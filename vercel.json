@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "node -e \"require('node:fs').rmSync('node_modules',{recursive:true,force:true})\" && npx npm@11.6.2 ci"
+  "installCommand": "npm ci"
 }
