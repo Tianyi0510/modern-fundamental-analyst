@@ -9,7 +9,6 @@ investment disclaimer.
 - Next.js 16 App Router
 - React 19 and TypeScript
 - Vercel production hosting
-- Optional Sites-compatible vinext build
 - Wix-managed domain and DNS
 
 ## Local development
@@ -26,12 +25,6 @@ Open `http://localhost:3000`.
 ```bash
 npm run build
 node --test tests/rendered-html.test.mjs
-```
-
-For the Sites-compatible output:
-
-```bash
-npm run build:sites
 ```
 
 Portfolio holdings and performance figures in the initial version are
