@@ -22,11 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const image = `${protocol}://${host}/og.png`;
   const description = "An independent public-equity portfolio, performance record, and investment memo archive.";
   return {
-    title: { default: "GI — Independent Investor", template: "%s | GI" },
+    title: { default: "Modern Fundamental Analyst", template: "%s | Modern Fundamental Analyst" },
     description,
     icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
-    openGraph: { title: "GI — Independent Investor", description, images: [{ url: image, width: 1728, height: 910, alt: "Ideas compound. Capital follows." }] },
-    twitter: { card: "summary_large_image", title: "GI — Independent Investor", description, images: [image] },
+    openGraph: { title: "Modern Fundamental Analyst", description, images: [{ url: image, width: 1728, height: 910, alt: "Ideas compound. Capital follows." }] },
+    twitter: { card: "summary_large_image", title: "Modern Fundamental Analyst", description, images: [image] },
   };
 }
 

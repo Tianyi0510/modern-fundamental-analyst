@@ -3,8 +3,8 @@ import Link from "next/link";
 export function SiteHeader() {
   return (
     <header className="site-header shell">
-      <Link className="wordmark" href="/" aria-label="GI home">
-        GI<span>.</span>
+      <Link className="wordmark" href="/" aria-label="Modern Fundamental Analyst home">
+        Modern Fundamental Analyst<span>.</span>
       </Link>
       <nav aria-label="Primary navigation">
         <Link href="/about">About</Link>

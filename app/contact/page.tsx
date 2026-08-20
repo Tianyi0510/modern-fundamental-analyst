@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-export const metadata: Metadata = { title: "Contact", description: "Contact GI about investment research and professional conversations." };
+export const metadata: Metadata = { title: "Contact", description: "Contact Modern Fundamental Analyst about investment research and professional conversations." };
 
 export default function ContactPage() {
   return <main><SiteHeader />
