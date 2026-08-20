@@ -34,13 +34,13 @@ body {
 
 a { color: inherit; text-decoration: none; }
 .shell { width: min(1440px, calc(100% - 64px)); margin-inline: auto; }
-.site-header { height: 92px; display: grid; grid-template-columns: 1.35fr auto 1fr; align-items: center; border-bottom: 1px solid var(--line); }
+.site-header { height: 92px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; border-bottom: 1px solid var(--line); }
 .wordmark { max-width: 260px; font-size: 18px; line-height: 1.05; font-weight: 800; letter-spacing: -0.045em; justify-self: start; }
 .wordmark span { color: var(--bright-blue); }
+.header-actions { min-width: 0; justify-self: end; display: flex; align-items: center; justify-content: flex-end; gap: 32px; }
 .site-header nav { display: flex; gap: 36px; font-size: 14px; font-weight: 600; }
 .site-header nav a { transition: color .2s ease; }
 .site-header nav a:hover { color: var(--bright-blue); }
-.site-header > .button { justify-self: end; }
 .button { min-height: 52px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 20px; font-size: 15px; font-weight: 700; transition: transform .2s ease, background .2s ease; }
 .button:hover { transform: translateY(-2px); }
 .button-dark { background: var(--black); color: var(--white); }
@@ -207,9 +207,10 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 800px) {
   .shell { width: min(100% - 32px, 720px); }
-  .site-header { height: auto; min-height: 78px; grid-template-columns: 1fr auto; }
+  .site-header { height: auto; min-height: 78px; grid-template-columns: 1fr; padding-top: 22px; }
   .site-header .wordmark { max-width: 190px; font-size: 16px; }
-  .site-header nav { order: 3; grid-column: 1 / -1; width: 100%; padding: 14px 0 18px; gap: 22px; overflow-x: auto; border-top: 1px solid var(--line); }
+  .header-actions { width: 100%; margin-top: 18px; padding: 14px 0 18px; border-top: 1px solid var(--line); gap: 16px; flex-wrap: wrap; }
+  .site-header nav { flex: 1 1 100%; justify-content: flex-end; gap: 18px; flex-wrap: wrap; }
   .hero { padding: 64px 0 54px; }
   .hero h1 { margin: 38px 0 52px; }
   .hero-bottom { grid-template-columns: 1fr; }
