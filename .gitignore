@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Vercel
+.vercel/
+
+# Local environment files
+.env*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage and build artifacts
+coverage/
+dist/
+.wrangler/
+
+# macOS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts.bak
