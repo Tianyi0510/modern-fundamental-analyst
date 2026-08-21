@@ -44,11 +44,13 @@ a { color: inherit; text-decoration: none; }
 .wordmark { max-width: 260px; font-size: 18px; line-height: 1.05; font-weight: 800; letter-spacing: -0.045em; justify-self: start; }
 .wordmark span { color: var(--bright-blue); }
 .header-actions { min-width: 0; justify-self: end; display: flex; align-items: center; justify-content: flex-end; gap: 32px; }
+.mobile-menu-button, .mobile-menu-layer { display: none; }
 .site-header nav { display: flex; gap: 36px; font-size: 14px; font-weight: 600; }
-.site-header nav a { transition: color .2s ease; }
+.site-header nav a { white-space: nowrap; transition: color .2s ease; }
 .site-header nav a:hover { color: var(--bright-blue); }
 .language-link { padding: 5px 0; border-bottom: 1px solid currentColor; font-size: 12px; font-weight: 750; letter-spacing: .06em; white-space: nowrap; }
 .language-link:hover { color: var(--bright-blue); }
+.arrow-icon { display: inline-block; font-family: var(--font-inter), Arial, sans-serif; font-style: normal; font-variant-emoji: text; line-height: 1; }
 .button { min-height: 52px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 20px; font-size: 15px; font-weight: 700; transition: transform .2s ease, background .2s ease; }
 .button:hover { transform: translateY(-2px); }
 .button-dark { background: var(--black); color: var(--white); }
@@ -235,10 +237,46 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 800px) {
   .shell { width: min(100% - 32px, 720px); }
-  .site-header { height: auto; min-height: 78px; grid-template-columns: 1fr; padding-top: 22px; }
+  .site-header { height: 78px; min-height: 78px; grid-template-columns: 1fr auto; padding: 0; }
   .site-header .wordmark { max-width: 190px; font-size: 16px; }
-  .header-actions { width: 100%; margin-top: 18px; padding: 14px 0 18px; border-top: 1px solid var(--line); gap: 16px; flex-wrap: wrap; }
-  .site-header nav { flex: 1 1 100%; justify-content: flex-end; gap: 18px; flex-wrap: wrap; }
+  .header-actions { display: none; }
+  .mobile-menu-button, .mobile-menu-close {
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 1px solid var(--black);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--black);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .mobile-menu-button svg, .mobile-menu-close svg { width: 23px; height: 23px; }
+  .mobile-menu-layer { display: block; position: fixed; inset: 0; z-index: 100; pointer-events: none; visibility: hidden; transition: visibility 0s linear .35s; }
+  .mobile-menu-layer.is-open { pointer-events: auto; visibility: visible; transition-delay: 0s; }
+  .mobile-menu-backdrop { position: absolute; inset: 0; padding: 0; border: 0; background: rgba(0,0,0,.36); opacity: 0; transition: opacity .3s ease; }
+  .mobile-menu-layer.is-open .mobile-menu-backdrop { opacity: 1; }
+  .mobile-menu-drawer {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(88vw, 420px);
+    padding: 22px 24px 30px;
+    background: var(--deep-blue);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .mobile-menu-layer.is-open .mobile-menu-drawer { transform: translateX(0); }
+  .mobile-menu-top { min-height: 46px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid rgba(255,255,255,.3); }
+  .mobile-menu-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .mobile-menu-close { border-color: rgba(255,255,255,.75); background: transparent; color: var(--white); }
+  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: clamp(26px, 8vw, 38px); font-weight: 650; line-height: 1; }
+  .mobile-menu-drawer nav a { padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.22); white-space: nowrap; transition: color .2s ease, padding-left .2s ease; }
+  .mobile-menu-drawer nav a:hover { color: var(--light-blue); padding-left: 8px; }
+  .mobile-menu-language { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.3); font-size: 14px; font-weight: 700; }
   .hero { padding: 64px 0 54px; }
   .hero h1 { margin: 38px 0 52px; }
   .hero-bottom { grid-template-columns: 1fr; }

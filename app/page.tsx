@@ -17,8 +17,8 @@ export default function Home() {
             performance, and the thinking behind every decision.
           </p>
           <div className="hero-actions">
-            <Link className="button button-dark" href="/portfolio">View portfolio <span>↗</span></Link>
-            <Link className="text-link" href="/memos">Read latest memo →</Link>
+            <Link className="button button-dark" href="/portfolio">View portfolio <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
+            <Link className="text-link" href="/memos">Read latest Investment Memo →</Link>
           </div>
         </div>
       </section>
@@ -44,7 +44,7 @@ export default function Home() {
       <section className="intro shell">
         <p className="section-number">01 / Portfolio</p>
         <h2>Concentrated by design.<br />Patient by default.</h2>
-        <Link className="round-link" href="/portfolio" aria-label="View portfolio">↗</Link>
+        <Link className="round-link" href="/portfolio" aria-label="View portfolio"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
 
       <section className="holdings-preview shell">
@@ -83,7 +83,7 @@ export default function Home() {
               <strong>+18.6%</strong>
               <p>Cumulative return since inception, versus +12.4% for the benchmark.</p>
               <small>Illustrative data for design preview.</small>
-              <Link className="button button-white" href="/performance">View performance <span>↗</span></Link>
+              <Link className="button button-white" href="/performance">View performance <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function Home() {
 
       <section className="memos-home shell">
         <div className="section-heading">
-          <p className="section-number">03 / Investment memos</p>
+          <p className="section-number">03 / Investment Memos</p>
           <h2>Thinking,<br />made visible.</h2>
         </div>
         <div className="memo-grid">
@@ -104,13 +104,13 @@ export default function Home() {
             </Link>
           ))}
         </div>
-        <Link className="text-link memos-all" href="/memos">View all memos →</Link>
+        <Link className="text-link memos-all" href="/memos">View all Investment Memos →</Link>
       </section>
 
       <section className="cta shell">
         <p className="eyebrow"><span /> Latest update</p>
         <h2>Follow the process,<br />not the noise.</h2>
-        <Link className="button button-dark" href="/contact">Get in touch <span>↗</span></Link>
+        <Link className="button button-dark" href="/contact">Get in touch <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
       <SiteFooter />
     </main>

@@ -14,8 +14,8 @@ export default function TraditionalChineseHome() {
         <div className="hero-bottom">
           <p>透明呈現集中投資、長期績效，以及每項決策背後的思考。</p>
           <div className="hero-actions">
-            <Link className="button button-dark" href="/zh-tw/portfolio">查看投資組合 <span>↗</span></Link>
-            <Link className="text-link" href="/zh-tw/memos">閱讀最新札記 →</Link>
+            <Link className="button button-dark" href="/zh-tw/portfolio">查看投資組合 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
+            <Link className="text-link" href="/zh-tw/memos">閱讀最新投資備忘錄 →</Link>
           </div>
         </div>
       </section>
@@ -29,7 +29,7 @@ export default function TraditionalChineseHome() {
       <section className="intro shell">
         <p className="section-number">01／投資組合</p>
         <h2>有意識地集中。<br />有紀律地等待。</h2>
-        <Link className="round-link" href="/zh-tw/portfolio" aria-label="查看投資組合">↗</Link>
+        <Link className="round-link" href="/zh-tw/portfolio" aria-label="查看投資組合"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
 
       <section className="holdings-preview shell">
@@ -61,13 +61,13 @@ export default function TraditionalChineseHome() {
                 </div>
               ))}
             </div>
-            <div className="performance-copy"><strong>+18.6%</strong><p>成立以來累積報酬，基準同期為 +12.4%。</p><small>此為設計預覽用示意數據。</small><Link className="button button-white" href="/zh-tw/performance">查看績效 <span>↗</span></Link></div>
+            <div className="performance-copy"><strong>+18.6%</strong><p>成立以來累積報酬，基準同期為 +12.4%。</p><small>此為設計預覽用示意數據。</small><Link className="button button-white" href="/zh-tw/performance">查看績效 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></div>
           </div>
         </div>
       </section>
 
       <section className="memos-home shell">
-        <div className="section-heading"><p className="section-number">03／投資札記</p><h2>讓思考，<br />清楚可見。</h2></div>
+        <div className="section-heading"><p className="section-number">03／投資備忘錄</p><h2>讓思考，<br />清楚可見。</h2></div>
         <div className="memo-grid">
           {memosZhTw.map((memo, index) => (
             <Link className={`memo-card memo-card-${index + 1}`} href={`/zh-tw/memos/${memo.slug}`} key={memo.slug}>
@@ -75,10 +75,10 @@ export default function TraditionalChineseHome() {
             </Link>
           ))}
         </div>
-        <Link className="text-link memos-all" href="/zh-tw/memos">查看所有札記 →</Link>
+        <Link className="text-link memos-all" href="/zh-tw/memos">查看所有投資備忘錄 →</Link>
       </section>
 
-      <section className="cta shell"><p className="eyebrow"><span /> 最新更新</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span>↗</span></Link></section>
+      <section className="cta shell"><p className="eyebrow"><span /> 最新更新</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
       <SiteFooter locale="zh-tw" />
     </main>
   );
