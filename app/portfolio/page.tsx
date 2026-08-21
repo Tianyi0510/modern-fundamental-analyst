@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
+import { PortfolioTable } from "@/components/portfolio-table";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { holdings } from "@/data/site";
+import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
 
 export const metadata: Metadata = { title: "Portfolio", description: "Current portfolio allocation and position-level investment rationale." };
 
 export default function PortfolioPage() {
   return <main><SiteHeader counterpartPath="/zh-tw/portfolio" />
-    <section className="page-hero shell"><p className="eyebrow"><span /> Portfolio · Sample data</p><h1>Concentrated.<br /><em>Intentional.</em></h1><div className="page-intro"><p>A snapshot of current exposure, the role of each position, and the level of liquidity held for future opportunities.</p><small>As of 30 June 2026</small></div></section>
-    <section className="portfolio-total shell"><div><span>Invested</span><strong>64.2%</strong></div><div className="stacked-bar">{holdings.map((h) => <i className={`segment segment-${h.color}`} style={{ width: `${h.weight}%` }} key={h.name} />)}</div></section>
-    <section className="portfolio-table shell">
-      <div className="table-head"><span>Allocation</span><span>Role in portfolio</span><span>Weight</span></div>
-      {holdings.map((holding, index) => <div className="portfolio-row" key={holding.name}><span>{String(index + 1).padStart(2,"0")} · {holding.name}</span><span>{holding.thesis}</span><strong>{holding.weight.toFixed(1)}%</strong></div>)}
+    <section className="page-hero shell"><p className="eyebrow"><span /> Portfolio · Verified snapshot</p><h1>Concentrated.<br /><em>Intentional.</em></h1><div className="page-intro"><p>Current public-equity positions, market values, position-level returns, and portfolio weights.</p><small>As of 31 July 2026</small></div></section>
+    <section className="portfolio-kpis shell" aria-label="Portfolio summary">
+      <div><span>Stock market value</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>USD</small></div>
+      <div><span>Net cost basis</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>Purchases and transaction fees</small></div>
+      <div><span>Total return</span><strong className="positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>Cumulative cost-basis return</small></div>
+      <div><span>Holdings</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>Stocks and ETFs</small></div>
     </section>
-    <p className="data-note shell">All figures on this initial version are illustrative placeholders and will be replaced by verified portfolio data.</p><SiteFooter /></main>;
+    <section className="portfolio-allocation shell"><div><span>Allocation by market value</span><small>100% of disclosed stock holdings</small></div><div className="stacked-bar" aria-label="Portfolio allocation by market value">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
+    <section className="portfolio-table-wrap shell">
+      <PortfolioTable holdings={portfolioHoldings} />
+    </section>
+    <p className="data-note portfolio-source-note shell">Source: Google Sheets “{portfolioSnapshot.source}”. Prices and market values are a verified snapshot, not live quotes. Cash and external funding are excluded.</p><SiteFooter /></main>;
 }
+
+const segmentColors = ["blue", "deep", "light", "green", "red", "black"] as const;
+const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
