@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata: Metadata = { title: "About", description: "The perspective and principles behind Modern Fundamental Analyst's independent investment research." };
 
 export default function AboutPage() {
-  return <main><SiteHeader />
+  return <main><SiteHeader counterpartPath="/zh-tw/about" />
     <section className="page-hero shell"><p className="eyebrow"><span /> About</p><h1>Independent thinking.<br /><em>Long-term orientation.</em></h1></section>
     <section className="two-column shell body-section">
       <h2>Research before opinion.</h2>

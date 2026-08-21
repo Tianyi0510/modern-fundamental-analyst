@@ -6,7 +6,7 @@ import { annualReturns, holdings, memos } from "@/data/site";
 export default function Home() {
   return (
     <main>
-      <SiteHeader />
+      <SiteHeader counterpartPath="/zh-tw" />
 
       <section className="hero shell">
         <p className="eyebrow"><span /> Independent public-equity research</p>

@@ -6,7 +6,7 @@ import { holdings } from "@/data/site";
 export const metadata: Metadata = { title: "Portfolio", description: "Current portfolio allocation and position-level investment rationale." };
 
 export default function PortfolioPage() {
-  return <main><SiteHeader />
+  return <main><SiteHeader counterpartPath="/zh-tw/portfolio" />
     <section className="page-hero shell"><p className="eyebrow"><span /> Portfolio · Sample data</p><h1>Concentrated.<br /><em>Intentional.</em></h1><div className="page-intro"><p>A snapshot of current exposure, the role of each position, and the level of liquidity held for future opportunities.</p><small>As of 30 June 2026</small></div></section>
     <section className="portfolio-total shell"><div><span>Invested</span><strong>64.2%</strong></div><div className="stacked-bar">{holdings.map((h) => <i className={`segment segment-${h.color}`} style={{ width: `${h.weight}%` }} key={h.name} />)}</div></section>
     <section className="portfolio-table shell">
