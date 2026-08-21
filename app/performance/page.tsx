@@ -6,7 +6,7 @@ import { annualReturns } from "@/data/site";
 export const metadata: Metadata = { title: "Performance", description: "Portfolio performance, benchmark comparison, and methodology." };
 
 export default function PerformancePage() {
-  return <main><SiteHeader />
+  return <main><SiteHeader counterpartPath="/zh-tw/performance" />
     <section className="page-hero shell"><p className="eyebrow"><span /> Performance · Sample data</p><h1>The score,<br /><em>with context.</em></h1></section>
     <section className="performance-summary shell"><div className="summary-primary"><span>Cumulative return</span><strong>+18.6%</strong><small>Since inception</small></div><div><span>Benchmark</span><strong>+12.4%</strong><small>Same period</small></div><div><span>Max drawdown</span><strong className="negative">−11.2%</strong><small>Peak to trough</small></div></section>
     <section className="returns shell"><div className="section-heading"><p className="section-number">Annual returns</p><h2>Year by year.</h2></div>
