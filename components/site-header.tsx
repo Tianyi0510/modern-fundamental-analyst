@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Check, ChevronDown, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 type SiteHeaderProps = {
   locale?: "en" | "zh-tw";
@@ -12,9 +13,13 @@ type SiteHeaderProps = {
 export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps = {}) {
   const isChinese = locale === "zh-tw";
   const prefix = isChinese ? "/zh-tw" : "";
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
   const menuLabel = isChinese ? "開啟目錄" : "Open menu";
   const closeLabel = isChinese ? "關閉目錄" : "Close menu";
+  const alternatePath = counterpartPath ?? (isChinese ? "/" : "/zh-tw");
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -32,6 +37,25 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
       window.removeEventListener("keydown", closeOnEscape);
     };
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (!isLanguageOpen) return;
+
+    const closeLanguageMenu = (event: MouseEvent) => {
+      if (!languageMenuRef.current?.contains(event.target as Node)) setIsLanguageOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsLanguageOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closeLanguageMenu);
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeLanguageMenu);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isLanguageOpen]);
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -58,9 +82,30 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
           <Link href={`${prefix}/performance`}>{isChinese ? "績效" : "Performance"}</Link>
           <Link href={`${prefix}/memos`}>{isChinese ? "投資備忘錄" : "Investment Memos"}</Link>
         </nav>
-        <Link className="language-link" href={counterpartPath ?? (isChinese ? "/" : "/zh-tw")} hrefLang={isChinese ? "en" : "zh-Hant-TW"}>
-          {isChinese ? "EN" : "繁體中文"}
-        </Link>
+        <div className="language-menu" ref={languageMenuRef}>
+          <button
+            className="language-trigger"
+            type="button"
+            aria-label={isChinese ? "切換語言" : "Change language"}
+            aria-haspopup="menu"
+            aria-expanded={isLanguageOpen}
+            aria-controls="desktop-language-menu"
+            onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+          >
+            {isChinese ? "繁體中文" : "English"}
+            <ChevronDown aria-hidden="true" strokeWidth={2} />
+          </button>
+          <div className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`} id="desktop-language-menu" role="menu" aria-hidden={!isLanguageOpen}>
+            <Link href={isChinese ? alternatePath : pathname} hrefLang="en" role="menuitem" aria-current={!isChinese ? "page" : undefined} tabIndex={isLanguageOpen ? 0 : -1} onClick={() => setIsLanguageOpen(false)}>
+              <span>English</span>
+              {!isChinese && <Check aria-hidden="true" strokeWidth={2.25} />}
+            </Link>
+            <Link href={isChinese ? pathname : alternatePath} hrefLang="zh-Hant-TW" role="menuitem" aria-current={isChinese ? "page" : undefined} tabIndex={isLanguageOpen ? 0 : -1} onClick={() => setIsLanguageOpen(false)}>
+              <span>繁體中文</span>
+              {isChinese && <Check aria-hidden="true" strokeWidth={2.25} />}
+            </Link>
+          </div>
+        </div>
         <Link className="button button-dark button-small" href={`${prefix}/contact`}>
           {isChinese ? "聯絡" : "Contact"}
         </Link>
@@ -83,7 +128,7 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
             <Link href={`${prefix}/memos`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{isChinese ? "投資備忘錄" : "Investment Memos"}</Link>
             <Link href={`${prefix}/contact`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{isChinese ? "聯絡" : "Contact"}</Link>
           </nav>
-          <Link className="mobile-menu-language" href={counterpartPath ?? (isChinese ? "/" : "/zh-tw")} hrefLang={isChinese ? "en" : "zh-Hant-TW"} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
+          <Link className="mobile-menu-language" href={alternatePath} hrefLang={isChinese ? "en" : "zh-Hant-TW"} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
             {isChinese ? "English" : "繁體中文"}
           </Link>
         </aside>
