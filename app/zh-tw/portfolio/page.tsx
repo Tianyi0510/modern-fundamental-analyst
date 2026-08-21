@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
+import { PortfolioTable } from "@/components/portfolio-table";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { holdingsZhTw } from "@/data/site-zh-tw";
+import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
 
 export const metadata: Metadata = { title: { absolute: "投資組合｜Modern Fundamental Analyst" }, description: "目前投資組合配置與各部位的投資角色。" };
 
 export default function PortfolioPageZhTw() {
   return <main><SiteHeader locale="zh-tw" counterpartPath="/portfolio" />
-    <section className="page-hero shell"><p className="eyebrow"><span /> 投資組合 · 示例數據</p><h1>集中。<br /><em>有意識。</em></h1><div className="page-intro"><p>呈現目前曝險、各部位在組合中的角色，以及為未來機會保留的流動性。</p><small>截至 2026 年 6 月 30 日</small></div></section>
-    <section className="portfolio-total shell"><div><span>已投資</span><strong>64.2%</strong></div><div className="stacked-bar">{holdingsZhTw.map((holding) => <i className={`segment segment-${holding.color}`} style={{ width: `${holding.weight}%` }} key={holding.name} />)}</div></section>
-    <section className="portfolio-table shell">
-      <div className="table-head"><span>配置</span><span>組合角色</span><span>權重</span></div>
-      {holdingsZhTw.map((holding, index) => <div className="portfolio-row" key={holding.name}><span>{String(index + 1).padStart(2, "0")} · {holding.name}</span><span>{holding.thesis}</span><strong>{holding.weight.toFixed(1)}%</strong></div>)}
+    <section className="page-hero shell"><p className="eyebrow"><span /> 投資組合 · 已驗證快照</p><h1>集中。<br /><em>有意識。</em></h1><div className="page-intro"><p>呈現目前公開市場股票部位、市值、個別部位報酬與投資組合權重。</p><small>截至 2026 年 7 月 31 日</small></div></section>
+    <section className="portfolio-kpis shell" aria-label="投資組合摘要">
+      <div><span>股票市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>美元</small></div>
+      <div><span>淨成本基礎</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>買入金額與交易費用</small></div>
+      <div><span>累積報酬</span><strong className="positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>成本基礎累積報酬</small></div>
+      <div><span>持股數量</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>股票與 ETF</small></div>
     </section>
-    <p className="data-note shell">初版所有數據皆為示意資料，之後將以經過驗證的投資組合數據取代。</p><SiteFooter locale="zh-tw" /></main>;
+    <section className="portfolio-allocation shell"><div><span>依市場價值配置</span><small>已揭露股票部位的 100%</small></div><div className="stacked-bar" aria-label="依市場價值計算的投資組合配置">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
+    <section className="portfolio-table-wrap shell">
+      <PortfolioTable holdings={portfolioHoldings} locale="zh-tw" />
+    </section>
+    <p className="data-note portfolio-source-note shell">資料來源：Google Sheets「{portfolioSnapshot.source}」。價格與市場價值為已驗證快照，並非即時報價；不包含現金與外部資金流。</p><SiteFooter locale="zh-tw" /></main>;
 }
+
+const segmentColors = ["blue", "deep", "light", "green", "red", "black"] as const;
+const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
