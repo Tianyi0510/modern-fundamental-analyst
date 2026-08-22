@@ -7,8 +7,8 @@ import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/p
 export const metadata: Metadata = { title: "Portfolio", description: "Current portfolio allocation and position-level investment rationale." };
 
 export default function PortfolioPage() {
-  return <main><SiteHeader counterpartPath="/zh-tw/portfolio" />
-    <section className="page-hero shell"><p className="eyebrow"><span /> Portfolio · Verified snapshot</p><h1>Concentrated.<br /><em>Intentional.</em></h1><div className="page-intro"><p>Current public-equity positions, market values, position-level returns, and portfolio weights.</p><small>As of 31 July 2026</small></div></section>
+  return <main className="portfolio-page portfolio-page-en"><SiteHeader counterpartPath="/zh-tw/portfolio" />
+    <section className="page-hero shell"><p className="eyebrow"><span /> Portfolio · Verified snapshot</p><h1>Concentrated.<br /><em>Intentional.</em></h1><div className="page-intro"><p>Current public-equity positions, market values, position-level returns, and portfolio weights.</p><small>As of 31 July 2026 · Updated monthly</small></div></section>
     <section className="portfolio-kpis shell" aria-label="Portfolio summary">
       <div><span>Stock market value</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>USD</small></div>
       <div><span>Net cost basis</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>Purchases and transaction fees</small></div>
@@ -16,6 +16,10 @@ export default function PortfolioPage() {
       <div><span>Holdings</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>Stocks and ETFs</small></div>
     </section>
     <section className="portfolio-allocation shell"><div><span>Allocation by market value</span><small>100% of disclosed stock holdings</small></div><div className="stacked-bar" aria-label="Portfolio allocation by market value">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
+    <section className="portfolio-holdings-heading shell">
+      <div><span>Current holdings</span><h2>{portfolioSnapshot.holdingsCount} disclosed positions.</h2></div>
+      <p>Click any column heading to sort. Prices and values reflect the verified month-end snapshot.</p>
+    </section>
     <section className="portfolio-table-wrap shell">
       <PortfolioTable holdings={portfolioHoldings} />
     </section>
