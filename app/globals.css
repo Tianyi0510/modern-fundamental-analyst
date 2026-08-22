@@ -11,6 +11,34 @@
   --price-down: #ff0000;
   --background: var(--white);
   --foreground: var(--black);
+
+  /* Unified editorial type system */
+  --type-display-large: 112px;
+  --type-display-medium: 72px;
+  --type-display-small: 42px;
+  --type-headline: 30px;
+  --type-title: 24px;
+  --type-subtitle: 19px;
+  --type-body-large: 19px;
+  --type-body: 16px;
+  --type-label: 17px;
+  --type-caption: 13px;
+  --type-action: 15px;
+  --type-data-large: 96px;
+  --type-data-kpi: 64px;
+  --type-data-kpi-compact: 48px;
+  --type-data-row: 20px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 650;
+  --weight-bold: 700;
+  --tracking-display: -.065em;
+  --tracking-heading: -.035em;
+  --tracking-label: .05em;
+  --leading-display: .92;
+  --leading-heading: 1.1;
+  --leading-lead: 1.4;
+  --leading-body: 1.65;
 }
 
 @theme inline {
@@ -321,6 +349,173 @@ a { color: inherit; text-decoration: none; }
 .not-found > span { color: var(--medium-blue); font: 700 14px var(--font-ui); }
 .not-found h1 { margin: 0; font-size: clamp(48px, 8vw, 110px); letter-spacing: -.06em; }
 
+/* Unified typography hierarchy
+   Display → Headline → Title → Subtitle → Body → Label → Caption → Action → Data */
+.hero h1,
+.page-hero h1,
+.legal h1,
+.memo-article h1 {
+  font-size: var(--type-display-large);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-semibold);
+}
+
+.home-about h2,
+.intro h2,
+.section-heading h2,
+.cta h2,
+.two-column h2,
+.methodology h2,
+.about-section-heading h2,
+.about-closing h2,
+.portfolio-holdings-heading h2 {
+  font-size: var(--type-display-medium);
+  line-height: .98;
+  letter-spacing: -.055em;
+  font-weight: var(--weight-semibold);
+}
+
+.memo-card h3,
+.memo-index-row h2,
+.principles h3 {
+  font-size: var(--type-display-small);
+  line-height: 1.05;
+  letter-spacing: -.045em;
+  font-weight: var(--weight-semibold);
+}
+
+.about-philosophy-copy h3,
+.article-body h2,
+.legal h2 {
+  font-size: var(--type-headline);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  font-weight: var(--weight-semibold);
+}
+
+.hero-bottom > p,
+.page-intro p,
+.article-lead,
+.contact-grid p {
+  font-size: var(--type-title);
+  line-height: var(--leading-lead);
+  letter-spacing: -.02em;
+  font-weight: var(--weight-regular);
+}
+
+.performance-copy p,
+.contact-note {
+  font-size: var(--type-subtitle);
+  line-height: 1.5;
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.rich-copy,
+.about-copy,
+.about-closing > div,
+.article-body,
+.methodology div,
+.legal p {
+  font-size: var(--type-body-large);
+  line-height: var(--leading-body);
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.home-about > div:last-child p,
+.memo-card p,
+.memo-index-row p,
+.principles p,
+.about-boundaries p,
+.portfolio-holdings-heading p,
+.portfolio-source-note,
+.return-row span:nth-child(3),
+.site-footer p,
+.holding-row small {
+  font-size: var(--type-body);
+  line-height: 1.6;
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.eyebrow,
+.section-number,
+.metric span,
+.allocation-card > span,
+.about-section-heading > span,
+.about-boundaries > div > span,
+.portfolio-kpis span,
+.portfolio-allocation span,
+.portfolio-holdings-heading span,
+.performance-summary span,
+.table-head,
+.contact-grid span {
+  font-family: var(--font-ui);
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
+}
+
+.metric small,
+.allocation-ring small,
+.performance-copy small,
+.memo-card > small,
+.page-intro small,
+.portfolio-kpis small,
+.portfolio-allocation small,
+.performance-summary small,
+.data-note,
+.memo-meta,
+.article-meta,
+.site-footer > small {
+  font-size: var(--type-caption);
+  line-height: 1.5;
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.button,
+.text-link,
+.back-link {
+  font-size: var(--type-action);
+  line-height: 1.2;
+  font-weight: var(--weight-bold);
+}
+
+.metric strong,
+.performance-copy > strong {
+  font-size: var(--type-data-large);
+  line-height: .88;
+  letter-spacing: -.065em;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-page .portfolio-kpis strong,
+.performance-summary strong {
+  font-size: var(--type-data-kpi);
+  line-height: .9;
+  letter-spacing: -.055em;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-page .portfolio-kpis > div:nth-child(n+3) strong {
+  font-size: var(--type-data-kpi-compact);
+}
+
+.portfolio-row strong,
+.return-row strong {
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
 [lang="zh-Hant-TW"] .hero h1 { line-height: 1; letter-spacing: -.015em; }
 [lang="zh-Hant-TW"] .page-hero h1,
 [lang="zh-Hant-TW"] .legal h1,
@@ -350,6 +545,17 @@ a { color: inherit; text-decoration: none; }
 [lang="zh-Hant-TW"] .portfolio-holdings-heading h2 { line-height: 1.08; }
 
 @media (max-width: 800px) {
+  :root {
+    --type-display-large: 52px;
+    --type-display-medium: 44px;
+    --type-display-small: 32px;
+    --type-title: 20px;
+    --type-subtitle: 18px;
+    --type-data-large: 52px;
+    --type-data-kpi: 48px;
+    --type-data-kpi-compact: 38px;
+  }
+
   .shell { width: min(100% - 32px, 720px); }
   .site-header { height: 78px; min-height: 78px; grid-template-columns: 1fr auto; padding: 0; }
   .site-header .wordmark { max-width: 190px; font-size: 16px; }
@@ -432,17 +638,17 @@ a { color: inherit; text-decoration: none; }
   .portfolio-page .portfolio-kpis > div:nth-child(2) { grid-column: 1 / -1; grid-row: auto; min-height: 208px; }
   .portfolio-page .portfolio-kpis > div:nth-child(3) { grid-column: 1; grid-row: auto; }
   .portfolio-page .portfolio-kpis > div:nth-child(4) { grid-column: 2; grid-row: auto; }
-  .portfolio-page .portfolio-kpis > div:nth-child(n+3) strong { font-size: 42px; }
+  .portfolio-page .portfolio-kpis > div:nth-child(n+3) strong { font-size: var(--type-data-kpi-compact); }
   .portfolio-page .portfolio-allocation { padding: 58px 0 64px; }
   .portfolio-holdings-heading { padding: 64px 0 34px; grid-template-columns: 1fr; gap: 30px; }
-  .portfolio-holdings-heading h2 { font-size: clamp(48px, 14vw, 68px); }
+  .portfolio-holdings-heading h2 { font-size: var(--type-display-medium); }
   .portfolio-allocation { grid-template-columns: 1fr; gap: 28px; padding: 64px 0 54px; }
   .table-head { display: none; }
   .portfolio-row { grid-template-columns: 1fr auto; padding: 22px 0; }
   .portfolio-row span:nth-child(2) { grid-column: 1 / -1; order: 3; }
   .performance-page .performance-summary { grid-template-columns: 1fr; margin-top: 48px; }
   .performance-page .performance-summary > div { min-height: 210px; padding: 24px; }
-  .performance-page .performance-summary strong { font-size: clamp(54px, 16vw, 72px); }
+  .performance-page .performance-summary strong { font-size: var(--type-data-kpi); }
   .returns, .methodology { padding: 100px 0; }
   .performance-page .returns { gap: 48px; }
   .returns-table .table-head { display: none; }
@@ -458,7 +664,7 @@ a { color: inherit; text-decoration: none; }
   [lang="zh-Hant-TW"] .hero h1,
   [lang="zh-Hant-TW"] .page-hero h1,
   [lang="zh-Hant-TW"] .legal h1,
-  [lang="zh-Hant-TW"] .memo-article h1 { font-size: 58px; }
+  [lang="zh-Hant-TW"] .memo-article h1 { font-size: var(--type-display-large); }
 }
 
 @media (max-width: 800px) {
@@ -470,7 +676,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 420px) {
-  .page-hero h1 { font-size: 58px; }
+  .page-hero h1 { font-size: var(--type-display-large); }
 }
 
 @media (prefers-reduced-motion: reduce) {
