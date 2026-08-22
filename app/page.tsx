@@ -13,7 +13,7 @@ export default function Home() {
       <SiteHeader counterpartPath="/zh-tw" />
 
       <section className="hero shell">
-        <p className="eyebrow"><span /> Tianyi (David) Li · Independent Public-Equity Research</p>
+        <p className="eyebrow"><span /> David&apos;s Independent Public-Equity Research</p>
         <h1>Focus Investing for a<br /><em>Disruptive Future.</em></h1>
         <div className="hero-bottom">
           <p>
@@ -96,7 +96,7 @@ export default function Home() {
       <section className="memos-home shell">
         <div className="section-heading">
           <p className="section-number">04 Investment Memos</p>
-          <h2>Thinking,<br />made visible.</h2>
+          <h2>Detailed Investment Theses<br />Behind Every Position</h2>
         </div>
         <div className="memo-grid">
           {memos.map((memo, index) => (

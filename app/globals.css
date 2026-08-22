@@ -169,6 +169,8 @@ a { color: inherit; text-decoration: none; }
 .about-section-heading > span, .about-boundaries > div > span { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .about-section-heading h2, .about-closing h2 { margin: 0; font-size: clamp(44px, 5.5vw, 78px); line-height: .98; letter-spacing: -.055em; }
 .about-copy { font-size: 19px; line-height: 1.65; }
+.about-copy > p { margin: 0; }
+.about-copy > p + p { margin-top: 1.35em; }
 .about-copy > :first-child { margin-top: 0; }
 .about-copy > :last-child { margin-bottom: 0; }
 .about-copy em { color: var(--dark-blue); font-style: normal; font-weight: 650; }
@@ -186,7 +188,8 @@ a { color: inherit; text-decoration: none; }
 .about-closing { padding: 118px 0 140px; border-top: 1px solid var(--black); display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; }
 .about-closing > .eyebrow { grid-column: 1 / -1; }
 .about-closing > div { font-size: 19px; line-height: 1.6; color: rgba(0,0,0,.68); }
-.about-closing > div p:first-child { margin-top: 0; }
+.about-closing > div p { margin: 0; }
+.about-closing > div p + p { margin-top: 1.35em; }
 .about-closing a { color: var(--dark-blue); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
 .portfolio-kpis { display: grid; grid-template-columns: 1.2fr 1.1fr .85fr .55fr; gap: 1px; margin-top: 80px; background: var(--black); border: 1px solid var(--black); }
 .portfolio-kpis > div { min-height: 250px; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
@@ -267,6 +270,9 @@ a { color: inherit; text-decoration: none; }
 .returns .section-heading h2 { margin-top: 36px; }
 .performance-page .performance-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .performance-page .performance-summary strong { font-variant-numeric: tabular-nums; }
+.performance-page .performance-summary span,
+.performance-page .returns .section-number,
+.performance-page .returns-table .table-head { font-size: 17px; text-transform: none; letter-spacing: .05em; }
 .returns-table .table-head, .return-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(120px, .62fr) minmax(240px, 1.38fr); column-gap: 40px; align-items: center; }
 .return-row { min-height: 82px; border-top: 1px solid var(--gray); }
 .returns-table .table-head > :nth-child(2),
