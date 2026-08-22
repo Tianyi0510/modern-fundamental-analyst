@@ -7,8 +7,8 @@ import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/p
 export const metadata: Metadata = { title: { absolute: "投資組合｜Modern Fundamental Analyst" }, description: "目前投資組合配置與各部位的投資角色。" };
 
 export default function PortfolioPageZhTw() {
-  return <main><SiteHeader locale="zh-tw" counterpartPath="/portfolio" />
-    <section className="page-hero shell"><p className="eyebrow"><span /> 投資組合 · 已驗證快照</p><h1>集中。<br /><em>有意識。</em></h1><div className="page-intro"><p>呈現目前公開市場股票部位、市值、個別部位報酬與投資組合權重。</p><small>截至 2026 年 7 月 31 日</small></div></section>
+  return <main className="portfolio-page"><SiteHeader locale="zh-tw" counterpartPath="/portfolio" />
+    <section className="page-hero shell"><p className="eyebrow"><span /> 投資組合 · 已驗證快照</p><h1>集中。<br /><em>有意識。</em></h1><div className="page-intro"><p>呈現目前公開市場股票部位、市值、個別部位報酬與投資組合權重。</p><small>截至 2026 年 7 月 31 日 · 每月更新</small></div></section>
     <section className="portfolio-kpis shell" aria-label="投資組合摘要">
       <div><span>股票市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>美元</small></div>
       <div><span>淨成本基礎</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>買入金額與交易費用</small></div>
@@ -16,6 +16,10 @@ export default function PortfolioPageZhTw() {
       <div><span>持股數量</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>股票與 ETF</small></div>
     </section>
     <section className="portfolio-allocation shell"><div><span>依市場價值配置</span><small>已揭露股票部位的 100%</small></div><div className="stacked-bar" aria-label="依市場價值計算的投資組合配置">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
+    <section className="portfolio-holdings-heading shell">
+      <div><span>目前持股</span><h2>{portfolioSnapshot.holdingsCount} 個已揭露部位。</h2></div>
+      <p>點選任一欄位標題即可排序；價格與價值反映已驗證的月底快照。</p>
+    </section>
     <section className="portfolio-table-wrap shell">
       <PortfolioTable holdings={portfolioHoldings} locale="zh-tw" />
     </section>

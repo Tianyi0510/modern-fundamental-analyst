@@ -7,7 +7,7 @@ import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/p
 export const metadata: Metadata = { title: "Portfolio", description: "Current portfolio allocation and position-level investment rationale." };
 
 export default function PortfolioPage() {
-  return <main className="portfolio-page portfolio-page-en"><SiteHeader counterpartPath="/zh-tw/portfolio" />
+  return <main className="portfolio-page"><SiteHeader counterpartPath="/zh-tw/portfolio" />
     <section className="page-hero shell"><p className="eyebrow"><span /> Portfolio · Verified snapshot</p><h1>Concentrated.<br /><em>Intentional.</em></h1><div className="page-intro"><p>Current public-equity positions, market values, position-level returns, and portfolio weights.</p><small>As of 31 July 2026 · Updated monthly</small></div></section>
     <section className="portfolio-kpis shell" aria-label="Portfolio summary">
       <div><span>Stock market value</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>USD</small></div>
