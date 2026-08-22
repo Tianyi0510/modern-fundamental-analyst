@@ -1,20 +1,3 @@
-export const holdingsZhTw = [
-  { name: "全球科技", thesis: "輕資產複利型企業", weight: 24.8, color: "blue" },
-  { name: "數位基礎設施", thesis: "關鍵任務型網路", weight: 15.6, color: "deep" },
-  { name: "消費平台", thesis: "高頻使用生態系", weight: 12.4, color: "light" },
-  { name: "醫療保健", thesis: "持久需求與創新", weight: 7.8, color: "green" },
-  { name: "特殊情境", thesis: "被錯誤定價的變化", weight: 3.6, color: "red" },
-  { name: "現金及約當現金", thesis: "保留選擇權", weight: 35.8, color: "black" },
-];
-
-export const annualReturnsZhTw = [
-  { year: "2022", portfolio: -8.4, benchmark: -12.1 },
-  { year: "2023", portfolio: 22.8, benchmark: 18.4 },
-  { year: "2024", portfolio: 16.2, benchmark: 13.7 },
-  { year: "2025", portfolio: 11.9, benchmark: 9.6 },
-  { year: "2026 年初至今", portfolio: 6.7, benchmark: 4.9 },
-];
-
 export const memosZhTw = [
   {
     slug: "durable-pricing-power",

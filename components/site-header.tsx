@@ -17,6 +17,9 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const languageMenuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuDrawerRef = useRef<HTMLElement>(null);
+  const menuCloseButtonRef = useRef<HTMLButtonElement>(null);
   const menuLabel = isChinese ? "開啟目錄" : "Open menu";
   const closeLabel = isChinese ? "關閉目錄" : "Close menu";
   const alternatePath = counterpartPath ?? (isChinese ? "/" : "/zh-tw");
@@ -25,16 +28,35 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
     if (!isMenuOpen) return;
 
     const previousOverflow = document.documentElement.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsMenuOpen(false);
+    const menuButton = menuButtonRef.current;
+    const handleMenuKeyboard = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = menuDrawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.documentElement.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
+    menuCloseButtonRef.current?.focus();
+    window.addEventListener("keydown", handleMenuKeyboard);
 
     return () => {
       document.documentElement.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handleMenuKeyboard);
+      menuButton?.focus();
     };
   }, [isMenuOpen]);
 
@@ -65,6 +87,7 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
         Modern Fundamental Analyst<span>.</span>
       </Link>
       <button
+        ref={menuButtonRef}
         className="mobile-menu-button"
         type="button"
         aria-label={menuLabel}
@@ -113,10 +136,10 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
 
       <div className={`mobile-menu-layer${isMenuOpen ? " is-open" : ""}`} aria-hidden={!isMenuOpen}>
         <button className="mobile-menu-backdrop" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} />
-        <aside className="mobile-menu-drawer" id="mobile-site-menu" aria-label={isChinese ? "網站目錄" : "Site menu"}>
+        <aside ref={menuDrawerRef} className="mobile-menu-drawer" id="mobile-site-menu" role="dialog" aria-modal="true" aria-label={isChinese ? "網站目錄" : "Site menu"}>
           <div className="mobile-menu-top">
             <span className="mobile-menu-title">{isChinese ? "目錄" : "Menu"}</span>
-            <button className="mobile-menu-close" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
+            <button ref={menuCloseButtonRef} className="mobile-menu-close" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
               <X aria-hidden="true" strokeWidth={2} />
             </button>
           </div>

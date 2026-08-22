@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memos } from "@/data/site";
+import { createPageMetadata } from "@/lib/site-config";
 
-export const metadata: Metadata = { title: "Investment Memos", description: "Long-form notes on business quality, valuation, risk, and capital allocation." };
+export const metadata = createPageMetadata({ title: "Investment Memos", description: "Long-form notes on business quality, valuation, risk, and capital allocation.", path: "/memos" });
 
 export default function MemosPage() {
   return <main className="memos-page"><SiteHeader counterpartPath="/zh-tw/memos" />

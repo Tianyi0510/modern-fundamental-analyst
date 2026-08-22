@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memosZhTw } from "@/data/site-zh-tw";
+import { createPageMetadata } from "@/lib/site-config";
 
-export const metadata: Metadata = { title: { absolute: "投資備忘錄｜Modern Fundamental Analyst" }, description: "關於企業品質、估值、風險與資本配置的長篇研究。" };
+export const metadata = createPageMetadata({ title: "投資備忘錄", description: "關於企業品質、估值、風險與資本配置的長篇研究。", path: "/memos", locale: "zh-tw" });
 
 export default function MemosPageZhTw() {
   return <main className="memos-page"><SiteHeader locale="zh-tw" counterpartPath="/memos" />

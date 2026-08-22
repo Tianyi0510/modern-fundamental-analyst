@@ -3,9 +3,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memos } from "@/data/site";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
+import { formatUsd } from "@/lib/format";
 
 const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
-const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 
 export default function Home() {
   return (
@@ -34,7 +34,7 @@ export default function Home() {
         </div>
         <div className="metric">
           <span>Market value</span>
-          <strong>{formatUsd(portfolioSnapshot.marketValue)}</strong>
+          <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
           <small>{portfolioSnapshot.holdingsCount} stocks and ETFs</small>
         </div>
         <div className="metric metric-green">
@@ -60,7 +60,7 @@ export default function Home() {
           {featuredHoldings.map((holding, index) => (
             <div className="holding-row" key={holding.symbol}>
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <div><strong>{holding.symbol}</strong><small>{formatUsd(holding.marketValue)} market value</small></div>
+              <div><strong>{holding.symbol}</strong><small>{formatUsd(holding.marketValue, 0)} market value</small></div>
               <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
             </div>
           ))}

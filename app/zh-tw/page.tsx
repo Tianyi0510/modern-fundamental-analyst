@@ -3,9 +3,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memosZhTw } from "@/data/site-zh-tw";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
+import { formatUsd } from "@/lib/format";
 
 const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
-const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 
 export default function TraditionalChineseHome() {
   return (
@@ -26,7 +26,7 @@ export default function TraditionalChineseHome() {
 
       <section className="metric-band shell" aria-label="投資組合摘要">
         <div className="metric metric-featured"><span>累積報酬</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>成本基礎累積報酬</small></div>
-        <div className="metric"><span>市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{portfolioSnapshot.holdingsCount} 檔股票與 ETF</small></div>
+        <div className="metric"><span>市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong><small>{portfolioSnapshot.holdingsCount} 檔股票與 ETF</small></div>
         <div className="metric metric-green"><span>投資組合 XIRR</span><strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong><small>截至 2026 年 7 月 31 日 · 每月更新</small></div>
       </section>
 
@@ -46,7 +46,7 @@ export default function TraditionalChineseHome() {
           {featuredHoldings.map((holding, index) => (
             <div className="holding-row" key={holding.symbol}>
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <div><strong>{holding.symbol}</strong><small>{formatUsd(holding.marketValue)} 市場價值</small></div>
+              <div><strong>{holding.symbol}</strong><small>{formatUsd(holding.marketValue, 0)} 市場價值</small></div>
               <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
             </div>
           ))}

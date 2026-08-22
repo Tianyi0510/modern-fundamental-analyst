@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memos } from "@/data/site";
+import { createPageMetadata } from "@/lib/site-config";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const memo = memos.find((item) => item.slug === slug);
   if (!memo) return {};
-  return { title: memo.title, description: memo.summary, openGraph: { title: memo.title, description: memo.summary, images: [] }, twitter: { title: memo.title, description: memo.summary, images: [] } };
+  return createPageMetadata({ title: memo.title, description: memo.summary, path: `/memos/${slug}` });
 }
 
 export default async function MemoPage({ params }: Props) {
