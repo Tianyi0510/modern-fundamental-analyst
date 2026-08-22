@@ -2,7 +2,7 @@ import { PortfolioTable } from "@/components/portfolio-table";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
-import { formatPortfolioDate, formatUsd } from "@/lib/format";
+import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 
 type Locale = "en" | "zh-tw";
 
@@ -47,19 +47,19 @@ const copy = {
   },
 } as const;
 
-const segmentColors = ["blue", "deep", "light", "green", "red", "black"] as const;
+const segmentColors = ["medium-blue", "dark-blue", "light-blue", "gray", "blue-mix", "black"] as const;
 
 export function PortfolioPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const isChinese = locale === "zh-tw";
-  const asOf = formatPortfolioDate(portfolioSnapshot.asOf, locale);
+  const asOf = formatDate(portfolioSnapshot.asOf, locale);
 
   return <main className="portfolio-page"><SiteHeader locale={locale} counterpartPath={isChinese ? "/portfolio" : "/zh-tw/portfolio"} />
-    <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small>{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
+    <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="portfolio-kpis shell" aria-label={text.summaryLabel}>
       <div><span>{text.marketValue}</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{text.currency}</small></div>
       <div><span>{text.costBasis}</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>{text.costBasisNote}</small></div>
-      <div><span>{text.totalReturn}</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>{text.totalReturnNote}</small></div>
+      <div><span>{text.totalReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.totalReturnNote}</small></div>
       <div><span>{text.holdings}</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>{text.holdingsNote}</small></div>
     </section>
     <section className="portfolio-allocation shell"><div><span>{text.allocation}</span><small>{text.allocationNote}</small></div><div className="stacked-bar" aria-label={text.allocationLabel}>{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
@@ -68,5 +68,5 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
       <p>{isChinese ? `點選任一欄位標題即可排序；價格與市場價值均採用 ${asOf} 收盤價。` : `Click any column heading to sort. Prices and market values use closing prices as of ${asOf}.`}</p>
     </section>
     <section className="portfolio-table-wrap shell"><PortfolioTable holdings={portfolioHoldings} locale={locale} /></section>
-    <p className="data-note portfolio-source-note shell">{isChinese ? `資料來源：Google Sheets「${portfolioSnapshot.source}」。價格與市場價值均採用 ${asOf} 收盤價，並非即時報價；不包含現金與外部資金流。` : `Source: Google Sheets “${portfolioSnapshot.source}”. Prices and market values use closing prices as of ${asOf} and are not live quotes. Cash and external funding are excluded.`}</p><SiteFooter locale={locale} /></main>;
+    <p className="data-note portfolio-source-note shell">{isChinese ? `資料來源：Google Sheets「${portfolioSnapshot.source}」，已驗證快照每月同步至本網站。價格與市場價值均採用 ${asOf} 收盤價，並非即時報價；不包含現金與外部資金流。` : `Source: Google Sheets “${portfolioSnapshot.source}”; the verified snapshot is synchronized to this site monthly. Prices and market values use closing prices as of ${asOf} and are not live quotes. Cash and external funding are excluded.`}</p><SiteFooter locale={locale} /></main>;
 }

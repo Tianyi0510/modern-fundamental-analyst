@@ -105,7 +105,7 @@ a { color: inherit; text-decoration: none; }
 .metric-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--black); border: 1px solid var(--black); }
 .metric { min-height: 280px; padding: 34px; display: flex; flex-direction: column; background: var(--white); }
 .metric-featured { background: var(--dark-blue); color: var(--white); }
-.metric-green { background: var(--light-blue); }
+.metric-accent { background: var(--light-blue); }
 .metric strong { margin-top: auto; }
 .metric small { margin-top: 18px; color: currentColor; opacity: .65; }
 .home-about { padding: 124px 0; border-bottom: 1px solid var(--black); display: grid; grid-template-columns: 1.1fr .9fr; gap: 96px; align-items: end; }
@@ -219,7 +219,7 @@ a { color: inherit; text-decoration: none; }
 .portfolio-allocation small { color: rgba(0,0,0,.62); }
 .stacked-bar { display: flex; height: 78px; overflow: hidden; background: var(--gray); }
 .segment { display: block; height: 100%; }
-.segment-blue { background: var(--medium-blue); }.segment-deep { background: var(--dark-blue); }.segment-light { background: var(--light-blue); }.segment-green { background: var(--gray); }.segment-red { background: color-mix(in srgb, var(--dark-blue) 55%, var(--medium-blue)); }.segment-black { background: var(--black); }
+.segment-medium-blue { background: var(--medium-blue); }.segment-dark-blue { background: var(--dark-blue); }.segment-light-blue { background: var(--light-blue); }.segment-gray { background: var(--gray); }.segment-blue-mix { background: color-mix(in srgb, var(--dark-blue) 55%, var(--medium-blue)); }.segment-black { background: var(--black); }
 .portfolio-table-wrap { overflow-x: auto; scrollbar-width: thin; }
 .portfolio-table, .returns-table { border-top: 1px solid var(--black); }
 .table-head, .portfolio-row { display: grid; grid-template-columns: 1fr 1fr 120px; gap: 30px; align-items: center; }
@@ -466,6 +466,7 @@ a { color: inherit; text-decoration: none; }
 
 .metric strong,
 .performance-copy > strong {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-large);
   line-height: .88;
   letter-spacing: -.065em;
@@ -475,6 +476,7 @@ a { color: inherit; text-decoration: none; }
 
 .portfolio-page .portfolio-kpis strong,
 .performance-summary strong {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-kpi);
   line-height: .9;
   letter-spacing: -.055em;
@@ -488,6 +490,7 @@ a { color: inherit; text-decoration: none; }
 
 .portfolio-row strong,
 .return-row strong {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
@@ -495,6 +498,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .portfolio-total-row > * {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-row-bold);
   line-height: 1.25;
   font-weight: var(--weight-bold);
@@ -533,6 +537,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .holding-row b {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
@@ -541,6 +546,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .allocation-ring b {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-kpi-small);
   line-height: .9;
   font-weight: var(--weight-bold);
@@ -549,6 +555,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .portfolio-row:not(.portfolio-total-row) > * {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
@@ -566,6 +573,15 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
   font-weight: var(--weight-regular);
   letter-spacing: 0;
+}
+
+.date-text,
+.memo-meta,
+.article-meta,
+.bar-value span,
+.holding-row > span {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 .memo-meta b {

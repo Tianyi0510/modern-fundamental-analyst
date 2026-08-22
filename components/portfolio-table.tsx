@@ -3,7 +3,7 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/data/portfolio";
-import { formatShares, formatUsd } from "@/lib/format";
+import { formatPercent, formatShares, formatUsd } from "@/lib/format";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
@@ -67,7 +67,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
             <span role="cell">{formatUsd(holding.costBasis)}</span>
             <span role="cell">{formatUsd(holding.price)}</span>
             <span role="cell">{formatUsd(holding.marketValue)}</span>
-            <span role="cell" className={`data-value ${holdingReturn < 0 ? "negative" : "positive"}`}>{holdingReturn > 0 ? "+" : ""}{holdingReturn.toFixed(1)}%</span>
+            <span role="cell" className={`data-value ${holdingReturn < 0 ? "negative" : "positive"}`}>{formatPercent(holdingReturn, 1)}</span>
             <span role="cell">{getHoldingWeight(holding.marketValue, totals.marketValue).toFixed(1)}%</span>
           </div>
         );
@@ -79,7 +79,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
         <span role="cell" />
         <span role="cell">{formatUsd(totals.marketValue)}</span>
         <strong role="cell" className={`data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
-          {totals.totalReturn > 0 ? "+" : ""}{totals.totalReturn.toFixed(2)}%
+          {formatPercent(totals.totalReturn)}
         </strong>
         <strong role="cell">100.0%</strong>
       </div>

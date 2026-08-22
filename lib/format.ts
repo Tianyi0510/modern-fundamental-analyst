@@ -17,7 +17,7 @@ export function formatUsd(value: number, fractionDigits = 2) {
 
 export const formatShares = (value: number) => sharesFormatter.format(value);
 
-export function formatPortfolioDate(value: string, locale: "en" | "zh-tw", compact = false) {
+export function formatDate(value: string, locale: "en" | "zh-tw", compact = false) {
   const [year, month, day] = value.split("-").map(Number);
   return new Intl.DateTimeFormat(locale === "zh-tw" ? "zh-TW" : "en-GB", {
     day: "numeric",
@@ -25,4 +25,9 @@ export function formatPortfolioDate(value: string, locale: "en" | "zh-tw", compa
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+export function formatPercent(value: number, fractionDigits = 2) {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(fractionDigits)}%`;
 }

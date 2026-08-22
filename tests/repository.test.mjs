@@ -62,11 +62,32 @@ test("portfolio dates are formatted from the snapshot date", async () => {
     read("components/performance-page-content.tsx"),
   ]);
 
-  assert.match(format, /formatPortfolioDate/);
+  assert.match(format, /formatDate/);
   for (const source of [home, homeZh, portfolioPage, performancePage]) {
-    assert.match(source, /formatPortfolioDate/);
+    assert.match(source, /formatDate/);
     assert.doesNotMatch(source, /31 July 2026|2026 年 7 月 31 日/);
   }
+});
+
+test("percent formatting handles positive, zero, and negative values", async () => {
+  const { formatPercent } = await import("../lib/format.ts");
+
+  assert.equal(formatPercent(3.2), "+3.20%");
+  assert.equal(formatPercent(0), "0.00%");
+  assert.equal(formatPercent(-3.2), "-3.20%");
+});
+
+test("memo publication dates use one shared ISO source", async () => {
+  const [metadata, english, chinese] = await Promise.all([
+    read("data/memo-metadata.ts"),
+    read("data/site.ts"),
+    read("data/site-zh-tw.ts"),
+  ]);
+
+  assert.match(metadata, /2026-06-18/);
+  assert.match(english, /memoPublishedAt/);
+  assert.match(chinese, /memoPublishedAt/);
+  assert.doesNotMatch(`${english}${chinese}`, /date:\s*["']/);
 });
 
 test("bilingual portfolio and performance routes share page structures", async () => {
