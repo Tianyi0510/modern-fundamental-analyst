@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { createPageMetadata } from "@/lib/site-config";
 
-export const metadata: Metadata = {
-  title: "About",
-  description: "Tianyi (David) Li's background, investment approach, and principles behind Modern Fundamental Analyst.",
-};
+export const metadata = createPageMetadata({ title: "About", description: "Tianyi (David) Li's background, investment approach, and principles behind Modern Fundamental Analyst.", path: "/about" });
 
 export default function AboutPage() {
   return <main className="about-page"><SiteHeader counterpartPath="/zh-tw/about" />

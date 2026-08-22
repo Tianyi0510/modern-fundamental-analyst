@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memosZhTw } from "@/data/site-zh-tw";
+import { createPageMetadata } from "@/lib/site-config";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const memo = memosZhTw.find((item) => item.slug === slug);
   if (!memo) return {};
-  return { title: { absolute: `${memo.title}｜Modern Fundamental Analyst` }, description: memo.summary, alternates: { canonical: `/zh-tw/memos/${slug}`, languages: { en: `/memos/${slug}`, "zh-Hant-TW": `/zh-tw/memos/${slug}` } } };
+  return createPageMetadata({ title: memo.title, description: memo.summary, path: `/memos/${slug}`, locale: "zh-tw" });
 }
 
 export default async function MemoPageZhTw({ params }: Props) {

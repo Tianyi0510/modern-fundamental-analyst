@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getHoldingWeight, portfolioSnapshot, type PortfolioHolding } from "@/data/portfolio";
+import { formatShares, formatUsd } from "@/lib/format";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
@@ -81,6 +82,3 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
     </div>
   );
 }
-
-const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
-const formatShares = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value);

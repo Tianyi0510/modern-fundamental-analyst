@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { createPageMetadata } from "@/lib/site-config";
 
-export const metadata: Metadata = {
-  title: { absolute: "關於｜Modern Fundamental Analyst" },
-  description: "Tianyi（David）Li 的背景、投資方法，以及 Modern Fundamental Analyst 背後的理念。",
-};
+export const metadata = createPageMetadata({ title: "關於", description: "Tianyi（David）Li 的背景、投資方法，以及 Modern Fundamental Analyst 背後的理念。", path: "/about", locale: "zh-tw" });
 
 export default function AboutPageZhTw() {
   return <main className="about-page"><SiteHeader locale="zh-tw" counterpartPath="/about" />

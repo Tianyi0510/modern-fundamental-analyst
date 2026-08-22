@@ -1,16 +1,3 @@
-export const portfolioSnapshot = {
-  asOf: "2026-07-31",
-  costBasis: 96425.37,
-  marketValue: 117230.24,
-  totalReturn: 22,
-  xirr: 19.27,
-  benchmarkXirr: 19.94,
-  benchmark: "SPY",
-  holdingsCount: 18,
-  updateFrequency: "Monthly",
-  source: "David's Portfolio Performance",
-};
-
 export const portfolioHoldings = [
   { symbol: "ADBE", shares: 25, costBasis: 8506.05, price: 250.41, marketValue: 6260.25, returnPct: -26.4 },
   { symbol: "AMD", shares: 30, costBasis: 3344.27, price: 476.15, marketValue: 14284.5, returnPct: 327.1 },
@@ -33,6 +20,22 @@ export const portfolioHoldings = [
 ] as const;
 
 export type PortfolioHolding = (typeof portfolioHoldings)[number];
+
+const costBasis = portfolioHoldings.reduce((total, holding) => total + holding.costBasis, 0);
+const marketValue = portfolioHoldings.reduce((total, holding) => total + holding.marketValue, 0);
+
+export const portfolioSnapshot = {
+  asOf: "2026-07-31",
+  costBasis,
+  marketValue,
+  totalReturn: ((marketValue - costBasis) / costBasis) * 100,
+  xirr: 19.27,
+  benchmarkXirr: 19.94,
+  benchmark: "SPY",
+  holdingsCount: portfolioHoldings.length,
+  updateFrequency: "Monthly",
+  source: "David's Portfolio Performance",
+} as const;
 
 export function getHoldingWeight(marketValue: number) {
   return (marketValue / portfolioSnapshot.marketValue) * 100;

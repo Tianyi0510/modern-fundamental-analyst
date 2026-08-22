@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { createPageMetadata } from "@/lib/site-config";
 
-export const metadata: Metadata = { title: { absolute: "聯絡｜Modern Fundamental Analyst" }, description: "就投資研究與專業合作聯絡 Modern Fundamental Analyst。" };
+export const metadata = createPageMetadata({ title: "聯絡", description: "就投資研究與專業合作聯絡 Modern Fundamental Analyst。", path: "/contact", locale: "zh-tw" });
 
 export default function ContactPageZhTw() {
   return <main className="contact-page"><SiteHeader locale="zh-tw" counterpartPath="/contact" />
