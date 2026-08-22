@@ -75,7 +75,7 @@ export default function TraditionalChineseHome() {
       <section className="memos-home shell">
         <div className="section-heading"><p className="section-number">04 投資備忘錄</p><h2>每個部位背後的<br />詳細投資論點</h2></div>
         <div className="memo-grid">
-          {memosZhTw.map((memo, index) => (
+          {memosZhTw.slice(0, 3).map((memo, index) => (
             <Link className={`memo-card memo-card-${index + 1}`} href={`/zh-tw/memos/${memo.slug}`} key={memo.slug}>
               <div><span>{memo.number}</span><span>{memo.tag}</span></div><h3>{memo.title}</h3><p>{memo.summary}</p><small className="date-text">{formatDate(memo.publishedAt, "zh-tw")} · {memo.readTime}</small>
             </Link>

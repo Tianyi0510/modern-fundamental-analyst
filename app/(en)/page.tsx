@@ -101,7 +101,7 @@ export default function Home() {
           <h2>Detailed Investment Theses<br />Behind Every Position</h2>
         </div>
         <div className="memo-grid">
-          {memos.map((memo, index) => (
+          {memos.slice(0, 3).map((memo, index) => (
             <Link className={`memo-card memo-card-${index + 1}`} href={`/memos/${memo.slug}`} key={memo.slug}>
               <div><span>{memo.number}</span><span>{memo.tag}</span></div>
               <h3>{memo.title}</h3>
