@@ -63,8 +63,8 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
           <span role="cell">{formatUsd(holding.costBasis)}</span>
           <span role="cell">{formatUsd(holding.price)}</span>
           <span role="cell">{formatUsd(holding.marketValue)}</span>
-          <strong role="cell" className={holding.returnPct < 0 ? "negative" : "positive"}>{holding.returnPct > 0 ? "+" : ""}{holding.returnPct.toFixed(1)}%</strong>
-          <strong role="cell">{getHoldingWeight(holding.marketValue).toFixed(1)}%</strong>
+          <span role="cell" className={`data-value ${holding.returnPct < 0 ? "negative" : "positive"}`}>{holding.returnPct > 0 ? "+" : ""}{holding.returnPct.toFixed(1)}%</span>
+          <span role="cell">{getHoldingWeight(holding.marketValue).toFixed(1)}%</span>
         </div>
       ))}
       <div className="portfolio-row portfolio-total-row" role="row">
@@ -73,7 +73,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
         <span role="cell">{formatUsd(portfolioSnapshot.costBasis)}</span>
         <span role="cell">—</span>
         <span role="cell">{formatUsd(portfolioSnapshot.marketValue)}</span>
-        <strong role="cell" className="positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong>
+        <strong role="cell" className="data-value positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong>
         <strong role="cell">100.0%</strong>
       </div>
     </div>

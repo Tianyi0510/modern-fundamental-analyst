@@ -12,18 +12,18 @@ export default function PortfolioPage() {
     <section className="portfolio-kpis shell" aria-label="Portfolio summary">
       <div><span>Stock market value</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>USD</small></div>
       <div><span>Net cost basis</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>Purchases and transaction fees</small></div>
-      <div><span>Total return</span><strong className="positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>Cumulative cost-basis return</small></div>
+      <div><span>Total return</span><strong className="data-value positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>Cumulative cost-basis return</small></div>
       <div><span>Holdings</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>Stocks and ETFs</small></div>
     </section>
     <section className="portfolio-allocation shell"><div><span>Allocation by market value</span><small>100% of disclosed stock holdings</small></div><div className="stacked-bar" aria-label="Portfolio allocation by market value">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
     <section className="portfolio-holdings-heading shell">
       <div><span>Current holdings</span><h2>{portfolioSnapshot.holdingsCount} disclosed positions.</h2></div>
-      <p>Click any column heading to sort. Prices and values reflect the verified month-end snapshot.</p>
+      <p>Click any column heading to sort. Prices and market values use closing prices as of 31 July 2026.</p>
     </section>
     <section className="portfolio-table-wrap shell">
       <PortfolioTable holdings={portfolioHoldings} />
     </section>
-    <p className="data-note portfolio-source-note shell">Source: Google Sheets “{portfolioSnapshot.source}”. Prices and market values are a verified snapshot, not live quotes. Cash and external funding are excluded.</p><SiteFooter /></main>;
+    <p className="data-note portfolio-source-note shell">Source: Google Sheets “{portfolioSnapshot.source}”. Prices and market values use closing prices as of 31 July 2026 and are not live quotes. Cash and external funding are excluded.</p><SiteFooter /></main>;
 }
 
 const segmentColors = ["blue", "deep", "light", "green", "red", "black"] as const;
