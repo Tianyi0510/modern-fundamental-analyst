@@ -17,6 +17,7 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const languageMenuRef = useRef<HTMLDivElement>(null);
+  const languageButtonRef = useRef<HTMLButtonElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuDrawerRef = useRef<HTMLElement>(null);
   const menuCloseButtonRef = useRef<HTMLButtonElement>(null);
@@ -66,16 +67,28 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
     const closeLanguageMenu = (event: MouseEvent) => {
       if (!languageMenuRef.current?.contains(event.target as Node)) setIsLanguageOpen(false);
     };
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsLanguageOpen(false);
+    const handleLanguageKeyboard = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsLanguageOpen(false);
+        languageButtonRef.current?.focus();
+        return;
+      }
+
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+      const items = Array.from(languageMenuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+      if (!items.length) return;
+      event.preventDefault();
+      const currentIndex = items.indexOf(document.activeElement as HTMLElement);
+      const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowDown" ? (currentIndex + 1) % items.length : (currentIndex - 1 + items.length) % items.length;
+      items[nextIndex].focus();
     };
 
     document.addEventListener("pointerdown", closeLanguageMenu);
-    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", handleLanguageKeyboard);
 
     return () => {
       document.removeEventListener("pointerdown", closeLanguageMenu);
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handleLanguageKeyboard);
     };
   }, [isLanguageOpen]);
 
@@ -107,6 +120,7 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
         </nav>
         <div className="language-menu" ref={languageMenuRef}>
           <button
+            ref={languageButtonRef}
             className="language-trigger"
             type="button"
             aria-label={isChinese ? "切換語言" : "Change language"}
@@ -114,6 +128,16 @@ export function SiteHeader({ locale = "en", counterpartPath }: SiteHeaderProps =
             aria-expanded={isLanguageOpen}
             aria-controls="desktop-language-menu"
             onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+            onKeyDown={(event) => {
+              if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+              event.preventDefault();
+              setIsLanguageOpen(true);
+              requestAnimationFrame(() => {
+                const items = languageMenuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
+                const targetIndex = event.key === "ArrowDown" ? 0 : (items?.length ?? 1) - 1;
+                items?.[targetIndex]?.focus();
+              });
+            }}
           >
             {isChinese ? "繁體中文" : "English"}
             <ChevronDown aria-hidden="true" strokeWidth={2} />

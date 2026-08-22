@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 type SiteFooterProps = { locale?: "en" | "zh-tw" };
+const currentYear = new Date().getUTCFullYear();
 
 export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
   const isChinese = locale === "zh-tw";
@@ -14,7 +15,7 @@ export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
         <Link href={`${prefix}/contact`}>{isChinese ? "聯絡" : "Contact"}</Link>
         <Link href={`${prefix}/disclaimer`}>{isChinese ? "免責聲明" : "Disclaimer"}</Link>
       </div>
-      <small>© 2026 Modern Fundamental Analyst. {isChinese ? "版權所有。" : "All rights reserved."}</small>
+      <small>© {currentYear} Modern Fundamental Analyst. {isChinese ? "版權所有。" : "All rights reserved."}</small>
     </footer>
   );
 }

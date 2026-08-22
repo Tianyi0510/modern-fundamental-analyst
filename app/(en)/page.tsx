@@ -3,9 +3,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memos } from "@/data/site";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
-import { formatUsd } from "@/lib/format";
+import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 
 const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
+const portfolioDate = formatDate(portfolioSnapshot.asOf, "en");
+const compactPortfolioDate = formatDate(portfolioSnapshot.asOf, "en", true);
 
 export default function Home() {
   return (
@@ -29,7 +31,7 @@ export default function Home() {
       <section className="metric-band shell" aria-label="Portfolio snapshot">
         <div className="metric metric-featured">
           <span>Total return</span>
-          <strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong>
+          <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
           <small>Cumulative cost-basis return</small>
         </div>
         <div className="metric">
@@ -37,10 +39,10 @@ export default function Home() {
           <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
           <small>{portfolioSnapshot.holdingsCount} stocks and ETFs</small>
         </div>
-        <div className="metric metric-green">
+        <div className="metric metric-accent">
           <span>Portfolio XIRR</span>
-          <strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong>
-          <small>As of 31 Jul 2026 · Updated monthly</small>
+          <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
+          <small className="date-text">As of {compactPortfolioDate} · Updated monthly</small>
         </div>
       </section>
 
@@ -67,7 +69,7 @@ export default function Home() {
         </div>
         <aside className="allocation-card">
           <span>Portfolio return</span>
-          <div className="allocation-ring" aria-label="22 percent cumulative return"><b>22.0%</b><small>total return</small></div>
+          <div className="allocation-ring" aria-label={`${portfolioSnapshot.totalReturn.toFixed(1)} percent cumulative return`}><b>{formatPercent(portfolioSnapshot.totalReturn, 1)}</b><small>total return</small></div>
           <Link href="/portfolio">Full portfolio →</Link>
         </aside>
       </section>
@@ -80,13 +82,13 @@ export default function Home() {
           </div>
           <div className="performance-grid">
             <div className="performance-bars" aria-label="XIRR comparison chart">
-              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{portfolioSnapshot.xirr}%</span></div><small>Portfolio</small></div>
-              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}><span>{portfolioSnapshot.benchmarkXirr}%</span></div><small>{portfolioSnapshot.benchmark}</small></div>
+              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{formatPercent(portfolioSnapshot.xirr)}</span></div><small>Portfolio</small></div>
+              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}><span>{formatPercent(portfolioSnapshot.benchmarkXirr)}</span></div><small>{portfolioSnapshot.benchmark}</small></div>
             </div>
             <div className="performance-copy">
-              <strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong>
-              <p>Portfolio XIRR, versus +{portfolioSnapshot.benchmarkXirr.toFixed(2)}% for {portfolioSnapshot.benchmark} over the same cash-flow period.</p>
-              <small>Verified snapshot as of 31 July 2026 · Updated monthly.</small>
+              <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
+              <p>Portfolio XIRR, versus {formatPercent(portfolioSnapshot.benchmarkXirr)} for {portfolioSnapshot.benchmark} over the same cash-flow period.</p>
+              <small className="date-text">Verified snapshot as of {portfolioDate} · Updated monthly.</small>
               <Link className="button button-white" href="/performance">View performance <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
             </div>
           </div>
@@ -104,7 +106,7 @@ export default function Home() {
               <div><span>{memo.number}</span><span>{memo.tag}</span></div>
               <h3>{memo.title}</h3>
               <p>{memo.summary}</p>
-              <small>{memo.date} · {memo.readTime}</small>
+              <small className="date-text">{formatDate(memo.publishedAt, "en", true)} · {memo.readTime}</small>
             </Link>
           ))}
         </div>

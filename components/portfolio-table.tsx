@@ -2,8 +2,8 @@
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getHoldingWeight, portfolioSnapshot, type PortfolioHolding } from "@/data/portfolio";
-import { formatShares, formatUsd } from "@/lib/format";
+import { getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/data/portfolio";
+import { formatPercent, formatShares, formatUsd } from "@/lib/format";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
@@ -24,13 +24,14 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
   const [sortKey, setSortKey] = useState<SortKey>("marketValue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const copy = labels[locale];
+  const totals = useMemo(() => getPortfolioTotals(holdings), [holdings]);
 
   const sortedHoldings = useMemo(() => holdings.toSorted((a, b) => {
-    const first = sortKey === "weight" ? getHoldingWeight(a.marketValue) : a[sortKey];
-    const second = sortKey === "weight" ? getHoldingWeight(b.marketValue) : b[sortKey];
+    const first = sortKey === "weight" ? getHoldingWeight(a.marketValue, totals.marketValue) : sortKey === "returnPct" ? getHoldingReturn(a) : a[sortKey];
+    const second = sortKey === "weight" ? getHoldingWeight(b.marketValue, totals.marketValue) : sortKey === "returnPct" ? getHoldingReturn(b) : b[sortKey];
     const comparison = typeof first === "string" ? first.localeCompare(String(second)) : first - Number(second);
     return sortDirection === "asc" ? comparison : -comparison;
-  }), [holdings, sortDirection, sortKey]);
+  }), [holdings, sortDirection, sortKey, totals.marketValue]);
 
   const changeSort = (nextKey: SortKey) => {
     if (nextKey === sortKey) {
@@ -57,25 +58,28 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
           </span>;
         })}
       </div>
-      {sortedHoldings.map((holding) => (
-        <div className="portfolio-row" role="row" key={holding.symbol}>
-          <span role="cell">{holding.symbol}</span>
-          <span role="cell">{formatShares(holding.shares)}</span>
-          <span role="cell">{formatUsd(holding.costBasis)}</span>
-          <span role="cell">{formatUsd(holding.price)}</span>
-          <span role="cell">{formatUsd(holding.marketValue)}</span>
-          <span role="cell" className={`data-value ${holding.returnPct < 0 ? "negative" : "positive"}`}>{holding.returnPct > 0 ? "+" : ""}{holding.returnPct.toFixed(1)}%</span>
-          <span role="cell">{getHoldingWeight(holding.marketValue).toFixed(1)}%</span>
-        </div>
-      ))}
+      {sortedHoldings.map((holding) => {
+        const holdingReturn = getHoldingReturn(holding);
+        return (
+          <div className="portfolio-row" role="row" key={holding.symbol}>
+            <span role="cell">{holding.symbol}</span>
+            <span role="cell">{formatShares(holding.shares)}</span>
+            <span role="cell">{formatUsd(holding.costBasis)}</span>
+            <span role="cell">{formatUsd(holding.price)}</span>
+            <span role="cell">{formatUsd(holding.marketValue)}</span>
+            <span role="cell" className={`data-value ${holdingReturn < 0 ? "negative" : "positive"}`}>{formatPercent(holdingReturn, 1)}</span>
+            <span role="cell">{getHoldingWeight(holding.marketValue, totals.marketValue).toFixed(1)}%</span>
+          </div>
+        );
+      })}
       <div className="portfolio-row portfolio-total-row" role="row">
         <span role="cell">{locale === "zh-tw" ? "合計" : "Total"}</span>
         <span role="cell" />
-        <span role="cell">{formatUsd(portfolioSnapshot.costBasis)}</span>
+        <span role="cell">{formatUsd(totals.costBasis)}</span>
         <span role="cell" />
-        <span role="cell">{formatUsd(portfolioSnapshot.marketValue)}</span>
-        <strong role="cell" className={`data-value ${portfolioSnapshot.totalReturn < 0 ? "negative" : "positive"}`}>
-          {portfolioSnapshot.totalReturn > 0 ? "+" : ""}{portfolioSnapshot.totalReturn.toFixed(2)}%
+        <span role="cell">{formatUsd(totals.marketValue)}</span>
+        <strong role="cell" className={`data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
+          {formatPercent(totals.totalReturn)}
         </strong>
         <strong role="cell">100.0%</strong>
       </div>
