@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: { absolute: "投資組合｜Modern Fu
 
 export default function PortfolioPageZhTw() {
   return <main className="portfolio-page"><SiteHeader locale="zh-tw" counterpartPath="/portfolio" />
-    <section className="page-hero shell"><p className="eyebrow"><span /> 投資組合 · 已驗證快照</p><h1>集中。<br /><em>有意識。</em></h1><div className="page-intro"><p>呈現目前公開市場股票部位、市值、個別部位報酬與投資組合權重。</p><small>截至 2026 年 7 月 31 日 · 每月更新</small></div></section>
+    <section className="page-hero shell"><p className="eyebrow"><span /> 投資組合</p><h1>集中。<br /><em>有意識。</em></h1><div className="page-intro"><p>呈現目前公開市場股票部位、市值、個別部位報酬與投資組合權重。</p><small>截至 2026 年 7 月 31 日 · 每月更新</small></div></section>
     <section className="portfolio-kpis shell" aria-label="投資組合摘要">
       <div><span>股票市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>美元</small></div>
       <div><span>淨成本基礎</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>買入金額與交易費用</small></div>
