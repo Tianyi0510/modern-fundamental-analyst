@@ -354,11 +354,13 @@ a { color: inherit; text-decoration: none; }
 .hero h1,
 .page-hero h1,
 .legal h1,
-.memo-article h1 {
+.memo-article h1,
+.not-found h1 {
   font-size: var(--type-display-large);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
   font-weight: var(--weight-bold);
+  text-transform: capitalize;
 }
 
 .home-about h2,
@@ -374,6 +376,7 @@ a { color: inherit; text-decoration: none; }
   line-height: .98;
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
+  text-transform: capitalize;
 }
 
 .memo-card h3,
@@ -383,15 +386,18 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.05;
   letter-spacing: -.045em;
   font-weight: var(--weight-bold);
+  text-transform: capitalize;
 }
 
 .about-philosophy-copy h3,
 .article-body h2,
+.article-body blockquote,
 .legal h2 {
   font-size: var(--type-headline);
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
+  text-transform: capitalize;
 }
 
 .hero-bottom > p,
@@ -402,6 +408,7 @@ a { color: inherit; text-decoration: none; }
   line-height: var(--leading-lead);
   letter-spacing: -.02em;
   font-weight: var(--weight-regular);
+  text-transform: capitalize;
 }
 
 .performance-copy p,
@@ -410,10 +417,12 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
   letter-spacing: 0;
   font-weight: var(--weight-regular);
+  text-transform: capitalize;
 }
 
 .rich-copy,
 .about-copy,
+.about-boundaries ul,
 .about-closing > div,
 .article-body,
 .methodology div,
@@ -451,13 +460,14 @@ a { color: inherit; text-decoration: none; }
 .portfolio-holdings-heading span,
 .performance-summary span,
 .table-head,
-.contact-grid span {
+.contact-grid span,
+.memo-card > div {
   font-family: var(--font-ui);
   font-size: var(--type-label);
   line-height: 1.3;
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
-  text-transform: none;
+  text-transform: capitalize;
 }
 
 .metric small,
@@ -523,6 +533,126 @@ a { color: inherit; text-decoration: none; }
   font-variant-numeric: tabular-nums;
 }
 
+/* Component typography mappings
+   Every remaining text-bearing component maps to the unified scale above. */
+.wordmark,
+.footer-mark {
+  font-size: var(--type-title);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.site-header nav,
+.language-trigger,
+.language-dropdown a,
+.footer-links,
+.allocation-card > a,
+.mobile-menu-language {
+  font-family: var(--font-ui);
+  font-size: var(--type-button);
+  line-height: 1.2;
+  font-weight: var(--weight-bold);
+}
+
+.holding-row strong {
+  font-size: var(--type-title);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.holding-row b {
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-ring b {
+  font-size: var(--type-data-kpi-compact);
+  line-height: .9;
+  font-weight: var(--weight-bold);
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-row:not(.portfolio-total-row) > * {
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
+.holding-row > span,
+.bar-value span,
+.year-bar small,
+.principles span,
+.memo-index-row > span,
+.memo-index-row small {
+  font-family: var(--font-ui);
+  font-size: var(--type-caption);
+  line-height: 1.5;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+}
+
+.memo-meta b {
+  font-size: var(--type-title);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+}
+
+.not-found > span,
+.mobile-menu-title {
+  font-family: var(--font-ui);
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
+.mobile-menu-drawer nav {
+  font-family: var(--font-ui);
+  font-size: var(--type-title);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+/* Higher-specificity legacy selectors must retain the new Label treatment. */
+.home-page .eyebrow,
+.home-page .section-number,
+.home-page .metric span,
+.about-page .page-hero .eyebrow,
+.contact-page .page-hero .eyebrow,
+.memos-page .page-hero .eyebrow,
+.memo-detail-page .memo-article > .eyebrow,
+.portfolio-page .page-hero .eyebrow,
+.performance-page .page-hero .eyebrow,
+.about-page .about-section-heading > span,
+.about-page .about-boundaries > div > span,
+.about-page .about-closing > .eyebrow,
+.portfolio-page .portfolio-kpis span,
+.portfolio-page .portfolio-allocation span,
+.portfolio-page .portfolio-holdings-heading span,
+.portfolio-page .portfolio-table-detailed .table-head,
+.performance-page .performance-summary span,
+.performance-page .returns .section-number,
+.performance-page .returns-table .table-head,
+.contact-grid span,
+.memo-card > div {
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
 [lang="zh-Hant-TW"] .hero h1 { line-height: 1; letter-spacing: -.015em; }
 [lang="zh-Hant-TW"] .page-hero h1,
 [lang="zh-Hant-TW"] .legal h1,
@@ -565,7 +695,7 @@ a { color: inherit; text-decoration: none; }
 
   .shell { width: min(100% - 32px, 720px); }
   .site-header { height: 78px; min-height: 78px; grid-template-columns: 1fr auto; padding: 0; }
-  .site-header .wordmark { max-width: 190px; font-size: 16px; }
+  .site-header .wordmark { max-width: 190px; font-size: var(--type-title); }
   .header-actions { display: none; }
   .language-menu { display: none; }
   .mobile-menu-button, .mobile-menu-close {
@@ -599,12 +729,12 @@ a { color: inherit; text-decoration: none; }
   }
   .mobile-menu-layer.is-open .mobile-menu-drawer { transform: translateX(0); }
   .mobile-menu-top { min-height: 46px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid rgba(255,255,255,.3); }
-  .mobile-menu-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .mobile-menu-title { font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); text-transform: capitalize; }
   .mobile-menu-close { border-color: rgba(255,255,255,.75); background: transparent; color: var(--white); }
-  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: clamp(26px, 8vw, 38px); font-weight: 700; line-height: 1; }
+  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: var(--type-title); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
   .mobile-menu-drawer nav a { padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.22); white-space: nowrap; transition: color .2s ease, padding-left .2s ease; }
   .mobile-menu-drawer nav a:hover { color: var(--light-blue); padding-left: 8px; }
-  .mobile-menu-language { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.3); font-size: 14px; font-weight: 700; }
+  .mobile-menu-language { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.3); font-size: var(--type-button); font-weight: var(--weight-bold); }
   .hero { padding: 64px 0 54px; }
   .hero h1 { margin: 38px 0 52px; }
   .hero-bottom { grid-template-columns: 1fr; }
@@ -660,7 +790,7 @@ a { color: inherit; text-decoration: none; }
   .performance-page .returns { gap: 48px; }
   .returns-table .table-head { display: none; }
   .return-row { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; padding: 24px 0; align-items: baseline; }
-  .return-row > :nth-child(3) { grid-column: 1 / -1; text-align: left; font-size: 15px; }
+  .return-row > :nth-child(3) { grid-column: 1 / -1; text-align: left; font-size: var(--type-body); }
   .memo-index-row { grid-template-columns: 44px 1fr; gap: 18px; }
   .memo-meta { grid-column: 2; flex-direction: row; align-items: center; }
   .memo-meta b { margin: 0 0 0 auto; }
