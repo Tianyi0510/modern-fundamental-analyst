@@ -44,8 +44,8 @@ export default function AboutPage() {
     </section>
 
     <section className="about-boundaries shell">
-      <div><span>What This Website Is</span><ul><li>A fully disclosed monthly record of my portfolio and performance</li><li>A repository for detailed investment theses and financial models</li><li>A resource created to empower every retail investor</li></ul></div>
-      <div><span>What This Website Is Not</span><ul><li>A promise that every investment thesis will be correct</li><li>A recommendation to buy or sell any particular security</li><li>A substitute for independent research or professional financial advice</li></ul></div>
+      <article><h2>What This Website Is</h2><ol><li>A fully disclosed monthly record of my portfolio and performance</li><li>A repository for detailed investment theses and financial models</li><li>A resource created to empower every retail investor</li></ol></article>
+      <article><h2>What This Website Is Not</h2><ol><li>A promise that every investment thesis will be correct</li><li>A recommendation to buy or sell any particular security</li><li>A substitute for independent research or professional financial advice</li></ol></article>
     </section>
 
     <section className="about-closing shell">

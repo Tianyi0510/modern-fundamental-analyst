@@ -44,8 +44,8 @@ export default function AboutPageZhTw() {
     </section>
 
     <section className="about-boundaries shell">
-      <div><span>這個網站是</span><ul><li>每月完整揭露的投資組合與績效紀錄</li><li>詳細投資論點與財務模型的資料庫</li><li>為幫助每一位個人投資者而建立的資源</li></ul></div>
-      <div><span>這個網站不是</span><ul><li>對每項投資論點都會正確的承諾</li><li>買入或賣出任何特定證券的建議</li><li>獨立研究或專業財務建議的替代品</li></ul></div>
+      <article><h2>這個網站是</h2><ol><li>每月完整揭露的投資組合與績效紀錄</li><li>詳細投資論點與財務模型的資料庫</li><li>為幫助每一位個人投資者而建立的資源</li></ol></article>
+      <article><h2>這個網站不是</h2><ol><li>對每項投資論點都會正確的承諾</li><li>買入或賣出任何特定證券的建議</li><li>獨立研究或專業財務建議的替代品</li></ol></article>
     </section>
 
     <section className="about-closing shell">
