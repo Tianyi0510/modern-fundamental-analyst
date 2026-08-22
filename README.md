@@ -23,10 +23,10 @@ Open `http://localhost:3000`.
 ## Validation
 
 ```bash
-npm run build
-node --test tests/rendered-html.test.mjs
+npm run lint
+npm test
 ```
 
-Portfolio holdings and performance figures in the initial version are
-illustrative placeholders and must be replaced with verified data before the
-site is presented as a live investment record.
+Portfolio holdings are maintained in `data/portfolio.ts`. Cost basis, market
+value, position weights, holding returns, and portfolio totals are derived from
+that source so displayed figures remain internally consistent.

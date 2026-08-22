@@ -29,10 +29,44 @@ test("page metadata provides canonical and bilingual alternate URLs", async () =
 test("portfolio totals are derived from holdings", async () => {
   const portfolio = await read("data/portfolio.ts");
 
-  assert.match(portfolio, /portfolioHoldings\.reduce/);
+  assert.match(portfolio, /holdings\.reduce/);
   assert.match(portfolio, /\(marketValue - costBasis\) \/ costBasis/);
-  assert.match(portfolio, /holdingsCount: portfolioHoldings\.length/);
+  assert.match(portfolio, /holdingsCount: holdings\.length/);
+  assert.match(portfolio, /getHoldingReturn/);
+  assert.doesNotMatch(portfolio, /returnPct:/);
   assert.doesNotMatch(portfolio, /totalReturn:\s*22\b/);
+});
+
+test("portfolio calculations remain internally consistent", async () => {
+  const { getHoldingReturn, getPortfolioTotals, portfolioHoldings, portfolioSnapshot } = await import("../data/portfolio.ts");
+  const totals = getPortfolioTotals(portfolioHoldings);
+
+  assert.equal(totals.holdingsCount, portfolioHoldings.length);
+  assert.equal(totals.costBasis, portfolioSnapshot.costBasis);
+  assert.equal(totals.marketValue, portfolioSnapshot.marketValue);
+  assert.equal(totals.totalReturn, portfolioSnapshot.totalReturn);
+
+  for (const holding of portfolioHoldings) {
+    assert.ok(holding.costBasis > 0, `${holding.symbol} must have a positive cost basis`);
+    assert.ok(Number.isFinite(getHoldingReturn(holding)), `${holding.symbol} must have a finite return`);
+    assert.ok(Math.abs(holding.shares * holding.price - holding.marketValue) < 0.01, `${holding.symbol} market value must equal shares × price`);
+  }
+});
+
+test("portfolio dates are formatted from the snapshot date", async () => {
+  const [format, home, homeZh, portfolioPage, performancePage] = await Promise.all([
+    read("lib/format.ts"),
+    read("app/(en)/page.tsx"),
+    read("app/zh-tw/page.tsx"),
+    read("components/portfolio-page-content.tsx"),
+    read("components/performance-page-content.tsx"),
+  ]);
+
+  assert.match(format, /formatPortfolioDate/);
+  for (const source of [home, homeZh, portfolioPage, performancePage]) {
+    assert.match(source, /formatPortfolioDate/);
+    assert.doesNotMatch(source, /31 July 2026|2026 年 7 月 31 日/);
+  }
 });
 
 test("bilingual portfolio and performance routes share page structures", async () => {

@@ -3,9 +3,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { memos } from "@/data/site";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
-import { formatUsd } from "@/lib/format";
+import { formatPortfolioDate, formatUsd } from "@/lib/format";
 
 const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
+const portfolioDate = formatPortfolioDate(portfolioSnapshot.asOf, "en");
+const compactPortfolioDate = formatPortfolioDate(portfolioSnapshot.asOf, "en", true);
 
 export default function Home() {
   return (
@@ -40,7 +42,7 @@ export default function Home() {
         <div className="metric metric-green">
           <span>Portfolio XIRR</span>
           <strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong>
-          <small>As of 31 Jul 2026 · Updated monthly</small>
+          <small>As of {compactPortfolioDate} · Updated monthly</small>
         </div>
       </section>
 
@@ -67,7 +69,7 @@ export default function Home() {
         </div>
         <aside className="allocation-card">
           <span>Portfolio return</span>
-          <div className="allocation-ring" aria-label="22 percent cumulative return"><b>22.0%</b><small>total return</small></div>
+          <div className="allocation-ring" aria-label={`${portfolioSnapshot.totalReturn.toFixed(1)} percent cumulative return`}><b>{portfolioSnapshot.totalReturn.toFixed(1)}%</b><small>total return</small></div>
           <Link href="/portfolio">Full portfolio →</Link>
         </aside>
       </section>
@@ -86,7 +88,7 @@ export default function Home() {
             <div className="performance-copy">
               <strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong>
               <p>Portfolio XIRR, versus +{portfolioSnapshot.benchmarkXirr.toFixed(2)}% for {portfolioSnapshot.benchmark} over the same cash-flow period.</p>
-              <small>Verified snapshot as of 31 July 2026 · Updated monthly.</small>
+              <small>Verified snapshot as of {portfolioDate} · Updated monthly.</small>
               <Link className="button button-white" href="/performance">View performance <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
             </div>
           </div>

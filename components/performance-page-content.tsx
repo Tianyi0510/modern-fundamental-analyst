@@ -1,6 +1,7 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/data/portfolio";
+import { formatPortfolioDate } from "@/lib/format";
 
 type Locale = "en" | "zh-tw";
 
@@ -9,7 +10,6 @@ const copy = {
     eyebrow: "Performance",
     title: <>A Monthly Record of<br /><em>Decisions and Results.</em></>,
     intro: "A complete monthly record of portfolio results, methodology, benchmarks, dividends, fees, and periods of underperformance.",
-    asOf: "As of 31 July 2026 · Updated monthly",
     cumulativeReturn: "Cumulative return",
     cumulativeNote: "Cost-basis return",
     portfolioXirr: "Portfolio XIRR",
@@ -31,7 +31,6 @@ const copy = {
     eyebrow: "績效",
     title: <>每月記錄<br /><em>決策與結果。</em></>,
     intro: "完整記錄每月投資組合結果、計算方法、基準、股息、費用與績效落後的時期。",
-    asOf: "截至 2026 年 7 月 31 日 · 每月更新",
     cumulativeReturn: "累積報酬",
     cumulativeNote: "成本基礎報酬",
     portfolioXirr: "投資組合 XIRR",
@@ -54,9 +53,10 @@ const copy = {
 export function PerformancePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const isChinese = locale === "zh-tw";
+  const asOf = formatPortfolioDate(portfolioSnapshot.asOf, locale);
 
   return <main className="performance-page"><SiteHeader locale={locale} counterpartPath={isChinese ? "/performance" : "/zh-tw/performance"} />
-    <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small>{text.asOf}</small></div></section>
+    <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small>{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="performance-summary shell"><div className="summary-primary"><span>{text.cumulativeReturn}</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>{text.cumulativeNote}</small></div><div><span>{text.portfolioXirr}</span><strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong><small>{text.portfolioNote}</small></div><div><span>{portfolioSnapshot.benchmark} XIRR</span><strong>+{portfolioSnapshot.benchmarkXirr.toFixed(2)}%</strong><small>{text.benchmarkNote}</small></div></section>
     <section className="returns shell"><div className="section-heading"><p className="section-number">{text.snapshot}</p><h2>{text.measured}</h2></div>
       <div className="returns-table"><div className="table-head"><span>{text.measure}</span><span>{text.result}</span><span>{text.context}</span></div><div className="return-row"><span>{text.cumulativeReturn}</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><span>{text.cumulativeContext}</span></div><div className="return-row"><span>{text.portfolioXirr}</span><strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong><span>{text.portfolioContext}</span></div><div className="return-row"><span>{portfolioSnapshot.benchmark} XIRR</span><strong>+{portfolioSnapshot.benchmarkXirr.toFixed(2)}%</strong><span>{text.benchmarkContext}</span></div></div>
