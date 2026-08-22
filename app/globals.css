@@ -18,6 +18,7 @@
   --type-display-small: 42px;
   --type-headline: 30px;
   --type-title: 24px; /* Title / 標題 */
+  --type-title-bold: 24px; /* Title Bold / 粗體標題 */
   --type-subtitle: 19px;
   --type-body-large: 19px;
   --type-body: 16px;
@@ -26,9 +27,9 @@
   --type-button: 15px; /* Button / 按鈕 */
   --type-data-large: 96px;
   --type-data-kpi: 64px;
-  --type-data-kpi-compact: 48px;
+  --type-data-kpi-small: 48px;
   --type-data-row: 20px;
-  --type-data-row-total: 20px;
+  --type-data-row-bold: 20px;
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-bold: 700;
@@ -350,7 +351,7 @@ a { color: inherit; text-decoration: none; }
 .not-found h1 { margin: 0; font-size: clamp(48px, 8vw, 110px); letter-spacing: -.06em; }
 
 /* Unified typography hierarchy
-   Display → Headline → Title → Subtitle → Body → Label → Caption → Button → Data */
+   Display → Headline → Title / Title Bold → Subtitle → Body → Label → Caption → Button → Data */
 .hero h1,
 .page-hero h1,
 .legal h1,
@@ -515,7 +516,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .portfolio-page .portfolio-kpis > div:nth-child(n+3) strong {
-  font-size: var(--type-data-kpi-compact);
+  font-size: var(--type-data-kpi-small);
 }
 
 .portfolio-row strong,
@@ -527,7 +528,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .portfolio-total-row > * {
-  font-size: var(--type-data-row-total);
+  font-size: var(--type-data-row-bold);
   line-height: 1.25;
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
@@ -537,7 +538,7 @@ a { color: inherit; text-decoration: none; }
    Every remaining text-bearing component maps to the unified scale above. */
 .wordmark,
 .footer-mark {
-  font-size: var(--type-title);
+  font-size: var(--type-title-bold);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
@@ -557,7 +558,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .holding-row strong {
-  font-size: var(--type-title);
+  font-size: var(--type-title-bold);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
@@ -573,7 +574,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .allocation-ring b {
-  font-size: var(--type-data-kpi-compact);
+  font-size: var(--type-data-kpi-small);
   line-height: .9;
   font-weight: var(--weight-bold);
   letter-spacing: -.055em;
@@ -601,7 +602,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .memo-meta b {
-  font-size: var(--type-title);
+  font-size: var(--type-title-bold);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
 }
@@ -618,7 +619,7 @@ a { color: inherit; text-decoration: none; }
 
 .mobile-menu-drawer nav {
   font-family: var(--font-ui);
-  font-size: var(--type-title);
+  font-size: var(--type-title-bold);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   text-transform: capitalize;
@@ -687,15 +688,16 @@ a { color: inherit; text-decoration: none; }
     --type-display-medium: 44px;
     --type-display-small: 32px;
     --type-title: 20px;
+    --type-title-bold: 20px;
     --type-subtitle: 18px;
     --type-data-large: 52px;
     --type-data-kpi: 48px;
-    --type-data-kpi-compact: 38px;
+    --type-data-kpi-small: 38px;
   }
 
   .shell { width: min(100% - 32px, 720px); }
   .site-header { height: 78px; min-height: 78px; grid-template-columns: 1fr auto; padding: 0; }
-  .site-header .wordmark { max-width: 190px; font-size: var(--type-title); }
+  .site-header .wordmark { max-width: 190px; font-size: var(--type-title-bold); }
   .header-actions { display: none; }
   .language-menu { display: none; }
   .mobile-menu-button, .mobile-menu-close {
@@ -731,7 +733,7 @@ a { color: inherit; text-decoration: none; }
   .mobile-menu-top { min-height: 46px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid rgba(255,255,255,.3); }
   .mobile-menu-title { font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); text-transform: capitalize; }
   .mobile-menu-close { border-color: rgba(255,255,255,.75); background: transparent; color: var(--white); }
-  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: var(--type-title); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: var(--type-title-bold); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
   .mobile-menu-drawer nav a { padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.22); white-space: nowrap; transition: color .2s ease, padding-left .2s ease; }
   .mobile-menu-drawer nav a:hover { color: var(--light-blue); padding-left: 8px; }
   .mobile-menu-language { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.3); font-size: var(--type-button); font-weight: var(--weight-bold); }
@@ -775,7 +777,7 @@ a { color: inherit; text-decoration: none; }
   .portfolio-page .portfolio-kpis > div:nth-child(2) { grid-column: 1 / -1; grid-row: auto; min-height: 208px; }
   .portfolio-page .portfolio-kpis > div:nth-child(3) { grid-column: 1; grid-row: auto; }
   .portfolio-page .portfolio-kpis > div:nth-child(4) { grid-column: 2; grid-row: auto; }
-  .portfolio-page .portfolio-kpis > div:nth-child(n+3) strong { font-size: var(--type-data-kpi-compact); }
+  .portfolio-page .portfolio-kpis > div:nth-child(n+3) strong { font-size: var(--type-data-kpi-small); }
   .portfolio-page .portfolio-allocation { padding: 58px 0 64px; }
   .portfolio-holdings-heading { padding: 64px 0 34px; grid-template-columns: 1fr; gap: 30px; }
   .portfolio-holdings-heading h2 { font-size: var(--type-display-medium); }
