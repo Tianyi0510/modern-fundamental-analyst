@@ -14,7 +14,7 @@ export default function TraditionalChineseHome() {
       <SiteHeader locale="zh-tw" />
 
       <section className="hero shell">
-        <p className="eyebrow"><span /> Tianyi（David）Li · 獨立公開市場股票研究</p>
+        <p className="eyebrow"><span /> David 的獨立公開市場股票研究</p>
         <h1>為顛覆性未來，<br /><em>實踐集中投資。</em></h1>
         <div className="hero-bottom">
           <p>透過長期價值研究、財務建模與完整揭露的投資組合，幫助每一位個人投資者建立獨立判斷。</p>
