@@ -28,6 +28,7 @@
   --type-data-large: 96px;
   --type-data-kpi: 64px;
   --type-data-kpi-small: 48px;
+  --type-data-ring: 40px;
   --type-data-row: 20px;
   --type-data-row-bold: 20px;
   --weight-regular: 400;
@@ -551,7 +552,7 @@ a { color: inherit; text-decoration: none; }
 
 .allocation-ring b {
   font-family: var(--font-inter), var(--font-ui), sans-serif;
-  font-size: var(--type-data-kpi-small);
+  font-size: var(--type-data-ring);
   line-height: .9;
   font-weight: var(--weight-bold);
   letter-spacing: -.055em;
@@ -707,6 +708,7 @@ a { color: inherit; text-decoration: none; }
     --type-data-large: 52px;
     --type-data-kpi: 48px;
     --type-data-kpi-small: 38px;
+    --type-data-ring: 38px;
   }
 
   .shell { width: min(100% - 32px, 720px); }
