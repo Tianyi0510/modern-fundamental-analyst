@@ -56,9 +56,9 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
           </span>;
         })}
       </div>
-      {sortedHoldings.map((holding, index) => (
+      {sortedHoldings.map((holding) => (
         <div className="portfolio-row" role="row" key={holding.symbol}>
-          <span role="cell">{String(index + 1).padStart(2,"0")} · {holding.symbol}</span>
+          <span role="cell">{holding.symbol}</span>
           <span role="cell">{formatShares(holding.shares)}</span>
           <span role="cell">{formatUsd(holding.costBasis)}</span>
           <span role="cell">{formatUsd(holding.price)}</span>
