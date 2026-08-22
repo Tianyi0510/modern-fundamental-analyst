@@ -78,16 +78,34 @@ test("percent formatting handles positive, zero, and negative values", async () 
 });
 
 test("memo publication dates use one shared ISO source", async () => {
-  const [metadata, english, chinese] = await Promise.all([
+  const [metadata, english, traditionalChinese, simplifiedChinese] = await Promise.all([
     read("data/memo-metadata.ts"),
     read("data/site.ts"),
     read("data/site-zh-tw.ts"),
+    read("data/site-zh-cn.ts"),
   ]);
 
-  assert.match(metadata, /2026-06-18/);
-  assert.match(english, /memoPublishedAt/);
-  assert.match(chinese, /memoPublishedAt/);
-  assert.doesNotMatch(`${english}${chinese}`, /date:\s*["']/);
+  assert.match(metadata, /2025-10-10/);
+  for (const source of [english, traditionalChinese, simplifiedChinese]) {
+    assert.match(source, /memoPublishedAt/);
+  }
+  assert.doesNotMatch(`${english}${traditionalChinese}${simplifiedChinese}`, /date:\s*["']/);
+});
+
+test("memo catalog contains only the Microsoft source memo and uses one shared disclosure", async () => {
+  const [english, traditionalChinese, simplifiedChinese, memoPage] = await Promise.all([
+    read("data/site.ts"),
+    read("data/site-zh-tw.ts"),
+    read("data/site-zh-cn.ts"),
+    read("components/memo-index.tsx"),
+  ]);
+
+  for (const source of [english, traditionalChinese, simplifiedChinese]) {
+    assert.match(source, /microsoft-stock-analysis-fy2024/);
+    assert.doesNotMatch(source, /durable-pricing-power|self-funded-growth|capital-allocation/);
+  }
+  assert.match(memoPage, /<details/);
+  assert.match(memoPage, /<summary/);
 });
 
 test("all portfolio and performance locales share page structures", async () => {

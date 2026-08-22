@@ -2,30 +2,12 @@ import { memoPublishedAt } from "@/data/memo-metadata";
 
 export const memos = [
   {
-    slug: "durable-pricing-power",
+    slug: "microsoft-stock-analysis-fy2024",
     number: "001",
-    title: "The anatomy of durable pricing power",
-    summary: "A practical framework for separating real customer value from temporary inflation pass-through.",
-    publishedAt: memoPublishedAt["durable-pricing-power"],
-    readTime: "8 min",
-    tag: "Business quality",
-  },
-  {
-    slug: "self-funded-growth",
-    number: "002",
-    title: "When growth becomes self-funded",
-    summary: "Why cash conversion and reinvestment runway matter more than headline revenue acceleration.",
-    publishedAt: memoPublishedAt["self-funded-growth"],
-    readTime: "6 min",
-    tag: "Financial analysis",
-  },
-  {
-    slug: "capital-allocation",
-    number: "003",
-    title: "Reading capital allocation",
-    summary: "A checklist for evaluating buybacks, acquisitions, dividends, and the discipline behind them.",
-    publishedAt: memoPublishedAt["capital-allocation"],
-    readTime: "10 min",
-    tag: "Management",
+    title: "Microsoft Stock Analysis Fiscal Year 2024",
+    summary: "An assessment of Microsoft’s cloud and AI position, Satya Nadella’s leadership, and the company’s fiscal 2024 financial quality.",
+    publishedAt: memoPublishedAt["microsoft-stock-analysis-fy2024"],
+    readTime: "12 min",
+    tag: "Company Analysis",
   },
 ];

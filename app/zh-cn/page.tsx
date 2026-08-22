@@ -75,7 +75,7 @@ export default function SimplifiedChineseHome() {
       <section className="memos-home shell">
         <div className="section-heading"><p className="section-number">04 投资备忘录</p><h2>每个持仓背后的<br />详细投资论点</h2></div>
         <div className="memo-grid">
-          {memosZhCn.map((memo, index) => (
+          {memosZhCn.slice(0, 3).map((memo, index) => (
             <Link className={`memo-card memo-card-${index + 1}`} href={`/zh-cn/memos/${memo.slug}`} key={memo.slug}>
               <div><span>{memo.number}</span><span>{memo.tag}</span></div><h3>{memo.title}</h3><p>{memo.summary}</p><small className="date-text">{formatDate(memo.publishedAt, "zh-cn")} · {memo.readTime}</small>
             </Link>
