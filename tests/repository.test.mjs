@@ -109,6 +109,7 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
   const fontClamp = /font-size:\s*clamp\(/;
 
   assert.doesNotMatch(css, fontClamp);
+  assert.doesNotMatch(css, /--weight-medium/);
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
 
