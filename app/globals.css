@@ -238,7 +238,10 @@ a { color: inherit; text-decoration: none; }
 .performance-page .performance-summary strong { font-variant-numeric: tabular-nums; }
 .returns-table .table-head, .return-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(120px, .62fr) minmax(240px, 1.38fr); column-gap: 40px; align-items: center; }
 .return-row { min-height: 82px; border-top: 1px solid var(--gray); }
-.returns-table .table-head > :nth-child(2), .return-row > :nth-child(2) { text-align: right; }
+.returns-table .table-head > :nth-child(2),
+.returns-table .table-head > :nth-child(3),
+.return-row > :nth-child(2),
+.return-row > :nth-child(3) { text-align: left; }
 .return-row strong { font-size: 20px; font-variant-numeric: tabular-nums; }
 .return-row span:nth-child(3) { color: rgba(0,0,0,.62); line-height: 1.45; }
 .methodology { padding: 100px 0 140px; display: grid; grid-template-columns: .7fr 1.3fr; gap: 80px; border-top: 1px solid var(--black); }

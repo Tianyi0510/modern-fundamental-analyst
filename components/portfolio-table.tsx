@@ -73,7 +73,9 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
         <span role="cell">{formatUsd(portfolioSnapshot.costBasis)}</span>
         <span role="cell">—</span>
         <span role="cell">{formatUsd(portfolioSnapshot.marketValue)}</span>
-        <strong role="cell" className="data-value positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong>
+        <strong role="cell" className={`data-value ${portfolioSnapshot.totalReturn < 0 ? "negative" : "positive"}`}>
+          {portfolioSnapshot.totalReturn > 0 ? "+" : ""}{portfolioSnapshot.totalReturn.toFixed(2)}%
+        </strong>
         <strong role="cell">100.0%</strong>
       </div>
     </div>
