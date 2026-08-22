@@ -69,9 +69,9 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
       ))}
       <div className="portfolio-row portfolio-total-row" role="row">
         <span role="cell">{locale === "zh-tw" ? "合計" : "Total"}</span>
-        <span role="cell">—</span>
+        <span role="cell" />
         <span role="cell">{formatUsd(portfolioSnapshot.costBasis)}</span>
-        <span role="cell">—</span>
+        <span role="cell" />
         <span role="cell">{formatUsd(portfolioSnapshot.marketValue)}</span>
         <strong role="cell" className={`data-value ${portfolioSnapshot.totalReturn < 0 ? "negative" : "positive"}`}>
           {portfolioSnapshot.totalReturn > 0 ? "+" : ""}{portfolioSnapshot.totalReturn.toFixed(2)}%
