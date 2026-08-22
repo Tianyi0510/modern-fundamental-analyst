@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description,
   alternates: {
     canonical: "/zh-tw",
-    languages: { en: "/", "zh-Hant-TW": "/zh-tw", "x-default": "/" },
+    languages: { en: "/", "zh-Hant-TW": "/zh-tw", "zh-Hans-CN": "/zh-cn", "x-default": "/" },
   },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
   openGraph: { title: `${SITE_NAME}｜繁體中文`, description, images: [{ url: image, width: 1728, height: 910, alt: "Ideas compound. Capital follows." }] },

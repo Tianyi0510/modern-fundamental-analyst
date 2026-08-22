@@ -90,18 +90,22 @@ test("memo publication dates use one shared ISO source", async () => {
   assert.doesNotMatch(`${english}${chinese}`, /date:\s*["']/);
 });
 
-test("bilingual portfolio and performance routes share page structures", async () => {
-  const [portfolioEn, portfolioZh, performanceEn, performanceZh] = await Promise.all([
+test("all portfolio and performance locales share page structures", async () => {
+  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
+    read("app/zh-cn/portfolio/page.tsx"),
     read("app/(en)/performance/page.tsx"),
     read("app/zh-tw/performance/page.tsx"),
+    read("app/zh-cn/performance/page.tsx"),
   ]);
 
   assert.match(portfolioEn, /PortfolioPageContent/);
-  assert.match(portfolioZh, /PortfolioPageContent/);
+  assert.match(portfolioZhTw, /PortfolioPageContent/);
+  assert.match(portfolioZhCn, /PortfolioPageContent/);
   assert.match(performanceEn, /PerformancePageContent/);
-  assert.match(performanceZh, /PerformancePageContent/);
+  assert.match(performanceZhTw, /PerformancePageContent/);
+  assert.match(performanceZhCn, /PerformancePageContent/);
 });
 
 test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
@@ -114,13 +118,29 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
 });
 
 test("language-specific root layouts preserve html lang without request-time proxying", async () => {
-  const [englishLayout, chineseLayout] = await Promise.all([
+  const [englishLayout, traditionalChineseLayout, simplifiedChineseLayout] = await Promise.all([
     read("app/(en)/layout.tsx"),
     read("app/zh-tw/layout.tsx"),
+    read("app/zh-cn/layout.tsx"),
   ]);
 
   assert.match(englishLayout, /language="en"/);
-  assert.match(chineseLayout, /language="zh-Hant-TW"/);
+  assert.match(traditionalChineseLayout, /language="zh-Hant-TW"/);
+  assert.match(simplifiedChineseLayout, /language="zh-CN"/);
   await assert.rejects(read("proxy.ts"));
   await assert.rejects(read("app/layout.tsx"));
+});
+
+test("all locales provide equivalent navigation paths and SEO alternates", async () => {
+  const [{ getLocalizedPath }, sitemap, siteConfig] = await Promise.all([
+    import("../lib/i18n.ts"),
+    read("app/sitemap.ts"),
+    read("lib/site-config.ts"),
+  ]);
+
+  assert.equal(getLocalizedPath("/portfolio", "zh-cn"), "/zh-cn/portfolio");
+  assert.equal(getLocalizedPath("/zh-tw/memos/example", "zh-cn"), "/zh-cn/memos/example");
+  assert.equal(getLocalizedPath("/zh-cn/about", "en"), "/about");
+  assert.match(sitemap, /zh-Hans-CN/);
+  assert.match(siteConfig, /zh-Hans-CN/);
 });

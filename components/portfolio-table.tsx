@@ -4,18 +4,20 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/data/portfolio";
 import { formatPercent, formatShares, formatUsd } from "@/lib/format";
+import type { Locale } from "@/lib/i18n";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
 
 type PortfolioTableProps = {
   holdings: ReadonlyArray<PortfolioHolding>;
-  locale?: "en" | "zh-tw";
+  locale?: Locale;
 };
 
 const labels = {
   en: { symbol: "Position", shares: "Shares", costBasis: "Cost basis", price: "Price", marketValue: "Market value", returnPct: "Return", weight: "Weight", sortBy: "Sort by" },
   "zh-tw": { symbol: "部位", shares: "股數", costBasis: "成本基礎", price: "價格", marketValue: "市場價值", returnPct: "報酬", weight: "權重", sortBy: "排序依據" },
+  "zh-cn": { symbol: "持仓", shares: "股数", costBasis: "成本基础", price: "价格", marketValue: "市场价值", returnPct: "回报", weight: "权重", sortBy: "排序依据" },
 } as const;
 
 const columns: SortKey[] = ["symbol", "shares", "costBasis", "price", "marketValue", "returnPct", "weight"];
@@ -44,7 +46,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
   };
 
   return (
-    <div className="portfolio-table portfolio-table-detailed" role="table" aria-label={locale === "zh-tw" ? "投資組合持股" : "Portfolio holdings"}>
+    <div className="portfolio-table portfolio-table-detailed" role="table" aria-label={locale === "en" ? "Portfolio holdings" : locale === "zh-tw" ? "投資組合持股" : "投资组合持仓"}>
       <div className="table-head" role="row">
         {columns.map((column) => {
           const isActive = sortKey === column;
@@ -73,7 +75,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
         );
       })}
       <div className="portfolio-row portfolio-total-row" role="row">
-        <span role="cell">{locale === "zh-tw" ? "合計" : "Total"}</span>
+        <span role="cell">{locale === "en" ? "Total" : locale === "zh-tw" ? "合計" : "合计"}</span>
         <span role="cell" />
         <span role="cell">{formatUsd(totals.costBasis)}</span>
         <span role="cell" />
