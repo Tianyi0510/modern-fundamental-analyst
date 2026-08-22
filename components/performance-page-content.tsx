@@ -2,8 +2,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/data/portfolio";
 import { formatDate, formatPercent } from "@/lib/format";
-
-type Locale = "en" | "zh-tw";
+import type { Locale } from "@/lib/i18n";
 
 const copy = {
   en: {
@@ -48,14 +47,35 @@ const copy = {
     methodologyCopy: <>績效以美元呈現。累積報酬比較目前市場價值與淨成本基礎；XIRR 反映投資組合現金流的時間與金額，{portfolioSnapshot.benchmark} 比較則將相同現金流套用至基準。</>,
     sourceCopy: <>資料來源：Google Sheets「{portfolioSnapshot.source}」。已驗證快照每月同步至本網站，並非依據即時市場價格。過往績效不代表未來結果。</>,
   },
+  "zh-cn": {
+    eyebrow: "业绩",
+    title: <>每月记录<br /><em>决策与结果。</em></>,
+    intro: "完整记录每月投资组合结果、计算方法、基准、股息、费用与业绩落后的时期。",
+    cumulativeReturn: "累计回报",
+    cumulativeNote: "成本基础回报",
+    portfolioXirr: "投资组合 XIRR",
+    portfolioNote: "现金流加权",
+    benchmarkNote: "相同现金流期间",
+    snapshot: "业绩快照",
+    measured: "以一致方式衡量。",
+    measure: "衡量项目",
+    result: "结果",
+    context: "说明",
+    cumulativeContext: "市场价值相对净成本基础",
+    portfolioContext: "资金加权年化回报",
+    benchmarkContext: "使用相同现金流计算的基准",
+    methodology: "计算方法",
+    methodologyCopy: <>业绩以美元呈现。累计回报比较当前市场价值与净成本基础；XIRR 反映投资组合现金流的时间与金额，{portfolioSnapshot.benchmark} 比较则将相同现金流应用于基准。</>,
+    sourceCopy: <>数据来源：Google Sheets“{portfolioSnapshot.source}”。已验证快照每月同步至本网站，并非依据实时市场价格。过往业绩不代表未来结果。</>,
+  },
 } as const;
 
 export function PerformancePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
-  const isChinese = locale === "zh-tw";
+  const isChinese = locale !== "en";
   const asOf = formatDate(portfolioSnapshot.asOf, locale);
 
-  return <main className="performance-page"><SiteHeader locale={locale} counterpartPath={isChinese ? "/performance" : "/zh-tw/performance"} />
+  return <main className="performance-page"><SiteHeader locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="performance-summary shell"><div className="summary-primary"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.cumulativeNote}</small></div><div><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><small>{text.portfolioNote}</small></div><div><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><small>{text.benchmarkNote}</small></div></section>
     <section className="returns shell"><div className="section-heading"><p className="section-number">{text.snapshot}</p><h2>{text.measured}</h2></div>

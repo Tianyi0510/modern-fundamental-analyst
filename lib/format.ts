@@ -17,9 +17,9 @@ export function formatUsd(value: number, fractionDigits = 2) {
 
 export const formatShares = (value: number) => sharesFormatter.format(value);
 
-export function formatDate(value: string, locale: "en" | "zh-tw", compact = false) {
+export function formatDate(value: string, locale: "en" | "zh-tw" | "zh-cn", compact = false) {
   const [year, month, day] = value.split("-").map(Number);
-  return new Intl.DateTimeFormat(locale === "zh-tw" ? "zh-TW" : "en-GB", {
+  return new Intl.DateTimeFormat(locale === "zh-tw" ? "zh-TW" : locale === "zh-cn" ? "zh-CN" : "en-GB", {
     day: "numeric",
     month: compact ? "short" : "long",
     year: "numeric",

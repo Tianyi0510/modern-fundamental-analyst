@@ -6,7 +6,7 @@ import { createPageMetadata } from "@/lib/site-config";
 export const metadata = createPageMetadata({ title: "About", description: "Tianyi (David) Li's background, investment approach, and principles behind Modern Fundamental Analyst.", path: "/about" });
 
 export default function AboutPage() {
-  return <main className="about-page"><SiteHeader counterpartPath="/zh-tw/about" />
+  return <main className="about-page"><SiteHeader />
     <section className="page-hero shell">
       <p className="eyebrow"><span /> About</p>
       <h1>Learning Continuously.<br /><em>Investing with Accountability.</em></h1>

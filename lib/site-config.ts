@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/lib/i18n";
 
 export const SITE_URL = "https://www.modernfundamentalanalyst.com";
 export const SITE_NAME = "Modern Fundamental Analyst";
@@ -8,22 +9,24 @@ type PageMetadataOptions = {
   title: string;
   description: string;
   path: `/${string}` | "/";
-  locale?: "en" | "zh-tw";
+  locale?: Locale;
 };
 
 export function createPageMetadata({ title, description, path, locale = "en" }: PageMetadataOptions): Metadata {
   const englishPath = path;
-  const chinesePath = path === "/" ? "/zh-tw" : `/zh-tw${path}`;
-  const canonical = locale === "zh-tw" ? chinesePath : englishPath;
+  const traditionalChinesePath = path === "/" ? "/zh-tw" : `/zh-tw${path}`;
+  const simplifiedChinesePath = path === "/" ? "/zh-cn" : `/zh-cn${path}`;
+  const canonical = locale === "zh-tw" ? traditionalChinesePath : locale === "zh-cn" ? simplifiedChinesePath : englishPath;
 
   return {
-    title: locale === "zh-tw" ? { absolute: `${title}｜${SITE_NAME}` } : title,
+    title: locale === "en" ? title : { absolute: `${title}｜${SITE_NAME}` },
     description,
     alternates: {
       canonical,
       languages: {
         en: englishPath,
-        "zh-Hant-TW": chinesePath,
+        "zh-Hant-TW": traditionalChinesePath,
+        "zh-Hans-CN": simplifiedChinesePath,
         "x-default": englishPath,
       },
     },

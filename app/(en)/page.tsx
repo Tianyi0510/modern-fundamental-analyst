@@ -12,7 +12,7 @@ const compactPortfolioDate = formatDate(portfolioSnapshot.asOf, "en", true);
 export default function Home() {
   return (
     <main className="home-page">
-      <SiteHeader counterpartPath="/zh-tw" />
+      <SiteHeader />
 
       <section className="hero shell">
         <p className="eyebrow"><span /> David&apos;s Independent Public-Equity Research</p>

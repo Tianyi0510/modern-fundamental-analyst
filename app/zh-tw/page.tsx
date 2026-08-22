@@ -11,7 +11,7 @@ const portfolioDate = formatDate(portfolioSnapshot.asOf, "zh-tw");
 export default function TraditionalChineseHome() {
   return (
     <main className="home-page">
-      <SiteHeader locale="zh-tw" counterpartPath="/" />
+      <SiteHeader locale="zh-tw" />
 
       <section className="hero shell">
         <p className="eyebrow"><span /> Tianyi（David）Li · 獨立公開市場股票研究</p>

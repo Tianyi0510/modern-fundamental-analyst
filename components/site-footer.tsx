@@ -1,21 +1,26 @@
 import Link from "next/link";
+import { localeConfig, type Locale } from "@/lib/i18n";
 
-type SiteFooterProps = { locale?: "en" | "zh-tw" };
+type SiteFooterProps = { locale?: Locale };
 const currentYear = new Date().getUTCFullYear();
 
 export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
-  const isChinese = locale === "zh-tw";
-  const prefix = isChinese ? "/zh-tw" : "";
+  const prefix = localeConfig[locale].prefix;
+  const copy = locale === "zh-tw"
+    ? { description: "獨立研究、透明思考、長期視角。", contact: "聯絡", disclaimer: "免責聲明", rights: "版權所有。" }
+    : locale === "zh-cn"
+      ? { description: "独立研究、透明思考、长期视角。", contact: "联系", disclaimer: "免责声明", rights: "版权所有。" }
+      : { description: "Independent research. Transparent thinking. Long-term orientation.", contact: "Contact", disclaimer: "Disclaimer", rights: "All rights reserved." };
 
   return (
     <footer className="site-footer shell">
       <Link className="wordmark footer-mark" href={prefix || "/"}>Modern Fundamental Analyst<span>.</span></Link>
-      <p>{isChinese ? "獨立研究、透明思考、長期視角。" : "Independent research. Transparent thinking. Long-term orientation."}</p>
+      <p>{copy.description}</p>
       <div className="footer-links">
-        <Link href={`${prefix}/contact`}>{isChinese ? "聯絡" : "Contact"}</Link>
-        <Link href={`${prefix}/disclaimer`}>{isChinese ? "免責聲明" : "Disclaimer"}</Link>
+        <Link href={`${prefix}/contact`}>{copy.contact}</Link>
+        <Link href={`${prefix}/disclaimer`}>{copy.disclaimer}</Link>
       </div>
-      <small>© {currentYear} Modern Fundamental Analyst. {isChinese ? "版權所有。" : "All rights reserved."}</small>
+      <small>© {currentYear} Modern Fundamental Analyst. {copy.rights}</small>
     </footer>
   );
 }
