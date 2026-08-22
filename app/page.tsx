@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { annualReturns, holdings, memos } from "@/data/site";
+import { memos } from "@/data/site";
+import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
+
+const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
+const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 
 export default function Home() {
   return (
@@ -25,19 +29,19 @@ export default function Home() {
 
       <section className="metric-band shell" aria-label="Portfolio snapshot">
         <div className="metric metric-featured">
-          <span>Since inception</span>
-          <strong>+18.6%</strong>
-          <small>Illustrative data</small>
+          <span>Total return</span>
+          <strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong>
+          <small>Cumulative cost-basis return</small>
         </div>
         <div className="metric">
-          <span>Invested</span>
-          <strong>64.2%</strong>
-          <small>6 positions</small>
+          <span>Market value</span>
+          <strong>{formatUsd(portfolioSnapshot.marketValue)}</strong>
+          <small>{portfolioSnapshot.holdingsCount} stocks and ETFs</small>
         </div>
         <div className="metric metric-green">
-          <span>Cash</span>
-          <strong>35.8%</strong>
-          <small>As of Jun 2026</small>
+          <span>Portfolio XIRR</span>
+          <strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong>
+          <small>As of 31 Jul 2026 · Updated monthly</small>
         </div>
       </section>
 
@@ -49,17 +53,17 @@ export default function Home() {
 
       <section className="holdings-preview shell">
         <div className="holdings-list">
-          {holdings.slice(0, 4).map((holding, index) => (
-            <div className="holding-row" key={holding.name}>
+          {featuredHoldings.map((holding, index) => (
+            <div className="holding-row" key={holding.symbol}>
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <div><strong>{holding.name}</strong><small>{holding.thesis}</small></div>
-              <b>{holding.weight.toFixed(1)}%</b>
+              <div><strong>{holding.symbol}</strong><small>{formatUsd(holding.marketValue)} market value</small></div>
+              <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
             </div>
           ))}
         </div>
         <aside className="allocation-card">
-          <span>Portfolio allocation</span>
-          <div className="allocation-ring" aria-label="64.2 percent invested"><b>64.2%</b><small>invested</small></div>
+          <span>Portfolio return</span>
+          <div className="allocation-ring" aria-label="22 percent cumulative return"><b>22.0%</b><small>total return</small></div>
           <Link href="/portfolio">Full portfolio →</Link>
         </aside>
       </section>
@@ -71,18 +75,14 @@ export default function Home() {
             <h2>A record built<br />one decision at a time.</h2>
           </div>
           <div className="performance-grid">
-            <div className="performance-bars" aria-label="Annual performance chart">
-              {annualReturns.slice(1).map((item) => (
-                <div className="year-bar" key={item.year}>
-                  <div className="bar-value" style={{ height: `${Math.max(item.portfolio * 5, 36)}px` }}><span>{item.portfolio}%</span></div>
-                  <small>{item.year}</small>
-                </div>
-              ))}
+            <div className="performance-bars" aria-label="XIRR comparison chart">
+              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{portfolioSnapshot.xirr}%</span></div><small>Portfolio</small></div>
+              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}><span>{portfolioSnapshot.benchmarkXirr}%</span></div><small>{portfolioSnapshot.benchmark}</small></div>
             </div>
             <div className="performance-copy">
-              <strong>+18.6%</strong>
-              <p>Cumulative return since inception, versus +12.4% for the benchmark.</p>
-              <small>Illustrative data for design preview.</small>
+              <strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong>
+              <p>Portfolio XIRR, versus +{portfolioSnapshot.benchmarkXirr.toFixed(2)}% for {portfolioSnapshot.benchmark} over the same cash-flow period.</p>
+              <small>Verified snapshot as of 31 July 2026 · Updated monthly.</small>
               <Link className="button button-white" href="/performance">View performance <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
             </div>
           </div>

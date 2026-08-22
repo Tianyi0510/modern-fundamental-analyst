@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { annualReturns } from "@/data/site";
+import { portfolioSnapshot } from "@/data/portfolio";
 
 export const metadata: Metadata = { title: "Performance", description: "Portfolio performance, benchmark comparison, and methodology." };
 
 export default function PerformancePage() {
   return <main><SiteHeader counterpartPath="/zh-tw/performance" />
-    <section className="page-hero shell"><p className="eyebrow"><span /> Performance · Sample data</p><h1>The score,<br /><em>with context.</em></h1></section>
-    <section className="performance-summary shell"><div className="summary-primary"><span>Cumulative return</span><strong className="positive">+18.6%</strong><small>Since inception</small></div><div><span>Benchmark</span><strong className="positive">+12.4%</strong><small>Same period</small></div><div><span>Max drawdown</span><strong className="negative">−11.2%</strong><small>Peak to trough</small></div></section>
-    <section className="returns shell"><div className="section-heading"><p className="section-number">Annual returns</p><h2>Year by year.</h2></div>
-      <div className="returns-table"><div className="table-head"><span>Year</span><span>Portfolio</span><span>Benchmark</span></div>{annualReturns.map((r) => <div className="return-row" key={r.year}><span>{r.year}</span><strong className={r.portfolio < 0 ? "negative" : "positive"}>{r.portfolio > 0 ? "+" : ""}{r.portfolio}%</strong><span className={r.benchmark < 0 ? "negative" : "positive"}>{r.benchmark > 0 ? "+" : ""}{r.benchmark}%</span></div>)}</div>
+    <section className="page-hero shell"><p className="eyebrow"><span /> Performance · Verified snapshot</p><h1>The score,<br /><em>with context.</em></h1><div className="page-intro"><p>Portfolio results alongside a comparable benchmark, based on the same cash-flow period.</p><small>As of 31 July 2026 · Updated monthly</small></div></section>
+    <section className="performance-summary shell"><div className="summary-primary"><span>Cumulative return</span><strong className="positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>Cost-basis return</small></div><div><span>Portfolio XIRR</span><strong className="positive">+{portfolioSnapshot.xirr.toFixed(2)}%</strong><small>Cash-flow weighted</small></div><div><span>{portfolioSnapshot.benchmark} XIRR</span><strong className="positive">+{portfolioSnapshot.benchmarkXirr.toFixed(2)}%</strong><small>Same cash-flow period</small></div></section>
+    <section className="returns shell"><div className="section-heading"><p className="section-number">Performance snapshot</p><h2>Measured consistently.</h2></div>
+      <div className="returns-table"><div className="table-head"><span>Measure</span><span>Result</span><span>Context</span></div><div className="return-row"><span>Cumulative return</span><strong className="positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><span>Market value versus net cost basis</span></div><div className="return-row"><span>Portfolio XIRR</span><strong className="positive">+{portfolioSnapshot.xirr.toFixed(2)}%</strong><span>Money-weighted annualized return</span></div><div className="return-row"><span>{portfolioSnapshot.benchmark} XIRR</span><strong className="positive">+{portfolioSnapshot.benchmarkXirr.toFixed(2)}%</strong><span>Benchmark using matching cash flows</span></div></div>
     </section>
-    <section className="methodology shell"><h2>Methodology</h2><div><p>Returns are presented in USD and assume dividends are reinvested. Fees, cash flows, and benchmark treatment will be documented before launch.</p><p>Past performance does not guarantee future results. These initial figures are illustrative placeholders.</p></div></section><SiteFooter /></main>;
+    <section className="methodology shell"><h2>Methodology</h2><div><p>Results are presented in USD. Cumulative return compares current market value with net cost basis. XIRR reflects the timing and amount of portfolio cash flows; the {portfolioSnapshot.benchmark} comparison applies those same cash flows to the benchmark.</p><p>Source: Google Sheets “{portfolioSnapshot.source}”. Data is updated monthly and is not based on live market prices. Past performance does not guarantee future results.</p></div></section><SiteFooter /></main>;
 }

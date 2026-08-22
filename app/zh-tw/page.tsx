@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { annualReturnsZhTw, holdingsZhTw, memosZhTw } from "@/data/site-zh-tw";
+import { memosZhTw } from "@/data/site-zh-tw";
+import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
+
+const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
+const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 
 export default function TraditionalChineseHome() {
   return (
@@ -21,9 +25,9 @@ export default function TraditionalChineseHome() {
       </section>
 
       <section className="metric-band shell" aria-label="投資組合摘要">
-        <div className="metric metric-featured"><span>成立以來</span><strong>+18.6%</strong><small>示意數據</small></div>
-        <div className="metric"><span>已投資</span><strong>64.2%</strong><small>6 個部位</small></div>
-        <div className="metric metric-green"><span>現金</span><strong>35.8%</strong><small>截至 2026 年 6 月</small></div>
+        <div className="metric metric-featured"><span>累積報酬</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>成本基礎累積報酬</small></div>
+        <div className="metric"><span>市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{portfolioSnapshot.holdingsCount} 檔股票與 ETF</small></div>
+        <div className="metric metric-green"><span>投資組合 XIRR</span><strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong><small>截至 2026 年 7 月 31 日 · 每月更新</small></div>
       </section>
 
       <section className="intro shell">
@@ -34,17 +38,17 @@ export default function TraditionalChineseHome() {
 
       <section className="holdings-preview shell">
         <div className="holdings-list">
-          {holdingsZhTw.slice(0, 4).map((holding, index) => (
-            <div className="holding-row" key={holding.name}>
+          {featuredHoldings.map((holding, index) => (
+            <div className="holding-row" key={holding.symbol}>
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <div><strong>{holding.name}</strong><small>{holding.thesis}</small></div>
-              <b>{holding.weight.toFixed(1)}%</b>
+              <div><strong>{holding.symbol}</strong><small>{formatUsd(holding.marketValue)} 市場價值</small></div>
+              <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
             </div>
           ))}
         </div>
         <aside className="allocation-card">
-          <span>投資配置</span>
-          <div className="allocation-ring" aria-label="已投資百分之六十四點二"><b>64.2%</b><small>已投資</small></div>
+          <span>投資組合報酬</span>
+          <div className="allocation-ring" aria-label="累積報酬百分之二十二"><b>22.0%</b><small>累積報酬</small></div>
           <Link href="/zh-tw/portfolio">完整投資組合 →</Link>
         </aside>
       </section>
@@ -53,15 +57,11 @@ export default function TraditionalChineseHome() {
         <div className="shell">
           <div className="section-heading inverse"><p className="section-number">02／績效</p><h2>每一次決策，<br />累積成一份紀錄。</h2></div>
           <div className="performance-grid">
-            <div className="performance-bars" aria-label="年度績效圖表">
-              {annualReturnsZhTw.slice(1).map((item) => (
-                <div className="year-bar" key={item.year}>
-                  <div className="bar-value" style={{ height: `${Math.max(item.portfolio * 5, 36)}px` }}><span>{item.portfolio}%</span></div>
-                  <small>{item.year}</small>
-                </div>
-              ))}
+            <div className="performance-bars" aria-label="XIRR 比較圖表">
+              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{portfolioSnapshot.xirr}%</span></div><small>投資組合</small></div>
+              <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}><span>{portfolioSnapshot.benchmarkXirr}%</span></div><small>{portfolioSnapshot.benchmark}</small></div>
             </div>
-            <div className="performance-copy"><strong>+18.6%</strong><p>成立以來累積報酬，基準同期為 +12.4%。</p><small>此為設計預覽用示意數據。</small><Link className="button button-white" href="/zh-tw/performance">查看績效 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></div>
+            <div className="performance-copy"><strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong><p>投資組合 XIRR；相同現金流期間的 {portfolioSnapshot.benchmark} 為 +{portfolioSnapshot.benchmarkXirr.toFixed(2)}%。</p><small>截至 2026 年 7 月 31 日的已驗證快照 · 每月更新。</small><Link className="button button-white" href="/zh-tw/performance">查看績效 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></div>
           </div>
         </div>
       </section>

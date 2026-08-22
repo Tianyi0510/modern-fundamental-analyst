@@ -3,7 +3,11 @@ export const portfolioSnapshot = {
   costBasis: 96425.37,
   marketValue: 117230.24,
   totalReturn: 22,
+  xirr: 19.27,
+  benchmarkXirr: 19.94,
+  benchmark: "SPY",
   holdingsCount: 18,
+  updateFrequency: "Monthly",
   source: "David's Portfolio Performance",
 };
 
