@@ -14,7 +14,7 @@ export default function SimplifiedChineseHome() {
       <SiteHeader locale="zh-cn" />
 
       <section className="hero shell">
-        <p className="eyebrow"><span /> Tianyi（David）Li · 独立公开市场股票研究</p>
+        <p className="eyebrow"><span /> David 的独立公开市场股票研究</p>
         <h1>为颠覆性未来，<br /><em>实践集中投资。</em></h1>
         <div className="hero-bottom">
           <p>通过长期价值研究、财务建模与完整披露的投资组合，帮助每一位个人投资者建立独立判断。</p>

@@ -24,7 +24,7 @@ const copy = {
     benchmarkContext: "Benchmark using matching cash flows",
     methodology: "Methodology",
     methodologyCopy: <>Results are presented in USD. Cumulative return compares current market value with net cost basis. XIRR reflects the timing and amount of portfolio cash flows; the {portfolioSnapshot.benchmark} comparison applies those same cash flows to the benchmark.</>,
-    sourceCopy: <>Source: Google Sheets “{portfolioSnapshot.source}”. The verified snapshot is synchronized to this site monthly and is not based on live market prices. Past performance does not guarantee future results.</>,
+    sourceCopy: <>Source: <a href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">“{portfolioSnapshot.source}”</a>. The verified snapshot is synchronized to this site monthly and is not based on live market prices. Past performance does not guarantee future results.</>,
   },
   "zh-tw": {
     eyebrow: "績效",
@@ -45,7 +45,7 @@ const copy = {
     benchmarkContext: "使用相同現金流計算的基準",
     methodology: "計算方法",
     methodologyCopy: <>績效以美元呈現。累積報酬比較目前市場價值與淨成本基礎；XIRR 反映投資組合現金流的時間與金額，{portfolioSnapshot.benchmark} 比較則將相同現金流套用至基準。</>,
-    sourceCopy: <>資料來源：Google Sheets「{portfolioSnapshot.source}」。已驗證快照每月同步至本網站，並非依據即時市場價格。過往績效不代表未來結果。</>,
+    sourceCopy: <>資料來源：<a href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">「{portfolioSnapshot.source}」</a>。已驗證快照每月同步至本網站，並非依據即時市場價格。過往績效不代表未來結果。</>,
   },
   "zh-cn": {
     eyebrow: "业绩",
@@ -66,7 +66,7 @@ const copy = {
     benchmarkContext: "使用相同现金流计算的基准",
     methodology: "计算方法",
     methodologyCopy: <>业绩以美元呈现。累计回报比较当前市场价值与净成本基础；XIRR 反映投资组合现金流的时间与金额，{portfolioSnapshot.benchmark} 比较则将相同现金流应用于基准。</>,
-    sourceCopy: <>数据来源：Google Sheets“{portfolioSnapshot.source}”。已验证快照每月同步至本网站，并非依据实时市场价格。过往业绩不代表未来结果。</>,
+    sourceCopy: <>数据来源：<a href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">“{portfolioSnapshot.source}”</a>。已验证快照每月同步至本网站，并非依据实时市场价格。过往业绩不代表未来结果。</>,
   },
 } as const;
 

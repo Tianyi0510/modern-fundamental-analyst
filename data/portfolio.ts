@@ -52,6 +52,7 @@ export const portfolioSnapshot = {
   benchmark: "SPY",
   updateFrequency: "Monthly",
   source: "David's Portfolio Performance",
+  sourceUrl: "https://docs.google.com/spreadsheets/d/1NoPTCfxNLB8FlM3tYr1EkR6t5GK1Hlz4Mfc6HU7pjkg/edit?usp=sharing",
 } as const;
 
 export function getHoldingWeight(marketValue: number, portfolioMarketValue = portfolioSnapshot.marketValue) {
