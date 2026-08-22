@@ -253,8 +253,8 @@ a { color: inherit; text-decoration: none; }
 .source-note p + p { margin-top: 12px; }
 .source-note p:first-child { color: var(--black); }
 .source-note p:first-child > span { font-weight: var(--weight-bold); }
-.source-link { display: inline; padding: 2px 5px; color: var(--black); background: var(--light-blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: background-color .2s ease; }
-.source-link:hover { background: color-mix(in srgb, var(--light-blue) 72%, var(--white)); }
+.source-link { color: var(--light-blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color .2s ease; }
+.source-link:hover { color: var(--medium-blue); }
 .source-link:focus-visible { outline: 2px solid var(--dark-blue); outline-offset: 3px; }
 .performance-summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1px; margin-top: 80px; background: var(--black); border: 1px solid var(--black); }
 .performance-summary > div { min-height: 310px; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
