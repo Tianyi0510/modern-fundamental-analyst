@@ -83,7 +83,7 @@ export default function TraditionalChineseHome() {
         <Link className="text-link memos-all" href="/zh-tw/memos">查看所有投資備忘錄 →</Link>
       </section>
 
-      <section className="cta shell"><p className="eyebrow"><span /> 06 聯絡</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
+      <section className="cta shell"><p className="eyebrow"><span /> 05 聯絡</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
       <SiteFooter locale="zh-tw" />
     </main>
   );

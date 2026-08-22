@@ -233,7 +233,7 @@ a { color: inherit; text-decoration: none; }
 .performance-summary small { margin-top: 14px; color: rgba(0,0,0,.62); }
 .data-value.positive { color: var(--price-up); }
 .data-value.negative { color: var(--price-down); }
-.portfolio-page .page-hero .eyebrow, .performance-page .page-hero .eyebrow { font-size: 17px; text-transform: none; letter-spacing: .05em; }
+.about-page .page-hero .eyebrow, .contact-page .page-hero .eyebrow, .memos-page .page-hero .eyebrow, .memo-detail-page .memo-article > .eyebrow, .portfolio-page .page-hero .eyebrow, .performance-page .page-hero .eyebrow { font-size: 17px; text-transform: none; letter-spacing: .05em; }
 
 /* Portfolio — shared bilingual editorial layout */
 .portfolio-page .page-hero { padding-bottom: 96px; }
