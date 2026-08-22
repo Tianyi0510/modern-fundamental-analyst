@@ -13,10 +13,10 @@ export default function TraditionalChineseHome() {
       <SiteHeader locale="zh-tw" counterpartPath="/" />
 
       <section className="hero shell">
-        <p className="eyebrow"><span /> 獨立公開市場股票研究</p>
+        <p className="eyebrow"><span /> Tianyi（David）Li · 獨立公開市場股票研究</p>
         <h1>觀點會複利。<br /><em>資本隨之成長。</em></h1>
         <div className="hero-bottom">
-          <p>透明呈現集中投資、長期績效，以及每項決策背後的思考。</p>
+          <p>結合基本面投資、資料分析與總體經濟脈絡，透過透明的投資組合、績效紀錄與投資備忘錄公開呈現。</p>
           <div className="hero-actions">
             <Link className="button button-dark" href="/zh-tw/portfolio">查看投資組合 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
             <Link className="text-link" href="/zh-tw/memos">閱讀最新投資備忘錄 →</Link>
@@ -30,8 +30,13 @@ export default function TraditionalChineseHome() {
         <div className="metric metric-green"><span>投資組合 XIRR</span><strong>+{portfolioSnapshot.xirr.toFixed(2)}%</strong><small>截至 2026 年 7 月 31 日 · 每月更新</small></div>
       </section>
 
+      <section className="home-about shell">
+        <div><p className="section-number">01／關於</p><h2>現代基本面，<br />公開記錄。</h2></div>
+        <div><p>我是 Tianyi（David）Li，一名投資者，也是即將進入羅格斯大學新布朗斯維克分校榮譽學院的學生。我透過這個網站把投資觀點轉化為結構化論證，並用結果檢驗每一項決策。</p><Link className="text-link" href="/zh-tw/about">了解投資過程 →</Link></div>
+      </section>
+
       <section className="intro shell">
-        <p className="section-number">01／投資組合</p>
+        <p className="section-number">02／投資組合</p>
         <h2>有意識地集中。<br />有紀律地等待。</h2>
         <Link className="round-link" href="/zh-tw/portfolio" aria-label="查看投資組合"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
@@ -55,7 +60,7 @@ export default function TraditionalChineseHome() {
 
       <section className="performance-home">
         <div className="shell">
-          <div className="section-heading inverse"><p className="section-number">02／績效</p><h2>每一次決策，<br />累積成一份紀錄。</h2></div>
+          <div className="section-heading inverse"><p className="section-number">03／績效</p><h2>每一次決策，<br />累積成一份紀錄。</h2></div>
           <div className="performance-grid">
             <div className="performance-bars" aria-label="XIRR 比較圖表">
               <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{portfolioSnapshot.xirr}%</span></div><small>投資組合</small></div>
@@ -67,7 +72,7 @@ export default function TraditionalChineseHome() {
       </section>
 
       <section className="memos-home shell">
-        <div className="section-heading"><p className="section-number">03／投資備忘錄</p><h2>讓思考，<br />清楚可見。</h2></div>
+        <div className="section-heading"><p className="section-number">04／投資備忘錄</p><h2>讓思考，<br />清楚可見。</h2></div>
         <div className="memo-grid">
           {memosZhTw.map((memo, index) => (
             <Link className={`memo-card memo-card-${index + 1}`} href={`/zh-tw/memos/${memo.slug}`} key={memo.slug}>

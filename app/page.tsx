@@ -13,12 +13,11 @@ export default function Home() {
       <SiteHeader counterpartPath="/zh-tw" />
 
       <section className="hero shell">
-        <p className="eyebrow"><span /> Independent public-equity research</p>
+        <p className="eyebrow"><span /> Tianyi (David) Li · Independent public-equity research</p>
         <h1>Ideas compound.<br /><em>Capital follows.</em></h1>
         <div className="hero-bottom">
           <p>
-            A transparent record of concentrated investments, long-term
-            performance, and the thinking behind every decision.
+            Fundamental investing, data analysis, and macroeconomic context—documented through a transparent portfolio, performance record, and investment memos.
           </p>
           <div className="hero-actions">
             <Link className="button button-dark" href="/portfolio">View portfolio <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
@@ -45,8 +44,13 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="home-about shell">
+        <div><p className="section-number">01 / About</p><h2>Modern fundamentals,<br />documented in public.</h2></div>
+        <div><p>I am Tianyi (David) Li, an investor and incoming Rutgers University–New Brunswick Honors College student. I use this website to turn investment opinions into structured arguments and measure those decisions against their results.</p><Link className="text-link" href="/about">About the process →</Link></div>
+      </section>
+
       <section className="intro shell">
-        <p className="section-number">01 / Portfolio</p>
+        <p className="section-number">02 / Portfolio</p>
         <h2>Concentrated by design.<br />Patient by default.</h2>
         <Link className="round-link" href="/portfolio" aria-label="View portfolio"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
@@ -71,7 +75,7 @@ export default function Home() {
       <section className="performance-home">
         <div className="shell">
           <div className="section-heading inverse">
-            <p className="section-number">02 / Performance</p>
+            <p className="section-number">03 / Performance</p>
             <h2>A record built<br />one decision at a time.</h2>
           </div>
           <div className="performance-grid">
@@ -91,7 +95,7 @@ export default function Home() {
 
       <section className="memos-home shell">
         <div className="section-heading">
-          <p className="section-number">03 / Investment Memos</p>
+          <p className="section-number">04 / Investment Memos</p>
           <h2>Thinking,<br />made visible.</h2>
         </div>
         <div className="memo-grid">
