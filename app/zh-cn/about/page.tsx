@@ -25,7 +25,7 @@ export default function AboutPageZhCn() {
 
     <section className="about-section shell"><div className="about-section-heading"><span>06 · 背景</span><h2>以好奇心、同理心与持续学习成长</h2></div><div className="about-copy"><p>我即将进入罗格斯大学新布朗斯维克分校荣誉学院，计划双主修金融与商业分析及信息技术，并考虑辅修哲学或音乐。</p><p>我倡导以好奇心、同理心与持续学习为基础的“learn-it-all”成长思维。我不期待自己一开始就拥有所有答案，而是希望提出更好的问题、倾听不同观点、接受反馈，并持续提升知识与能力。</p><p>这种思维也塑造了我的投资方式。当证据挑战既有观点时，我宁愿重新检视并修正投资论点，也不会只为了维持一致而捍卫先前的结论。</p></div></section>
 
-    <section className="about-boundaries shell"><div><span>这个网站是</span><ul><li>每月完整披露的投资组合与业绩记录</li><li>详细投资论点与财务模型的资料库</li><li>为帮助每一位个人投资者而建立的资源</li></ul></div><div><span>这个网站不是</span><ul><li>对每项投资论点都会正确的承诺</li><li>买入或卖出任何特定证券的建议</li><li>独立研究或专业财务建议的替代品</li></ul></div></section>
+    <section className="about-boundaries shell"><article><h2>这个网站是</h2><ol><li>每月完整披露的投资组合与业绩记录</li><li>详细投资论点与财务模型的资料库</li><li>为帮助每一位个人投资者而建立的资源</li></ol></article><article><h2>这个网站不是</h2><ol><li>对每项投资论点都会正确的承诺</li><li>买入或卖出任何特定证券的建议</li><li>独立研究或专业财务建议的替代品</li></ol></article></section>
 
     <section className="about-closing shell"><p className="eyebrow"><span /> 结语</p><h2>公开学习，独立思考，持续进步</h2><div><p>我相信公开学习、透明投资，并帮助他人独立思考。</p><p>我不期待自己拥有所有答案。我希望保持好奇、以同理心面对不同观点、清楚说明自己的假设，并在证据改变时修正结论。</p><p>Modern Fundamental Analyst 保存我每项投资决策背后的推理，并以结果衡量这些决策。通过每月披露投资组合与业绩、发布详细投资论点与透明的估值方法，我希望建立更严谨的投资流程，同时帮助每一位个人投资者发展自己的判断。</p><p>更详细的法律与方法信息，请参阅<Link href="/zh-cn/disclaimer">免责声明</Link>与<Link href="/zh-cn/performance">业绩</Link>页面。</p></div></section>
     <SiteFooter locale="zh-cn" />
