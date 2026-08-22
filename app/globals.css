@@ -248,6 +248,14 @@ a { color: inherit; text-decoration: none; }
 .portfolio-total-row { min-height: 102px; border-top: 1px solid var(--black); background: var(--white); }
 .data-note { margin-top: 46px; margin-bottom: 140px; max-width: 800px; color: rgba(0,0,0,.62); }
 .portfolio-source-note { color: rgba(0,0,0,.62); line-height: 1.55; }
+.source-note { padding-top: 22px; border-top: 1px solid var(--gray); }
+.source-note p { margin: 0; }
+.source-note p + p { margin-top: 12px; }
+.source-note p:first-child { color: var(--black); }
+.source-note p:first-child > span { font-weight: var(--weight-bold); }
+.source-link { display: inline; padding: 2px 5px; color: var(--black); background: var(--light-blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: background-color .2s ease; }
+.source-link:hover { background: color-mix(in srgb, var(--light-blue) 72%, var(--white)); }
+.source-link:focus-visible { outline: 2px solid var(--dark-blue); outline-offset: 3px; }
 .performance-summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1px; margin-top: 80px; background: var(--black); border: 1px solid var(--black); }
 .performance-summary > div { min-height: 310px; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
 .performance-summary .summary-primary { background: var(--white); }
@@ -326,7 +334,7 @@ a { color: inherit; text-decoration: none; }
 .memo-references { margin-top: 112px; padding-top: 72px; border-top: 1px solid var(--black); }
 .memo-references ol { margin: 0; padding-left: 22px; }
 .memo-references li + li { margin-top: 14px; }
-.article-source-note { margin-top: 46px !important; padding-top: 22px; border-top: 1px solid var(--gray); color: rgba(0,0,0,.62); }
+.article-source-note { margin-top: 46px !important; padding-top: 22px; border-top: 1px solid var(--gray); color: rgba(0,0,0,.62); line-height: 1.65; }
 .article-body blockquote { margin: 64px 0; padding: 34px 0; border-top: 3px solid var(--medium-blue); border-bottom: 1px solid var(--gray); }
 .contact-hero { min-height: 680px; }
 .contact-note { max-width: 580px; margin: 80px 0 0 auto; color: rgba(0,0,0,.62); }

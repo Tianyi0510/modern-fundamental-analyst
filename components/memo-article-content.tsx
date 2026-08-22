@@ -18,7 +18,7 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
       <section className="memo-references">
         <h2>{content.referencesTitle}</h2>
         <ol>{content.references.map((reference) => <li key={reference}>{reference}</li>)}</ol>
-        <p className="article-source-note"><a href={content.sourceUrl} target="_blank" rel="noreferrer">{content.sourceLabel}</a></p>
+        <p className="article-source-note"><a className="source-link" href={content.sourceUrl} target="_blank" rel="noreferrer">{content.sourceLabel}</a></p>
       </section>
     </div>
   );
