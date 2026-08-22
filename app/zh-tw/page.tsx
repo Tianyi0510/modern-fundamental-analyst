@@ -14,9 +14,9 @@ export default function TraditionalChineseHome() {
 
       <section className="hero shell">
         <p className="eyebrow"><span /> Tianyi（David）Li · 獨立公開市場股票研究</p>
-        <h1>觀點會複利。<br /><em>資本隨之成長。</em></h1>
+        <h1>為顛覆性未來，<br /><em>實踐集中投資。</em></h1>
         <div className="hero-bottom">
-          <p>結合基本面投資、資料分析與總體經濟脈絡，透過透明的投資組合、績效紀錄與投資備忘錄公開呈現。</p>
+          <p>透過長期價值研究、財務建模與完整揭露的投資組合，幫助每一位個人投資者建立獨立判斷。</p>
           <div className="hero-actions">
             <Link className="button button-dark" href="/zh-tw/portfolio">查看投資組合 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
             <Link className="text-link" href="/zh-tw/memos">閱讀最新投資備忘錄 →</Link>
@@ -31,13 +31,13 @@ export default function TraditionalChineseHome() {
       </section>
 
       <section className="home-about shell">
-        <div><p className="section-number">01 關於</p><h2>現代基本面，<br />公開記錄。</h2></div>
-        <div><p>我相信集中投資與長期價值投資的力量，也相信人工智慧與其他顛覆性科技浪潮即將到來。每一項投資觀點仍必須建立在企業品質、長期價值、估值與風險之上。</p><Link className="text-link" href="/zh-tw/about">了解投資過程 →</Link></div>
+        <div><p className="section-number">01 關於</p><h2>我的投資信念與<br />持續學習的承諾</h2></div>
+        <div><p>我相信集中投資、長期價值投資，以及即將到來的人工智慧與其他顛覆性科技浪潮。我重視會計作為商業語言的角色，並運用財務建模連結企業基本面與估值。我也提倡以好奇心、同理心與持續學習為基礎的「learn-it-all」成長思維。</p><Link className="text-link" href="/zh-tw/about">了解投資過程 →</Link></div>
       </section>
 
       <section className="intro shell">
         <p className="section-number">02 投資組合</p>
-        <h2>有意識地集中。<br />有紀律地等待。</h2>
+        <h2>為長期持有而建立的<br />集中投資組合</h2>
         <Link className="round-link" href="/zh-tw/portfolio" aria-label="查看投資組合"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
 
@@ -60,7 +60,7 @@ export default function TraditionalChineseHome() {
 
       <section className="performance-home">
         <div className="shell">
-          <div className="section-heading inverse"><p className="section-number">03 績效</p><h2>每一次決策，<br />累積成一份紀錄。</h2></div>
+          <div className="section-heading inverse"><p className="section-number">03 績效</p><h2>每月完整透明揭露<br />投資結果</h2></div>
           <div className="performance-grid">
             <div className="performance-bars" aria-label="XIRR 比較圖表">
               <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{portfolioSnapshot.xirr}%</span></div><small>投資組合</small></div>
@@ -83,7 +83,7 @@ export default function TraditionalChineseHome() {
         <Link className="text-link memos-all" href="/zh-tw/memos">查看所有投資備忘錄 →</Link>
       </section>
 
-      <section className="cta shell"><p className="eyebrow"><span /> 05 聯絡</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
+      <section className="cta shell"><p className="eyebrow"><span /> 05 聯絡</p><h2>持續掌握我的<br />最新研究</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
       <SiteFooter locale="zh-tw" />
     </main>
   );

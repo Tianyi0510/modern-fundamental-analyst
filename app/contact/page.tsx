@@ -6,6 +6,6 @@ export const metadata: Metadata = { title: "Contact", description: "Contact Mode
 
 export default function ContactPage() {
   return <main className="contact-page"><SiteHeader counterpartPath="/zh-tw/contact" />
-    <section className="page-hero contact-hero shell"><p className="eyebrow"><span /> Contact</p><h1>Start a thoughtful<br /><em>conversation.</em></h1><p className="contact-note">Contact details and the Resend-powered form will be connected before launch.</p></section>
-    <section className="contact-grid shell"><div><span>Research</span><p>Questions, constructive disagreement, and long-term ideas are welcome.</p></div><div><span>Professional</span><p>For collaborations and other professional enquiries.</p></div></section><SiteFooter /></main>;
+    <section className="page-hero contact-hero shell"><p className="eyebrow"><span /> Contact</p><h1>Connect Through Research,<br /><em>Ideas, and Opportunities.</em></h1><p className="contact-note">Reach out to discuss investment research, financial modeling, business opportunities, or ideas that empower retail investors.</p></section>
+    <section className="contact-grid shell"><div><span>Research</span><p>Share feedback, challenge my assumptions, or discuss detailed investment theses, valuation methods, and portfolio decisions.</p></div><div><span>Business</span><p>Contact me about internships, collaborations, tutoring, financial modeling projects, or other professional opportunities across finance.</p></div></section><SiteFooter /></main>;
 }

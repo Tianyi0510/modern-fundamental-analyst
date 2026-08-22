@@ -14,10 +14,10 @@ export default function Home() {
 
       <section className="hero shell">
         <p className="eyebrow"><span /> Tianyi (David) Li · Independent Public-Equity Research</p>
-        <h1>Ideas compound.<br /><em>Capital follows.</em></h1>
+        <h1>Focus Investing for a<br /><em>Disruptive Future.</em></h1>
         <div className="hero-bottom">
           <p>
-            Fundamental investing, data analysis, and macroeconomic context—documented through a transparent portfolio, performance record, and investment memos.
+            Long-term value research, financial modeling, and a fully disclosed portfolio built to empower every retail investor.
           </p>
           <div className="hero-actions">
             <Link className="button button-dark" href="/portfolio">View portfolio <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
@@ -45,13 +45,13 @@ export default function Home() {
       </section>
 
       <section className="home-about shell">
-        <div><p className="section-number">01 About</p><h2>Modern fundamentals,<br />documented in public.</h2></div>
-        <div><p>I believe in the power of focus investing and long-term value investing—and in the coming waves of AI and other disruptive technologies. Every idea must still be grounded in business quality, long-term value, valuation, and risk.</p><Link className="text-link" href="/about">About the process →</Link></div>
+        <div><p className="section-number">01 About</p><h2>My Investment Beliefs and<br />Commitment to Learning</h2></div>
+        <div><p>I believe in focus investing, long-term value investing, and the coming waves of AI and other disruptive technologies. I value accounting as the language of business and use financial modeling to connect business fundamentals with valuation. I also promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning.</p><Link className="text-link" href="/about">About the process →</Link></div>
       </section>
 
       <section className="intro shell">
         <p className="section-number">02 Portfolio</p>
-        <h2>Concentrated by design.<br />Patient by default.</h2>
+        <h2>A Focus Portfolio Built<br />for Long-Term Ownership</h2>
         <Link className="round-link" href="/portfolio" aria-label="View portfolio"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
 
@@ -76,7 +76,7 @@ export default function Home() {
         <div className="shell">
           <div className="section-heading inverse">
             <p className="section-number">03 Performance</p>
-            <h2>A record built<br />one decision at a time.</h2>
+            <h2>Monthly Results Disclosed<br />with Complete Transparency</h2>
           </div>
           <div className="performance-grid">
             <div className="performance-bars" aria-label="XIRR comparison chart">
@@ -113,7 +113,7 @@ export default function Home() {
 
       <section className="cta shell">
         <p className="eyebrow"><span /> 05 Contact</p>
-        <h2>Follow the process,<br />not the noise.</h2>
+        <h2>Stay Connected with<br />My Latest Research</h2>
         <Link className="button button-dark" href="/contact">Get in touch <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
       <SiteFooter />
