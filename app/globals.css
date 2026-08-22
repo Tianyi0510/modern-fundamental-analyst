@@ -17,20 +17,20 @@
   --type-display-medium: 72px;
   --type-display-small: 42px;
   --type-headline: 30px;
-  --type-title: 24px;
+  --type-title: 24px; /* Title / 標題 */
   --type-subtitle: 19px;
   --type-body-large: 19px;
   --type-body: 16px;
-  --type-label: 17px;
-  --type-caption: 13px;
-  --type-action: 15px;
+  --type-label: 17px; /* Label / 標籤 */
+  --type-caption: 13px; /* Caption / 註解 */
+  --type-button: 15px; /* Button / 按鈕 */
   --type-data-large: 96px;
   --type-data-kpi: 64px;
   --type-data-kpi-compact: 48px;
   --type-data-row: 20px;
+  --type-data-row-total: 20px;
   --weight-regular: 400;
   --weight-medium: 500;
-  --weight-semibold: 650;
   --weight-bold: 700;
   --tracking-display: -.065em;
   --tracking-heading: -.035em;
@@ -116,7 +116,7 @@ a { color: inherit; text-decoration: none; }
 .section-number { font: 600 12px var(--font-ui); text-transform: uppercase; letter-spacing: .1em; color: rgba(0,0,0,.62); }
 .home-page .eyebrow, .home-page .section-number { font-size: 17px; text-transform: none; letter-spacing: .05em; }
 .home-page .metric span { font-size: 17px; text-transform: none; letter-spacing: .05em; }
-.intro h2 { margin: 46px 0 0; font-size: clamp(48px, 7vw, 108px); line-height: .95; letter-spacing: -.065em; font-weight: 650; }
+.intro h2 { margin: 46px 0 0; font-size: clamp(48px, 7vw, 108px); line-height: .95; letter-spacing: -.065em; font-weight: 700; }
 .round-link { position: absolute; right: 0; bottom: 170px; width: 76px; height: 76px; border: 1px solid var(--black); border-radius: 50%; display: grid; place-items: center; font-size: 28px; transition: background .2s ease, color .2s ease; }
 .round-link:hover { background: var(--black); color: var(--white); }
 .holdings-preview { display: grid; grid-template-columns: 1.65fr .75fr; gap: 64px; padding: 0 0 150px; }
@@ -136,7 +136,7 @@ a { color: inherit; text-decoration: none; }
 .allocation-card > a { font-weight: 700; border-top: 1px solid rgba(0,0,0,.18); padding-top: 18px; }
 .performance-home { background: var(--dark-blue); color: var(--white); padding: 140px 0; }
 .section-heading { display: grid; grid-template-columns: 1fr 2fr; align-items: start; }
-.section-heading h2 { margin: 0; font-size: clamp(52px, 7vw, 106px); line-height: .93; letter-spacing: -.065em; font-weight: 650; }
+.section-heading h2 { margin: 0; font-size: clamp(52px, 7vw, 106px); line-height: .93; letter-spacing: -.065em; font-weight: 700; }
 .inverse .section-number { color: rgba(255,255,255,.58); }
 .performance-grid { display: grid; grid-template-columns: 1.45fr .7fr; gap: 80px; margin-top: 108px; align-items: end; }
 .performance-bars { height: 360px; display: flex; align-items: end; gap: clamp(18px, 4vw, 62px); padding: 40px 26px 0; border-left: 1px solid rgba(255,255,255,.35); border-bottom: 1px solid rgba(255,255,255,.35); }
@@ -167,7 +167,7 @@ a { color: inherit; text-decoration: none; }
 .memos-all { display: table; margin: 50px 0 0 auto; }
 .cta { padding: 140px 0; display: grid; grid-template-columns: 1fr auto; align-items: end; border-top: 1px solid var(--black); }
 .cta .eyebrow { grid-column: 1 / -1; margin: 0 0 46px; }
-.cta h2 { margin: 0; font-size: clamp(52px, 7vw, 108px); line-height: .93; letter-spacing: -.065em; font-weight: 650; }
+.cta h2 { margin: 0; font-size: clamp(52px, 7vw, 108px); line-height: .93; letter-spacing: -.065em; font-weight: 700; }
 .site-footer { padding: 66px 0 32px; display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 32px; align-items: start; border-top: 1px solid var(--gray); }
 .footer-mark { max-width: 320px; font-size: 25px; }
 .site-footer p { margin: 0; max-width: 390px; color: rgba(0,0,0,.62); }
@@ -202,7 +202,7 @@ a { color: inherit; text-decoration: none; }
 .about-copy > p + p { margin-top: 1.35em; }
 .about-copy > :first-child { margin-top: 0; }
 .about-copy > :last-child { margin-bottom: 0; }
-.about-copy em { color: var(--dark-blue); font-style: normal; font-weight: 650; }
+.about-copy em { color: var(--dark-blue); font-style: normal; font-weight: 700; }
 .about-philosophy-copy h3 { margin: 54px 0 14px; font-size: 30px; line-height: 1.1; letter-spacing: -.035em; }
 .about-philosophy-copy h3:first-child { margin-top: 0; }
 .about-list { margin: 34px 0 42px; padding: 0; list-style: none; border-top: 1px solid var(--black); }
@@ -326,7 +326,7 @@ a { color: inherit; text-decoration: none; }
 .memo-meta { display: flex; flex-direction: column; align-items: end; gap: 10px; font-size: 12px; }
 .memo-meta b { margin-top: auto; font-size: 26px; }
 .memo-article { padding: 70px 0 150px; }
-.back-link { display: inline-block; margin-bottom: 90px; font-weight: 650; }
+.back-link { display: inline-block; margin-bottom: 90px; font-weight: 700; }
 .memo-article h1 { max-width: 1120px; margin: 50px 0 46px; font-size: clamp(58px, 8vw, 118px); line-height: .9; letter-spacing: -.07em; }
 .article-meta { display: flex; gap: 28px; padding: 18px 0; border-top: 1px solid var(--black); border-bottom: 1px solid var(--gray); font: 500 12px var(--font-ui); }
 .article-lead { max-width: 900px; margin: 94px 0; font-size: clamp(28px, 4vw, 48px); line-height: 1.2; letter-spacing: -.04em; }
@@ -350,7 +350,7 @@ a { color: inherit; text-decoration: none; }
 .not-found h1 { margin: 0; font-size: clamp(48px, 8vw, 110px); letter-spacing: -.06em; }
 
 /* Unified typography hierarchy
-   Display → Headline → Title → Subtitle → Body → Label → Caption → Action → Data */
+   Display → Headline → Title → Subtitle → Body → Label → Caption → Button → Data */
 .hero h1,
 .page-hero h1,
 .legal h1,
@@ -358,7 +358,7 @@ a { color: inherit; text-decoration: none; }
   font-size: var(--type-display-large);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
 }
 
 .home-about h2,
@@ -373,7 +373,7 @@ a { color: inherit; text-decoration: none; }
   font-size: var(--type-display-medium);
   line-height: .98;
   letter-spacing: -.055em;
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
 }
 
 .memo-card h3,
@@ -382,7 +382,7 @@ a { color: inherit; text-decoration: none; }
   font-size: var(--type-display-small);
   line-height: 1.05;
   letter-spacing: -.045em;
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
 }
 
 .about-philosophy-copy h3,
@@ -391,7 +391,7 @@ a { color: inherit; text-decoration: none; }
   font-size: var(--type-headline);
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
 }
 
 .hero-bottom > p,
@@ -481,7 +481,7 @@ a { color: inherit; text-decoration: none; }
 .button,
 .text-link,
 .back-link {
-  font-size: var(--type-action);
+  font-size: var(--type-button);
   line-height: 1.2;
   font-weight: var(--weight-bold);
 }
@@ -513,6 +513,13 @@ a { color: inherit; text-decoration: none; }
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-total-row > * {
+  font-size: var(--type-data-row-total);
+  line-height: 1.25;
+  font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
 
@@ -594,7 +601,7 @@ a { color: inherit; text-decoration: none; }
   .mobile-menu-top { min-height: 46px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid rgba(255,255,255,.3); }
   .mobile-menu-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
   .mobile-menu-close { border-color: rgba(255,255,255,.75); background: transparent; color: var(--white); }
-  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: clamp(26px, 8vw, 38px); font-weight: 650; line-height: 1; }
+  .mobile-menu-drawer nav { display: flex; flex-direction: column; gap: 0; margin-top: 24px; font-size: clamp(26px, 8vw, 38px); font-weight: 700; line-height: 1; }
   .mobile-menu-drawer nav a { padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.22); white-space: nowrap; transition: color .2s ease, padding-left .2s ease; }
   .mobile-menu-drawer nav a:hover { color: var(--light-blue); padding-left: 8px; }
   .mobile-menu-language { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.3); font-size: 14px; font-weight: 700; }
