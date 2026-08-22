@@ -112,7 +112,7 @@ export default function Home() {
       </section>
 
       <section className="cta shell">
-        <p className="eyebrow"><span /> 06 Contact</p>
+        <p className="eyebrow"><span /> 05 Contact</p>
         <h2>Follow the process,<br />not the noise.</h2>
         <Link className="button button-dark" href="/contact">Get in touch <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
