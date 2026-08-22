@@ -8,17 +8,6 @@ export const metadata: Metadata = {
   description: "Tianyi（David）Li 的背景、投資方法，以及 Modern Fundamental Analyst 背後的理念。",
 };
 
-const investmentFocus = [
-  "商業模式與收入來源",
-  "競爭優勢與產業結構",
-  "財務品質與資產負債表韌性",
-  "管理層與資本配置",
-  "長期成長動力",
-  "估值與預期報酬",
-  "下行風險與投資論點可能失效的原因",
-  "相關的總體經濟或監管發展",
-];
-
 const disclosureFocus = [
   "投資組合持股與部位權重",
   "相對於適當基準的績效",
@@ -42,13 +31,17 @@ export default function AboutPageZhTw() {
     </section>
 
     <section className="about-section shell">
-      <div className="about-section-heading"><span>02 · 為什麼是現代基本面分析？</span><h2>傳統基礎，面對持續變化的環境。</h2></div>
+      <div className="about-section-heading"><span>02 · 什麼是現代基本面分析師？</span><h2>傳統基礎，面對持續變化的環境。</h2></div>
       <div className="about-copy"><p>基本面分析始終是我的方法基礎：理解企業、檢視其財務狀況、評估管理層的資本配置，並比較內在價值與市場價格。</p><p>然而，企業正日益受到科技、全球資本流動、地緣政治分化與大規模經濟轉型的影響。現代基本面分析因此應結合傳統企業研究、資料與產業分析，以及對更廣泛總體經濟環境的理解。</p><p><em>Modern Fundamental Analyst</em> 這個名稱反映了這種結合。它並不代表我已完善這套方法，而是描述我正在努力成為的投資者。</p></div>
     </section>
 
     <section className="about-section shell">
-      <div className="about-section-heading"><span>03 · 投資方法</span><h2>持有企業，而不只是持有代號。</h2></div>
-      <div className="about-copy"><p>我將投資視為對真實企業的所有權，而不只是股票代號或短期價格波動。我的研究通常聚焦於：</p><ul className="about-list">{investmentFocus.map((item) => <li key={item}>{item}</li>)}</ul><p>我不嚴格區分「價值」與「成長」。成長型企業可能被低估，而統計上價格低廉的企業也可能仍是一項不佳的投資。真正重要的問題是：企業最終可能賺取多少、結果存在多少不確定性，以及投資者為此支付什麼價格。</p><p>我的投資組合仍是一項持續發展中的工作。不同部位可能反映不同程度的信念；隨著經驗累積及新證據出現，我的分析流程也會繼續演進。</p></div>
+      <div className="about-section-heading"><span>03 · 投資哲學</span><h2>集中、長期，並迎向即將到來的浪潮。</h2></div>
+      <div className="about-copy about-philosophy-copy">
+        <h3>集中投資</h3><p>我相信投資組合應集中於少數我真正理解並抱有信念的投資。當信念建立在研究之上，集中的投資組合能讓最強的觀點對績效產生實質影響。</p><p>集中投資同時需要紀律。每個部位都必須具備清楚的投資論點、審慎的下行風險分析，並持續檢視原始推理是否仍然成立。</p>
+        <h3>長期價值投資</h3><p>在分析一檔股票時，我遵循長期價值投資原則。我會理解其背後的企業、估算長期價值，並將該價值與市場價格比較。</p><p>長期價值投資並不只是購買估值倍數較低的股票，而是投資於長期價值尚未完全反映在目前價格中的企業，並給予投資論點充分發展的時間。</p>
+        <h3>即將到來的浪潮</h3><p>我相信人工智慧與其他顛覆性科技浪潮即將到來。這些科技將重塑企業、產業與整體經濟，同時創造重大機會與新的風險。</p><p>相信科技浪潮，並不代表投資每一家與其相關的公司。我仍會運用長期價值投資原則：理解企業將如何受益、是否能持續取得價值，以及該機會是否已反映在股價之中。</p>
+      </div>
     </section>
 
     <section className="about-section shell">
