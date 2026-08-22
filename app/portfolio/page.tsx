@@ -12,7 +12,7 @@ export default function PortfolioPage() {
     <section className="portfolio-kpis shell" aria-label="Portfolio summary">
       <div><span>Stock market value</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>USD</small></div>
       <div><span>Net cost basis</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>Purchases and transaction fees</small></div>
-      <div><span>Total return</span><strong className="data-value positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>Cumulative cost-basis return</small></div>
+      <div><span>Total return</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>Cumulative cost-basis return</small></div>
       <div><span>Holdings</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>Stocks and ETFs</small></div>
     </section>
     <section className="portfolio-allocation shell"><div><span>Allocation by market value</span><small>100% of disclosed stock holdings</small></div><div className="stacked-bar" aria-label="Portfolio allocation by market value">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>

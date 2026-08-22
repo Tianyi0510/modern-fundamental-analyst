@@ -12,7 +12,7 @@ export default function PortfolioPageZhTw() {
     <section className="portfolio-kpis shell" aria-label="投資組合摘要">
       <div><span>股票市場價值</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>美元</small></div>
       <div><span>淨成本基礎</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>買入金額與交易費用</small></div>
-      <div><span>累積報酬</span><strong className="data-value positive">+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>成本基礎累積報酬</small></div>
+      <div><span>累積報酬</span><strong>+{portfolioSnapshot.totalReturn.toFixed(2)}%</strong><small>成本基礎累積報酬</small></div>
       <div><span>持股數量</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>股票與 ETF</small></div>
     </section>
     <section className="portfolio-allocation shell"><div><span>依市場價值配置</span><small>已揭露股票部位的 100%</small></div><div className="stacked-bar" aria-label="依市場價值計算的投資組合配置">{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
