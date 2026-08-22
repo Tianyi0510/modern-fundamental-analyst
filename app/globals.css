@@ -171,6 +171,8 @@ a { color: inherit; text-decoration: none; }
 .about-copy > :first-child { margin-top: 0; }
 .about-copy > :last-child { margin-bottom: 0; }
 .about-copy em { color: var(--dark-blue); font-style: normal; font-weight: 650; }
+.about-philosophy-copy h3 { margin: 54px 0 14px; font-size: 30px; line-height: 1.1; letter-spacing: -.035em; }
+.about-philosophy-copy h3:first-child { margin-top: 0; }
 .about-list { margin: 34px 0 42px; padding: 0; list-style: none; border-top: 1px solid var(--black); }
 .about-list li { padding: 15px 0; border-bottom: 1px solid var(--gray); display: grid; grid-template-columns: 24px 1fr; gap: 12px; }
 .about-list li::before { content: "↗"; color: var(--medium-blue); }
@@ -322,6 +324,7 @@ a { color: inherit; text-decoration: none; }
 [lang="zh-Hant-TW"] .article-body blockquote,
 [lang="zh-Hant-TW"] .contact-grid p,
 [lang="zh-Hant-TW"] .legal h2,
+[lang="zh-Hant-TW"] .about-philosophy-copy h3,
 [lang="zh-Hant-TW"] .principles h3,
 [lang="zh-Hant-TW"] .two-column h2,
 [lang="zh-Hant-TW"] .methodology h2,

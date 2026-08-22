@@ -32,7 +32,7 @@ export default function TraditionalChineseHome() {
 
       <section className="home-about shell">
         <div><p className="section-number">01／關於</p><h2>現代基本面，<br />公開記錄。</h2></div>
-        <div><p>我是 Tianyi（David）Li，一名投資者，也是即將進入羅格斯大學新布朗斯維克分校榮譽學院的學生。我透過這個網站把投資觀點轉化為結構化論證，並用結果檢驗每一項決策。</p><Link className="text-link" href="/zh-tw/about">了解投資過程 →</Link></div>
+        <div><p>我相信集中投資與長期價值投資的力量，也相信人工智慧與其他顛覆性科技浪潮即將到來。每一項投資觀點仍必須建立在企業品質、長期價值、估值與風險之上。</p><Link className="text-link" href="/zh-tw/about">了解投資過程 →</Link></div>
       </section>
 
       <section className="intro shell">

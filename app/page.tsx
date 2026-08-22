@@ -46,7 +46,7 @@ export default function Home() {
 
       <section className="home-about shell">
         <div><p className="section-number">01 / About</p><h2>Modern fundamentals,<br />documented in public.</h2></div>
-        <div><p>I am Tianyi (David) Li, an investor and incoming Rutgers University–New Brunswick Honors College student. I use this website to turn investment opinions into structured arguments and measure those decisions against their results.</p><Link className="text-link" href="/about">About the process →</Link></div>
+        <div><p>I believe in the power of focus investing and long-term value investing—and in the coming waves of AI and other disruptive technologies. Every idea must still be grounded in business quality, long-term value, valuation, and risk.</p><Link className="text-link" href="/about">About the process →</Link></div>
       </section>
 
       <section className="intro shell">

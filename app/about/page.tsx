@@ -8,17 +8,6 @@ export const metadata: Metadata = {
   description: "Tianyi (David) Li's background, investment approach, and principles behind Modern Fundamental Analyst.",
 };
 
-const investmentFocus = [
-  "Business model and sources of revenue",
-  "Competitive advantages and industry structure",
-  "Financial quality and balance-sheet resilience",
-  "Management and capital allocation",
-  "Long-term growth drivers",
-  "Valuation and expected return",
-  "Downside risk and potential thesis failure",
-  "Relevant macroeconomic or regulatory developments",
-];
-
 const disclosureFocus = [
   "Portfolio holdings and position weights",
   "Performance against an appropriate benchmark",
@@ -42,13 +31,17 @@ export default function AboutPage() {
     </section>
 
     <section className="about-section shell">
-      <div className="about-section-heading"><span>02 · Why modern fundamental analysis?</span><h2>Traditional foundations. A changing environment.</h2></div>
+      <div className="about-section-heading"><span>02 · What is a Modern Fundamental Analyst?</span><h2>Traditional foundations. A changing environment.</h2></div>
       <div className="about-copy"><p>Fundamental analysis remains the foundation of my approach: understand the business, examine its financial position, assess management&apos;s allocation of capital, and compare intrinsic value with the market price.</p><p>But businesses are increasingly shaped by technology, global capital flows, geopolitical fragmentation, and large-scale economic transitions. Modern fundamental analysis should combine traditional company research with data, industry analysis, and awareness of the wider macroeconomic context.</p><p>The name <em>Modern Fundamental Analyst</em> reflects this combination. It is not a claim to have perfected the process; it describes the kind of investor I am working to become.</p></div>
     </section>
 
     <section className="about-section shell">
-      <div className="about-section-heading"><span>03 · Investment approach</span><h2>Own the business, not the ticker.</h2></div>
-      <div className="about-copy"><p>I approach an investment as an ownership interest in a real business, not simply as a ticker or a short-term price movement. My research generally focuses on:</p><ul className="about-list">{investmentFocus.map((item) => <li key={item}>{item}</li>)}</ul><p>I do not follow a rigid distinction between “value” and “growth.” A growing company can be undervalued, while a statistically inexpensive company can still be a poor investment. The relevant questions are what the business may ultimately earn, how much uncertainty surrounds that outcome, and what price is being paid for it.</p><p>My portfolio remains a developing body of work. Positions may reflect different levels of conviction, and my analytical process will continue to evolve as I gain experience and encounter new evidence.</p></div>
+      <div className="about-section-heading"><span>03 · Investment Philosophy</span><h2>Focused. Long-term. Open to the coming waves.</h2></div>
+      <div className="about-copy about-philosophy-copy">
+        <h3>Focus Investing</h3><p>I believe a portfolio should focus on a limited number of investments that I understand and genuinely believe in. When conviction is supported by research, a focused portfolio allows the strongest ideas to have a meaningful impact on performance.</p><p>Focus investing also requires discipline. Every position must be supported by a clear thesis, careful analysis of downside risk, and continuous review of whether the original reasoning remains valid.</p>
+        <h3>Long-Term Value Investing</h3><p>When pitching a stock, I follow the principles of long-term value investing. I seek to understand the underlying business, estimate its long-term value, and compare that value with the market price.</p><p>Long-term value investing does not simply mean buying stocks with low valuation multiples. It means investing in businesses whose long-term value is not fully reflected in their current prices—and giving the investment thesis sufficient time to develop.</p>
+        <h3>The Coming Waves</h3><p>I believe in the coming waves of AI and other disruptive technologies. These technologies will reshape businesses, industries, and the wider economy, creating both significant opportunities and new risks.</p><p>Believing in a technological wave does not mean investing in every company associated with it. I still apply long-term value-investing principles: understanding how a company will benefit, whether it can capture lasting value, and whether that opportunity is already reflected in its share price.</p>
+      </div>
     </section>
 
     <section className="about-section shell">
