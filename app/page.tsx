@@ -9,11 +9,11 @@ const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "cu
 
 export default function Home() {
   return (
-    <main>
+    <main className="home-page">
       <SiteHeader counterpartPath="/zh-tw" />
 
       <section className="hero shell">
-        <p className="eyebrow"><span /> Tianyi (David) Li · Independent public-equity research</p>
+        <p className="eyebrow"><span /> Tianyi (David) Li · Independent Public-Equity Research</p>
         <h1>Ideas compound.<br /><em>Capital follows.</em></h1>
         <div className="hero-bottom">
           <p>
@@ -45,12 +45,12 @@ export default function Home() {
       </section>
 
       <section className="home-about shell">
-        <div><p className="section-number">01 / About</p><h2>Modern fundamentals,<br />documented in public.</h2></div>
+        <div><p className="section-number">01 About</p><h2>Modern fundamentals,<br />documented in public.</h2></div>
         <div><p>I believe in the power of focus investing and long-term value investing—and in the coming waves of AI and other disruptive technologies. Every idea must still be grounded in business quality, long-term value, valuation, and risk.</p><Link className="text-link" href="/about">About the process →</Link></div>
       </section>
 
       <section className="intro shell">
-        <p className="section-number">02 / Portfolio</p>
+        <p className="section-number">02 Portfolio</p>
         <h2>Concentrated by design.<br />Patient by default.</h2>
         <Link className="round-link" href="/portfolio" aria-label="View portfolio"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
@@ -75,7 +75,7 @@ export default function Home() {
       <section className="performance-home">
         <div className="shell">
           <div className="section-heading inverse">
-            <p className="section-number">03 / Performance</p>
+            <p className="section-number">03 Performance</p>
             <h2>A record built<br />one decision at a time.</h2>
           </div>
           <div className="performance-grid">
@@ -95,7 +95,7 @@ export default function Home() {
 
       <section className="memos-home shell">
         <div className="section-heading">
-          <p className="section-number">04 / Investment Memos</p>
+          <p className="section-number">04 Investment Memos</p>
           <h2>Thinking,<br />made visible.</h2>
         </div>
         <div className="memo-grid">
@@ -112,7 +112,7 @@ export default function Home() {
       </section>
 
       <section className="cta shell">
-        <p className="eyebrow"><span /> Latest update</p>
+        <p className="eyebrow"><span /> 06 Contact</p>
         <h2>Follow the process,<br />not the noise.</h2>
         <Link className="button button-dark" href="/contact">Get in touch <span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>

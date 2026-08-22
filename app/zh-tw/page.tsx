@@ -9,7 +9,7 @@ const formatUsd = (value: number) => new Intl.NumberFormat("en-US", { style: "cu
 
 export default function TraditionalChineseHome() {
   return (
-    <main>
+    <main className="home-page">
       <SiteHeader locale="zh-tw" counterpartPath="/" />
 
       <section className="hero shell">
@@ -31,12 +31,12 @@ export default function TraditionalChineseHome() {
       </section>
 
       <section className="home-about shell">
-        <div><p className="section-number">01／關於</p><h2>現代基本面，<br />公開記錄。</h2></div>
+        <div><p className="section-number">01 關於</p><h2>現代基本面，<br />公開記錄。</h2></div>
         <div><p>我相信集中投資與長期價值投資的力量，也相信人工智慧與其他顛覆性科技浪潮即將到來。每一項投資觀點仍必須建立在企業品質、長期價值、估值與風險之上。</p><Link className="text-link" href="/zh-tw/about">了解投資過程 →</Link></div>
       </section>
 
       <section className="intro shell">
-        <p className="section-number">02／投資組合</p>
+        <p className="section-number">02 投資組合</p>
         <h2>有意識地集中。<br />有紀律地等待。</h2>
         <Link className="round-link" href="/zh-tw/portfolio" aria-label="查看投資組合"><span className="arrow-icon" aria-hidden="true">↗︎</span></Link>
       </section>
@@ -60,7 +60,7 @@ export default function TraditionalChineseHome() {
 
       <section className="performance-home">
         <div className="shell">
-          <div className="section-heading inverse"><p className="section-number">03／績效</p><h2>每一次決策，<br />累積成一份紀錄。</h2></div>
+          <div className="section-heading inverse"><p className="section-number">03 績效</p><h2>每一次決策，<br />累積成一份紀錄。</h2></div>
           <div className="performance-grid">
             <div className="performance-bars" aria-label="XIRR 比較圖表">
               <div className="year-bar"><div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}><span>{portfolioSnapshot.xirr}%</span></div><small>投資組合</small></div>
@@ -72,7 +72,7 @@ export default function TraditionalChineseHome() {
       </section>
 
       <section className="memos-home shell">
-        <div className="section-heading"><p className="section-number">04／投資備忘錄</p><h2>讓思考，<br />清楚可見。</h2></div>
+        <div className="section-heading"><p className="section-number">04 投資備忘錄</p><h2>讓思考，<br />清楚可見。</h2></div>
         <div className="memo-grid">
           {memosZhTw.map((memo, index) => (
             <Link className={`memo-card memo-card-${index + 1}`} href={`/zh-tw/memos/${memo.slug}`} key={memo.slug}>
@@ -83,7 +83,7 @@ export default function TraditionalChineseHome() {
         <Link className="text-link memos-all" href="/zh-tw/memos">查看所有投資備忘錄 →</Link>
       </section>
 
-      <section className="cta shell"><p className="eyebrow"><span /> 最新更新</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
+      <section className="cta shell"><p className="eyebrow"><span /> 06 聯絡</p><h2>關注過程，<br />而不是雜訊。</h2><Link className="button button-dark" href="/zh-tw/contact">與我聯絡 <span className="arrow-icon" aria-hidden="true">↗︎</span></Link></section>
       <SiteFooter locale="zh-tw" />
     </main>
   );
