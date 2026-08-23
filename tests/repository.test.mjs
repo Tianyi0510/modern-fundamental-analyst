@@ -300,7 +300,7 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.contact-grid > article:first-child p\s*\{[^}]*color:\s*var\(--text-inverse\)/s);
-  assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.contact-grid > article:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.about-boundaries\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(css, /\.contact-grid\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(css, /\.about-boundaries ol\s*\{[^}]*margin:\s*48px 0 0/s);
