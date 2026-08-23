@@ -149,6 +149,8 @@ test("all home locales use one shared page structure", async () => {
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /HomePageContent/);
   assert.match(shared, /getMemos\(locale\)/);
   assert.match(shared, /className="link-label">\{text\.fullPortfolio\}/);
+  assert.match(shared, /className="home-portfolio-section"/);
+  assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
   assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--interactive-accent\); \}/);
   assert.match(styles, /\.allocation-card > a:hover \.arrow-icon \{ transform: translateX\(4px\); \}/);
@@ -174,6 +176,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceZhTw, /PerformancePageContent/);
   assert.match(performanceZhCn, /PerformancePageContent/);
   assert.doesNotMatch(portfolioShared, /portfolio-allocation|Allocation by market value|getHoldingWeight/);
+  assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
+  assert.match(performanceShared, /className="methodology-source"/);
+  assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
@@ -207,6 +212,7 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   ]);
 
   assert.match(page, /ContactForm locale=\{locale\}/);
+  assert.match(page, /className="contact-grid"/);
   assert.match(form, /fetch\("\/api\/contact"/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
@@ -215,6 +221,7 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
   assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
+  assert.match(styles, /\.control\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /CONTACT_TO_EMAIL/);
   assert.match(route, /contact@mail\.modernfundamentalanalyst\.com/);
@@ -293,7 +300,9 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.contact-grid > article:first-child p\s*\{[^}]*color:\s*var\(--text-inverse\)/s);
-  assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.about-boundaries\s*\{[^}]*min-height:\s*100svh/s);
+  assert.match(css, /\.contact-grid\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
   assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*80px 0 150px/);

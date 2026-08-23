@@ -24,7 +24,7 @@ const copy = {
     benchmarkContext: "Benchmark using matching cash flows",
     methodology: "Methodology",
     methodologyCopy: <>Results are presented in USD. Cumulative return compares current market value with net cost basis. XIRR reflects the timing and amount of portfolio cash flows; the {portfolioSnapshot.benchmark} comparison applies those same cash flows to the benchmark.</>,
-    sourceCopy: <><p><span>Source Sheet:</span> <a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>The verified snapshot is synchronized to this site monthly and is not based on live market prices. Past performance does not guarantee future results.</p></>,
+    sourceCopy: (asOf: string) => <><p><span>Source Sheet:</span> <a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>The verified snapshot is synchronized to this site monthly. Prices and market values use closing prices as of {asOf} and are not live quotes. Cash and external funding are excluded.</p></>,
   },
   "zh-tw": {
     eyebrow: "績效",
@@ -45,7 +45,7 @@ const copy = {
     benchmarkContext: "使用相同現金流計算的基準",
     methodology: "計算方法",
     methodologyCopy: <>績效以美元呈現。累積報酬比較目前市場價值與淨成本基礎；XIRR 反映投資組合現金流的時間與金額，{portfolioSnapshot.benchmark} 比較則將相同現金流套用至基準。</>,
-    sourceCopy: <><p><span>來源試算表：</span><a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>已驗證快照每月同步至本網站，並非依據即時市場價格。過往績效不代表未來結果。</p></>,
+    sourceCopy: (asOf: string) => <><p><span>來源試算表：</span><a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>已驗證快照每月同步至本網站。價格與市場價值均採用 {asOf} 收盤價，並非即時報價；不包含現金與外部資金流。</p></>,
   },
   "zh-cn": {
     eyebrow: "业绩",
@@ -66,7 +66,7 @@ const copy = {
     benchmarkContext: "使用相同现金流计算的基准",
     methodology: "计算方法",
     methodologyCopy: <>业绩以美元呈现。累计回报比较当前市场价值与净成本基础；XIRR 反映投资组合现金流的时间与金额，{portfolioSnapshot.benchmark} 比较则将相同现金流应用于基准。</>,
-    sourceCopy: <><p><span>来源电子表格：</span><a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>已验证快照每月同步至本网站，并非依据实时市场价格。过往业绩不代表未来结果。</p></>,
+    sourceCopy: (asOf: string) => <><p><span>来源电子表格：</span><a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>已验证快照每月同步至本网站。价格与市场价值均采用 {asOf} 收盘价，并非实时报价；不包含现金与外部资金流。</p></>,
   },
 } as const;
 
@@ -81,5 +81,5 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
     <section className="returns shell"><div className="section-heading"><p className="section-number">{text.snapshot}</p><h2>{text.measured}</h2></div>
       <div className="returns-table"><div className="table-head"><span>{text.measure}</span><span>{text.result}</span><span>{text.context}</span></div><div className="return-row"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><span>{text.cumulativeContext}</span></div><div className="return-row"><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><span>{text.portfolioContext}</span></div><div className="return-row"><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><span>{text.benchmarkContext}</span></div></div>
     </section>
-    <section className="methodology shell section-gray"><h2>{text.methodology}</h2><div><p>{text.methodologyCopy}</p><div className="source-note">{text.sourceCopy}</div></div></section><SiteFooter locale={locale} /></main>;
+    <section className="methodology shell section-gray"><h2>{text.methodology}</h2><div className="methodology-content"><p>{text.methodologyCopy}</p><aside className="methodology-source">{text.sourceCopy(asOf)}</aside></div></section><SiteFooter locale={locale} /></main>;
 }
