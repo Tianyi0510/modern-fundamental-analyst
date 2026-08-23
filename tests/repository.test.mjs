@@ -195,7 +195,7 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.doesNotMatch(form, /RESEND_API_KEY/);
 });
 
-test("subscribe form stores localized signups in Resend Contacts", async () => {
+test("subscribe form stores signups in Resend Contacts", async () => {
   const [page, form, styles, route, footer] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/subscribe-form.tsx"),
@@ -214,7 +214,7 @@ test("subscribe form stores localized signups in Resend Contacts", async () => {
   assert.match(route, /resend\.contacts\.update/);
   assert.match(route, /resend\.contacts\.get/);
   assert.match(route, /unsubscribed:\s*false/);
-  assert.match(route, /signup_locale/);
+  assert.doesNotMatch(route, /properties:/);
   assert.match(route, /isSameOrigin/);
   assert.match(route, /isRateLimited/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);

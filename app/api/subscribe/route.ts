@@ -10,7 +10,6 @@ const requests = new Map<string, number[]>();
 type SubscribeRequest = {
   email?: unknown;
   website?: unknown;
-  locale?: unknown;
 };
 
 function text(value: unknown, maxLength: number) {
@@ -54,7 +53,6 @@ export async function POST(request: Request) {
 
   const email = text(body.email, 254).toLowerCase();
   const website = text(body.website, 200);
-  const locale = text(body.locale, 10);
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (website) return NextResponse.json({ ok: true });
@@ -66,15 +64,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
   }
 
-  const properties = {
-    signup_locale: locale || "unknown",
-    signup_source: "website",
-  };
   const existing = await resend.contacts.get({ email });
   const result = existing.data
-    ? await resend.contacts.update({ id: existing.data.id, unsubscribed: false, properties })
+    ? await resend.contacts.update({ id: existing.data.id, unsubscribed: false })
     : existing.error?.statusCode === 404
-      ? await resend.contacts.create({ email, unsubscribed: false, properties })
+      ? await resend.contacts.create({ email, unsubscribed: false })
       : existing;
 
   if (result.error) {
