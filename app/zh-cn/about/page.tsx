@@ -6,7 +6,7 @@ import { createPageMetadata } from "@/lib/site-config";
 export const metadata = createPageMetadata({ title: "关于", description: "Tianyi（David）Li 的背景、投资方法，以及 Modern Fundamental Analyst 背后的理念。", path: "/about", locale: "zh-cn" });
 
 export default function AboutPageZhCn() {
-  return <main className="about-page"><SiteHeader locale="zh-cn" />
+  return <main className="about-page" id="main-content"><SiteHeader locale="zh-cn" />
     <section className="page-hero shell">
       <p className="eyebrow"><span /> 关于</p>
       <h1>持续学习。<br /><em>以问责精神投资。</em></h1>

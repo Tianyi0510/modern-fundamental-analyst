@@ -35,7 +35,7 @@ const copy = {
 export function ContactPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
-  return <main className="contact-page">
+  return <main className="contact-page" id="main-content">
     <SiteHeader locale={locale} />
     <section className="page-hero contact-hero shell">
       <p className="eyebrow"><span /> {text.label}</p>

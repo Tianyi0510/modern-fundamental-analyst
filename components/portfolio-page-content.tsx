@@ -72,7 +72,7 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
   const isChinese = locale !== "en";
   const asOf = formatDate(portfolioSnapshot.asOf, locale);
 
-  return <main className="portfolio-page"><SiteHeader locale={locale} />
+  return <main className="portfolio-page" id="main-content"><SiteHeader locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="portfolio-kpis shell" aria-label={text.summaryLabel}>
       <div><span>{text.marketValue}</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{text.currency}</small></div>
@@ -80,7 +80,7 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
       <div><span>{text.totalReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.totalReturnNote}</small></div>
       <div><span>{text.holdings}</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>{text.holdingsNote}</small></div>
     </section>
-    <section className="portfolio-allocation shell"><div><span>{text.allocation}</span><small>{text.allocationNote}</small></div><div className="stacked-bar" aria-label={text.allocationLabel}>{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
+    <section className="portfolio-allocation shell"><div><span>{text.allocation}</span><small>{text.allocationNote}</small></div><div className="stacked-bar" role="img" aria-label={text.allocationLabel}>{portfolioHoldings.map((holding, index) => <i className={`segment segment-${segmentColors[index % segmentColors.length]}`} style={{ width: `${getHoldingWeight(holding.marketValue)}%` }} key={holding.symbol} title={`${holding.symbol} ${getHoldingWeight(holding.marketValue).toFixed(1)}%`} />)}</div></section>
     <section className="portfolio-holdings-heading shell">
       <div><span>{text.currentHoldings}</span><h2>{text.positionCount}</h2></div>
       <p>{locale === "en" ? `Click any column heading to sort. Prices and market values use closing prices as of ${asOf}.` : locale === "zh-tw" ? `點選任一欄位標題即可排序；價格與市場價值均採用 ${asOf} 收盤價。` : `点击任一栏标题即可排序；价格与市场价值均采用 ${asOf} 收盘价。`}</p>

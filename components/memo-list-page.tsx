@@ -14,7 +14,7 @@ export function MemoListPage({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const basePath = `${localeConfig[locale].prefix}/memos`;
 
-  return <main className="memos-page"><SiteHeader locale={locale} />
+  return <main className="memos-page" id="main-content"><SiteHeader locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}<br /><em>{text.emphasis}</em></h1></section>
     <MemoIndex memos={getMemos(locale)} locale={locale} label={text.indexLabel} basePath={basePath} />
     <SiteFooter locale={locale} />
