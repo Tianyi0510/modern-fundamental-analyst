@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
+import { cleanSingleLine, cleanText, createMemoryRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
 import { getResendClient } from "@/lib/resend";
 
 export const runtime = "nodejs";
 
 const FROM_EMAIL = "Modern Fundamental Analyst <contact@mail.modernfundamentalanalyst.com>";
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_REQUESTS = 5;
-const requests = new Map<string, number[]>();
+const isRateLimited = createMemoryRateLimiter({ windowMs: 10 * 60 * 1000, maxRequests: 5 });
 
 type ContactRequest = {
   name?: unknown;
@@ -16,20 +15,6 @@ type ContactRequest = {
   website?: unknown;
   locale?: unknown;
 };
-
-function text(value: unknown, maxLength: number) {
-  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
-}
-
-function singleLine(value: unknown, maxLength: number) {
-  return Array.from(text(value, maxLength))
-    .filter((character) => {
-      const code = character.charCodeAt(0);
-      return code > 31 && code !== 127;
-    })
-    .join("")
-    .replace(/\s+/g, " ");
-}
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => ({
@@ -41,32 +26,6 @@ function escapeHtml(value: string) {
   })[character] ?? character);
 }
 
-function isSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  if (!origin || !host) return false;
-  try {
-    return new URL(origin).host === host;
-  } catch {
-    return false;
-  }
-}
-
-function isRateLimited(request: Request) {
-  const now = Date.now();
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const key = forwarded || "unknown";
-  const recent = (requests.get(key) ?? []).filter((timestamp) => now - timestamp < WINDOW_MS);
-  recent.push(now);
-  requests.set(key, recent);
-  if (requests.size > 1000) {
-    for (const [storedKey, timestamps] of requests) {
-      if (!timestamps.some((timestamp) => now - timestamp < WINDOW_MS)) requests.delete(storedKey);
-    }
-  }
-  return recent.length > MAX_REQUESTS;
-}
-
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
@@ -74,30 +33,25 @@ export async function POST(request: Request) {
   if (isRateLimited(request)) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
-  const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > 20_000) {
-    return NextResponse.json({ error: "Request is too large." }, { status: 413 });
-  }
-
   let body: ContactRequest;
   try {
-    const payload: unknown = await request.json();
+    const payload = await readLimitedJson(request, 20_000);
     if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("Invalid payload");
     body = payload as ContactRequest;
-  } catch {
-    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    const message = error instanceof RequestBodyError ? error.message : "Invalid request.";
+    return NextResponse.json({ error: message }, { status });
   }
 
-  const name = singleLine(body.name, 100);
-  const email = singleLine(body.email, 254).toLowerCase();
-  const subject = singleLine(body.subject, 160);
-  const message = text(body.message, 5000);
-  const website = text(body.website, 200);
-  const locale = text(body.locale, 10);
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+  const name = cleanSingleLine(body.name, 100);
+  const email = cleanSingleLine(body.email, 254).toLowerCase();
+  const subject = cleanSingleLine(body.subject, 160);
+  const message = cleanText(body.message, 5000);
+  const website = cleanText(body.website, 200);
+  const locale = cleanText(body.locale, 10);
   if (website) return NextResponse.json({ ok: true });
-  if (!name || !subject || message.length < 10 || !emailPattern.test(email)) {
+  if (!name || !subject || message.length < 10 || !isValidEmail(email)) {
     return NextResponse.json({ error: "Please complete every required field." }, { status: 400 });
   }
 

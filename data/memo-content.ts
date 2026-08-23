@@ -10,6 +10,8 @@ export type MemoContent = {
   sourceUrl: string;
 };
 
+const microsoftSourceUrl = "https://docs.google.com/document/d/1X4DwJBuHM0jo77lEtBHMzmTcQSo9Xc5TkrNjcpj2yyw/edit?usp=sharing";
+
 const english: MemoContent = {
   sections: [
     {
@@ -136,7 +138,7 @@ const english: MemoContent = {
     "Buffett, W. (1988). 1987 Letter to Shareholders. Berkshire Hathaway Inc.",
   ],
   sourceLabel: "Source document: Microsoft Stock Analysis Fiscal Year 2024",
-  sourceUrl: "https://docs.google.com/document/d/1X4DwJBuHM0jo77lEtBHMzmTcQSo9Xc5TkrNjcpj2yyw/edit?usp=sharing",
+  sourceUrl: microsoftSourceUrl,
 };
 
 const traditionalChinese: MemoContent = {
@@ -177,7 +179,7 @@ const traditionalChinese: MemoContent = {
   referencesTitle: "參考資料",
   references: english.references,
   sourceLabel: "來源文件：Microsoft Stock Analysis Fiscal Year 2024",
-  sourceUrl: "https://docs.google.com/document/d/1X4DwJBuHM0jo77lEtBHMzmTcQSo9Xc5TkrNjcpj2yyw/edit?usp=sharing",
+  sourceUrl: microsoftSourceUrl,
 };
 
 const simplifiedChinese: MemoContent = {
@@ -190,7 +192,7 @@ const simplifiedChinese: MemoContent = {
   referencesTitle: "参考资料",
   references: english.references,
   sourceLabel: "来源文件：Microsoft Stock Analysis Fiscal Year 2024",
-  sourceUrl: "https://docs.google.com/document/d/1X4DwJBuHM0jo77lEtBHMzmTcQSo9Xc5TkrNjcpj2yyw/edit?usp=sharing",
+  sourceUrl: microsoftSourceUrl,
 };
 
 function toSimplified(value: string) {
