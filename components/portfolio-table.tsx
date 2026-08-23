@@ -55,8 +55,8 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
           </select>
         </label>
         <button type="button" onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")} aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}>
-          {sortDirection === "asc" ? <ArrowUp aria-hidden="true" /> : <ArrowDown aria-hidden="true" />}
           <span>{sortDirection === "asc" ? copy.ascending : copy.descending}</span>
+          {sortDirection === "asc" ? <ArrowUp aria-hidden="true" /> : <ArrowDown aria-hidden="true" />}
         </button>
       </div>
       <div className="table-head" role="row">
@@ -89,13 +89,13 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
       <div className="portfolio-row portfolio-total-row" role="row">
         <span role="cell" data-label={copy.symbol}>{copy.total}</span>
         <span role="cell" />
-        <span role="cell" data-label={copy.costBasis}>{formatUsd(totals.costBasis)}</span>
+        <span className="portfolio-total-cost" role="cell" data-label={copy.costBasis}>{formatUsd(totals.costBasis)}</span>
         <span role="cell" />
-        <span role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
-        <strong role="cell" data-label={copy.returnPct} className={`data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
+        <span className="portfolio-total-market" role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
+        <strong role="cell" data-label={copy.returnPct} className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
           {formatPercent(totals.totalReturn)}
         </strong>
-        <strong role="cell" data-label={copy.weight}>100.0%</strong>
+        <strong className="portfolio-total-weight" role="cell" data-label={copy.weight}>100.0%</strong>
       </div>
     </div>
   );
