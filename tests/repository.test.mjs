@@ -171,6 +171,25 @@ test("all contact and disclaimer locales share page structures", async () => {
   for (const page of pages.slice(3)) assert.match(page, /DisclaimerPageContent/);
 });
 
+test("contact form uses a server-only Resend route with localized UI", async () => {
+  const [page, form, route, resend] = await Promise.all([
+    read("components/contact-page-content.tsx"),
+    read("components/contact-form.tsx"),
+    read("app/api/contact/route.ts"),
+    read("lib/resend.ts"),
+  ]);
+
+  assert.match(page, /ContactForm locale=\{locale\}/);
+  assert.match(form, /fetch\("\/api\/contact"/);
+  assert.match(form, /"zh-tw"/);
+  assert.match(form, /"zh-cn"/);
+  assert.match(route, /CONTACT_TO_EMAIL/);
+  assert.match(route, /contact@mail\.modernfundamentalanalyst\.com/);
+  assert.match(route, /replyTo:\s*email/);
+  assert.match(resend, /process\.env\.RESEND_API_KEY/);
+  assert.doesNotMatch(form, /RESEND_API_KEY/);
+});
+
 test("all about locales use one shared page structure", async () => {
   const paths = ["app/(en)/about/page.tsx", "app/zh-tw/about/page.tsx", "app/zh-cn/about/page.tsx"];
   const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([...paths.map(read), read("components/about-page-content.tsx")]);

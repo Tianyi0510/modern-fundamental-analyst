@@ -1,3 +1,4 @@
+import { ContactForm } from "@/components/contact-form";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
@@ -45,6 +46,7 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
     <section className="contact-grid shell">
       {text.cards.map(([title, description]) => <div key={title}><span>{title}</span><p>{description}</p></div>)}
     </section>
+    <ContactForm locale={locale} />
     <SiteFooter locale={locale} />
   </main>;
 }

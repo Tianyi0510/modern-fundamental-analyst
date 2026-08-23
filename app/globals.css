@@ -379,6 +379,20 @@ a { color: inherit; text-decoration: none; }
 .contact-grid > div { min-height: 270px; padding: 30px; border: 1px solid var(--black); display: flex; flex-direction: column; }
 .contact-grid > div:last-child { background: var(--gray); }
 .contact-grid p { margin: auto 0 0; max-width: 460px; }
+.contact-form-section { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 80px; padding: 120px 0 150px; border-top: 1px solid var(--black); }
+.contact-form-heading h2 { margin: 28px 0 34px; }
+.contact-form-heading > p:last-child { max-width: 410px; color: rgba(0,0,0,.62); }
+.contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 22px; }
+.contact-form label { display: grid; gap: 10px; }
+.contact-form-wide, .contact-form-actions { grid-column: 1 / -1; }
+.contact-form input, .contact-form textarea { width: 100%; border: 1px solid var(--black); border-radius: 0; background: var(--white); color: var(--black); font: inherit; padding: 15px 16px; transition: border-color .18s ease, box-shadow .18s ease; }
+.contact-form textarea { resize: vertical; min-height: 190px; }
+.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--medium-blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--medium-blue) 20%, transparent); }
+.contact-form-actions { display: flex; align-items: center; gap: 24px; margin-top: 8px; }
+.contact-form button { border: 0; cursor: pointer; font: inherit; }
+.contact-form button:disabled { cursor: wait; opacity: .64; transform: none; }
+.contact-form-status { margin: 0; max-width: 440px; }
+.contact-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
 .legal { padding: 100px 0 150px; }
 .legal-header { padding-bottom: 92px; }
 .legal h1 { max-width: 1000px; margin: 60px 0 0; }
@@ -432,6 +446,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .about-philosophy-copy h3,
+.contact-form-heading h2,
 .memo-subsection h3,
 .article-body h2,
 .article-body blockquote,
@@ -461,6 +476,15 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0;
   font-weight: var(--weight-regular);
   text-transform: capitalize;
+}
+
+.contact-form-heading > p:last-child,
+.contact-form input,
+.contact-form textarea,
+.contact-form-status {
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
+  font-weight: var(--weight-regular);
 }
 
 .rich-copy,
@@ -502,6 +526,8 @@ a { color: inherit; text-decoration: none; }
 .performance-summary span,
 .table-head,
 .contact-grid span,
+.contact-form label > span,
+.contact-form-section .section-number,
 .legal-section-number,
 .memo-card > div {
   font-family: var(--font-ui);
@@ -916,6 +942,10 @@ a { color: inherit; text-decoration: none; }
   .article-body { margin-left: 0; }
   .memo-section + .memo-section, .memo-references { margin-top: 82px; padding-top: 54px; }
   .contact-grid { grid-template-columns: 1fr; }
+  .contact-form-section { grid-template-columns: 1fr; gap: 52px; padding: 90px 0 110px; }
+  .contact-form { grid-template-columns: 1fr; }
+  .contact-form-wide, .contact-form-actions { grid-column: auto; }
+  .contact-form-actions { align-items: flex-start; flex-direction: column; }
   .legal { padding: 70px 0 110px; }
   .legal-header { padding-bottom: 64px; }
   .legal h1 { margin-top: 42px; }
