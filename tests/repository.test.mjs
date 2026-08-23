@@ -172,9 +172,10 @@ test("all contact and disclaimer locales share page structures", async () => {
 });
 
 test("contact form uses a server-only Resend route with localized UI", async () => {
-  const [page, form, route, resend] = await Promise.all([
+  const [page, form, styles, route, resend] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/contact-form.tsx"),
+    read("components/contact-form.module.css"),
     read("app/api/contact/route.ts"),
     read("lib/resend.ts"),
   ]);
@@ -183,6 +184,10 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.match(form, /fetch\("\/api\/contact"/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
+  assert.match(form, /contact-form\.module\.css/);
+  assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
+  assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
+  assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /CONTACT_TO_EMAIL/);
   assert.match(route, /contact@mail\.modernfundamentalanalyst\.com/);
   assert.match(route, /replyTo:\s*email/);
