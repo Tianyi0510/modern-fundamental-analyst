@@ -180,7 +180,7 @@ test("all home locales use one shared page structure", async () => {
   assert.match(shared, /const allocationGradient = `conic-gradient/);
   assert.match(shared, /className="allocation-legend"/);
   assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*1\.65fr \.75fr;[^}]*column-gap:\s*64px/s);
+  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, \.75fr\);[^}]*column-gap:\s*48px/s);
   assert.doesNotMatch(styles, /\.intro\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(268px, 100%\)/s);
   assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
@@ -216,7 +216,7 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*20px/);
+  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*8px/);
   assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);
@@ -227,7 +227,7 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > span:nth-child\(3\)\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > strong:nth-child\(7\)\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*3;/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > \[role="cell"\]:not\(:first-child\)\s*\{[^}]*padding-left:\s*14px;[^}]*align-content:\s*start/s);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > \[role="cell"\]:not\(:first-child\)\s*\{[^}]*padding-inline:\s*var\(--portfolio-mobile-inline\);[^}]*align-content:\s*start/s);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
   assert.match(styles, /--background-gray:\s*#f8f9fb/);
   assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
@@ -327,11 +327,12 @@ test("subscribe form keeps localized copy on the server and stores signups in Re
 
 test("all about locales use one shared page structure", async () => {
   const paths = ["app/(en)/about/page.tsx", "app/zh-tw/about/page.tsx", "app/zh-cn/about/page.tsx"];
-  const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([...paths.map(read), read("components/about-page-content.tsx")]);
+  const [english, traditionalChinese, simplifiedChinese, shared, styles] = await Promise.all([...paths.map(read), read("components/about-page-content.tsx"), readStyles()]);
 
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /AboutPageContent/);
   assert.match(shared, /text\.sections\.map/);
   assert.match(shared, /index % 2 === 1 \? " section-gray"/);
+  assert.match(styles, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
   assert.match(shared, /text\.boundaries\.map/);
 });
 
@@ -370,8 +371,7 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.memos-home\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*font-size:\s*var\(--type-title\)/s);
-  assert.match(css, /\.about-copy\s*\{[^}]*color:\s*var\(--black\)/s);
-  assert.match(css, /\.about-closing > div\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.match(css, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
   assert.match(css, /\.performance-home\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.performance-home \.button-white\s*\{[^}]*background:\s*var\(--black\);[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);

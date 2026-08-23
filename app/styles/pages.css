@@ -23,7 +23,10 @@
 .about-copy > p + p { margin-top: 1.35em; }
 .about-copy > :first-child { margin-top: 0; }
 .about-copy > :last-child { margin-bottom: 0; }
-.about-copy { color: var(--black); }
+.about-page .page-intro p,
+.about-page .about-copy,
+.about-page .about-boundaries > article:last-child ol,
+.about-page .about-closing > div { color: var(--black); }
 .about-copy em { color: var(--dark-blue); font-style: normal; font-weight: 700; }
 .about-philosophy-copy h3 { margin: 54px 0 14px; }
 .about-philosophy-copy h3:first-child { margin-top: 0; }
@@ -51,7 +54,7 @@
 .portfolio-kpis > div:nth-child(2) { grid-area: cost; }
 .portfolio-kpis > div:nth-child(3) { grid-area: return; }
 .portfolio-kpis > div:nth-child(4) { grid-area: holdings; }
-.portfolio-kpis strong { margin-top: 20px; }
+.portfolio-kpis strong { margin-top: 8px; }
 .portfolio-kpis small { margin-top: auto; padding-top: 15px; color: currentColor; opacity: .62; }
 .portfolio-table-wrap { overflow-x: auto; scrollbar-width: thin; }
 .portfolio-table, .returns-table { border-top: 1px solid var(--black); }
