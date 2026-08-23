@@ -43,6 +43,8 @@
     "examples",
     "worker",
     "vite.config.ts",
-    "drizzle.config.ts"
+    "drizzle.config.ts",
+    "**/* 2.*",
+    "**/* 3.*"
   ]
 }

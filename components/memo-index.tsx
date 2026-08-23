@@ -1,19 +1,10 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
+import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
 
-type Memo = {
-  slug: string;
-  number: string;
-  title: string;
-  summary: string;
-  publishedAt: string;
-  readTime: string;
-  tag: string;
-};
-
 type MemoIndexProps = {
-  memos: readonly Memo[];
+  memos: readonly MemoSummary[];
   locale: "en" | "zh-tw" | "zh-cn";
   label: string;
   basePath: string;

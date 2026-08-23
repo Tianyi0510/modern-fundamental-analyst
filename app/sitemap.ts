@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { memos } from "@/data/site";
+import { memos } from "@/data/memos";
 import { SITE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {

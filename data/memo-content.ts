@@ -212,8 +212,16 @@ function toSimplified(value: string) {
   return Array.from(value, (character) => traditionalToSimplified.get(character) ?? character).join("");
 }
 
-export const memoContentByLocale = {
+const microsoftContentByLocale = {
   en: english,
   "zh-tw": traditionalChinese,
   "zh-cn": simplifiedChinese,
 } as const;
+
+export const memoContentBySlug = {
+  "microsoft-stock-analysis-fy2024": microsoftContentByLocale,
+} as const;
+
+export function getMemoContent(slug: string, locale: "en" | "zh-tw" | "zh-cn") {
+  return memoContentBySlug[slug as keyof typeof memoContentBySlug]?.[locale];
+}
