@@ -303,6 +303,8 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.about-boundaries\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(css, /\.contact-grid\s*\{[^}]*min-height:\s*100svh/s);
+  assert.match(css, /\.about-boundaries ol\s*\{[^}]*margin:\s*48px 0 0/s);
+  assert.match(css, /\.contact-grid p\s*\{[^}]*margin:\s*48px 0 0/s);
   assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
   assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*80px 0 150px/);
