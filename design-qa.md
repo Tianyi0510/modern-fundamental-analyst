@@ -1,47 +1,35 @@
-# Design QA — Investment Memos Hero Metadata
+# Design QA — Home And Footer Interactions
 
 ## Evidence
 
-- Source visual truth: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/memos-subtitle/portfolio-reference.png`
-- Rendered implementation: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/memos-subtitle/memos-intro.png`
-- Local route: `http://127.0.0.1:3000/memos`
-- Viewport: 1280 × 720 CSS px
-- Source and implementation pixels: 1280 × 720 at 1× density; no normalization required
-- State: desktop, English, page hero and introduction visible
+- Local route: `http://127.0.0.1:3000/`
+- Reference: the site's existing button and arrow interaction system
+- State checked: English desktop home page, portfolio card, and footer
 
-## Full-View Comparison
+## Interaction Comparison
 
-The Portfolio hero was used as the existing-product reference because the request was to keep the Investment Memos page consistent with other inner pages. Both use the shared `page-hero` and `page-intro` structures: the subtitle is left aligned at Title size and the date annotation is right aligned at Caption size. The Investment Memos title is longer and naturally extends the hero below the first viewport, but the spacing and hierarchy remain consistent.
+The Full Portfolio link keeps its existing placement and typography. Its arrow is now a dedicated `.arrow-icon` element with the same 220ms easing used by the site's other arrow controls, moving four pixels to the right on hover.
 
-## Focused Region Comparison
-
-The scrolled Investment Memos capture isolates the subtitle and date row at a readable scale. It confirms that the subtitle wraps within the same 630px measure as Portfolio and that “Last updated on 10 October 2025” aligns to the lower-right edge of the shared grid.
+The footer wordmark keeps its white text and blue punctuation in both resting and hover states. Its transition is explicitly disabled, while the remaining footer navigation links retain their existing hover feedback.
 
 ## Required Fidelity Surfaces
 
-- Fonts and typography: existing Inter/Noto Sans locale typography and shared Subtitle/Caption tokens are used.
-- Spacing and layout rhythm: existing `page-intro` grid, 72px top margin, mobile stacking breakpoint, and alignment are reused without page-specific CSS.
-- Colors and visual tokens: black body copy and muted black date annotation match the other inner-page heroes.
-- Image quality and assets: no image or icon assets are required for this text-only change.
-- Copy and content: the requested English subtitle is present; equivalent Traditional Chinese and Simplified Chinese translations are included.
-- Responsiveness: the existing 800px breakpoint stacks subtitle and date with a 28px gap.
-- Accessibility: the content remains semantic paragraph and supporting `small` text; the date uses the existing `date-text` convention.
+- Typography: unchanged; the existing Button and wordmark tokens remain in use.
+- Layout: unchanged except for flex alignment inside the Full Portfolio link so the arrow remains aligned at the trailing edge.
+- Color: footer wordmark remains white with the existing blue punctuation.
+- Motion: portfolio arrow uses the existing interaction duration and easing; footer wordmark has no motion or color transition.
+- Accessibility: the decorative arrow is hidden from assistive technology and the link's accessible name remains “Full portfolio”.
+- Responsiveness: the interaction uses the existing card layout and does not introduce breakpoint-specific dimensions.
+
+## Verification
+
+- Live DOM confirmed the Full Portfolio arrow is rendered as `→` with a `transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)` transition.
+- Live DOM confirmed the footer wordmark remains `rgb(255, 255, 255)` with `transition: none`.
+- TypeScript, ESLint, and all 21 repository tests passed.
+- The production build passed with webpack. The default Turbopack build was blocked by the sandbox's port-binding restriction, not by application code.
 
 ## Findings
 
 - No actionable P0, P1, or P2 differences remain.
-- No focused visual fixes were required after the first comparison.
-
-## Comparison History
-
-1. Initial comparison: no P0/P1/P2 findings. The implementation directly reuses the established inner-page component classes and responsive rules.
-
-## Implementation Checklist
-
-- [x] Add English subtitle
-- [x] Add Traditional Chinese and Simplified Chinese equivalents
-- [x] Derive the displayed update date from the newest memo publication date
-- [x] Reuse shared inner-page layout and typography
-- [x] Verify typecheck, lint, tests, production build, and browser rendering
 
 final result: passed
