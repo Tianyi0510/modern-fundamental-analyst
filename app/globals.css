@@ -126,7 +126,8 @@ a { color: inherit; text-decoration: none; }
 .button-small { min-height: 42px; padding-inline: 20px; }
 .hero { padding: 92px 0 72px; }
 .home-opening { padding-bottom: 48px; background: var(--background-gray); border-bottom: 1px solid var(--black); }
-.home-opening > .site-header { background: var(--white); box-shadow: 0 0 0 100vmax var(--white); clip-path: inset(0 -100vmax); }
+.home-opening > .site-header { position: relative; z-index: 30; background: var(--white); }
+.home-opening > .site-header::before { content: ""; position: absolute; z-index: -1; inset: 0 50%; width: 100vw; transform: translateX(-50%); background: var(--white); }
 .hero,
 .page-hero,
 .legal-header,
@@ -254,8 +255,8 @@ a { color: inherit; text-decoration: none; }
 .about-list { margin: 34px 0 42px; padding: 0; list-style: none; border-top: 1px solid var(--black); }
 .about-list li { padding: 15px 0; border-bottom: 1px solid var(--gray); display: grid; grid-template-columns: 24px 1fr; gap: 12px; }
 .about-list li::before { content: "↗"; color: var(--medium-blue); }
-.about-boundaries { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--black); border-top: 1px solid var(--black); border-bottom: 1px solid var(--black); }
-.about-boundaries > article { min-height: 0; padding: 48px; background: var(--white); display: flex; flex-direction: column; }
+.about-boundaries { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--black); border-top: 1px solid var(--black); border-bottom: 1px solid var(--black); }
+.about-boundaries > article { min-height: 0; padding: 112px 48px; background: var(--white); display: flex; flex-direction: column; }
 .about-boundaries > article:last-child { background: var(--gray); border-top-color: var(--black); }
 .about-boundaries h2 { max-width: 420px; margin: 0; }
 .about-boundaries ol { margin: 48px 0 0; padding: 0; list-style: none; counter-reset: boundary-item; }
@@ -882,8 +883,8 @@ a { color: inherit; text-decoration: none; }
   .memo-grid, .principles { grid-template-columns: 1fr; }
   .about-section, .about-boundaries, .about-closing { grid-template-columns: 1fr; }
   .about-section { padding: 86px 0; gap: 48px; }
-  .about-boundaries { grid-template-rows: repeat(2, minmax(50svh, auto)); }
-  .about-boundaries > article { min-height: 50svh; padding: 28px 24px; }
+  .about-boundaries { grid-template-rows: auto; }
+  .about-boundaries > article { min-height: 0; padding: 86px 24px; }
   .about-boundaries ol { margin-top: 36px; }
   .about-closing { padding: 90px 0 110px; gap: 42px; }
   .memo-card { min-height: 410px; }
