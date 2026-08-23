@@ -70,25 +70,21 @@ export function SubscribeForm({ locale }: { locale: Locale }) {
     }
   }
 
-  return <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
-    <div className={`${styles.inner} shell`}>
-      <div>
-        <p className={styles.label}>{text.label}</p>
-        <h2 id="subscribe-title">{text.title}</h2>
-      </div>
-      <div>
-        <p className={styles.intro}>{text.intro}</p>
-        <form className={styles.form} onSubmit={submit}>
-          <label className={styles.field}>
-            <span>{text.email}</span>
-            <input className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={text.placeholder} maxLength={254} required />
-          </label>
-          <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
-          <button className={`${styles.submit} button button-dark`} type="submit" disabled={status === "submitting"}>{status === "submitting" ? text.submitting : text.submit}</button>
-          <p className={styles.note}>{text.note}</p>
-          <p className={styles.status} role="status" aria-live="polite">{status === "success" ? text.success : status === "error" ? text.error : ""}</p>
-        </form>
-      </div>
-    </div>
-  </section>;
+  return (
+    <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
+      <p className={styles.label}>{text.label}</p>
+      <h2 id="subscribe-title">{text.title}</h2>
+      <p className={styles.intro}>{text.intro}</p>
+      <form className={styles.form} onSubmit={submit}>
+        <label className={styles.field}>
+          <span>{text.email}</span>
+          <input className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={text.placeholder} maxLength={254} required />
+        </label>
+        <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
+        <button className={styles.submit} type="submit" disabled={status === "submitting"}>{status === "submitting" ? text.submitting : text.submit}</button>
+        <p className={styles.note}>{text.note}</p>
+        <p className={styles.status} role="status" aria-live="polite">{status === "success" ? text.success : status === "error" ? text.error : ""}</p>
+      </form>
+    </section>
+  );
 }
