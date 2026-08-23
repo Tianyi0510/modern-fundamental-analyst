@@ -173,7 +173,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceZhTw, /PerformancePageContent/);
   assert.match(performanceZhCn, /PerformancePageContent/);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
-  assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--gray\)/s);
+  assert.match(styles, /--background-gray:\s*#f8f9fb/);
+  assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.legal-header,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s);
 });
 
 test("all contact and disclaimer locales share page structures", async () => {

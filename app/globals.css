@@ -9,6 +9,7 @@
   --medium-blue: var(--bright-blue);
   --light-blue: #5fcdfd;
   --gray: #ededed;
+  --background-gray: #f8f9fb;
   --price-up: #34a853;
   --price-down: #ff0000;
   --background: var(--white);
@@ -124,6 +125,14 @@ a { color: inherit; text-decoration: none; }
 .button-dark:hover { background: var(--dark-blue); }
 .button-small { min-height: 42px; padding-inline: 20px; }
 .hero { padding: 92px 0 72px; }
+.hero,
+.page-hero,
+.legal-header,
+.memo-article-header {
+  background: var(--background-gray);
+  box-shadow: 0 0 0 100vmax var(--background-gray);
+  clip-path: inset(0 -100vmax);
+}
 .eyebrow { display: flex; align-items: center; gap: 10px; }
 .eyebrow span { width: 9px; height: 9px; background: var(--medium-blue); border-radius: 50%; }
 .hero h1 { margin: 46px 0 68px; max-width: 1160px; }
@@ -220,7 +229,7 @@ a { color: inherit; text-decoration: none; }
 .page-intro small { color: rgba(0,0,0,.62); }
 .memos-page .page-hero { border-bottom: 1px solid var(--black); }
 .body-section { padding: 130px 0; border-bottom: 1px solid var(--gray); }
-.section-gray { background: var(--gray); box-shadow: 0 0 0 100vmax var(--gray); clip-path: inset(0 -100vmax); }
+.section-gray { background: var(--background-gray); box-shadow: 0 0 0 100vmax var(--background-gray); clip-path: inset(0 -100vmax); }
 .two-column { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
 .two-column h2, .methodology h2 { margin: 0; }
 .rich-copy p:first-child { margin-top: 0; }
