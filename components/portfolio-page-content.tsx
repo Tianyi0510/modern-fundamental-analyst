@@ -76,10 +76,12 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
       <div><span>{text.totalReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.totalReturnNote}</small></div>
       <div><span>{text.holdings}</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>{text.holdingsNote}</small></div>
     </section>
-    <section className="portfolio-holdings-heading shell">
-      <div><span>{text.currentHoldings}</span><h2>{text.positionCount}</h2></div>
-      <p><span className="portfolio-desktop-instruction">{locale === "en" ? "Click any column heading to sort. " : locale === "zh-tw" ? "點選任一欄位標題即可排序；" : "点击任一栏标题即可排序；"}</span>{locale === "en" ? `Prices and market values use closing prices as of ${asOf}.` : locale === "zh-tw" ? `價格與市場價值均採用 ${asOf} 收盤價。` : `价格与市场价值均采用 ${asOf} 收盘价。`}</p>
+    <section className="portfolio-holdings-section" aria-labelledby="portfolio-holdings-title">
+      <div className="portfolio-holdings-heading shell">
+        <div><span>{text.currentHoldings}</span><h2 id="portfolio-holdings-title">{text.positionCount}</h2></div>
+        <p><span className="portfolio-desktop-instruction">{locale === "en" ? "Click any column heading to sort. " : locale === "zh-tw" ? "點選任一欄位標題即可排序；" : "点击任一栏标题即可排序；"}</span>{locale === "en" ? `Prices and market values use closing prices as of ${asOf}.` : locale === "zh-tw" ? `價格與市場價值均採用 ${asOf} 收盤價。` : `价格与市场价值均采用 ${asOf} 收盘价。`}</p>
+      </div>
+      <div className="portfolio-table-wrap shell"><PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} /></div>
     </section>
-    <section className="portfolio-table-wrap shell"><PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} /></section>
     <SiteFooter locale={locale} /></main>;
 }
