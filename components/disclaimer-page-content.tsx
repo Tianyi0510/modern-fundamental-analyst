@@ -32,7 +32,7 @@ const copy = {
 export function DisclaimerPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
-  return <main>
+  return <main id="main-content">
     <SiteHeader locale={locale} />
     <section className="legal shell">
       <header className="legal-header"><p className="eyebrow"><span /> {text.label}</p><h1>{text.title}</h1></header>
