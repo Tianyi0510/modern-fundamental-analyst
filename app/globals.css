@@ -3,8 +3,10 @@
 :root {
   --black: #000000;
   --white: #ffffff;
-  --dark-blue: #002991;
-  --medium-blue: #008cff;
+  --deep-blue: #002991;
+  --bright-blue: #008cff;
+  --dark-blue: var(--deep-blue);
+  --medium-blue: var(--bright-blue);
   --light-blue: #5fcdfd;
   --gray: #ededed;
   --price-up: #34a853;
@@ -132,6 +134,8 @@ a { color: inherit; text-decoration: none; }
 .text-link { border-bottom: 1px solid currentColor; padding-bottom: 4px; transition: color .2s ease, border-color .2s ease; }
 .text-link:hover { color: var(--medium-blue); }
 .metric-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--black); border: 1px solid var(--black); }
+.home-page .metric-band { position: relative; }
+.home-page .metric-band::after { content: ""; position: absolute; left: 0; right: 0; bottom: -48px; height: 1px; background: var(--black); }
 .metric { min-height: 280px; padding: 34px; display: flex; flex-direction: column; background: var(--white); }
 .metric-featured { background: var(--dark-blue); color: var(--white); }
 .metric-accent { background: var(--light-blue); }
@@ -214,6 +218,7 @@ a { color: inherit; text-decoration: none; }
 .page-intro { display: grid; grid-template-columns: 1fr auto; align-items: end; margin-top: 72px; }
 .page-intro p { max-width: 630px; margin: 0; }
 .page-intro small { color: rgba(0,0,0,.62); }
+.memos-page .page-hero { border-bottom: 1px solid var(--black); }
 .body-section { padding: 130px 0; border-bottom: 1px solid var(--gray); }
 .two-column { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
 .two-column h2, .methodology h2 { margin: 0; }
@@ -296,7 +301,7 @@ a { color: inherit; text-decoration: none; }
 .performance-summary > div { min-height: 310px; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
 .performance-summary .summary-primary { background: var(--white); }
 .performance-summary strong { margin-top: auto; }
-.performance-summary small { margin-top: 14px; color: rgba(0,0,0,.62); }
+.performance-summary small { margin-top: 14px; color: currentColor; opacity: .62; }
 .data-value.positive { color: var(--price-up); }
 .data-value.negative { color: var(--price-down); }
 
@@ -967,18 +972,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Editorial color architecture
-   White and black remain primary. Dark blue and light blue define section
-   hierarchy; medium blue is reserved for interactive and data accents. */
+   White and black remain primary. Deep Blue and Light Blue define section
+   hierarchy; Bright Blue is reserved for interactive and data accents. */
 :root {
   --surface-primary: var(--white);
   --surface-inverse: var(--black);
-  --surface-brand: var(--dark-blue);
+  --surface-brand: var(--deep-blue);
   --surface-highlight: var(--light-blue);
   --text-primary: var(--black);
-  --text-brand: var(--dark-blue);
+  --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
   --text-highlight: var(--light-blue);
-  --interactive-accent: var(--medium-blue);
+  --interactive-accent: var(--bright-blue);
 }
 
 body { background: var(--surface-primary); color: var(--text-primary); }
@@ -1040,7 +1045,25 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-bars { border-color: color-mix(in srgb, var(--light-blue) 48%, transparent); }
 .portfolio-kpis > div:nth-child(4) { background: var(--surface-brand); color: var(--text-highlight); }
 
-/* Medium blue remains an auxiliary interaction color. */
+/* Three-card KPI sequence: light blue, dark blue, white. */
+.home-page .metric-band > .metric:nth-child(1),
+.performance-page .performance-summary > div:nth-child(1) {
+  background: var(--surface-highlight);
+  color: var(--text-brand);
+}
+.home-page .metric-band > .metric:nth-child(2),
+.performance-page .performance-summary > div:nth-child(2) {
+  background: var(--surface-brand);
+  color: var(--text-highlight);
+}
+.home-page .metric-band > .metric:nth-child(3),
+.performance-page .performance-summary > div:nth-child(3) {
+  background: var(--surface-primary);
+  color: var(--text-brand);
+  box-shadow: inset 0 0 0 1px var(--black);
+}
+
+/* Bright Blue remains an auxiliary interaction color. */
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"],
 .language-trigger:hover,

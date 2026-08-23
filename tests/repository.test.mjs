@@ -255,16 +255,25 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
 
-test("editorial color roles keep the footer inverse and medium blue auxiliary", async () => {
+test("editorial color roles keep the footer inverse and Bright Blue auxiliary", async () => {
   const css = await read("app/globals.css");
 
+  assert.match(css, /--deep-blue:\s*#002991/);
+  assert.match(css, /--bright-blue:\s*#008cff/);
   assert.match(css, /--surface-primary:\s*var\(--white\)/);
   assert.match(css, /--surface-inverse:\s*var\(--black\)/);
-  assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
+  assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
+  assert.match(css, /--interactive-accent:\s*var\(--bright-blue\)/);
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-kpis > div:nth-child\(4\)[^}]*background:\s*var\(--surface-brand\)[^}]*color:\s*var\(--text-highlight\)/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(1\),\s*\.performance-page \.performance-summary > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.home-page \.metric-band::after\s*\{[^}]*height:\s*1px;[^}]*background:\s*var\(--black\)/s);
+  assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
