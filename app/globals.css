@@ -135,7 +135,7 @@ a { color: inherit; text-decoration: none; }
 .text-link:hover { color: var(--medium-blue); }
 .metric-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--black); border: 1px solid var(--black); }
 .home-page .metric-band { position: relative; }
-.home-page .metric-band::after { content: ""; position: absolute; left: 0; right: 0; bottom: -48px; height: 2px; background: var(--black); }
+.home-page .metric-band::after { content: ""; position: absolute; left: 0; right: 0; bottom: -48px; height: 1px; background: var(--black); }
 .metric { min-height: 280px; padding: 34px; display: flex; flex-direction: column; background: var(--white); }
 .metric-featured { background: var(--dark-blue); color: var(--white); }
 .metric-accent { background: var(--light-blue); }
@@ -218,8 +218,7 @@ a { color: inherit; text-decoration: none; }
 .page-intro { display: grid; grid-template-columns: 1fr auto; align-items: end; margin-top: 72px; }
 .page-intro p { max-width: 630px; margin: 0; }
 .page-intro small { color: rgba(0,0,0,.62); }
-.memos-page .page-hero { padding-bottom: 0; border-bottom: 0; }
-.memos-page .page-intro { padding-bottom: 48px; border-bottom: 2px solid var(--black); }
+.memos-page .page-hero { border-bottom: 1px solid var(--black); }
 .body-section { padding: 130px 0; border-bottom: 1px solid var(--gray); }
 .two-column { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
 .two-column h2, .methodology h2 { margin: 0; }
