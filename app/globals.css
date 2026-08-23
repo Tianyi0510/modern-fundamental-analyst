@@ -1026,13 +1026,13 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .metric-featured,
 .portfolio-kpis > div:first-child,
 .performance-summary > div:first-child,
-.about-boundaries > article:last-child,
+.about-boundaries > article:first-child,
 .contact-grid > div:last-child {
   background: var(--surface-inverse);
   color: var(--text-inverse);
 }
-.about-boundaries > article:last-child li { border-top-color: rgba(255,255,255,.28); }
-.about-boundaries > article:last-child li::before { color: var(--text-highlight); }
+.about-boundaries > article:first-child li { border-top-color: rgba(255,255,255,.28); }
+.about-boundaries > article:first-child li::before { color: var(--text-highlight); }
 .contact-grid > div:last-child p { color: rgba(255,255,255,.72); }
 
 /* Light blue / black and light blue / dark blue */
@@ -1041,9 +1041,9 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .contact-grid > div:first-child { background: var(--surface-highlight); color: var(--text-primary); }
 .portfolio-kpis > div:nth-child(3),
 .performance-summary > div:nth-child(3),
-.about-boundaries > article:first-child {
+.about-boundaries > article:last-child {
   background: var(--surface-highlight);
-  color: var(--text-brand);
+  color: var(--text-primary);
 }
 .about-boundaries > article { border-top-color: var(--dark-blue); }
 .principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
