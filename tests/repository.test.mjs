@@ -54,16 +54,15 @@ test("portfolio calculations remain internally consistent", async () => {
 });
 
 test("portfolio dates are formatted from the snapshot date", async () => {
-  const [format, home, homeZh, portfolioPage, performancePage] = await Promise.all([
+  const [format, home, portfolioPage, performancePage] = await Promise.all([
     read("lib/format.ts"),
-    read("app/(en)/page.tsx"),
-    read("app/zh-tw/page.tsx"),
+    read("components/home-page-content.tsx"),
     read("components/portfolio-page-content.tsx"),
     read("components/performance-page-content.tsx"),
   ]);
 
   assert.match(format, /formatDate/);
-  for (const source of [home, homeZh, portfolioPage, performancePage]) {
+  for (const source of [home, portfolioPage, performancePage]) {
     assert.match(source, /formatDate/);
     assert.doesNotMatch(source, /31 July 2026|2026 年 7 月 31 日/);
   }
@@ -77,35 +76,66 @@ test("percent formatting handles positive, zero, and negative values", async () 
   assert.equal(formatPercent(-3.2), "-3.20%");
 });
 
-test("memo publication dates use one shared ISO source", async () => {
-  const [metadata, english, traditionalChinese, simplifiedChinese] = await Promise.all([
-    read("data/memo-metadata.ts"),
-    read("data/site.ts"),
-    read("data/site-zh-tw.ts"),
-    read("data/site-zh-cn.ts"),
-  ]);
+test("memo metadata uses one localized catalog", async () => {
+  const source = await read("data/memos.ts");
+  const { memos, memosZhTw, memosZhCn } = await import("../data/memos.ts");
 
-  assert.match(metadata, /2025-10-10/);
-  for (const source of [english, traditionalChinese, simplifiedChinese]) {
-    assert.match(source, /memoPublishedAt/);
-  }
-  assert.doesNotMatch(`${english}${traditionalChinese}${simplifiedChinese}`, /date:\s*["']/);
+  assert.match(source, /2025-10-10/);
+  assert.equal(memos[0].publishedAt, memosZhTw[0].publishedAt);
+  assert.equal(memos[0].publishedAt, memosZhCn[0].publishedAt);
+  assert.equal(memosZhTw[0].readTime, "閱讀 12 分鐘");
+  assert.equal(memosZhCn[0].readTime, "阅读 12 分钟");
 });
 
 test("memo catalog contains only the Microsoft source memo and uses one shared disclosure", async () => {
-  const [english, traditionalChinese, simplifiedChinese, memoPage] = await Promise.all([
-    read("data/site.ts"),
-    read("data/site-zh-tw.ts"),
-    read("data/site-zh-cn.ts"),
+  const [catalog, memoPage] = await Promise.all([
+    read("data/memos.ts"),
     read("components/memo-index.tsx"),
   ]);
 
-  for (const source of [english, traditionalChinese, simplifiedChinese]) {
-    assert.match(source, /microsoft-stock-analysis-fy2024/);
-    assert.doesNotMatch(source, /durable-pricing-power|self-funded-growth|capital-allocation/);
-  }
+  assert.match(catalog, /microsoft-stock-analysis-fy2024/);
+  assert.doesNotMatch(catalog, /durable-pricing-power|self-funded-growth|capital-allocation/);
   assert.match(memoPage, /<details/);
   assert.match(memoPage, /<summary/);
+});
+
+test("memo content is selected by slug and locale", async () => {
+  const { getMemoContent } = await import("../data/memo-content.ts");
+
+  assert.match(getMemoContent("microsoft-stock-analysis-fy2024", "en").sections[0].title, /Business Analysis/);
+  assert.match(getMemoContent("microsoft-stock-analysis-fy2024", "zh-tw").sections[0].title, /企業分析/);
+  assert.equal(getMemoContent("missing-memo", "en"), undefined);
+});
+
+test("all memo locales use shared list and detail page structures", async () => {
+  const paths = [
+    "app/(en)/memos/page.tsx",
+    "app/zh-tw/memos/page.tsx",
+    "app/zh-cn/memos/page.tsx",
+    "app/(en)/memos/[slug]/page.tsx",
+    "app/zh-tw/memos/[slug]/page.tsx",
+    "app/zh-cn/memos/[slug]/page.tsx",
+  ];
+  const pages = await Promise.all(paths.map(read));
+
+  for (const page of pages.slice(0, 3)) assert.match(page, /MemoListPage/);
+  for (const page of pages.slice(3)) {
+    assert.match(page, /MemoDetailPage/);
+    assert.match(page, /getMemoStaticParams/);
+    assert.match(page, /createMemoPageMetadata/);
+  }
+});
+
+test("all home locales use one shared page structure", async () => {
+  const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([
+    read("app/(en)/page.tsx"),
+    read("app/zh-tw/page.tsx"),
+    read("app/zh-cn/page.tsx"),
+    read("components/home-page-content.tsx"),
+  ]);
+
+  for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /HomePageContent/);
+  assert.match(shared, /getMemos\(locale\)/);
 });
 
 test("all portfolio and performance locales share page structures", async () => {
