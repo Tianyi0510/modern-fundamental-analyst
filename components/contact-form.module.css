@@ -79,7 +79,7 @@
   padding: 13px 15px;
   border: 1px solid var(--black);
   border-radius: 0;
-  background: var(--white);
+  background: var(--background-gray);
   color: var(--black);
   font: inherit;
   font-size: var(--type-body);

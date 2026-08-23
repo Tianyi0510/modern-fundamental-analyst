@@ -64,7 +64,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
   return <main className="about-page" id="main-content"><SiteHeader locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.headline[0]}<br /><em>{text.headline[1]}</em></h1><div className="page-intro"><p>{text.introduction}</p><small>{text.disciplines}</small></div></section>
     {text.sections.map((section, index) => <section className={`about-section shell${index % 2 === 1 ? " section-gray" : ""}`} key={section.label}><div className="about-section-heading"><span>{section.label}</span><h2>{section.title}</h2></div><div className="about-copy">{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></section>)}
-    <section className="about-boundaries shell">{text.boundaries.map((boundary) => <article key={boundary.title}><h2>{boundary.title}</h2><ol>{boundary.items.map((item) => <li key={item}>{item}</li>)}</ol></article>)}</section>
+    <section className="about-boundaries">{text.boundaries.map((boundary) => <article key={boundary.title}><h2>{boundary.title}</h2><ol>{boundary.items.map((item) => <li key={item}>{item}</li>)}</ol></article>)}</section>
     <section className="about-closing shell"><p className="eyebrow"><span /> {text.closingLabel}</p><h2>{text.closingTitle}</h2><div>{text.closingParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<p>{text.legalPrefix}<Link href={`${prefix}/disclaimer`}>{text.disclaimer}</Link>{text.conjunction}<Link href={`${prefix}/performance`}>{text.performance}</Link>{text.legalSuffix}</p></div></section>
     <SiteFooter locale={locale} />
   </main>;
