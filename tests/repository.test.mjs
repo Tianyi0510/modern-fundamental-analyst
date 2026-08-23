@@ -149,6 +149,7 @@ test("all home locales use one shared page structure", async () => {
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /HomePageContent/);
   assert.match(shared, /getMemos\(locale\)/);
   assert.match(shared, /className="link-label">\{text\.fullPortfolio\}/);
+  assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
   assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--interactive-accent\); \}/);
   assert.match(styles, /\.allocation-card > a:hover \.arrow-icon \{ transform: translateX\(4px\); \}/);
 });

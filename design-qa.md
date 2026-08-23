@@ -8,7 +8,7 @@
 
 ## Interaction Comparison
 
-The link retains its existing typography, spacing, accessible name, and card dimensions. On hover, the label and arrow both change to the site's interactive blue, matching the Home page's existing text-link behavior. The arrow also moves four pixels to the right for directional emphasis; the label remains stable.
+The link retains its existing typography, accessible name, and card dimensions. Its label and arrow now sit together with an eight-pixel gap. On hover, both change to the site's interactive blue, matching the Home page's existing text-link behavior. The arrow also moves four pixels to the right for directional emphasis; the label remains stable.
 
 ## Required Fidelity Surfaces
 
