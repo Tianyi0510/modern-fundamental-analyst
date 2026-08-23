@@ -149,7 +149,7 @@ a { color: inherit; text-decoration: none; }
 .round-link:hover .arrow-icon { transform: translate(3px, -3px); }
 .round-link:active { transform: scale(.96); }
 .round-link .arrow-icon { transition: transform .22s cubic-bezier(.22,1,.36,1); }
-.holdings-preview { display: grid; grid-template-columns: 1.65fr .75fr; gap: 64px; padding: 0 0 150px; }
+.holdings-preview { display: grid; grid-template-columns: 1.65fr .75fr; gap: 64px; padding: 0 0 150px; border-bottom: 1px solid var(--black); }
 .holdings-list { border-top: 1px solid var(--black); }
 .holding-row { min-height: 112px; display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 24px; border-bottom: 1px solid var(--gray); transition: background .2s ease, padding .22s cubic-bezier(.22,1,.36,1); }
 .holding-row:hover { padding-inline: 14px; background: color-mix(in srgb, var(--light-blue) 12%, var(--white)); }
@@ -214,6 +214,8 @@ a { color: inherit; text-decoration: none; }
 .page-intro { display: grid; grid-template-columns: 1fr auto; align-items: end; margin-top: 72px; }
 .page-intro p { max-width: 630px; margin: 0; }
 .page-intro small { color: rgba(0,0,0,.62); }
+.memos-page .page-hero { padding-bottom: 0; border-bottom: 0; }
+.memos-page .page-intro { padding-bottom: 48px; border-bottom: 1px solid var(--black); }
 .body-section { padding: 130px 0; border-bottom: 1px solid var(--gray); }
 .two-column { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
 .two-column h2, .methodology h2 { margin: 0; }
@@ -296,7 +298,7 @@ a { color: inherit; text-decoration: none; }
 .performance-summary > div { min-height: 310px; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
 .performance-summary .summary-primary { background: var(--white); }
 .performance-summary strong { margin-top: auto; }
-.performance-summary small { margin-top: 14px; color: rgba(0,0,0,.62); }
+.performance-summary small { margin-top: 14px; color: currentColor; opacity: .62; }
 .data-value.positive { color: var(--price-up); }
 .data-value.negative { color: var(--price-down); }
 
@@ -1039,6 +1041,23 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .year-bar small { color: rgba(255,255,255,.76); }
 .performance-home .performance-bars { border-color: color-mix(in srgb, var(--light-blue) 48%, transparent); }
 .portfolio-kpis > div:nth-child(4) { background: var(--surface-brand); color: var(--text-highlight); }
+
+/* Three-card KPI sequence: light blue, dark blue, white. */
+.home-page .metric-band > .metric:nth-child(1),
+.performance-page .performance-summary > div:nth-child(1) {
+  background: var(--surface-highlight);
+  color: var(--text-brand);
+}
+.home-page .metric-band > .metric:nth-child(2),
+.performance-page .performance-summary > div:nth-child(2) {
+  background: var(--surface-brand);
+  color: var(--text-highlight);
+}
+.home-page .metric-band > .metric:nth-child(3),
+.performance-page .performance-summary > div:nth-child(3) {
+  background: var(--surface-primary);
+  color: var(--text-brand);
+}
 
 /* Medium blue remains an auxiliary interaction color. */
 .site-header nav a:hover,

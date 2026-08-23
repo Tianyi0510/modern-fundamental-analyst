@@ -265,6 +265,11 @@ test("editorial color roles keep the footer inverse and medium blue auxiliary", 
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-kpis > div:nth-child\(4\)[^}]*background:\s*var\(--surface-brand\)[^}]*color:\s*var\(--text-highlight\)/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(1\),\s*\.performance-page \.performance-summary > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.holdings-preview\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
+  assert.match(css, /\.memos-page \.page-intro\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
