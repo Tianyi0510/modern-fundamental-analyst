@@ -1,5 +1,4 @@
 import { ContactForm } from "@/components/contact-form";
-import { SubscribeForm } from "@/components/subscribe-form";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
@@ -48,7 +47,6 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
       {text.cards.map(([title, description]) => <div key={title}><span>{title}</span><p>{description}</p></div>)}
     </section>
     <ContactForm locale={locale} />
-    <SubscribeForm locale={locale} />
     <SiteFooter locale={locale} />
   </main>;
 }

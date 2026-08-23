@@ -204,11 +204,11 @@ test("subscribe form stores signups in Resend Contacts", async () => {
     read("components/site-footer.tsx"),
   ]);
 
-  assert.match(page, /SubscribeForm locale=\{locale\}/);
+  assert.doesNotMatch(page, /SubscribeForm/);
   assert.match(form, /fetch\("\/api\/subscribe"/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
-  assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\)/s);
+  assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /resend\.contacts\.create/);
   assert.match(route, /resend\.contacts\.update/);
@@ -218,7 +218,7 @@ test("subscribe form stores signups in Resend Contacts", async () => {
   assert.match(route, /isSameOrigin/);
   assert.match(route, /isRateLimited/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);
-  assert.match(footer, /contact#subscribe/);
+  assert.match(footer, /SubscribeForm locale=\{locale\}/);
 });
 
 test("all about locales use one shared page structure", async () => {

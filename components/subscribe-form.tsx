@@ -7,38 +7,29 @@ import styles from "./subscribe-form.module.css";
 
 const copy = {
   en: {
-    label: "Subscribe",
     title: "Stay Updated.",
-    intro: "Receive new investment memos and occasional research updates directly by email.",
     email: "Email Address",
     placeholder: "you@example.com",
     submit: "Subscribe",
     submitting: "Subscribing…",
-    note: "By subscribing, you agree to receive research updates. You can unsubscribe at any time.",
     success: "You’re subscribed. Thank you for following the research.",
     error: "Subscription could not be completed. Please try again.",
   },
   "zh-tw": {
-    label: "訂閱",
     title: "掌握最新研究。",
-    intro: "透過電子郵件接收最新投資備忘錄與不定期研究更新。",
     email: "電子郵件地址",
     placeholder: "you@example.com",
     submit: "訂閱",
     submitting: "訂閱中…",
-    note: "訂閱即表示你同意接收研究更新；你可以隨時取消訂閱。",
     success: "訂閱成功。感謝你持續關注研究內容。",
     error: "目前無法完成訂閱，請稍後再試。",
   },
   "zh-cn": {
-    label: "订阅",
     title: "掌握最新研究。",
-    intro: "通过电子邮件接收最新投资备忘录与不定期研究更新。",
     email: "电子邮件地址",
     placeholder: "you@example.com",
     submit: "订阅",
     submitting: "订阅中…",
-    note: "订阅即表示你同意接收研究更新；你可以随时取消订阅。",
     success: "订阅成功。感谢你持续关注研究内容。",
     error: "目前无法完成订阅，请稍后再试。",
   },
@@ -70,25 +61,18 @@ export function SubscribeForm({ locale }: { locale: Locale }) {
     }
   }
 
-  return <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
-    <div className={`${styles.inner} shell`}>
-      <div>
-        <p className={styles.label}>{text.label}</p>
-        <h2 id="subscribe-title">{text.title}</h2>
-      </div>
-      <div>
-        <p className={styles.intro}>{text.intro}</p>
-        <form className={styles.form} onSubmit={submit}>
-          <label className={styles.field}>
-            <span>{text.email}</span>
-            <input className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={text.placeholder} maxLength={254} required />
-          </label>
-          <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
-          <button className={`${styles.submit} button button-dark`} type="submit" disabled={status === "submitting"}>{status === "submitting" ? text.submitting : text.submit}</button>
-          <p className={styles.note}>{text.note}</p>
-          <p className={styles.status} role="status" aria-live="polite">{status === "success" ? text.success : status === "error" ? text.error : ""}</p>
-        </form>
-      </div>
-    </div>
-  </section>;
+  return (
+    <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
+      <h2 id="subscribe-title">{text.title}</h2>
+      <form className={styles.form} onSubmit={submit}>
+        <label className={styles.field}>
+          <span>{text.email}</span>
+          <input className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={text.placeholder} maxLength={254} required />
+        </label>
+        <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
+        <button className={styles.submit} type="submit" disabled={status === "submitting"}>{status === "submitting" ? text.submitting : text.submit}</button>
+        <p className={styles.status} role="status" aria-live="polite">{status === "success" ? text.success : status === "error" ? text.error : ""}</p>
+      </form>
+    </section>
+  );
 }
