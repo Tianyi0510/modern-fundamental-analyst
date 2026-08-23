@@ -195,6 +195,32 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.doesNotMatch(form, /RESEND_API_KEY/);
 });
 
+test("subscribe form stores localized signups in Resend Contacts", async () => {
+  const [page, form, styles, route, footer] = await Promise.all([
+    read("components/contact-page-content.tsx"),
+    read("components/subscribe-form.tsx"),
+    read("components/subscribe-form.module.css"),
+    read("app/api/subscribe/route.ts"),
+    read("components/site-footer.tsx"),
+  ]);
+
+  assert.match(page, /SubscribeForm locale=\{locale\}/);
+  assert.match(form, /fetch\("\/api\/subscribe"/);
+  assert.match(form, /"zh-tw"/);
+  assert.match(form, /"zh-cn"/);
+  assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\)/s);
+  assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
+  assert.match(route, /resend\.contacts\.create/);
+  assert.match(route, /resend\.contacts\.update/);
+  assert.match(route, /resend\.contacts\.get/);
+  assert.match(route, /unsubscribed:\s*false/);
+  assert.match(route, /signup_locale/);
+  assert.match(route, /isSameOrigin/);
+  assert.match(route, /isRateLimited/);
+  assert.doesNotMatch(form, /RESEND_API_KEY/);
+  assert.match(footer, /contact#subscribe/);
+});
+
 test("all about locales use one shared page structure", async () => {
   const paths = ["app/(en)/about/page.tsx", "app/zh-tw/about/page.tsx", "app/zh-cn/about/page.tsx"];
   const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([...paths.map(read), read("components/about-page-content.tsx")]);
