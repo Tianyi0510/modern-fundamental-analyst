@@ -29,6 +29,15 @@ export function SiteHeader({ locale = "en" }: SiteHeaderProps = {}) {
   const menuCloseButtonRef = useRef<HTMLButtonElement>(null);
   const menuLabel = copy.open;
   const closeLabel = copy.close;
+  const homePath = prefix || "/";
+  const navigation = [
+    { href: homePath, label: copy.home },
+    { href: `${prefix}/about`, label: copy.about },
+    { href: `${prefix}/portfolio`, label: copy.portfolio },
+    { href: `${prefix}/performance`, label: copy.performance },
+    { href: `${prefix}/memos`, label: copy.memos },
+  ];
+  const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -117,11 +126,9 @@ export function SiteHeader({ locale = "en" }: SiteHeaderProps = {}) {
       </button>
       <div className="header-actions">
         <nav aria-label={copy.primary}>
-          <Link href={prefix || "/"}>{copy.home}</Link>
-          <Link href={`${prefix}/about`}>{copy.about}</Link>
-          <Link href={`${prefix}/portfolio`}>{copy.portfolio}</Link>
-          <Link href={`${prefix}/performance`}>{copy.performance}</Link>
-          <Link href={`${prefix}/memos`}>{copy.memos}</Link>
+          {navigation.map(({ href, label }) => (
+            <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} key={href}>{label}</Link>
+          ))}
         </nav>
         <div className="language-menu" ref={languageMenuRef}>
           <button
@@ -154,7 +161,7 @@ export function SiteHeader({ locale = "en" }: SiteHeaderProps = {}) {
             </Link>)}
           </div>
         </div>
-        <Link className="button button-dark button-small" href={`${prefix}/contact`}>
+        <Link className="button button-dark button-small" href={`${prefix}/contact`} aria-current={isCurrentPath(`${prefix}/contact`) ? "page" : undefined}>
           {copy.contact}
         </Link>
       </div>
@@ -169,12 +176,9 @@ export function SiteHeader({ locale = "en" }: SiteHeaderProps = {}) {
             </button>
           </div>
           <nav aria-label={copy.mobilePrimary}>
-            <Link href={prefix || "/"} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{copy.home}</Link>
-            <Link href={`${prefix}/about`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{copy.about}</Link>
-            <Link href={`${prefix}/portfolio`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{copy.portfolio}</Link>
-            <Link href={`${prefix}/performance`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{copy.performance}</Link>
-            <Link href={`${prefix}/memos`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{copy.memos}</Link>
-            <Link href={`${prefix}/contact`} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>{copy.contact}</Link>
+            {[...navigation, { href: `${prefix}/contact`, label: copy.contact }].map(({ href, label }) => (
+              <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} key={href}>{label}</Link>
+            ))}
           </nav>
           <div className="mobile-language-links">{locales.filter((targetLocale) => targetLocale !== locale).map((targetLocale) => <Link className="mobile-menu-language" href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} key={targetLocale}>{localeConfig[targetLocale].label}</Link>)}</div>
         </aside>
