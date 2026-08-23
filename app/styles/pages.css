@@ -49,13 +49,13 @@
 .about-closing > div p + p { margin-top: 1.35em; }
 .about-closing a { color: var(--dark-blue); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
 .portfolio-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); grid-template-areas: "market return" "cost holdings"; gap: 0; min-height: 680px; background: transparent; }
-.portfolio-kpis > div { min-height: 0; padding: 40px; display: flex; flex-direction: column; background: var(--white); }
+.portfolio-kpis > div { min-height: 0; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
 .portfolio-kpis > div:nth-child(1) { grid-area: market; }
 .portfolio-kpis > div:nth-child(2) { grid-area: cost; }
 .portfolio-kpis > div:nth-child(3) { grid-area: return; }
 .portfolio-kpis > div:nth-child(4) { grid-area: holdings; }
-.portfolio-kpis strong { margin-top: 20px; }
-.portfolio-kpis small { margin-top: auto; padding-top: 15px; color: currentColor; opacity: .62; }
+.portfolio-kpis strong { margin-top: auto; }
+.portfolio-kpis small { margin-top: 14px; color: currentColor; opacity: .62; }
 .portfolio-table-wrap { overflow-x: auto; scrollbar-width: thin; }
 .portfolio-table, .returns-table { border-top: 1px solid var(--black); }
 .table-head, .portfolio-row { display: grid; grid-template-columns: 1fr 1fr 120px; gap: 30px; align-items: center; }
