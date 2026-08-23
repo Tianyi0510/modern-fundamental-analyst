@@ -213,7 +213,7 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.match(form, /contact-form\.module\.css/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
   assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\);[^}]*color:\s*var\(--black\)/s);
-  assert.match(styles, /\.form\s*\{[^}]*background:\s*transparent/s);
+  assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
   assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /CONTACT_TO_EMAIL/);

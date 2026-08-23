@@ -49,7 +49,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px 22px;
   padding: 40px;
-  border: 1px solid var(--black);
+  border: 0;
   background: transparent;
 }
 
