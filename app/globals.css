@@ -126,6 +126,7 @@ a { color: inherit; text-decoration: none; }
 .button-small { min-height: 42px; padding-inline: 20px; }
 .hero { padding: 92px 0 72px; }
 .home-opening { padding-bottom: 48px; background: var(--background-gray); border-bottom: 1px solid var(--black); }
+.home-opening > .site-header { background: var(--white); box-shadow: 0 0 0 100vmax var(--white); clip-path: inset(0 -100vmax); }
 .hero,
 .page-hero,
 .legal-header,
@@ -267,18 +268,14 @@ a { color: inherit; text-decoration: none; }
 .about-closing > div p { margin: 0; }
 .about-closing > div p + p { margin-top: 1.35em; }
 .about-closing a { color: var(--dark-blue); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
-.portfolio-kpis { display: grid; grid-template-columns: 1.2fr 1.1fr .85fr .55fr; gap: 1px; margin-top: 80px; background: var(--black); border: 1px solid var(--black); }
-.portfolio-kpis > div { min-height: 250px; padding: 30px; display: flex; flex-direction: column; background: var(--white); }
-.portfolio-kpis > div:first-child { background: var(--dark-blue); color: var(--white); }
-.portfolio-kpis > div:nth-child(4) { background: var(--gray); }
+.portfolio-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); grid-template-areas: "market return" "cost holdings"; gap: 1px; min-height: 100svh; background: var(--black); border-top: 1px solid var(--black); border-bottom: 1px solid var(--black); }
+.portfolio-kpis > div { min-height: 0; padding: 48px; display: flex; flex-direction: column; background: var(--white); }
+.portfolio-kpis > div:nth-child(1) { grid-area: market; }
+.portfolio-kpis > div:nth-child(2) { grid-area: cost; }
+.portfolio-kpis > div:nth-child(3) { grid-area: return; }
+.portfolio-kpis > div:nth-child(4) { grid-area: holdings; }
 .portfolio-kpis strong { margin-top: auto; }
 .portfolio-kpis small { margin-top: 15px; color: currentColor; opacity: .62; }
-.portfolio-allocation { padding: 88px 0 72px; display: grid; grid-template-columns: .55fr 1.45fr; gap: 70px; align-items: end; }
-.portfolio-allocation > div:first-child { display: grid; gap: 9px; }
-.portfolio-allocation small { color: rgba(0,0,0,.62); }
-.stacked-bar { display: flex; height: 78px; overflow: hidden; background: var(--gray); }
-.segment { display: block; height: 100%; }
-.segment-medium-blue { background: var(--medium-blue); }.segment-dark-blue { background: var(--dark-blue); }.segment-light-blue { background: var(--light-blue); }.segment-gray { background: var(--gray); }.segment-blue-mix { background: color-mix(in srgb, var(--dark-blue) 55%, var(--medium-blue)); }.segment-black { background: var(--black); }
 .portfolio-table-wrap { overflow-x: auto; scrollbar-width: thin; }
 .portfolio-table, .returns-table { border-top: 1px solid var(--black); }
 .table-head, .portfolio-row { display: grid; grid-template-columns: 1fr 1fr 120px; gap: 30px; align-items: center; }
@@ -319,18 +316,8 @@ a { color: inherit; text-decoration: none; }
 .portfolio-page .page-hero { padding-bottom: 96px; }
 .portfolio-page .page-hero h1 { max-width: 1080px; }
 .portfolio-page .portfolio-kpis {
-  grid-template-columns: 1fr 1fr .68fr;
-  grid-template-rows: repeat(2, 132px);
-  margin-top: 64px;
+  margin-top: 0;
 }
-.portfolio-page .portfolio-kpis > div { min-height: 0; padding: 24px 26px; }
-.portfolio-page .portfolio-kpis > div:nth-child(1),
-.portfolio-page .portfolio-kpis > div:nth-child(2) { grid-row: 1 / 3; }
-.portfolio-page .portfolio-kpis > div:nth-child(3) { grid-column: 3; grid-row: 1; }
-.portfolio-page .portfolio-kpis > div:nth-child(4) { grid-column: 3; grid-row: 2; }
-.portfolio-page .portfolio-kpis > div:nth-child(n+3) small { margin-top: 8px; }
-.portfolio-page .portfolio-allocation { padding: 68px 0 78px; grid-template-columns: .62fr 1.38fr; }
-.portfolio-page .stacked-bar { height: 34px; }
 .portfolio-holdings-heading { padding: 76px 0 40px; border-top: 1px solid var(--black); display: grid; grid-template-columns: 1.35fr .65fr; gap: 64px; align-items: end; }
 .portfolio-holdings-heading > div { display: grid; gap: 20px; }
 .portfolio-holdings-heading h2 { margin: 0; }
@@ -520,7 +507,6 @@ a { color: inherit; text-decoration: none; }
 .allocation-card > span,
 .about-section-heading > span,
 .portfolio-kpis span,
-.portfolio-allocation span,
 .portfolio-holdings-heading span,
 .performance-summary span,
 .table-head,
@@ -541,7 +527,6 @@ a { color: inherit; text-decoration: none; }
 .memo-card > small,
 .page-intro small,
 .portfolio-kpis small,
-.portfolio-allocation small,
 .performance-summary small,
 .data-note,
 .memo-meta,
@@ -579,10 +564,6 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
-}
-
-.portfolio-page .portfolio-kpis > div:nth-child(n+3) strong {
-  font-size: var(--type-data-kpi-small);
 }
 
 .portfolio-row strong,
@@ -734,7 +715,6 @@ a { color: inherit; text-decoration: none; }
 .about-page .about-section-heading > span,
 .about-page .about-closing > .eyebrow,
 .portfolio-page .portfolio-kpis span,
-.portfolio-page .portfolio-allocation span,
 .portfolio-page .portfolio-holdings-heading span,
 .portfolio-page .portfolio-table-detailed .table-head,
 .performance-page .performance-summary span,
@@ -916,19 +896,11 @@ a { color: inherit; text-decoration: none; }
   .page-hero { padding: 70px 0 90px; }
   .page-hero h1 { overflow-wrap: anywhere; }
   .page-intro { grid-template-columns: 1fr; gap: 28px; }
-  .portfolio-kpis { grid-template-columns: 1fr; }
-  .portfolio-kpis > div { min-height: 210px; }
-  .portfolio-page .portfolio-kpis { grid-template-columns: 1fr 1fr; grid-template-rows: auto; margin-top: 48px; }
-  .portfolio-page .portfolio-kpis > div { min-height: 168px; }
-  .portfolio-page .portfolio-kpis > div:nth-child(1),
-  .portfolio-page .portfolio-kpis > div:nth-child(2) { grid-column: 1 / -1; grid-row: auto; min-height: 208px; }
-  .portfolio-page .portfolio-kpis > div:nth-child(3) { grid-column: 1; grid-row: auto; }
-  .portfolio-page .portfolio-kpis > div:nth-child(4) { grid-column: 2; grid-row: auto; }
-  .portfolio-page .portfolio-kpis > div:nth-child(n+3) strong { font-size: var(--type-data-kpi-small); }
-  .portfolio-page .portfolio-allocation { padding: 58px 0 64px; }
+  .portfolio-page .portfolio-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(220px, 1fr)); min-height: 0; }
+  .portfolio-page .portfolio-kpis > div { min-height: 220px; padding: 22px 18px; }
+  .portfolio-page .portfolio-kpis strong { font-size: var(--type-data-kpi-small); }
   .portfolio-holdings-heading { padding: 64px 0 34px; grid-template-columns: 1fr; gap: 30px; }
   .portfolio-holdings-heading h2 { font-size: var(--type-display-medium); }
-  .portfolio-allocation { grid-template-columns: 1fr; gap: 28px; padding: 64px 0 54px; }
   .table-head { display: none; }
   .portfolio-row { grid-template-columns: 1fr auto; padding: 22px 0; }
   .portfolio-row span:nth-child(2) { grid-column: 1 / -1; order: 3; }
@@ -1018,15 +990,12 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 /* White / black, white / dark blue */
 .metric,
 .memo-card,
-.portfolio-kpis > div,
 .performance-summary > div { background: var(--surface-primary); color: var(--text-primary); }
 .metric:nth-child(2),
-.portfolio-kpis > div:nth-child(2),
 .performance-summary > div:nth-child(2) { color: var(--text-brand); }
 
 /* Black / white */
 .metric-featured,
-.portfolio-kpis > div:first-child,
 .performance-summary > div:first-child,
 .about-boundaries > article:first-child,
 .contact-grid > article:first-child {
@@ -1035,13 +1004,12 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 }
 .about-boundaries > article:first-child li { border-top-color: rgba(255,255,255,.28); }
 .about-boundaries > article:first-child li::before { color: var(--text-highlight); }
-.contact-grid > article:first-child p { color: rgba(255,255,255,.72); }
+.contact-grid > article:first-child p { color: var(--text-inverse); }
 
 /* Light blue / black and light blue / dark blue */
 .metric-accent,
 .allocation-card,
 .contact-grid > article:last-child { background: var(--surface-highlight); color: var(--text-primary); }
-.portfolio-kpis > div:nth-child(3),
 .performance-summary > div:nth-child(3),
 .about-boundaries > article:last-child {
   background: var(--surface-highlight);
@@ -1057,7 +1025,6 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-copy small,
 .performance-home .year-bar small { color: rgba(255,255,255,.76); }
 .performance-home .performance-bars { border-color: color-mix(in srgb, var(--light-blue) 48%, transparent); }
-.portfolio-kpis > div:nth-child(4) { background: var(--surface-brand); color: var(--text-highlight); }
 
 /* Three-card KPI sequence: light blue, dark blue, white. */
 .home-page .metric-band > .metric:nth-child(1),
@@ -1076,6 +1043,12 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   color: var(--text-brand);
 }
 
+/* Full-page Portfolio KPI matrix: market / return, cost / holdings. */
+.portfolio-page .portfolio-kpis > div:nth-child(1) { background: var(--surface-primary); color: var(--text-primary); }
+.portfolio-page .portfolio-kpis > div:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
+.portfolio-page .portfolio-kpis > div:nth-child(3) { background: var(--surface-brand); color: var(--text-highlight); }
+.portfolio-page .portfolio-kpis > div:nth-child(4) { background: var(--surface-primary); color: var(--text-brand); }
+
 /* Bright Blue remains an auxiliary interaction color. */
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"],
@@ -1085,8 +1058,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .memo-disclosure > summary:hover,
 .source-link:hover { color: var(--interactive-accent); }
 .site-header nav a::after,
-.bar-value,
-.segment-medium-blue { background: var(--interactive-accent); }
+.bar-value { background: var(--interactive-accent); }
 
 /* A light-blue contact band closes the homepage before the inverse footer. */
 .home-page .cta {
