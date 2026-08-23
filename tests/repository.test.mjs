@@ -171,6 +171,15 @@ test("all contact and disclaimer locales share page structures", async () => {
   for (const page of pages.slice(3)) assert.match(page, /DisclaimerPageContent/);
 });
 
+test("all about locales use one shared page structure", async () => {
+  const paths = ["app/(en)/about/page.tsx", "app/zh-tw/about/page.tsx", "app/zh-cn/about/page.tsx"];
+  const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([...paths.map(read), read("components/about-page-content.tsx")]);
+
+  for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /AboutPageContent/);
+  assert.match(shared, /text\.sections\.map/);
+  assert.match(shared, /text\.boundaries\.map/);
+});
+
 test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
   const css = await read("app/globals.css");
   const fontClamp = /font-size:\s*clamp\(/;
