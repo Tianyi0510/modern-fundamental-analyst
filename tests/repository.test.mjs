@@ -180,6 +180,8 @@ test("all home locales use one shared page structure", async () => {
   assert.match(shared, /const allocationGradient = `conic-gradient/);
   assert.match(shared, /className="allocation-legend"/);
   assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*1\.65fr \.75fr;[^}]*column-gap:\s*64px/s);
+  assert.doesNotMatch(styles, /\.intro\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(268px, 100%\)/s);
   assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
   assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--interactive-accent\); \}/);
@@ -207,24 +209,29 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceZhCn, /PerformancePageContent/);
   assert.doesNotMatch(portfolioShared, /portfolio-allocation|Allocation by market value|getHoldingWeight/);
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
+  assert.match(portfolioShared, /className="portfolio-holdings-section"/);
+  assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*32px/);
+  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*20px/);
+  assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-mobile-sort\s*\{[^}]*display:\s*grid;/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*grid-template-areas:\s*"market" "cost" "return" "holdings"/s);
   assert.match(styles, /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*24px/s);
-  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*width:\s*100%;[^}]*justify-content:\s*center/s);
+  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*width:\s*100%;[^}]*justify-content:\s*flex-start/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > span:nth-child\(3\)\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > strong:nth-child\(7\)\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*3;/s);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > \[role="cell"\]:not\(:first-child\)\s*\{[^}]*padding-left:\s*14px;[^}]*align-content:\s*start/s);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
   assert.match(styles, /--background-gray:\s*#f8f9fb/);
   assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.legal-header,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s);
 });
 
 test("all contact and disclaimer locales share page structures", async () => {
@@ -240,6 +247,20 @@ test("all contact and disclaimer locales share page structures", async () => {
 
   for (const page of pages.slice(0, 3)) assert.match(page, /ContactPageContent/);
   for (const page of pages.slice(3)) assert.match(page, /DisclaimerPageContent/);
+
+  const [disclaimer, styles] = await Promise.all([
+    read("components/disclaimer-page-content.tsx"),
+    readStyles(),
+  ]);
+  assert.match(disclaimer, /className="legal-hero"/);
+  assert.match(disclaimer, /className="legal-body"/);
+  assert.match(styles, /\.legal > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
+  assert.match(styles, /\.legal-hero\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.legal-body\s*\{[^}]*background:\s*var\(--white\)/s);
+  assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
+  assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
+  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
 });
 
 test("contact form keeps localized copy on the server and sends through a client boundary", async () => {
@@ -346,6 +367,11 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
   assert.match(css, /\.home-opening\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
+  assert.match(css, /\.memos-home\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*font-size:\s*var\(--type-title\)/s);
+  assert.match(css, /\.about-copy\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.match(css, /\.about-closing > div\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.match(css, /\.performance-home\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.performance-home \.button-white\s*\{[^}]*background:\s*var\(--black\);[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);

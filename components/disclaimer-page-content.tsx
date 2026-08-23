@@ -33,11 +33,13 @@ const copy = {
 export function DisclaimerPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
-  return <main id="main-content">
+  return <main className="legal" id="main-content">
     <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-    <section className="legal shell">
-      <header className="legal-header"><p className="eyebrow"><span /> {text.label}</p><h1>{text.title}</h1></header>
-      <div className="legal-content">
+    <section className="legal-hero">
+      <header className="legal-header shell"><p className="eyebrow"><span /> {text.label}</p><h1>{text.title}</h1></header>
+    </section>
+    <section className="legal-body">
+      <div className="legal-content shell">
         {text.sections.map(([title, description], index) => <article className="legal-section" key={title}>
           <span className="legal-section-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><h2>{title}</h2><p>{description}</p>
         </article>)}

@@ -97,6 +97,12 @@
   font-weight: var(--weight-regular);
 }
 
+.home-about > div:last-child p {
+  font-size: var(--type-title);
+  line-height: var(--leading-lead);
+  letter-spacing: -.02em;
+}
+
 .eyebrow,
 .section-number,
 .metric span,
