@@ -1,6 +1,7 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
+import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
@@ -33,7 +34,7 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
   return <main id="main-content">
-    <SiteHeader locale={locale} />
+    <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="legal shell">
       <header className="legal-header"><p className="eyebrow"><span /> {text.label}</p><h1>{text.title}</h1></header>
       <div className="legal-content">

@@ -5,6 +5,7 @@ import { getMemos } from "@/data/memos";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import { localeConfig, type Locale } from "@/lib/i18n";
+import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
@@ -30,7 +31,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
 
   return <main className="home-page" id="main-content">
     <div className="home-opening">
-      <SiteHeader locale={locale} />
+      <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <section className="hero shell"><p className="eyebrow"><span /> {text.researchLabel}</p><h1>{text.hero[0]}<br /><em>{text.hero[1]}</em></h1><div className="hero-bottom"><p>{text.heroIntro}</p><div className="hero-actions"><Link className="button button-dark" href={`${prefix}/portfolio`}>{text.viewPortfolio} <span className="arrow-icon" aria-hidden="true">↗︎</span></Link><Link className="text-link" href={`${prefix}/memos`}>{text.readLatest} →</Link></div></div></section>
       <section className="metric-band shell" aria-label={text.portfolioSnapshot}><div className="metric metric-featured"><span>{text.totalReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.cumulativeReturn}</small></div><div className="metric"><span>{text.marketValue}</span><strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong><small>{portfolioSnapshot.holdingsCount} {text.holdingsUnit}</small></div><div className="metric metric-accent"><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><small className="date-text">{text.asOf} {compactPortfolioDate} · {text.updatedMonthly}</small></div></section>
     </div>

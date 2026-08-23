@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/data/portfolio";
 import { formatDate, formatPercent } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
+import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
@@ -75,7 +76,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
   const isChinese = locale !== "en";
   const asOf = formatDate(portfolioSnapshot.asOf, locale);
 
-  return <main className="performance-page" id="main-content"><SiteHeader locale={locale} />
+  return <main className="performance-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="performance-summary shell"><div className="summary-primary"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.cumulativeNote}</small></div><div><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><small>{text.portfolioNote}</small></div><div><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><small>{text.benchmarkNote}</small></div></section>
     <section className="returns shell"><div className="section-heading"><p className="section-number">{text.snapshot}</p><h2>{text.measured}</h2></div>

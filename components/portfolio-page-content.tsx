@@ -1,9 +1,10 @@
-import { PortfolioTable } from "@/components/portfolio-table";
+import { PortfolioTable, type PortfolioTableCopy } from "@/components/portfolio-table";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
+import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
@@ -56,12 +57,18 @@ const copy = {
   },
 } as const;
 
+const tableCopy = {
+  en: { ariaLabel: "Portfolio holdings", symbol: "Position", shares: "Shares", costBasis: "Cost Basis", price: "Price", marketValue: "Market Value", returnPct: "Return", weight: "Weight", sortBy: "Sort By", ascending: "Ascending", descending: "Descending", total: "Total" },
+  "zh-tw": { ariaLabel: "投資組合持股", symbol: "部位", shares: "股數", costBasis: "成本基礎", price: "價格", marketValue: "市場價值", returnPct: "報酬", weight: "權重", sortBy: "排序依據", ascending: "升序", descending: "降序", total: "合計" },
+  "zh-cn": { ariaLabel: "投资组合持仓", symbol: "持仓", shares: "股数", costBasis: "成本基础", price: "价格", marketValue: "市场价值", returnPct: "回报", weight: "权重", sortBy: "排序依据", ascending: "升序", descending: "降序", total: "合计" },
+} satisfies Record<Locale, PortfolioTableCopy>;
+
 export function PortfolioPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const isChinese = locale !== "en";
   const asOf = formatDate(portfolioSnapshot.asOf, locale);
 
-  return <main className="portfolio-page" id="main-content"><SiteHeader locale={locale} />
+  return <main className="portfolio-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="portfolio-kpis" aria-label={text.summaryLabel}>
       <div><span>{text.marketValue}</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{text.currency}</small></div>
@@ -73,6 +80,6 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
       <div><span>{text.currentHoldings}</span><h2>{text.positionCount}</h2></div>
       <p><span className="portfolio-desktop-instruction">{locale === "en" ? "Click any column heading to sort. " : locale === "zh-tw" ? "點選任一欄位標題即可排序；" : "点击任一栏标题即可排序；"}</span>{locale === "en" ? `Prices and market values use closing prices as of ${asOf}.` : locale === "zh-tw" ? `價格與市場價值均採用 ${asOf} 收盤價。` : `价格与市场价值均采用 ${asOf} 收盘价。`}</p>
     </section>
-    <section className="portfolio-table-wrap shell"><PortfolioTable holdings={portfolioHoldings} locale={locale} /></section>
+    <section className="portfolio-table-wrap shell"><PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} /></section>
     <SiteFooter locale={locale} /></main>;
 }

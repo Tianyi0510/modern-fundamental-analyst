@@ -1,3 +1,12 @@
+import {
+  getHoldingWeight as calculateHoldingWeight,
+  getPortfolioTotals,
+  type PortfolioHolding,
+} from "@/lib/portfolio-calculations";
+
+export { getHoldingReturn, getPortfolioTotals } from "@/lib/portfolio-calculations";
+export type { PortfolioHolding } from "@/lib/portfolio-calculations";
+
 export const portfolioHoldings = [
   { symbol: "ADBE", shares: 25, costBasis: 8506.05, price: 250.41, marketValue: 6260.25 },
   { symbol: "AMD", shares: 30, costBasis: 3344.27, price: 476.15, marketValue: 14284.5 },
@@ -17,30 +26,7 @@ export const portfolioHoldings = [
   { symbol: "TSLA", shares: 10, costBasis: 2606, price: 311.21, marketValue: 3112.1 },
   { symbol: "UNH", shares: 25, costBasis: 9061.21, price: 414.4, marketValue: 10360 },
   { symbol: "VGT", shares: 32, costBasis: 2465.98, price: 113.15, marketValue: 3620.8 },
-] as const;
-
-export type PortfolioHolding = (typeof portfolioHoldings)[number];
-
-export function getHoldingReturn(holding: Pick<PortfolioHolding, "costBasis" | "marketValue">) {
-  return ((holding.marketValue - holding.costBasis) / holding.costBasis) * 100;
-}
-
-export function getPortfolioTotals(holdings: ReadonlyArray<PortfolioHolding>) {
-  const { costBasis, marketValue } = holdings.reduce(
-    (totals, holding) => ({
-      costBasis: totals.costBasis + holding.costBasis,
-      marketValue: totals.marketValue + holding.marketValue,
-    }),
-    { costBasis: 0, marketValue: 0 },
-  );
-
-  return {
-    costBasis,
-    marketValue,
-    totalReturn: ((marketValue - costBasis) / costBasis) * 100,
-    holdingsCount: holdings.length,
-  };
-}
+] as const satisfies ReadonlyArray<PortfolioHolding>;
 
 const totals = getPortfolioTotals(portfolioHoldings);
 
@@ -56,5 +42,5 @@ export const portfolioSnapshot = {
 } as const;
 
 export function getHoldingWeight(marketValue: number, portfolioMarketValue = portfolioSnapshot.marketValue) {
-  return (marketValue / portfolioMarketValue) * 100;
+  return calculateHoldingWeight(marketValue, portfolioMarketValue);
 }

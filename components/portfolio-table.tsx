@@ -2,30 +2,30 @@
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/data/portfolio";
 import { formatPercent, formatShares, formatUsd } from "@/lib/format";
-import type { Locale } from "@/lib/i18n";
+import { getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/lib/portfolio-calculations";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
 
 type PortfolioTableProps = {
+  copy: PortfolioTableCopy;
   holdings: ReadonlyArray<PortfolioHolding>;
-  locale?: Locale;
 };
 
-const labels = {
-  en: { symbol: "Position", shares: "Shares", costBasis: "Cost Basis", price: "Price", marketValue: "Market Value", returnPct: "Return", weight: "Weight", sortBy: "Sort By", ascending: "Ascending", descending: "Descending" },
-  "zh-tw": { symbol: "部位", shares: "股數", costBasis: "成本基礎", price: "價格", marketValue: "市場價值", returnPct: "報酬", weight: "權重", sortBy: "排序依據", ascending: "升序", descending: "降序" },
-  "zh-cn": { symbol: "持仓", shares: "股数", costBasis: "成本基础", price: "价格", marketValue: "市场价值", returnPct: "回报", weight: "权重", sortBy: "排序依据", ascending: "升序", descending: "降序" },
-} as const;
+export type PortfolioTableCopy = Record<SortKey, string> & {
+  ariaLabel: string;
+  ascending: string;
+  descending: string;
+  sortBy: string;
+  total: string;
+};
 
 const columns: SortKey[] = ["symbol", "shares", "costBasis", "price", "marketValue", "returnPct", "weight"];
 
-export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps) {
+export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("marketValue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const copy = labels[locale];
   const totals = useMemo(() => getPortfolioTotals(holdings), [holdings]);
 
   const sortedHoldings = useMemo(() => holdings.toSorted((a, b) => {
@@ -46,7 +46,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
   };
 
   return (
-    <div className="portfolio-table portfolio-table-detailed" role="table" aria-label={locale === "en" ? "Portfolio holdings" : locale === "zh-tw" ? "投資組合持股" : "投资组合持仓"}>
+    <div className="portfolio-table portfolio-table-detailed" role="table" aria-label={copy.ariaLabel}>
       <div className="portfolio-mobile-sort">
         <label>
           <span>{copy.sortBy}</span>
@@ -87,7 +87,7 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
         );
       })}
       <div className="portfolio-row portfolio-total-row" role="row">
-        <span role="cell" data-label={copy.symbol}>{locale === "en" ? "Total" : locale === "zh-tw" ? "合計" : "合计"}</span>
+        <span role="cell" data-label={copy.symbol}>{copy.total}</span>
         <span role="cell" />
         <span role="cell" data-label={copy.costBasis}>{formatUsd(totals.costBasis)}</span>
         <span role="cell" />
