@@ -2,6 +2,7 @@ import { ContactForm } from "@/components/contact-form";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
+import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
@@ -37,7 +38,7 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
   return <main className="contact-page" id="main-content">
-    <SiteHeader locale={locale} />
+    <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero contact-hero shell">
       <p className="eyebrow"><span /> {text.label}</p>
       <h1>{text.title[0]}<br /><em>{text.title[1]}</em></h1>

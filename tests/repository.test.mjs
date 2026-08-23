@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { registerHooks } from "node:module";
 import test from "node:test";
+
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (specifier.startsWith("@/")) {
+      return nextResolve(new URL(`../${specifier.slice(2)}.ts`, import.meta.url).href, context);
+    }
+    return nextResolve(specifier, context);
+  },
+});
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -27,12 +37,16 @@ test("page metadata provides canonical and bilingual alternate URLs", async () =
 });
 
 test("portfolio totals are derived from holdings", async () => {
-  const portfolio = await read("data/portfolio.ts");
+  const [portfolio, calculations] = await Promise.all([
+    read("data/portfolio.ts"),
+    read("lib/portfolio-calculations.ts"),
+  ]);
 
-  assert.match(portfolio, /holdings\.reduce/);
-  assert.match(portfolio, /\(marketValue - costBasis\) \/ costBasis/);
-  assert.match(portfolio, /holdingsCount: holdings\.length/);
-  assert.match(portfolio, /getHoldingReturn/);
+  assert.match(calculations, /holdings\.reduce/);
+  assert.match(calculations, /\(marketValue - costBasis\) \/ costBasis/);
+  assert.match(calculations, /holdingsCount: holdings\.length/);
+  assert.match(calculations, /getHoldingReturn/);
+  assert.match(portfolio, /getPortfolioTotals\(portfolioHoldings\)/);
   assert.doesNotMatch(portfolio, /returnPct:/);
   assert.doesNotMatch(portfolio, /totalReturn:\s*22\b/);
 });
@@ -337,6 +351,37 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("shared client navigation receives only the active locale copy from server components", async () => {
+  const [header, navigationCopy, home, about, portfolio] = await Promise.all([
+    read("components/site-header.tsx"),
+    read("lib/navigation-copy.ts"),
+    read("components/home-page-content.tsx"),
+    read("components/about-page-content.tsx"),
+    read("components/portfolio-page-content.tsx"),
+  ]);
+
+  assert.match(header, /"use client"/);
+  assert.match(header, /copy: NavigationCopy/);
+  assert.doesNotMatch(header, /Mobile primary navigation|手機版主要導覽|手机版主要导航/);
+  assert.match(navigationCopy, /satisfies Record<Locale, NavigationCopy>/);
+  for (const component of [home, about, portfolio]) {
+    assert.match(component, /SiteHeader copy=\{getNavigationCopy\(locale\)\} locale=\{locale\}/);
+  }
+});
+
+test("portfolio table receives only the active locale labels from its server parent", async () => {
+  const [table, page] = await Promise.all([
+    read("components/portfolio-table.tsx"),
+    read("components/portfolio-page-content.tsx"),
+  ]);
+
+  assert.match(table, /"use client"/);
+  assert.match(table, /copy: PortfolioTableCopy/);
+  assert.doesNotMatch(table, /投資組合持股|投资组合持仓|"zh-tw"|"zh-cn"/);
+  assert.match(page, /satisfies Record<Locale, PortfolioTableCopy>/);
+  assert.match(page, /PortfolioTable copy=\{tableCopy\[locale\]\} holdings=\{portfolioHoldings\}/);
 });
 
 test("language-specific root layouts preserve html lang without request-time proxying", async () => {

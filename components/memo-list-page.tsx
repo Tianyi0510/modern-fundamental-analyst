@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { getMemos } from "@/data/memos";
 import { formatDate } from "@/lib/format";
 import { localeConfig, type Locale } from "@/lib/i18n";
+import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: { eyebrow: "Investment Memos", title: "Detailed Theses for", emphasis: "Independent Investor Evaluation.", subtitle: "Detailed investment theses supported by fundamental research, financial analysis, valuation, and clearly defined risks.", updated: "Last updated on", indexLabel: "View All Investment Memos" },
@@ -18,7 +19,7 @@ export function MemoListPage({ locale }: { locale: Locale }) {
   const latestPublishedAt = memos.reduce((latest, memo) => memo.publishedAt > latest ? memo.publishedAt : latest, "");
   const lastUpdated = latestPublishedAt ? formatDate(latestPublishedAt, locale) : "—";
 
-  return <main className="memos-page" id="main-content"><SiteHeader locale={locale} />
+  return <main className="memos-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}<br /><em>{text.emphasis}</em></h1><div className="page-intro"><p>{text.subtitle}</p><small className="date-text">{text.updated} {lastUpdated}</small></div></section>
     <MemoIndex memos={memos} locale={locale} label={text.indexLabel} basePath={basePath} />
     <SiteFooter locale={locale} />
