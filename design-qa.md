@@ -3,7 +3,7 @@
 ## Evidence
 
 - Source visual truth: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/footer-redesign/paypal-footer-reference.png`
-- Rendered implementation: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/footer-redesign/mfa-footer-prototype.png`
+- Rendered implementation: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/footer-redesign/mfa-footer-clean.png`
 - Local route: `http://127.0.0.1:3000/contact#subscribe`
 - Viewport: 1280 × 720 CSS px
 - Source pixels: 1280 × 720; implementation pixels: 1280 × 720
@@ -24,7 +24,7 @@ A separate crop was not needed: the 1280 × 720 comparison renders the form cont
 - Spacing and layout rhythm: three-column desktop hierarchy and lower divider match the reference pattern without adding unnecessary empty alert categories.
 - Colors and visual tokens: black, white, and existing light-blue accent tokens are used; contrast is appropriate and green/red data colors remain absent from navigation and form UI.
 - Image quality and assets: no reference imagery is required for this adapted component; the existing text wordmark is preserved and no placeholder or synthetic asset was introduced.
-- Copy and content: existing localized English, Traditional Chinese, and Simplified Chinese subscription copy is preserved; Resend behavior and consent note remain unchanged.
+- Copy and content: localized English, Traditional Chinese, and Simplified Chinese labels and status messages are preserved; nonessential explanatory copy and the duplicate Subscribe link were removed.
 - Responsiveness: the existing 800px breakpoint stacks the footer and form, makes the CTA full-width, and prevents horizontal overflow.
 - Accessibility and interaction: semantic footer/nav/section structure, visible focus ring, associated email label, live status region, disabled submitting state, and honeypot protection remain present.
 
@@ -38,6 +38,8 @@ A separate crop was not needed: the 1280 × 720 comparison renders the form cont
 1. Initial comparison found a P2 token conflict: the Subscribe label inherited the footer's muted paragraph color instead of the light-blue section accent.
 2. Fix applied: strengthened the component-scoped label color so it remains light blue inside the inverse footer.
 3. Post-fix evidence: `mfa-footer-prototype.png` shows both Quick Links and Subscribe labels using the light-blue accent while the explanatory copy remains muted white.
+4. The user requested a cleaner interface with fewer annotations. The introductory paragraph, consent note, and duplicate lower Subscribe link were removed.
+5. Final evidence: `mfa-footer-clean.png` shows a concise heading, email field, and CTA with a single legal line and no redundant explanatory blocks.
 
 ## Implementation Checklist
 

@@ -8,10 +8,10 @@ const currentYear = new Date().getUTCFullYear();
 export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
   const prefix = localeConfig[locale].prefix;
   const copy = locale === "zh-tw"
-    ? { description: "獨立研究、透明思考、長期視角。", quickLinks: "快速連結", subscribe: "訂閱", contact: "聯絡", disclaimer: "免責聲明", rights: "版權所有。" }
+    ? { description: "獨立研究、透明思考、長期視角。", quickLinks: "快速連結", contact: "聯絡", disclaimer: "免責聲明", rights: "版權所有。" }
     : locale === "zh-cn"
-      ? { description: "独立研究、透明思考、长期视角。", quickLinks: "快速链接", subscribe: "订阅", contact: "联系", disclaimer: "免责声明", rights: "版权所有。" }
-      : { description: "Independent research. Transparent thinking. Long-term orientation.", quickLinks: "Quick Links", subscribe: "Subscribe", contact: "Contact", disclaimer: "Disclaimer", rights: "All rights reserved." };
+      ? { description: "独立研究、透明思考、长期视角。", quickLinks: "快速链接", contact: "联系", disclaimer: "免责声明", rights: "版权所有。" }
+      : { description: "Independent research. Transparent thinking. Long-term orientation.", quickLinks: "Quick Links", contact: "Contact", disclaimer: "Disclaimer", rights: "All rights reserved." };
 
   return (
     <footer className="site-footer shell">
@@ -29,7 +29,6 @@ export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
       <SubscribeForm locale={locale} />
       <div className="footer-bottom">
         <small>© {currentYear} Modern Fundamental Analyst. {copy.rights}</small>
-        <Link href={`${prefix}/contact#subscribe`}>{copy.subscribe}</Link>
       </div>
     </footer>
   );

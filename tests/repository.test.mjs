@@ -219,8 +219,6 @@ test("subscribe form stores signups in Resend Contacts", async () => {
   assert.match(route, /isRateLimited/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);
   assert.match(footer, /SubscribeForm locale=\{locale\}/);
-  assert.match(footer, /contact#subscribe/);
-  assert.match(footer, /contact#subscribe/);
 });
 
 test("all about locales use one shared page structure", async () => {
