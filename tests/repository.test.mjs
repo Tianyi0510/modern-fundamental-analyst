@@ -180,9 +180,10 @@ test("all home locales use one shared page structure", async () => {
   assert.match(shared, /const allocationGradient = `conic-gradient/);
   assert.match(shared, /className="allocation-legend"/);
   assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, \.75fr\);[^}]*column-gap:\s*48px/s);
+  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, \.75fr\);[^}]*column-gap:\s*40px/s);
   assert.doesNotMatch(styles, /\.intro\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(268px, 100%\)/s);
+  assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(210px, 100%\)/s);
+  assert.match(styles, /\.allocation-ring::before\s*\{[^}]*inset:\s*15%/s);
   assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
   assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--interactive-accent\); \}/);
   assert.match(styles, /\.allocation-card > a:hover \.arrow-icon \{ transform: translateX\(4px\); \}/);
@@ -214,9 +215,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
-  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*100svh/s);
+  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*680px/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*8px/);
+  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*20px/);
   assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);
@@ -225,8 +226,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*24px/s);
   assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*width:\s*100%;[^}]*justify-content:\s*flex-start/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > span:nth-child\(3\)\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > strong:nth-child\(7\)\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*3;/s);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-cost\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-weight\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*3;/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > \[role="cell"\]:not\(:first-child\)\s*\{[^}]*padding-inline:\s*var\(--portfolio-mobile-inline\);[^}]*align-content:\s*start/s);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
   assert.match(styles, /--background-gray:\s*#f8f9fb/);
@@ -378,15 +380,35 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.contact-grid > article:first-child p\s*\{[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.contact-grid > article:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.doesNotMatch(css, /\.about-boundaries\s*\{[^}]*min-height:\s*100svh/s);
-  assert.match(css, /\.about-boundaries > article\s*\{[^}]*padding:\s*112px 48px/s);
+  assert.match(css, /--space-section:\s*96px/);
+  assert.match(css, /--space-section-compact:\s*72px/);
+  assert.match(css, /--space-heading-content:\s*56px/);
+  assert.match(css, /\.about-boundaries > article\s*\{[^}]*padding:\s*var\(--space-section\) 48px/s);
   assert.doesNotMatch(css, /\.contact-grid\s*\{[^}]*min-height:\s*100svh/s);
-  assert.match(css, /\.contact-grid > article\s*\{[^}]*padding:\s*112px 48px/s);
-  assert.match(css, /\.about-boundaries ol\s*\{[^}]*margin:\s*48px 0 0/s);
-  assert.match(css, /\.contact-grid p\s*\{[^}]*margin:\s*48px 0 0/s);
+  assert.match(css, /\.contact-grid > article\s*\{[^}]*padding:\s*var\(--space-section\) 48px/s);
+  assert.match(css, /\.about-boundaries ol\s*\{[^}]*margin:\s*var\(--space-related-content\) 0 0/s);
+  assert.match(css, /\.contact-grid p\s*\{[^}]*margin:\s*var\(--space-related-content\) 0 0/s);
   assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.doesNotMatch(css, /\.(?:site-header|home-opening|home-about|page-hero|about-section|about-boundaries|about-closing|portfolio-kpis|portfolio-holdings-heading|methodology|contact-grid|site-footer)\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*80px 0 150px/);
+  assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
+});
+
+test("page sections share one responsive vertical rhythm", async () => {
+  const css = await readStyles();
+
+  assert.match(css, /--space-section:\s*96px/);
+  assert.match(css, /--space-section-compact:\s*72px/);
+  assert.match(css, /--space-heading-content:\s*56px/);
+  assert.match(css, /--space-related-content:\s*40px/);
+  assert.match(css, /@media \(max-width: 800px\)[\s\S]*--space-section:\s*72px;[\s\S]*--space-section-compact:\s*56px;[\s\S]*--space-heading-content:\s*40px;[\s\S]*--space-related-content:\s*32px;/);
+  assert.match(css, /\.hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.page-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.legal-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.memo-article\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.legal-section\s*\{[^}]*padding:\s*var\(--space-section-compact\) 0/s);
+  assert.match(css, /\.memo-section \+ \.memo-section\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding-top:\s*var\(--space-section-compact\)/s);
+  assert.match(css, /\.contact-hero\s*\{[^}]*min-height:\s*0/s);
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {

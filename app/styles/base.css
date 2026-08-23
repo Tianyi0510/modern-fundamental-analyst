@@ -43,6 +43,12 @@
   --leading-heading: 1.1;
   --leading-lead: 1.4;
   --leading-body: 1.65;
+
+  /* Unified page-section rhythm */
+  --space-section: 96px;
+  --space-section-compact: 72px;
+  --space-heading-content: 56px;
+  --space-related-content: 40px;
 }
 
 * { box-sizing: border-box; }

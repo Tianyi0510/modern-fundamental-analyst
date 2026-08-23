@@ -3,8 +3,8 @@
   grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
   gap: 72px;
   align-items: start;
-  padding-top: 120px;
-  padding-bottom: 150px;
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
   background: var(--light-blue);
   color: var(--black);
   box-shadow: 0 0 0 100vmax var(--light-blue);
@@ -138,8 +138,8 @@ textarea.control {
   .section {
     grid-template-columns: 1fr;
     gap: 44px;
-    padding-top: 82px;
-    padding-bottom: 100px;
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
   }
 
   .heading {
