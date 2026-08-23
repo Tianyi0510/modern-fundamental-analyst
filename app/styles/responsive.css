@@ -165,9 +165,9 @@
   .portfolio-mobile-sort label { display: contents; }
   .portfolio-mobile-sort label > span { grid-column: 1 / -1; font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); text-transform: capitalize; white-space: nowrap; }
   .portfolio-mobile-sort select,
-  .portfolio-mobile-sort button { min-height: 50px; border: 1px solid var(--black); border-radius: 0; background: var(--white); color: var(--black); font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); }
+  .portfolio-mobile-sort button { box-sizing: border-box; width: 100%; height: 50px; min-width: 0; margin: 0; border: 1px solid var(--black); border-radius: 0; background: var(--white); color: var(--black); font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); line-height: 1; }
   .portfolio-mobile-sort select { width: 100%; min-width: 0; padding: 0 36px 0 14px; }
-  .portfolio-mobile-sort button { width: 100%; min-width: 0; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+  .portfolio-mobile-sort button { padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
   .portfolio-mobile-sort button svg { width: 17px; height: 17px; margin-left: auto; }
   .portfolio-table-detailed .portfolio-row { min-height: 0; padding: 24px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
   .portfolio-table-detailed .portfolio-row > [role="cell"] { min-width: 0; display: grid; gap: 5px; text-align: left; overflow-wrap: anywhere; }

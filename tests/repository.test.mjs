@@ -126,9 +126,28 @@ test("memo catalog contains only the Microsoft source memo and uses one shared d
 test("memo content is selected by slug and locale", async () => {
   const { getMemoContent } = await import("../data/memo-content.ts");
 
-  assert.match(getMemoContent("microsoft-stock-analysis-fy2024", "en").sections[0].title, /Business Analysis/);
-  assert.match(getMemoContent("microsoft-stock-analysis-fy2024", "zh-tw").sections[0].title, /企業分析/);
+  const english = getMemoContent("microsoft-stock-analysis-fy2024", "en");
+  const traditionalChinese = getMemoContent("microsoft-stock-analysis-fy2024", "zh-tw");
+
+  assert.equal(english.sections[0].title, "Section 1: Business Analysis");
+  assert.equal(traditionalChinese.sections[0].title, "Section 1: Business Analysis");
+  assert.equal(english.sections[0].subsections[0].paragraphs[0], "Warren Buffett’s most important investing principle is understanding the business in which you’re investing. Buffett once said, “If you don’t understand a business, you shouldn’t own it.”");
+  assert.equal(english.referencesTitle, "References:");
   assert.equal(getMemoContent("missing-memo", "en"), undefined);
+});
+
+test("memo article uses the source document prose and the wider references layout", async () => {
+  const [content, styles] = await Promise.all([read("data/memo-content.ts"), readStyles()]);
+
+  assert.match(content, /const sourceContent: MemoContent/);
+  assert.match(content, /Microsoft now operates through three primary business segments/);
+  assert.match(content, /Satya Nadella’s ethical leadership is a masterclass/);
+  assert.match(content, /Microsoft‘s retained earnings surged from \$24\.2 billion/);
+  assert.doesNotMatch(content, /Business Conclusion|Management Conclusion|Financial Conclusion/);
+  assert.match(styles, /\.article-body\s*\{[^}]*width:\s*min\(1040px, 100%\);[^}]*margin-inline:\s*auto/s);
+  assert.match(styles, /\.memo-references\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
+  assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
 });
 
 test("all memo locales use shared list and detail page structures", async () => {
@@ -229,7 +248,8 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*8px 12px/s);
   assert.match(styles, /\.portfolio-mobile-sort label\s*\{[^}]*display:\s*contents/s);
   assert.match(styles, /\.portfolio-mobile-sort label > span\s*\{[^}]*grid-column:\s*1 \/ -1/s);
-  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*width:\s*100%;[^}]*justify-content:\s*center/s);
+  assert.match(styles, /\.portfolio-mobile-sort select,\s*\.portfolio-mobile-sort button\s*\{[^}]*box-sizing:\s*border-box;[^}]*width:\s*100%;[^}]*height:\s*50px;[^}]*margin:\s*0;/s);
+  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*display:\s*inline-flex;[^}]*justify-content:\s*center/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-cost\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);

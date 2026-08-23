@@ -150,17 +150,17 @@
 .memo-article h1 { max-width: 1120px; margin: 50px 0 46px; }
 .article-meta { display: flex; gap: 28px; padding: 18px 0; border-top: 1px solid var(--black); border-bottom: 1px solid var(--gray); }
 .article-lead { max-width: 900px; margin: var(--space-section) 0; }
-.article-body { max-width: 760px; margin-left: 25%; }
+.article-body { width: min(1040px, 100%); margin-inline: auto; }
 .article-body h2 { margin: 0 0 34px; }
 .article-body p { margin: 0; }
 .article-body p + p { margin-top: 1.35em; }
 .memo-section + .memo-section { margin-top: var(--space-section); padding-top: var(--space-section-compact); border-top: 1px solid var(--black); }
 .memo-subsection { margin-top: var(--space-heading-content); }
 .memo-subsection h3 { margin: 0 0 18px; }
-.memo-references { margin-top: var(--space-section); padding-top: var(--space-section-compact); border-top: 1px solid var(--black); }
+.memo-references { margin-top: var(--space-section); padding: var(--space-section-compact) 48px; background: var(--background-gray); }
 .memo-references ol { margin: 0; padding-left: 22px; }
 .memo-references li + li { margin-top: 14px; }
-.article-source-note { margin-top: 46px !important; padding-top: 22px; border-top: 1px solid var(--gray); color: rgba(0,0,0,.62); line-height: 1.65; }
+.article-source-note { margin-top: 46px !important; color: rgba(0,0,0,.62); line-height: 1.65; }
 .article-body blockquote { margin: 64px 0; padding: 34px 0; border-top: 3px solid var(--medium-blue); border-bottom: 1px solid var(--gray); }
 .contact-hero { min-height: 0; }
 .contact-note { max-width: 580px; margin: var(--space-heading-content) 0 0 auto; color: rgba(0,0,0,.62); }
