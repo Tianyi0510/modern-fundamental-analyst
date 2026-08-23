@@ -189,6 +189,18 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
 
+test("editorial color roles keep the footer inverse and medium blue auxiliary", async () => {
+  const css = await read("app/globals.css");
+
+  assert.match(css, /--surface-primary:\s*var\(--white\)/);
+  assert.match(css, /--surface-inverse:\s*var\(--black\)/);
+  assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
+  assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
+  assert.match(css, /\.portfolio-kpis > div:nth-child\(4\)[^}]*background:\s*var\(--surface-brand\)[^}]*color:\s*var\(--text-highlight\)/s);
+});
+
 test("language-specific root layouts preserve html lang without request-time proxying", async () => {
   const [englishLayout, traditionalChineseLayout, simplifiedChineseLayout] = await Promise.all([
     read("app/(en)/layout.tsx"),
