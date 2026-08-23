@@ -126,6 +126,17 @@ test("all memo locales use shared list and detail page structures", async () => 
   }
 });
 
+test("memo index hero uses the shared subtitle and latest memo date", async () => {
+  const page = await read("components/memo-list-page.tsx");
+
+  assert.match(page, /Detailed investment theses supported by fundamental research, financial analysis, valuation, and clearly defined risks\./);
+  assert.match(page, /Last updated on/);
+  assert.match(page, /最後更新於/);
+  assert.match(page, /最后更新于/);
+  assert.match(page, /formatDate\(latestPublishedAt, locale\)/);
+  assert.match(page, /className="page-intro"/);
+});
+
 test("all home locales use one shared page structure", async () => {
   const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([
     read("app/(en)/page.tsx"),
