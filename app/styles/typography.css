@@ -1,0 +1,385 @@
+/* Unified typography hierarchy
+   Display → Headline → Title / Title Bold → Subtitle → Body → Label → Caption → Button → Data */
+.hero h1,
+.page-hero h1,
+.legal h1,
+.memo-article h1,
+.not-found h1 {
+  font-size: var(--type-display-large);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+.home-about h2,
+.intro h2,
+.section-heading h2,
+.cta h2,
+.two-column h2,
+.methodology h2,
+.about-section-heading h2,
+.about-closing h2,
+.portfolio-holdings-heading h2 {
+  font-size: var(--type-display-medium);
+  line-height: .98;
+  letter-spacing: -.055em;
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+.memo-card h3,
+.memo-index-row h2,
+.principles h3 {
+  font-size: var(--type-display-small);
+  line-height: 1.05;
+  letter-spacing: -.045em;
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+.about-philosophy-copy h3,
+.memo-subsection h3,
+.article-body h2,
+.article-body blockquote,
+.legal h2 {
+  font-size: var(--type-headline);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+.hero-bottom > p,
+.page-intro p,
+.article-lead,
+.contact-grid p {
+  font-size: var(--type-title);
+  line-height: var(--leading-lead);
+  letter-spacing: -.02em;
+  font-weight: var(--weight-regular);
+  text-transform: capitalize;
+}
+
+.performance-copy p,
+.contact-note {
+  font-size: var(--type-subtitle);
+  line-height: 1.5;
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+  text-transform: capitalize;
+}
+
+.rich-copy,
+.about-copy,
+.about-boundaries ol,
+.about-closing > div,
+.article-body,
+.methodology div,
+.legal p {
+  font-size: var(--type-body-large);
+  line-height: var(--leading-body);
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.home-about > div:last-child p,
+.memo-card p,
+.memo-index-row p,
+.principles p,
+.portfolio-holdings-heading p,
+.return-row span:nth-child(3),
+.site-footer p,
+.holding-row small {
+  font-size: var(--type-body);
+  line-height: 1.6;
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.eyebrow,
+.section-number,
+.metric span,
+.allocation-card > span,
+.about-section-heading > span,
+.portfolio-kpis span,
+.portfolio-holdings-heading span,
+.performance-summary span,
+.table-head,
+.contact-grid span,
+.legal-section-number,
+.memo-card > div {
+  font-family: var(--font-ui);
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
+.metric small,
+.allocation-ring small,
+.performance-copy small,
+.memo-card > small,
+.page-intro small,
+.portfolio-kpis small,
+.performance-summary small,
+.memo-meta,
+.article-meta,
+.footer-bottom small {
+  font-size: var(--type-caption);
+  line-height: 1.5;
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+}
+
+.button,
+.text-link,
+.back-link {
+  font-size: var(--type-button);
+  line-height: 1.2;
+  font-weight: var(--weight-bold);
+}
+
+.metric strong,
+.performance-copy > strong {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-large);
+  line-height: .88;
+  letter-spacing: -.065em;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-page .portfolio-kpis strong,
+.performance-summary strong {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-kpi);
+  line-height: .9;
+  letter-spacing: -.055em;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-row strong,
+.return-row strong {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-total-row > * {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-row-bold);
+  line-height: 1.25;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Component typography mappings
+   Every remaining text-bearing component maps to the unified scale above. */
+.wordmark,
+.footer-mark {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.memo-disclosure > summary {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.site-header nav,
+.language-trigger,
+.language-dropdown a,
+.footer-links,
+.allocation-card > a,
+.mobile-menu-language {
+  font-family: var(--font-ui);
+  font-size: var(--type-button);
+  line-height: 1.2;
+  font-weight: var(--weight-bold);
+}
+
+.holding-row strong {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.about-boundaries h2 {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.holding-row b {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-ring b {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-ring);
+  line-height: .9;
+  font-weight: var(--weight-bold);
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-row:not(.portfolio-total-row) > * {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
+.holding-row > span,
+.bar-value span,
+.year-bar small,
+.principles span,
+.memo-index-row > span,
+.memo-index-row small {
+  font-family: var(--font-ui);
+  font-size: var(--type-caption);
+  line-height: 1.5;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+}
+
+.date-text,
+.memo-meta,
+.article-meta,
+.bar-value span,
+.holding-row > span {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.memo-meta b {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+}
+
+.not-found > span,
+.mobile-menu-title {
+  font-family: var(--font-ui);
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
+.mobile-menu-drawer nav {
+  font-family: var(--font-ui);
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+/* Higher-specificity legacy selectors must retain the new Label treatment. */
+.home-page .eyebrow,
+.home-page .section-number,
+.home-page .metric span,
+.about-page .page-hero .eyebrow,
+.contact-page .page-hero .eyebrow,
+.memos-page .page-hero .eyebrow,
+.memo-detail-page .memo-article > .eyebrow,
+.portfolio-page .page-hero .eyebrow,
+.performance-page .page-hero .eyebrow,
+.about-page .about-section-heading > span,
+.about-page .about-closing > .eyebrow,
+.portfolio-page .portfolio-kpis span,
+.portfolio-page .portfolio-holdings-heading span,
+.portfolio-page .portfolio-table-detailed .table-head,
+.performance-page .performance-summary span,
+.performance-page .returns .section-number,
+.performance-page .returns-table .table-head,
+.contact-grid span,
+.memo-card > div {
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
+[lang="zh-Hant-TW"] .hero h1,
+[lang="zh-CN"] .hero h1 { line-height: 1; letter-spacing: -.015em; }
+[lang="zh-Hant-TW"] .page-hero h1,
+[lang="zh-Hant-TW"] .legal h1,
+[lang="zh-Hant-TW"] .memo-article h1,
+[lang="zh-CN"] .page-hero h1,
+[lang="zh-CN"] .legal h1,
+[lang="zh-CN"] .memo-article h1 { line-height: 1.05; letter-spacing: -.015em; }
+[lang="zh-Hant-TW"] .intro h2,
+[lang="zh-Hant-TW"] .section-heading h2,
+[lang="zh-Hant-TW"] .home-about h2,
+[lang="zh-Hant-TW"] .cta h2,
+[lang="zh-CN"] .intro h2,
+[lang="zh-CN"] .section-heading h2,
+[lang="zh-CN"] .home-about h2,
+[lang="zh-CN"] .cta h2 { line-height: 1.1; letter-spacing: -.01em; }
+[lang="zh-Hant-TW"] .memo-card h3,
+[lang="zh-Hant-TW"] .memo-index-row h2,
+[lang="zh-CN"] .memo-card h3,
+[lang="zh-CN"] .memo-index-row h2 { line-height: 1.2; letter-spacing: 0; }
+[lang="zh-Hant-TW"] .hero-bottom > p,
+[lang="zh-Hant-TW"] .rich-copy,
+[lang="zh-Hant-TW"] .article-lead,
+[lang="zh-Hant-TW"] .article-body h2,
+[lang="zh-Hant-TW"] .article-body blockquote,
+[lang="zh-Hant-TW"] .contact-grid p,
+[lang="zh-Hant-TW"] .legal h2,
+[lang="zh-Hant-TW"] .about-philosophy-copy h3,
+[lang="zh-Hant-TW"] .principles h3,
+[lang="zh-Hant-TW"] .two-column h2,
+[lang="zh-Hant-TW"] .methodology h2,
+[lang="zh-Hant-TW"] .about-section-heading h2,
+[lang="zh-Hant-TW"] .about-boundaries h2,
+[lang="zh-Hant-TW"] .about-closing h2,
+[lang="zh-Hant-TW"] .portfolio-holdings-heading h2,
+[lang="zh-CN"] .hero-bottom > p,
+[lang="zh-CN"] .rich-copy,
+[lang="zh-CN"] .article-lead,
+[lang="zh-CN"] .article-body h2,
+[lang="zh-CN"] .article-body blockquote,
+[lang="zh-CN"] .contact-grid p,
+[lang="zh-CN"] .legal h2,
+[lang="zh-CN"] .about-philosophy-copy h3,
+[lang="zh-CN"] .principles h3,
+[lang="zh-CN"] .two-column h2,
+[lang="zh-CN"] .methodology h2,
+[lang="zh-CN"] .about-section-heading h2,
+[lang="zh-CN"] .about-boundaries h2,
+[lang="zh-CN"] .about-closing h2,
+[lang="zh-CN"] .portfolio-holdings-heading h2 { letter-spacing: 0; }
+[lang="zh-Hant-TW"] .about-section-heading h2,
+[lang="zh-Hant-TW"] .about-boundaries h2,
+[lang="zh-Hant-TW"] .about-closing h2,
+[lang="zh-Hant-TW"] .portfolio-holdings-heading h2,
+[lang="zh-CN"] .about-section-heading h2,
+[lang="zh-CN"] .about-boundaries h2,
+[lang="zh-CN"] .about-closing h2,
+[lang="zh-CN"] .portfolio-holdings-heading h2 { line-height: 1.08; }
+

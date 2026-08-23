@@ -1,0 +1,125 @@
+/* Editorial color architecture
+   White and black remain primary. Deep Blue and Light Blue define section
+   hierarchy; Bright Blue is reserved for interactive and data accents. */
+:root {
+  --surface-primary: var(--white);
+  --surface-inverse: var(--black);
+  --surface-brand: var(--deep-blue);
+  --surface-highlight: var(--light-blue);
+  --text-primary: var(--black);
+  --text-brand: var(--deep-blue);
+  --text-inverse: var(--white);
+  --text-highlight: var(--light-blue);
+  --interactive-accent: var(--bright-blue);
+}
+
+body { background: var(--surface-primary); color: var(--text-primary); }
+.wordmark span,
+.eyebrow span,
+.memo-count,
+.legal-section-number { background-color: transparent; color: var(--interactive-accent); }
+.eyebrow span { background: var(--interactive-accent); }
+.page-hero h1 em,
+.hero h1 em,
+.home-about h2,
+.intro h2,
+.about-section-heading h2,
+.portfolio-holdings-heading h2,
+.returns h2,
+.methodology h2,
+.legal h1 { color: var(--text-brand); }
+
+/* White / black, white / dark blue */
+.metric,
+.memo-card,
+.performance-summary > div { background: var(--surface-primary); color: var(--text-primary); }
+.metric:nth-child(2),
+.performance-summary > div:nth-child(2) { color: var(--text-brand); }
+
+/* Black / white */
+.metric-featured,
+.performance-summary > div:first-child,
+.about-boundaries > article:first-child,
+.contact-grid > article:first-child {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+}
+.about-boundaries > article:first-child li { border-top-color: rgba(255,255,255,.28); }
+.about-boundaries > article:first-child li::before { color: var(--text-highlight); }
+.contact-grid > article:first-child p { color: var(--text-inverse); }
+
+/* Light blue / black and light blue / dark blue */
+.metric-accent,
+.allocation-card { background: var(--surface-highlight); color: var(--text-primary); }
+.performance-summary > div:nth-child(3),
+.about-boundaries > article:last-child {
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+}
+.about-boundaries > article { border-top-color: var(--dark-blue); }
+.about-boundaries li { border-top: 0; }
+.contact-grid > article:nth-child(2) { background: var(--surface-primary); color: var(--text-primary); }
+.principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
+
+/* Dark blue / light blue */
+.performance-home { background: var(--surface-brand); color: var(--text-highlight); }
+.performance-home .performance-copy p,
+.performance-home .performance-copy small,
+.performance-home .year-bar small { color: rgba(255,255,255,.76); }
+.performance-home .performance-bars { border-color: color-mix(in srgb, var(--light-blue) 48%, transparent); }
+
+/* Three-card KPI sequence: light blue, dark blue, white. */
+.home-page .metric-band > .metric:nth-child(1),
+.performance-page .performance-summary > div:nth-child(1) {
+  background: var(--surface-highlight);
+  color: var(--text-brand);
+}
+.home-page .metric-band > .metric:nth-child(2),
+.performance-page .performance-summary > div:nth-child(2) {
+  background: var(--surface-brand);
+  color: var(--text-highlight);
+}
+.home-page .metric-band > .metric:nth-child(3),
+.performance-page .performance-summary > div:nth-child(3) {
+  background: var(--surface-primary);
+  color: var(--text-brand);
+}
+
+/* Full-page Portfolio KPI matrix: market / return, cost / holdings. */
+.portfolio-page .portfolio-kpis > div:nth-child(1) { background: var(--surface-primary); color: var(--text-primary); }
+.portfolio-page .portfolio-kpis > div:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
+.portfolio-page .portfolio-kpis > div:nth-child(3) { background: var(--surface-brand); color: var(--text-highlight); }
+.portfolio-page .portfolio-kpis > div:nth-child(4) { background: var(--surface-primary); color: var(--text-brand); }
+
+/* Bright Blue remains an auxiliary interaction color. */
+.site-header nav a:hover,
+.site-header nav a[aria-current="page"],
+.language-trigger:hover,
+.language-trigger[aria-expanded="true"],
+.text-link:hover,
+.memo-disclosure > summary:hover,
+.source-link:hover { color: var(--interactive-accent); }
+.site-header nav a::after,
+.bar-value { background: var(--interactive-accent); }
+
+/* A light-blue contact band closes the homepage before the inverse footer. */
+.home-page .cta {
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 100vmax var(--surface-highlight);
+  clip-path: inset(0 -100vmax);
+}
+.home-page .cta .button-dark { background: var(--black); color: var(--white); }
+.home-page .cta .button-dark:hover { background: var(--dark-blue); color: var(--light-blue); }
+.site-footer {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  box-shadow: 0 0 0 100vmax var(--surface-inverse);
+  clip-path: inset(0 -100vmax);
+}
+.site-footer p { color: rgba(255,255,255,.68); }
+.site-footer a { transition: color .2s ease; }
+.site-footer a:hover { color: var(--text-highlight); }
+.site-footer .footer-mark,
+.site-footer .footer-mark:hover { color: var(--text-inverse); transition: none; }
+.site-footer .wordmark span { color: var(--interactive-accent); }

@@ -13,6 +13,16 @@ registerHooks({
 });
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const styleModules = [
+  "app/reset.css",
+  "app/styles/base.css",
+  "app/styles/chrome.css",
+  "app/styles/pages.css",
+  "app/styles/typography.css",
+  "app/styles/responsive.css",
+  "app/styles/colors.css",
+];
+const readStyles = async () => (await Promise.all(styleModules.map(read))).join("\n");
 
 test("SEO routes use the production site URL instead of localhost", async () => {
   const [config, sitemap, robots] = await Promise.all([
@@ -157,7 +167,7 @@ test("all home locales use one shared page structure", async () => {
     read("app/zh-tw/page.tsx"),
     read("app/zh-cn/page.tsx"),
     read("components/home-page-content.tsx"),
-    read("app/globals.css"),
+    readStyles(),
   ]);
 
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /HomePageContent/);
@@ -180,7 +190,7 @@ test("all portfolio and performance locales share page structures", async () => 
     read("app/zh-cn/performance/page.tsx"),
     read("components/portfolio-page-content.tsx"),
     read("components/performance-page-content.tsx"),
-    read("app/globals.css"),
+    readStyles(),
   ]);
 
   assert.match(portfolioEn, /PortfolioPageContent/);
@@ -292,7 +302,7 @@ test("all about locales use one shared page structure", async () => {
 });
 
 test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
-  const css = await read("app/globals.css");
+  const css = await readStyles();
   const fontClamp = /font-size:\s*clamp\(/;
 
   assert.doesNotMatch(css, fontClamp);
@@ -301,7 +311,7 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
 });
 
 test("editorial color roles keep the footer inverse and Bright Blue auxiliary", async () => {
-  const css = await read("app/globals.css");
+  const css = await readStyles();
 
   assert.match(css, /--deep-blue:\s*#002991/);
   assert.match(css, /--bright-blue:\s*#008cff/);
@@ -341,7 +351,7 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
   const [header, css] = await Promise.all([
     read("components/site-header.tsx"),
-    read("app/globals.css"),
+    readStyles(),
   ]);
 
   assert.match(header, /aria-modal="true"/);
