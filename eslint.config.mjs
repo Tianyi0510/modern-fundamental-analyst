@@ -5,7 +5,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: [".next/**", ".vercel/**", "node_modules/**", "audit-layout/**", "design-reference/**", "**/* 2.*", "**/* 3.*"] },
+  { ignores: [".next/**", ".vercel/**", "node_modules/**", "audit-layout/**", "design-reference/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

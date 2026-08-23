@@ -156,6 +156,21 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceZhCn, /PerformancePageContent/);
 });
 
+test("all contact and disclaimer locales share page structures", async () => {
+  const paths = [
+    "app/(en)/contact/page.tsx",
+    "app/zh-tw/contact/page.tsx",
+    "app/zh-cn/contact/page.tsx",
+    "app/(en)/disclaimer/page.tsx",
+    "app/zh-tw/disclaimer/page.tsx",
+    "app/zh-cn/disclaimer/page.tsx",
+  ];
+  const pages = await Promise.all(paths.map(read));
+
+  for (const page of pages.slice(0, 3)) assert.match(page, /ContactPageContent/);
+  for (const page of pages.slice(3)) assert.match(page, /DisclaimerPageContent/);
+});
+
 test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
   const css = await read("app/globals.css");
   const fontClamp = /font-size:\s*clamp\(/;
