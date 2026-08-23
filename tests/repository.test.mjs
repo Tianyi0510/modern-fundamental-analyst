@@ -267,6 +267,21 @@ test("editorial color roles keep the footer inverse and medium blue auxiliary", 
   assert.match(css, /\.portfolio-kpis > div:nth-child\(4\)[^}]*background:\s*var\(--surface-brand\)[^}]*color:\s*var\(--text-highlight\)/s);
 });
 
+test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
+  const [header, css] = await Promise.all([
+    read("components/site-header.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(header, /aria-modal="true"/);
+  assert.match(header, /event\.key === "Escape"/);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*\.42s cubic-bezier/s);
+  assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
+  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
+  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
 test("language-specific root layouts preserve html lang without request-time proxying", async () => {
   const [englishLayout, traditionalChineseLayout, simplifiedChineseLayout] = await Promise.all([
     read("app/(en)/layout.tsx"),
