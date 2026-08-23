@@ -226,9 +226,10 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-mobile-sort\s*\{[^}]*display:\s*grid;/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*grid-template-areas:\s*"market" "cost" "return" "holdings"/s);
-  assert.match(styles, /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*auto minmax\(0, 1fr\) auto;[^}]*gap:\s*12px/s);
+  assert.match(styles, /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*8px 12px/s);
   assert.match(styles, /\.portfolio-mobile-sort label\s*\{[^}]*display:\s*contents/s);
-  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*width:\s*auto;[^}]*justify-content:\s*center/s);
+  assert.match(styles, /\.portfolio-mobile-sort label > span\s*\{[^}]*grid-column:\s*1 \/ -1/s);
+  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*width:\s*100%;[^}]*justify-content:\s*center/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-cost\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
