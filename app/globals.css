@@ -3,8 +3,10 @@
 :root {
   --black: #000000;
   --white: #ffffff;
-  --dark-blue: #002991;
-  --medium-blue: #008cff;
+  --deep-blue: #002991;
+  --bright-blue: #008cff;
+  --dark-blue: var(--deep-blue);
+  --medium-blue: var(--bright-blue);
   --light-blue: #5fcdfd;
   --gray: #ededed;
   --price-up: #34a853;
@@ -132,6 +134,8 @@ a { color: inherit; text-decoration: none; }
 .text-link { border-bottom: 1px solid currentColor; padding-bottom: 4px; transition: color .2s ease, border-color .2s ease; }
 .text-link:hover { color: var(--medium-blue); }
 .metric-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--black); border: 1px solid var(--black); }
+.home-page .metric-band { position: relative; }
+.home-page .metric-band::after { content: ""; position: absolute; left: 0; right: 0; bottom: -48px; height: 2px; background: var(--black); }
 .metric { min-height: 280px; padding: 34px; display: flex; flex-direction: column; background: var(--white); }
 .metric-featured { background: var(--dark-blue); color: var(--white); }
 .metric-accent { background: var(--light-blue); }
@@ -149,7 +153,7 @@ a { color: inherit; text-decoration: none; }
 .round-link:hover .arrow-icon { transform: translate(3px, -3px); }
 .round-link:active { transform: scale(.96); }
 .round-link .arrow-icon { transition: transform .22s cubic-bezier(.22,1,.36,1); }
-.holdings-preview { display: grid; grid-template-columns: 1.65fr .75fr; gap: 64px; padding: 0 0 150px; border-bottom: 1px solid var(--black); }
+.holdings-preview { display: grid; grid-template-columns: 1.65fr .75fr; gap: 64px; padding: 0 0 150px; }
 .holdings-list { border-top: 1px solid var(--black); }
 .holding-row { min-height: 112px; display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 24px; border-bottom: 1px solid var(--gray); transition: background .2s ease, padding .22s cubic-bezier(.22,1,.36,1); }
 .holding-row:hover { padding-inline: 14px; background: color-mix(in srgb, var(--light-blue) 12%, var(--white)); }
@@ -215,7 +219,7 @@ a { color: inherit; text-decoration: none; }
 .page-intro p { max-width: 630px; margin: 0; }
 .page-intro small { color: rgba(0,0,0,.62); }
 .memos-page .page-hero { padding-bottom: 0; border-bottom: 0; }
-.memos-page .page-intro { padding-bottom: 48px; border-bottom: 1px solid var(--black); }
+.memos-page .page-intro { padding-bottom: 48px; border-bottom: 2px solid var(--black); }
 .body-section { padding: 130px 0; border-bottom: 1px solid var(--gray); }
 .two-column { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
 .two-column h2, .methodology h2 { margin: 0; }
@@ -969,18 +973,18 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Editorial color architecture
-   White and black remain primary. Dark blue and light blue define section
-   hierarchy; medium blue is reserved for interactive and data accents. */
+   White and black remain primary. Deep Blue and Light Blue define section
+   hierarchy; Bright Blue is reserved for interactive and data accents. */
 :root {
   --surface-primary: var(--white);
   --surface-inverse: var(--black);
-  --surface-brand: var(--dark-blue);
+  --surface-brand: var(--deep-blue);
   --surface-highlight: var(--light-blue);
   --text-primary: var(--black);
-  --text-brand: var(--dark-blue);
+  --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
   --text-highlight: var(--light-blue);
-  --interactive-accent: var(--medium-blue);
+  --interactive-accent: var(--bright-blue);
 }
 
 body { background: var(--surface-primary); color: var(--text-primary); }
@@ -1057,9 +1061,10 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-page .performance-summary > div:nth-child(3) {
   background: var(--surface-primary);
   color: var(--text-brand);
+  box-shadow: inset 0 0 0 1px var(--black);
 }
 
-/* Medium blue remains an auxiliary interaction color. */
+/* Bright Blue remains an auxiliary interaction color. */
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"],
 .language-trigger:hover,
