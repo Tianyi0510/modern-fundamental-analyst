@@ -208,6 +208,8 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.match(form, /"zh-cn"/);
   assert.match(form, /contact-form\.module\.css/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
+  assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\);[^}]*color:\s*var\(--black\)/s);
+  assert.match(styles, /\.form\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /CONTACT_TO_EMAIL/);
@@ -281,7 +283,9 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
   assert.match(css, /\.home-opening\s*\{[^}]*background:\s*var\(--background-gray\);[^}]*border-bottom:\s*1px solid var\(--black\)/s);
+  assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.contact-grid > article:first-child p\s*\{[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);

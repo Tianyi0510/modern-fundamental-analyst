@@ -126,6 +126,7 @@ a { color: inherit; text-decoration: none; }
 .button-small { min-height: 42px; padding-inline: 20px; }
 .hero { padding: 92px 0 72px; }
 .home-opening { padding-bottom: 48px; background: var(--background-gray); border-bottom: 1px solid var(--black); }
+.home-opening > .site-header { background: var(--white); box-shadow: 0 0 0 100vmax var(--white); clip-path: inset(0 -100vmax); }
 .hero,
 .page-hero,
 .legal-header,
@@ -1035,7 +1036,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 }
 .about-boundaries > article:first-child li { border-top-color: rgba(255,255,255,.28); }
 .about-boundaries > article:first-child li::before { color: var(--text-highlight); }
-.contact-grid > article:first-child p { color: rgba(255,255,255,.72); }
+.contact-grid > article:first-child p { color: var(--text-inverse); }
 
 /* Light blue / black and light blue / dark blue */
 .metric-accent,
