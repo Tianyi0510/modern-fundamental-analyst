@@ -951,3 +951,112 @@ a { color: inherit; text-decoration: none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
+
+/* Editorial color architecture
+   White and black remain primary. Dark blue and light blue define section
+   hierarchy; medium blue is reserved for interactive and data accents. */
+:root {
+  --surface-primary: var(--white);
+  --surface-inverse: var(--black);
+  --surface-brand: var(--dark-blue);
+  --surface-highlight: var(--light-blue);
+  --text-primary: var(--black);
+  --text-brand: var(--dark-blue);
+  --text-inverse: var(--white);
+  --text-highlight: var(--light-blue);
+  --interactive-accent: var(--medium-blue);
+}
+
+body { background: var(--surface-primary); color: var(--text-primary); }
+.wordmark span,
+.eyebrow span,
+.memo-count,
+.legal-section-number { background-color: transparent; color: var(--interactive-accent); }
+.eyebrow span { background: var(--interactive-accent); }
+.page-hero h1 em,
+.hero h1 em,
+.home-about h2,
+.intro h2,
+.about-section-heading h2,
+.portfolio-holdings-heading h2,
+.returns h2,
+.methodology h2,
+.legal h1 { color: var(--text-brand); }
+
+/* White / black, white / dark blue */
+.metric,
+.memo-card,
+.portfolio-kpis > div,
+.performance-summary > div { background: var(--surface-primary); color: var(--text-primary); }
+.metric:nth-child(2),
+.portfolio-kpis > div:nth-child(2),
+.performance-summary > div:nth-child(2) { color: var(--text-brand); }
+
+/* Black / white */
+.metric-featured,
+.portfolio-kpis > div:first-child,
+.performance-summary > div:first-child,
+.about-boundaries > article:last-child,
+.contact-grid > div:last-child {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+}
+.about-boundaries > article:last-child li { border-top-color: rgba(255,255,255,.28); }
+.about-boundaries > article:last-child li::before { color: var(--text-highlight); }
+.contact-grid > div:last-child p { color: rgba(255,255,255,.72); }
+
+/* Light blue / black and light blue / dark blue */
+.metric-accent,
+.allocation-card,
+.contact-grid > div:first-child { background: var(--surface-highlight); color: var(--text-primary); }
+.portfolio-kpis > div:nth-child(3),
+.performance-summary > div:nth-child(3),
+.about-boundaries > article:first-child {
+  background: var(--surface-highlight);
+  color: var(--text-brand);
+}
+.about-boundaries > article { border-top-color: var(--dark-blue); }
+.principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
+
+/* Dark blue / light blue */
+.performance-home { background: var(--surface-brand); color: var(--text-highlight); }
+.performance-home .performance-copy p,
+.performance-home .performance-copy small,
+.performance-home .year-bar small { color: rgba(255,255,255,.76); }
+.performance-home .performance-bars { border-color: color-mix(in srgb, var(--light-blue) 48%, transparent); }
+.portfolio-kpis > div:nth-child(4) { background: var(--surface-brand); color: var(--text-highlight); }
+
+/* Medium blue remains an auxiliary interaction color. */
+.site-header nav a:hover,
+.site-header nav a[aria-current="page"],
+.language-trigger:hover,
+.language-trigger[aria-expanded="true"],
+.text-link:hover,
+.memo-disclosure > summary:hover,
+.source-link:hover { color: var(--interactive-accent); }
+.site-header nav a::after,
+.bar-value,
+.segment-medium-blue { background: var(--interactive-accent); }
+
+/* A light-blue contact band closes the homepage before the inverse footer. */
+.home-page .cta {
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+  border-top-color: var(--black);
+  box-shadow: 0 0 0 100vmax var(--surface-highlight);
+  clip-path: inset(0 -100vmax);
+}
+.home-page .cta .button-dark { background: var(--black); color: var(--white); }
+.home-page .cta .button-dark:hover { background: var(--dark-blue); color: var(--light-blue); }
+.site-footer {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+  border-top-color: rgba(255,255,255,.22);
+  box-shadow: 0 0 0 100vmax var(--surface-inverse);
+  clip-path: inset(0 -100vmax);
+}
+.site-footer p,
+.site-footer > small { color: rgba(255,255,255,.68); }
+.site-footer a { transition: color .2s ease; }
+.site-footer a:hover { color: var(--text-highlight); }
+.site-footer .wordmark span { color: var(--interactive-accent); }
