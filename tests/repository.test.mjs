@@ -273,6 +273,7 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
   assert.match(css, /\.home-page \.metric-band::after\s*\{[^}]*height:\s*1px;[^}]*background:\s*var\(--black\)/s);
   assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
+  assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*80px 0 150px/);
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
