@@ -15,9 +15,9 @@ type PortfolioTableProps = {
 };
 
 const labels = {
-  en: { symbol: "Position", shares: "Shares", costBasis: "Cost basis", price: "Price", marketValue: "Market value", returnPct: "Return", weight: "Weight", sortBy: "Sort by" },
-  "zh-tw": { symbol: "部位", shares: "股數", costBasis: "成本基礎", price: "價格", marketValue: "市場價值", returnPct: "報酬", weight: "權重", sortBy: "排序依據" },
-  "zh-cn": { symbol: "持仓", shares: "股数", costBasis: "成本基础", price: "价格", marketValue: "市场价值", returnPct: "回报", weight: "权重", sortBy: "排序依据" },
+  en: { symbol: "Position", shares: "Shares", costBasis: "Cost Basis", price: "Price", marketValue: "Market Value", returnPct: "Return", weight: "Weight", sortBy: "Sort By", ascending: "Ascending", descending: "Descending" },
+  "zh-tw": { symbol: "部位", shares: "股數", costBasis: "成本基礎", price: "價格", marketValue: "市場價值", returnPct: "報酬", weight: "權重", sortBy: "排序依據", ascending: "升序", descending: "降序" },
+  "zh-cn": { symbol: "持仓", shares: "股数", costBasis: "成本基础", price: "价格", marketValue: "市场价值", returnPct: "回报", weight: "权重", sortBy: "排序依据", ascending: "升序", descending: "降序" },
 } as const;
 
 const columns: SortKey[] = ["symbol", "shares", "costBasis", "price", "marketValue", "returnPct", "weight"];
@@ -47,6 +47,18 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
 
   return (
     <div className="portfolio-table portfolio-table-detailed" role="table" aria-label={locale === "en" ? "Portfolio holdings" : locale === "zh-tw" ? "投資組合持股" : "投资组合持仓"}>
+      <div className="portfolio-mobile-sort">
+        <label>
+          <span>{copy.sortBy}</span>
+          <select value={sortKey} onChange={(event) => changeSort(event.target.value as SortKey)}>
+            {columns.map((column) => <option value={column} key={column}>{copy[column]}</option>)}
+          </select>
+        </label>
+        <button type="button" onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")} aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}>
+          {sortDirection === "asc" ? <ArrowUp aria-hidden="true" /> : <ArrowDown aria-hidden="true" />}
+          <span>{sortDirection === "asc" ? copy.ascending : copy.descending}</span>
+        </button>
+      </div>
       <div className="table-head" role="row">
         {columns.map((column) => {
           const isActive = sortKey === column;
@@ -64,26 +76,26 @@ export function PortfolioTable({ holdings, locale = "en" }: PortfolioTableProps)
         const holdingReturn = getHoldingReturn(holding);
         return (
           <div className="portfolio-row" role="row" key={holding.symbol}>
-            <span role="cell">{holding.symbol}</span>
-            <span role="cell">{formatShares(holding.shares)}</span>
-            <span role="cell">{formatUsd(holding.costBasis)}</span>
-            <span role="cell">{formatUsd(holding.price)}</span>
-            <span role="cell">{formatUsd(holding.marketValue)}</span>
-            <span role="cell" className={`data-value ${holdingReturn < 0 ? "negative" : "positive"}`}>{formatPercent(holdingReturn, 1)}</span>
-            <span role="cell">{getHoldingWeight(holding.marketValue, totals.marketValue).toFixed(1)}%</span>
+            <span role="cell" data-label={copy.symbol}>{holding.symbol}</span>
+            <span role="cell" data-label={copy.shares}>{formatShares(holding.shares)}</span>
+            <span role="cell" data-label={copy.costBasis}>{formatUsd(holding.costBasis)}</span>
+            <span role="cell" data-label={copy.price}>{formatUsd(holding.price)}</span>
+            <span role="cell" data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</span>
+            <span role="cell" data-label={copy.returnPct} className={`data-value ${holdingReturn < 0 ? "negative" : "positive"}`}>{formatPercent(holdingReturn, 1)}</span>
+            <span role="cell" data-label={copy.weight}>{getHoldingWeight(holding.marketValue, totals.marketValue).toFixed(1)}%</span>
           </div>
         );
       })}
       <div className="portfolio-row portfolio-total-row" role="row">
-        <span role="cell">{locale === "en" ? "Total" : locale === "zh-tw" ? "合計" : "合计"}</span>
+        <span role="cell" data-label={copy.symbol}>{locale === "en" ? "Total" : locale === "zh-tw" ? "合計" : "合计"}</span>
         <span role="cell" />
-        <span role="cell">{formatUsd(totals.costBasis)}</span>
+        <span role="cell" data-label={copy.costBasis}>{formatUsd(totals.costBasis)}</span>
         <span role="cell" />
-        <span role="cell">{formatUsd(totals.marketValue)}</span>
-        <strong role="cell" className={`data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
+        <span role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
+        <strong role="cell" data-label={copy.returnPct} className={`data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
           {formatPercent(totals.totalReturn)}
         </strong>
-        <strong role="cell">100.0%</strong>
+        <strong role="cell" data-label={copy.weight}>100.0%</strong>
       </div>
     </div>
   );
