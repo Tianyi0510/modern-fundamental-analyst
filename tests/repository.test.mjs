@@ -138,15 +138,20 @@ test("memo index hero uses the shared subtitle and latest memo date", async () =
 });
 
 test("all home locales use one shared page structure", async () => {
-  const [english, traditionalChinese, simplifiedChinese, shared] = await Promise.all([
+  const [english, traditionalChinese, simplifiedChinese, shared, styles] = await Promise.all([
     read("app/(en)/page.tsx"),
     read("app/zh-tw/page.tsx"),
     read("app/zh-cn/page.tsx"),
     read("components/home-page-content.tsx"),
+    read("app/globals.css"),
   ]);
 
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /HomePageContent/);
   assert.match(shared, /getMemos\(locale\)/);
+  assert.match(shared, /className="link-label">\{text\.fullPortfolio\}/);
+  assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
+  assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--interactive-accent\); \}/);
+  assert.match(styles, /\.allocation-card > a:hover \.arrow-icon \{ transform: translateX\(4px\); \}/);
 });
 
 test("all portfolio and performance locales share page structures", async () => {

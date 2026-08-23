@@ -1,32 +1,29 @@
-# Design QA — Home And Footer Interactions
+# Design QA — Full Portfolio Motion
 
 ## Evidence
 
 - Local route: `http://127.0.0.1:3000/`
-- Reference: the site's existing button and arrow interaction system
-- State checked: English desktop home page, portfolio card, and footer
+- Reference: the Home page's existing arrow-button motion system
+- State: Full Portfolio link in the allocation card
 
 ## Interaction Comparison
 
-The Full Portfolio link keeps its existing placement and typography. Its arrow is now a dedicated `.arrow-icon` element with the same 220ms easing used by the site's other arrow controls, moving four pixels to the right on hover.
-
-The footer wordmark keeps its white text and blue punctuation in both resting and hover states. Its transition is explicitly disabled, while the remaining footer navigation links retain their existing hover feedback.
+The link retains its existing typography, accessible name, and card dimensions. Its label and arrow now sit together with an eight-pixel gap. On hover, both change to the site's interactive blue, matching the Home page's existing text-link behavior. The arrow also moves four pixels to the right for directional emphasis; the label remains stable.
 
 ## Required Fidelity Surfaces
 
-- Typography: unchanged; the existing Button and wordmark tokens remain in use.
-- Layout: unchanged except for flex alignment inside the Full Portfolio link so the arrow remains aligned at the trailing edge.
-- Color: footer wordmark remains white with the existing blue punctuation.
-- Motion: portfolio arrow uses the existing interaction duration and easing; footer wordmark has no motion or color transition.
-- Accessibility: the decorative arrow is hidden from assistive technology and the link's accessible name remains “Full portfolio”.
-- Responsiveness: the interaction uses the existing card layout and does not introduce breakpoint-specific dimensions.
+- Typography and colors: unchanged.
+- Layout: unchanged; transforms do not affect document flow.
+- Motion: the shared text-and-arrow color transition uses the existing 200ms timing; the arrow uses the existing 220ms directional easing.
+- Accessibility: the label remains the link's accessible text; the decorative arrow remains hidden from assistive technology.
+- Localization: the shared component applies the interaction to English, Traditional Chinese, and Simplified Chinese.
 
 ## Verification
 
-- Live DOM confirmed the Full Portfolio arrow is rendered as `→` with a `transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)` transition.
-- Live DOM confirmed the footer wordmark remains `rgb(255, 255, 255)` with `transition: none`.
-- TypeScript, ESLint, and all 21 repository tests passed.
-- The production build passed with webpack. The default Turbopack build was blocked by the sandbox's port-binding restriction, not by application code.
+- Production HTML contains the dedicated `link-label` and `arrow-icon` elements.
+- Repository tests explicitly guard the shared interactive color and 4px arrow hover transform.
+- TypeScript, ESLint, all 21 tests, and the webpack production build passed.
+- The in-app browser connection was unavailable during the final interaction check; HTML output and compiled CSS were verified directly instead.
 
 ## Findings
 
