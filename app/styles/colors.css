@@ -61,12 +61,15 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .contact-grid > article:nth-child(2) { background: var(--surface-primary); color: var(--text-primary); }
 .principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
 
-/* Dark blue / light blue */
-.performance-home { background: var(--surface-brand); color: var(--text-highlight); }
+/* Home performance uses the primary white / black editorial treatment. */
+.performance-home { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-copy p,
 .performance-home .performance-copy small,
-.performance-home .year-bar small { color: rgba(255,255,255,.76); }
-.performance-home .performance-bars { border-color: color-mix(in srgb, var(--light-blue) 48%, transparent); }
+.performance-home .year-bar small { color: rgba(0,0,0,.68); }
+.performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
+.performance-home .inverse .section-number { color: rgba(0,0,0,.62); }
+.performance-home .button-white { background: var(--black); color: var(--white); }
+.performance-home .button-white:hover { background: var(--deep-blue); color: var(--light-blue); }
 
 /* Three-card KPI sequence: light blue, dark blue, white. */
 .home-page .metric-band > .metric:nth-child(1),

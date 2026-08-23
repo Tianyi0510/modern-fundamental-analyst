@@ -234,13 +234,18 @@
   font-variant-numeric: tabular-nums;
 }
 
-.allocation-ring b {
+.allocation-ring > span {
   font-family: var(--font-inter), var(--font-ui), sans-serif;
   font-size: var(--type-data-ring);
   line-height: .9;
   font-weight: var(--weight-bold);
   letter-spacing: -.055em;
   font-variant-numeric: tabular-nums;
+}
+
+.allocation-legend {
+  font-size: var(--type-caption);
+  line-height: 1.35;
 }
 
 .portfolio-row:not(.portfolio-total-row) > * {
@@ -382,4 +387,3 @@
 [lang="zh-CN"] .about-boundaries h2,
 [lang="zh-CN"] .about-closing h2,
 [lang="zh-CN"] .portfolio-holdings-heading h2 { line-height: 1.08; }
-

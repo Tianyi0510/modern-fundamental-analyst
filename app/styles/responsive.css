@@ -107,8 +107,8 @@
   .page-hero { padding: 70px 0 90px; }
   .page-hero h1 { overflow-wrap: anywhere; }
   .page-intro { grid-template-columns: 1fr; gap: 28px; }
-  .portfolio-page .portfolio-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(220px, 1fr)); min-height: 0; }
-  .portfolio-page .portfolio-kpis > div { min-height: 220px; padding: 24px 20px; }
+  .portfolio-page .portfolio-kpis { grid-template-columns: 1fr; grid-template-rows: repeat(4, minmax(190px, auto)); grid-template-areas: "market" "cost" "return" "holdings"; min-height: 0; }
+  .portfolio-page .portfolio-kpis > div { min-height: 190px; padding: 28px 20px; }
   .portfolio-page .portfolio-kpis strong { font-size: var(--type-data-kpi-small); }
   .portfolio-holdings-heading { padding: 64px 0 34px; grid-template-columns: 1fr; gap: 30px; }
   .portfolio-holdings-heading h2 { font-size: var(--type-display-medium); }
@@ -150,13 +150,13 @@
   .portfolio-table-wrap { width: min(100% - 32px, 720px); margin-inline: auto; padding: 0 0 90px; overflow: visible; }
   .portfolio-table-detailed { min-width: 0; border-top: 0; }
   .portfolio-table-detailed .table-head { display: none; }
-  .portfolio-mobile-sort { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin-bottom: 18px; }
+  .portfolio-mobile-sort { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 18px; }
   .portfolio-mobile-sort label { min-width: 0; display: grid; gap: 8px; }
   .portfolio-mobile-sort label > span { font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); text-transform: capitalize; }
   .portfolio-mobile-sort select,
   .portfolio-mobile-sort button { min-height: 50px; border: 1px solid var(--black); border-radius: 0; background: var(--white); color: var(--black); font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); }
   .portfolio-mobile-sort select { width: 100%; padding: 0 36px 0 14px; }
-  .portfolio-mobile-sort button { align-self: end; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+  .portfolio-mobile-sort button { width: 100%; align-self: end; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
   .portfolio-mobile-sort button svg { width: 17px; height: 17px; }
   .portfolio-table-detailed .portfolio-row { min-height: 0; padding: 24px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
   .portfolio-table-detailed .portfolio-row > [role="cell"] { min-width: 0; display: grid; gap: 5px; text-align: left; overflow-wrap: anywhere; }
@@ -164,9 +164,13 @@
   .portfolio-table-detailed .portfolio-row > span:first-child { grid-column: 1 / -1; font-size: var(--type-title-bold); font-weight: var(--weight-bold); }
   .portfolio-table-detailed .portfolio-row > span:first-child::before { display: none; }
   .portfolio-table-detailed .portfolio-row > span:nth-child(2) { grid-column: auto; order: initial; color: var(--black); }
-  .portfolio-table-detailed .portfolio-total-row { padding-block: 28px; }
+  .portfolio-table-detailed .portfolio-total-row { padding-block: 28px; align-items: start; grid-auto-flow: row; }
   .portfolio-table-detailed .portfolio-total-row > [role="cell"]:empty { display: none; }
-  .portfolio-table-detailed .portfolio-total-row > span:first-child { color: var(--black); }
+  .portfolio-table-detailed .portfolio-total-row > span:first-child { grid-column: 1 / -1; color: var(--black); }
+  .portfolio-table-detailed .portfolio-total-row > span:nth-child(3) { grid-column: 1; grid-row: 2; }
+  .portfolio-table-detailed .portfolio-total-row > span:nth-child(5) { grid-column: 2; grid-row: 2; }
+  .portfolio-table-detailed .portfolio-total-row > strong:nth-child(6) { grid-column: 1; grid-row: 3; }
+  .portfolio-table-detailed .portfolio-total-row > strong:nth-child(7) { grid-column: 2; grid-row: 3; }
   .portfolio-desktop-instruction { display: none; }
 }
 
@@ -183,4 +187,3 @@
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
-
