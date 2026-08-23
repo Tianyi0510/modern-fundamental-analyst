@@ -155,13 +155,15 @@ test("all home locales use one shared page structure", async () => {
 });
 
 test("all portfolio and performance locales share page structures", async () => {
-  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn] = await Promise.all([
+  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, performanceShared, styles] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
     read("app/zh-cn/portfolio/page.tsx"),
     read("app/(en)/performance/page.tsx"),
     read("app/zh-tw/performance/page.tsx"),
     read("app/zh-cn/performance/page.tsx"),
+    read("components/performance-page-content.tsx"),
+    read("app/globals.css"),
   ]);
 
   assert.match(portfolioEn, /PortfolioPageContent/);
@@ -170,6 +172,10 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceEn, /PerformancePageContent/);
   assert.match(performanceZhTw, /PerformancePageContent/);
   assert.match(performanceZhCn, /PerformancePageContent/);
+  assert.match(performanceShared, /className="methodology shell section-gray"/);
+  assert.match(styles, /--background-gray:\s*#f8f9fb/);
+  assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.legal-header,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s);
 });
 
 test("all contact and disclaimer locales share page structures", async () => {
@@ -243,6 +249,7 @@ test("all about locales use one shared page structure", async () => {
 
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /AboutPageContent/);
   assert.match(shared, /text\.sections\.map/);
+  assert.match(shared, /index % 2 === 1 \? " section-gray"/);
   assert.match(shared, /text\.boundaries\.map/);
 });
 
@@ -269,11 +276,17 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-kpis > div:nth-child\(4\)[^}]*background:\s*var\(--surface-brand\)[^}]*color:\s*var\(--text-highlight\)/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(1\),\s*\.performance-page \.performance-summary > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.about-boundaries > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\);/s);
+  assert.match(css, /\.about-boundaries > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\);/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
-  assert.match(css, /\.home-page \.metric-band::after\s*\{[^}]*height:\s*1px;[^}]*background:\s*var\(--black\)/s);
+  assert.match(css, /\.home-opening\s*\{[^}]*background:\s*var\(--background-gray\);[^}]*border-bottom:\s*1px solid var\(--black\)/s);
+  assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
-  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
+  assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*80px 0 150px/);
+  assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {

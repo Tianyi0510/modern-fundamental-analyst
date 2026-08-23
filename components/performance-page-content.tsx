@@ -81,5 +81,5 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
     <section className="returns shell"><div className="section-heading"><p className="section-number">{text.snapshot}</p><h2>{text.measured}</h2></div>
       <div className="returns-table"><div className="table-head"><span>{text.measure}</span><span>{text.result}</span><span>{text.context}</span></div><div className="return-row"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><span>{text.cumulativeContext}</span></div><div className="return-row"><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><span>{text.portfolioContext}</span></div><div className="return-row"><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><span>{text.benchmarkContext}</span></div></div>
     </section>
-    <section className="methodology shell"><h2>{text.methodology}</h2><div><p>{text.methodologyCopy}</p><div className="source-note">{text.sourceCopy}</div></div></section><SiteFooter locale={locale} /></main>;
+    <section className="methodology shell section-gray"><h2>{text.methodology}</h2><div><p>{text.methodologyCopy}</p><div className="source-note">{text.sourceCopy}</div></div></section><SiteFooter locale={locale} /></main>;
 }

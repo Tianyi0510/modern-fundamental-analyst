@@ -23,7 +23,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
   const memosPath = `${localeConfig[locale].prefix}/memos`;
 
   return <main className="memo-detail-page" id="main-content"><SiteHeader locale={locale} />
-    <article className="memo-article shell"><Link className="back-link" href={memosPath}>← {text.back}</Link><p className="eyebrow"><span /> {memo.tag}</p><h1>{memo.title}</h1><div className="article-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span><span>{text.memoLabel} {memo.number}</span></div>
+    <article className="memo-article shell"><header className="memo-article-header"><Link className="back-link" href={memosPath}>← {text.back}</Link><p className="eyebrow"><span /> {memo.tag}</p><h1>{memo.title}</h1><div className="article-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span><span>{text.memoLabel} {memo.number}</span></div></header>
       <p className="article-lead">{memo.summary}</p>
       <MemoArticleContent content={content} />
     </article><SiteFooter locale={locale} />
