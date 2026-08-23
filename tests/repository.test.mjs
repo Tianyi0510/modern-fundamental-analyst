@@ -205,10 +205,11 @@ test("all contact and disclaimer locales share page structures", async () => {
   for (const page of pages.slice(3)) assert.match(page, /DisclaimerPageContent/);
 });
 
-test("contact form uses a server-only Resend route with localized UI", async () => {
-  const [page, form, styles, route, resend] = await Promise.all([
+test("contact form keeps localized copy on the server and sends through a client boundary", async () => {
+  const [page, form, client, styles, route, resend] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/contact-form.tsx"),
+    read("components/contact-form-client.tsx"),
     read("components/contact-form.module.css"),
     read("app/api/contact/route.ts"),
     read("lib/resend.ts"),
@@ -216,10 +217,13 @@ test("contact form uses a server-only Resend route with localized UI", async () 
 
   assert.match(page, /ContactForm locale=\{locale\}/);
   assert.match(page, /className="contact-grid"/);
-  assert.match(form, /fetch\("\/api\/contact"/);
+  assert.doesNotMatch(form, /"use client"/);
+  assert.match(form, /ContactFormClient copy=\{copy\[locale\]\}/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
-  assert.match(form, /contact-form\.module\.css/);
+  assert.match(client, /"use client"/);
+  assert.match(client, /fetch\("\/api\/contact"/);
+  assert.match(client, /contact-form\.module\.css/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
   assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
@@ -230,22 +234,26 @@ test("contact form uses a server-only Resend route with localized UI", async () 
   assert.match(route, /contact@mail\.modernfundamentalanalyst\.com/);
   assert.match(route, /replyTo:\s*email/);
   assert.match(resend, /process\.env\.RESEND_API_KEY/);
-  assert.doesNotMatch(form, /RESEND_API_KEY/);
+  assert.doesNotMatch(client, /RESEND_API_KEY/);
 });
 
-test("subscribe form stores signups in Resend Contacts", async () => {
-  const [page, form, styles, route, footer] = await Promise.all([
+test("subscribe form keeps localized copy on the server and stores signups in Resend Contacts", async () => {
+  const [page, form, client, styles, route, footer] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/subscribe-form.tsx"),
+    read("components/subscribe-form-client.tsx"),
     read("components/subscribe-form.module.css"),
     read("app/api/subscribe/route.ts"),
     read("components/site-footer.tsx"),
   ]);
 
   assert.doesNotMatch(page, /SubscribeForm/);
-  assert.match(form, /fetch\("\/api\/subscribe"/);
+  assert.doesNotMatch(form, /"use client"/);
+  assert.match(form, /SubscribeFormClient copy=\{copy\[locale\]\}/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
+  assert.match(client, /"use client"/);
+  assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /resend\.contacts\.create/);
@@ -255,7 +263,7 @@ test("subscribe form stores signups in Resend Contacts", async () => {
   assert.doesNotMatch(route, /properties:/);
   assert.match(route, /isSameOrigin/);
   assert.match(route, /isRateLimited/);
-  assert.doesNotMatch(form, /RESEND_API_KEY/);
+  assert.doesNotMatch(client, /RESEND_API_KEY/);
   assert.match(footer, /SubscribeForm locale=\{locale\}/);
 });
 
