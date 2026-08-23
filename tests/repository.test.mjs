@@ -155,13 +155,14 @@ test("all home locales use one shared page structure", async () => {
 });
 
 test("all portfolio and performance locales share page structures", async () => {
-  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, performanceShared, styles] = await Promise.all([
+  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, portfolioShared, performanceShared, styles] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
     read("app/zh-cn/portfolio/page.tsx"),
     read("app/(en)/performance/page.tsx"),
     read("app/zh-tw/performance/page.tsx"),
     read("app/zh-cn/performance/page.tsx"),
+    read("components/portfolio-page-content.tsx"),
     read("components/performance-page-content.tsx"),
     read("app/globals.css"),
   ]);
@@ -172,6 +173,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceEn, /PerformancePageContent/);
   assert.match(performanceZhTw, /PerformancePageContent/);
   assert.match(performanceZhCn, /PerformancePageContent/);
+  assert.doesNotMatch(portfolioShared, /portfolio-allocation|Allocation by market value|getHoldingWeight/);
+  assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
+  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
   assert.match(styles, /--background-gray:\s*#f8f9fb/);
   assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
@@ -276,7 +280,10 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
-  assert.match(css, /\.portfolio-kpis > div:nth-child\(4\)[^}]*background:\s*var\(--surface-brand\)[^}]*color:\s*var\(--text-highlight\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(4\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\)/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(1\),\s*\.performance-page \.performance-summary > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
   assert.match(css, /\.about-boundaries > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\);/s);
   assert.match(css, /\.about-boundaries > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\);/s);
