@@ -1060,7 +1060,6 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-page .performance-summary > div:nth-child(3) {
   background: var(--surface-primary);
   color: var(--text-brand);
-  box-shadow: inset 0 0 0 1px var(--black);
 }
 
 /* Bright Blue remains an auxiliary interaction color. */
