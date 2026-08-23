@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Locale } from "@/lib/i18n";
+import styles from "./contact-form.module.css";
 
 const copy = {
   en: {
@@ -76,21 +77,21 @@ export function ContactForm({ locale }: { locale: Locale }) {
     setStatus("error");
   }
 
-  return <section className="contact-form-section shell" aria-labelledby="contact-form-title">
-    <div className="contact-form-heading">
-      <p className="section-number">{text.label}</p>
+  return <section className={`${styles.section} shell`} aria-labelledby="contact-form-title">
+    <div className={styles.heading}>
+      <p className={styles.headingLabel}>{text.label}</p>
       <h2 id="contact-form-title">{text.title}</h2>
-      <p>{text.intro}</p>
+      <p className={styles.headingIntro}>{text.intro}</p>
     </div>
-    <form className="contact-form" onSubmit={submit}>
-      <label><span>{text.name}</span><input name="name" type="text" autoComplete="name" maxLength={100} required /></label>
-      <label><span>{text.email}</span><input name="email" type="email" autoComplete="email" maxLength={254} required /></label>
-      <label className="contact-form-wide"><span>{text.subject}</span><input name="subject" type="text" maxLength={160} required /></label>
-      <label className="contact-form-wide"><span>{text.message}</span><textarea name="message" rows={7} minLength={10} maxLength={5000} required /></label>
-      <label className="contact-honeypot" aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
-      <div className="contact-form-actions">
-        <button className="button button-dark" type="submit" disabled={status === "sending"}>{status === "sending" ? text.sending : text.send}</button>
-        <p className="contact-form-status" role="status" aria-live="polite">{status === "success" ? text.success : status === "error" ? text.error : ""}</p>
+    <form className={styles.form} onSubmit={submit}>
+      <label className={styles.field}><span className={styles.fieldLabel}>{text.name}</span><input className={styles.control} name="name" type="text" autoComplete="name" maxLength={100} required /></label>
+      <label className={styles.field}><span className={styles.fieldLabel}>{text.email}</span><input className={styles.control} name="email" type="email" autoComplete="email" maxLength={254} required /></label>
+      <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{text.subject}</span><input className={styles.control} name="subject" type="text" maxLength={160} required /></label>
+      <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{text.message}</span><textarea className={styles.control} name="message" rows={7} minLength={10} maxLength={5000} required /></label>
+      <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
+      <div className={styles.actions}>
+        <button className={`${styles.submit} button button-dark`} type="submit" disabled={status === "sending"}>{status === "sending" ? text.sending : text.send}</button>
+        <p className={styles.status} role="status" aria-live="polite">{status === "success" ? text.success : status === "error" ? text.error : ""}</p>
       </div>
     </form>
   </section>;
