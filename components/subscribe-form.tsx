@@ -7,7 +7,6 @@ import styles from "./subscribe-form.module.css";
 
 const copy = {
   en: {
-    label: "Subscribe",
     title: "Stay Updated.",
     email: "Email Address",
     placeholder: "you@example.com",
@@ -17,7 +16,6 @@ const copy = {
     error: "Subscription could not be completed. Please try again.",
   },
   "zh-tw": {
-    label: "訂閱",
     title: "掌握最新研究。",
     email: "電子郵件地址",
     placeholder: "you@example.com",
@@ -27,7 +25,6 @@ const copy = {
     error: "目前無法完成訂閱，請稍後再試。",
   },
   "zh-cn": {
-    label: "订阅",
     title: "掌握最新研究。",
     email: "电子邮件地址",
     placeholder: "you@example.com",
@@ -66,7 +63,6 @@ export function SubscribeForm({ locale }: { locale: Locale }) {
 
   return (
     <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
-      <p className={styles.label}>{text.label}</p>
       <h2 id="subscribe-title">{text.title}</h2>
       <form className={styles.form} onSubmit={submit}>
         <label className={styles.field}>

@@ -3,7 +3,7 @@
 ## Evidence
 
 - Source visual truth: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/footer-redesign/paypal-footer-reference.png`
-- Rendered implementation: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/footer-redesign/mfa-footer-clean.png`
+- Rendered implementation: `/Users/davidli/.codex/visualizations/2026/08/14/01a00138-4bbc-73e2-bcba-170108a73a34/footer-redesign/mfa-footer-no-label.png`
 - Local route: `http://127.0.0.1:3000/contact#subscribe`
 - Viewport: 1280 × 720 CSS px
 - Source pixels: 1280 × 720; implementation pixels: 1280 × 720
@@ -40,6 +40,8 @@ A separate crop was not needed: the 1280 × 720 comparison renders the form cont
 3. Post-fix evidence: `mfa-footer-prototype.png` shows both Quick Links and Subscribe labels using the light-blue accent while the explanatory copy remains muted white.
 4. The user requested a cleaner interface with fewer annotations. The introductory paragraph, consent note, and duplicate lower Subscribe link were removed.
 5. Final evidence: `mfa-footer-clean.png` shows a concise heading, email field, and CTA with a single legal line and no redundant explanatory blocks.
+6. The user requested removal of the remaining blue Subscribe label. The label and its unused localized copy/style were removed.
+7. Final evidence: `mfa-footer-no-label.png` shows only the white subscription title, email field, and CTA in the form column.
 
 ## Implementation Checklist
 
