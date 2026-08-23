@@ -161,13 +161,13 @@
   .portfolio-holdings-section .portfolio-table-wrap { width: min(100% - 32px, 720px); margin-inline: auto; padding: 0 0 var(--space-section-compact); overflow: visible; }
   .portfolio-table-detailed { min-width: 0; border-top: 0; }
   .portfolio-table-detailed .table-head { display: none; }
-  .portfolio-mobile-sort { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; margin-bottom: 18px; }
+  .portfolio-mobile-sort { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; align-items: center; margin-bottom: 18px; }
   .portfolio-mobile-sort label { display: contents; }
-  .portfolio-mobile-sort label > span { font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); text-transform: capitalize; white-space: nowrap; }
+  .portfolio-mobile-sort label > span { grid-column: 1 / -1; font-size: var(--type-label); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); text-transform: capitalize; white-space: nowrap; }
   .portfolio-mobile-sort select,
   .portfolio-mobile-sort button { min-height: 50px; border: 1px solid var(--black); border-radius: 0; background: var(--white); color: var(--black); font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); }
   .portfolio-mobile-sort select { width: 100%; min-width: 0; padding: 0 36px 0 14px; }
-  .portfolio-mobile-sort button { width: auto; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+  .portfolio-mobile-sort button { width: 100%; min-width: 0; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
   .portfolio-mobile-sort button svg { width: 17px; height: 17px; margin-left: auto; }
   .portfolio-table-detailed .portfolio-row { min-height: 0; padding: 24px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
   .portfolio-table-detailed .portfolio-row > [role="cell"] { min-width: 0; display: grid; gap: 5px; text-align: left; overflow-wrap: anywhere; }
