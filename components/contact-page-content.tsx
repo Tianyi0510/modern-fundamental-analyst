@@ -44,7 +44,7 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
       <p className="contact-note">{text.intro}</p>
     </section>
     <section className="contact-grid shell">
-      {text.cards.map(([title, description]) => <div key={title}><span>{title}</span><p>{description}</p></div>)}
+      {text.cards.map(([title, description], index) => <article key={title}><header><span>{String(index + 1).padStart(2, "0")}</span><h2>{title}</h2></header><p>{description}</p></article>)}
     </section>
     <ContactForm locale={locale} />
     <SiteFooter locale={locale} />

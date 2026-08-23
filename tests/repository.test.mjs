@@ -280,7 +280,10 @@ test("editorial color roles keep the footer inverse and Bright Blue auxiliary", 
   assert.match(css, /\.about-boundaries > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\);/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
   assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
-  assert.match(css, /\.home-page \.metric-band::after\s*\{[^}]*height:\s*1px;[^}]*background:\s*var\(--black\)/s);
+  assert.match(css, /\.home-opening\s*\{[^}]*background:\s*var\(--background-gray\);[^}]*border-bottom:\s*1px solid var\(--black\)/s);
+  assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.contact-grid > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.match(css, /\.memos-page \.page-hero\s*\{[^}]*border-bottom:\s*1px solid var\(--black\)/s);
   assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*80px 0 150px/);
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
