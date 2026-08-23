@@ -1013,7 +1013,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 }
 .about-boundaries > article { border-top-color: var(--dark-blue); }
 .about-boundaries li { border-top: 0; }
-.contact-grid > article:last-child { background: var(--surface-primary); color: var(--text-primary); }
+.contact-grid > article:nth-child(2) { background: var(--surface-primary); color: var(--text-primary); }
 .principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
 
 /* Dark blue / light blue */
