@@ -155,13 +155,15 @@ test("all home locales use one shared page structure", async () => {
 });
 
 test("all portfolio and performance locales share page structures", async () => {
-  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn] = await Promise.all([
+  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, performanceShared, styles] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
     read("app/zh-cn/portfolio/page.tsx"),
     read("app/(en)/performance/page.tsx"),
     read("app/zh-tw/performance/page.tsx"),
     read("app/zh-cn/performance/page.tsx"),
+    read("components/performance-page-content.tsx"),
+    read("app/globals.css"),
   ]);
 
   assert.match(portfolioEn, /PortfolioPageContent/);
@@ -170,6 +172,8 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceEn, /PerformancePageContent/);
   assert.match(performanceZhTw, /PerformancePageContent/);
   assert.match(performanceZhCn, /PerformancePageContent/);
+  assert.match(performanceShared, /className="methodology shell section-gray"/);
+  assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--gray\)/s);
 });
 
 test("all contact and disclaimer locales share page structures", async () => {
@@ -243,6 +247,7 @@ test("all about locales use one shared page structure", async () => {
 
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /AboutPageContent/);
   assert.match(shared, /text\.sections\.map/);
+  assert.match(shared, /index % 2 === 1 \? " section-gray"/);
   assert.match(shared, /text\.boundaries\.map/);
 });
 
