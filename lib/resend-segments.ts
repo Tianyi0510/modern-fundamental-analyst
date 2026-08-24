@@ -2,9 +2,9 @@ import type { Resend } from "resend";
 import type { Locale } from "@/lib/i18n";
 
 const preferredLanguageSegments = {
-  en: "39c96ed5-94c2-4755-876a-b29b414433e0",
-  "zh-tw": "4e7fa9d7-7df1-42a9-a6d0-224f6a59b982",
-  "zh-cn": "84cc2bde-6d03-4497-b21b-84c1d4fc265e",
+  en: process.env.RESEND_SEGMENT_EN || "39c96ed5-94c2-4755-876a-b29b414433e0",
+  "zh-tw": process.env.RESEND_SEGMENT_ZH_TW || "4e7fa9d7-7df1-42a9-a6d0-224f6a59b982",
+  "zh-cn": process.env.RESEND_SEGMENT_ZH_CN || "84cc2bde-6d03-4497-b21b-84c1d4fc265e",
 } satisfies Record<Locale, string>;
 
 const languageSegmentIds = new Set(Object.values(preferredLanguageSegments));
@@ -33,9 +33,9 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
     if (added.error) throw new Error(`Unable to add preferred language segment: ${added.error.name}`);
   }
 
-  for (const segmentId of currentLanguageIds) {
-    if (segmentId === targetId) continue;
+  const previousLanguageIds = currentLanguageIds.filter((segmentId) => segmentId !== targetId);
+  await Promise.all(previousLanguageIds.map(async (segmentId) => {
     const removed = await resend.contacts.segments.remove({ email, segmentId });
     if (removed.error) throw new Error(`Unable to remove previous language segment: ${removed.error.name}`);
-  }
+  }));
 }

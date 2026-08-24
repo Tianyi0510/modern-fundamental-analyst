@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getMemos } from "@/data/memos";
+import { getLatestMemo } from "@/data/memos";
 import { cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
-import { localeConfig, locales, type Locale } from "@/lib/i18n";
+import { localeConfig, resolveLocale } from "@/lib/i18n";
 import { getResendClient } from "@/lib/resend";
 import { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { SITE_URL } from "@/lib/site-config";
@@ -33,8 +33,7 @@ export async function POST(request: Request) {
   }
 
   const email = cleanText(body.email, 254).toLowerCase();
-  const requestedLocale = cleanText(body.locale, 10);
-  const locale: Locale = locales.includes(requestedLocale as Locale) ? requestedLocale as Locale : "en";
+  const locale = resolveLocale(cleanText(body.locale, 10));
   const website = cleanText(body.website, 200);
   if (website) return NextResponse.json({ ok: true });
   if (!isValidEmail(email)) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
@@ -74,7 +73,13 @@ export async function POST(request: Request) {
   }
 
   if (shouldSendWelcome) {
-    const latestMemo = getMemos(locale)[0];
+    const latestMemo = getLatestMemo(locale);
+    if (!latestMemo) {
+      const contactId = result.data?.id ?? existing.data?.id;
+      if (contactId) await resend.contacts.update({ id: contactId, unsubscribed: true });
+      console.error("Welcome automation requires at least one investment memo.");
+      return NextResponse.json({ error: "Subscription could not be completed." }, { status: 503 });
+    }
     const prefix = localeConfig[locale].prefix;
     const preferencesUrl = createPreferenceUrl(email, locale);
     const welcome = await resend.events.send({

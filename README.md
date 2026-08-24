@@ -104,17 +104,34 @@ Investment memo metadata is maintained in `data/memos.ts`, while article content
 
 Resend handles contact delivery, subscribers, segments, templates, automations, and broadcasts. New subscriptions store a preferred-language property, synchronize the corresponding language segment, and trigger a localized welcome event containing the latest memo.
 
-Subscribers can request a short-lived secure link to update their preferred language or unsubscribe. Preference links are signed server-side and must not expose the Resend API key.
+Subscribers can request a short-lived secure link to update their preferred language or unsubscribe. Preference links use authenticated AES-256-GCM encryption and a dedicated server-side secret. A migration fallback preserves links created before that secret was introduced.
 
-Redis supplies shared rate-limit state across Vercel Functions. If Redis is unavailable, the application falls back to a process-local limiter without storing raw client IP addresses.
+## Redis Rate Limiting
+
+Redis supplies shared rate-limit state across Vercel Functions. The implementation is intentionally small and failure-tolerant:
+
+- One multiplexed client and one in-flight connection promise are reused per runtime instance.
+- Connection and socket timeouts fail quickly, the offline queue is disabled, and reconnect attempts are bounded.
+- A Lua script performs `INCR` and `PEXPIRE` atomically for each fixed rate-limit window.
+- Keys follow the versioned `mfa:rate-limit:v1:{namespace}:{digest}` convention.
+- Client identifiers use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback.
+- Redis failures fall back to a bounded process-local limiter so public forms remain available.
+- Repeated connection errors are log-throttled to keep Vercel logs useful during an outage.
+- `rediss://` should be used whenever the configured provider endpoint supports TLS; production emits a warning when it does not.
 
 Required server-side environment variables:
 
 ```bash
 RESEND_API_KEY=
 CONTACT_TO_EMAIL=
+SUBSCRIPTION_PREFERENCES_SECRET=
 REDIS_URL=
+RATE_LIMIT_HASH_SECRET=
 ```
+
+`SUBSCRIPTION_PREFERENCES_SECRET` and `RATE_LIMIT_HASH_SECRET` are configured as separate Sensitive variables in Vercel Production and Preview. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+
+The three optional `RESEND_SEGMENT_*` variables can override the checked-in language-segment defaults when Resend segments are recreated.
 
 Never commit production credentials. Configure them in Vercel and use `.env.local` only for local development.
 

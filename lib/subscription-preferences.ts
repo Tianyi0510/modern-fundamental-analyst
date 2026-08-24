@@ -11,15 +11,25 @@ type PreferenceTokenPayload = {
   version: number;
 };
 
-function getEncryptionKey() {
-  const secret = process.env.RESEND_API_KEY;
-  if (!secret) throw new Error("RESEND_API_KEY is unavailable");
+function getEncryptionKey(secret: string) {
   return createHash("sha256").update(`subscription-preferences:${secret}`).digest();
+}
+
+function getEncryptionSecrets() {
+  const resendKey = process.env.RESEND_API_KEY;
+  const primarySecret = process.env.SUBSCRIPTION_PREFERENCES_SECRET || resendKey;
+  if (!primarySecret) throw new Error("SUBSCRIPTION_PREFERENCES_SECRET is unavailable");
+
+  // Retain the Resend-derived key as a migration fallback so links created
+  // before the dedicated secret was configured continue to work.
+  return [...new Set([primarySecret, resendKey].filter((secret): secret is string => Boolean(secret)))];
 }
 
 export function createPreferenceToken(email: string, lifetimeMs = TOKEN_LIFETIME_MS) {
   const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", getEncryptionKey(), iv);
+  const [primarySecret] = getEncryptionSecrets();
+  if (!primarySecret) throw new Error("SUBSCRIPTION_PREFERENCES_SECRET is unavailable");
+  const cipher = createCipheriv("aes-256-gcm", getEncryptionKey(primarySecret), iv);
   const payload: PreferenceTokenPayload = {
     email,
     expiresAt: Date.now() + lifetimeMs,
@@ -30,17 +40,29 @@ export function createPreferenceToken(email: string, lifetimeMs = TOKEN_LIFETIME
 }
 
 export function readPreferenceToken(token: string): PreferenceTokenPayload | null {
+  let value: Buffer;
+  let secrets: string[];
   try {
-    const value = Buffer.from(token, "base64url");
-    if (value.length < 29) return null;
-    const decipher = createDecipheriv("aes-256-gcm", getEncryptionKey(), value.subarray(0, 12));
-    decipher.setAuthTag(value.subarray(12, 28));
-    const payload = JSON.parse(Buffer.concat([decipher.update(value.subarray(28)), decipher.final()]).toString("utf8")) as PreferenceTokenPayload;
-    if (payload.version !== TOKEN_VERSION || payload.expiresAt <= Date.now() || typeof payload.email !== "string") return null;
-    return payload;
+    value = Buffer.from(token, "base64url");
+    secrets = getEncryptionSecrets();
   } catch {
     return null;
   }
+  if (value.length < 29) return null;
+
+  for (const secret of secrets) {
+    try {
+      const decipher = createDecipheriv("aes-256-gcm", getEncryptionKey(secret), value.subarray(0, 12));
+      decipher.setAuthTag(value.subarray(12, 28));
+      const payload = JSON.parse(Buffer.concat([decipher.update(value.subarray(28)), decipher.final()]).toString("utf8")) as PreferenceTokenPayload;
+      if (payload.version !== TOKEN_VERSION || payload.expiresAt <= Date.now() || typeof payload.email !== "string") return null;
+      return payload;
+    } catch {
+      // Try the migration fallback, if present.
+    }
+  }
+
+  return null;
 }
 
 export function createPreferenceUrl(email: string, locale: Locale, lifetimeMs?: number) {

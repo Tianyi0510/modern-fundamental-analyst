@@ -8,6 +8,10 @@ export const localeConfig = {
   "zh-cn": { prefix: "/zh-cn", hrefLang: "zh-Hans-CN", htmlLang: "zh-CN", label: "简体中文" },
 } as const;
 
+export function resolveLocale(value: unknown, fallback: Locale = "en"): Locale {
+  return typeof value === "string" && locales.includes(value as Locale) ? value as Locale : fallback;
+}
+
 export function getLocalizedPath(pathname: string, locale: Locale) {
   const path = pathname.replace(/^\/zh-(?:tw|cn)(?=\/|$)/, "") || "/";
   const prefix = localeConfig[locale].prefix;

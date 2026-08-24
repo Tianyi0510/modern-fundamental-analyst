@@ -9,10 +9,12 @@ export const notoSansTc = Noto_Sans_TC({
   variable: "--font-noto-sans-tc",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
 });
 
 export const notoSansSc = Noto_Sans_SC({
   variable: "--font-noto-sans-sc",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
 });

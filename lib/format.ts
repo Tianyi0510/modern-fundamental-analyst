@@ -18,13 +18,15 @@ export function formatUsd(value: number, fractionDigits = 2) {
 export const formatShares = (value: number) => sharesFormatter.format(value);
 
 export function formatDate(value: string, locale: "en" | "zh-tw" | "zh-cn", compact = false) {
-  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) throw new RangeError(`Invalid ISO date: ${value}`);
+
   return new Intl.DateTimeFormat(locale === "zh-tw" ? "zh-TW" : locale === "zh-cn" ? "zh-CN" : "en-GB", {
     day: "numeric",
     month: compact ? "short" : "long",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(Date.UTC(year, month - 1, day)));
+  }).format(date);
 }
 
 export function formatPercent(value: number, fractionDigits = 2) {

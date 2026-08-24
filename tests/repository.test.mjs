@@ -32,9 +32,12 @@ test("API rate limiting uses Redis with a privacy-preserving memory fallback", a
   assert.match(redis, /disableOfflineQueue: true/);
   assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
   assert.match(redis, /process\.env\.REDIS_URL/);
-  assert.match(requestHelpers, /createHash\("sha256"\)\.update\(clientKey\)/);
+  assert.match(redis, /__mfaRedisState/);
+  assert.match(redis, /ERROR_LOG_INTERVAL_MS/);
+  assert.match(redis, /url\.protocol !== "rediss:"/);
+  assert.match(requestHelpers, /createHmac\("sha256", secret\)/);
   assert.match(requestHelpers, /redis\.eval\(rateLimitScript/);
-  assert.match(requestHelpers, /rate-limit:\$\{namespace\}:\$\{digest\}/);
+  assert.match(requestHelpers, /mfa:rate-limit:v1/);
   assert.match(requestHelpers, /return memoryFallback\(request\)/);
 });
 
@@ -331,7 +334,8 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(styles, /\.control\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /CONTACT_TO_EMAIL/);
-  assert.match(route, /contact@mail\.modernfundamentalanalyst\.com/);
+  assert.match(route, /CONTACT_FROM_EMAIL/);
+  assert.match(resend, /contact@mail\.modernfundamentalanalyst\.com/);
   assert.match(route, /replyTo:\s*email/);
   assert.match(resend, /process\.env\.RESEND_API_KEY/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
@@ -380,7 +384,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 });
 
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
-  const [tokens, route, requestRoute, page, form, requestForm, segments, subscribeRoute] = await Promise.all([
+  const [tokens, route, requestRoute, page, form, requestForm, segments, subscribeRoute, emailTemplate] = await Promise.all([
     read("lib/subscription-preferences.ts"),
     read("app/api/subscription-preferences/route.ts"),
     read("app/api/subscription-preferences/request/route.ts"),
@@ -389,10 +393,12 @@ test("subscription preferences use encrypted expiring links and update Resend co
     read("components/subscription-preferences-request-form.tsx"),
     read("lib/resend-segments.ts"),
     read("app/api/subscribe/route.ts"),
+    read("lib/email-template.ts"),
   ]);
 
   assert.match(tokens, /createCipheriv\("aes-256-gcm"/);
   assert.match(tokens, /payload\.expiresAt <= Date\.now\(\)/);
+  assert.match(tokens, /process\.env\.SUBSCRIPTION_PREFERENCES_SECRET/);
   assert.match(tokens, /process\.env\.RESEND_API_KEY/);
   assert.match(route, /readPreferenceToken\(token\)/);
   assert.match(route, /preferred_language: localeConfig\[locale\]\.label/);
@@ -405,11 +411,15 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.doesNotMatch(form, /RESEND_API_KEY/);
   assert.match(requestRoute, /createPreferenceUrl\(email, locale, 30 \* 60 \* 1000\)/);
   assert.match(requestRoute, /resend\.emails\.send/);
+  assert.match(requestRoute, /renderPreferenceEmail/);
+  assert.match(emailTemplate, /Modern Fundamental Analyst<span style="color:#008cff">\.<\/span>/);
+  assert.doesNotMatch(emailTemplate, />MODERN FUNDAMENTAL ANALYST</);
   assert.match(requestRoute, /existing\.error\?\.statusCode !== 404/);
   assert.match(requestRoute, /return NextResponse\.json\(\{ ok: true \}\)/);
   assert.match(requestForm, /subscription-preferences\/request/);
   assert.match(page, /SubscriptionPreferencesRequestForm/);
   assert.match(segments, /PreferredLanguageSegments|preferredLanguageSegments/);
+  assert.match(segments, /process\.env\.RESEND_SEGMENT_EN/);
   assert.match(segments, /contacts\.segments\.add/);
   assert.match(segments, /contacts\.segments\.remove/);
   assert.match(subscribeRoute, /segments: \[\{ id: getPreferredLanguageSegmentId\(locale\) \}\]/);

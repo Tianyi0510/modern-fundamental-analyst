@@ -66,6 +66,10 @@ export function getMemos(locale: Locale): readonly MemoSummary[] {
   return memosByLocale[locale];
 }
 
+export function getLatestMemo(locale: Locale) {
+  return getMemos(locale)[0];
+}
+
 export function getMemo(slug: string, locale: Locale) {
   return getMemos(locale).find((memo) => memo.slug === slug);
 }

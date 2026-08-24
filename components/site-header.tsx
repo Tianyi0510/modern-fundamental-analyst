@@ -50,6 +50,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
       if (!focusable?.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
@@ -89,7 +90,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
       event.preventDefault();
       const currentIndex = items.indexOf(document.activeElement as HTMLElement);
       const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowDown" ? (currentIndex + 1) % items.length : (currentIndex - 1 + items.length) % items.length;
-      items[nextIndex].focus();
+      items[nextIndex]?.focus();
     };
 
     document.addEventListener("pointerdown", closeLanguageMenu);

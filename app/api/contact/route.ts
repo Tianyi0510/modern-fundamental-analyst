@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { cleanSingleLine, cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
-import { getResendClient } from "@/lib/resend";
+import { CONTACT_FROM_EMAIL, getResendClient } from "@/lib/resend";
 
 export const runtime = "nodejs";
 
-const FROM_EMAIL = "Modern Fundamental Analyst <contact@mail.modernfundamentalanalyst.com>";
 const isRateLimited = createRateLimiter({ namespace: "contact", windowMs: 10 * 60 * 1000, maxRequests: 5 });
 
 type ContactRequest = {
@@ -67,7 +66,7 @@ export async function POST(request: Request) {
   const safeSubject = escapeHtml(subject);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
   const { error } = await resend.emails.send({
-    from: FROM_EMAIL,
+    from: CONTACT_FROM_EMAIL,
     to: recipient,
     replyTo: email,
     subject: `[MFA Contact] ${subject}`,
