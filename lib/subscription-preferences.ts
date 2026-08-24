@@ -17,12 +17,12 @@ function getEncryptionKey() {
   return createHash("sha256").update(`subscription-preferences:${secret}`).digest();
 }
 
-export function createPreferenceToken(email: string) {
+export function createPreferenceToken(email: string, lifetimeMs = TOKEN_LIFETIME_MS) {
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", getEncryptionKey(), iv);
   const payload: PreferenceTokenPayload = {
     email,
-    expiresAt: Date.now() + TOKEN_LIFETIME_MS,
+    expiresAt: Date.now() + lifetimeMs,
     version: TOKEN_VERSION,
   };
   const encrypted = Buffer.concat([cipher.update(JSON.stringify(payload), "utf8"), cipher.final()]);
@@ -43,9 +43,9 @@ export function readPreferenceToken(token: string): PreferenceTokenPayload | nul
   }
 }
 
-export function createPreferenceUrl(email: string, locale: Locale) {
+export function createPreferenceUrl(email: string, locale: Locale, lifetimeMs?: number) {
   const prefix = localeConfig[locale].prefix;
-  const token = createPreferenceToken(email);
+  const token = createPreferenceToken(email, lifetimeMs);
   return `${SITE_URL}${prefix}/subscription-preferences?token=${encodeURIComponent(token)}`;
 }
 

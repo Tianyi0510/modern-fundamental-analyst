@@ -380,11 +380,13 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 });
 
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
-  const [tokens, route, page, form, segments, subscribeRoute] = await Promise.all([
+  const [tokens, route, requestRoute, page, form, requestForm, segments, subscribeRoute] = await Promise.all([
     read("lib/subscription-preferences.ts"),
     read("app/api/subscription-preferences/route.ts"),
+    read("app/api/subscription-preferences/request/route.ts"),
     read("components/subscription-preferences-page.tsx"),
     read("components/subscription-preferences-form.tsx"),
+    read("components/subscription-preferences-request-form.tsx"),
     read("lib/resend-segments.ts"),
     read("app/api/subscribe/route.ts"),
   ]);
@@ -401,6 +403,12 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(page, /maskEmail\(payload\.email\)/);
   assert.match(page, /Save Preferences/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);
+  assert.match(requestRoute, /createPreferenceUrl\(email, locale, 30 \* 60 \* 1000\)/);
+  assert.match(requestRoute, /resend\.emails\.send/);
+  assert.match(requestRoute, /existing\.error\?\.statusCode !== 404/);
+  assert.match(requestRoute, /return NextResponse\.json\(\{ ok: true \}\)/);
+  assert.match(requestForm, /subscription-preferences\/request/);
+  assert.match(page, /SubscriptionPreferencesRequestForm/);
   assert.match(segments, /PreferredLanguageSegments|preferredLanguageSegments/);
   assert.match(segments, /contacts\.segments\.add/);
   assert.match(segments, /contacts\.segments\.remove/);
