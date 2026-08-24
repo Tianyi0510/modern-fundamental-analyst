@@ -38,7 +38,7 @@ app/                         App Router pages, layouts, APIs, and global styles
   zh-cn/                     Simplified Chinese routes
   api/                       Contact, subscribe, and preference endpoints
 components/                  Shared server and client components
-data/                        Portfolio snapshot and investment memo content
+data/                        Localized home copy, portfolio snapshot, and memo content
 lib/                         Formatting, calculations, i18n, email, Redis, and site utilities
 public/                      Favicon and social-sharing image
 tests/                       Node test suite and repository-level assertions
@@ -94,7 +94,7 @@ Global CSS is separated by responsibility:
 
 ## Portfolio and Memo Data
 
-Portfolio holdings are maintained in `data/portfolio.ts`. The application derives cost basis, market value, position weights, holding returns, and portfolio totals from that single snapshot so displayed figures remain internally consistent.
+Localized home-page copy is maintained in `data/home-copy.ts`, separate from the shared server-rendered layout. Portfolio holdings are maintained in `data/portfolio.ts`. The application derives cost basis, market value, position weights, holding returns, and portfolio totals from that single snapshot so displayed figures remain internally consistent.
 
 Google Sheets is the public source record, but the production site does not fetch it at request time. A verified monthly snapshot is committed to the repository and deployed with the application. Prices are therefore not live quotes.
 
@@ -116,7 +116,7 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 - Keys follow the versioned `mfa:rate-limit:v1:{namespace}:{digest}` convention.
 - Client identifiers use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
-- Repeated connection errors are log-throttled to keep Vercel logs useful during an outage.
+- Repeated connection errors are log-throttled by error category to keep Vercel logs useful during an outage without hiding unrelated failures.
 - `rediss://` should be used whenever the configured provider endpoint supports TLS; production emits a warning when it does not.
 
 Required server-side environment variables:
@@ -169,6 +169,8 @@ This command runs:
 GitHub Actions runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
 
 Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
+
+Tests are grouped by responsibility: behavioral API, email, and preference tests live in focused files; Redis connection and rate-limit architecture checks live in `tests/redis-config.test.mjs`; broader cross-page and design-system invariants remain in `tests/repository.test.mjs`.
 
 ## Deployment
 

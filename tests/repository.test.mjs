@@ -24,23 +24,6 @@ const styleModules = [
 ];
 const readStyles = async () => (await Promise.all(styleModules.map(read))).join("\n");
 
-test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {
-  const [requestHelpers, redis] = await Promise.all([read("lib/api-request.ts"), read("lib/redis.ts")]);
-
-  assert.match(redis, /connectTimeout: CONNECT_TIMEOUT_MS/);
-  assert.match(redis, /socketTimeout: SOCKET_TIMEOUT_MS/);
-  assert.match(redis, /disableOfflineQueue: true/);
-  assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
-  assert.match(redis, /process\.env\.REDIS_URL/);
-  assert.match(redis, /__mfaRedisState/);
-  assert.match(redis, /ERROR_LOG_INTERVAL_MS/);
-  assert.match(redis, /url\.protocol !== "rediss:"/);
-  assert.match(requestHelpers, /createHmac\("sha256", secret\)/);
-  assert.match(requestHelpers, /redis\.eval\(rateLimitScript/);
-  assert.match(requestHelpers, /mfa:rate-limit:v1/);
-  assert.match(requestHelpers, /return memoryFallback\(request\)/);
-});
-
 test("SEO routes use the production site URL instead of localhost", async () => {
   const [config, sitemap, robots] = await Promise.all([
     read("lib/site-config.ts"),
@@ -198,11 +181,12 @@ test("memo index hero uses the shared subtitle and latest memo date", async () =
 });
 
 test("all home locales use one shared page structure", async () => {
-  const [english, traditionalChinese, simplifiedChinese, shared, styles] = await Promise.all([
+  const [english, traditionalChinese, simplifiedChinese, shared, copy, styles] = await Promise.all([
     read("app/(en)/page.tsx"),
     read("app/zh-tw/page.tsx"),
     read("app/zh-cn/page.tsx"),
     read("components/home-page-content.tsx"),
+    read("data/home-copy.ts"),
     readStyles(),
   ]);
 
@@ -210,9 +194,10 @@ test("all home locales use one shared page structure", async () => {
   assert.match(shared, /getMemos\(locale\)/);
   assert.match(shared, /className="link-label">\{text\.fullPortfolio\}/);
   assert.match(shared, /className="home-portfolio-section"/);
-  assert.match(shared, /holdingsAllocation: "Holdings allocation"/);
-  assert.match(shared, /holdingsAllocation: "持倉佔比"/);
-  assert.match(shared, /holdingsAllocation: "持仓占比"/);
+  assert.match(shared, /homeCopy\[locale\]/);
+  assert.match(copy, /holdingsAllocation: "Holdings allocation"/);
+  assert.match(copy, /holdingsAllocation: "持倉佔比"/);
+  assert.match(copy, /holdingsAllocation: "持仓占比"/);
   assert.match(shared, /const allocationGradient = `conic-gradient/);
   assert.match(shared, /className="allocation-legend"/);
   assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);

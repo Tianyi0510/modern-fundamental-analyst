@@ -4,7 +4,7 @@ type RedisClient = ReturnType<typeof createClient>;
 type RedisState = {
   client: RedisClient | null;
   connection: Promise<RedisClient> | null;
-  lastErrorLogAt: number;
+  lastErrorLogAt: Map<string, number>;
   warnedAboutInsecureUrl: boolean;
 };
 
@@ -13,11 +13,11 @@ const SOCKET_TIMEOUT_MS = 5_000;
 const MAX_RECONNECT_ATTEMPTS = 2;
 const ERROR_LOG_INTERVAL_MS = 60_000;
 
-const globalForRedis = globalThis as typeof globalThis & { __mfaRedisState?: RedisState };
-const state = globalForRedis.__mfaRedisState ??= {
+const globalForRedis = globalThis as typeof globalThis & { __mfaRedisStateV2?: RedisState };
+const state = globalForRedis.__mfaRedisStateV2 ??= {
   client: null,
   connection: null,
-  lastErrorLogAt: 0,
+  lastErrorLogAt: new Map(),
   warnedAboutInsecureUrl: false,
 };
 
@@ -28,8 +28,9 @@ function reconnectStrategy(retries: number) {
 
 export function logRedisError(message: string, error: unknown) {
   const now = Date.now();
-  if (now - state.lastErrorLogAt < ERROR_LOG_INTERVAL_MS) return;
-  state.lastErrorLogAt = now;
+  const lastLoggedAt = state.lastErrorLogAt.get(message) ?? 0;
+  if (now - lastLoggedAt < ERROR_LOG_INTERVAL_MS) return;
+  state.lastErrorLogAt.set(message, now);
   console.error(message, error instanceof Error ? error.name : "UnknownError");
 }
 
