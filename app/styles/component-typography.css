@@ -1,0 +1,209 @@
+/* Component typography mappings
+   Every remaining text-bearing component maps to the unified scale above. */
+.wordmark,
+.footer-mark {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.memo-disclosure > summary {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.site-header nav,
+.language-trigger,
+.language-dropdown a,
+.footer-links,
+.allocation-card > a,
+.mobile-menu-language {
+  font-family: var(--font-ui);
+  font-size: var(--type-button);
+  line-height: 1.2;
+  font-weight: var(--weight-bold);
+}
+
+.holding-row strong {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.about-boundaries h2 {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  text-transform: capitalize;
+}
+
+.holding-row b {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-ring > span {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-ring);
+  line-height: .9;
+  font-weight: var(--weight-bold);
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-legend {
+  font-size: var(--type-caption);
+  line-height: 1.35;
+}
+
+.portfolio-row:not(.portfolio-total-row) > * {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-size: var(--type-data-row);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
+.holding-row > span,
+.bar-value span,
+.year-bar small,
+.principles span,
+.memo-index-row > span,
+.memo-index-row small {
+  font-family: var(--font-ui);
+  font-size: var(--type-caption);
+  line-height: 1.5;
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+}
+
+.date-text,
+.memo-meta,
+.article-meta,
+.bar-value span,
+.holding-row > span {
+  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.memo-meta b {
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+}
+
+.not-found > span,
+.mobile-menu-title {
+  font-family: var(--font-ui);
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
+.mobile-menu-drawer nav {
+  font-family: var(--font-ui);
+  font-size: var(--type-title-bold);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-bold);
+  text-transform: capitalize;
+}
+
+/* Higher-specificity legacy selectors must retain the new Label treatment. */
+.home-page .eyebrow,
+.home-page .section-number,
+.home-page .metric span,
+.about-page .page-hero .eyebrow,
+.contact-page .page-hero .eyebrow,
+.memos-page .page-hero .eyebrow,
+.memo-detail-page .memo-article > .eyebrow,
+.portfolio-page .page-hero .eyebrow,
+.performance-page .page-hero .eyebrow,
+.about-page .about-section-heading > span,
+.about-page .about-closing > .eyebrow,
+.portfolio-page .portfolio-kpis span,
+.portfolio-page .portfolio-holdings-heading span,
+.portfolio-page .portfolio-table-detailed .table-head,
+.performance-page .performance-summary span,
+.performance-page .returns .section-number,
+.performance-page .returns-table .table-head,
+.contact-grid span,
+.memo-card > div {
+  font-size: var(--type-label);
+  line-height: 1.3;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: capitalize;
+}
+
+[lang="zh-Hant-TW"] .hero h1,
+[lang="zh-CN"] .hero h1 { line-height: 1; letter-spacing: -.015em; }
+[lang="zh-Hant-TW"] .page-hero h1,
+[lang="zh-Hant-TW"] .legal h1,
+[lang="zh-Hant-TW"] .memo-article h1,
+[lang="zh-CN"] .page-hero h1,
+[lang="zh-CN"] .legal h1,
+[lang="zh-CN"] .memo-article h1 { line-height: 1.05; letter-spacing: -.015em; }
+[lang="zh-Hant-TW"] .intro h2,
+[lang="zh-Hant-TW"] .section-heading h2,
+[lang="zh-Hant-TW"] .home-about h2,
+[lang="zh-Hant-TW"] .cta h2,
+[lang="zh-CN"] .intro h2,
+[lang="zh-CN"] .section-heading h2,
+[lang="zh-CN"] .home-about h2,
+[lang="zh-CN"] .cta h2 { line-height: 1.1; letter-spacing: -.01em; }
+[lang="zh-Hant-TW"] .memo-card h3,
+[lang="zh-Hant-TW"] .memo-index-row h2,
+[lang="zh-CN"] .memo-card h3,
+[lang="zh-CN"] .memo-index-row h2 { line-height: 1.2; letter-spacing: 0; }
+[lang="zh-Hant-TW"] .hero-bottom > p,
+[lang="zh-Hant-TW"] .rich-copy,
+[lang="zh-Hant-TW"] .article-lead,
+[lang="zh-Hant-TW"] .article-body h2,
+[lang="zh-Hant-TW"] .article-body blockquote,
+[lang="zh-Hant-TW"] .contact-grid p,
+[lang="zh-Hant-TW"] .legal h2,
+[lang="zh-Hant-TW"] .about-philosophy-copy h3,
+[lang="zh-Hant-TW"] .principles h3,
+[lang="zh-Hant-TW"] .two-column h2,
+[lang="zh-Hant-TW"] .methodology h2,
+[lang="zh-Hant-TW"] .about-section-heading h2,
+[lang="zh-Hant-TW"] .about-boundaries h2,
+[lang="zh-Hant-TW"] .about-closing h2,
+[lang="zh-Hant-TW"] .portfolio-holdings-heading h2,
+[lang="zh-CN"] .hero-bottom > p,
+[lang="zh-CN"] .rich-copy,
+[lang="zh-CN"] .article-lead,
+[lang="zh-CN"] .article-body h2,
+[lang="zh-CN"] .article-body blockquote,
+[lang="zh-CN"] .contact-grid p,
+[lang="zh-CN"] .legal h2,
+[lang="zh-CN"] .about-philosophy-copy h3,
+[lang="zh-CN"] .principles h3,
+[lang="zh-CN"] .two-column h2,
+[lang="zh-CN"] .methodology h2,
+[lang="zh-CN"] .about-section-heading h2,
+[lang="zh-CN"] .about-boundaries h2,
+[lang="zh-CN"] .about-closing h2,
+[lang="zh-CN"] .portfolio-holdings-heading h2 { letter-spacing: 0; }
+[lang="zh-Hant-TW"] .about-section-heading h2,
+[lang="zh-Hant-TW"] .about-boundaries h2,
+[lang="zh-Hant-TW"] .about-closing h2,
+[lang="zh-Hant-TW"] .portfolio-holdings-heading h2,
+[lang="zh-CN"] .about-section-heading h2,
+[lang="zh-CN"] .about-boundaries h2,
+[lang="zh-CN"] .about-closing h2,
+[lang="zh-CN"] .portfolio-holdings-heading h2 { line-height: 1.08; }

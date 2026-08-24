@@ -3,5 +3,6 @@
 @import "./styles/chrome.css";
 @import "./styles/pages.css";
 @import "./styles/typography.css";
+@import "./styles/component-typography.css";
 @import "./styles/responsive.css";
 @import "./styles/colors.css";

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Check, ChevronDown, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
 
@@ -15,13 +15,23 @@ type SiteHeaderProps = {
 export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const prefix = localeConfig[locale].prefix;
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-  const languageMenuRef = useRef<HTMLDivElement>(null);
-  const languageButtonRef = useRef<HTMLButtonElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const menuDrawerRef = useRef<HTMLElement>(null);
-  const menuCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const {
+    close: closeMenu,
+    closeButtonRef: menuCloseButtonRef,
+    drawerRef: menuDrawerRef,
+    isOpen: isMenuOpen,
+    open: openMenu,
+    triggerRef: menuButtonRef,
+  } = useMobileMenu();
+  const {
+    close: closeLanguageMenu,
+    containerRef: languageMenuRef,
+    focusItem: focusLanguageItem,
+    isOpen: isLanguageOpen,
+    open: openLanguageMenu,
+    toggle: toggleLanguageMenu,
+    triggerRef: languageButtonRef,
+  } = useLanguageMenu();
   const menuLabel = copy.open;
   const closeLabel = copy.close;
   const homePath = prefix || "/";
@@ -33,76 +43,6 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
     { href: `${prefix}/memos`, label: copy.memos },
   ];
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
-
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
-    const previousOverflow = document.documentElement.style.overflow;
-    const menuButton = menuButtonRef.current;
-    const handleMenuKeyboard = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsMenuOpen(false);
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      const focusable = menuDrawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (!first || !last) return;
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.documentElement.style.overflow = "hidden";
-    menuCloseButtonRef.current?.focus();
-    window.addEventListener("keydown", handleMenuKeyboard);
-
-    return () => {
-      document.documentElement.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleMenuKeyboard);
-      menuButton?.focus();
-    };
-  }, [isMenuOpen]);
-
-  useEffect(() => {
-    if (!isLanguageOpen) return;
-
-    const closeLanguageMenu = (event: MouseEvent) => {
-      if (!languageMenuRef.current?.contains(event.target as Node)) setIsLanguageOpen(false);
-    };
-    const handleLanguageKeyboard = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsLanguageOpen(false);
-        languageButtonRef.current?.focus();
-        return;
-      }
-
-      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
-      const items = Array.from(languageMenuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
-      if (!items.length) return;
-      event.preventDefault();
-      const currentIndex = items.indexOf(document.activeElement as HTMLElement);
-      const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowDown" ? (currentIndex + 1) % items.length : (currentIndex - 1 + items.length) % items.length;
-      items[nextIndex]?.focus();
-    };
-
-    document.addEventListener("pointerdown", closeLanguageMenu);
-    window.addEventListener("keydown", handleLanguageKeyboard);
-
-    return () => {
-      document.removeEventListener("pointerdown", closeLanguageMenu);
-      window.removeEventListener("keydown", handleLanguageKeyboard);
-    };
-  }, [isLanguageOpen]);
-
-  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header className="site-header shell">
@@ -116,7 +56,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
         aria-label={menuLabel}
         aria-expanded={isMenuOpen}
         aria-controls="mobile-site-menu"
-        onClick={() => setIsMenuOpen(true)}
+        onClick={openMenu}
       >
         <Menu aria-hidden="true" strokeWidth={2} />
       </button>
@@ -135,23 +75,19 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             aria-haspopup="menu"
             aria-expanded={isLanguageOpen}
             aria-controls="desktop-language-menu"
-            onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+            onClick={toggleLanguageMenu}
             onKeyDown={(event) => {
               if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
               event.preventDefault();
-              setIsLanguageOpen(true);
-              requestAnimationFrame(() => {
-                const items = languageMenuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
-                const targetIndex = event.key === "ArrowDown" ? 0 : (items?.length ?? 1) - 1;
-                items?.[targetIndex]?.focus();
-              });
+              openLanguageMenu();
+              focusLanguageItem(event.key === "ArrowDown" ? "first" : "last");
             }}
           >
             {localeConfig[locale].label}
             <ChevronDown aria-hidden="true" strokeWidth={2} />
           </button>
           <div className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`} id="desktop-language-menu" role="menu" aria-hidden={!isLanguageOpen}>
-            {locales.map((targetLocale) => <Link href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} role="menuitem" aria-current={locale === targetLocale ? "page" : undefined} tabIndex={isLanguageOpen ? 0 : -1} onClick={() => setIsLanguageOpen(false)} key={targetLocale}>
+            {locales.map((targetLocale) => <Link href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} role="menuitem" aria-current={locale === targetLocale ? "page" : undefined} tabIndex={isLanguageOpen ? 0 : -1} onClick={closeLanguageMenu} key={targetLocale}>
               <span>{localeConfig[targetLocale].label}</span>
               {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
             </Link>)}

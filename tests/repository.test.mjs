@@ -19,6 +19,7 @@ const styleModules = [
   "app/styles/chrome.css",
   "app/styles/pages.css",
   "app/styles/typography.css",
+  "app/styles/component-typography.css",
   "app/styles/responsive.css",
   "app/styles/colors.css",
 ];
@@ -149,7 +150,7 @@ test("memo content is selected by slug and locale", async () => {
 });
 
 test("memo article uses the source document prose and the wider references layout", async () => {
-  const [content, styles] = await Promise.all([read("data/memo-content.ts"), readStyles()]);
+  const [content, styles] = await Promise.all([read("content/memos/microsoft-stock-analysis-fy2024.ts"), readStyles()]);
 
   assert.match(content, /const sourceContent: MemoContent/);
   assert.match(content, /Microsoft now operates through three primary business segments/);
@@ -339,12 +340,13 @@ test("contact form keeps localized copy on the server and sends through a client
 });
 
 test("subscribe form stores contacts and triggers a localized welcome automation", async () => {
-  const [page, form, client, styles, route, footer] = await Promise.all([
+  const [page, form, client, styles, route, service, footer] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/subscribe-form.tsx"),
     read("components/subscribe-form-client.tsx"),
     read("components/subscribe-form.module.css"),
     read("app/api/subscribe/route.ts"),
+    read("lib/subscription-service.ts"),
     read("components/site-footer.tsx"),
   ]);
 
@@ -357,20 +359,21 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
-  assert.match(route, /resend\.contacts\.create/);
-  assert.match(route, /resend\.contacts\.update/);
-  assert.match(route, /resend\.contacts\.get/);
-  assert.match(route, /unsubscribed:\s*false/);
-  assert.match(route, /preferred_language: localeConfig\[locale\]\.label/);
-  assert.match(route, /resend\.events\.send/);
-  assert.match(route, /event:\s*"subscriber\.created"/);
-  assert.match(route, /shouldSendWelcome = !existing\.data \|\| existing\.data\.unsubscribed/);
-  assert.match(route, /memo_title:\s*latestMemo\.title/);
-  assert.match(route, /memo_summary:\s*latestMemo\.summary/);
-  assert.match(route, /memo_url:\s*`\$\{SITE_URL\}\$\{prefix\}\/memos\/\$\{latestMemo\.slug\}`/);
-  assert.match(route, /preferences_url: preferencesUrl/);
+  assert.match(route, /subscribeContact\(email, locale\)/);
+  assert.match(service, /resend\.contacts\.create/);
+  assert.match(service, /resend\.contacts\.update/);
+  assert.match(service, /resend\.contacts\.get/);
+  assert.match(service, /unsubscribed:\s*false/);
+  assert.match(service, /preferred_language: localeConfig\[locale\]\.label/);
+  assert.match(service, /resend\.events\.send/);
+  assert.match(service, /event:\s*"subscriber\.created"/);
+  assert.match(service, /shouldSendWelcome = !existing\.data \|\| existing\.data\.unsubscribed/);
+  assert.match(service, /memo_title:\s*latestMemo\.title/);
+  assert.match(service, /memo_summary:\s*latestMemo\.summary/);
+  assert.match(service, /memo_url:\s*`\$\{SITE_URL\}\$\{prefix\}\/memos\/\$\{latestMemo\.slug\}`/);
+  assert.match(service, /preferences_url: createPreferenceUrl\(email, locale\)/);
   assert.doesNotMatch(route, /ok: true, preferencesUrl/);
-  assert.match(route, /unsubscribed:\s*true/);
+  assert.match(service, /unsubscribed:\s*true/);
   assert.match(form, /secure preferences link/);
   assert.match(form, /安全偏好設定連結/);
   assert.match(form, /安全偏好设置链接/);
@@ -381,7 +384,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 });
 
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
-  const [tokens, route, requestRoute, page, form, requestForm, segments, subscribeRoute, emailTemplate] = await Promise.all([
+  const [tokens, route, requestRoute, page, form, requestForm, segments, subscriptionService, emailTemplate] = await Promise.all([
     read("lib/subscription-preferences.ts"),
     read("app/api/subscription-preferences/route.ts"),
     read("app/api/subscription-preferences/request/route.ts"),
@@ -389,7 +392,7 @@ test("subscription preferences use encrypted expiring links and update Resend co
     read("components/subscription-preferences-form.tsx"),
     read("components/subscription-preferences-request-form.tsx"),
     read("lib/resend-segments.ts"),
-    read("app/api/subscribe/route.ts"),
+    read("lib/subscription-service.ts"),
     read("lib/email-template.ts"),
   ]);
 
@@ -419,7 +422,7 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(segments, /process\.env\.RESEND_SEGMENT_EN/);
   assert.match(segments, /contacts\.segments\.add/);
   assert.match(segments, /contacts\.segments\.remove/);
-  assert.match(subscribeRoute, /segments: \[\{ id: getPreferredLanguageSegmentId\(locale\) \}\]/);
+  assert.match(subscriptionService, /segments: \[\{ id: getPreferredLanguageSegmentId\(locale\) \}\]/);
 });
 
 test("all about locales use one shared page structure", async () => {
@@ -507,13 +510,14 @@ test("page sections share one responsive vertical rhythm", async () => {
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
-  const [header, css] = await Promise.all([
+  const [header, behavior, css] = await Promise.all([
     read("components/site-header.tsx"),
+    read("components/use-site-header.ts"),
     readStyles(),
   ]);
 
   assert.match(header, /aria-modal="true"/);
-  assert.match(header, /event\.key === "Escape"/);
+  assert.match(behavior, /event\.key === "Escape"/);
   assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*\.42s cubic-bezier/s);
   assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
