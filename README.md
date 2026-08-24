@@ -150,7 +150,7 @@ Never commit production credentials. Configure them in Vercel and use `.env.loca
 
 Requirements:
 
-- Node.js 22.x (22.13 or newer)
+- Node.js 24.x
 - npm
 
 Install dependencies and start the development server:
