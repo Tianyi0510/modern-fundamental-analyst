@@ -37,9 +37,10 @@ app/                         App Router pages, layouts, APIs, and global styles
   zh-tw/                     Traditional Chinese routes
   zh-cn/                     Simplified Chinese routes
   api/                       Contact, subscribe, and preference endpoints
-components/                  Shared server and client components
-data/                        Localized home copy, portfolio snapshot, and memo content
-lib/                         Formatting, calculations, i18n, email, Redis, and site utilities
+components/                  Shared components and isolated client interaction hooks
+content/memos/               Versioned long-form investment memo source content
+data/                        Localized copy, portfolio snapshot, and memo catalog
+lib/                         Domain services, formatting, i18n, email, Redis, and utilities
 public/                      Favicon and social-sharing image
 tests/                       Node test suite and repository-level assertions
 .github/workflows/ci.yml     Pull-request and main-branch verification
@@ -89,6 +90,7 @@ Global CSS is separated by responsibility:
 - `chrome.css` — header, footer, buttons, and shared site chrome
 - `pages.css` — page and content layouts
 - `typography.css` — semantic type mappings
+- `component-typography.css` — component-level mappings to the semantic type scale
 - `responsive.css` — breakpoints and reduced-motion behavior
 - `colors.css` — semantic color roles
 
@@ -98,11 +100,11 @@ Localized home-page copy is maintained in `data/home-copy.ts`, separate from the
 
 Google Sheets is the public source record, but the production site does not fetch it at request time. A verified monthly snapshot is committed to the repository and deployed with the application. Prices are therefore not live quotes.
 
-Investment memo metadata is maintained in `data/memos.ts`, while article content is stored in `data/memo-content.ts`. Google Docs may serve as the source document, but published content is versioned with the website rather than fetched at runtime.
+Investment memo metadata is maintained in `data/memos.ts`. `data/memo-content.ts` is the lightweight content registry, while each long-form article lives in its own versioned module under `content/memos/`. Google Docs may serve as the source document, but published content is versioned with the website rather than fetched at runtime.
 
 ## Email and Subscription Flow
 
-Resend handles contact delivery, subscribers, segments, templates, automations, and broadcasts. New subscriptions store a preferred-language property, synchronize the corresponding language segment, and trigger a localized welcome event containing the latest memo.
+Resend handles contact delivery, subscribers, segments, templates, automations, and broadcasts. The subscribe API validates the HTTP boundary and delegates provider orchestration to `lib/subscription-service.ts`. New subscriptions store a preferred-language property, synchronize the corresponding language segment, and trigger a localized welcome event containing the latest memo.
 
 One Resend client is reused per runtime instance and recreated automatically if its API key changes. Provider calls pass through a shared exception boundary so transient network failures return controlled API responses without exposing contact data. Preferred-language segment changes use best-effort compensation: if a multi-step update fails, successfully removed language segments are restored and a newly added target segment is removed.
 
@@ -208,7 +210,8 @@ For a monthly portfolio update:
 For a new investment memo:
 
 1. Add the localized catalog entry in `data/memos.ts`.
-2. Add the source article content in `data/memo-content.ts`.
-3. Verify the list page, article page, metadata, and all three locales.
-4. Update the related Resend broadcast or automation content when required.
-5. Run `npm run verify` before deployment.
+2. Add a dedicated source-content module under `content/memos/`.
+3. Register that module in `data/memo-content.ts`.
+4. Verify the list page, article page, metadata, and all three locales.
+5. Update the related Resend broadcast or automation content when required.
+6. Run `npm run verify` before deployment.
