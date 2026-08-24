@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cleanText, createRateLimiter, isSameOrigin, readLimitedJson, RequestBodyError } from "@/lib/api-request";
 import { localeConfig, locales, type Locale } from "@/lib/i18n";
 import { getResendClient } from "@/lib/resend";
+import { getLocaleFromPreferredLanguage, syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { readPreferenceToken } from "@/lib/subscription-preferences";
 
 export const runtime = "nodejs";
@@ -43,16 +44,30 @@ export async function POST(request: Request) {
   const existing = await resend.contacts.get({ email: payload.email });
   if (!existing.data) return NextResponse.json({ error: "Subscription preferences could not be found." }, { status: 404 });
 
-  const result = action === "unsubscribe"
-    ? await resend.contacts.update({ email: payload.email, unsubscribed: true })
-    : await resend.contacts.update({
+  if (action === "save") {
+    const previousLocale = getLocaleFromPreferredLanguage(existing.data.properties.preferred_language?.value);
+    try {
+      await syncPreferredLanguageSegment(resend, payload.email, locale);
+    } catch (error) {
+      console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
+      return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
+    }
+
+    const result = await resend.contacts.update({
       email: payload.email,
       properties: { preferred_language: localeConfig[locale].label },
     });
-
-  if (result.error) {
-    console.error("Resend preferences update failed", result.error.name);
-    return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
+    if (result.error) {
+      await syncPreferredLanguageSegment(resend, payload.email, previousLocale).catch(() => undefined);
+      console.error("Resend preferences update failed", result.error.name);
+      return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
+    }
+  } else {
+    const result = await resend.contacts.update({ email: payload.email, unsubscribed: true });
+    if (result.error) {
+      console.error("Resend preferences update failed", result.error.name);
+      return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
+    }
   }
 
   return NextResponse.json({ ok: true, action });

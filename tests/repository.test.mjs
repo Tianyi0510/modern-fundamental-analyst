@@ -380,11 +380,13 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 });
 
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
-  const [tokens, route, page, form] = await Promise.all([
+  const [tokens, route, page, form, segments, subscribeRoute] = await Promise.all([
     read("lib/subscription-preferences.ts"),
     read("app/api/subscription-preferences/route.ts"),
     read("components/subscription-preferences-page.tsx"),
     read("components/subscription-preferences-form.tsx"),
+    read("lib/resend-segments.ts"),
+    read("app/api/subscribe/route.ts"),
   ]);
 
   assert.match(tokens, /createCipheriv\("aes-256-gcm"/);
@@ -392,11 +394,17 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(tokens, /process\.env\.RESEND_API_KEY/);
   assert.match(route, /readPreferenceToken\(token\)/);
   assert.match(route, /preferred_language: localeConfig\[locale\]\.label/);
+  assert.match(route, /syncPreferredLanguageSegment\(resend, payload\.email, locale\)/);
+  assert.match(route, /syncPreferredLanguageSegment\(resend, payload\.email, previousLocale\)/);
   assert.match(route, /unsubscribed: true/);
   assert.match(route, /await isRateLimited\(request\)/);
   assert.match(page, /maskEmail\(payload\.email\)/);
   assert.match(page, /Save Preferences/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);
+  assert.match(segments, /PreferredLanguageSegments|preferredLanguageSegments/);
+  assert.match(segments, /contacts\.segments\.add/);
+  assert.match(segments, /contacts\.segments\.remove/);
+  assert.match(subscribeRoute, /segments: \[\{ id: getPreferredLanguageSegmentId\(locale\) \}\]/);
 });
 
 test("all about locales use one shared page structure", async () => {
