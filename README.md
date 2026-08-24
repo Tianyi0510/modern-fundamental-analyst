@@ -112,12 +112,14 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 
 - One multiplexed client and one in-flight connection promise are reused per runtime instance.
 - Connection and socket timeouts fail quickly, the offline queue is disabled, and reconnect attempts are bounded.
+- Failed connections open a 30-second circuit breaker so an outage does not trigger a fresh authentication attempt on every request.
 - A Lua script performs `INCR` and `PEXPIRE` atomically for each fixed rate-limit window.
 - Keys follow the versioned `mfa:rate-limit:v1:{namespace}:{digest}` convention.
 - Client identifiers use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
 - Repeated connection errors are log-throttled by error category to keep Vercel logs useful during an outage without hiding unrelated failures.
-- `rediss://` should be used whenever the configured provider endpoint supports TLS; production emits a warning when it does not.
+- `rediss://` is required by default in production. If the provider exposes only `redis://`, the non-TLS connection must be explicitly acknowledged with `REDIS_ALLOW_INSECURE=true`; production then emits a warning without logging the endpoint or credentials.
+- Redis authentication is mandatory. Only HMAC-derived client identifiers, counters, and short TTLs are transmitted; raw IP addresses and form contents never enter Redis.
 
 Required server-side environment variables:
 
@@ -126,10 +128,13 @@ RESEND_API_KEY=
 CONTACT_TO_EMAIL=
 SUBSCRIPTION_PREFERENCES_SECRET=
 REDIS_URL=
+REDIS_ALLOW_INSECURE=false
 RATE_LIMIT_HASH_SECRET=
 ```
 
 `SUBSCRIPTION_PREFERENCES_SECRET` and `RATE_LIMIT_HASH_SECRET` are configured as separate Sensitive variables in Vercel Production and Preview. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+
+Keep `REDIS_ALLOW_INSECURE=false` whenever TLS is available. For a provider-issued non-TLS endpoint, set it to `true` only in the environments that use that endpoint. This acknowledgement does not encrypt traffic; migrate back to `rediss://` as soon as the provider exposes TLS.
 
 The three optional `RESEND_SEGMENT_*` variables can override the checked-in language-segment defaults when Resend segments are recreated.
 

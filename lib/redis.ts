@@ -6,19 +6,22 @@ type RedisState = {
   connection: Promise<RedisClient> | null;
   lastErrorLogAt: Map<string, number>;
   warnedAboutInsecureUrl: boolean;
+  unavailableUntil: number;
 };
 
 const CONNECT_TIMEOUT_MS = 2_000;
 const SOCKET_TIMEOUT_MS = 5_000;
 const MAX_RECONNECT_ATTEMPTS = 2;
+const CONNECTION_COOLDOWN_MS = 30_000;
 const ERROR_LOG_INTERVAL_MS = 60_000;
 
-const globalForRedis = globalThis as typeof globalThis & { __mfaRedisStateV2?: RedisState };
-const state = globalForRedis.__mfaRedisStateV2 ??= {
+const globalForRedis = globalThis as typeof globalThis & { __mfaRedisStateV3?: RedisState };
+const state = globalForRedis.__mfaRedisStateV3 ??= {
   client: null,
   connection: null,
   lastErrorLogAt: new Map(),
   warnedAboutInsecureUrl: false,
+  unavailableUntil: 0,
 };
 
 function reconnectStrategy(retries: number) {
@@ -41,9 +44,16 @@ function getRedisUrl() {
   try {
     const url = new URL(value);
     if (url.protocol !== "redis:" && url.protocol !== "rediss:") throw new Error("Unsupported Redis protocol");
-    if (process.env.NODE_ENV === "production" && url.protocol !== "rediss:" && !state.warnedAboutInsecureUrl) {
-      state.warnedAboutInsecureUrl = true;
-      console.warn("REDIS_URL does not use TLS in production.");
+    if (!url.hostname || !url.password) throw new Error("Redis authentication is required");
+
+    if (process.env.NODE_ENV === "production" && url.protocol === "redis:") {
+      if (process.env.REDIS_ALLOW_INSECURE !== "true") {
+        throw new Error("Non-TLS Redis requires REDIS_ALLOW_INSECURE=true");
+      }
+      if (!state.warnedAboutInsecureUrl) {
+        state.warnedAboutInsecureUrl = true;
+        console.warn("Redis TLS is unavailable; using explicitly permitted non-TLS transport.");
+      }
     }
     return value;
   } catch (error) {
@@ -55,6 +65,7 @@ function getRedisUrl() {
 export async function getRedisClient() {
   const url = getRedisUrl();
   if (!url) return null;
+  if (Date.now() < state.unavailableUntil) return null;
 
   if (!state.client) {
     state.client = createClient({
@@ -74,8 +85,12 @@ export async function getRedisClient() {
   if (!state.connection) {
     const pendingClient = state.client;
     state.connection = pendingClient.connect()
-      .then(() => pendingClient)
+      .then(() => {
+        state.unavailableUntil = 0;
+        return pendingClient;
+      })
       .catch((error) => {
+        state.unavailableUntil = Date.now() + CONNECTION_COOLDOWN_MS;
         if (state.client === pendingClient) {
           state.client = null;
           if (pendingClient.isOpen) pendingClient.destroy();

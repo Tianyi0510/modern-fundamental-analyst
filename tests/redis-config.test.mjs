@@ -12,8 +12,11 @@ test("Redis connections are bounded and reused", async () => {
   assert.match(redis, /disableOfflineQueue: true/);
   assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
   assert.match(redis, /process\.env\.REDIS_URL/);
-  assert.match(redis, /__mfaRedisStateV2/);
-  assert.match(redis, /url\.protocol !== "rediss:"/);
+  assert.match(redis, /__mfaRedisStateV3/);
+  assert.match(redis, /url\.protocol === "redis:"/);
+  assert.match(redis, /REDIS_ALLOW_INSECURE/);
+  assert.match(redis, /Redis authentication is required/);
+  assert.match(redis, /unavailableUntil = Date\.now\(\) \+ CONNECTION_COOLDOWN_MS/);
 });
 
 test("Redis errors are throttled independently by category", async () => {
