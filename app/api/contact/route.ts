@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { cleanSingleLine, cleanText, createMemoryRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
+import { cleanSingleLine, cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
 import { getResendClient } from "@/lib/resend";
 
 export const runtime = "nodejs";
 
 const FROM_EMAIL = "Modern Fundamental Analyst <contact@mail.modernfundamentalanalyst.com>";
-const isRateLimited = createMemoryRateLimiter({ windowMs: 10 * 60 * 1000, maxRequests: 5 });
+const isRateLimited = createRateLimiter({ namespace: "contact", windowMs: 10 * 60 * 1000, maxRequests: 5 });
 
 type ContactRequest = {
   name?: unknown;
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   if (!isSameOrigin(request)) {
     return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
   }
-  if (isRateLimited(request)) {
+  if (await isRateLimited(request)) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
   let body: ContactRequest;

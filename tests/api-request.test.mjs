@@ -1,13 +1,24 @@
 import assert from "node:assert/strict";
+import { registerHooks } from "node:module";
 import test from "node:test";
-import {
+
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (specifier.startsWith("@/")) {
+      return nextResolve(new URL(`../${specifier.slice(2)}.ts`, import.meta.url).href, context);
+    }
+    return nextResolve(specifier, context);
+  },
+});
+
+const {
   cleanSingleLine,
   createMemoryRateLimiter,
   isSameOrigin,
   isValidEmail,
   readLimitedJson,
   RequestBodyError,
-} from "../lib/api-request.ts";
+} = await import("../lib/api-request.ts");
 
 test("request helpers normalize text and validate forwarded origins", () => {
   assert.equal(cleanSingleLine("  Hello\n\tworld  ", 100), "Hello world");
