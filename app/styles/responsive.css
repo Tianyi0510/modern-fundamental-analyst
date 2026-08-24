@@ -195,7 +195,7 @@
 }
 
 @media (hover: none) {
-  .home-page .button:hover, .home-page .round-link:hover, .home-page .site-footer button[type="submit"]:hover { transform: none; }
+  .home-page .button:hover, .home-page .round-link:hover, .site-header .button:hover { transform: none; }
   .holding-row:hover, .memo-index-row:hover, .memo-disclosure > summary:hover { padding-inline: 0; }
   .memo-card:hover { transform: none; }
 }

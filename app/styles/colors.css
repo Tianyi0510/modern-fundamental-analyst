@@ -69,7 +69,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
 .performance-home .inverse .section-number { color: rgba(0,0,0,.62); }
 .home-page .hero .button-dark, .performance-home .button-white { background: var(--black); color: var(--white); }
-.home-page .hero .button-dark:hover, .performance-home .button-white:hover, .home-page .site-header .button-dark:hover { background: var(--bright-blue); color: var(--black); }
+.home-page .hero .button-dark:hover, .performance-home .button-white:hover, .site-header .button-dark:hover { background: var(--bright-blue); color: var(--black); }
 
 /* Three-card KPI sequence: Bright Blue, Deep Blue, White. */
 .home-page .metric-band > .metric:nth-child(1),
@@ -113,7 +113,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   clip-path: inset(0 -100vmax);
 }
 .home-page .cta .button-dark { background: var(--black); color: var(--white); }
-.home-page .cta .button-dark:hover { background: var(--deep-blue); color: var(--black); }
+.home-page .cta .button-dark:hover { background: var(--deep-blue); color: var(--white); }
 .site-footer {
   background: var(--surface-inverse);
   color: var(--text-inverse);
