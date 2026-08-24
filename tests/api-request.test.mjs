@@ -18,6 +18,7 @@ const {
   isSameOrigin,
   isValidEmail,
   readLimitedJson,
+  readLimitedText,
   readObjectJson,
   RequestBodyError,
 } = await import("../lib/api-request.ts");
@@ -53,6 +54,12 @@ test("limited JSON reader checks streamed bytes without relying on Content-Lengt
     readLimitedJson(oversized, 20),
     (error) => error instanceof RequestBodyError && error.status === 413,
   );
+});
+
+test("limited text reader preserves the raw request body for signature verification", async () => {
+  const payload = '{"type":"email.bounced","data":{"to":["reader@example.com"]}}';
+  const request = new Request("https://example.com/api", { method: "POST", body: payload });
+  assert.equal(await readLimitedText(request, 100), payload);
 });
 
 test("object JSON reader rejects arrays and scalar payloads", async () => {

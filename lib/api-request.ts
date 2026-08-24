@@ -49,7 +49,7 @@ export function isSameOrigin(request: Request) {
   }
 }
 
-export async function readLimitedJson(request: Request, maxBytes: number): Promise<unknown> {
+export async function readLimitedText(request: Request, maxBytes: number) {
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
     throw new RequestBodyError("Request is too large.", 413);
@@ -83,9 +83,14 @@ export async function readLimitedJson(request: Request, maxBytes: number): Promi
     offset += chunk.byteLength;
   }
 
+  return new TextDecoder().decode(bytes);
+}
+
+export async function readLimitedJson(request: Request, maxBytes: number): Promise<unknown> {
   try {
-    return JSON.parse(new TextDecoder().decode(bytes)) as unknown;
-  } catch {
+    return JSON.parse(await readLimitedText(request, maxBytes)) as unknown;
+  } catch (error) {
+    if (error instanceof RequestBodyError) throw error;
     throw new RequestBodyError("Invalid request.", 400);
   }
 }

@@ -106,6 +106,8 @@ Resend handles contact delivery, subscribers, segments, templates, automations, 
 
 One Resend client is reused per runtime instance and recreated automatically if its API key changes. Provider calls pass through a shared exception boundary so transient network failures return controlled API responses without exposing contact data. Preferred-language segment changes use best-effort compensation: if a multi-step update fails, successfully removed language segments are restored and a newly added target segment is removed.
 
+The signed Resend webhook at `/api/webhooks/resend` processes bounce, complaint, and suppression events. It verifies the untouched request body and Svix signature before marking matching contacts as unsubscribed; invalid signatures and oversized payloads are rejected before any contact update.
+
 Subscribers can request a short-lived secure link to update their preferred language or unsubscribe. Preference links use authenticated AES-256-GCM encryption and a dedicated server-side secret. A migration fallback preserves links created before that secret was introduced.
 
 ## Redis Rate Limiting
@@ -128,6 +130,7 @@ Required server-side environment variables:
 
 ```bash
 RESEND_API_KEY=
+RESEND_WEBHOOK_SECRET=
 CONTACT_TO_EMAIL=
 SUBSCRIPTION_PREFERENCES_SECRET=
 REDIS_URL=
@@ -135,7 +138,7 @@ REDIS_ALLOW_INSECURE=false
 RATE_LIMIT_HASH_SECRET=
 ```
 
-`SUBSCRIPTION_PREFERENCES_SECRET` and `RATE_LIMIT_HASH_SECRET` are configured as separate Sensitive variables in Vercel Production and Preview. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, and `RATE_LIMIT_HASH_SECRET` are configured as Sensitive variables in Vercel Production and Preview. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
 
 Keep `REDIS_ALLOW_INSECURE=false` whenever TLS is available. For a provider-issued non-TLS endpoint, set it to `true` only in the environments that use that endpoint. This acknowledgement does not encrypt traffic; migrate back to `rediss://` as soon as the provider exposes TLS.
 
@@ -147,7 +150,7 @@ Never commit production credentials. Configure them in Vercel and use `.env.loca
 
 Requirements:
 
-- Node.js 22.13 or newer
+- Node.js 22.x (22.13 or newer)
 - npm
 
 Install dependencies and start the development server:
