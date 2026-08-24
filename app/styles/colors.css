@@ -1,16 +1,16 @@
 /* Editorial color architecture
-   White and black remain primary. Deep Blue and Light Blue define section
-   hierarchy; Bright Blue is reserved for interactive and data accents. */
+   White and black remain primary. Deep Blue and Bright Blue define section
+   hierarchy; Medium Blue is reserved for interactive and data accents. */
 :root {
   --surface-primary: var(--white);
   --surface-inverse: var(--black);
   --surface-brand: var(--deep-blue);
-  --surface-highlight: var(--light-blue);
+  --surface-highlight: var(--bright-blue);
   --text-primary: var(--black);
   --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
-  --text-highlight: var(--light-blue);
-  --interactive-accent: var(--bright-blue);
+  --text-highlight: var(--bright-blue);
+  --interactive-accent: var(--medium-blue);
 }
 
 body { background: var(--surface-primary); color: var(--text-primary); }
@@ -29,7 +29,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .methodology h2,
 .legal h1 { color: var(--text-brand); }
 
-/* White / black, white / dark blue */
+/* White / Black and White / Deep Blue */
 .metric,
 .memo-card,
 .performance-summary > div { background: var(--surface-primary); color: var(--text-primary); }
@@ -48,7 +48,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .about-boundaries > article:first-child li::before { color: var(--text-highlight); }
 .contact-grid > article:first-child p { color: var(--text-inverse); }
 
-/* Light blue / black and light blue / dark blue */
+/* Bright Blue / Black and Bright Blue / Deep Blue */
 .metric-accent,
 .allocation-card { background: var(--surface-highlight); color: var(--text-primary); }
 .performance-summary > div:nth-child(3),
@@ -56,7 +56,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   background: var(--surface-highlight);
   color: var(--text-primary);
 }
-.about-boundaries > article { border-top-color: var(--dark-blue); }
+.about-boundaries > article { border-top-color: var(--deep-blue); }
 .about-boundaries li { border-top: 0; }
 .contact-grid > article:nth-child(2) { background: var(--surface-primary); color: var(--text-primary); }
 .principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
@@ -69,9 +69,9 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
 .performance-home .inverse .section-number { color: rgba(0,0,0,.62); }
 .performance-home .button-white { background: var(--black); color: var(--white); }
-.performance-home .button-white:hover { background: var(--deep-blue); color: var(--light-blue); }
+.performance-home .button-white:hover { background: var(--deep-blue); color: var(--bright-blue); }
 
-/* Three-card KPI sequence: light blue, dark blue, white. */
+/* Three-card KPI sequence: Bright Blue, Deep Blue, White. */
 .home-page .metric-band > .metric:nth-child(1),
 .performance-page .performance-summary > div:nth-child(1) {
   background: var(--surface-highlight);
@@ -94,7 +94,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .portfolio-page .portfolio-kpis > div:nth-child(3) { background: var(--surface-brand); color: var(--text-highlight); }
 .portfolio-page .portfolio-kpis > div:nth-child(4) { background: var(--surface-primary); color: var(--text-brand); }
 
-/* Bright Blue remains an auxiliary interaction color. */
+/* Medium Blue remains an auxiliary interaction color. */
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"],
 .language-trigger:hover,
@@ -113,7 +113,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   clip-path: inset(0 -100vmax);
 }
 .home-page .cta .button-dark { background: var(--black); color: var(--white); }
-.home-page .cta .button-dark:hover { background: var(--dark-blue); color: var(--light-blue); }
+.home-page .cta .button-dark:hover { background: var(--deep-blue); color: var(--bright-blue); }
 .site-footer {
   background: var(--surface-inverse);
   color: var(--text-inverse);

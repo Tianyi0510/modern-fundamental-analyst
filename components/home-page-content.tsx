@@ -23,7 +23,7 @@ const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.
 const featuredWeights = featuredHoldings.map((holding) => getHoldingWeight(holding.marketValue));
 const otherWeight = 100 - featuredWeights.reduce((total, weight) => total + weight, 0);
 const allocationStops = [...featuredWeights, otherWeight].reduce<number[]>((stops, weight) => [...stops, (stops.at(-1) ?? 0) + weight], []);
-const allocationGradient = `conic-gradient(var(--deep-blue) 0 ${allocationStops[0]}%, var(--bright-blue) ${allocationStops[0]}% ${allocationStops[1]}%, var(--black) ${allocationStops[1]}% ${allocationStops[2]}%, var(--white) ${allocationStops[2]}% ${allocationStops[3]}%, var(--gray) ${allocationStops[3]}% 100%)`;
+const allocationGradient = `conic-gradient(var(--deep-blue) 0 ${allocationStops[0]}%, var(--medium-blue) ${allocationStops[0]}% ${allocationStops[1]}%, var(--black) ${allocationStops[1]}% ${allocationStops[2]}%, var(--white) ${allocationStops[2]}% ${allocationStops[3]}%, var(--gray) ${allocationStops[3]}% 100%)`;
 
 export function HomePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];

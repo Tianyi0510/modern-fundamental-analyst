@@ -5,9 +5,9 @@
   align-items: start;
   padding-top: var(--space-section);
   padding-bottom: var(--space-section);
-  background: var(--light-blue);
+  background: var(--bright-blue);
   color: var(--black);
-  box-shadow: 0 0 0 100vmax var(--light-blue);
+  box-shadow: 0 0 0 100vmax var(--bright-blue);
   clip-path: inset(0 -100vmax);
 }
 

@@ -325,7 +325,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(client, /fetch\("\/api\/contact"/);
   assert.match(client, /contact-form\.module\.css/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
-  assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--light-blue\);[^}]*color:\s*var\(--black\)/s);
+  assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
   assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
   assert.match(styles, /\.control\s*\{[^}]*background:\s*var\(--background-gray\)/s);
@@ -435,15 +435,15 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
 
-test("editorial color roles keep the footer inverse and Bright Blue auxiliary", async () => {
+test("editorial color roles keep the footer inverse and Medium Blue auxiliary", async () => {
   const css = await readStyles();
 
   assert.match(css, /--deep-blue:\s*#002991/);
-  assert.match(css, /--bright-blue:\s*#008cff/);
+  assert.match(css, /--medium-blue:\s*#008cff/);
   assert.match(css, /--surface-primary:\s*var\(--white\)/);
   assert.match(css, /--surface-inverse:\s*var\(--black\)/);
   assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
-  assert.match(css, /--interactive-accent:\s*var\(--bright-blue\)/);
+  assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);

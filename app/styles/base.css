@@ -4,10 +4,8 @@
   --black: #000000;
   --white: #ffffff;
   --deep-blue: #002991;
-  --bright-blue: #008cff;
-  --dark-blue: var(--deep-blue);
-  --medium-blue: var(--bright-blue);
-  --light-blue: #5fcdfd;
+  --medium-blue: #008cff;
+  --bright-blue: #5fcdfd;
   --gray: #ededed;
   --background-gray: #f8f9fb;
   --price-up: #34a853;

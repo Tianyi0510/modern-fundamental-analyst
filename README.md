@@ -1,34 +1,182 @@
 # Modern Fundamental Analyst
 
-An independent public-equity portfolio website featuring portfolio allocation,
-performance reporting, investment memos, contact information, and a clear
-investment disclaimer.
+Modern Fundamental Analyst is a multilingual public-equity research website. It presents an independently maintained portfolio, a transparent performance record, long-form investment memos, and the methodology behind the published results.
+
+Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.com)
+
+## Features
+
+- English, Traditional Chinese, and Simplified Chinese experiences
+- Portfolio holdings, cost basis, market value, allocation, and return calculations
+- Performance reporting against SPY with documented methodology
+- Localized investment memo index and article pages
+- Contact form delivered through Resend
+- Newsletter subscription, localized welcome emails, language preferences, and self-service unsubscribe
+- Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
+- Vercel Analytics and Speed Insights
+- Responsive navigation, mobile-specific portfolio presentation, accessible focus states, and reduced-motion support
 
 ## Technology
 
 - Next.js 16 App Router
-- React 19 and TypeScript
-- Vercel production hosting
-- Wix-managed domain and DNS
+- React 19
+- TypeScript 5 in strict mode
+- Native CSS and CSS Modules
+- `next/font` with Inter, Noto Sans TC, and Noto Sans SC
+- Resend for contact and subscriber email
+- Redis for shared server-side rate-limit state, with a privacy-preserving in-memory fallback
+- GitHub Actions for continuous integration
+- Vercel for builds, server functions, analytics, and production hosting
+- Wix for domain registration and DNS management
 
-## Local development
+## Application Structure
+
+```text
+app/                         App Router pages, layouts, APIs, and global styles
+  (en)/                      English routes
+  zh-tw/                     Traditional Chinese routes
+  zh-cn/                     Simplified Chinese routes
+  api/                       Contact, subscribe, and preference endpoints
+components/                  Shared server and client components
+data/                        Portfolio snapshot and investment memo content
+lib/                         Formatting, calculations, i18n, email, Redis, and site utilities
+public/                      Favicon and social-sharing image
+tests/                       Node test suite and repository-level assertions
+.github/workflows/ci.yml     Pull-request and main-branch verification
+```
+
+Localized URLs use these route conventions:
+
+- English: `/`
+- Traditional Chinese: `/zh-tw`
+- Simplified Chinese: `/zh-cn`
+
+The three language versions share page components wherever possible. Locale files provide copy and metadata while preserving the same information architecture and interaction patterns.
+
+## Design System
+
+The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion.
+
+### Color Tokens
+
+| Token | Value | Primary role |
+| --- | --- | --- |
+| Black | `#000000` | Primary text and inverse surfaces |
+| White | `#FFFFFF` | Primary surface and inverse text |
+| Deep Blue | `#002991` | Brand surfaces and headings |
+| Medium Blue | `#008CFF` | Interactive and data accents |
+| Bright Blue | `#5FCDFD` | Highlight surfaces and inverse accents |
+| Gray | `#EDEDED` | Rules and neutral UI |
+| Background Gray | `#F8F9FB` | Section backgrounds and form controls |
+| Price Up | `#34A853` | Positive financial data only |
+| Price Down | `#FF0000` | Negative financial data only |
+
+The semantic aliases live in `app/styles/colors.css`; the base values and type scale live in `app/styles/base.css`.
+
+### Typography
+
+- English and numeric UI: Inter
+- Traditional Chinese: Noto Sans TC
+- Simplified Chinese: Noto Sans SC
+- Supported weights: 400 and 700
+- Dates and financial figures use tabular numerals
+- Desktop and mobile use explicit token values instead of fluid `clamp()` sizing
+
+Global CSS is separated by responsibility:
+
+- `reset.css` — browser normalization
+- `base.css` — tokens and global foundations
+- `chrome.css` — header, footer, buttons, and shared site chrome
+- `pages.css` — page and content layouts
+- `typography.css` — semantic type mappings
+- `responsive.css` — breakpoints and reduced-motion behavior
+- `colors.css` — semantic color roles
+
+## Portfolio and Memo Data
+
+Portfolio holdings are maintained in `data/portfolio.ts`. The application derives cost basis, market value, position weights, holding returns, and portfolio totals from that single snapshot so displayed figures remain internally consistent.
+
+Google Sheets is the public source record, but the production site does not fetch it at request time. A verified monthly snapshot is committed to the repository and deployed with the application. Prices are therefore not live quotes.
+
+Investment memo metadata is maintained in `data/memos.ts`, while article content is stored in `data/memo-content.ts`. Google Docs may serve as the source document, but published content is versioned with the website rather than fetched at runtime.
+
+## Email and Subscription Flow
+
+Resend handles contact delivery, subscribers, segments, templates, automations, and broadcasts. New subscriptions store a preferred-language property, synchronize the corresponding language segment, and trigger a localized welcome event containing the latest memo.
+
+Subscribers can request a short-lived secure link to update their preferred language or unsubscribe. Preference links are signed server-side and must not expose the Resend API key.
+
+Redis supplies shared rate-limit state across Vercel Functions. If Redis is unavailable, the application falls back to a process-local limiter without storing raw client IP addresses.
+
+Required server-side environment variables:
 
 ```bash
-npm install
+RESEND_API_KEY=
+CONTACT_TO_EMAIL=
+REDIS_URL=
+```
+
+Never commit production credentials. Configure them in Vercel and use `.env.local` only for local development.
+
+## Local Development
+
+Requirements:
+
+- Node.js 22.13 or newer
+- npm
+
+Install dependencies and start the development server:
+
+```bash
+npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Validation
+## Quality Checks
+
+Run the complete local verification pipeline:
 
 ```bash
 npm run verify
 ```
 
-`verify` runs TypeScript, ESLint, unit tests, and a production build. Pull
-requests run the same command in GitHub Actions before they are merged.
+This command runs:
 
-Portfolio holdings are maintained in `data/portfolio.ts`. Cost basis, market
-value, position weights, holding returns, and portfolio totals are derived from
-that source so displayed figures remain internally consistent.
+1. TypeScript type checking
+2. ESLint
+3. Node tests
+4. A production Next.js build
+
+GitHub Actions runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
+
+Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
+
+## Deployment
+
+The production delivery path is:
+
+```text
+Local repository → GitHub → GitHub Actions → Vercel → Wix-managed DNS
+```
+
+Vercel installs dependencies with `npm ci`. A production deployment should only be promoted after the verification pipeline passes. The public domain remains managed through Wix DNS, while application hosting and server functions run on Vercel.
+
+## Content Updates
+
+For a monthly portfolio update:
+
+1. Verify the source Google Sheet.
+2. Update the snapshot and date in `data/portfolio.ts`.
+3. Confirm all derived totals and localized date displays.
+4. Run `npm run verify`.
+5. Submit and merge the change through the normal GitHub workflow.
+
+For a new investment memo:
+
+1. Add the localized catalog entry in `data/memos.ts`.
+2. Add the source article content in `data/memo-content.ts`.
+3. Verify the list page, article page, metadata, and all three locales.
+4. Update the related Resend broadcast or automation content when required.
+5. Run `npm run verify` before deployment.
