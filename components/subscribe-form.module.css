@@ -6,9 +6,9 @@
 .control { display: block; width: 100%; min-height: 52px; padding: 13px 20px; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; background: transparent; color: var(--white); font: inherit; font-size: var(--type-body); }
 .control::placeholder { color: rgba(255,255,255,.6); }
 .control:focus { outline: none; border-color: var(--bright-blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bright-blue) 28%, transparent); }
-.submit { min-width: 116px; min-height: 52px; padding: 13px 24px; border: 1px solid var(--white); border-radius: 999px; background: var(--white); color: var(--black); cursor: pointer; font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
-.submit:hover { border-color: var(--bright-blue); background: var(--bright-blue); }
-.submit:active { transform: translateY(1px); }
+.submit { min-width: 116px; min-height: 52px; padding: 13px 24px; border: 1px solid var(--white); border-radius: 999px; background: var(--white); color: var(--black); cursor: pointer; font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease; }
+.submit:hover { border-color: var(--bright-blue); background: var(--bright-blue); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.22); }
+.submit:active { transform: translateY(0) scale(.98); box-shadow: none; }
 .submit:disabled { cursor: wait; opacity: .64; transform: none; }
 .status { grid-column: 1 / -1; min-height: 1.55em; margin: 0; color: var(--white); font-size: var(--type-caption); line-height: 1.55; }
 .status { font-weight: var(--weight-bold); }

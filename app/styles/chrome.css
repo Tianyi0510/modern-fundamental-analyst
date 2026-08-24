@@ -10,21 +10,22 @@
 .site-header nav a:hover, .site-header nav a[aria-current="page"] { color: var(--medium-blue); }
 .site-header nav a:hover::after, .site-header nav a[aria-current="page"]::after { transform: scaleX(1); transform-origin: left; }
 .language-menu { position: relative; }
-.language-trigger { padding: 7px 0; border: 0; border-bottom: 1px solid currentColor; background: transparent; color: inherit; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; cursor: pointer; transition: color .2s ease; }
-.language-trigger:hover, .language-trigger[aria-expanded="true"] { color: var(--medium-blue); }
-.language-trigger svg { width: 14px; height: 14px; transition: transform .2s ease; }
+.language-trigger { min-height: 42px; padding: 0 11px; border: 0; border-radius: 999px; background: transparent; color: inherit; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; cursor: pointer; transition: color .2s ease, background-color .2s ease, transform .2s cubic-bezier(.22,1,.36,1); }
+.language-trigger:hover, .language-trigger[aria-expanded="true"] { background: color-mix(in srgb, var(--bright-blue) 18%, transparent); color: var(--medium-blue); }
+.language-trigger:active { transform: scale(.97); }
+.language-trigger svg { width: 14px; height: 14px; transition: transform .28s cubic-bezier(.22,1,.36,1); }
 .language-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
-.language-dropdown { position: absolute; z-index: 20; top: calc(100% + 12px); right: 0; width: 190px; border: 1px solid var(--gray); border-radius: 4px; background: var(--white); color: var(--black); box-shadow: 0 10px 28px rgba(0,0,0,.09); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s; }
+.language-dropdown { position: absolute; z-index: 20; top: calc(100% + 10px); right: 0; width: 190px; overflow: hidden; border: 1px solid var(--gray); border-radius: 8px; background: var(--white); color: var(--black); box-shadow: 0 16px 40px rgba(0,0,0,.12); opacity: 0; visibility: hidden; transform: translateY(-8px) scale(.98); transform-origin: top right; transition: opacity .2s ease, transform .26s cubic-bezier(.22,1,.36,1), visibility 0s linear .26s; }
 .language-dropdown.is-open { opacity: 1; visibility: visible; transform: translateY(0); transition-delay: 0s; }
-.language-dropdown a { min-height: 54px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: color .18s ease, background .18s ease, padding .18s ease; }
+.language-dropdown a { min-height: 54px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: color .18s ease, background-color .18s ease, padding .22s cubic-bezier(.22,1,.36,1); }
 .language-dropdown a + a { border-top: 1px solid var(--gray); }
-.language-dropdown a:hover { background: var(--gray); color: var(--deep-blue); }
+.language-dropdown a:hover { padding-inline: 20px 14px; background: var(--gray); color: var(--deep-blue); }
 .language-dropdown a[aria-current="page"] { background: color-mix(in srgb, var(--bright-blue) 20%, var(--white)); color: var(--deep-blue); }
 .language-dropdown svg { width: 18px; height: 18px; color: var(--medium-blue); }
 .arrow-icon { display: inline-block; font-family: var(--font-inter), Arial, sans-serif; font-style: normal; font-variant-emoji: text; line-height: 1; }
-.button { min-height: 52px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 20px; transition: transform .22s cubic-bezier(.22,1,.36,1), background .2s ease, box-shadow .2s ease; }
-.button:hover { transform: translateY(-2px); }
-.button:active { transform: translateY(0) scale(.98); }
+.button { min-height: 52px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 20px; cursor: pointer; transition: transform .22s cubic-bezier(.22,1,.36,1), background-color .2s ease, color .2s ease, box-shadow .22s ease; }
+.button:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.14); }
+.button:active { transform: translateY(0) scale(.98); box-shadow: 0 3px 10px rgba(0,0,0,.1); }
 .button .arrow-icon { transition: transform .22s cubic-bezier(.22,1,.36,1); }
 .button:hover .arrow-icon { transform: translate(3px, -3px); }
 .button-dark { background: var(--black); color: var(--white); }

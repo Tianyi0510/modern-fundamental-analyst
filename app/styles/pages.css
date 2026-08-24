@@ -64,10 +64,12 @@
 .portfolio-table-detailed .table-head span:not(:first-child),
 .portfolio-table-detailed .portfolio-row > span:not(:first-child) { text-align: right; }
 .table-head { min-height: 54px; color: rgba(0,0,0,.62); }
-.sort-button { width: 100%; padding: 10px 0; border: 0; background: transparent; color: inherit; display: inline-flex; align-items: center; justify-content: inherit; gap: 6px; font: inherit; letter-spacing: inherit; text-transform: inherit; white-space: nowrap; cursor: pointer; transition: color .18s ease; }
+.sort-button { width: 100%; padding: 10px 0; border: 0; background: transparent; color: inherit; display: inline-flex; align-items: center; justify-content: inherit; gap: 6px; font: inherit; letter-spacing: inherit; text-transform: inherit; white-space: nowrap; cursor: pointer; transition: color .18s ease, transform .2s cubic-bezier(.22,1,.36,1); }
 .table-head span:not(:first-child) .sort-button { justify-content: flex-end; }
 .sort-button:hover, .sort-button.is-active { color: var(--deep-blue); }
-.sort-button svg { width: 13px; height: 13px; flex: none; }
+.sort-button:active { transform: scale(.98); }
+.sort-button svg { width: 13px; height: 13px; flex: none; transition: transform .2s cubic-bezier(.22,1,.36,1); }
+.sort-button:hover svg { transform: translateY(-1px); }
 .portfolio-mobile-sort { display: none; }
 .table-head span:last-child { text-align: right; }
 .portfolio-row { min-height: 94px; border-top: 1px solid var(--gray); transition: background .18s ease; }
@@ -115,10 +117,10 @@
 .return-row strong { font-variant-numeric: tabular-nums; }
 .return-row span:nth-child(3) { color: rgba(0,0,0,.62); line-height: 1.45; }
 .methodology { padding: var(--space-section) 0; display: grid; grid-template-columns: .7fr 1.3fr; gap: 80px; }
-.methodology div { color: rgba(0,0,0,.62); }
+.methodology div { color: var(--black); }
 .methodology div p:first-child { margin-top: 0; }
 .methodology-content > p { max-width: 760px; }
-.methodology-source { margin-top: var(--space-related-content); padding: 30px; border-left: 4px solid var(--deep-blue); background: var(--white); color: rgba(0,0,0,.68); }
+.methodology-source { margin-top: var(--space-related-content); padding: 30px; border-left: 4px solid var(--deep-blue); background: var(--white); color: var(--black); }
 .methodology-source p { margin: 0; }
 .methodology-source p + p { margin-top: 18px; }
 .methodology-source p:first-child { color: var(--black); }
