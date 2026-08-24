@@ -28,14 +28,28 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
     .map(({ id }) => id)
     .filter((id) => languageSegmentIds.has(id)) ?? [];
 
-  if (!currentLanguageIds.includes(targetId)) {
-    const added = await resend.contacts.segments.add({ email, segmentId: targetId });
-    if (added.error) throw new Error(`Unable to add preferred language segment: ${added.error.name}`);
-  }
-
+  const targetWasAdded = !currentLanguageIds.includes(targetId);
+  let targetAdded = false;
   const previousLanguageIds = currentLanguageIds.filter((segmentId) => segmentId !== targetId);
-  await Promise.all(previousLanguageIds.map(async (segmentId) => {
-    const removed = await resend.contacts.segments.remove({ email, segmentId });
-    if (removed.error) throw new Error(`Unable to remove previous language segment: ${removed.error.name}`);
-  }));
+  const removedLanguageIds: string[] = [];
+
+  try {
+    if (targetWasAdded) {
+      const added = await resend.contacts.segments.add({ email, segmentId: targetId });
+      if (added.error) throw new Error(`Unable to add preferred language segment: ${added.error.name}`);
+      targetAdded = true;
+    }
+
+    for (const segmentId of previousLanguageIds) {
+      const removed = await resend.contacts.segments.remove({ email, segmentId });
+      if (removed.error) throw new Error(`Unable to remove previous language segment: ${removed.error.name}`);
+      removedLanguageIds.push(segmentId);
+    }
+  } catch (error) {
+    await Promise.allSettled([
+      ...removedLanguageIds.map((segmentId) => resend.contacts.segments.add({ email, segmentId })),
+      ...(targetAdded ? [resend.contacts.segments.remove({ email, segmentId: targetId })] : []),
+    ]);
+    throw error;
+  }
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { cleanSingleLine, cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
-import { CONTACT_FROM_EMAIL, getResendClient } from "@/lib/resend";
+import { cleanSingleLine, cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { CONTACT_FROM_EMAIL, getResendClient, runResendOperation } from "@/lib/resend";
 
 export const runtime = "nodejs";
 
@@ -34,12 +34,9 @@ export async function POST(request: Request) {
   }
   let body: ContactRequest;
   try {
-    const payload = await readLimitedJson(request, 20_000);
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("Invalid payload");
-    body = payload as ContactRequest;
+    body = await readObjectJson<ContactRequest>(request, 20_000);
   } catch (error) {
-    const status = error instanceof RequestBodyError ? error.status : 400;
-    const message = error instanceof RequestBodyError ? error.message : "Invalid request.";
+    const { message, status } = getRequestErrorDetails(error);
     return NextResponse.json({ error: message }, { status });
   }
 
@@ -65,17 +62,17 @@ export async function POST(request: Request) {
   const safeEmail = escapeHtml(email);
   const safeSubject = escapeHtml(subject);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
-  const { error } = await resend.emails.send({
+  const result = await runResendOperation("Resend contact delivery request failed", () => resend.emails.send({
     from: CONTACT_FROM_EMAIL,
     to: recipient,
     replyTo: email,
     subject: `[MFA Contact] ${subject}`,
     text: `Name: ${name}\nEmail: ${email}\nLanguage: ${locale || "unknown"}\nSubject: ${subject}\n\n${message}`,
     html: `<h1>New website message</h1><p><strong>Name:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><p><strong>Language:</strong> ${escapeHtml(locale || "unknown")}</p><p><strong>Subject:</strong> ${safeSubject}</p><hr /><p>${safeMessage}</p>`,
-  });
+  }));
 
-  if (error) {
-    console.error("Resend contact delivery failed", error.name);
+  if (!result || result.error) {
+    if (result?.error) console.error("Resend contact delivery failed", result.error.name);
     return NextResponse.json({ error: "Message could not be sent." }, { status: 502 });
   }
 

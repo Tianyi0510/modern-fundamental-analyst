@@ -1,4 +1,4 @@
-import { createHash, createHmac } from "node:crypto";
+import { createHmac, randomBytes } from "node:crypto";
 import { getRedisClient, logRedisError } from "@/lib/redis";
 
 export class RequestBodyError extends Error {
@@ -9,6 +9,12 @@ export class RequestBodyError extends Error {
     this.name = "RequestBodyError";
     this.status = status;
   }
+}
+
+export function getRequestErrorDetails(error: unknown) {
+  return error instanceof RequestBodyError
+    ? { message: error.message, status: error.status }
+    : { message: "Invalid request.", status: 400 as const };
 }
 
 export function cleanText(value: unknown, maxLength: number) {
@@ -84,6 +90,14 @@ export async function readLimitedJson(request: Request, maxBytes: number): Promi
   }
 }
 
+export async function readObjectJson<T extends object>(request: Request, maxBytes: number): Promise<T> {
+  const payload = await readLimitedJson(request, maxBytes);
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new RequestBodyError("Invalid request.", 400);
+  }
+  return payload as T;
+}
+
 type RateLimiterOptions = {
   windowMs: number;
   maxRequests: number;
@@ -95,6 +109,7 @@ type RedisRateLimiterOptions = RateLimiterOptions & {
 };
 
 const RATE_LIMIT_KEY_PREFIX = "mfa:rate-limit:v1";
+const fallbackRateLimitSecret = randomBytes(32);
 
 function getRequestIdentifier(request: Request) {
   const clientKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
@@ -103,14 +118,13 @@ function getRequestIdentifier(request: Request) {
 
   const secret = process.env.RATE_LIMIT_HASH_SECRET
     || process.env.SUBSCRIPTION_PREFERENCES_SECRET
-    || process.env.RESEND_API_KEY;
-  return secret
-    ? createHmac("sha256", secret).update(`rate-limit:${clientKey}`).digest("hex")
-    : createHash("sha256").update(clientKey).digest("hex");
+    || process.env.RESEND_API_KEY
+    || fallbackRateLimitSecret;
+  return createHmac("sha256", secret).update(`rate-limit:${clientKey}`).digest("hex");
 }
 
 export function createMemoryRateLimiter({ windowMs, maxRequests, maxKeys = 1000 }: RateLimiterOptions) {
-  const requests = new Map<string, number[]>();
+  const requests = new Map<string, { count: number; expiresAt: number }>();
 
   return (request: Request) => {
     const key = getRequestIdentifier(request);
@@ -120,18 +134,20 @@ export function createMemoryRateLimiter({ windowMs, maxRequests, maxKeys = 1000 
     if (!key) return false;
 
     const now = Date.now();
-    const recent = (requests.get(key) ?? []).filter((timestamp) => now - timestamp < windowMs);
-    recent.push(now);
-    requests.set(key, recent);
+    const current = requests.get(key);
+    const window = current && current.expiresAt > now
+      ? { count: current.count + 1, expiresAt: current.expiresAt }
+      : { count: 1, expiresAt: now + windowMs };
+    requests.set(key, window);
 
     if (requests.size > maxKeys) {
-      for (const [storedKey, timestamps] of requests) {
-        if (!timestamps.some((timestamp) => now - timestamp < windowMs)) requests.delete(storedKey);
+      for (const [storedKey, entry] of requests) {
+        if (entry.expiresAt <= now) requests.delete(storedKey);
       }
       while (requests.size > maxKeys) requests.delete(requests.keys().next().value as string);
     }
 
-    return recent.length > maxRequests;
+    return window.count > maxRequests;
   };
 }
 

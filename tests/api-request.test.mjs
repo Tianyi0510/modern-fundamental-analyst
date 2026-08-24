@@ -14,9 +14,11 @@ registerHooks({
 const {
   cleanSingleLine,
   createMemoryRateLimiter,
+  getRequestErrorDetails,
   isSameOrigin,
   isValidEmail,
   readLimitedJson,
+  readObjectJson,
   RequestBodyError,
 } = await import("../lib/api-request.ts");
 
@@ -53,6 +55,26 @@ test("limited JSON reader checks streamed bytes without relying on Content-Lengt
   );
 });
 
+test("object JSON reader rejects arrays and scalar payloads", async () => {
+  for (const body of ["[]", '"value"', "null"]) {
+    await assert.rejects(
+      readObjectJson(new Request("https://example.com/api", { method: "POST", body }), 100),
+      (error) => error instanceof RequestBodyError && error.status === 400,
+    );
+  }
+});
+
+test("request errors are normalized to stable API details", () => {
+  assert.deepEqual(getRequestErrorDetails(new RequestBodyError("Request is too large.", 413)), {
+    message: "Request is too large.",
+    status: 413,
+  });
+  assert.deepEqual(getRequestErrorDetails(new TypeError("private details")), {
+    message: "Invalid request.",
+    status: 400,
+  });
+});
+
 test("memory limiter isolates client keys and does not group missing IPs", () => {
   const limit = createMemoryRateLimiter({ windowMs: 60_000, maxRequests: 1, maxKeys: 2 });
   const from = (ip) => new Request("https://example.com/api", { headers: ip ? { "x-forwarded-for": ip } : {} });
@@ -62,4 +84,23 @@ test("memory limiter isolates client keys and does not group missing IPs", () =>
   assert.equal(limit(from("192.0.2.2")), false);
   assert.equal(limit(from()), false);
   assert.equal(limit(from()), false);
+});
+
+test("memory limiter uses bounded fixed-window counters", () => {
+  const originalNow = Date.now;
+  let now = 1_000;
+  Date.now = () => now;
+
+  try {
+    const limit = createMemoryRateLimiter({ windowMs: 100, maxRequests: 2 });
+    const request = new Request("https://example.com/api", { headers: { "x-forwarded-for": "192.0.2.10" } });
+    assert.equal(limit(request), false);
+    now = 1_099;
+    assert.equal(limit(request), false);
+    assert.equal(limit(request), true);
+    now = 1_100;
+    assert.equal(limit(request), false);
+  } finally {
+    Date.now = originalNow;
+  }
 });

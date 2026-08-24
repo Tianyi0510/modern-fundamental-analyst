@@ -30,8 +30,12 @@ test("Redis errors are throttled independently by category", async () => {
 test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {
   const requestHelpers = await read("lib/api-request.ts");
 
+  assert.match(requestHelpers, /fallbackRateLimitSecret = randomBytes\(32\)/);
   assert.match(requestHelpers, /createHmac\("sha256", secret\)/);
+  assert.doesNotMatch(requestHelpers, /createHash/);
   assert.match(requestHelpers, /redis\.eval\(rateLimitScript/);
   assert.match(requestHelpers, /mfa:rate-limit:v1/);
   assert.match(requestHelpers, /return memoryFallback\(request\)/);
+  assert.match(requestHelpers, /count: current\.count \+ 1/);
+  assert.doesNotMatch(requestHelpers, /number\[\]/);
 });

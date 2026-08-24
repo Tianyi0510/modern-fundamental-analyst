@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { cleanText, createRateLimiter, isSameOrigin, readLimitedJson, RequestBodyError } from "@/lib/api-request";
+import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, readObjectJson } from "@/lib/api-request";
 import { localeConfig, resolveLocale } from "@/lib/i18n";
-import { getResendClient } from "@/lib/resend";
+import { getResendClient, runResendOperation } from "@/lib/resend";
 import { getLocaleFromPreferredLanguage, syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { readPreferenceToken } from "@/lib/subscription-preferences";
 
@@ -21,12 +21,10 @@ export async function POST(request: Request) {
 
   let body: PreferenceRequest;
   try {
-    const payload = await readLimitedJson(request, 5_000);
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("Invalid payload");
-    body = payload as PreferenceRequest;
+    body = await readObjectJson<PreferenceRequest>(request, 5_000);
   } catch (error) {
-    const status = error instanceof RequestBodyError ? error.status : 400;
-    return NextResponse.json({ error: error instanceof RequestBodyError ? error.message : "Invalid request." }, { status });
+    const { message, status } = getRequestErrorDetails(error);
+    return NextResponse.json({ error: message }, { status });
   }
 
   const action = cleanText(body.action, 20);
@@ -41,7 +39,8 @@ export async function POST(request: Request) {
   const resend = getResendClient();
   if (!resend) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
 
-  const existing = await resend.contacts.get({ email: payload.email });
+  const existing = await runResendOperation("Resend preferences contact lookup failed", () => resend.contacts.get({ email: payload.email }));
+  if (!existing) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
   if (!existing.data) return NextResponse.json({ error: "Subscription preferences could not be found." }, { status: 404 });
 
   if (action === "save") {
@@ -53,19 +52,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
     }
 
-    const result = await resend.contacts.update({
+    const result = await runResendOperation("Resend preferences update request failed", () => resend.contacts.update({
       email: payload.email,
       properties: { preferred_language: localeConfig[locale].label },
-    });
-    if (result.error) {
+    }));
+    if (!result || result.error) {
       await syncPreferredLanguageSegment(resend, payload.email, previousLocale).catch(() => undefined);
-      console.error("Resend preferences update failed", result.error.name);
+      if (result?.error) console.error("Resend preferences update failed", result.error.name);
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
     }
   } else {
-    const result = await resend.contacts.update({ email: payload.email, unsubscribed: true });
-    if (result.error) {
-      console.error("Resend preferences update failed", result.error.name);
+    const result = await runResendOperation("Resend unsubscribe request failed", () => resend.contacts.update({ email: payload.email, unsubscribed: true }));
+    if (!result || result.error) {
+      if (result?.error) console.error("Resend preferences update failed", result.error.name);
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
     }
   }

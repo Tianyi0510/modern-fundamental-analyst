@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getLatestMemo } from "@/data/memos";
-import { cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
+import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
 import { localeConfig, resolveLocale } from "@/lib/i18n";
-import { getResendClient } from "@/lib/resend";
+import { getResendClient, runResendOperation } from "@/lib/resend";
 import { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
@@ -23,12 +23,9 @@ export async function POST(request: Request) {
 
   let body: SubscribeRequest;
   try {
-    const payload = await readLimitedJson(request, 5_000);
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("Invalid payload");
-    body = payload as SubscribeRequest;
+    body = await readObjectJson<SubscribeRequest>(request, 5_000);
   } catch (error) {
-    const status = error instanceof RequestBodyError ? error.status : 400;
-    const message = error instanceof RequestBodyError ? error.message : "Invalid request.";
+    const { message, status } = getRequestErrorDetails(error);
     return NextResponse.json({ error: message }, { status });
   }
 
@@ -44,7 +41,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
   }
 
-  const existing = await resend.contacts.get({ email });
+  const existing = await runResendOperation("Resend contact lookup failed", () => resend.contacts.get({ email }));
+  if (!existing) return NextResponse.json({ error: "Subscription could not be completed." }, { status: 502 });
   const shouldSendWelcome = !existing.data || existing.data.unsubscribed;
   const properties = { preferred_language: localeConfig[locale].label };
   let result;
@@ -55,20 +53,20 @@ export async function POST(request: Request) {
       console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
       return NextResponse.json({ error: "Subscription could not be completed." }, { status: 502 });
     }
-    result = await resend.contacts.update({ id: existing.data.id, unsubscribed: false, properties });
+    result = await runResendOperation("Resend contact update failed", () => resend.contacts.update({ id: existing.data.id, unsubscribed: false, properties }));
   } else if (existing.error?.statusCode === 404) {
-    result = await resend.contacts.create({
+    result = await runResendOperation("Resend contact creation failed", () => resend.contacts.create({
       email,
       unsubscribed: false,
       properties,
       segments: [{ id: getPreferredLanguageSegmentId(locale) }],
-    });
+    }));
   } else {
     result = existing;
   }
 
-  if (result.error) {
-    console.error("Resend subscription failed", result.error.name);
+  if (!result || result.error) {
+    if (result?.error) console.error("Resend subscription failed", result.error.name);
     return NextResponse.json({ error: "Subscription could not be completed." }, { status: 502 });
   }
 
@@ -76,13 +74,13 @@ export async function POST(request: Request) {
     const latestMemo = getLatestMemo(locale);
     if (!latestMemo) {
       const contactId = result.data?.id ?? existing.data?.id;
-      if (contactId) await resend.contacts.update({ id: contactId, unsubscribed: true });
+      if (contactId) await runResendOperation("Resend subscription rollback failed", () => resend.contacts.update({ id: contactId, unsubscribed: true }));
       console.error("Welcome automation requires at least one investment memo.");
       return NextResponse.json({ error: "Subscription could not be completed." }, { status: 503 });
     }
     const prefix = localeConfig[locale].prefix;
     const preferencesUrl = createPreferenceUrl(email, locale);
-    const welcome = await resend.events.send({
+    const welcome = await runResendOperation("Resend welcome automation request failed", () => resend.events.send({
       event: "subscriber.created",
       email,
       payload: {
@@ -92,12 +90,12 @@ export async function POST(request: Request) {
         memo_url: `${SITE_URL}${prefix}/memos/${latestMemo.slug}`,
         preferences_url: preferencesUrl,
       },
-    });
+    }));
 
-    if (welcome.error) {
+    if (!welcome || welcome.error) {
       const contactId = result.data?.id ?? existing.data?.id;
-      if (contactId) await resend.contacts.update({ id: contactId, unsubscribed: true });
-      console.error("Resend welcome automation failed", welcome.error.name);
+      if (contactId) await runResendOperation("Resend subscription rollback failed", () => resend.contacts.update({ id: contactId, unsubscribed: true }));
+      if (welcome?.error) console.error("Resend welcome automation failed", welcome.error.name);
       return NextResponse.json({ error: "Subscription could not be completed." }, { status: 502 });
     }
   }

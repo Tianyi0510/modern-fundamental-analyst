@@ -104,6 +104,8 @@ Investment memo metadata is maintained in `data/memos.ts`, while article content
 
 Resend handles contact delivery, subscribers, segments, templates, automations, and broadcasts. New subscriptions store a preferred-language property, synchronize the corresponding language segment, and trigger a localized welcome event containing the latest memo.
 
+One Resend client is reused per runtime instance and recreated automatically if its API key changes. Provider calls pass through a shared exception boundary so transient network failures return controlled API responses without exposing contact data. Preferred-language segment changes use best-effort compensation: if a multi-step update fails, successfully removed language segments are restored and a newly added target segment is removed.
+
 Subscribers can request a short-lived secure link to update their preferred language or unsubscribe. Preference links use authenticated AES-256-GCM encryption and a dedicated server-side secret. A migration fallback preserves links created before that secret was introduced.
 
 ## Redis Rate Limiting
@@ -114,8 +116,9 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 - Connection and socket timeouts fail quickly, the offline queue is disabled, and reconnect attempts are bounded.
 - Failed connections open a 30-second circuit breaker so an outage does not trigger a fresh authentication attempt on every request.
 - A Lua script performs `INCR` and `PEXPIRE` atomically for each fixed rate-limit window.
+- The process-local fallback mirrors the same fixed-window model with one bounded counter and expiry timestamp per client instead of retaining one timestamp per request.
 - Keys follow the versioned `mfa:rate-limit:v1:{namespace}:{digest}` convention.
-- Client identifiers use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback.
+- Client identifiers always use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback. If no configured secret is available locally, the runtime generates an ephemeral HMAC key instead of using a predictable unkeyed hash.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
 - Repeated connection errors are log-throttled by error category to keep Vercel logs useful during an outage without hiding unrelated failures.
 - `rediss://` is required by default in production. If the provider exposes only `redis://`, the non-TLS connection must be explicitly acknowledged with `REDIS_ALLOW_INSECURE=true`; production then emits a warning without logging the endpoint or credentials.
@@ -175,7 +178,7 @@ GitHub Actions runs the same verification for every pull request and every push 
 
 Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
 
-Tests are grouped by responsibility: behavioral API, email, and preference tests live in focused files; Redis connection and rate-limit architecture checks live in `tests/redis-config.test.mjs`; broader cross-page and design-system invariants remain in `tests/repository.test.mjs`.
+Tests are grouped by responsibility: behavioral API, email, preference, and Resend segment-compensation tests live in focused files; Redis connection and rate-limit architecture checks live in `tests/redis-config.test.mjs`; broader cross-page and design-system invariants remain in `tests/repository.test.mjs`.
 
 ## Deployment
 

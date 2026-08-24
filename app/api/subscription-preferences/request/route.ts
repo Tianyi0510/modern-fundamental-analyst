@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
+import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
 import { renderPreferenceEmail, type PreferenceEmailCopy } from "@/lib/email-template";
 import { resolveLocale, type Locale } from "@/lib/i18n";
-import { getResendClient, UPDATES_FROM_EMAIL } from "@/lib/resend";
+import { getResendClient, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 
 export const runtime = "nodejs";
@@ -20,12 +20,10 @@ export async function POST(request: Request) {
 
   let body: { email?: unknown; locale?: unknown };
   try {
-    const payload = await readLimitedJson(request, 5_000);
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("Invalid payload");
-    body = payload;
+    body = await readObjectJson(request, 5_000);
   } catch (error) {
-    const status = error instanceof RequestBodyError ? error.status : 400;
-    return NextResponse.json({ error: error instanceof RequestBodyError ? error.message : "Invalid request." }, { status });
+    const { message, status } = getRequestErrorDetails(error);
+    return NextResponse.json({ error: message }, { status });
   }
 
   const email = cleanText(body.email, 254).toLowerCase();
@@ -35,19 +33,19 @@ export async function POST(request: Request) {
   const resend = getResendClient();
   if (!resend) return NextResponse.json({ error: "Email service is temporarily unavailable." }, { status: 503 });
 
-  const existing = await resend.contacts.get({ email });
-  if (existing.data) {
+  const existing = await runResendOperation("Preference link contact lookup failed", () => resend.contacts.get({ email }));
+  if (existing?.data) {
     const text = mailCopy[locale];
     const preferencesUrl = createPreferenceUrl(email, locale, 30 * 60 * 1000);
-    const result = await resend.emails.send({
+    const result = await runResendOperation("Preference link email request failed", () => resend.emails.send({
       from: UPDATES_FROM_EMAIL,
       to: email,
       subject: text.subject,
       text: `${text.heading}\n\n${text.body}\n\n${preferencesUrl}\n\n${text.note}`,
       html: renderPreferenceEmail(text, preferencesUrl),
-    });
-    if (result.error) console.error("Preference link email failed", result.error.name);
-  } else if (existing.error?.statusCode !== 404) {
+    }));
+    if (result?.error) console.error("Preference link email failed", result.error.name);
+  } else if (existing && existing.error?.statusCode !== 404) {
     console.error("Preference link contact lookup failed", existing.error?.name ?? "UnknownError");
   }
 
