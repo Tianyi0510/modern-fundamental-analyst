@@ -24,6 +24,20 @@ const styleModules = [
 ];
 const readStyles = async () => (await Promise.all(styleModules.map(read))).join("\n");
 
+test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {
+  const [requestHelpers, redis] = await Promise.all([read("lib/api-request.ts"), read("lib/redis.ts")]);
+
+  assert.match(redis, /connectTimeout: CONNECT_TIMEOUT_MS/);
+  assert.match(redis, /socketTimeout: SOCKET_TIMEOUT_MS/);
+  assert.match(redis, /disableOfflineQueue: true/);
+  assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
+  assert.match(redis, /process\.env\.REDIS_URL/);
+  assert.match(requestHelpers, /createHash\("sha256"\)\.update\(clientKey\)/);
+  assert.match(requestHelpers, /redis\.eval\(rateLimitScript/);
+  assert.match(requestHelpers, /rate-limit:\$\{namespace\}:\$\{digest\}/);
+  assert.match(requestHelpers, /return memoryFallback\(request\)/);
+});
+
 test("SEO routes use the production site URL instead of localhost", async () => {
   const [config, sitemap, robots] = await Promise.all([
     read("lib/site-config.ts"),
@@ -323,7 +337,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.doesNotMatch(client, /RESEND_API_KEY/);
 });
 
-test("subscribe form keeps localized copy on the server and stores signups in Resend Contacts", async () => {
+test("subscribe form stores contacts and triggers a localized welcome automation", async () => {
   const [page, form, client, styles, route, footer] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/subscribe-form.tsx"),
@@ -346,11 +360,43 @@ test("subscribe form keeps localized copy on the server and stores signups in Re
   assert.match(route, /resend\.contacts\.update/);
   assert.match(route, /resend\.contacts\.get/);
   assert.match(route, /unsubscribed:\s*false/);
-  assert.doesNotMatch(route, /properties:/);
+  assert.match(route, /preferred_language: localeConfig\[locale\]\.label/);
+  assert.match(route, /resend\.events\.send/);
+  assert.match(route, /event:\s*"subscriber\.created"/);
+  assert.match(route, /shouldSendWelcome = !existing\.data \|\| existing\.data\.unsubscribed/);
+  assert.match(route, /memo_title:\s*latestMemo\.title/);
+  assert.match(route, /memo_summary:\s*latestMemo\.summary/);
+  assert.match(route, /memo_url:\s*`\$\{SITE_URL\}\$\{prefix\}\/memos\/\$\{latestMemo\.slug\}`/);
+  assert.match(route, /preferences_url: preferencesUrl/);
+  assert.doesNotMatch(route, /ok: true, preferencesUrl/);
+  assert.match(route, /unsubscribed:\s*true/);
+  assert.match(form, /secure preferences link/);
+  assert.match(form, /安全偏好設定連結/);
+  assert.match(form, /安全偏好设置链接/);
   assert.match(route, /isSameOrigin/);
-  assert.match(route, /isRateLimited/);
+  assert.match(route, /await isRateLimited\(request\)/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
   assert.match(footer, /SubscribeForm locale=\{locale\}/);
+});
+
+test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
+  const [tokens, route, page, form] = await Promise.all([
+    read("lib/subscription-preferences.ts"),
+    read("app/api/subscription-preferences/route.ts"),
+    read("components/subscription-preferences-page.tsx"),
+    read("components/subscription-preferences-form.tsx"),
+  ]);
+
+  assert.match(tokens, /createCipheriv\("aes-256-gcm"/);
+  assert.match(tokens, /payload\.expiresAt <= Date\.now\(\)/);
+  assert.match(tokens, /process\.env\.RESEND_API_KEY/);
+  assert.match(route, /readPreferenceToken\(token\)/);
+  assert.match(route, /preferred_language: localeConfig\[locale\]\.label/);
+  assert.match(route, /unsubscribed: true/);
+  assert.match(route, /await isRateLimited\(request\)/);
+  assert.match(page, /maskEmail\(payload\.email\)/);
+  assert.match(page, /Save Preferences/);
+  assert.doesNotMatch(form, /RESEND_API_KEY/);
 });
 
 test("all about locales use one shared page structure", async () => {

@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import { getRedisClient } from "@/lib/redis";
+
 export class RequestBodyError extends Error {
   readonly status: 400 | 413;
 
@@ -87,12 +90,20 @@ type RateLimiterOptions = {
   maxKeys?: number;
 };
 
+type RedisRateLimiterOptions = RateLimiterOptions & {
+  namespace: string;
+};
+
+function getRequestKey(request: Request) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || request.headers.get("x-real-ip")?.trim();
+}
+
 export function createMemoryRateLimiter({ windowMs, maxRequests, maxKeys = 1000 }: RateLimiterOptions) {
   const requests = new Map<string, number[]>();
 
   return (request: Request) => {
-    const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-    const key = forwarded || request.headers.get("x-real-ip")?.trim();
+    const key = getRequestKey(request);
 
     // Vercel supplies a client IP. If a different runtime does not, avoid
     // grouping every visitor into one shared bucket.
@@ -111,5 +122,37 @@ export function createMemoryRateLimiter({ windowMs, maxRequests, maxKeys = 1000 
     }
 
     return recent.length > maxRequests;
+  };
+}
+
+const rateLimitScript = `
+local count = redis.call("INCR", KEYS[1])
+if count == 1 then
+  redis.call("PEXPIRE", KEYS[1], ARGV[1])
+end
+return count
+`;
+
+export function createRateLimiter({ namespace, windowMs, maxRequests, maxKeys }: RedisRateLimiterOptions) {
+  const memoryFallback = createMemoryRateLimiter({ windowMs, maxRequests, maxKeys });
+
+  return async (request: Request) => {
+    const clientKey = getRequestKey(request);
+    if (!clientKey) return false;
+
+    try {
+      const redis = await getRedisClient();
+      if (!redis) return memoryFallback(request);
+
+      const digest = createHash("sha256").update(clientKey).digest("hex");
+      const count = await redis.eval(rateLimitScript, {
+        keys: [`rate-limit:${namespace}:${digest}`],
+        arguments: [String(windowMs)],
+      });
+      return Number(count) > maxRequests;
+    } catch (error) {
+      console.error("Redis rate limiter unavailable", error instanceof Error ? error.name : "UnknownError");
+      return memoryFallback(request);
+    }
   };
 }
