@@ -109,12 +109,34 @@ textarea.control {
   border: 0;
   cursor: pointer;
   font: inherit;
+  font-size: var(--type-button);
+  font-weight: var(--weight-bold);
+  transform-origin: center;
+  transition: transform .2s cubic-bezier(0,.5,.5,1), background-color .2s cubic-bezier(0,.5,.5,1), color .2s cubic-bezier(0,.5,.5,1);
+}
+
+.section .submit:hover:not(:disabled) {
+  background: var(--deep-blue);
+  color: var(--white);
+  transform: scale(1.04);
+  box-shadow: none;
+}
+
+.section .submit:active:not(:disabled) {
+  transform: scale(.985);
+  box-shadow: none;
 }
 
 .submit:disabled {
   cursor: wait;
   opacity: .64;
   transform: none;
+}
+
+.submit:disabled:hover {
+  background: var(--black);
+  color: var(--white);
+  box-shadow: none;
 }
 
 .status {
@@ -169,5 +191,11 @@ textarea.control {
 
   .submit {
     width: 100%;
+  }
+}
+
+@media (hover: none) {
+  .section .submit:hover:not(:disabled) {
+    transform: none;
   }
 }

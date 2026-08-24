@@ -219,7 +219,7 @@ test("all home locales use one shared page structure", async () => {
   assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(210px, 100%\)/s);
   assert.match(styles, /\.allocation-ring::before\s*\{[^}]*inset:\s*15%/s);
   assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
-  assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--interactive-accent\); \}/);
+  assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--deep-blue\); \}/);
   assert.match(styles, /\.allocation-card > a:hover \.arrow-icon \{ transform: translateX\(4px\); \}/);
 });
 
