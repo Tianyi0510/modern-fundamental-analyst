@@ -138,7 +138,9 @@ REDIS_ALLOW_INSECURE=false
 RATE_LIMIT_HASH_SECRET=
 ```
 
-`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, and `RATE_LIMIT_HASH_SECRET` are configured as Sensitive variables in Vercel Production and Preview. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+Production is the only Vercel environment with Resend, contact-delivery, subscription-preference, and shared rate-limit credentials. Preview intentionally has no server-side service credentials, so branch and pull-request deployments can review the interface without sending email, changing the production audience, or accessing production Redis. Development uses uncommitted local `.env.local` values when service integration testing is explicitly needed.
+
+`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, `REDIS_URL`, and `RATE_LIMIT_HASH_SECRET` are configured as Sensitive Production variables. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
 
 Keep `REDIS_ALLOW_INSECURE=false` whenever TLS is available. For a provider-issued non-TLS endpoint, set it to `true` only in the environments that use that endpoint. This acknowledgement does not encrypt traffic; migrate back to `rediss://` as soon as the provider exposes TLS.
 
