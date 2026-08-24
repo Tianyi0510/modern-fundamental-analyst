@@ -68,8 +68,8 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .year-bar small { color: rgba(0,0,0,.68); }
 .performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
 .performance-home .inverse .section-number { color: rgba(0,0,0,.62); }
-.performance-home .button-white { background: var(--black); color: var(--white); }
-.performance-home .button-white:hover { background: var(--deep-blue); color: var(--bright-blue); }
+.home-page .hero .button-dark, .performance-home .button-white { background: var(--black); color: var(--white); }
+.home-page .hero .button-dark:hover, .performance-home .button-white:hover { background: var(--deep-blue); color: var(--bright-blue); }
 
 /* Three-card KPI sequence: Bright Blue, Deep Blue, White. */
 .home-page .metric-band > .metric:nth-child(1),

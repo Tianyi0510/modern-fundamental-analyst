@@ -37,9 +37,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <p>{text.heroIntro}</p>
             <div className="hero-actions">
               <Link className="button button-dark" href={`${prefix}/portfolio`}>
-                {text.viewPortfolio} <span className="arrow-icon" aria-hidden="true">↗︎</span>
+                {text.viewPortfolio}
               </Link>
-              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest} →</Link>
+              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest} <span className="arrow-icon" aria-hidden="true">→</span></Link>
             </div>
           </div>
         </section>
@@ -69,7 +69,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
         <div>
           <p>{text.aboutCopy}</p>
-          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink} →</Link>
+          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink} <span className="arrow-icon" aria-hidden="true">→</span></Link>
         </div>
       </section>
 
@@ -148,7 +148,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 {text.verified} {portfolioDate}{locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} · {text.updatedMonthly}{locale === "en" ? "." : "。"}
               </small>
               <Link className="button button-white" href={`${prefix}/performance`}>
-                {text.viewPerformance} <span className="arrow-icon" aria-hidden="true">↗︎</span>
+                {text.viewPerformance}
               </Link>
             </div>
           </div>
@@ -170,14 +170,14 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             </Link>
           ))}
         </div>
-        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos} →</Link>
+        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos} <span className="arrow-icon" aria-hidden="true">→</span></Link>
       </section>
 
       <section className="cta shell">
         <p className="eyebrow"><span /> {text.contactLabel}</p>
         <h2>{text.contactTitle[0]}<br />{text.contactTitle[1]}</h2>
         <Link className="button button-dark" href={`${prefix}/contact`}>
-          {text.contactLink} <span className="arrow-icon" aria-hidden="true">↗︎</span>
+          {text.contactLink}
         </Link>
       </section>
       <SiteFooter locale={locale} />

@@ -51,6 +51,14 @@
 .hero-actions { display: flex; align-items: center; justify-content: flex-end; gap: 28px; }
 .text-link { border-bottom: 1px solid currentColor; padding-bottom: 4px; transition: color .2s ease, border-color .2s ease; }
 .text-link:hover { color: var(--medium-blue); }
+.home-page .text-link { display: inline-flex; align-items: center; gap: 8px; padding: 8px 2px; border-bottom: 0; transition: color .2s ease, transform .22s cubic-bezier(.22,1,.36,1); }
+.home-page .text-link:hover { color: var(--medium-blue); transform: translateX(4px); }
+.home-page .text-link:active { transform: translateX(2px) scale(.98); }
+.home-page .text-link .arrow-icon { transition: transform .22s cubic-bezier(.22,1,.36,1); }
+.home-page .text-link:hover .arrow-icon { transform: translateX(4px); }
+.home-page .button { text-decoration: none; }
+.home-page .button:hover { transform: translateY(-3px); }
+.home-page .button:active { transform: translateY(0) scale(.98); }
 .metric-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--black); border: 1px solid var(--black); }
 .home-page .metric-band { position: relative; }
 .metric { min-height: 280px; padding: 34px; display: flex; flex-direction: column; background: var(--white); }
