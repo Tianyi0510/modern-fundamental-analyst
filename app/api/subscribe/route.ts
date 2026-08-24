@@ -3,6 +3,7 @@ import { getMemos } from "@/data/memos";
 import { cleanText, createRateLimiter, isSameOrigin, isValidEmail, readLimitedJson, RequestBodyError } from "@/lib/api-request";
 import { localeConfig, locales, type Locale } from "@/lib/i18n";
 import { getResendClient } from "@/lib/resend";
+import { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 
@@ -47,11 +48,25 @@ export async function POST(request: Request) {
   const existing = await resend.contacts.get({ email });
   const shouldSendWelcome = !existing.data || existing.data.unsubscribed;
   const properties = { preferred_language: localeConfig[locale].label };
-  const result = existing.data
-    ? await resend.contacts.update({ id: existing.data.id, unsubscribed: false, properties })
-    : existing.error?.statusCode === 404
-      ? await resend.contacts.create({ email, unsubscribed: false, properties })
-      : existing;
+  let result;
+  if (existing.data) {
+    try {
+      await syncPreferredLanguageSegment(resend, email, locale);
+    } catch (error) {
+      console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
+      return NextResponse.json({ error: "Subscription could not be completed." }, { status: 502 });
+    }
+    result = await resend.contacts.update({ id: existing.data.id, unsubscribed: false, properties });
+  } else if (existing.error?.statusCode === 404) {
+    result = await resend.contacts.create({
+      email,
+      unsubscribed: false,
+      properties,
+      segments: [{ id: getPreferredLanguageSegmentId(locale) }],
+    });
+  } else {
+    result = existing;
+  }
 
   if (result.error) {
     console.error("Resend subscription failed", result.error.name);
