@@ -357,7 +357,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
   assert.match(client, /fetch\("\/api\/subscribe"/);
-  assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
+  assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /subscribeContact\(email, locale\)/);
   assert.match(service, /resend\.contacts\.create/);
@@ -460,7 +460,7 @@ test("Jost renders Latin text and numbers before locale-specific CJK fallbacks",
   assert.match(css, /\[lang="zh-CN"\] body[^}]*--font-ui:\s*var\(--font-jost\),\s*var\(--font-noto-sans-sc\)/s);
   assert.doesNotMatch(`${fonts}\n${document}\n${css}`, /font-inter|\bInter\b|inter\.variable/);
 });
-test("editorial color roles keep the footer inverse and Medium Blue auxiliary", async () => {
+test("editorial color roles keep the footer highlighted and Medium Blue auxiliary", async () => {
   const css = await readStyles();
 
   assert.match(css, /--deep-blue:\s*#002991/);
@@ -469,7 +469,7 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /--surface-inverse:\s*var\(--black\)/);
   assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
   assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
-  assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
@@ -505,6 +505,21 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.doesNotMatch(css, /\.(?:site-header|home-opening|home-about|page-hero|about-section|about-boundaries|about-closing|portfolio-kpis|portfolio-holdings-heading|methodology|contact-grid|site-footer)\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
+});
+
+test("English hero copy uses sentence case and mobile arrows have touch motion", async () => {
+  const [typography, responsive, subscribe] = await Promise.all([
+    read("app/styles/typography.css"),
+    read("app/styles/responsive.css"),
+    read("components/subscribe-form.module.css"),
+  ]);
+
+  assert.match(typography, /\[lang="en"\] \.hero-bottom > p,[\s\S]*?\[lang="en"\] \.page-intro p,[\s\S]*?\[lang="en"\] \.contact-hero > \.contact-note\s*\{\s*text-transform:\s*none;/);
+  assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
+  assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
+  assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon,[\s\S]*?\.memo-index-row:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
+  assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--black\)/);
+  assert.match(subscribe, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--black\);[^}]*color:\s*var\(--white\)/);
 });
 
 test("page sections share one responsive vertical rhythm", async () => {

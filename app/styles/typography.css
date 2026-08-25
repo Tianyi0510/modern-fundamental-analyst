@@ -61,6 +61,12 @@
   text-transform: capitalize;
 }
 
+[lang="en"] .hero-bottom > p,
+[lang="en"] .page-intro p,
+[lang="en"] .contact-hero > .contact-note {
+  text-transform: none;
+}
+
 .performance-copy p,
 .contact-note {
   font-size: var(--type-subtitle);

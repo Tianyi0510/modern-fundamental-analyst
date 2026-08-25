@@ -105,7 +105,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .site-header nav a::after,
 .bar-value { background: var(--interactive-accent); }
 
-/* A light-blue contact band closes the homepage before the inverse footer. */
+/* Light-blue closing surfaces keep the homepage CTA and footer connected. */
 .home-page .cta {
   background: var(--surface-highlight);
   color: var(--text-primary);
@@ -115,14 +115,14 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .home-page .cta .button-dark { background: var(--black); color: var(--white); }
 .home-page .cta .button-dark:hover { background: var(--deep-blue); color: var(--white); }
 .site-footer {
-  background: var(--surface-inverse);
-  color: var(--text-inverse);
-  box-shadow: 0 0 0 100vmax var(--surface-inverse);
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 100vmax var(--surface-highlight);
   clip-path: inset(0 -100vmax);
 }
-.site-footer p { color: rgba(255,255,255,.68); }
+.site-footer p { color: rgba(0,0,0,.68); }
 .site-footer a { transition: color .2s ease; }
-.site-footer a:hover { color: var(--text-highlight); }
+.site-footer a:hover { color: var(--text-brand); }
 .site-footer .footer-mark,
-.site-footer .footer-mark:hover { color: var(--text-inverse); transition: none; }
-.site-footer .wordmark span { color: var(--interactive-accent); }
+.site-footer .footer-mark:hover { color: var(--text-primary); transition: none; }
+.site-footer .wordmark span { color: var(--text-brand); }
