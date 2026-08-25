@@ -149,7 +149,7 @@
 
 .metric strong,
 .performance-copy > strong {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-large);
   line-height: .88;
   letter-spacing: -.065em;
@@ -159,7 +159,7 @@
 
 .portfolio-page .portfolio-kpis strong,
 .performance-summary strong {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-kpi);
   line-height: .9;
   letter-spacing: -.055em;
@@ -169,7 +169,7 @@
 
 .portfolio-row strong,
 .return-row strong {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
@@ -177,7 +177,7 @@
 }
 
 .portfolio-total-row > * {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-row-bold);
   line-height: 1.25;
   font-weight: var(--weight-bold);

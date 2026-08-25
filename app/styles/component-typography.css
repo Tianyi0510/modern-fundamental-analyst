@@ -46,7 +46,7 @@
 }
 
 .holding-row b {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
@@ -55,7 +55,7 @@
 }
 
 .allocation-ring > span {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-ring);
   line-height: .9;
   font-weight: var(--weight-bold);
@@ -69,7 +69,7 @@
 }
 
 .portfolio-row:not(.portfolio-total-row) > * {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-size: var(--type-data-row);
   line-height: 1.25;
   font-weight: var(--weight-regular);
@@ -94,7 +94,7 @@
 .article-meta,
 .bar-value span,
 .holding-row > span {
-  font-family: var(--font-inter), var(--font-ui), sans-serif;
+  font-family: var(--font-ui);
   font-variant-numeric: tabular-nums;
 }
 

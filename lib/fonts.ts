@@ -1,8 +1,10 @@
-import { Inter, Noto_Sans_SC, Noto_Sans_TC } from "next/font/google";
+import { Jost, Noto_Sans_SC, Noto_Sans_TC } from "next/font/google";
 
-export const inter = Inter({
-  variable: "--font-inter",
+export const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
+  weight: "variable",
+  display: "swap",
 });
 
 export const notoSansTc = Noto_Sans_TC({

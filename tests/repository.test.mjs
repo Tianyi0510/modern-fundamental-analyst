@@ -445,6 +445,21 @@ test("typography uses semantic tokens instead of legacy responsive font clamps",
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
 
+test("Jost renders Latin text and numbers before locale-specific CJK fallbacks", async () => {
+  const [fonts, document, css] = await Promise.all([
+    read("lib/fonts.ts"),
+    read("components/site-document.tsx"),
+    readStyles(),
+  ]);
+
+  assert.match(fonts, /import \{ Jost, Noto_Sans_SC, Noto_Sans_TC \}/);
+  assert.match(fonts, /variable: "--font-jost"/);
+  assert.match(document, /jost\.variable/);
+  assert.match(css, /--font-ui:\s*var\(--font-jost\)/);
+  assert.match(css, /\[lang="zh-Hant-TW"\] body[^}]*--font-ui:\s*var\(--font-jost\),\s*var\(--font-noto-sans-tc\)/s);
+  assert.match(css, /\[lang="zh-CN"\] body[^}]*--font-ui:\s*var\(--font-jost\),\s*var\(--font-noto-sans-sc\)/s);
+  assert.doesNotMatch(`${fonts}\n${document}\n${css}`, /font-inter|\bInter\b|inter\.variable/);
+});
 test("editorial color roles keep the footer inverse and Medium Blue auxiliary", async () => {
   const css = await readStyles();
 

@@ -22,7 +22,7 @@
 .language-dropdown a:hover { padding-inline: 20px 14px; background: var(--gray); color: var(--deep-blue); }
 .language-dropdown a[aria-current="page"] { background: color-mix(in srgb, var(--bright-blue) 20%, var(--white)); color: var(--deep-blue); }
 .language-dropdown svg { width: 18px; height: 18px; color: var(--medium-blue); }
-.arrow-icon { display: inline-block; font-family: var(--font-inter), Arial, sans-serif; font-style: normal; font-variant-emoji: text; line-height: 1; }
+.arrow-icon { display: inline-block; font-family: var(--font-ui); font-style: normal; font-variant-emoji: text; line-height: 1; }
 .button { min-height: 52px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 20px; cursor: pointer; transition: transform .22s cubic-bezier(.22,1,.36,1), background-color .2s ease, color .2s ease, box-shadow .22s ease; }
 .button:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.14); }
 .button:active { transform: translateY(0) scale(.98); box-shadow: 0 3px 10px rgba(0,0,0,.1); }

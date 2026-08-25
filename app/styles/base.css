@@ -53,11 +53,11 @@
 *:focus-visible { outline: 2px solid var(--medium-blue); outline-offset: 4px; }
 html { scroll-behavior: smooth; }
 body {
-  --font-ui: var(--font-inter);
+  --font-ui: var(--font-jost), Arial, Helvetica, sans-serif;
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-ui), "PingFang TC", "Microsoft JhengHei", Arial, Helvetica, sans-serif;
+  font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -78,14 +78,14 @@ body {
 
 .skip-link:focus { transform: translateY(0); }
 
-[lang="zh-Hant-TW"] {
-  --font-ui: var(--font-noto-sans-tc);
-  font-family: var(--font-ui), "PingFang TC", "Microsoft JhengHei", sans-serif;
+[lang="zh-Hant-TW"] body {
+  --font-ui: var(--font-jost), var(--font-noto-sans-tc), "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-family: var(--font-ui);
 }
 
-[lang="zh-CN"] {
-  --font-ui: var(--font-noto-sans-sc);
-  font-family: var(--font-ui), "PingFang SC", "Microsoft YaHei", sans-serif;
+[lang="zh-CN"] body {
+  --font-ui: var(--font-jost), var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-ui);
 }
 
 a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }

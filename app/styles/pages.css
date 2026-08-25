@@ -40,7 +40,7 @@
 .about-boundaries ol { margin: var(--space-related-content) 0 0; padding: 0; list-style: none; counter-reset: boundary-item; }
 .about-boundaries li { counter-increment: boundary-item; display: grid; grid-template-columns: 42px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid rgba(0,0,0,.2); }
 .about-boundaries li:last-child { padding-bottom: 0; }
-.about-boundaries li::before { content: "0" counter(boundary-item); color: var(--medium-blue); font-family: var(--font-inter), var(--font-ui), sans-serif; font-size: var(--type-caption); line-height: 1.6; font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
+.about-boundaries li::before { content: "0" counter(boundary-item); color: var(--medium-blue); font-family: var(--font-ui); font-size: var(--type-caption); line-height: 1.6; font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
 .about-boundaries > article:last-child li::before { color: var(--deep-blue); }
 .about-closing { padding: var(--space-section) 0; display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; }
 .about-closing > .eyebrow { grid-column: 1 / -1; }
