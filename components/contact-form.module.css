@@ -194,8 +194,16 @@ textarea.control {
   }
 }
 
-@media (hover: none) {
+@media (hover: none) and (pointer: coarse) {
   .section .submit:hover:not(:disabled) {
+    background: var(--black);
+    color: var(--white);
     transform: none;
+  }
+
+  .section .submit:active:not(:disabled) {
+    background: var(--deep-blue);
+    color: var(--white);
+    transform: scale(.97);
   }
 }

@@ -19,4 +19,12 @@
   .submit { width: 100%; }
   .status { grid-column: auto; }
 }
-@media (hover: none) { .submit:hover:not(:disabled) { transform: none; } }
+@media (hover: none) and (pointer: coarse) {
+  .submit:hover:not(:disabled) {
+    border-color: var(--white); background: var(--white); color: var(--black); transform: none;
+  }
+
+  .submit:active:not(:disabled) {
+    border-color: var(--bright-blue); background: var(--bright-blue); color: var(--white); transform: scale(.97);
+  }
+}

@@ -518,10 +518,11 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
 
   assert.match(header, /aria-modal="true"/);
   assert.match(behavior, /event\.key === "Escape"/);
-  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*\.42s cubic-bezier/s);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*\.36s cubic-bezier/s);
   assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
