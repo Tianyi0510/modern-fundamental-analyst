@@ -14,7 +14,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Newsletter subscription, localized welcome emails, language preferences, and self-service unsubscribe
 - Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
 - Vercel Analytics and Speed Insights
-- Responsive navigation, mobile-specific portfolio presentation, accessible focus states, and reduced-motion support
+- Responsive navigation, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
 
 ## Technology
 
@@ -22,7 +22,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - React 19
 - TypeScript 5 in strict mode
 - Native CSS and CSS Modules
-- `next/font` with Inter, Noto Sans TC, and Noto Sans SC
+- `next/font` with Jost Variable, Noto Sans TC, and Noto Sans SC
 - Resend for contact and subscriber email
 - Redis for shared server-side rate-limit state, with a privacy-preserving in-memory fallback
 - GitHub Actions for continuous integration
@@ -56,7 +56,7 @@ The three language versions share page components wherever possible. Locale file
 
 ## Design System
 
-The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion.
+The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices.
 
 ### Color Tokens
 
@@ -76,10 +76,10 @@ The semantic aliases live in `app/styles/colors.css`; the base values and type s
 
 ### Typography
 
-- English and numeric UI: Inter
-- Traditional Chinese: Noto Sans TC
-- Simplified Chinese: Noto Sans SC
-- Supported weights: 400 and 700
+- English and numeric UI: [Jost Variable](https://indestructibletype.com/Jost.html)
+- Traditional Chinese: Jost for Latin characters and numbers, with Noto Sans TC for CJK glyphs
+- Simplified Chinese: Jost for Latin characters and numbers, with Noto Sans SC for CJK glyphs
+- Jost variable range: 100-900; semantic UI weights: 400 and 700
 - Dates and financial figures use tabular numerals
 - Desktop and mobile use explicit token values instead of fluid `clamp()` sizing
 
@@ -195,7 +195,7 @@ The production delivery path is:
 Local repository → GitHub → GitHub Actions → Vercel → Wix-managed DNS
 ```
 
-Vercel installs dependencies with `npm ci`. A production deployment should only be promoted after the verification pipeline passes. The public domain remains managed through Wix DNS, while application hosting and server functions run on Vercel.
+Pushes to `main` trigger both the GitHub Actions verification workflow and a Vercel Production deployment through the Git integration. Vercel installs dependencies with `npm ci`, builds the same commit, and assigns the production aliases after a successful deployment. Pull requests and non-production branches receive Preview deployments without production service credentials. The public domain remains managed through Wix DNS, while application hosting and server functions run on Vercel.
 
 ## Content Updates
 
