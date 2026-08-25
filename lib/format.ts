@@ -1,4 +1,5 @@
 const usdFormatters = new Map<number, Intl.NumberFormat>();
+const percentFormatters = new Map<number, Intl.NumberFormat>();
 const sharesFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
 export function formatUsd(value: number, fractionDigits = 2) {
@@ -30,6 +31,15 @@ export function formatDate(value: string, locale: "en" | "zh-tw" | "zh-cn", comp
 }
 
 export function formatPercent(value: number, fractionDigits = 2) {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(fractionDigits)}%`;
+  let formatter = percentFormatters.get(fractionDigits);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat("en-US", {
+      style: "percent",
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+      signDisplay: "exceptZero",
+    });
+    percentFormatters.set(fractionDigits, formatter);
+  }
+  return formatter.format(value / 100);
 }

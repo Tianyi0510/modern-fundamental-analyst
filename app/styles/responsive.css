@@ -28,6 +28,12 @@
     -webkit-text-stroke: .45px currentColor;
     transition: transform .2s cubic-bezier(0,.5,.5,1);
   }
+  .home-page .round-link .round-link-arrow {
+    width: 32px;
+    height: 32px;
+    stroke-width: 3;
+    -webkit-text-stroke: 0;
+  }
   .site-header { height: 78px; min-height: 78px; grid-template-columns: 1fr auto; padding: 0; }
   .site-header .wordmark { max-width: 190px; font-size: var(--type-title-bold); }
   .header-actions { display: none; }

@@ -106,11 +106,25 @@ test("portfolio dates are formatted from the snapshot date", async () => {
 });
 
 test("percent formatting handles positive, zero, and negative values", async () => {
+  const source = await read("lib/format.ts");
   const { formatPercent } = await import("../lib/format.ts");
 
+  assert.match(source, /const percentFormatters = new Map<number, Intl\.NumberFormat>\(\)/);
+  assert.match(source, /percentFormatters\.get\(fractionDigits\)/);
+  assert.match(source, /percentFormatters\.set\(fractionDigits, formatter\)/);
   assert.equal(formatPercent(3.2), "+3.20%");
   assert.equal(formatPercent(0), "0.00%");
   assert.equal(formatPercent(-3.2), "-3.20%");
+});
+
+test("portfolio sorting precomputes derived values once per holding", async () => {
+  const source = await read("components/portfolio-table.tsx");
+
+  assert.match(source, /const rows = useMemo\(\(\) => holdings\.map/);
+  assert.match(source, /returnPct: getHoldingReturn\(holding\)/);
+  assert.match(source, /weight: getHoldingWeight\(holding\.marketValue, totals\.marketValue\)/);
+  assert.match(source, /const sortedRows = useMemo\(\(\) => rows\.toSorted/);
+  assert.doesNotMatch(source, /toSorted\(\(a, b\) => \{[\s\S]*?getHolding(?:Return|Weight)\(/);
 });
 
 test("memo metadata uses one localized catalog", async () => {
@@ -357,7 +371,8 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
   assert.match(client, /fetch\("\/api\/subscribe"/);
-  assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
+  assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /subscribeContact\(email, locale\)/);
   assert.match(service, /resend\.contacts\.create/);
@@ -460,7 +475,7 @@ test("Jost renders Latin text and numbers before locale-specific CJK fallbacks",
   assert.match(css, /\[lang="zh-CN"\] body[^}]*--font-ui:\s*var\(--font-jost\),\s*var\(--font-noto-sans-sc\)/s);
   assert.doesNotMatch(`${fonts}\n${document}\n${css}`, /font-inter|\bInter\b|inter\.variable/);
 });
-test("editorial color roles keep the footer highlighted and Medium Blue auxiliary", async () => {
+test("editorial color roles keep the footer inverse and Medium Blue auxiliary", async () => {
   const css = await readStyles();
 
   assert.match(css, /--deep-blue:\s*#002991/);
@@ -469,7 +484,7 @@ test("editorial color roles keep the footer highlighted and Medium Blue auxiliar
   assert.match(css, /--surface-inverse:\s*var\(--black\)/);
   assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
   assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
-  assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
@@ -508,18 +523,22 @@ test("editorial color roles keep the footer highlighted and Medium Blue auxiliar
 });
 
 test("English hero copy uses sentence case and mobile arrows have touch motion", async () => {
-  const [typography, responsive, subscribe] = await Promise.all([
+  const [typography, responsive, subscribe, home] = await Promise.all([
     read("app/styles/typography.css"),
     read("app/styles/responsive.css"),
     read("components/subscribe-form.module.css"),
+    read("components/home-page-content.tsx"),
   ]);
 
   assert.match(typography, /\[lang="en"\] \.hero-bottom > p,[\s\S]*?\[lang="en"\] \.page-intro p,[\s\S]*?\[lang="en"\] \.contact-hero > \.contact-note\s*\{\s*text-transform:\s*none;/);
   assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
   assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon,[\s\S]*?\.memo-index-row:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
-  assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--black\)/);
-  assert.match(subscribe, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--black\);[^}]*color:\s*var\(--white\)/);
+  assert.match(home, /<ArrowUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
+  assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>↗/);
+  assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
+  assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/);
+  assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/);
 });
 
 test("page sections share one responsive vertical rhythm", async () => {

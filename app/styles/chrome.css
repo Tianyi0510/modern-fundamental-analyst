@@ -84,7 +84,7 @@
 .round-link:hover { background: var(--black); color: var(--white); }
 .round-link:hover .arrow-icon { transform: translate(3px, -3px); }
 .round-link:active { transform: scale(.96); }
-.round-link .arrow-icon { font-weight: var(--weight-bold); transition: transform .22s cubic-bezier(.22,1,.36,1); }
+.round-link .arrow-icon { width: 32px; height: 32px; font-weight: var(--weight-bold); stroke-width: 3; transition: transform .22s cubic-bezier(.22,1,.36,1); }
 .holdings-preview { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(220px, .75fr); gap: 40px; padding: 0 0 var(--space-section); align-items: stretch; }
 .holdings-list { border-top: 1px solid var(--black); }
 .holding-row { min-height: 96px; display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 24px; border-bottom: 1px solid var(--gray); transition: background .2s ease, padding .22s cubic-bezier(.22,1,.36,1); }
@@ -146,8 +146,8 @@
 .site-footer { padding: 74px 0 30px; display: grid; grid-template-columns: minmax(220px,.9fr) minmax(140px,.45fr) minmax(360px,1.35fr); gap: 64px; align-items: start; }
 .footer-brand { display: grid; gap: 28px; }
 .footer-mark { max-width: 320px; }
-.site-footer p { margin: 0; max-width: 390px; color: rgba(0,0,0,.62); }
-.footer-heading { margin-bottom: 20px !important; color: var(--black) !important; font-size: var(--type-label) !important; font-weight: var(--weight-bold) !important; letter-spacing: var(--tracking-label) !important; line-height: 1.3 !important; }
+.site-footer p { margin: 0; max-width: 390px; color: rgba(255,255,255,.62); }
+.footer-heading { margin-bottom: 20px !important; color: var(--bright-blue) !important; font-size: var(--type-label) !important; font-weight: var(--weight-bold) !important; letter-spacing: var(--tracking-label) !important; line-height: 1.3 !important; }
 .footer-links { display: grid; gap: 14px; }
-.footer-bottom { grid-column: 1 / -1; margin-top: 34px; padding-top: 26px; border-top: 1px solid rgba(0,0,0,.24); }
-.footer-bottom small { color: rgba(0,0,0,.62); }
+.footer-bottom { grid-column: 1 / -1; margin-top: 34px; padding-top: 26px; border-top: 1px solid rgba(255,255,255,.22); }
+.footer-bottom small { color: rgba(255,255,255,.62); }

@@ -27,13 +27,23 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("marketValue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const totals = useMemo(() => getPortfolioTotals(holdings), [holdings]);
+  const rows = useMemo(() => holdings.map((holding) => ({
+    holding,
+    returnPct: getHoldingReturn(holding),
+    weight: getHoldingWeight(holding.marketValue, totals.marketValue),
+  })), [holdings, totals.marketValue]);
 
-  const sortedHoldings = useMemo(() => holdings.toSorted((a, b) => {
-    const first = sortKey === "weight" ? getHoldingWeight(a.marketValue, totals.marketValue) : sortKey === "returnPct" ? getHoldingReturn(a) : a[sortKey];
-    const second = sortKey === "weight" ? getHoldingWeight(b.marketValue, totals.marketValue) : sortKey === "returnPct" ? getHoldingReturn(b) : b[sortKey];
+  const sortedRows = useMemo(() => rows.toSorted((a, b) => {
+    const getSortValue = (row: (typeof rows)[number]) => {
+      if (sortKey === "weight") return row.weight;
+      if (sortKey === "returnPct") return row.returnPct;
+      return row.holding[sortKey];
+    };
+    const first = getSortValue(a);
+    const second = getSortValue(b);
     const comparison = typeof first === "string" ? first.localeCompare(String(second)) : first - Number(second);
     return sortDirection === "asc" ? comparison : -comparison;
-  }), [holdings, sortDirection, sortKey, totals.marketValue]);
+  }), [rows, sortDirection, sortKey]);
 
   const changeSort = (nextKey: SortKey) => {
     if (nextKey === sortKey) {
@@ -72,20 +82,17 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
           </span>;
         })}
       </div>
-      {sortedHoldings.map((holding) => {
-        const holdingReturn = getHoldingReturn(holding);
-        return (
+      {sortedRows.map(({ holding, returnPct, weight }) => (
           <div className="portfolio-row" role="row" key={holding.symbol}>
             <span role="cell" data-label={copy.symbol}>{holding.symbol}</span>
             <span role="cell" data-label={copy.shares}>{formatShares(holding.shares)}</span>
             <span role="cell" data-label={copy.costBasis}>{formatUsd(holding.costBasis)}</span>
             <span role="cell" data-label={copy.price}>{formatUsd(holding.price)}</span>
             <span role="cell" data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</span>
-            <span role="cell" data-label={copy.returnPct} className={`data-value ${holdingReturn < 0 ? "negative" : "positive"}`}>{formatPercent(holdingReturn, 1)}</span>
-            <span role="cell" data-label={copy.weight}>{getHoldingWeight(holding.marketValue, totals.marketValue).toFixed(1)}%</span>
+            <span role="cell" data-label={copy.returnPct} className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}>{formatPercent(returnPct, 1)}</span>
+            <span role="cell" data-label={copy.weight}>{weight.toFixed(1)}%</span>
           </div>
-        );
-      })}
+      ))}
       <div className="portfolio-row portfolio-total-row" role="row">
         <span role="cell" data-label={copy.symbol}>{copy.total}</span>
         <span role="cell" />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { homeCopy } from "@/data/home-copy";
@@ -78,7 +79,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <p className="section-number">{text.portfolioLabel}</p>
           <h2>{text.portfolioTitle[0]}<br />{text.portfolioTitle[1]}</h2>
           <Link className="round-link" href={`${prefix}/portfolio`} aria-label={text.viewPortfolio}>
-            <span className="arrow-icon" aria-hidden="true">↗︎</span>
+            <ArrowUpRight className="arrow-icon round-link-arrow" aria-hidden="true" strokeWidth={3} />
           </Link>
         </section>
         <section className="holdings-preview shell">
