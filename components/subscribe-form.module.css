@@ -6,11 +6,11 @@
 .control { display: block; width: 100%; min-height: 52px; padding: 13px 20px; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; background: transparent; color: var(--white); font: inherit; font-size: var(--type-body); }
 .control::placeholder { color: rgba(255,255,255,.6); }
 .control:focus { outline: none; border-color: var(--bright-blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bright-blue) 28%, transparent); }
-.submit { min-width: 116px; min-height: 52px; padding: 13px 24px; border: 1px solid var(--bright-blue); border-radius: 999px; background: var(--bright-blue); color: var(--black); cursor: pointer; font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); transform-origin: center; transition: transform .2s cubic-bezier(0,.5,.5,1), background-color .2s cubic-bezier(0,.5,.5,1), border-color .2s cubic-bezier(0,.5,.5,1), color .2s cubic-bezier(0,.5,.5,1); }
+.submit { min-width: 116px; min-height: 52px; padding: 13px 24px; border: 1px solid var(--white); border-radius: 999px; background: var(--white); color: var(--black); cursor: pointer; font: inherit; font-size: var(--type-button); font-weight: var(--weight-bold); transform-origin: center; transition: transform .2s cubic-bezier(0,.5,.5,1), background-color .2s cubic-bezier(0,.5,.5,1), border-color .2s cubic-bezier(0,.5,.5,1), color .2s cubic-bezier(0,.5,.5,1); }
 .submit:hover:not(:disabled) { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(1.04); box-shadow: none; }
 .submit:active:not(:disabled) { transform: scale(.985); box-shadow: none; }
 .submit:disabled { cursor: wait; opacity: .64; transform: none; }
-.submit:disabled:hover { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); box-shadow: none; }
+.submit:disabled:hover { border-color: var(--white); background: var(--white); color: var(--black); box-shadow: none; }
 .status { grid-column: 1 / -1; min-height: 1.55em; margin: 0; color: var(--white); font-size: var(--type-caption); line-height: 1.55; }
 .status { font-weight: var(--weight-bold); }
 .honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; pointer-events: none !important; }
@@ -21,7 +21,7 @@
 }
 @media (hover: none) and (pointer: coarse) {
   .submit:hover:not(:disabled) {
-    border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: none;
+    border-color: var(--white); background: var(--white); color: var(--black); transform: none;
   }
 
   .submit:active:not(:disabled) {

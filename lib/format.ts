@@ -1,9 +1,15 @@
 const usdFormatters = new Map<number, Intl.NumberFormat>();
 const percentFormatters = new Map<number, Intl.NumberFormat>();
 const sharesFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+const MAX_CACHED_FRACTION_DIGITS = 4;
+
+function shouldCacheFormatter(fractionDigits: number) {
+  return Number.isInteger(fractionDigits) && fractionDigits >= 0 && fractionDigits <= MAX_CACHED_FRACTION_DIGITS;
+}
 
 export function formatUsd(value: number, fractionDigits = 2) {
-  let formatter = usdFormatters.get(fractionDigits);
+  const shouldCache = shouldCacheFormatter(fractionDigits);
+  let formatter = shouldCache ? usdFormatters.get(fractionDigits) : undefined;
   if (!formatter) {
     formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -11,7 +17,7 @@ export function formatUsd(value: number, fractionDigits = 2) {
       minimumFractionDigits: fractionDigits,
       maximumFractionDigits: fractionDigits,
     });
-    usdFormatters.set(fractionDigits, formatter);
+    if (shouldCache) usdFormatters.set(fractionDigits, formatter);
   }
   return formatter.format(value);
 }
@@ -31,7 +37,8 @@ export function formatDate(value: string, locale: "en" | "zh-tw" | "zh-cn", comp
 }
 
 export function formatPercent(value: number, fractionDigits = 2) {
-  let formatter = percentFormatters.get(fractionDigits);
+  const shouldCache = shouldCacheFormatter(fractionDigits);
+  let formatter = shouldCache ? percentFormatters.get(fractionDigits) : undefined;
   if (!formatter) {
     formatter = new Intl.NumberFormat("en-US", {
       style: "percent",
@@ -39,7 +46,7 @@ export function formatPercent(value: number, fractionDigits = 2) {
       maximumFractionDigits: fractionDigits,
       signDisplay: "exceptZero",
     });
-    percentFormatters.set(fractionDigits, formatter);
+    if (shouldCache) percentFormatters.set(fractionDigits, formatter);
   }
   return formatter.format(value / 100);
 }

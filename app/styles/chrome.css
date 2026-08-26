@@ -129,12 +129,9 @@
 .button-white:hover { background: var(--bright-blue); }
 .memos-home { padding: var(--space-section) 0; background: var(--background-gray); box-shadow: 0 0 0 100vmax var(--background-gray); clip-path: inset(0 -100vmax); }
 .memo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: var(--space-heading-content); background: var(--black); border: 1px solid var(--black); }
-.memo-card { min-height: 510px; padding: 30px; display: flex; flex-direction: column; background: var(--white); transition: transform .25s cubic-bezier(.22,1,.36,1), background .25s ease, box-shadow .25s ease; }
-.memo-card:hover { transform: translateY(-8px); }
-.memo-card:active { transform: translateY(-3px) scale(.995); }
-.memo-card-1:hover { background: var(--bright-blue); }
-.memo-card-2:hover { background: var(--bright-blue); }
-.memo-card-3:hover { background: color-mix(in srgb, var(--bright-blue) 20%, var(--white)); }
+.memo-card { min-height: 510px; padding: 30px; display: flex; flex-direction: column; background: var(--white); transform-origin: center; transition: transform .2s cubic-bezier(0,.5,.5,1), background-color .2s cubic-bezier(0,.5,.5,1); }
+.memo-card:hover { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(.99); }
+.memo-card:active { background: color-mix(in srgb, var(--bright-blue) 28%, var(--white)); transform: scale(.98); }
 .memo-card > div { display: flex; justify-content: space-between; gap: 20px; }
 .memo-card h3 { margin: auto 0 26px; }
 .memo-card p { margin: 0 0 36px; color: rgba(0,0,0,.62); line-height: 1.55; }

@@ -10,21 +10,25 @@ test("Redis connections are bounded and reused", async () => {
   assert.match(redis, /connectTimeout: CONNECT_TIMEOUT_MS/);
   assert.match(redis, /socketTimeout: SOCKET_TIMEOUT_MS/);
   assert.match(redis, /disableOfflineQueue: true/);
+  assert.match(redis, /commandsQueueMaxLength: MAX_COMMAND_QUEUE_LENGTH/);
+  assert.match(redis, /MAX_COMMAND_QUEUE_LENGTH = 100/);
   assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
   assert.match(redis, /process\.env\.REDIS_URL/);
-  assert.match(redis, /__mfaRedisStateV3/);
+  assert.match(redis, /__mfaRedisStateV4/);
   assert.match(redis, /url\.protocol === "redis:"/);
   assert.match(redis, /REDIS_ALLOW_INSECURE/);
   assert.match(redis, /Redis authentication is required/);
   assert.match(redis, /unavailableUntil = Date\.now\(\) \+ CONNECTION_COOLDOWN_MS/);
+  assert.match(redis, /pendingClient\.removeAllListeners\(\)/);
 });
 
-test("Redis errors are throttled independently by category", async () => {
+test("Redis errors use bounded categories and are throttled independently", async () => {
   const redis = await read("lib/redis.ts");
 
-  assert.match(redis, /lastErrorLogAt: Map<string, number>/);
-  assert.match(redis, /lastErrorLogAt\.get\(message\)/);
-  assert.match(redis, /lastErrorLogAt\.set\(message, now\)/);
+  assert.match(redis, /type RedisErrorCategory =/);
+  assert.match(redis, /lastErrorLogAt: Partial<Record<RedisErrorCategory, number>>/);
+  assert.match(redis, /lastErrorLogAt\[message\]/);
+  assert.doesNotMatch(redis, /lastErrorLogAt: Map/);
 });
 
 test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {

@@ -1,10 +1,11 @@
 import { createClient } from "redis";
 
 type RedisClient = ReturnType<typeof createClient>;
+type RedisErrorCategory = "Invalid REDIS_URL" | "Redis client error" | "Redis rate limiter unavailable";
 type RedisState = {
   client: RedisClient | null;
   connection: Promise<RedisClient> | null;
-  lastErrorLogAt: Map<string, number>;
+  lastErrorLogAt: Partial<Record<RedisErrorCategory, number>>;
   warnedAboutInsecureUrl: boolean;
   unavailableUntil: number;
 };
@@ -14,12 +15,13 @@ const SOCKET_TIMEOUT_MS = 5_000;
 const MAX_RECONNECT_ATTEMPTS = 2;
 const CONNECTION_COOLDOWN_MS = 30_000;
 const ERROR_LOG_INTERVAL_MS = 60_000;
+const MAX_COMMAND_QUEUE_LENGTH = 100;
 
-const globalForRedis = globalThis as typeof globalThis & { __mfaRedisStateV3?: RedisState };
-const state = globalForRedis.__mfaRedisStateV3 ??= {
+const globalForRedis = globalThis as typeof globalThis & { __mfaRedisStateV4?: RedisState };
+const state = globalForRedis.__mfaRedisStateV4 ??= {
   client: null,
   connection: null,
-  lastErrorLogAt: new Map(),
+  lastErrorLogAt: {},
   warnedAboutInsecureUrl: false,
   unavailableUntil: 0,
 };
@@ -29,11 +31,11 @@ function reconnectStrategy(retries: number) {
   return Math.min(100 * 2 ** retries, 500);
 }
 
-export function logRedisError(message: string, error: unknown) {
+export function logRedisError(message: RedisErrorCategory, error: unknown) {
   const now = Date.now();
-  const lastLoggedAt = state.lastErrorLogAt.get(message) ?? 0;
+  const lastLoggedAt = state.lastErrorLogAt[message] ?? 0;
   if (now - lastLoggedAt < ERROR_LOG_INTERVAL_MS) return;
-  state.lastErrorLogAt.set(message, now);
+  state.lastErrorLogAt[message] = now;
   console.error(message, error instanceof Error ? error.name : "UnknownError");
 }
 
@@ -71,6 +73,7 @@ export async function getRedisClient() {
     state.client = createClient({
       url,
       disableOfflineQueue: true,
+      commandsQueueMaxLength: MAX_COMMAND_QUEUE_LENGTH,
       socket: {
         connectTimeout: CONNECT_TIMEOUT_MS,
         socketTimeout: SOCKET_TIMEOUT_MS,
@@ -94,6 +97,7 @@ export async function getRedisClient() {
         if (state.client === pendingClient) {
           state.client = null;
           if (pendingClient.isOpen) pendingClient.destroy();
+          pendingClient.removeAllListeners();
         }
         throw error;
       })

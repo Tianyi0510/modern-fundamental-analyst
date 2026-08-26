@@ -244,8 +244,8 @@
   .memo-card-2:hover,
   .memo-card-3:hover { background: var(--white); transform: none; }
   .memo-card:active { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(.99); }
-  .memo-index-row:hover { padding-inline: 0; background: transparent; }
-  .memo-index-row:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); }
+  .memo-index-row:hover { background: transparent; transform: none; }
+  .memo-index-row:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(.99); }
   .memo-disclosure > summary:hover { padding-inline: 0; color: inherit; }
   .memo-disclosure > summary:active { color: var(--deep-blue); }
   .portfolio-mobile-sort button:hover { background: var(--white); color: var(--black); }

@@ -110,6 +110,8 @@ test("percent formatting handles positive, zero, and negative values", async () 
   const { formatPercent } = await import("../lib/format.ts");
 
   assert.match(source, /const percentFormatters = new Map<number, Intl\.NumberFormat>\(\)/);
+  assert.match(source, /MAX_CACHED_FRACTION_DIGITS = 4/);
+  assert.match(source, /shouldCacheFormatter\(fractionDigits\)/);
   assert.match(source, /percentFormatters\.get\(fractionDigits\)/);
   assert.match(source, /percentFormatters\.set\(fractionDigits, formatter\)/);
   assert.equal(formatPercent(3.2), "+3.20%");
@@ -263,11 +265,12 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
-  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*680px/s);
+  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*480px/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*30px;[^}]*display:\s*flex;[^}]*flex-direction:\s*column/s);
-  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*auto/);
-  assert.match(styles, /\.portfolio-kpis small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
+  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*display:\s*flex;[^}]*flex-direction:\s*column/s);
+  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*24px/);
+  assert.match(styles, /\.portfolio-kpis small\s*\{[^}]*margin-top:\s*10px;[^}]*opacity:\s*\.62/s);
+  assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis > div\s*\{[^}]*padding:\s*24px/s);
   assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
@@ -372,7 +375,8 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /"use client"/);
   assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
-  assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
+  assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
+  assert.match(styles, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /subscribeContact\(email, locale\)/);
   assert.match(service, /resend\.contacts\.create/);
@@ -538,7 +542,8 @@ test("English hero copy uses sentence case and mobile arrows have touch motion",
   assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>↗/);
   assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
   assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/);
-  assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/);
+  assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/);
+  assert.match(subscribe, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/);
 });
 
 test("page sections share one responsive vertical rhythm", async () => {
@@ -573,6 +578,17 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("desktop and touch memo interactions share restrained color and scale feedback", async () => {
+  const css = await readStyles();
+
+  assert.match(css, /\.memo-card:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 22%, var\(--white\)\);[^}]*scale\(\.99\)/s);
+  assert.doesNotMatch(css, /\.memo-card:hover\s*\{[^}]*translateY/);
+  assert.match(css, /\.memo-index-row:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
+  assert.match(css, /\.memo-index-row:hover \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\)/);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:active\s*\{[^}]*scale\(\.99\)/s);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*scale\(\.99\)/s);
 });
 
 test("shared client navigation receives only the active locale copy from server components", async () => {
