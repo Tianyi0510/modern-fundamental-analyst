@@ -53,7 +53,7 @@ export function markRedisUnavailable() {
 }
 
 function getRedisUrl() {
-  const value = process.env.REDIS_URL;
+  const value = process.env.UPSTASH_REDIS_URL ?? process.env.REDIS_URL;
   if (!value) return null;
 
   try {

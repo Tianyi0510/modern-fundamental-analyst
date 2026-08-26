@@ -125,7 +125,8 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 - Client identifiers always use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback. If no configured secret is available locally, the runtime generates an ephemeral HMAC key instead of using a predictable unkeyed hash.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
 - Repeated connection errors are log-throttled by error category to keep Vercel logs useful during an outage without hiding unrelated failures.
-- `rediss://` is required by default in production. If the provider exposes only `redis://`, the non-TLS connection must be explicitly acknowledged with `REDIS_ALLOW_INSECURE=true`; production then emits a warning without logging the endpoint or credentials.
+- The Vercel Marketplace Upstash connection is namespaced as `UPSTASH_REDIS_URL` and takes precedence over the legacy `REDIS_URL`, which remains available during migration as a rollback path.
+- `rediss://` is required by default in production. If a legacy provider exposes only `redis://`, the non-TLS connection must be explicitly acknowledged with `REDIS_ALLOW_INSECURE=true`; production then emits a warning without logging the endpoint or credentials.
 - Redis authentication is mandatory. Only HMAC-derived client identifiers, counters, and short TTLs are transmitted; raw IP addresses and form contents never enter Redis.
 
 Required server-side environment variables:
@@ -135,6 +136,7 @@ RESEND_API_KEY=
 RESEND_WEBHOOK_SECRET=
 CONTACT_TO_EMAIL=
 SUBSCRIPTION_PREFERENCES_SECRET=
+UPSTASH_REDIS_URL=
 REDIS_URL=
 REDIS_ALLOW_INSECURE=false
 RATE_LIMIT_HASH_SECRET=
@@ -142,7 +144,7 @@ RATE_LIMIT_HASH_SECRET=
 
 Production is the only Vercel environment with Resend, contact-delivery, subscription-preference, and shared rate-limit credentials. Preview intentionally has no server-side service credentials, so branch and pull-request deployments can review the interface without sending email, changing the production audience, or accessing production Redis. Development uses uncommitted local `.env.local` values when service integration testing is explicitly needed.
 
-`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, `REDIS_URL`, and `RATE_LIMIT_HASH_SECRET` are configured as Sensitive Production variables. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, `REDIS_URL`, and `RATE_LIMIT_HASH_SECRET` are configured as Sensitive Production variables. `UPSTASH_REDIS_URL` is an integration-managed Production variable created by the Vercel Marketplace connection. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
 
 Keep `REDIS_ALLOW_INSECURE=false` whenever TLS is available. For a provider-issued non-TLS endpoint, set it to `true` only in the environments that use that endpoint. This acknowledgement does not encrypt traffic; migrate back to `rediss://` as soon as the provider exposes TLS.
 
