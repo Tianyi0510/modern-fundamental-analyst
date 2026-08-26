@@ -139,6 +139,8 @@
 .memo-card { min-height: 510px; padding: 30px; display: flex; flex-direction: column; background: var(--white); transform-origin: center; transition: transform .2s cubic-bezier(0,.5,.5,1), background-color .2s cubic-bezier(0,.5,.5,1); }
 .memo-card:hover { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(.99); }
 .memo-card:active { background: color-mix(in srgb, var(--bright-blue) 28%, var(--white)); transform: scale(.98); }
+.memo-card-placeholder { cursor: default; }
+.memo-card-placeholder:hover, .memo-card-placeholder:active { background: var(--white); transform: none; }
 .memo-card > div { display: flex; justify-content: space-between; gap: 20px; }
 .memo-card h3 { margin: auto 0 26px; }
 .memo-card p { margin: 0 0 36px; color: rgba(0,0,0,.62); line-height: 1.55; }

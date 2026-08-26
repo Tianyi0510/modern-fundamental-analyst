@@ -123,6 +123,7 @@
   .about-boundaries ol { margin-top: var(--space-related-content); }
   .about-closing { padding: var(--space-section) 0; gap: 42px; }
   .memo-card { min-height: 410px; }
+  .memo-card-placeholder { display: none; }
   .cta { grid-template-columns: 1fr; gap: 44px; }
   .site-footer { grid-template-columns: 1fr; gap: 50px; }
   .footer-bottom { grid-column: auto; margin-top: 12px; }
@@ -247,7 +248,15 @@
   .memo-index-row:hover { background: transparent; transform: none; }
   .memo-index-row:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(.99); }
   .memo-disclosure > summary:hover { padding-inline: 0; color: inherit; }
+  .memo-disclosure > summary:hover::before { transform: scaleX(0); }
+  .memo-disclosure > summary:hover > span:first-child { transform: none; }
+  .memo-disclosure > summary:hover svg { transform: none; }
+  .memo-disclosure[open] > summary:hover svg { transform: rotate(180deg); }
   .memo-disclosure > summary:active { color: var(--deep-blue); }
+  .memo-disclosure > summary:active::before { transform: scaleX(1); transform-origin: left; }
+  .memo-disclosure > summary:active > span:first-child { transform: translateX(5px); }
+  .memo-disclosure > summary:active svg { transform: translateY(3px); }
+  .memo-disclosure[open] > summary:active svg { transform: rotate(180deg) translateY(3px); }
   .portfolio-mobile-sort button:hover { background: var(--white); color: var(--black); }
   .portfolio-mobile-sort button:hover svg { transform: none; }
   .portfolio-mobile-sort button:active { background: var(--black); color: var(--white); transform: scale(.97); }

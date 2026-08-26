@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { MemoCards } from "@/components/memo-cards";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { homeCopy } from "@/data/home-copy";
@@ -161,16 +162,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <p className="section-number">{text.memosLabel}</p>
           <h2>{text.memosTitle[0]}<br />{text.memosTitle[1]}</h2>
         </div>
-        <div className="memo-grid">
-          {memos.slice(0, 3).map((memo, index) => (
-            <Link className={`memo-card memo-card-${index + 1}`} href={`${prefix}/memos/${memo.slug}`} key={memo.slug}>
-              <div><span>{memo.number}</span><span>{memo.tag}</span></div>
-              <h3>{memo.title}</h3>
-              <p>{memo.summary}</p>
-              <small className="date-text">{formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}</small>
-            </Link>
-          ))}
-        </div>
+        <MemoCards memos={memos} locale={locale} basePath={`${prefix}/memos`} />
         <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos} <span className="arrow-icon" aria-hidden="true">→</span></Link>
       </section>
 

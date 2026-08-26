@@ -163,6 +163,8 @@
   font-variant-numeric: tabular-nums;
 }
 
+.home-page .metric strong { font-size: 52px; }
+
 .portfolio-page .portfolio-kpis strong,
 .performance-summary strong {
   font-family: var(--font-ui);

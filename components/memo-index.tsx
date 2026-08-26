@@ -1,30 +1,21 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
+import { MemoCards } from "@/components/memo-cards";
 import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
+import type { Locale } from "@/lib/i18n";
 
 type MemoIndexProps = {
   memos: readonly MemoSummary[];
-  locale: "en" | "zh-tw" | "zh-cn";
+  locale: Locale;
   label: string;
   basePath: string;
 };
 
 export function MemoIndex({ memos, locale, label, basePath }: MemoIndexProps) {
-  const latestMemos = memos.slice(0, 3);
-
   return (
     <section className="memo-index shell">
-      <div className="memo-grid memo-index-featured">
-        {latestMemos.map((memo, index) => (
-          <Link className={`memo-card memo-card-${index + 1}`} href={`${basePath}/${memo.slug}`} key={memo.slug}>
-            <div><span>{memo.number}</span><span>{memo.tag}</span></div>
-            <h3>{memo.title}</h3>
-            <p>{memo.summary}</p>
-            <small className="date-text">{formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}</small>
-          </Link>
-        ))}
-      </div>
+      <MemoCards memos={memos} locale={locale} basePath={basePath} className="memo-index-featured" />
       <details className="memo-disclosure">
         <summary>
           <span>{label}</span>

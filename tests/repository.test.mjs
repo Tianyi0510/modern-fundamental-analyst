@@ -286,6 +286,7 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/);
   assert.match(styles, /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/);
+  assert.match(styles, /\.home-page \.metric strong\s*\{\s*font-size:\s*52px;/);
   assert.match(styles, /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
   assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis > div\s*\{[^}]*padding:\s*24px/s);
@@ -600,14 +601,31 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
 });
 
 test("desktop and touch memo interactions share restrained color and scale feedback", async () => {
-  const css = await readStyles();
+  const [cards, home, index, css] = await Promise.all([
+    read("components/memo-cards.tsx"),
+    read("components/home-page-content.tsx"),
+    read("components/memo-index.tsx"),
+    readStyles(),
+  ]);
 
+  assert.match(cards, /const slotIndexes = \[0, 1, 2\]/);
+  assert.match(cards, /memo-card-placeholder/);
+  assert.match(home, /<MemoCards memos=\{memos\}/);
+  assert.match(index, /<MemoCards memos=\{memos\}/);
+  assert.match(css, /\.metric,\s*\.memo-card,\s*\.performance-summary > div\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.doesNotMatch(css, /\.memo-card\.memo-card-placeholder\s*\{[^}]*surface-inverse/s);
+  assert.match(css, /@media \(max-width: 800px\)[\s\S]*?\.memo-card-placeholder\s*\{\s*display:\s*none;/s);
   assert.match(css, /\.memo-card:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 22%, var\(--white\)\);[^}]*scale\(\.99\)/s);
   assert.doesNotMatch(css, /\.memo-card:hover\s*\{[^}]*translateY/);
   assert.match(css, /\.memo-index-row:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
   assert.match(css, /\.memo-index-row:hover \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\)/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:active\s*\{[^}]*scale\(\.99\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*scale\(\.99\)/s);
+  assert.match(css, /\.memo-disclosure > summary:hover::before,[^}]*scaleX\(1\)/s);
+  assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(8px\)/s);
+  assert.match(css, /\.memo-disclosure\[open\] > summary:hover svg,[^}]*rotate\(180deg\) translateY\(3px\)/s);
+  assert.match(css, /\.memo-disclosure > summary:hover,[\s\S]*?\.memo-disclosure > summary:focus-visible\s*\{\s*color:\s*var\(--deep-blue\)/s);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-disclosure > summary:active > span:first-child\s*\{[^}]*translateX\(5px\)/s);
 });
 
 test("shared client navigation receives only the active locale copy from server components", async () => {

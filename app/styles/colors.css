@@ -102,6 +102,8 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .text-link:hover,
 .memo-disclosure > summary:hover,
 .source-link:hover { color: var(--interactive-accent); }
+.memo-disclosure > summary:hover,
+.memo-disclosure > summary:focus-visible { color: var(--deep-blue); }
 .site-header nav a::after,
 .bar-value { background: var(--interactive-accent); }
 
