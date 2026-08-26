@@ -146,7 +146,7 @@ test("memo catalog contains only the Microsoft source memo and uses one shared d
     read("components/memo-index.tsx"),
   ]);
 
-  assert.match(catalog, /microsoft-stock-analysis-fy2024/);
+  assert.match(catalog, /microsoft-stock-analysis-fiscal-year-2024/);
   assert.doesNotMatch(catalog, /durable-pricing-power|self-funded-growth|capital-allocation/);
   assert.match(memoPage, /<details/);
   assert.match(memoPage, /<summary/);
@@ -155,8 +155,8 @@ test("memo catalog contains only the Microsoft source memo and uses one shared d
 test("memo content is selected by slug and locale", async () => {
   const { getMemoContent } = await import("../data/memo-content.ts");
 
-  const english = getMemoContent("microsoft-stock-analysis-fy2024", "en");
-  const traditionalChinese = getMemoContent("microsoft-stock-analysis-fy2024", "zh-tw");
+  const english = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "en");
+  const traditionalChinese = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "zh-tw");
 
   assert.equal(english.sections[0].title, "Section 1: Business Analysis");
   assert.equal(traditionalChinese.sections[0].title, "Section 1: Business Analysis");
@@ -166,7 +166,7 @@ test("memo content is selected by slug and locale", async () => {
 });
 
 test("memo article uses the source document prose and the wider references layout", async () => {
-  const [content, styles] = await Promise.all([read("content/memos/microsoft-stock-analysis-fy2024.ts"), readStyles()]);
+  const [content, styles] = await Promise.all([read("content/memos/microsoft-stock-analysis-fiscal-year-2024.ts"), readStyles()]);
 
   assert.match(content, /const sourceContent: MemoContent/);
   assert.match(content, /Microsoft now operates through three primary business segments/);
@@ -177,6 +177,18 @@ test("memo article uses the source document prose and the wider references layou
   assert.match(styles, /\.memo-references\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
+});
+
+test("the legacy Microsoft memo URL permanently redirects to the descriptive slug", async () => {
+  const config = await read("next.config.ts");
+  const detailPage = await read("components/memo-detail-page.tsx");
+
+  assert.match(config, /microsoft-stock-analysis-fy2024/);
+  assert.match(config, /microsoft-stock-analysis-fiscal-year-2024/);
+  assert.match(config, /permanent:\s*true/);
+  assert.match(config, /\["", "\/zh-tw", "\/zh-cn"\]/);
+  assert.match(detailPage, /<SiteHeader[^>]+\/>\s*<main className="memo-detail-page"/s);
+  assert.match(detailPage, /<\/main>\s*<SiteFooter/s);
 });
 
 test("all memo locales use shared list and detail page structures", async () => {
@@ -563,7 +575,8 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /\.hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.match(css, /\.page-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.match(css, /\.legal-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
-  assert.match(css, /\.memo-article\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.memo-article\s*\{[^}]*padding:\s*0 0 var\(--space-section\)/s);
+  assert.match(css, /\.memo-article-header\s*\{[^}]*padding-top:\s*var\(--space-section\)/s);
   assert.match(css, /\.legal-section\s*\{[^}]*padding:\s*var\(--space-section-compact\) 0/s);
   assert.match(css, /\.memo-section \+ \.memo-section\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding-top:\s*var\(--space-section-compact\)/s);
   assert.match(css, /\.contact-hero\s*\{[^}]*min-height:\s*0/s);

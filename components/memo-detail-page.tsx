@@ -23,10 +23,15 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
   const text = copy[locale];
   const memosPath = `${localeConfig[locale].prefix}/memos`;
 
-  return <main className="memo-detail-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-    <article className="memo-article shell"><header className="memo-article-header"><Link className="back-link" href={memosPath}>← {text.back}</Link><p className="eyebrow"><span /> {memo.tag}</p><h1>{memo.title}</h1><div className="article-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span><span>{text.memoLabel} {memo.number}</span></div></header>
-      <p className="article-lead">{memo.summary}</p>
-      <MemoArticleContent content={content} />
-    </article><SiteFooter locale={locale} />
-  </main>;
+  return <>
+    <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+    <main className="memo-detail-page" id="main-content">
+      <article className="memo-article shell">
+        <header className="memo-article-header"><Link className="back-link" href={memosPath}>← {text.back}</Link><p className="eyebrow"><span /> {memo.tag}</p><h1>{memo.title}</h1><div className="article-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span><span>{text.memoLabel} {memo.number}</span></div></header>
+        <p className="article-lead">{memo.summary}</p>
+        <MemoArticleContent content={content} />
+      </article>
+    </main>
+    <SiteFooter locale={locale} />
+  </>;
 }

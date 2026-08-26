@@ -147,7 +147,8 @@
 .memo-index-row p { margin: 0; max-width: 670px; color: rgba(0,0,0,.62); line-height: 1.5; }
 .memo-meta { display: flex; flex-direction: column; align-items: end; gap: 10px; }
 .memo-meta b { margin-top: auto; }
-.memo-article { padding: var(--space-section) 0; }
+.memo-article { padding: 0 0 var(--space-section); }
+.memo-article-header { padding-top: var(--space-section); }
 .back-link { display: inline-block; margin-bottom: var(--space-section-compact); font-weight: 700; }
 .memo-article h1 { max-width: 1120px; margin: 50px 0 46px; }
 .article-meta { display: flex; gap: 28px; padding: 18px 0; border-top: 1px solid var(--black); border-bottom: 1px solid var(--gray); }

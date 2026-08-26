@@ -20,7 +20,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 
 - Next.js 16 App Router
 - React 19
-- TypeScript 5 in strict mode
+- TypeScript 6 in strict mode
 - Native CSS and CSS Modules
 - `next/font` with Jost Variable, Noto Sans TC, and Noto Sans SC
 - Resend for contact and subscriber email
@@ -154,7 +154,7 @@ Never commit production credentials. Configure them in Vercel and use `.env.loca
 
 Requirements:
 
-- Node.js 24.x
+- Node.js 24.19.0 (latest Node.js 24 LTS patch; `24.x` is used in production)
 - npm
 
 Install dependencies and start the development server:

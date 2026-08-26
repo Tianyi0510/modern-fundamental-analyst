@@ -12,6 +12,16 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   agentRules: false,
   poweredByHeader: false,
+  async redirects() {
+    const oldSlug = "microsoft-stock-analysis-fy2024";
+    const newSlug = "microsoft-stock-analysis-fiscal-year-2024";
+
+    return ["", "/zh-tw", "/zh-cn"].map((prefix) => ({
+      source: `${prefix}/memos/${oldSlug}`,
+      destination: `${prefix}/memos/${newSlug}`,
+      permanent: true,
+    }));
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

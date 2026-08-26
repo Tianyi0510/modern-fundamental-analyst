@@ -12,7 +12,7 @@ export type MemoSummary = {
 
 const memoCatalog = [
   {
-    slug: "microsoft-stock-analysis-fy2024",
+    slug: "microsoft-stock-analysis-fiscal-year-2024",
     number: "001",
     publishedAt: "2025-10-10",
     readTimeMinutes: 12,
