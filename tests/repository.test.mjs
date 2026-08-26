@@ -166,7 +166,11 @@ test("memo content is selected by slug and locale", async () => {
 });
 
 test("memo article uses the source document prose and the wider references layout", async () => {
-  const [content, styles] = await Promise.all([read("content/memos/microsoft-stock-analysis-fiscal-year-2024.ts"), readStyles()]);
+  const [content, detailPage, styles] = await Promise.all([
+    read("content/memos/microsoft-stock-analysis-fiscal-year-2024.ts"),
+    read("components/memo-detail-page.tsx"),
+    readStyles(),
+  ]);
 
   assert.match(content, /const sourceContent: MemoContent/);
   assert.match(content, /Microsoft now operates through three primary business segments/);
@@ -174,6 +178,9 @@ test("memo article uses the source document prose and the wider references layou
   assert.match(content, /Microsoft‘s retained earnings surged from \$24\.2 billion/);
   assert.doesNotMatch(content, /Business Conclusion|Management Conclusion|Financial Conclusion/);
   assert.match(styles, /\.article-body\s*\{[^}]*width:\s*min\(1040px, 100%\);[^}]*margin-inline:\s*auto/s);
+  assert.match(detailPage, /className="back-link-arrow" aria-hidden="true">←<\/span>/);
+  assert.match(styles, /\.back-link:hover \.back-link-arrow,[^}]*translateX\(-6px\)/s);
+  assert.match(styles, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.back-link:active \.back-link-arrow\s*\{\s*transform:\s*translateX\(-4px\)/s);
   assert.match(styles, /\.memo-references\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
@@ -286,7 +293,8 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/);
   assert.match(styles, /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/);
-  assert.match(styles, /\.home-page \.metric strong\s*\{\s*font-size:\s*52px;/);
+  assert.match(styles, /\.home-page \.metric strong\s*\{\s*font-size:\s*var\(--type-data-kpi\);/);
+  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.home-page \.metric strong\s*\{\s*font-size:\s*52px;/);
   assert.match(styles, /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
   assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis > div\s*\{[^}]*padding:\s*24px/s);
@@ -621,10 +629,13 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /\.memo-index-row:hover \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\)/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:active\s*\{[^}]*scale\(\.99\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*scale\(\.99\)/s);
-  assert.match(css, /\.memo-disclosure > summary:hover::before,[^}]*scaleX\(1\)/s);
+  assert.doesNotMatch(css, /\.memo-disclosure > summary::before/);
+  assert.match(css, /\.memo-disclosure > summary:hover, \.memo-disclosure > summary:focus-visible\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(8px\)/s);
-  assert.match(css, /\.memo-disclosure\[open\] > summary:hover svg,[^}]*rotate\(180deg\) translateY\(3px\)/s);
+  assert.match(css, /\.memo-disclosure\[open\] > summary svg\s*\{\s*transform:\s*rotate\(180deg\);/s);
+  assert.doesNotMatch(css, /\.memo-disclosure[^}]*summary[^}]*svg\s*\{[^}]*translate/s);
   assert.match(css, /\.memo-disclosure > summary:hover,[\s\S]*?\.memo-disclosure > summary:focus-visible\s*\{\s*color:\s*var\(--deep-blue\)/s);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-disclosure > summary:active\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-disclosure > summary:active > span:first-child\s*\{[^}]*translateX\(5px\)/s);
 });
 

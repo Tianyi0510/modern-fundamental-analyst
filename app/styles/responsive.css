@@ -102,6 +102,7 @@
   .hero-actions { justify-content: flex-start; flex-wrap: wrap; }
   .metric-band { grid-template-columns: 1fr; }
   .metric { min-height: 220px; }
+  .home-page .metric strong { font-size: 52px; }
   .home-about { padding: var(--space-section) 0; grid-template-columns: 1fr; gap: 50px; }
   .home-about > div:last-child { justify-self: start; }
   .intro { padding: var(--space-section) 0 var(--space-heading-content); grid-template-columns: 1fr; }
@@ -247,16 +248,16 @@
   .memo-card:active { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(.99); }
   .memo-index-row:hover { background: transparent; transform: none; }
   .memo-index-row:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(.99); }
-  .memo-disclosure > summary:hover { padding-inline: 0; color: inherit; }
-  .memo-disclosure > summary:hover::before { transform: scaleX(0); }
+  .back-link:hover { color: inherit; transform: none; }
+  .back-link:hover .back-link-arrow { transform: none; }
+  .back-link:active { color: var(--deep-blue); transform: scale(.98); }
+  .back-link:active .back-link-arrow { transform: translateX(-4px); }
+  .memo-disclosure > summary:hover { padding-inline: 0; background: transparent; color: inherit; }
   .memo-disclosure > summary:hover > span:first-child { transform: none; }
   .memo-disclosure > summary:hover svg { transform: none; }
   .memo-disclosure[open] > summary:hover svg { transform: rotate(180deg); }
-  .memo-disclosure > summary:active { color: var(--deep-blue); }
-  .memo-disclosure > summary:active::before { transform: scaleX(1); transform-origin: left; }
+  .memo-disclosure > summary:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); color: var(--deep-blue); }
   .memo-disclosure > summary:active > span:first-child { transform: translateX(5px); }
-  .memo-disclosure > summary:active svg { transform: translateY(3px); }
-  .memo-disclosure[open] > summary:active svg { transform: rotate(180deg) translateY(3px); }
   .portfolio-mobile-sort button:hover { background: var(--white); color: var(--black); }
   .portfolio-mobile-sort button:hover svg { transform: none; }
   .portfolio-mobile-sort button:active { background: var(--black); color: var(--white); transform: scale(.97); }
