@@ -64,13 +64,20 @@
 .home-page .round-link:hover { background: var(--bright-blue); color: var(--black); transform: scale(1.04); }
 .home-page .round-link:hover .arrow-icon { transform: none; }
 .home-page .round-link:active { transform: scale(.985); }
-.metric-band { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1px; background: var(--black); border: 1px solid var(--black); }
+.metric-band { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--black); border: 1px solid var(--black); }
 .home-page .metric-band { position: relative; }
-.metric { min-height: 280px; padding: 34px; display: flex; flex-direction: column; background: var(--white); }
+.metric { min-height: 280px; padding: 34px; background: var(--white); }
 .metric-featured { background: var(--deep-blue); color: var(--white); }
 .metric-accent { background: var(--bright-blue); }
-.metric strong { margin-top: auto; }
-.metric small { margin-top: 18px; color: currentColor; opacity: .65; }
+.metric,
+.portfolio-kpis > div,
+.performance-summary > div { display: flex; flex-direction: column; }
+.metric strong,
+.portfolio-kpis strong,
+.performance-summary strong { margin-top: auto; }
+.metric small,
+.portfolio-kpis small,
+.performance-summary small { margin-top: 14px; color: currentColor; opacity: .62; }
 .home-about { padding: var(--space-section) 0; display: grid; grid-template-columns: 1.1fr .9fr; gap: 96px; align-items: end; }
 .home-about h2 { margin: 36px 0 0; }
 .home-about > div:last-child { max-width: 580px; justify-self: end; }

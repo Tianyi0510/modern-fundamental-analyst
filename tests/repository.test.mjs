@@ -240,7 +240,7 @@ test("all home locales use one shared page structure", async () => {
 });
 
 test("all portfolio and performance locales share page structures", async () => {
-  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, portfolioShared, performanceShared, styles] = await Promise.all([
+  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, portfolioShared, performanceShared, portfolioTable, styles] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
     read("app/zh-cn/portfolio/page.tsx"),
@@ -249,6 +249,7 @@ test("all portfolio and performance locales share page structures", async () => 
     read("app/zh-cn/performance/page.tsx"),
     read("components/portfolio-page-content.tsx"),
     read("components/performance-page-content.tsx"),
+    read("components/portfolio-table.tsx"),
     readStyles(),
   ]);
 
@@ -262,14 +263,18 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
   assert.match(portfolioShared, /className="portfolio-holdings-section"/);
   assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
+  assert.doesNotMatch(portfolioTable, /100\.0%/);
+  assert.match(portfolioTable, /<span className="portfolio-total-weight" role="cell" data-label=\{copy\.weight\} \/>/);
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
+  assert.match(styles, /\.metric-band\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*480px/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*display:\s*flex;[^}]*flex-direction:\s*column/s);
-  assert.match(styles, /\.portfolio-kpis strong\s*\{\s*margin-top:\s*24px/);
-  assert.match(styles, /\.portfolio-kpis small\s*\{[^}]*margin-top:\s*10px;[^}]*opacity:\s*\.62/s);
+  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*background:\s*var\(--white\)/s);
+  assert.match(styles, /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/);
+  assert.match(styles, /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/);
+  assert.match(styles, /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
   assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis > div\s*\{[^}]*padding:\s*24px/s);
   assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
@@ -286,6 +291,7 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-cost\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-weight\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*3;/s);
+  assert.match(styles, /\.portfolio-total-row \.portfolio-total-return\s*\{\s*font-weight:\s*var\(--weight-bold\)/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > \[role="cell"\]:not\(:first-child\)\s*\{[^}]*align-content:\s*start/s);
   assert.doesNotMatch(styles, /--portfolio-mobile-inline/);
   assert.match(performanceShared, /className="methodology shell section-gray"/);

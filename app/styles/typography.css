@@ -189,3 +189,4 @@
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
+.portfolio-total-row .portfolio-total-return { font-weight: var(--weight-bold); }

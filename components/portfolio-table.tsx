@@ -102,7 +102,7 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
         <strong role="cell" data-label={copy.returnPct} className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
           {formatPercent(totals.totalReturn)}
         </strong>
-        <strong className="portfolio-total-weight" role="cell" data-label={copy.weight}>100.0%</strong>
+        <span className="portfolio-total-weight" role="cell" data-label={copy.weight} />
       </div>
     </div>
   );
