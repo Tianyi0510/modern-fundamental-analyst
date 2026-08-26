@@ -1,5 +1,5 @@
 import { createHmac, randomBytes } from "node:crypto";
-import { getRedisClient, logRedisError } from "@/lib/redis";
+import { getRedisClient, logRedisError, markRedisUnavailable } from "@/lib/redis";
 
 export class RequestBodyError extends Error {
   readonly status: 400 | 413;
@@ -128,12 +128,10 @@ function getRequestIdentifier(request: Request) {
   return createHmac("sha256", secret).update(`rate-limit:${clientKey}`).digest("hex");
 }
 
-export function createMemoryRateLimiter({ windowMs, maxRequests, maxKeys = 1000 }: RateLimiterOptions) {
+function createIdentifierRateLimiter({ windowMs, maxRequests, maxKeys = 1000 }: RateLimiterOptions) {
   const requests = new Map<string, { count: number; expiresAt: number }>();
 
-  return (request: Request) => {
-    const key = getRequestIdentifier(request);
-
+  return (key: string | null) => {
     // Vercel supplies a client IP. If a different runtime does not, avoid
     // grouping every visitor into one shared bucket.
     if (!key) return false;
@@ -156,6 +154,11 @@ export function createMemoryRateLimiter({ windowMs, maxRequests, maxKeys = 1000 
   };
 }
 
+export function createMemoryRateLimiter(options: RateLimiterOptions) {
+  const isIdentifierRateLimited = createIdentifierRateLimiter(options);
+  return (request: Request) => isIdentifierRateLimited(getRequestIdentifier(request));
+}
+
 const rateLimitScript = `
 local count = redis.call("INCR", KEYS[1])
 if count == 1 then
@@ -165,7 +168,7 @@ return count
 `;
 
 export function createRateLimiter({ namespace, windowMs, maxRequests, maxKeys }: RedisRateLimiterOptions) {
-  const memoryFallback = createMemoryRateLimiter({ windowMs, maxRequests, maxKeys });
+  const memoryFallback = createIdentifierRateLimiter({ windowMs, maxRequests, maxKeys });
 
   return async (request: Request) => {
     const identifier = getRequestIdentifier(request);
@@ -173,7 +176,7 @@ export function createRateLimiter({ namespace, windowMs, maxRequests, maxKeys }:
 
     try {
       const redis = await getRedisClient();
-      if (!redis) return memoryFallback(request);
+      if (!redis) return memoryFallback(identifier);
 
       const count = await redis.eval(rateLimitScript, {
         keys: [`${RATE_LIMIT_KEY_PREFIX}:${namespace}:${identifier}`],
@@ -181,8 +184,9 @@ export function createRateLimiter({ namespace, windowMs, maxRequests, maxKeys }:
       });
       return Number(count) > maxRequests;
     } catch (error) {
+      markRedisUnavailable();
       logRedisError("Redis rate limiter unavailable", error);
-      return memoryFallback(request);
+      return memoryFallback(identifier);
     }
   };
 }

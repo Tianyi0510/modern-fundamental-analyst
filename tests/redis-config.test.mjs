@@ -19,7 +19,9 @@ test("Redis connections are bounded and reused", async () => {
   assert.match(redis, /REDIS_ALLOW_INSECURE/);
   assert.match(redis, /Redis authentication is required/);
   assert.match(redis, /unavailableUntil = Date\.now\(\) \+ CONNECTION_COOLDOWN_MS/);
-  assert.match(redis, /pendingClient\.removeAllListeners\(\)/);
+  assert.match(redis, /export function markRedisUnavailable\(\)/);
+  assert.match(redis, /suspendRedis\(pendingClient\)/);
+  assert.match(redis, /client\.removeAllListeners\(\)/);
 });
 
 test("Redis errors use bounded categories and are throttled independently", async () => {
@@ -39,7 +41,8 @@ test("API rate limiting uses Redis with a privacy-preserving memory fallback", a
   assert.doesNotMatch(requestHelpers, /createHash/);
   assert.match(requestHelpers, /redis\.eval\(rateLimitScript/);
   assert.match(requestHelpers, /mfa:rate-limit:v1/);
-  assert.match(requestHelpers, /return memoryFallback\(request\)/);
+  assert.match(requestHelpers, /markRedisUnavailable\(\)/);
+  assert.match(requestHelpers, /return memoryFallback\(identifier\)/);
   assert.match(requestHelpers, /count: current\.count \+ 1/);
   assert.doesNotMatch(requestHelpers, /number\[\]/);
 });

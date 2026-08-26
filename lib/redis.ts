@@ -39,6 +39,19 @@ export function logRedisError(message: RedisErrorCategory, error: unknown) {
   console.error(message, error instanceof Error ? error.name : "UnknownError");
 }
 
+function suspendRedis(client = state.client) {
+  state.unavailableUntil = Date.now() + CONNECTION_COOLDOWN_MS;
+  if (!client || state.client !== client) return;
+
+  state.client = null;
+  if (client.isOpen) client.destroy();
+  client.removeAllListeners();
+}
+
+export function markRedisUnavailable() {
+  suspendRedis();
+}
+
 function getRedisUrl() {
   const value = process.env.REDIS_URL;
   if (!value) return null;
@@ -93,12 +106,7 @@ export async function getRedisClient() {
         return pendingClient;
       })
       .catch((error) => {
-        state.unavailableUntil = Date.now() + CONNECTION_COOLDOWN_MS;
-        if (state.client === pendingClient) {
-          state.client = null;
-          if (pendingClient.isOpen) pendingClient.destroy();
-          pendingClient.removeAllListeners();
-        }
+        suspendRedis(pendingClient);
         throw error;
       })
       .finally(() => {

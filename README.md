@@ -118,9 +118,9 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 
 - One multiplexed client and one in-flight connection promise are reused per runtime instance.
 - Connection and socket timeouts fail quickly, the offline queue is disabled, and reconnect attempts are bounded.
-- Failed connections open a 30-second circuit breaker so an outage does not trigger a fresh authentication attempt on every request.
+- Failed connections or rate-limit commands open a 30-second circuit breaker so an outage does not trigger another Redis attempt on every request.
 - A Lua script performs `INCR` and `PEXPIRE` atomically for each fixed rate-limit window.
-- The process-local fallback mirrors the same fixed-window model with one bounded counter and expiry timestamp per client instead of retaining one timestamp per request.
+- The process-local fallback mirrors the same fixed-window model with one bounded counter and expiry timestamp per client instead of retaining one timestamp per request; fallback reuses the request's existing HMAC identifier.
 - Keys follow the versioned `mfa:rate-limit:v1:{namespace}:{digest}` convention.
 - Client identifiers always use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback. If no configured secret is available locally, the runtime generates an ephemeral HMAC key instead of using a predictable unkeyed hash.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
