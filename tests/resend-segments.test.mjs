@@ -43,9 +43,12 @@ test("preferred-language segment sync leaves only the selected language", async 
   const traditionalChinese = getPreferredLanguageSegmentId("zh-tw");
   const mock = createResendSegmentMock([english]);
 
-  await syncPreferredLanguageSegment(mock.client, "reader@example.com", "zh-tw");
+  const rollback = await syncPreferredLanguageSegment(mock.client, "reader@example.com", "zh-tw");
 
   assert.deepEqual([...mock.segmentIds], [traditionalChinese]);
+
+  await rollback();
+  assert.deepEqual([...mock.segmentIds], [english]);
 });
 
 test("preferred-language segment sync rolls back a partial failure", async () => {

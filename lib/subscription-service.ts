@@ -28,10 +28,11 @@ export async function subscribeContact(email: string, locale: Locale): Promise<S
   const shouldSendWelcome = !existing.data || existing.data.unsubscribed;
   const properties = { preferred_language: localeConfig[locale].label };
   let result;
+  let rollbackLanguageSegments: (() => Promise<void>) | null = null;
 
   if (existing.data) {
     try {
-      await syncPreferredLanguageSegment(resend, email, locale);
+      rollbackLanguageSegments = await syncPreferredLanguageSegment(resend, email, locale);
     } catch (error) {
       console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
       return unavailable();
@@ -53,6 +54,7 @@ export async function subscribeContact(email: string, locale: Locale): Promise<S
   }
 
   if (!result || result.error) {
+    if (rollbackLanguageSegments) await rollbackLanguageSegments().catch(() => undefined);
     if (result?.error) console.error("Resend subscription failed", result.error.name);
     return unavailable();
   }

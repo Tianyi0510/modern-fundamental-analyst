@@ -1,0 +1,140 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { read, readStyles } from "./repository-helpers.mjs";
+
+test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
+  const css = await readStyles();
+  const fontClamp = /font-size:\s*clamp\(/;
+
+  assert.doesNotMatch(css, fontClamp);
+  assert.doesNotMatch(css, /--weight-medium/);
+  assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
+});
+
+test("Jost renders Latin text and numbers before locale-specific CJK fallbacks", async () => {
+  const [fonts, document, css] = await Promise.all([
+    read("lib/fonts.ts"),
+    read("components/site-document.tsx"),
+    readStyles(),
+  ]);
+
+  assert.match(fonts, /import \{ Jost, Noto_Sans_SC, Noto_Sans_TC \}/);
+  assert.match(fonts, /variable: "--font-jost"/);
+  assert.match(document, /jost\.variable/);
+  assert.match(css, /--font-ui:\s*var\(--font-jost\)/);
+  assert.match(css, /\[lang="zh-Hant-TW"\] body[^}]*--font-ui:\s*var\(--font-jost\),\s*var\(--font-noto-sans-tc\)/s);
+  assert.match(css, /\[lang="zh-CN"\] body[^}]*--font-ui:\s*var\(--font-jost\),\s*var\(--font-noto-sans-sc\)/s);
+  assert.doesNotMatch(`${fonts}\n${document}\n${css}`, /font-inter|\bInter\b|inter\.variable/);
+});
+test("editorial color roles keep the footer inverse and Medium Blue auxiliary", async () => {
+  const css = await readStyles();
+
+  assert.match(css, /--deep-blue:\s*#002991/);
+  assert.match(css, /--medium-blue:\s*#008cff/);
+  assert.match(css, /--surface-primary:\s*var\(--white\)/);
+  assert.match(css, /--surface-inverse:\s*var\(--black\)/);
+  assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
+  assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
+  assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*14px/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*margin-bottom:\s*14px !important/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*font-size:\s*var\(--type-title-bold\) !important/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*letter-spacing:\s*var\(--tracking-heading\) !important/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-heading\) !important/s);
+  assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(4\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\)/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(1\),\s*\.performance-page \.performance-summary > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.about-boundaries > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\);/s);
+  assert.match(css, /\.about-boundaries > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.home-opening\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
+  assert.match(css, /\.memos-home\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*font-size:\s*var\(--type-title\)/s);
+  assert.match(css, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
+  assert.match(css, /\.performance-home\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.performance-home \.button-white\s*\{[^}]*background:\s*var\(--black\);[^}]*color:\s*var\(--white\)/s);
+  assert.match(css, /\.contact-grid > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.contact-grid > article:first-child p\s*\{[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.contact-grid > article:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.doesNotMatch(css, /\.about-boundaries\s*\{[^}]*min-height:\s*100svh/s);
+  assert.match(css, /--space-section:\s*96px/);
+  assert.match(css, /--space-section-compact:\s*72px/);
+  assert.match(css, /--space-heading-content:\s*56px/);
+  assert.match(css, /\.about-boundaries > article\s*\{[^}]*padding:\s*var\(--space-section\) 48px/s);
+  assert.doesNotMatch(css, /\.contact-grid\s*\{[^}]*min-height:\s*100svh/s);
+  assert.match(css, /\.contact-grid > article\s*\{[^}]*padding:\s*var\(--space-section\) 48px/s);
+  assert.match(css, /\.about-boundaries ol\s*\{[^}]*margin:\s*var\(--space-related-content\) 0 0/s);
+  assert.match(css, /\.contact-grid p\s*\{[^}]*margin:\s*var\(--space-related-content\) 0 0/s);
+  assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
+  assert.doesNotMatch(css, /\.(?:site-header|home-opening|home-about|page-hero|about-section|about-boundaries|about-closing|portfolio-kpis|portfolio-holdings-heading|methodology|contact-grid|site-footer)\s*\{[^}]*(?:border-top|border-bottom):/s);
+  assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
+});
+
+test("English hero copy uses sentence case and mobile arrows have intentional touch motion", async () => {
+  const [typography, responsive, subscribe, home] = await Promise.all([
+    read("app/styles/typography.css"),
+    read("app/styles/responsive.css"),
+    read("components/subscribe-form.module.css"),
+    read("components/home-page-content.tsx"),
+  ]);
+
+  assert.match(typography, /\[lang="en"\] \.hero-bottom > p,[\s\S]*?\[lang="en"\] \.page-intro p,[\s\S]*?\[lang="en"\] \.contact-hero > \.contact-note\s*\{\s*text-transform:\s*none;/);
+  assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
+  assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
+  assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
+  assert.doesNotMatch(responsive, /\.memo-index-row:active \.arrow-icon/);
+  assert.match(home, /<ArrowUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
+  assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>↗/);
+  assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
+  assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/);
+  assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/);
+  assert.match(subscribe, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/);
+});
+
+test("page sections share one responsive vertical rhythm", async () => {
+  const css = await readStyles();
+
+  assert.match(css, /--space-section:\s*96px/);
+  assert.match(css, /--space-section-compact:\s*72px/);
+  assert.match(css, /--space-heading-content:\s*56px/);
+  assert.match(css, /--space-related-content:\s*40px/);
+  assert.match(css, /@media \(max-width: 800px\)[\s\S]*--space-section:\s*72px;[\s\S]*--space-section-compact:\s*56px;[\s\S]*--space-heading-content:\s*40px;[\s\S]*--space-related-content:\s*32px;/);
+  assert.match(css, /\.hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.page-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.legal-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.memo-article\s*\{[^}]*padding:\s*0 0 var\(--space-section\)/s);
+  assert.match(css, /\.memo-article-header\s*\{[^}]*padding-top:\s*var\(--space-section\)/s);
+  assert.match(css, /\.legal-section\s*\{[^}]*padding:\s*var\(--space-section-compact\) 0/s);
+  assert.match(css, /\.memo-section \+ \.memo-section\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding-top:\s*var\(--space-section-compact\)/s);
+  assert.match(css, /\.contact-hero\s*\{[^}]*min-height:\s*0/s);
+  assert.match(css, /\.eyebrow\s*\{[^}]*margin:\s*0/s);
+  assert.match(css, /\.section-number\s*\{[^}]*margin:\s*0/s);
+  assert.match(css, /\.article-meta\s*\{[^}]*align-items:\s*center;[^}]*flex-wrap:\s*wrap/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.return-row\s*\{[^}]*align-items:\s*start/s);
+});
+
+test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
+  const [header, behavior, css] = await Promise.all([
+    read("components/site-header.tsx"),
+    read("components/use-site-header.ts"),
+    readStyles(),
+  ]);
+
+  assert.match(header, /aria-modal="true"/);
+  assert.match(behavior, /event\.key === "Escape"/);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*\.36s cubic-bezier/s);
+  assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
+  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
+  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});

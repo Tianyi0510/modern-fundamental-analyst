@@ -34,18 +34,21 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
     weight: getHoldingWeight(holding.marketValue, totals.marketValue),
   })), [holdings, totals.marketValue]);
 
-  const sortedRows = useMemo(() => rows.toSorted((a, b) => {
+  const sortedRows = useMemo(() => {
     const getSortValue = (row: (typeof rows)[number]) => {
       if (sortKey === "weight") return row.weight;
       if (sortKey === "returnPct") return row.returnPct;
       if (sortKey === "costBasis") return row.costPerShare;
       return row.holding[sortKey];
     };
-    const first = getSortValue(a);
-    const second = getSortValue(b);
-    const comparison = typeof first === "string" ? first.localeCompare(String(second)) : first - Number(second);
-    return sortDirection === "asc" ? comparison : -comparison;
-  }), [rows, sortDirection, sortKey]);
+
+    return rows.toSorted((a, b) => {
+      const first = getSortValue(a);
+      const second = getSortValue(b);
+      const comparison = typeof first === "string" ? first.localeCompare(String(second)) : first - Number(second);
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [rows, sortDirection, sortKey]);
 
   const changeSort = (nextKey: SortKey) => {
     if (nextKey === sortKey) {
@@ -99,12 +102,12 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
         <span role="cell" data-label={copy.symbol}>{copy.total}</span>
         <span role="cell" />
         <span role="cell" />
-        <span role="cell" data-label={copy.costBasis} />
+        <span role="cell" />
         <span className="portfolio-total-market" role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
         <strong role="cell" data-label={copy.returnPct} className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
           {formatPercent(totals.totalReturn)}
         </strong>
-        <span role="cell" data-label={copy.weight} />
+        <span role="cell" />
       </div>
     </div>
   );

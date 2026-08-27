@@ -13,10 +13,21 @@ export function getPreferredLanguageSegmentId(locale: Locale) {
   return preferredLanguageSegments[locale];
 }
 
-export function getLocaleFromPreferredLanguage(value: unknown): Locale {
-  if (value === "繁體中文") return "zh-tw";
-  if (value === "简体中文") return "zh-cn";
-  return "en";
+type SegmentRollback = () => Promise<void>;
+
+async function restorePreferredLanguageSegments(
+  resend: Resend,
+  email: string,
+  segmentIds: ReadonlyArray<string>,
+  removeTarget: boolean,
+  targetId: string,
+) {
+  const results = await Promise.allSettled([
+    ...segmentIds.map((segmentId) => resend.contacts.segments.add({ email, segmentId })),
+    ...(removeTarget ? [resend.contacts.segments.remove({ email, segmentId: targetId })] : []),
+  ]);
+  const failed = results.some((result) => result.status === "rejected" || result.value.error);
+  if (failed) throw new Error("Unable to restore preferred language segments");
 }
 
 export async function syncPreferredLanguageSegment(resend: Resend, email: string, locale: Locale) {
@@ -46,10 +57,9 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
       removedLanguageIds.push(segmentId);
     }
   } catch (error) {
-    await Promise.allSettled([
-      ...removedLanguageIds.map((segmentId) => resend.contacts.segments.add({ email, segmentId })),
-      ...(targetAdded ? [resend.contacts.segments.remove({ email, segmentId: targetId })] : []),
-    ]);
+    await restorePreferredLanguageSegments(resend, email, removedLanguageIds, targetAdded, targetId).catch(() => undefined);
     throw error;
   }
+
+  return (() => restorePreferredLanguageSegments(resend, email, previousLanguageIds, targetWasAdded, targetId)) satisfies SegmentRollback;
 }

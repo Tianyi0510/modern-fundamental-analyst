@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, readObjectJson } from "@/lib/api-request";
 import { localeConfig, resolveLocale } from "@/lib/i18n";
 import { getResendClient, runResendOperation } from "@/lib/resend";
-import { getLocaleFromPreferredLanguage, syncPreferredLanguageSegment } from "@/lib/resend-segments";
+import { syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { readPreferenceToken } from "@/lib/subscription-preferences";
 
 export const runtime = "nodejs";
@@ -44,9 +44,9 @@ export async function POST(request: Request) {
   if (!existing.data) return NextResponse.json({ error: "Subscription preferences could not be found." }, { status: 404 });
 
   if (action === "save") {
-    const previousLocale = getLocaleFromPreferredLanguage(existing.data.properties.preferred_language?.value);
+    let rollbackLanguageSegments: (() => Promise<void>) | null = null;
     try {
-      await syncPreferredLanguageSegment(resend, payload.email, locale);
+      rollbackLanguageSegments = await syncPreferredLanguageSegment(resend, payload.email, locale);
     } catch (error) {
       console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       properties: { preferred_language: localeConfig[locale].label },
     }));
     if (!result || result.error) {
-      await syncPreferredLanguageSegment(resend, payload.email, previousLocale).catch(() => undefined);
+      if (rollbackLanguageSegments) await rollbackLanguageSegments().catch(() => undefined);
       if (result?.error) console.error("Resend preferences update failed", result.error.name);
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
     }
