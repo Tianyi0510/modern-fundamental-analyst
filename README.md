@@ -14,6 +14,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Newsletter subscription, localized welcome emails, language preferences, and self-service unsubscribe
 - Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
 - Vercel Analytics and Speed Insights
+- Shared footer navigation with GitHub and LinkedIn profile links
 - Responsive navigation, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
 
 ## Technology
@@ -56,7 +57,7 @@ The three language versions share page components wherever possible. Locale file
 
 ## Design System
 
-The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices.
+The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts across desktop and mobile.
 
 ### Color Tokens
 
