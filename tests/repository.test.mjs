@@ -287,6 +287,7 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
   assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
   assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
+  assert.match(portfolioTable, /const columns: SortKey\[\] = \["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"\]/);
   assert.doesNotMatch(portfolioTable, /formatUsd\(totals\.costBasis\)|100\.0%/);
   assert.match(portfolioTable, /portfolio-total-market[^>]*>\{formatUsd\(totals\.marketValue\)\}<\/span>/);
   assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
@@ -357,7 +358,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*48px;[^}]*align-items:\s*start/s);
-  assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-headline\);[^}]*line-height:\s*var\(--leading-heading\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-headline\);[^}]*line-height:\s*var\(--leading-heading\);[^}]*font-weight:\s*var\(--weight-bold\);[^}]*text-align:\s*right/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*40px minmax\(0, 1fr\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
 });

@@ -21,7 +21,7 @@ export type PortfolioTableCopy = Record<SortKey, string> & {
   total: string;
 };
 
-const columns: SortKey[] = ["symbol", "shares", "costBasis", "price", "marketValue", "returnPct", "weight"];
+const columns: SortKey[] = ["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"];
 
 export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("marketValue");
@@ -88,8 +88,8 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
           <div className="portfolio-row" role="row" key={holding.symbol}>
             <span role="cell" data-label={copy.symbol}>{holding.symbol}</span>
             <span role="cell" data-label={copy.shares}>{formatShares(holding.shares)}</span>
-            <span role="cell" data-label={copy.costBasis}>{formatUsd(costPerShare)}</span>
             <span role="cell" data-label={copy.price}>{formatUsd(holding.price)}</span>
+            <span role="cell" data-label={copy.costBasis}>{formatUsd(costPerShare)}</span>
             <span role="cell" data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</span>
             <span role="cell" data-label={copy.returnPct} className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}>{formatPercent(returnPct, 1)}</span>
             <span role="cell" data-label={copy.weight}>{weight.toFixed(1)}%</span>
@@ -98,8 +98,8 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
       <div className="portfolio-row portfolio-total-row" role="row">
         <span role="cell" data-label={copy.symbol}>{copy.total}</span>
         <span role="cell" />
-        <span role="cell" data-label={copy.costBasis} />
         <span role="cell" />
+        <span role="cell" data-label={copy.costBasis} />
         <span className="portfolio-total-market" role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
         <strong role="cell" data-label={copy.returnPct} className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
           {formatPercent(totals.totalReturn)}
