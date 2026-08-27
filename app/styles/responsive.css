@@ -234,8 +234,7 @@
   .allocation-card > a:active { color: var(--deep-blue); }
   .home-page .text-link:active .arrow-icon,
   .allocation-card > a:active .arrow-icon { transform: translateX(5px); }
-  .home-page .round-link:active .arrow-icon,
-  .memo-index-row:active .arrow-icon { transform: translate(3px, -3px); }
+  .home-page .round-link:active .arrow-icon { transform: translate(3px, -3px); }
 
   .site-footer .footer-links a:hover { color: var(--black); }
   .site-footer .footer-links a:active { color: var(--deep-blue); }

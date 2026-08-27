@@ -149,11 +149,15 @@
 .cta { padding: var(--space-section) 0; display: grid; grid-template-columns: 1fr auto; align-items: end; }
 .cta .eyebrow { grid-column: 1 / -1; margin: 0 0 46px; }
 .cta h2 { margin: 0; }
-.site-footer { padding: 74px 0 30px; display: grid; grid-template-columns: minmax(220px,.9fr) minmax(140px,.45fr) minmax(360px,1.35fr); gap: 64px; align-items: start; }
-.footer-brand { display: grid; gap: 28px; }
+.site-footer { padding: 74px 0 30px; display: grid; grid-template-columns: minmax(220px,.9fr) minmax(140px,.45fr) minmax(360px,1.35fr); gap: 64px; align-items: start; text-align: left; }
+.footer-brand, .footer-navigation { min-width: 0; align-self: start; text-align: left; }
+.footer-brand { display: grid; justify-items: start; gap: 28px; }
 .footer-mark { max-width: 320px; }
 .site-footer p { margin: 0; max-width: 390px; color: rgba(255,255,255,.62); }
 .footer-heading { margin-bottom: 20px !important; color: var(--bright-blue) !important; font-size: var(--type-label) !important; font-weight: var(--weight-bold) !important; letter-spacing: var(--tracking-label) !important; line-height: 1.3 !important; }
-.footer-links { display: grid; gap: 14px; }
+.footer-links { display: grid; justify-items: start; gap: 14px; }
+.footer-links a { width: fit-content; min-height: 24px; display: inline-flex; align-items: center; }
+.footer-github { gap: 8px; }
+.footer-github svg { flex: none; }
 .footer-bottom { grid-column: 1 / -1; margin-top: 34px; padding-top: 26px; border-top: 1px solid rgba(255,255,255,.22); }
 .footer-bottom small { color: rgba(255,255,255,.62); }

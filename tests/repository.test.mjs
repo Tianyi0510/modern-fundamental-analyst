@@ -553,7 +553,7 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
-test("English hero copy uses sentence case and mobile arrows have touch motion", async () => {
+test("English hero copy uses sentence case and mobile arrows have intentional touch motion", async () => {
   const [typography, responsive, subscribe, home] = await Promise.all([
     read("app/styles/typography.css"),
     read("app/styles/responsive.css"),
@@ -564,7 +564,8 @@ test("English hero copy uses sentence case and mobile arrows have touch motion",
   assert.match(typography, /\[lang="en"\] \.hero-bottom > p,[\s\S]*?\[lang="en"\] \.page-intro p,[\s\S]*?\[lang="en"\] \.contact-hero > \.contact-note\s*\{\s*text-transform:\s*none;/);
   assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
-  assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon,[\s\S]*?\.memo-index-row:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
+  assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
+  assert.doesNotMatch(responsive, /\.memo-index-row:active \.arrow-icon/);
   assert.match(home, /<ArrowUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
   assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>↗/);
   assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
@@ -626,7 +627,8 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /\.memo-card:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 22%, var\(--white\)\);[^}]*scale\(\.99\)/s);
   assert.doesNotMatch(css, /\.memo-card:hover\s*\{[^}]*translateY/);
   assert.match(css, /\.memo-index-row:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
-  assert.match(css, /\.memo-index-row:hover \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\)/);
+  assert.match(css, /\.memo-index-row \.arrow-icon\s*\{\s*transform:\s*none;\s*transition:\s*none;/);
+  assert.doesNotMatch(css, /\.memo-index-row:hover \.arrow-icon/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:active\s*\{[^}]*scale\(\.99\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*scale\(\.99\)/s);
   assert.doesNotMatch(css, /\.memo-disclosure > summary::before/);

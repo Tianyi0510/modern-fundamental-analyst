@@ -45,7 +45,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   color: var(--text-inverse);
 }
 .about-boundaries > article:first-child li { border-top-color: rgba(255,255,255,.28); }
-.about-boundaries > article:first-child li::before { color: var(--text-highlight); }
+.about-boundaries > article:first-child .about-boundary-number { color: var(--text-highlight); }
 .contact-grid > article:first-child p { color: var(--text-inverse); }
 
 /* Bright Blue / Black and Bright Blue / Deep Blue */
