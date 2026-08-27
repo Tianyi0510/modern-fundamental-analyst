@@ -182,7 +182,7 @@
 .legal h1 { max-width: 1000px; margin: var(--space-heading-content) 0 0; }
 .legal-body { padding: var(--space-section-compact) 0 var(--space-section); background: var(--white); }
 .legal-content { display: grid; gap: 16px; }
-.legal-section { display: grid; grid-template-columns: 64px minmax(220px, .8fr) minmax(0, 1.2fr); gap: 48px; align-items: baseline; padding: var(--space-section-compact) 0; }
+.legal-section { display: grid; grid-template-columns: 64px minmax(220px, .8fr) minmax(0, 1.2fr); gap: 48px; align-items: start; padding: var(--space-section-compact) 0; }
 .legal-section-number { color: var(--medium-blue); font-family: var(--font-ui); font-size: var(--type-body-large); line-height: var(--leading-body); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
 .legal h2 { margin: 0; }
 .legal p { max-width: 720px; margin: 0; color: var(--black); }

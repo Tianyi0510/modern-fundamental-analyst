@@ -2,6 +2,7 @@ export type PortfolioHolding = {
   symbol: string;
   shares: number;
   costBasis: number;
+  stockCost: number;
   price: number;
   marketValue: number;
 };

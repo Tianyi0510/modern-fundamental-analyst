@@ -196,12 +196,9 @@
   .portfolio-table-detailed .portfolio-total-row { padding-block: 28px; grid-template-rows: auto auto auto; align-items: start; row-gap: 24px; }
   .portfolio-table-detailed .portfolio-total-row > [role="cell"]:empty { display: none; }
   .portfolio-table-detailed .portfolio-total-row > span:first-child { grid-column: 1 / -1; color: var(--black); }
-  .portfolio-table-detailed .portfolio-total-row > [role="cell"]:not(:first-child) { align-content: start; }
-  .portfolio-table-detailed .portfolio-total-cost { grid-column: 1; grid-row: 2; }
-  .portfolio-table-detailed .portfolio-total-market { grid-column: 2; grid-row: 2; }
-  .portfolio-table-detailed .portfolio-total-return { grid-column: 1; grid-row: 3; }
-  .portfolio-table-detailed .portfolio-total-weight { grid-column: 2; grid-row: 3; }
   .portfolio-desktop-instruction { display: none; }
+  .portfolio-table-detailed .portfolio-total-market { grid-column: 1; grid-row: 2; }
+  .portfolio-table-detailed .portfolio-total-return { grid-column: 2; grid-row: 2; }
 }
 
 @media (max-width: 420px) {

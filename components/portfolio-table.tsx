@@ -37,6 +37,7 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
     const getSortValue = (row: (typeof rows)[number]) => {
       if (sortKey === "weight") return row.weight;
       if (sortKey === "returnPct") return row.returnPct;
+      if (sortKey === "costBasis") return row.holding.stockCost;
       return row.holding[sortKey];
     };
     const first = getSortValue(a);
@@ -86,7 +87,7 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
           <div className="portfolio-row" role="row" key={holding.symbol}>
             <span role="cell" data-label={copy.symbol}>{holding.symbol}</span>
             <span role="cell" data-label={copy.shares}>{formatShares(holding.shares)}</span>
-            <span role="cell" data-label={copy.costBasis}>{formatUsd(holding.costBasis)}</span>
+            <span role="cell" data-label={copy.costBasis}>{formatUsd(holding.stockCost)}</span>
             <span role="cell" data-label={copy.price}>{formatUsd(holding.price)}</span>
             <span role="cell" data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</span>
             <span role="cell" data-label={copy.returnPct} className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}>{formatPercent(returnPct, 1)}</span>
@@ -96,13 +97,13 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
       <div className="portfolio-row portfolio-total-row" role="row">
         <span role="cell" data-label={copy.symbol}>{copy.total}</span>
         <span role="cell" />
-        <span className="portfolio-total-cost" role="cell" data-label={copy.costBasis}>{formatUsd(totals.costBasis)}</span>
+        <span role="cell" data-label={copy.costBasis} />
         <span role="cell" />
         <span className="portfolio-total-market" role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
         <strong role="cell" data-label={copy.returnPct} className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
           {formatPercent(totals.totalReturn)}
         </strong>
-        <span className="portfolio-total-weight" role="cell" data-label={copy.weight} />
+        <span role="cell" data-label={copy.weight} />
       </div>
     </div>
   );

@@ -82,9 +82,13 @@ test("portfolio calculations remain internally consistent", async () => {
   assert.equal(totals.costBasis, portfolioSnapshot.costBasis);
   assert.equal(totals.marketValue, portfolioSnapshot.marketValue);
   assert.equal(totals.totalReturn, portfolioSnapshot.totalReturn);
+  const stockCost = portfolioHoldings.reduce((sum, holding) => sum + holding.stockCost, 0);
+  assert.ok(Math.abs(stockCost - 96243.82) < 0.001, "stock cost must match the disclosed position-level U.S. trade amounts");
 
   for (const holding of portfolioHoldings) {
     assert.ok(holding.costBasis > 0, `${holding.symbol} must have a positive cost basis`);
+    assert.ok(holding.stockCost > 0, `${holding.symbol} must have a positive stock cost`);
+    assert.ok(holding.stockCost <= holding.costBasis, `${holding.symbol} stock cost must exclude fees from net cost basis`);
     assert.ok(Number.isFinite(getHoldingReturn(holding)), `${holding.symbol} must have a finite return`);
     assert.ok(Math.abs(holding.shares * holding.price - holding.marketValue) < 0.01, `${holding.symbol} market value must equal shares × price`);
   }
@@ -281,8 +285,13 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
   assert.match(portfolioShared, /className="portfolio-holdings-section"/);
   assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
-  assert.doesNotMatch(portfolioTable, /100\.0%/);
-  assert.match(portfolioTable, /<span className="portfolio-total-weight" role="cell" data-label=\{copy\.weight\} \/>/);
+  assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.holding\.stockCost/);
+  assert.match(portfolioTable, /formatUsd\(holding\.stockCost\)/);
+  assert.doesNotMatch(portfolioTable, /formatUsd\(totals\.costBasis\)|100\.0%/);
+  assert.match(portfolioTable, /portfolio-total-market[^>]*>\{formatUsd\(totals\.marketValue\)\}<\/span>/);
+  assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
+  assert.doesNotMatch(portfolioTable, /portfolio-total-(?:cost|weight)/);
+  assert.match(styles, /\.portfolio-total-row \.portfolio-total-return\s*\{\s*font-weight:\s*var\(--weight-bold\)/s);
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
   assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
@@ -309,11 +318,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*display:\s*inline-flex;[^}]*justify-content:\s*center/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
   assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-cost\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-weight\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*3;/s);
-  assert.match(styles, /\.portfolio-total-row \.portfolio-total-return\s*\{\s*font-weight:\s*var\(--weight-bold\)/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-row > \[role="cell"\]:not\(:first-child\)\s*\{[^}]*align-content:\s*start/s);
   assert.doesNotMatch(styles, /--portfolio-mobile-inline/);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-market\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
+  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-return\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*2;/s);
   assert.match(performanceShared, /className="methodology shell section-gray"/);
   assert.match(styles, /--background-gray:\s*#f8f9fb/);
   assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
@@ -349,7 +356,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*48px;[^}]*align-items:\s*baseline/s);
+  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*48px;[^}]*align-items:\s*start/s);
   assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*40px minmax\(0, 1fr\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
