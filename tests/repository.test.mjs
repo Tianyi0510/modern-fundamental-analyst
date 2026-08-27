@@ -180,8 +180,7 @@ test("memo article uses the source document prose and the wider references layou
   assert.match(styles, /\.article-body\s*\{[^}]*width:\s*min\(1040px, 100%\);[^}]*margin-inline:\s*auto/s);
   assert.doesNotMatch(detailPage, /All Investment Memos|back-link/);
   assert.doesNotMatch(styles, /\.back-link(?:-arrow)?/);
-  assert.match(styles, /\.article-body p \+ p\s*\{[^}]*margin-top:\s*1\.35em/s);
-  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*1\.35em;[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding:\s*var\(--space-section-compact\) 48px;[^}]*background:\s*var\(--background-gray\)/s);
   assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
 });
@@ -341,6 +340,8 @@ test("all contact and disclaimer locales share page structures", async () => {
   ]);
   assert.match(disclaimer, /className="legal-hero"/);
   assert.match(disclaimer, /className="legal-body"/);
+  assert.match(disclaimer, /className="legal-section-number"/);
+  assert.doesNotMatch(disclaimer, />·<|numbered-label/);
   assert.match(styles, /\.legal > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal-hero\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s);
@@ -348,7 +349,9 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(styles, /\.legal-section\s*\{[^}]*align-items:\s*start/s);
+  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*48px;[^}]*align-items:\s*baseline/s);
+  assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*40px minmax\(0, 1fr\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
 });
 
@@ -486,7 +489,10 @@ test("all about locales use one shared page structure", async () => {
   assert.match(shared, /index % 2 === 1 \? " section-gray"/);
   assert.match(styles, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
   assert.match(shared, /text\.boundaries\.map/);
-  assert.match(styles, /\.about-boundaries li\s*\{[^}]*align-items:\s*start/s);
+  assert.match(shared, /className="about-boundary-number"/);
+  assert.doesNotMatch(shared, /about-boundary-item|numbered-label/);
+  assert.match(styles, /\.about-boundaries li\s*\{[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*align-items:\s*baseline/s);
+  assert.match(styles, /\.about-boundary-number\s*\{[^}]*font-size:\s*var\(--type-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
 });
 
 test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {

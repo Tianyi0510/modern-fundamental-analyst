@@ -119,7 +119,6 @@
 .performance-summary span,
 .table-head,
 .contact-grid span,
-.legal-section-number,
 .memo-card > div {
   font-family: var(--font-ui);
   font-size: var(--type-label);
