@@ -2,7 +2,6 @@ export type PortfolioHolding = {
   symbol: string;
   shares: number;
   costBasis: number;
-  stockCost: number;
   price: number;
   marketValue: number;
 };
@@ -10,6 +9,10 @@ export type PortfolioHolding = {
 export function getHoldingReturn(holding: Pick<PortfolioHolding, "costBasis" | "marketValue">) {
   return ((holding.marketValue - holding.costBasis) / holding.costBasis) * 100;
 }
+export function getHoldingCostPerShare(holding: Pick<PortfolioHolding, "costBasis" | "shares">) {
+  return holding.costBasis / holding.shares;
+}
+
 
 export function getPortfolioTotals(holdings: ReadonlyArray<PortfolioHolding>) {
   const { costBasis, marketValue } = holdings.reduce(

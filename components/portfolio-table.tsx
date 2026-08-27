@@ -3,7 +3,7 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatPercent, formatShares, formatUsd } from "@/lib/format";
-import { getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/lib/portfolio-calculations";
+import { getHoldingCostPerShare, getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/lib/portfolio-calculations";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
@@ -30,6 +30,7 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
   const rows = useMemo(() => holdings.map((holding) => ({
     holding,
     returnPct: getHoldingReturn(holding),
+    costPerShare: getHoldingCostPerShare(holding),
     weight: getHoldingWeight(holding.marketValue, totals.marketValue),
   })), [holdings, totals.marketValue]);
 
@@ -37,7 +38,7 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
     const getSortValue = (row: (typeof rows)[number]) => {
       if (sortKey === "weight") return row.weight;
       if (sortKey === "returnPct") return row.returnPct;
-      if (sortKey === "costBasis") return row.holding.stockCost;
+      if (sortKey === "costBasis") return row.costPerShare;
       return row.holding[sortKey];
     };
     const first = getSortValue(a);
@@ -83,11 +84,11 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
           </span>;
         })}
       </div>
-      {sortedRows.map(({ holding, returnPct, weight }) => (
+      {sortedRows.map(({ holding, costPerShare, returnPct, weight }) => (
           <div className="portfolio-row" role="row" key={holding.symbol}>
             <span role="cell" data-label={copy.symbol}>{holding.symbol}</span>
             <span role="cell" data-label={copy.shares}>{formatShares(holding.shares)}</span>
-            <span role="cell" data-label={copy.costBasis}>{formatUsd(holding.stockCost)}</span>
+            <span role="cell" data-label={copy.costBasis}>{formatUsd(costPerShare)}</span>
             <span role="cell" data-label={copy.price}>{formatUsd(holding.price)}</span>
             <span role="cell" data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</span>
             <span role="cell" data-label={copy.returnPct} className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}>{formatPercent(returnPct, 1)}</span>

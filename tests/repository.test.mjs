@@ -69,26 +69,25 @@ test("portfolio totals are derived from holdings", async () => {
   assert.match(calculations, /\(marketValue - costBasis\) \/ costBasis/);
   assert.match(calculations, /holdingsCount: holdings\.length/);
   assert.match(calculations, /getHoldingReturn/);
+  assert.match(calculations, /return holding\.costBasis \/ holding\.shares/);
   assert.match(portfolio, /getPortfolioTotals\(portfolioHoldings\)/);
   assert.doesNotMatch(portfolio, /returnPct:/);
   assert.doesNotMatch(portfolio, /totalReturn:\s*22\b/);
 });
 
 test("portfolio calculations remain internally consistent", async () => {
-  const { getHoldingReturn, getPortfolioTotals, portfolioHoldings, portfolioSnapshot } = await import("../data/portfolio.ts");
+  const { getHoldingCostPerShare, getHoldingReturn, getPortfolioTotals, portfolioHoldings, portfolioSnapshot } = await import("../data/portfolio.ts");
   const totals = getPortfolioTotals(portfolioHoldings);
 
   assert.equal(totals.holdingsCount, portfolioHoldings.length);
   assert.equal(totals.costBasis, portfolioSnapshot.costBasis);
   assert.equal(totals.marketValue, portfolioSnapshot.marketValue);
   assert.equal(totals.totalReturn, portfolioSnapshot.totalReturn);
-  const stockCost = portfolioHoldings.reduce((sum, holding) => sum + holding.stockCost, 0);
-  assert.ok(Math.abs(stockCost - 96243.82) < 0.001, "stock cost must match the disclosed position-level U.S. trade amounts");
 
   for (const holding of portfolioHoldings) {
     assert.ok(holding.costBasis > 0, `${holding.symbol} must have a positive cost basis`);
-    assert.ok(holding.stockCost > 0, `${holding.symbol} must have a positive stock cost`);
-    assert.ok(holding.stockCost <= holding.costBasis, `${holding.symbol} stock cost must exclude fees from net cost basis`);
+    assert.ok(getHoldingCostPerShare(holding) > 0, `${holding.symbol} must have a positive per-share cost`);
+    assert.ok(Math.abs(getHoldingCostPerShare(holding) * holding.shares - holding.costBasis) < 0.001, `${holding.symbol} per-share cost must reconcile to net cost basis`);
     assert.ok(Number.isFinite(getHoldingReturn(holding)), `${holding.symbol} must have a finite return`);
     assert.ok(Math.abs(holding.shares * holding.price - holding.marketValue) < 0.01, `${holding.symbol} market value must equal shares × price`);
   }
@@ -285,8 +284,9 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
   assert.match(portfolioShared, /className="portfolio-holdings-section"/);
   assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
-  assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.holding\.stockCost/);
-  assert.match(portfolioTable, /formatUsd\(holding\.stockCost\)/);
+  assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
+  assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
+  assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
   assert.doesNotMatch(portfolioTable, /formatUsd\(totals\.costBasis\)|100\.0%/);
   assert.match(portfolioTable, /portfolio-total-market[^>]*>\{formatUsd\(totals\.marketValue\)\}<\/span>/);
   assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
@@ -357,7 +357,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*48px;[^}]*align-items:\s*start/s);
-  assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-headline\);[^}]*line-height:\s*var\(--leading-heading\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*40px minmax\(0, 1fr\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
 });
