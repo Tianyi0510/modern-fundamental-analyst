@@ -347,6 +347,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
+  assert.match(styles, /\.legal-section\s*\{[^}]*align-items:\s*start/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
 });
 
@@ -370,6 +371,8 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(client, /fetch\("\/api\/contact"/);
   assert.match(client, /contact-form\.module\.css/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
+  assert.match(styles, /\.form\s*\{[^}]*padding:\s*40px 40px 0/s);
+  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.form\s*\{[^}]*padding:\s*26px 22px 0/s);
   assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
   assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
@@ -402,6 +405,8 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /"use client"/);
   assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
+  assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
+  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start/s);
   assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
@@ -480,6 +485,7 @@ test("all about locales use one shared page structure", async () => {
   assert.match(shared, /index % 2 === 1 \? " section-gray"/);
   assert.match(styles, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
   assert.match(shared, /text\.boundaries\.map/);
+  assert.match(styles, /\.about-boundaries li\s*\{[^}]*align-items:\s*start/s);
 });
 
 test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
@@ -516,6 +522,8 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
   assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
+  assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*24px/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*margin-bottom:\s*28px !important/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
@@ -590,6 +598,10 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /\.legal-section\s*\{[^}]*padding:\s*var\(--space-section-compact\) 0/s);
   assert.match(css, /\.memo-section \+ \.memo-section\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding-top:\s*var\(--space-section-compact\)/s);
   assert.match(css, /\.contact-hero\s*\{[^}]*min-height:\s*0/s);
+  assert.match(css, /\.eyebrow\s*\{[^}]*margin:\s*0/s);
+  assert.match(css, /\.section-number\s*\{[^}]*margin:\s*0/s);
+  assert.match(css, /\.article-meta\s*\{[^}]*align-items:\s*center;[^}]*flex-wrap:\s*wrap/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.return-row\s*\{[^}]*align-items:\s*start/s);
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
@@ -627,6 +639,7 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /\.memo-card:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 22%, var\(--white\)\);[^}]*scale\(\.99\)/s);
   assert.doesNotMatch(css, /\.memo-card:hover\s*\{[^}]*translateY/);
   assert.match(css, /\.memo-index-row:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
+  assert.match(css, /\.memo-index-row\s*\{[^}]*align-items:\s*start/s);
   assert.match(css, /\.memo-index-row \.arrow-icon\s*\{\s*transform:\s*none;\s*transition:\s*none;/);
   assert.doesNotMatch(css, /\.memo-index-row:hover \.arrow-icon/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:active\s*\{[^}]*scale\(\.99\)/s);

@@ -145,7 +145,7 @@
   .returns, .methodology { padding: var(--space-section) 0; }
   .performance-page .returns { gap: var(--space-related-content); }
   .returns-table .table-head { display: none; }
-  .return-row { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; padding: 24px 0; align-items: baseline; }
+  .return-row { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; padding: 24px 0; align-items: start; }
   .return-row > :nth-child(3) { grid-column: 1 / -1; text-align: left; font-size: var(--type-body); }
   .memo-index-row { grid-template-columns: 44px 1fr; gap: 18px; }
   .memo-index { padding-top: var(--space-section); }
