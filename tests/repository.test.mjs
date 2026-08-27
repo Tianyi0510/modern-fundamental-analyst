@@ -180,7 +180,8 @@ test("memo article uses the source document prose and the wider references layou
   assert.match(styles, /\.article-body\s*\{[^}]*width:\s*min\(1040px, 100%\);[^}]*margin-inline:\s*auto/s);
   assert.doesNotMatch(detailPage, /All Investment Memos|back-link/);
   assert.doesNotMatch(styles, /\.back-link(?:-arrow)?/);
-  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*18px;[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.article-body p \+ p\s*\{[^}]*margin-top:\s*1\.35em/s);
+  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*1\.35em;[^}]*background:\s*var\(--background-gray\)/s);
   assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
 });
@@ -406,7 +407,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
-  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*14px/s);
+  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*15px/s);
   assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);

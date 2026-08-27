@@ -163,7 +163,7 @@
 .memo-section + .memo-section { margin-top: var(--space-section); padding-top: var(--space-section-compact); border-top: 1px solid var(--black); }
 .memo-subsection { margin-top: var(--space-heading-content); }
 .memo-subsection h3 { margin: 0 0 18px; }
-.memo-references { margin-top: 18px; padding: var(--space-section-compact) 48px; background: var(--background-gray); }
+.memo-references { margin-top: 1.35em; padding: var(--space-section-compact) 48px; background: var(--background-gray); }
 .memo-references ol { margin: 0; padding-left: 22px; }
 .memo-references li + li { margin-top: 14px; }
 .article-source-note { margin-top: 46px !important; color: rgba(0,0,0,.62); line-height: 1.65; }

@@ -1,6 +1,6 @@
 .section { min-width: 0; align-self: start; }
 .section h2 { margin: 0; color: var(--white); font-size: var(--type-title-bold); line-height: 1.1; letter-spacing: -.03em; font-weight: var(--weight-bold); text-transform: capitalize; }
-.form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; margin-top: 14px; }
+.form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; margin-top: 15px; }
 .field { min-width: 0; }
 .field span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .control { display: block; width: 100%; min-height: 52px; padding: 13px 20px; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; background: transparent; color: var(--white); font: inherit; font-size: var(--type-body); }
