@@ -13,10 +13,12 @@ test("Redis connections are bounded and reused", async () => {
   assert.match(redis, /commandsQueueMaxLength: MAX_COMMAND_QUEUE_LENGTH/);
   assert.match(redis, /MAX_COMMAND_QUEUE_LENGTH = 100/);
   assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
-  assert.match(redis, /process\.env\.REDIS_URL/);
-  assert.match(redis, /__mfaRedisStateV4/);
-  assert.match(redis, /url\.protocol === "redis:"/);
-  assert.match(redis, /REDIS_ALLOW_INSECURE/);
+  assert.match(redis, /process\.env\.UPSTASH_REDIS_URL/);
+  assert.doesNotMatch(redis, /process\.env\.REDIS_URL\b/);
+  assert.match(redis, /__mfaRedisStateV5/);
+  assert.match(redis, /url\.protocol !== "rediss:"/);
+  assert.match(redis, /Upstash Redis requires TLS/);
+  assert.doesNotMatch(redis, /REDIS_ALLOW_INSECURE/);
   assert.match(redis, /Redis authentication is required/);
   assert.match(redis, /unavailableUntil = Date\.now\(\) \+ CONNECTION_COOLDOWN_MS/);
   assert.match(redis, /export function markRedisUnavailable\(\)/);
