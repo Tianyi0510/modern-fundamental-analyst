@@ -153,7 +153,8 @@
   .memo-meta { grid-column: 2; flex-direction: row; align-items: center; }
   .memo-meta b { margin: 0 0 0 auto; }
   .article-body { margin-left: 0; }
-  .memo-section + .memo-section, .memo-references { margin-top: var(--space-section); padding-top: var(--space-section-compact); }
+  .memo-section + .memo-section { margin-top: var(--space-section); padding-top: var(--space-section-compact); }
+  .memo-references { padding-top: var(--space-section-compact); }
   .contact-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
   .contact-grid > article { padding: var(--space-section) 24px; }
   .legal-hero { padding: var(--space-section) 0; }
@@ -247,10 +248,6 @@
   .memo-card:active { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(.99); }
   .memo-index-row:hover { background: transparent; transform: none; }
   .memo-index-row:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(.99); }
-  .back-link:hover { color: inherit; transform: none; }
-  .back-link:hover .back-link-arrow { transform: none; }
-  .back-link:active { color: var(--deep-blue); transform: scale(.98); }
-  .back-link:active .back-link-arrow { transform: translateX(-4px); }
   .memo-disclosure > summary:hover { padding-inline: 0; background: transparent; color: inherit; }
   .memo-disclosure > summary:hover > span:first-child { transform: none; }
   .memo-disclosure > summary:hover svg { transform: none; }

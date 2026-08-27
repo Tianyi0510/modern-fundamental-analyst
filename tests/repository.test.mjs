@@ -178,10 +178,9 @@ test("memo article uses the source document prose and the wider references layou
   assert.match(content, /Microsoft‘s retained earnings surged from \$24\.2 billion/);
   assert.doesNotMatch(content, /Business Conclusion|Management Conclusion|Financial Conclusion/);
   assert.match(styles, /\.article-body\s*\{[^}]*width:\s*min\(1040px, 100%\);[^}]*margin-inline:\s*auto/s);
-  assert.match(detailPage, /className="back-link-arrow" aria-hidden="true">←<\/span>/);
-  assert.match(styles, /\.back-link:hover \.back-link-arrow,[^}]*translateX\(-6px\)/s);
-  assert.match(styles, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.back-link:active \.back-link-arrow\s*\{\s*transform:\s*translateX\(-4px\)/s);
-  assert.match(styles, /\.memo-references\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.doesNotMatch(detailPage, /All Investment Memos|back-link/);
+  assert.doesNotMatch(styles, /\.back-link(?:-arrow)?/);
+  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*18px;[^}]*background:\s*var\(--background-gray\)/s);
   assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
 });
@@ -343,6 +342,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(disclaimer, /className="legal-body"/);
   assert.match(styles, /\.legal > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal-hero\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s);
   assert.match(styles, /\.legal-body\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
@@ -406,7 +406,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
-  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start/s);
+  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*14px/s);
   assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
@@ -522,8 +522,11 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
   assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
-  assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*24px/s);
-  assert.match(css, /\.footer-heading\s*\{[^}]*margin-bottom:\s*28px !important/s);
+  assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*14px/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*margin-bottom:\s*14px !important/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*font-size:\s*var\(--type-title-bold\) !important/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*letter-spacing:\s*var\(--tracking-heading\) !important/s);
+  assert.match(css, /\.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-heading\) !important/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);

@@ -146,8 +146,7 @@
 }
 
 .button,
-.text-link,
-.back-link {
+.text-link {
   font-size: var(--type-button);
   line-height: 1.2;
   font-weight: var(--weight-bold);
