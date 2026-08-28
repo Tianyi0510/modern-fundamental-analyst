@@ -83,7 +83,7 @@
   font: inherit;
   font-size: var(--type-body);
   line-height: var(--leading-body);
-  transition: border-color .18s ease, box-shadow .18s ease;
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-standard), box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 textarea.control {
@@ -112,13 +112,13 @@ textarea.control {
   font-size: var(--type-button);
   font-weight: var(--weight-bold);
   transform-origin: center;
-  transition: transform .2s cubic-bezier(0,.5,.5,1), background-color .2s cubic-bezier(0,.5,.5,1), color .2s cubic-bezier(0,.5,.5,1);
+  transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 .section .submit:hover:not(:disabled) {
   background: var(--deep-blue);
   color: var(--white);
-  transform: scale(1.04);
+  transform: scale(var(--motion-scale-hover));
   box-shadow: none;
 }
 

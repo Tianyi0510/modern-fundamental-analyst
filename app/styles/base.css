@@ -37,16 +37,41 @@
   --tracking-display: -.065em;
   --tracking-heading: -.035em;
   --tracking-label: .05em;
+  --tracking-caption: .02em;
   --leading-display: .92;
   --leading-heading: 1.1;
   --leading-lead: 1.4;
   --leading-body: 1.65;
 
+  /* 4px-based spacing scale with semantic layout aliases. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+  --space-9: 56px;
+  --space-10: 72px;
+  --space-11: 96px;
+  --space-page-gutter: var(--space-6);
+
   /* Unified page-section rhythm */
-  --space-section: 96px;
-  --space-section-compact: 72px;
-  --space-heading-content: 56px;
-  --space-related-content: 40px;
+  --space-section: var(--space-11);
+  --space-section-compact: var(--space-10);
+  --space-heading-content: var(--space-9);
+  --space-related-content: var(--space-7);
+
+  /* One interaction language for pointer, keyboard, and touch. */
+  --motion-duration-fast: 180ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-medium: 280ms;
+  --motion-duration-slow: 360ms;
+  --motion-ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --motion-ease-emphasized: cubic-bezier(.22, 1, .36, 1);
+  --motion-scale-hover: 1.04;
+  --motion-scale-press: .98;
 }
 
 * { box-sizing: border-box; }
@@ -73,7 +98,7 @@ body {
   font-size: var(--type-button);
   font-weight: var(--weight-bold);
   transform: translateY(calc(-100% - 16px));
-  transition: transform .2s ease;
+  transition: transform var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 .skip-link:focus { transform: translateY(0); }
@@ -97,4 +122,4 @@ button,
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
-.shell { width: min(1440px, calc(100% - 64px)); margin-inline: auto; }
+.shell { width: min(1440px, calc(100% - (var(--space-page-gutter) * 2))); margin-inline: auto; }

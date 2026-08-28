@@ -10,6 +10,7 @@
   letter-spacing: var(--tracking-display);
   font-weight: var(--weight-bold);
   text-transform: capitalize;
+  text-wrap: balance;
 }
 
 .home-about h2,
@@ -26,6 +27,7 @@
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
   text-transform: capitalize;
+  text-wrap: balance;
 }
 
 .memo-card h3,
@@ -36,6 +38,7 @@
   letter-spacing: -.045em;
   font-weight: var(--weight-bold);
   text-transform: capitalize;
+  text-wrap: balance;
 }
 
 .about-philosophy-copy h3,
@@ -48,6 +51,7 @@
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: capitalize;
+  text-wrap: balance;
 }
 
 .hero-bottom > p,
@@ -87,6 +91,7 @@
   line-height: var(--leading-body);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
+  text-wrap: pretty;
 }
 
 .home-about > div:last-child p,

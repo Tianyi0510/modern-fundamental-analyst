@@ -65,9 +65,9 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /\.contact-grid > article:first-child p\s*\{[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.contact-grid > article:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.doesNotMatch(css, /\.about-boundaries\s*\{[^}]*min-height:\s*100svh/s);
-  assert.match(css, /--space-section:\s*96px/);
-  assert.match(css, /--space-section-compact:\s*72px/);
-  assert.match(css, /--space-heading-content:\s*56px/);
+  assert.match(css, /--space-section:\s*var\(--space-11\)/);
+  assert.match(css, /--space-section-compact:\s*var\(--space-10\)/);
+  assert.match(css, /--space-heading-content:\s*var\(--space-9\)/);
   assert.match(css, /\.about-boundaries > article\s*\{[^}]*padding:\s*var\(--space-section\) 48px/s);
   assert.doesNotMatch(css, /\.contact-grid\s*\{[^}]*min-height:\s*100svh/s);
   assert.match(css, /\.contact-grid > article\s*\{[^}]*padding:\s*var\(--space-section\) 48px/s);
@@ -103,11 +103,18 @@ test("English hero copy uses sentence case and mobile arrows have intentional to
 test("page sections share one responsive vertical rhythm", async () => {
   const css = await readStyles();
 
-  assert.match(css, /--space-section:\s*96px/);
-  assert.match(css, /--space-section-compact:\s*72px/);
-  assert.match(css, /--space-heading-content:\s*56px/);
-  assert.match(css, /--space-related-content:\s*40px/);
-  assert.match(css, /@media \(max-width: 800px\)[\s\S]*--space-section:\s*72px;[\s\S]*--space-section-compact:\s*56px;[\s\S]*--space-heading-content:\s*40px;[\s\S]*--space-related-content:\s*32px;/);
+  assert.match(css, /--space-1:\s*4px;[\s\S]*--space-11:\s*96px;/);
+  assert.match(css, /--space-section:\s*var\(--space-11\)/);
+  assert.match(css, /--space-section-compact:\s*var\(--space-10\)/);
+  assert.match(css, /--space-heading-content:\s*var\(--space-9\)/);
+  assert.match(css, /--space-related-content:\s*var\(--space-7\)/);
+  assert.match(css, /@media \(max-width: 800px\)[\s\S]*--space-page-gutter:\s*var\(--space-4\);[\s\S]*--space-section:\s*var\(--space-10\);[\s\S]*--space-section-compact:\s*var\(--space-9\);[\s\S]*--space-heading-content:\s*var\(--space-7\);[\s\S]*--space-related-content:\s*var\(--space-6\);/);
+  assert.match(css, /--tracking-caption:\s*\.02em/);
+  assert.match(css, /--motion-duration-fast:\s*180ms/);
+  assert.match(css, /--motion-duration-base:\s*220ms/);
+  assert.match(css, /--motion-duration-slow:\s*360ms/);
+  assert.match(css, /--motion-ease-standard:\s*cubic-bezier\(\.2, 0, 0, 1\)/);
+  assert.match(css, /--motion-ease-emphasized:\s*cubic-bezier\(\.22, 1, \.36, 1\)/);
   assert.match(css, /\.hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.match(css, /\.page-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.match(css, /\.legal-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
@@ -131,7 +138,7 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
 
   assert.match(header, /aria-modal="true"/);
   assert.match(behavior, /event\.key === "Escape"/);
-  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*\.36s cubic-bezier/s);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
   assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
