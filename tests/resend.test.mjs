@@ -1,7 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { getResendClient, runResendOperation } = await import("../lib/resend.ts");
+const { getResendClient, getResendIdempotencyKey, runResendOperation } = await import("../lib/resend.ts");
+
+test("Resend email idempotency keys are scoped and accept only UUID request IDs", () => {
+  const request = new Request("https://example.com", {
+    headers: { "Idempotency-Key": "550E8400-E29B-41D4-A716-446655440000" },
+  });
+
+  assert.equal(getResendIdempotencyKey(request, "contact"), "contact/550e8400-e29b-41d4-a716-446655440000");
+  assert.equal(getResendIdempotencyKey(request, "preferences"), "preferences/550e8400-e29b-41d4-a716-446655440000");
+  assert.equal(getResendIdempotencyKey(new Request("https://example.com"), "contact"), undefined);
+  assert.equal(getResendIdempotencyKey(new Request("https://example.com", { headers: { "Idempotency-Key": "invalid" } }), "contact"), undefined);
+});
 
 test("Resend client is reused until its API key changes", () => {
   const originalKey = process.env.RESEND_API_KEY;

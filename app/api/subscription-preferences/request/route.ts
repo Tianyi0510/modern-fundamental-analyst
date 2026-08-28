@@ -3,7 +3,7 @@ import { cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObje
 import { renderPreferenceEmail, type PreferenceEmailCopy } from "@/lib/email-template";
 import { resolveLocale, type Locale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { getResendClient, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
+import { getResendClient, getResendIdempotencyKey, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 
 export const runtime = "nodejs";
@@ -38,13 +38,14 @@ export async function POST(request: Request) {
   if (existing?.data) {
     const text = mailCopy[locale];
     const preferencesUrl = createPreferenceUrl(email, locale, 30 * 60 * 1000);
+    const idempotencyKey = getResendIdempotencyKey(request, "preferences");
     const result = await runResendOperation("Preference link email request failed", () => resend.emails.send({
       from: UPDATES_FROM_EMAIL,
       to: email,
       subject: text.subject,
       text: `${text.heading}\n\n${text.body}\n\n${preferencesUrl}\n\n${text.note}`,
       html: renderPreferenceEmail(text, preferencesUrl),
-    }));
+    }, idempotencyKey ? { idempotencyKey } : undefined));
     if (result?.error) console.error("Preference link email failed", result.error.name);
   } else if (existing && existing.error?.statusCode !== 404) {
     console.error("Preference link contact lookup failed", existing.error?.name ?? "UnknownError");

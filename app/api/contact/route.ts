@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cleanSingleLine, cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { CONTACT_FROM_EMAIL, getResendClient, runResendOperation } from "@/lib/resend";
+import { CONTACT_FROM_EMAIL, getResendClient, getResendIdempotencyKey, runResendOperation } from "@/lib/resend";
 
 export const runtime = "nodejs";
 
@@ -63,6 +63,7 @@ export async function POST(request: Request) {
   const safeEmail = escapeHtml(email);
   const safeSubject = escapeHtml(subject);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
+  const idempotencyKey = getResendIdempotencyKey(request, "contact");
   const result = await runResendOperation("Resend contact delivery request failed", () => resend.emails.send({
     from: CONTACT_FROM_EMAIL,
     to: recipient,
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
     subject: `[MFA Contact] ${subject}`,
     text: `Name: ${name}\nEmail: ${email}\nLanguage: ${locale || "unknown"}\nSubject: ${subject}\n\n${message}`,
     html: `<h1>New website message</h1><p><strong>Name:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><p><strong>Language:</strong> ${escapeHtml(locale || "unknown")}</p><p><strong>Subject:</strong> ${safeSubject}</p><hr /><p>${safeMessage}</p>`,
-  }));
+  }, idempotencyKey ? { idempotencyKey } : undefined));
 
   if (!result || result.error) {
     if (result?.error) console.error("Resend contact delivery failed", result.error.name);
