@@ -127,7 +127,8 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.doesNotMatch(css, /\.memo-disclosure > summary::before/);
   assert.match(css, /\.memo-disclosure > summary:hover, \.memo-disclosure > summary:focus-visible\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(8px\)/s);
-  assert.match(css, /\.memo-disclosure\[open\] > summary svg\s*\{\s*transform:\s*rotate\(180deg\);/s);
+  assert.doesNotMatch(index, /ChevronDown/);
+  assert.doesNotMatch(css, /\.memo-disclosure > summary svg/);
   assert.doesNotMatch(css, /\.memo-disclosure[^}]*summary[^}]*svg\s*\{[^}]*translate/s);
   assert.match(css, /\.memo-disclosure > summary:hover,[\s\S]*?\.memo-disclosure > summary:focus-visible\s*\{\s*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-disclosure > summary:active\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);

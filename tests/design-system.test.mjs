@@ -80,11 +80,12 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
 });
 
 test("English hero copy uses sentence case and mobile arrows have intentional touch motion", async () => {
-  const [typography, responsive, subscribe, home] = await Promise.all([
+  const [typography, responsive, subscribe, home, chrome] = await Promise.all([
     read("app/styles/typography.css"),
     read("app/styles/responsive.css"),
     read("components/subscribe-form.module.css"),
     read("components/home-page-content.tsx"),
+    read("app/styles/chrome.css"),
   ]);
 
   assert.match(typography, /\[lang="en"\] \.hero-bottom > p,[\s\S]*?\[lang="en"\] \.page-intro p,[\s\S]*?\[lang="en"\] \.contact-hero > \.contact-note\s*\{\s*text-transform:\s*none;/);
@@ -92,8 +93,12 @@ test("English hero copy uses sentence case and mobile arrows have intentional to
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
   assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
   assert.doesNotMatch(responsive, /\.memo-index-row:active \.arrow-icon/);
+  assert.match(home, /import \{ ArrowRight, ArrowUpRight \} from "lucide-react"/);
+  assert.equal((home.match(/<ArrowRight className="arrow-icon"[^>]*strokeWidth=\{3\} \/>/g) ?? []).length, 4);
+
   assert.match(home, /<ArrowUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
-  assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>↗/);
+  assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>[→↗]/);
+  assert.match(chrome, /\.home-page \.text-link \.arrow-icon, \.home-page \.allocation-card > a \.arrow-icon \{[^}]*stroke-width:\s*3;/);
   assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
   assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/);
   assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/);

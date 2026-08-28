@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 import { MemoCards } from "@/components/memo-cards";
 import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
@@ -20,7 +19,6 @@ export function MemoIndex({ memos, locale, label, basePath }: MemoIndexProps) {
         <summary>
           <span>{label}</span>
           <span className="memo-count">{String(memos.length).padStart(2, "0")}</span>
-          <ChevronDown aria-hidden="true" size={24} strokeWidth={2} />
         </summary>
         <div className="memo-disclosure-content">
           {memos.map((memo) => (

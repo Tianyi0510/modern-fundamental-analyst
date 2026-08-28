@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MemoCards } from "@/components/memo-cards";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -41,7 +41,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <Link className="button button-dark" href={`${prefix}/portfolio`}>
                 {text.viewPortfolio}
               </Link>
-              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest} <span className="arrow-icon" aria-hidden="true">→</span></Link>
+              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest}<ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
             </div>
           </div>
         </section>
@@ -71,7 +71,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
         <div>
           <p>{text.aboutCopy}</p>
-          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink} <span className="arrow-icon" aria-hidden="true">→</span></Link>
+          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink}<ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
         </div>
       </section>
 
@@ -115,8 +115,8 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               </ul>
             </div>
             <Link href={`${prefix}/portfolio`}>
-              <span className="link-label">{text.fullPortfolio}</span>{" "}
-              <span className="arrow-icon" aria-hidden="true">→</span>
+              <span className="link-label">{text.fullPortfolio}</span>
+              <ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
             </Link>
           </aside>
         </section>
@@ -163,7 +163,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <h2>{text.memosTitle[0]}<br />{text.memosTitle[1]}</h2>
         </div>
         <MemoCards memos={memos} locale={locale} basePath={`${prefix}/memos`} />
-        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos} <span className="arrow-icon" aria-hidden="true">→</span></Link>
+        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos}<ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
       </section>
 
       <section className="cta shell">
