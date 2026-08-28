@@ -16,8 +16,7 @@
 body { background: var(--surface-primary); color: var(--text-primary); }
 .wordmark span,
 .eyebrow span,
-.memo-count,
-.legal-section-number { background-color: transparent; color: var(--interactive-accent); }
+.memo-count { background-color: transparent; color: var(--interactive-accent); }
 .eyebrow span { background: var(--interactive-accent); }
 .page-hero h1 em,
 .hero h1 em,
@@ -26,8 +25,9 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .about-section-heading h2,
 .portfolio-holdings-heading h2,
 .returns h2,
-.methodology h2,
-.legal h1 { color: var(--text-brand); }
+.methodology h2 { color: var(--text-brand); }
+.legal h1 { color: var(--text-primary); }
+.legal h1 em { color: var(--text-brand); }
 
 /* White / Black and White / Deep Blue */
 .metric,

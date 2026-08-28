@@ -53,8 +53,17 @@ test("all contact and disclaimer locales share page structures", async () => {
   ]);
   assert.match(disclaimer, /className="legal-hero"/);
   assert.match(disclaimer, /className="legal-body"/);
-  assert.match(disclaimer, /className="legal-section-number"/);
-  assert.doesNotMatch(disclaimer, />·<|numbered-label/);
+  assert.match(disclaimer, /className="section-number legal-section-label"/);
+  assert.match(disclaimer, /aria-hidden="true">·<\/span>/);
+  assert.match(disclaimer, /className="legal-section-copy"/);
+  assert.match(disclaimer, /title: "Legal Disclaimer and Important"/);
+  assert.match(disclaimer, /titleAccent: "Investment Risk Disclosures"/);
+  assert.match(disclaimer, /Please read these terms carefully before relying on any research, financial information, valuation, or performance data/);
+  assert.match(disclaimer, /className="legal-subtitle"/);
+  assert.match(disclaimer, /"No Investment Advice", "Research and Education, Not Personalized Financial Advice"/);
+  assert.match(disclaimer, /"Investment Risks", "Investment Outcomes and Future Events Remain Uncertain"/);
+  assert.match(disclaimer, /"Limitation of Liability", "Content Provided Without Warranties or Guaranteed Results"/);
+  assert.doesNotMatch(disclaimer, /legal-section-number|numbered-label/);
   assert.match(styles, /\.legal > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal-hero\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s);
@@ -62,10 +71,17 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*var\(--space-8\);[^}]*align-items:\s*start/s);
-  assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-headline\);[^}]*line-height:\s*var\(--leading-heading\);[^}]*font-weight:\s*var\(--weight-bold\);[^}]*text-align:\s*right/s);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*40px minmax\(0, 1fr\)/s);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);
+  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*\.9fr 1\.1fr;[^}]*gap:\s*var\(--space-11\);[^}]*align-items:\s*start/s);
+  assert.match(styles, /\.legal-section-heading\s*\{[^}]*display:\s*grid;[^}]*gap:\s*34px/s);
+  assert.match(styles, /\.legal \.legal-section-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*color:\s*rgba\(0,0,0,\.62\)/s);
+  assert.match(styles, /\.legal \.legal-section-label,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?line-height:\s*var\(--leading-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\);[\s\S]*?letter-spacing:\s*var\(--tracking-label\)/s);
+  assert.match(styles, /\.section-number\s*\{[^}]*color:\s*rgba\(0,0,0,\.62\)/s);
+  assert.match(styles, /\.legal-section-copy\s*\{[^}]*max-width:\s*720px/s);
+  assert.match(styles, /\.legal-section-copy p \+ p\s*\{[^}]*margin-top:\s*1\.35em/s);
+  assert.match(styles, /\.legal h1\s*\{[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(styles, /\.legal h1 em\s*\{[^}]*color:\s*var\(--text-brand\)/s);
+  assert.match(styles, /\.legal \.legal-subtitle\s*\{[^}]*margin:\s*var\(--space-related-content\) 0 0/s);
+  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*gap:\s*var\(--space-related-content\)/s);
 });
 
 test("all about locales use one shared page structure", async () => {

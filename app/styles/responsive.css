@@ -161,8 +161,7 @@
   .legal-hero { padding: var(--space-section) 0; }
   .legal-body { padding: var(--space-section-compact) 0 var(--space-section); }
   .legal h1 { margin-top: var(--space-heading-content); }
-  .legal-section { grid-template-columns: 40px minmax(0, 1fr); gap: 18px 12px; padding: var(--space-section-compact) 0; }
-  .legal-section p { grid-column: 1 / -1; }
+  .legal-section { grid-template-columns: 1fr; gap: var(--space-related-content); padding: var(--space-section-compact) 0; }
 
   [lang="zh-Hant-TW"] .hero h1,
   [lang="zh-Hant-TW"] .page-hero h1,
