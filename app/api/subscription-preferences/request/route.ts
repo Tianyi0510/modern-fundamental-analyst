@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
 import { renderPreferenceEmail, type PreferenceEmailCopy } from "@/lib/email-template";
 import { resolveLocale, type Locale } from "@/lib/i18n";
+import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 

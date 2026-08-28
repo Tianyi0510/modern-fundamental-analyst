@@ -36,15 +36,19 @@ test("Redis errors use bounded categories and are throttled independently", asyn
 });
 
 test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {
-  const requestHelpers = await read("lib/api-request.ts");
+  const [requestHelpers, rateLimiter] = await Promise.all([
+    read("lib/api-request.ts"),
+    read("lib/rate-limit.ts"),
+  ]);
 
-  assert.match(requestHelpers, /fallbackRateLimitSecret = randomBytes\(32\)/);
-  assert.match(requestHelpers, /createHmac\("sha256", secret\)/);
-  assert.doesNotMatch(requestHelpers, /createHash/);
-  assert.match(requestHelpers, /redis\.eval\(rateLimitScript/);
-  assert.match(requestHelpers, /mfa:rate-limit:v1/);
-  assert.match(requestHelpers, /markRedisUnavailable\(\)/);
-  assert.match(requestHelpers, /return memoryFallback\(identifier\)/);
-  assert.match(requestHelpers, /count: current\.count \+ 1/);
-  assert.doesNotMatch(requestHelpers, /number\[\]/);
+  assert.doesNotMatch(requestHelpers, /Redis|RateLimiter|createHmac/);
+  assert.match(rateLimiter, /randomBytes\(32\)/);
+  assert.match(rateLimiter, /createHmac\("sha256", rateLimitHashSecret\)/);
+  assert.doesNotMatch(rateLimiter, /createHash/);
+  assert.match(rateLimiter, /redis\.eval\(rateLimitScript/);
+  assert.match(rateLimiter, /mfa:rl:v2/);
+  assert.match(rateLimiter, /markRedisUnavailable\(\)/);
+  assert.match(rateLimiter, /return memoryFallback\(identifier\)/);
+  assert.match(rateLimiter, /count: current\.count \+ 1/);
+  assert.doesNotMatch(rateLimiter, /number\[\]/);
 });

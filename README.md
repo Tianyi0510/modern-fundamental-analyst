@@ -121,9 +121,10 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 - Connection and socket timeouts fail quickly, the offline queue is disabled, and reconnect attempts are bounded.
 - Failed connections or rate-limit commands open a 30-second circuit breaker so an outage does not trigger another Redis attempt on every request.
 - A Lua script performs `INCR` and `PEXPIRE` atomically for each fixed rate-limit window.
+- Rate-limit option and namespace validation rejects invalid bounds before they can create unbounded fallback behavior or malformed Redis keys.
 - The process-local fallback mirrors the same fixed-window model with one bounded counter and expiry timestamp per client instead of retaining one timestamp per request; fallback reuses the request's existing HMAC identifier.
-- Keys follow the versioned `mfa:rate-limit:v1:{namespace}:{digest}` convention.
-- Client identifiers always use HMAC-SHA256; raw IP addresses are never stored in Redis or the memory fallback. If no configured secret is available locally, the runtime generates an ephemeral HMAC key instead of using a predictable unkeyed hash.
+- Keys follow the compact, versioned `mfa:rl:v2:{namespace}:{base64url-digest}` convention, reducing key bytes compared with hexadecimal identifiers.
+- Client identifiers always use HMAC-SHA256 with one runtime-cached secret; raw IP addresses are never stored in Redis or the memory fallback. If no configured secret is available locally, the runtime generates an ephemeral HMAC key instead of using a predictable unkeyed hash.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
 - Repeated connection errors are log-throttled by error category to keep Vercel logs useful during an outage without hiding unrelated failures.
 - Upstash Free is connected through Vercel Marketplace and exposes the native TCP endpoint as `UPSTASH_REDIS_URL` only to Production.
@@ -184,7 +185,7 @@ GitHub Actions runs the same verification for every pull request and every push 
 
 Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
 
-Tests are grouped by responsibility: behavioral API, email, preference, and Resend segment-compensation tests live in focused files; Redis connection and rate-limit architecture checks live in `tests/redis-config.test.mjs`; broader cross-page and design-system invariants remain in `tests/repository.test.mjs`.
+Tests are grouped by responsibility: behavioral API, email, preference, Resend, and Rate Limiter tests live in focused files; Redis connection architecture checks live in `tests/redis-config.test.mjs`; broader page, portfolio, memo, and design-system invariants are split across their corresponding test files.
 
 ## Deployment
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
 import { resolveLocale } from "@/lib/i18n";
+import { createRateLimiter } from "@/lib/rate-limit";
 import { subscribeContact } from "@/lib/subscription-service";
 
 export const runtime = "nodejs";

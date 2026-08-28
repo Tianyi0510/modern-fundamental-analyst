@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, readObjectJson } from "@/lib/api-request";
+import { cleanText, getRequestErrorDetails, isSameOrigin, readObjectJson } from "@/lib/api-request";
 import { localeConfig, resolveLocale } from "@/lib/i18n";
+import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, runResendOperation } from "@/lib/resend";
 import { syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { readPreferenceToken } from "@/lib/subscription-preferences";

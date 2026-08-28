@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { cleanSingleLine, cleanText, createRateLimiter, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { cleanSingleLine, cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { createRateLimiter } from "@/lib/rate-limit";
 import { CONTACT_FROM_EMAIL, getResendClient, runResendOperation } from "@/lib/resend";
 
 export const runtime = "nodejs";
