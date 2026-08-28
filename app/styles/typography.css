@@ -23,7 +23,7 @@
 .about-closing h2,
 .portfolio-holdings-heading h2 {
   font-size: var(--type-display-medium);
-  line-height: .98;
+  line-height: var(--leading-section);
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
   text-transform: capitalize;
@@ -34,7 +34,7 @@
 .memo-index-row h2,
 .principles h3 {
   font-size: var(--type-display-small);
-  line-height: 1.05;
+  line-height: var(--leading-card);
   letter-spacing: -.045em;
   font-weight: var(--weight-bold);
   text-transform: capitalize;
@@ -74,7 +74,7 @@
 .performance-copy p,
 .contact-note {
   font-size: var(--type-subtitle);
-  line-height: 1.5;
+  line-height: var(--leading-caption);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
   text-transform: capitalize;
@@ -103,7 +103,7 @@
 .site-footer p,
 .holding-row small {
   font-size: var(--type-body);
-  line-height: 1.6;
+  line-height: var(--leading-body-compact);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
 }
@@ -127,7 +127,7 @@
 .memo-card > div {
   font-family: var(--font-ui);
   font-size: var(--type-label);
-  line-height: 1.3;
+  line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: capitalize;
@@ -144,7 +144,7 @@
 .article-meta,
 .footer-bottom small {
   font-size: var(--type-caption);
-  line-height: 1.5;
+  line-height: var(--leading-caption);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
 }
@@ -152,7 +152,7 @@
 .button,
 .text-link {
   font-size: var(--type-button);
-  line-height: 1.2;
+  line-height: var(--leading-control);
   font-weight: var(--weight-bold);
 }
 
@@ -160,7 +160,7 @@
 .performance-copy > strong {
   font-family: var(--font-ui);
   font-size: var(--type-data-large);
-  line-height: .88;
+  line-height: var(--leading-data-large);
   letter-spacing: -.065em;
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
@@ -172,7 +172,7 @@
 .performance-summary strong {
   font-family: var(--font-ui);
   font-size: var(--type-data-kpi);
-  line-height: .9;
+  line-height: var(--leading-data);
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
@@ -182,7 +182,7 @@
 .return-row strong {
   font-family: var(--font-ui);
   font-size: var(--type-data-row);
-  line-height: 1.25;
+  line-height: var(--leading-data-row);
   font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
 }
@@ -190,7 +190,7 @@
 .portfolio-total-row > * {
   font-family: var(--font-ui);
   font-size: var(--type-data-row-bold);
-  line-height: 1.25;
+  line-height: var(--leading-data-row);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }

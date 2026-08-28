@@ -116,9 +116,9 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /\.metric,\s*\.memo-card,\s*\.performance-summary > div\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.doesNotMatch(css, /\.memo-card\.memo-card-placeholder\s*\{[^}]*surface-inverse/s);
   assert.match(css, /@media \(max-width: 800px\)[\s\S]*?\.memo-card-placeholder\s*\{\s*display:\s*none;/s);
-  assert.match(css, /\.memo-card:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 22%, var\(--white\)\);[^}]*scale\(\.99\)/s);
-  assert.doesNotMatch(css, /\.memo-card:hover\s*\{[^}]*translateY/);
-  assert.match(css, /\.memo-index-row:hover\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
+  assert.match(css, /\.memo-card:hover, \.memo-card:focus-visible\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 22%, var\(--white\)\);[^}]*scale\(\.99\)/s);
+  assert.doesNotMatch(css, /\.memo-card:hover, \.memo-card:focus-visible\s*\{[^}]*translateY/);
+  assert.match(css, /\.memo-index-row:hover, \.memo-index-row:focus-visible\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
   assert.match(css, /\.memo-index-row\s*\{[^}]*align-items:\s*start/s);
   assert.match(css, /\.memo-index-row \.arrow-icon\s*\{\s*transform:\s*none;\s*transition:\s*none;/);
   assert.doesNotMatch(css, /\.memo-index-row:hover \.arrow-icon/);

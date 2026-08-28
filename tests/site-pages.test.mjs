@@ -24,13 +24,13 @@ test("all home locales use one shared page structure", async () => {
   assert.match(shared, /const allocationGradient = `conic-gradient/);
   assert.match(shared, /className="allocation-legend"/);
   assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, \.75fr\);[^}]*column-gap:\s*40px/s);
+  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, \.75fr\);[^}]*column-gap:\s*var\(--space-7\)/s);
   assert.doesNotMatch(styles, /\.intro\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(210px, 100%\)/s);
   assert.match(styles, /\.allocation-ring::before\s*\{[^}]*inset:\s*15%/s);
-  assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: 8px;/);
-  assert.match(styles, /\.allocation-card > a:hover \{ color: var\(--deep-blue\); \}/);
-  assert.match(styles, /\.allocation-card > a:hover \.arrow-icon \{ transform: translateX\(4px\); \}/);
+  assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: var\(--space-2\);/);
+  assert.match(styles, /\.allocation-card > a:hover, \.allocation-card > a:focus-visible \{ color: var\(--deep-blue\); \}/);
+  assert.match(styles, /\.allocation-card > a:hover \.arrow-icon, \.allocation-card > a:focus-visible \.arrow-icon \{ transform: translateX\(4px\); \}/);
 });
 
 test("all contact and disclaimer locales share page structures", async () => {
@@ -62,7 +62,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*48px;[^}]*align-items:\s*start/s);
+  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*64px minmax\(220px, \.8fr\) minmax\(0, 1\.2fr\);[^}]*gap:\s*var\(--space-8\);[^}]*align-items:\s*start/s);
   assert.match(styles, /\.legal-section-number\s*\{[^}]*font-size:\s*var\(--type-headline\);[^}]*line-height:\s*var\(--leading-heading\);[^}]*font-weight:\s*var\(--weight-bold\);[^}]*text-align:\s*right/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*40px minmax\(0, 1fr\)/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section p\s*\{[^}]*grid-column:\s*1 \/ -1/s);

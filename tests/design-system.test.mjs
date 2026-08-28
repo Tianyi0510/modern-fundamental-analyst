@@ -38,10 +38,10 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*14px/s);
-  assert.match(css, /\.footer-heading\s*\{[^}]*margin-bottom:\s*14px !important/s);
-  assert.match(css, /\.footer-heading\s*\{[^}]*font-size:\s*var\(--type-title-bold\) !important/s);
-  assert.match(css, /\.footer-heading\s*\{[^}]*letter-spacing:\s*var\(--tracking-heading\) !important/s);
-  assert.match(css, /\.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-heading\) !important/s);
+  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*margin-bottom:\s*14px/s);
+  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*font-size:\s*var\(--type-title-bold\)/s);
+  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*letter-spacing:\s*var\(--tracking-heading\)/s);
+  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-heading\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
@@ -97,7 +97,7 @@ test("English hero copy uses sentence case and mobile arrows have intentional to
   assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
   assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/);
   assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/);
-  assert.match(subscribe, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/);
+  assert.match(subscribe, /\.submit:hover:not\(:disabled\), \.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/);
 });
 
 test("page sections share one responsive vertical rhythm", async () => {

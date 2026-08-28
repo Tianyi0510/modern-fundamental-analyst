@@ -69,7 +69,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
 .performance-home .inverse .section-number { color: rgba(0,0,0,.62); }
 .home-page .hero .button-dark, .performance-home .button-white { background: var(--black); color: var(--white); }
-.home-page .hero .button-dark:hover, .performance-home .button-white:hover, .site-header .button-dark:hover { background: var(--bright-blue); color: var(--black); }
+.home-page .hero .button-dark:hover, .home-page .hero .button-dark:focus-visible, .performance-home .button-white:hover, .performance-home .button-white:focus-visible, .site-header .button-dark:hover, .site-header .button-dark:focus-visible { background: var(--bright-blue); color: var(--black); }
 
 /* Three-card KPI sequence: Bright Blue, Deep Blue, White. */
 .home-page .metric-band > .metric:nth-child(1),
@@ -96,12 +96,16 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 
 /* Medium Blue remains an auxiliary interaction color. */
 .site-header nav a:hover,
+.site-header nav a:focus-visible,
 .site-header nav a[aria-current="page"],
 .language-trigger:hover,
+.language-trigger:focus-visible,
 .language-trigger[aria-expanded="true"],
 .text-link:hover,
+.text-link:focus-visible,
 .memo-disclosure > summary:hover,
-.source-link:hover { color: var(--interactive-accent); }
+.source-link:hover,
+.source-link:focus-visible { color: var(--interactive-accent); }
 .memo-disclosure > summary:hover,
 .memo-disclosure > summary:focus-visible { color: var(--deep-blue); }
 .site-header nav a::after,
@@ -115,7 +119,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   clip-path: inset(0 -100vmax);
 }
 .home-page .cta .button-dark { background: var(--black); color: var(--white); }
-.home-page .cta .button-dark:hover { background: var(--deep-blue); color: var(--white); }
+.home-page .cta .button-dark:hover, .home-page .cta .button-dark:focus-visible { background: var(--deep-blue); color: var(--white); }
 .site-footer {
   background: var(--surface-inverse);
   color: var(--text-inverse);
@@ -124,7 +128,8 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 }
 .site-footer p { color: rgba(255,255,255,.68); }
 .site-footer a { transition: color var(--motion-duration-base) var(--motion-ease-standard); }
-.site-footer a:hover { color: var(--text-highlight); }
+.site-footer a:hover, .site-footer a:focus-visible { color: var(--text-highlight); }
 .site-footer .footer-mark,
-.site-footer .footer-mark:hover { color: var(--text-inverse); transition: none; }
+.site-footer .footer-mark:hover,
+.site-footer .footer-mark:focus-visible { color: var(--text-inverse); transition: none; }
 .site-footer .wordmark span { color: var(--interactive-accent); }

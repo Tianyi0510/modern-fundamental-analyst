@@ -61,9 +61,9 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /fetch\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
-  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*24px/s);
+  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*var\(--space-5\)/s);
   assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
-  assert.match(styles, /\.submit:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
+  assert.match(styles, /\.submit:hover:not\(:disabled\), \.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(route, /subscribeContact\(email, locale\)/);
   assert.match(service, /resend\.contacts\.create/);
