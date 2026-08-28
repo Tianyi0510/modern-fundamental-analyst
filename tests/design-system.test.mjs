@@ -93,10 +93,10 @@ test("English hero copy uses sentence case and mobile arrows have intentional to
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
   assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
   assert.doesNotMatch(responsive, /\.memo-index-row:active \.arrow-icon/);
-  assert.match(home, /import \{ ArrowRight, ArrowUpRight \} from "lucide-react"/);
-  assert.equal((home.match(/<ArrowRight className="arrow-icon"[^>]*strokeWidth=\{3\} \/>/g) ?? []).length, 4);
+  assert.match(home, /import \{ MoveRight, MoveUpRight \} from "lucide-react"/);
+  assert.equal((home.match(/<MoveRight className="arrow-icon"[^>]*strokeWidth=\{3\} \/>/g) ?? []).length, 4);
 
-  assert.match(home, /<ArrowUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
+  assert.match(home, /<MoveUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
   assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>[→↗]/);
   assert.match(chrome, /\.home-page \.text-link \.arrow-icon, \.home-page \.allocation-card > a \.arrow-icon \{[^}]*stroke-width:\s*3;/);
   assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);

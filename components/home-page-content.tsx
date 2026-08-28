@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { MoveRight, MoveUpRight } from "lucide-react";
 import { MemoCards } from "@/components/memo-cards";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -41,7 +41,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <Link className="button button-dark" href={`${prefix}/portfolio`}>
                 {text.viewPortfolio}
               </Link>
-              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest}<ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
             </div>
           </div>
         </section>
@@ -71,7 +71,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
         <div>
           <p>{text.aboutCopy}</p>
-          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink}<ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
         </div>
       </section>
 
@@ -80,7 +80,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <p className="section-number">{text.portfolioLabel}</p>
           <h2>{text.portfolioTitle[0]}<br />{text.portfolioTitle[1]}</h2>
           <Link className="round-link" href={`${prefix}/portfolio`} aria-label={text.viewPortfolio}>
-            <ArrowUpRight className="arrow-icon round-link-arrow" aria-hidden="true" strokeWidth={3} />
+            <MoveUpRight className="arrow-icon round-link-arrow" aria-hidden="true" strokeWidth={3} />
           </Link>
         </section>
         <section className="holdings-preview shell">
@@ -116,7 +116,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             </div>
             <Link href={`${prefix}/portfolio`}>
               <span className="link-label">{text.fullPortfolio}</span>
-              <ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+              <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
             </Link>
           </aside>
         </section>
@@ -163,7 +163,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <h2>{text.memosTitle[0]}<br />{text.memosTitle[1]}</h2>
         </div>
         <MemoCards memos={memos} locale={locale} basePath={`${prefix}/memos`} />
-        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos}<ArrowRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
       </section>
 
       <section className="cta shell">
