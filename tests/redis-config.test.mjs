@@ -5,8 +5,15 @@ import test from "node:test";
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("Redis connections are bounded and reused", async () => {
-  const redis = await read("lib/redis.ts");
+  const [redis, packageSource] = await Promise.all([
+    read("lib/redis.ts"),
+    read("package.json"),
+  ]);
+  const dependencies = JSON.parse(packageSource).dependencies;
 
+  assert.match(redis, /from "@redis\/client"/);
+  assert.equal(dependencies["@redis/client"], "^6.2.1");
+  assert.equal(dependencies.redis, undefined);
   assert.match(redis, /connectTimeout: CONNECT_TIMEOUT_MS/);
   assert.match(redis, /socketTimeout: SOCKET_TIMEOUT_MS/);
   assert.match(redis, /disableOfflineQueue: true/);

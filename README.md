@@ -117,6 +117,7 @@ Subscribers can request a short-lived secure link to update their preferred lang
 
 Redis supplies shared rate-limit state across Vercel Functions. The implementation is intentionally small and failure-tolerant:
 
+- The Function bundle imports `@redis/client` directly, excluding the unused Bloom, JSON, Search, and Time Series modules from the production dependency graph.
 - One multiplexed client and one in-flight connection promise are reused per runtime instance.
 - Connection and socket timeouts fail quickly, the offline queue is disabled, and reconnect attempts are bounded.
 - Failed connections or rate-limit commands open a 30-second circuit breaker so an outage does not trigger another Redis attempt on every request.

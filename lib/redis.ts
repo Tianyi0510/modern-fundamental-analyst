@@ -1,4 +1,4 @@
-import { createClient } from "redis";
+import { createClient } from "@redis/client";
 
 type RedisClient = ReturnType<typeof createClient>;
 type RedisErrorCategory = "Invalid UPSTASH_REDIS_URL" | "Redis client error" | "Redis rate limiter unavailable";
