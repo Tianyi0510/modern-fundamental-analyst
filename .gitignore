@@ -22,6 +22,8 @@ dist/
 .wrangler/
 playwright-report/
 test-results/
+.playwright-cli/
+output/
 
 # macOS
 .DS_Store

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { cleanText, isValidEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { renderPreferenceEmail, type PreferenceEmailCopy } from "@/lib/email-template";
 import { resolveLocale, type Locale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
@@ -7,7 +7,8 @@ import { getResendClient, getResendIdempotencyKey, runResendOperation, UPDATES_F
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 
 export const runtime = "nodejs";
-const isRateLimited = createRateLimiter({ namespace: "subscription-preferences-request", windowMs: 10 * 60 * 1000, maxRequests: 5 });
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const isRateLimited = createRateLimiter({ namespace: "subscription-preferences-request", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 5 });
 
 const mailCopy = {
   en: { subject: "Manage your email preferences", heading: "Manage Your Email Preferences", body: "Use the secure link below to update your preferred language or unsubscribe.", action: "Manage Email Preferences", note: "If you did not request this email, you can ignore it." },
@@ -16,16 +17,13 @@ const mailCopy = {
 } satisfies Record<Locale, PreferenceEmailCopy & { subject: string }>;
 
 export async function POST(request: Request) {
-  if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
-  if (await isRateLimited(request)) return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
-
-  let body: { email?: unknown; locale?: unknown };
-  try {
-    body = await readObjectJson(request, 5_000);
-  } catch (error) {
-    const { message, status } = getRequestErrorDetails(error);
-    return NextResponse.json({ error: message }, { status });
-  }
+  const parsed = await readProtectedObjectJson<{ email?: unknown; locale?: unknown }>(request, {
+    isRateLimited,
+    maxBytes: 5_000,
+    rateLimitWindowMs: RATE_LIMIT_WINDOW_MS,
+  });
+  if (!parsed.ok) return parsed.response;
+  const { body } = parsed;
 
   const email = cleanText(body.email, 254).toLowerCase();
   const locale = resolveLocale(cleanText(body.locale, 10));

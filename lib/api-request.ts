@@ -14,6 +14,20 @@ export function getRequestErrorDetails(error: unknown) {
     : { message: "Invalid request.", status: 400 as const };
 }
 
+type ProtectedJsonOptions = {
+  isRateLimited: (request: Request) => Promise<boolean>;
+  maxBytes: number;
+  rateLimitWindowMs: number;
+};
+
+type ProtectedJsonResult<T extends object> =
+  | { ok: true; body: T }
+  | { ok: false; response: Response };
+
+function jsonError(message: string, status: number, headers?: HeadersInit) {
+  return Response.json({ error: message }, { status, headers });
+}
+
 export function cleanText(value: unknown, maxLength: number) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
@@ -40,7 +54,11 @@ export function isSameOrigin(request: Request) {
   if (!origin || !host) return false;
 
   try {
-    return new URL(origin).host === host;
+    const requestUrl = new URL(request.url);
+    const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim().replace(/:$/, "");
+    const protocol = forwardedProtocol || requestUrl.protocol.slice(0, -1);
+    if (protocol !== "http" && protocol !== "https") return false;
+    return new URL(origin).origin === new URL(`${protocol}://${host}`).origin;
   } catch {
     return false;
   }
@@ -98,4 +116,29 @@ export async function readObjectJson<T extends object>(request: Request, maxByte
     throw new RequestBodyError("Invalid request.", 400);
   }
   return payload as T;
+}
+
+export async function readProtectedObjectJson<T extends object>(
+  request: Request,
+  { isRateLimited, maxBytes, rateLimitWindowMs }: ProtectedJsonOptions,
+): Promise<ProtectedJsonResult<T>> {
+  if (!isSameOrigin(request)) {
+    return { ok: false, response: jsonError("Invalid request origin.", 403) };
+  }
+
+  if (await isRateLimited(request)) {
+    return {
+      ok: false,
+      response: jsonError("Too many requests. Please try again later.", 429, {
+        "Retry-After": String(Math.ceil(rateLimitWindowMs / 1000)),
+      }),
+    };
+  }
+
+  try {
+    return { ok: true, body: await readObjectJson<T>(request, maxBytes) };
+  } catch (error) {
+    const { message, status } = getRequestErrorDetails(error);
+    return { ok: false, response: jsonError(message, status) };
+  }
 }

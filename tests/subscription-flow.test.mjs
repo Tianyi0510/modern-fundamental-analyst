@@ -20,7 +20,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
-  assert.match(client, /fetch\("\/api\/contact"/);
+  assert.match(client, /postJson\("\/api\/contact"/);
   assert.match(client, /contact-form\.module\.css/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
   assert.match(styles, /\.form\s*\{[^}]*padding:\s*40px 40px 0/s);
@@ -35,7 +35,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(resend, /contact@mail\.modernfundamentalanalyst\.com/);
   assert.match(route, /replyTo:\s*email/);
   assert.match(route, /getResendIdempotencyKey\(request, "contact"\)/);
-  assert.match(client, /"Idempotency-Key": getSubmissionId\(\)/);
+  assert.match(client, /idempotencyKey: getSubmissionId\(\)/);
   assert.match(client, /onChange=\{\(\) => resetSubmissionId\(\)\}/);
   assert.match(resend, /process\.env\.RESEND_API_KEY/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
@@ -58,7 +58,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
-  assert.match(client, /fetch\("\/api\/subscribe"/);
+  assert.match(client, /postJson\("\/api\/subscribe"/);
   assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
   assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
   assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*var\(--space-5\)/s);
@@ -83,8 +83,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(form, /secure preferences link/);
   assert.match(form, /安全偏好設定連結/);
   assert.match(form, /安全偏好设置链接/);
-  assert.match(route, /isSameOrigin/);
-  assert.match(route, /await isRateLimited\(request\)/);
+  assert.match(route, /readProtectedObjectJson/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
   assert.match(footer, /SubscribeForm locale=\{locale\}/);
 });
@@ -113,14 +112,14 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(route, /syncPreferredLanguageSegment\(resend, payload\.email, locale\)/);
   assert.match(route, /rollbackLanguageSegments = await syncPreferredLanguageSegment\(resend, payload\.email, locale\)/);
   assert.match(route, /unsubscribed: true/);
-  assert.match(route, /await isRateLimited\(request\)/);
+  assert.match(route, /readProtectedObjectJson/);
   assert.match(page, /maskEmail\(payload\.email\)/);
   assert.match(page, /Save Preferences/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);
   assert.match(requestRoute, /createPreferenceUrl\(email, locale, 30 \* 60 \* 1000\)/);
   assert.match(requestRoute, /resend\.emails\.send/);
   assert.match(requestRoute, /getResendIdempotencyKey\(request, "preferences"\)/);
-  assert.match(requestForm, /"Idempotency-Key": getSubmissionId\(\)/);
+  assert.match(requestForm, /idempotencyKey: getSubmissionId\(\)/);
   assert.match(requestForm, /onChange=\{\(\) => resetSubmissionId\(\)\}/);
   assert.match(requestRoute, /renderPreferenceEmail/);
   assert.match(emailTemplate, /Modern Fundamental Analyst<span style="color:#008cff">\.<\/span>/);

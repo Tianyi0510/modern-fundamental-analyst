@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { postJson } from "@/lib/client-post-json";
 import { localeConfig, locales, type Locale } from "@/lib/i18n";
 import styles from "./subscription-preferences.module.css";
+import { useExclusiveSubmit } from "./use-exclusive-submit";
 
 export type PreferencesCopy = {
   email: string;
@@ -21,28 +23,26 @@ type Status = "idle" | "saving" | "saved" | "unsubscribing" | "unsubscribed" | "
 
 export function SubscriptionPreferencesForm({ copy, email, initialLocale, token }: { copy: PreferencesCopy; email: string; initialLocale: Locale; token: string }) {
   const [status, setStatus] = useState<Status>("idle");
+  const runExclusive = useExclusiveSubmit();
 
   async function submit(form: HTMLFormElement, action: "save" | "unsubscribe") {
-    const locale = String(new FormData(form).get("locale") ?? initialLocale);
-    setStatus(action === "save" ? "saving" : "unsubscribing");
+    await runExclusive(async () => {
+      const locale = String(new FormData(form).get("locale") ?? initialLocale);
+      setStatus(action === "save" ? "saving" : "unsubscribing");
 
-    try {
-      const response = await fetch("/api/subscription-preferences", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, locale, token }),
-      });
-      if (!response.ok) throw new Error("Preferences update failed");
-      setStatus(action === "save" ? "saved" : "unsubscribed");
-    } catch {
-      setStatus("error");
-    }
+      try {
+        await postJson("/api/subscription-preferences", { action, locale, token });
+        setStatus(action === "save" ? "saved" : "unsubscribed");
+      } catch {
+        setStatus("error");
+      }
+    });
   }
 
   const busy = status === "saving" || status === "unsubscribing";
   const message = status === "saved" ? copy.saved : status === "unsubscribed" ? copy.unsubscribed : status === "error" ? copy.error : "";
 
-  return <form className={styles.form} onSubmit={(event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void submit(event.currentTarget, "save"); }}>
+  return <form className={styles.form} aria-busy={busy} onSubmit={(event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void submit(event.currentTarget, "save"); }}>
     <div className={styles.field}>
       <span>{copy.email}</span>
       <strong>{email}</strong>

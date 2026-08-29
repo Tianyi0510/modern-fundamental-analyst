@@ -14,6 +14,8 @@ registerHooks({
 
 const { POST: contact } = await import("../app/api/contact/route.ts");
 const { POST: subscribe } = await import("../app/api/subscribe/route.ts");
+const { POST: preferences } = await import("../app/api/subscription-preferences/route.ts");
+const { POST: preferenceRequest } = await import("../app/api/subscription-preferences/request/route.ts");
 
 const encoder = new TextEncoder();
 let requestNumber = 0;
@@ -46,13 +48,18 @@ function request(path, body, options = {}) {
   return new Request(`${origin}${path}`, { method: "POST", headers, body });
 }
 
-test("contact and subscribe routes reject cross-origin requests", async () => {
-  const payload = JSON.stringify({ website: "bot" });
-  const contactResponse = await contact(request("/api/contact", payload, { origin: "https://attacker.example" }));
-  const subscribeResponse = await subscribe(request("/api/subscribe", payload, { origin: "https://attacker.example" }));
+test("all browser-facing API routes reject cross-origin requests", async () => {
+  const routes = [
+    [contact, "/api/contact"],
+    [subscribe, "/api/subscribe"],
+    [preferences, "/api/subscription-preferences"],
+    [preferenceRequest, "/api/subscription-preferences/request"],
+  ];
 
-  assert.equal(contactResponse.status, 403);
-  assert.equal(subscribeResponse.status, 403);
+  for (const [handler, path] of routes) {
+    const response = await handler(request(path, "{}", { origin: "https://attacker.example" }));
+    assert.equal(response.status, 403);
+  }
 });
 
 test("routes enforce streamed body limits without Content-Length", async () => {
@@ -99,4 +106,6 @@ test("route-level rate limits reject the sixth request from one client", async (
 
   assert.equal(contactResponse.status, 429);
   assert.equal(subscribeResponse.status, 429);
+  assert.equal(contactResponse.headers.get("retry-after"), "600");
+  assert.equal(subscribeResponse.headers.get("retry-after"), "600");
 });

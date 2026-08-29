@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { cleanSingleLine, cleanText, getRequestErrorDetails, isSameOrigin, isValidEmail, readObjectJson } from "@/lib/api-request";
+import { cleanSingleLine, cleanText, isValidEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { CONTACT_FROM_EMAIL, getResendClient, getResendIdempotencyKey, runResendOperation } from "@/lib/resend";
 
 export const runtime = "nodejs";
 
-const isRateLimited = createRateLimiter({ namespace: "contact", windowMs: 10 * 60 * 1000, maxRequests: 5 });
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const isRateLimited = createRateLimiter({ namespace: "contact", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 5 });
 
 type ContactRequest = {
   name?: unknown;
@@ -27,19 +28,13 @@ function escapeHtml(value: string) {
 }
 
 export async function POST(request: Request) {
-  if (!isSameOrigin(request)) {
-    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
-  }
-  if (await isRateLimited(request)) {
-    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
-  }
-  let body: ContactRequest;
-  try {
-    body = await readObjectJson<ContactRequest>(request, 20_000);
-  } catch (error) {
-    const { message, status } = getRequestErrorDetails(error);
-    return NextResponse.json({ error: message }, { status });
-  }
+  const parsed = await readProtectedObjectJson<ContactRequest>(request, {
+    isRateLimited,
+    maxBytes: 20_000,
+    rateLimitWindowMs: RATE_LIMIT_WINDOW_MS,
+  });
+  if (!parsed.ok) return parsed.response;
+  const { body } = parsed;
 
   const name = cleanSingleLine(body.name, 100);
   const email = cleanSingleLine(body.email, 254).toLowerCase();

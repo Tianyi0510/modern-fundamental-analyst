@@ -15,6 +15,17 @@ const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
   status,
 });
 
+type ResendClient = NonNullable<ReturnType<typeof getResendClient>>;
+
+async function rollbackSubscription(resend: ResendClient, contactId: string | undefined, rollbackLanguageSegments: (() => Promise<void>) | null) {
+  await Promise.all([
+    contactId
+      ? runResendOperation("Resend subscription rollback failed", () => resend.contacts.update({ id: contactId, unsubscribed: true }))
+      : Promise.resolve(null),
+    rollbackLanguageSegments ? rollbackLanguageSegments().catch(() => undefined) : Promise.resolve(),
+  ]);
+}
+
 export async function subscribeContact(email: string, locale: Locale): Promise<SubscriptionResult> {
   const resend = getResendClient();
   if (!resend) {
@@ -64,7 +75,7 @@ export async function subscribeContact(email: string, locale: Locale): Promise<S
   const latestMemo = getLatestMemo(locale);
   const contactId = result.data?.id ?? existing.data?.id;
   if (!latestMemo) {
-    if (contactId) await runResendOperation("Resend subscription rollback failed", () => resend.contacts.update({ id: contactId, unsubscribed: true }));
+    await rollbackSubscription(resend, contactId, rollbackLanguageSegments);
     console.error("Welcome automation requires at least one investment memo.");
     return unavailable(503);
   }
@@ -83,7 +94,7 @@ export async function subscribeContact(email: string, locale: Locale): Promise<S
   }));
 
   if (!welcome || welcome.error) {
-    if (contactId) await runResendOperation("Resend subscription rollback failed", () => resend.contacts.update({ id: contactId, unsubscribed: true }));
+    await rollbackSubscription(resend, contactId, rollbackLanguageSegments);
     if (welcome?.error) console.error("Resend welcome automation failed", welcome.error.name);
     return unavailable();
   }
