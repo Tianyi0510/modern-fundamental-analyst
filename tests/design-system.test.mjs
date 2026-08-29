@@ -201,13 +201,16 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
 
   assert.match(header, /aria-modal="true"/);
   assert.match(behavior, /event\.key === "Escape"/);
-  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*width:\s*100%;[^}]*background:\s*var\(--white\);[^}]*translateX\(100%\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
   assert.doesNotMatch(css, /\.site-header nav a::after/);
   assert.match(css, /\.site-header nav a:hover, \.site-header nav a:focus-visible \{[^}]*background:[^}]*transform: translateY\(-1px\)/s);
   assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(\.97\)/s);
   assert.match(css, /\.language-dropdown a:hover, \.language-dropdown a:focus-visible \{[^}]*transform: translateX\(4px\)/s);
-  assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
-  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
+  assert.doesNotMatch(header, /mobile-menu-index/);
+  assert.match(header, /mobile-menu-label/);
+  assert.match(header, /<MoveRight aria-hidden="true" strokeWidth=\{2\.75\}/);
+  assert.match(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]\s*\{[^}]*background:\s*var\(--deep-blue\);[^}]*color:\s*var\(--white\)/s);
+  assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
