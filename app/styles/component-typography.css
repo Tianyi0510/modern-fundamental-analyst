@@ -1,8 +1,9 @@
 /* Component typography mappings
    Every remaining text-bearing component maps to the unified scale above. */
 .wordmark,
-.footer-mark {
-  font-size: var(--type-title-bold);
+.footer-mark,
+.site-footer .footer-heading {
+  font-size: var(--font-size-compact-title);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
@@ -10,7 +11,7 @@
 }
 
 .memo-disclosure > summary {
-  font-size: var(--type-title-bold);
+  font-size: var(--font-size-compact-title);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
@@ -24,13 +25,13 @@
 .allocation-card > a,
 .mobile-menu-language {
   font-family: var(--font-ui);
-  font-size: var(--type-button);
+  font-size: var(--font-size-control);
   line-height: var(--leading-control);
   font-weight: var(--weight-bold);
 }
 
 .holding-row strong {
-  font-size: var(--type-title-bold);
+  font-size: var(--font-size-compact-title);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
@@ -38,7 +39,7 @@
 }
 
 .about-boundaries h2 {
-  font-size: var(--type-title-bold);
+  font-size: var(--font-size-compact-title);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
@@ -47,7 +48,7 @@
 
 .holding-row b {
   font-family: var(--font-ui);
-  font-size: var(--type-data-row);
+  font-size: var(--font-size-data-row);
   line-height: var(--leading-data-row);
   font-weight: var(--weight-regular);
   letter-spacing: 0;
@@ -56,7 +57,7 @@
 
 .allocation-ring > span {
   font-family: var(--font-ui);
-  font-size: var(--type-data-ring);
+  font-size: var(--font-size-data-ring);
   line-height: var(--leading-data);
   font-weight: var(--weight-bold);
   letter-spacing: -.055em;
@@ -64,13 +65,13 @@
 }
 
 .allocation-legend {
-  font-size: var(--type-caption);
+  font-size: var(--font-size-caption);
   line-height: var(--leading-meta);
 }
 
 .portfolio-row:not(.portfolio-total-row) > * {
   font-family: var(--font-ui);
-  font-size: var(--type-data-row);
+  font-size: var(--font-size-data-row);
   line-height: var(--leading-data-row);
   font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
@@ -83,7 +84,7 @@
 .memo-index-row > span,
 .memo-index-row small {
   font-family: var(--font-ui);
-  font-size: var(--type-caption);
+  font-size: var(--font-size-caption);
   line-height: var(--leading-caption);
   font-weight: var(--weight-regular);
   letter-spacing: 0;
@@ -98,16 +99,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-.memo-meta b {
-  font-size: var(--type-title-bold);
-  line-height: var(--leading-heading);
-  font-weight: var(--weight-bold);
-}
-
 .not-found > span,
 .mobile-menu-title {
   font-family: var(--font-ui);
-  font-size: var(--type-label);
+  font-size: var(--font-size-label);
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -116,7 +111,7 @@
 
 .mobile-menu-drawer nav {
   font-family: var(--font-ui);
-  font-size: var(--type-title-bold);
+  font-size: var(--font-size-compact-title);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
@@ -144,11 +139,30 @@
 .performance-page .returns-table .table-head,
 .contact-grid span,
 .memo-card > div {
-  font-size: var(--type-label);
+  font-size: var(--font-size-label);
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: none;
+}
+
+.about-boundary-number {
+  font-size: var(--font-size-body-large);
+  line-height: var(--leading-body);
+  font-weight: var(--weight-bold);
+}
+
+.portfolio-mobile-sort label > span {
+  font-size: var(--font-size-label);
+}
+
+.portfolio-mobile-sort select,
+.portfolio-mobile-sort button {
+  font-size: var(--font-size-control);
+}
+
+.portfolio-table-detailed .portfolio-row > [role="cell"]::before {
+  font-size: var(--font-size-caption);
 }
 
 [lang="zh-Hant-TW"] .hero h1,
@@ -177,7 +191,7 @@
 [lang="zh-Hant-TW"] .article-body h2,
 [lang="zh-Hant-TW"] .article-body blockquote,
 [lang="zh-Hant-TW"] .contact-grid p,
-[lang="zh-Hant-TW"] .legal h2,
+[lang="zh-Hant-TW"] .legal-section h2,
 [lang="zh-Hant-TW"] .about-philosophy-copy h3,
 [lang="zh-Hant-TW"] .principles h3,
 [lang="zh-Hant-TW"] .two-column h2,
@@ -192,7 +206,7 @@
 [lang="zh-CN"] .article-body h2,
 [lang="zh-CN"] .article-body blockquote,
 [lang="zh-CN"] .contact-grid p,
-[lang="zh-CN"] .legal h2,
+[lang="zh-CN"] .legal-section h2,
 [lang="zh-CN"] .about-philosophy-copy h3,
 [lang="zh-CN"] .principles h3,
 [lang="zh-CN"] .two-column h2,

@@ -66,7 +66,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.doesNotMatch(disclaimer, /legal-section-number|numbered-label/);
   assert.match(styles, /\.legal > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal-hero\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(styles, /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--font-size-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s);
   assert.match(styles, /\.legal-body\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
@@ -74,7 +74,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*\.9fr 1\.1fr;[^}]*gap:\s*var\(--space-11\);[^}]*align-items:\s*start/s);
   assert.match(styles, /\.legal-section-heading\s*\{[^}]*display:\s*grid;[^}]*gap:\s*34px/s);
   assert.match(styles, /\.legal \.legal-section-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*\.35em;[^}]*color:\s*var\(--text-secondary\)/s);
-  assert.match(styles, /\.legal \.legal-section-label,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?line-height:\s*var\(--leading-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\);[\s\S]*?letter-spacing:\s*var\(--tracking-label\)/s);
+  assert.match(styles, /\.legal \.legal-section-label,[\s\S]*?font-size:\s*var\(--font-size-label\);[\s\S]*?line-height:\s*var\(--leading-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\);[\s\S]*?letter-spacing:\s*var\(--tracking-label\)/s);
   assert.match(styles, /\.section-number\s*\{[^}]*color:\s*var\(--text-secondary\)/s);
   assert.match(styles, /\.legal-section-copy\s*\{[^}]*max-width:\s*720px/s);
   assert.match(styles, /\.legal-section-copy p \+ p\s*\{[^}]*margin-top:\s*1\.35em/s);
@@ -96,7 +96,7 @@ test("all about locales use one shared page structure", async () => {
   assert.match(shared, /className="about-boundary-number"/);
   assert.doesNotMatch(shared, /about-boundary-item|numbered-label/);
   assert.match(styles, /\.about-boundaries li\s*\{[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*align-items:\s*baseline/s);
-  assert.match(styles, /\.about-boundary-number\s*\{[^}]*font-size:\s*var\(--type-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(styles, /\.about-boundary-number\s*\{[^}]*font-size:\s*var\(--font-size-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
 });
 
 test("shared client navigation receives only the active locale copy from server components", async () => {

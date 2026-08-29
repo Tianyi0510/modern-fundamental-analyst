@@ -42,7 +42,7 @@
 .about-boundaries ol { margin: var(--space-related-content) 0 0; padding: 0; list-style: none; }
 .about-boundaries li { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: baseline; gap: 14px; padding: 18px 0; border-top: 1px solid rgba(0,0,0,.2); }
 .about-boundaries li:last-child { padding-bottom: 0; }
-.about-boundary-number { color: var(--medium-blue); font-family: var(--font-ui); font-size: var(--type-body-large); line-height: var(--leading-body); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
+.about-boundary-number { color: var(--medium-blue); font-family: var(--font-ui); font-variant-numeric: tabular-nums; }
 .about-boundaries > article:last-child .about-boundary-number { color: var(--deep-blue); }
 .about-closing { padding: var(--space-section) 0; display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; }
 .about-closing > .eyebrow { grid-column: 1 / -1; }
@@ -173,7 +173,6 @@
 .contact-grid > article { min-height: 0; padding: var(--space-section) 48px; display: flex; flex-direction: column; }
 .contact-grid header { display: block; }
 .contact-grid h2 { max-width: 420px; margin: 0; }
-.contact-grid h2 { font-size: var(--type-display-small); line-height: var(--leading-card); letter-spacing: -.045em; font-weight: var(--weight-bold); text-transform: none; }
 .contact-grid p { margin: var(--space-related-content) 0 0; max-width: 460px; }
 .legal { background: var(--white); }
 .legal > .site-header { background: var(--white); }
@@ -187,7 +186,7 @@
 .legal-section-heading { align-self: start; display: grid; gap: 34px; }
 .legal .legal-section-label { margin: 0; display: inline-flex; align-items: baseline; gap: .35em; color: var(--text-secondary); }
 .legal-section-label > span:first-child { min-width: 2ch; font-variant-numeric: tabular-nums; }
-.legal h2 { margin: 0; }
+.legal-section h2 { margin: 0; }
 .legal p { max-width: 720px; margin: 0; color: var(--black); }
 .legal-section-copy { max-width: 720px; }
 .legal-section-copy p + p { margin-top: 1.35em; }

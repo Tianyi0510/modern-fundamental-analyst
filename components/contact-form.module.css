@@ -18,7 +18,7 @@
 .headingLabel {
   margin: 0;
   color: var(--black);
-  font-size: var(--type-label);
+  font-size: var(--font-size-label);
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -28,7 +28,7 @@
 .heading h2 {
   margin: 28px 0 24px;
   max-width: 380px;
-  font-size: var(--type-headline);
+  font-size: var(--font-size-subsection-title);
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
@@ -39,7 +39,7 @@
   max-width: 390px;
   margin: 0;
   color: var(--black);
-  font-size: var(--type-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-body);
 }
 
@@ -64,7 +64,7 @@
 }
 
 .fieldLabel {
-  font-size: var(--type-label);
+  font-size: var(--font-size-label);
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -81,7 +81,7 @@
   background: var(--background-gray);
   color: var(--black);
   font: inherit;
-  font-size: var(--type-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-body);
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard), box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -109,7 +109,7 @@ textarea.control {
   border: 0;
   cursor: pointer;
   font: inherit;
-  font-size: var(--type-button);
+  font-size: var(--font-size-control);
   font-weight: var(--weight-bold);
   transform-origin: center;
   transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard);
@@ -144,7 +144,7 @@ textarea.control {
   min-height: 1.65em;
   max-width: 420px;
   margin: 0;
-  font-size: var(--type-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-body);
 }
 

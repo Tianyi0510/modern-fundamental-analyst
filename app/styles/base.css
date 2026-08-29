@@ -13,25 +13,23 @@
   --background: var(--white);
   --foreground: var(--black);
 
-  /* Fluid editorial type system: semantic roles scale without breakpoint jumps. */
-  --type-display-large: clamp(52px, 7.78vw, 112px);
-  --type-display-medium: clamp(44px, 5vw, 72px);
-  --type-display-small: clamp(32px, 2.92vw, 42px);
-  --type-headline: clamp(28px, 2.08vw, 30px);
-  --type-title: clamp(20px, 1.67vw, 24px); /* Title / 標題 */
-  --type-title-bold: clamp(20px, 1.67vw, 24px); /* Title Bold / 粗體標題 */
-  --type-subtitle: clamp(18px, 1.53vw, 22px);
-  --type-body-large: clamp(18px, 1.32vw, 19px);
-  --type-body: 16px;
-  --type-label: clamp(16px, 1.18vw, 17px); /* Label / 標籤 */
-  --type-caption: 14px; /* Caption / 註解 */
-  --type-button: 15px; /* Button / 按鈕 */
-  --type-data-large: 96px;
-  --type-data-kpi: 64px;
-  --type-data-kpi-small: 48px;
-  --type-data-ring: 40px;
-  --type-data-row: 20px;
-  --type-data-row-bold: 20px;
+  /* Semantic font-size roles. Components may only reference these tokens. */
+  --font-size-page-title: clamp(52px, 7.778vw, 112px);
+  --font-size-section-title: clamp(44px, 5vw, 72px);
+  --font-size-card-title: clamp(32px, 2.917vw, 42px);
+  --font-size-subsection-title: clamp(28px, 2.084vw, 30px);
+  --font-size-compact-title: clamp(20px, 1.667vw, 24px);
+  --font-size-utility-title: clamp(32px, 5vw, 72px);
+  --font-size-lead: clamp(18px, 1.528vw, 22px);
+  --font-size-body-large: clamp(18px, 1.32vw, 19px);
+  --font-size-body: 16px;
+  --font-size-label: clamp(16px, 1.181vw, 17px);
+  --font-size-control: 15px;
+  --font-size-caption: 14px;
+  --font-size-data-display: clamp(52px, 6.667vw, 96px);
+  --font-size-data-kpi: clamp(48px, 4.445vw, 64px);
+  --font-size-data-ring: clamp(38px, 2.778vw, 40px);
+  --font-size-data-row: 20px;
   --weight-regular: 400;
   --weight-bold: 700;
   --tracking-display: -.065em;
@@ -118,7 +116,7 @@ body {
   border: 2px solid var(--black);
   background: var(--white);
   color: var(--black);
-  font-size: var(--type-button);
+  font-size: var(--font-size-control);
   font-weight: var(--weight-bold);
   transform: translateY(calc(-100% - 16px));
   transition: transform var(--motion-duration-base) var(--motion-ease-standard);

@@ -32,5 +32,8 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
       - name: Verify application
         run: npm run verify

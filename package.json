@@ -11,7 +11,9 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "test": "node --test tests/*.test.mjs",
+    "test": "npm run test:unit && npm run test:computed-style",
+    "test:unit": "node --test tests/*.test.mjs",
+    "test:computed-style": "playwright test tests/typography-roles.spec.ts",
     "verify": "npm run typecheck && npm run lint && npm test && npm run build"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.4",
     "@next/eslint-plugin-next": "16.3.3",
+    "@playwright/test": "1.62.1",
     "@types/node": "24.13.3",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",

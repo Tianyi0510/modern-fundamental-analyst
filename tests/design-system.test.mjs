@@ -3,18 +3,33 @@ import test from "node:test";
 
 import { read, readStyles } from "./repository-helpers.mjs";
 
-test("typography uses fluid semantic tokens instead of component-level font clamps", async () => {
-  const [base, typography, componentTypography, responsive] = await Promise.all([
+test("typography uses centralized semantic role tokens", async () => {
+  const [base, reset, globals, typography, componentTypography, chrome, pages, responsive, colors, contact, subscribe, preferences] = await Promise.all([
     read("app/styles/base.css"),
+    read("app/reset.css"),
+    read("app/globals.css"),
     read("app/styles/typography.css"),
     read("app/styles/component-typography.css"),
+    read("app/styles/chrome.css"),
+    read("app/styles/pages.css"),
     read("app/styles/responsive.css"),
+    read("app/styles/colors.css"),
+    read("components/contact-form.module.css"),
+    read("components/subscribe-form.module.css"),
+    read("components/subscription-preferences.module.css"),
   ]);
-  const css = `${base}\n${typography}\n${componentTypography}\n${responsive}`;
+  const componentCss = `${reset}\n${globals}\n${typography}\n${componentTypography}\n${chrome}\n${pages}\n${responsive}\n${colors}\n${contact}\n${subscribe}\n${preferences}`;
+  const css = `${base}\n${componentCss}`;
 
-  assert.match(base, /--type-display-large:\s*clamp\(52px, 7\.78vw, 112px\)/);
-  assert.match(base, /--type-subtitle:\s*clamp\(18px, 1\.53vw, 22px\)/);
-  assert.doesNotMatch(`${typography}\n${componentTypography}\n${responsive}`, /font-size:\s*clamp\(/);
+  assert.match(base, /--font-size-page-title:\s*clamp\(52px, 7\.778vw, 112px\)/);
+  assert.match(base, /--font-size-lead:\s*clamp\(18px, 1\.528vw, 22px\)/);
+  assert.match(base, /--font-size-data-kpi:\s*clamp\(48px, 4\.445vw, 64px\)/);
+  assert.doesNotMatch(css, /--type-/);
+  assert.doesNotMatch(componentCss, /--font-size-[a-z-]+\s*:/);
+  for (const [, value] of componentCss.matchAll(/font-size:\s*([^;]+);/g)) {
+    assert.match(value.trim(), /^var\(--font-size-[a-z-]+\)$/, `Non-role font-size declaration: ${value}`);
+  }
+  assert.doesNotMatch(responsive, /font-size\s*:/, "Responsive rules must not switch a component's typography role");
   assert.doesNotMatch(css, /--weight-medium/);
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
@@ -49,7 +64,7 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*14px/s);
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*margin-bottom:\s*14px/s);
-  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*font-size:\s*var\(--type-title-bold\)/s);
+  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*font-size:\s*var\(--font-size-compact-title\)/s);
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*letter-spacing:\s*var\(--tracking-heading\)/s);
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-heading\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
@@ -67,7 +82,7 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.memos-home\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*color:\s*var\(--black\)/s);
-  assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*font-size:\s*var\(--type-title\)/s);
+  assert.match(css, /\.home-about > div:last-child p\s*\{[^}]*font-size:\s*var\(--font-size-lead\)/s);
   assert.match(css, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
   assert.match(css, /\.performance-home\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.performance-home \.button-white\s*\{[^}]*background:\s*var\(--black\);[^}]*color:\s*var\(--white\)/s);
@@ -100,7 +115,7 @@ test("editorial copy preserves authored casing and mobile arrows have intentiona
   ]);
 
   assert.match(typography, /\.hero h1,[\s\S]*?text-transform:\s*none;/);
-  assert.match(typography, /\.hero-bottom > p,[\s\S]*?\.legal \.legal-subtitle\s*\{[\s\S]*?font-size:\s*var\(--type-subtitle\);[\s\S]*?text-transform:\s*none;/);
+  assert.match(typography, /\.hero-bottom > p,[\s\S]*?\.legal \.legal-subtitle\s*\{[\s\S]*?font-size:\s*var\(--font-size-lead\);[\s\S]*?text-transform:\s*none;/);
   assert.doesNotMatch(`${typography}\n${responsive}\n${subscribe}\n${contact}`, /text-transform:\s*capitalize/);
   assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
@@ -153,7 +168,7 @@ test("tablet navigation compacts before the mobile breakpoint", async () => {
   assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.site-header \.wordmark\s*\{\s*max-width:\s*150px;/);
   assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.site-header nav\s*\{\s*gap:\s*10px;/);
   assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.returns,[\s\S]*?\.methodology\s*\{\s*grid-template-columns:\s*1fr;/);
-  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.home-page \.metric strong\s*\{\s*font-size:\s*40px;/);
+  assert.doesNotMatch(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.metric strong\s*\{[^}]*font-size:/);
 });
 
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {

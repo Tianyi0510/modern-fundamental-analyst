@@ -128,8 +128,8 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/);
   assert.match(styles, /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/);
-  assert.match(styles, /\.home-page \.metric strong\s*\{\s*font-size:\s*var\(--type-data-kpi\);/);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.home-page \.metric strong\s*\{\s*font-size:\s*52px;/);
+  assert.match(styles, /\.home-page \.metric strong,[\s\S]*?\.portfolio-page \.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{[^}]*font-size:\s*var\(--font-size-data-kpi\);/s);
+  assert.doesNotMatch(styles, /@media \(max-width:\s*800px\)[\s\S]*?(?:\.metric|\.portfolio-kpis|\.performance-summary) strong\s*\{[^}]*font-size:/s);
   assert.match(styles, /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
   assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis > div\s*\{[^}]*padding:\s*24px/s);

@@ -20,6 +20,8 @@ npm-debug.log*
 coverage/
 dist/
 .wrangler/
+playwright-report/
+test-results/
 
 # macOS
 .DS_Store

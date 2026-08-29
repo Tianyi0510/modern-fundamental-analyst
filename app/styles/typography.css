@@ -1,11 +1,10 @@
-/* Unified typography hierarchy
-   Display → Headline → Title / Title Bold → Subtitle → Body → Label → Caption → Button → Data */
+/* Semantic role mapping. Font sizes are defined only by role tokens in base.css. */
 .hero h1,
 .page-hero h1,
 .legal h1,
 .memo-article h1,
 .not-found h1 {
-  font-size: var(--type-display-large);
+  font-size: var(--font-size-page-title);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
   font-weight: var(--weight-bold);
@@ -22,7 +21,7 @@
 .about-section-heading h2,
 .about-closing h2,
 .portfolio-holdings-heading h2 {
-  font-size: var(--type-display-medium);
+  font-size: var(--font-size-section-title);
   line-height: var(--leading-section);
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
@@ -32,8 +31,9 @@
 
 .memo-card h3,
 .memo-index-row h2,
-.principles h3 {
-  font-size: var(--type-display-small);
+.principles h3,
+.contact-grid h2 {
+  font-size: var(--font-size-card-title);
   line-height: var(--leading-card);
   letter-spacing: -.045em;
   font-weight: var(--weight-bold);
@@ -45,8 +45,8 @@
 .memo-subsection h3,
 .article-body h2,
 .article-body blockquote,
-.legal h2 {
-  font-size: var(--type-headline);
+.legal-section h2 {
+  font-size: var(--font-size-subsection-title);
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
@@ -59,7 +59,7 @@
 .article-lead,
 .contact-note,
 .legal .legal-subtitle {
-  font-size: var(--type-subtitle);
+  font-size: var(--font-size-lead);
   line-height: var(--leading-lead);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
@@ -68,7 +68,7 @@
 }
 
 .performance-copy p {
-  font-size: var(--type-subtitle);
+  font-size: var(--font-size-lead);
   line-height: var(--leading-caption);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
@@ -76,7 +76,7 @@
 }
 
 .contact-grid p {
-  font-size: var(--type-body-large);
+  font-size: var(--font-size-body-large);
   line-height: var(--leading-body);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
@@ -90,7 +90,7 @@
 .article-body,
 .methodology div,
 .legal p {
-  font-size: var(--type-body-large);
+  font-size: var(--font-size-body-large);
   line-height: var(--leading-body);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
@@ -105,14 +105,14 @@
 .return-row span:nth-child(3),
 .site-footer p,
 .holding-row small {
-  font-size: var(--type-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-body-compact);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
 }
 
 .home-about > div:last-child p {
-  font-size: var(--type-title);
+  font-size: var(--font-size-lead);
   line-height: var(--leading-lead);
   letter-spacing: -.02em;
 }
@@ -129,7 +129,7 @@
 .contact-grid span,
 .memo-card > div {
   font-family: var(--font-ui);
-  font-size: var(--type-label);
+  font-size: var(--font-size-label);
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
@@ -146,7 +146,7 @@
 .memo-meta,
 .article-meta,
 .footer-bottom small {
-  font-size: var(--type-caption);
+  font-size: var(--font-size-caption);
   line-height: var(--leading-caption);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
@@ -154,7 +154,7 @@
 
 .button,
 .text-link {
-  font-size: var(--type-button);
+  font-size: var(--font-size-control);
   line-height: var(--leading-control);
   font-weight: var(--weight-bold);
 }
@@ -162,19 +162,18 @@
 .metric strong,
 .performance-copy > strong {
   font-family: var(--font-ui);
-  font-size: var(--type-data-large);
+  font-size: var(--font-size-data-display);
   line-height: var(--leading-data-large);
   letter-spacing: -.065em;
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
 
-.home-page .metric strong { font-size: var(--type-data-kpi); }
-
+.home-page .metric strong,
 .portfolio-page .portfolio-kpis strong,
 .performance-summary strong {
   font-family: var(--font-ui);
-  font-size: var(--type-data-kpi);
+  font-size: var(--font-size-data-kpi);
   line-height: var(--leading-data);
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
@@ -184,7 +183,7 @@
 .portfolio-row strong,
 .return-row strong {
   font-family: var(--font-ui);
-  font-size: var(--type-data-row);
+  font-size: var(--font-size-data-row);
   line-height: var(--leading-data-row);
   font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
@@ -192,7 +191,7 @@
 
 .portfolio-total-row > * {
   font-family: var(--font-ui);
-  font-size: var(--type-data-row-bold);
+  font-size: var(--font-size-data-row);
   line-height: var(--leading-data-row);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
