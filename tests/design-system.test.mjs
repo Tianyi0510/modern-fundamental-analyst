@@ -21,27 +21,37 @@ test("typography uses centralized semantic role tokens", async () => {
   const componentCss = `${reset}\n${globals}\n${typography}\n${componentTypography}\n${chrome}\n${pages}\n${responsive}\n${colors}\n${contact}\n${subscribe}\n${preferences}`;
   const css = `${base}\n${componentCss}`;
 
-  assert.match(base, /--font-size-page-title:\s*clamp\(52px, 7\.778vw, 112px\)/);
-  assert.match(base, /--font-size-lead:\s*22px/);
-  assert.match(base, /--font-size-body-large:\s*18px/);
-  assert.match(base, /--font-size-label:\s*16px/);
-  assert.match(base, /--font-size-caption:\s*15px/);
-  assert.match(base, /--font-size-data-ring:\s*40px/);
+  assert.match(base, /--font-size-page-title:\s*clamp\(3\.25rem, 1\.75rem \+ 5vw, 7rem\)/);
+  assert.match(base, /--font-size-section-title:\s*clamp\(2\.75rem, 2\.125rem \+ 2\.5vw, 4\.5rem\)/);
+  assert.match(base, /--font-size-card-title:\s*clamp\(2rem, 1\.75rem \+ 1vw, 2\.625rem\)/);
+  assert.match(base, /--font-size-compact-title:\s*clamp\(1\.25rem, 1\.125rem \+ \.5vw, 1\.5rem\)/);
+  assert.match(base, /--font-size-lead:\s*1\.375rem/);
+  assert.match(base, /--font-size-body-large:\s*1\.125rem/);
+  assert.match(base, /--font-size-body:\s*1rem/);
+  assert.match(base, /--font-size-label:\s*1rem/);
+  assert.match(base, /--font-size-caption:\s*\.9375rem/);
+  assert.match(base, /--font-size-data-ring:\s*2\.5rem/);
   assert.match(base, /--tracking-heading:\s*-\.05em/);
   assert.match(base, /--tracking-body:\s*0/);
   assert.match(base, /--tracking-label:\s*\.05em/);
-  assert.match(base, /--leading-heading:\s*1/);
+  assert.match(base, /--leading-page-title:\s*1\.05/);
+  assert.match(base, /--leading-section-title:\s*1\.1/);
+  assert.match(base, /--leading-card-title:\s*1\.1/);
+  assert.match(base, /--leading-compact-title:\s*1\.2/);
+  assert.match(base, /--leading-data:\s*1/);
   assert.match(base, /--leading-body:\s*1\.5/);
   assert.doesNotMatch(css, /font-size-(?:utility|subsection)-title/);
-  assert.doesNotMatch(css, /--leading-(?!heading|body)[a-z-]+/);
+  assert.doesNotMatch(css, /--leading-heading/);
   assert.doesNotMatch(css, /--tracking-(?!heading|body|label)[a-z-]+/);
-  assert.match(base, /--font-size-data-kpi:\s*clamp\(48px, 4\.445vw, 64px\)/);
+  assert.match(base, /--font-size-data-kpi:\s*clamp\(3rem, 2\.5rem \+ 1\.5vw, 4rem\)/);
   assert.doesNotMatch(css, /--type-/);
   assert.doesNotMatch(componentCss, /--font-size-[a-z-]+\s*:/);
   for (const [, value] of componentCss.matchAll(/font-size:\s*([^;]+);/g)) {
     assert.match(value.trim(), /^var\(--font-size-[a-z-]+\)$/, `Non-role font-size declaration: ${value}`);
   }
   assert.doesNotMatch(responsive, /font-size\s*:/, "Responsive rules must not switch a component's typography role");
+  assert.match(base, /body\s*\{[^}]*font-size:\s*var\(--font-size-body\);[^}]*line-height:\s*var\(--leading-body\)/s);
+  assert.match(chrome, /\.button\s*\{[^}]*padding:\s*0 1\.6em;[^}]*gap:\s*1\.333em/s);
   assert.doesNotMatch(css, /--weight-medium/);
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
@@ -78,7 +88,7 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*margin-bottom:\s*14px/s);
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*font-size:\s*var\(--font-size-compact-title\)/s);
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*letter-spacing:\s*var\(--tracking-heading\)/s);
-  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-heading\)/s);
+  assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-compact-title\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
   assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);

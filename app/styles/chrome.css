@@ -25,14 +25,14 @@
 .language-dropdown a[aria-current="page"] { background: color-mix(in srgb, var(--bright-blue) 20%, var(--white)); color: var(--deep-blue); }
 .language-dropdown svg { width: 18px; height: 18px; color: var(--medium-blue); }
 .arrow-icon { display: inline-block; font-family: var(--font-ui); font-style: normal; font-variant-emoji: text; line-height: 1; }
-.button { min-height: var(--size-control); padding: 0 var(--space-5); border-radius: var(--radius-pill); display: inline-flex; align-items: center; justify-content: center; gap: 20px; cursor: pointer; transition: transform var(--motion-duration-base) var(--motion-ease-emphasized), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard), box-shadow var(--motion-duration-base) var(--motion-ease-standard); }
+.button { min-height: var(--size-control); padding: 0 1.6em; border-radius: var(--radius-pill); display: inline-flex; align-items: center; justify-content: center; gap: 1.333em; cursor: pointer; transition: transform var(--motion-duration-base) var(--motion-ease-emphasized), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard), box-shadow var(--motion-duration-base) var(--motion-ease-standard); }
 .button:hover, .button:focus-visible { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.14); }
 .button:active { transform: translateY(0) scale(.98); box-shadow: 0 3px 10px rgba(0,0,0,.1); }
 .button .arrow-icon { transition: transform var(--motion-duration-base) var(--motion-ease-emphasized); }
 .button:hover .arrow-icon, .button:focus-visible .arrow-icon { transform: translate(3px, -3px); }
 .button-dark { background: var(--black); color: var(--white); }
 .button-dark:hover, .button-dark:focus-visible { background: var(--deep-blue); }
-.button-small { min-height: var(--size-control-small); padding-inline: 20px; }
+.button-small { min-height: var(--size-control-small); padding-inline: 1.333em; }
 .hero { padding: var(--space-section) 0; }
 .home-opening { padding-bottom: var(--space-section-compact); background: var(--background-gray); }
 .home-opening > .site-header { position: relative; z-index: 30; background: var(--white); }

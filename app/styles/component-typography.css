@@ -4,7 +4,7 @@
 .footer-mark,
 .site-footer .footer-heading {
   font-size: var(--font-size-compact-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-compact-title);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   text-transform: none;
@@ -12,7 +12,7 @@
 
 .memo-disclosure > summary {
   font-size: var(--font-size-compact-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-compact-title);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   text-transform: none;
@@ -32,7 +32,7 @@
 
 .holding-row strong {
   font-size: var(--font-size-compact-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-compact-title);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   text-transform: none;
@@ -40,7 +40,7 @@
 
 .about-boundaries h2 {
   font-size: var(--font-size-compact-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-compact-title);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   text-transform: none;
@@ -49,7 +49,7 @@
 .holding-row b {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   font-weight: var(--weight-regular);
   letter-spacing: var(--tracking-heading);
   font-variant-numeric: tabular-nums;
@@ -58,7 +58,7 @@
 .allocation-ring > span {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-ring);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   font-variant-numeric: tabular-nums;
@@ -73,7 +73,7 @@
 .portfolio-row:not(.portfolio-total-row) > * {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
@@ -114,7 +114,7 @@
 .mobile-menu-drawer nav {
   font-family: var(--font-ui);
   font-size: var(--font-size-compact-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-compact-title);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;

@@ -29,7 +29,7 @@
   margin: 28px 0 24px;
   max-width: 380px;
   font-size: var(--font-size-card-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-card-title);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;

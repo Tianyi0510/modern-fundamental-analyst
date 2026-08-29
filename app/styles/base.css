@@ -13,27 +13,31 @@
   --background: var(--white);
   --foreground: var(--black);
 
-  /* Semantic font-size roles. Components may only reference these tokens. */
-  --font-size-page-title: clamp(52px, 7.778vw, 112px);
-  --font-size-section-title: clamp(44px, 5vw, 72px);
-  --font-size-card-title: clamp(32px, 2.917vw, 42px);
-  --font-size-compact-title: clamp(20px, 1.667vw, 24px);
-  --font-size-lead: 22px;
-  --font-size-body-large: 18px;
-  --font-size-body: 16px;
-  --font-size-label: 16px;
-  --font-size-control: 15px;
-  --font-size-caption: 15px;
-  --font-size-data-display: clamp(52px, 6.667vw, 96px);
-  --font-size-data-kpi: clamp(48px, 4.445vw, 64px);
-  --font-size-data-ring: 40px;
-  --font-size-data-row: 20px;
+  /* Semantic type roles: rem for text, bounded rem + vw for fluid display roles. */
+  --font-size-page-title: clamp(3.25rem, 1.75rem + 5vw, 7rem);
+  --font-size-section-title: clamp(2.75rem, 2.125rem + 2.5vw, 4.5rem);
+  --font-size-card-title: clamp(2rem, 1.75rem + 1vw, 2.625rem);
+  --font-size-compact-title: clamp(1.25rem, 1.125rem + .5vw, 1.5rem);
+  --font-size-lead: 1.375rem;
+  --font-size-body-large: 1.125rem;
+  --font-size-body: 1rem;
+  --font-size-label: 1rem;
+  --font-size-control: .9375rem;
+  --font-size-caption: .9375rem;
+  --font-size-data-display: clamp(3.25rem, 2rem + 4vw, 6rem);
+  --font-size-data-kpi: clamp(3rem, 2.5rem + 1.5vw, 4rem);
+  --font-size-data-ring: 2.5rem;
+  --font-size-data-row: 1.25rem;
   --weight-regular: 400;
   --weight-bold: 700;
   --tracking-heading: -.05em;
   --tracking-body: 0;
   --tracking-label: .05em;
-  --leading-heading: 1;
+  --leading-page-title: 1.05;
+  --leading-section-title: 1.1;
+  --leading-card-title: 1.1;
+  --leading-compact-title: 1.2;
+  --leading-data: 1;
   --leading-body: 1.5;
 
   /* 4px-based spacing scale with semantic layout aliases. */
@@ -86,6 +90,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-ui);
+  font-size: var(--font-size-body);
+  line-height: var(--leading-body);
   font-kerning: normal;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;

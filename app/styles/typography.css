@@ -5,7 +5,7 @@
 .memo-article h1,
 .not-found h1 {
   font-size: var(--font-size-page-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-page-title);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
@@ -23,7 +23,7 @@
 .portfolio-holdings-heading h2,
 .legal-section h2 {
   font-size: var(--font-size-section-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-section-title);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
@@ -35,7 +35,7 @@
 .principles h3,
 .contact-grid h2 {
   font-size: var(--font-size-card-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-card-title);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
@@ -47,7 +47,7 @@
 .article-body h2,
 .article-body blockquote {
   font-size: var(--font-size-card-title);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-card-title);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
@@ -164,7 +164,7 @@
 .performance-copy > strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-display);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
@@ -175,7 +175,7 @@
 .performance-summary strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-kpi);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
@@ -185,7 +185,7 @@
 .return-row strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
@@ -194,7 +194,7 @@
 .portfolio-total-row > * {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
-  line-height: var(--leading-heading);
+  line-height: var(--leading-data);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;

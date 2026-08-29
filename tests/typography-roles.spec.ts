@@ -3,18 +3,18 @@ import { expect, test, type Page } from "@playwright/test";
 type Role = keyof typeof roleScale;
 
 const roleScale = {
-  pageTitle: { min: 52, fluidVw: 7.778, max: 112 },
-  sectionTitle: { min: 44, fluidVw: 5, max: 72 },
-  cardTitle: { min: 32, fluidVw: 2.917, max: 42 },
-  compactTitle: { min: 20, fluidVw: 1.667, max: 24 },
+  pageTitle: { min: 52, fluidRem: 1.75, fluidVw: 5, max: 112 },
+  sectionTitle: { min: 44, fluidRem: 2.125, fluidVw: 2.5, max: 72 },
+  cardTitle: { min: 32, fluidRem: 1.75, fluidVw: 1, max: 42 },
+  compactTitle: { min: 20, fluidRem: 1.125, fluidVw: 0.5, max: 24 },
   lead: { min: 22, max: 22 },
   bodyLarge: { min: 18, max: 18 },
   body: { min: 16, max: 16 },
   label: { min: 16, max: 16 },
   control: { min: 15, max: 15 },
   caption: { min: 15, max: 15 },
-  dataDisplay: { min: 52, fluidVw: 6.667, max: 96 },
-  dataKpi: { min: 48, fluidVw: 4.445, max: 64 },
+  dataDisplay: { min: 52, fluidRem: 2, fluidVw: 4, max: 96 },
+  dataKpi: { min: 48, fluidRem: 2.5, fluidVw: 1.5, max: 64 },
   dataRing: { min: 40, max: 40 },
   dataRow: { min: 20, max: 20 },
 } as const;
@@ -104,13 +104,16 @@ const viewports = [
 function expectedSize(role: Role, width: number) {
   const scale = roleScale[role];
   if (!("fluidVw" in scale)) return scale.min;
-  return Math.min(scale.max, Math.max(scale.min, width * scale.fluidVw / 100));
+  return Math.min(scale.max, Math.max(scale.min, scale.fluidRem * 16 + width * scale.fluidVw / 100));
 }
 
-const headingRoles = new Set<Role>(["pageTitle", "sectionTitle", "cardTitle", "compactTitle", "dataDisplay", "dataKpi", "dataRing", "dataRow"]);
+const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
 
 function expectedRhythm(role: Role) {
-  if (headingRoles.has(role)) return { lineHeight: 1, trackingEm: -0.05 };
+  if (role === "pageTitle") return { lineHeight: 1.05, trackingEm: -0.05 };
+  if (role === "sectionTitle" || role === "cardTitle") return { lineHeight: 1.1, trackingEm: -0.05 };
+  if (role === "compactTitle") return { lineHeight: 1.2, trackingEm: -0.05 };
+  if (dataRoles.has(role)) return { lineHeight: 1, trackingEm: -0.05 };
   if (role === "label") return { lineHeight: 1.5, trackingEm: 0.05 };
   return { lineHeight: 1.5, trackingEm: 0 };
 }
