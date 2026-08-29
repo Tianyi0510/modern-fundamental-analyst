@@ -42,7 +42,7 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
     <section className="page-hero contact-hero shell">
       <p className="eyebrow"><span /> {text.label}</p>
       <h1>{text.title[0]}<br /><em>{text.title[1]}</em></h1>
-      <p className="contact-note">{text.intro}</p>
+      <div className="page-intro"><p className="contact-note">{text.intro}</p></div>
     </section>
     <section className="contact-grid">
       {text.cards.map(([title, description]) => <article key={title}><header><h2>{title}</h2></header><p>{description}</p></article>)}

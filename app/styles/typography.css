@@ -5,8 +5,8 @@
 .memo-article h1,
 .not-found h1 {
   font-size: var(--font-size-page-title);
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
   text-wrap: balance;
@@ -20,10 +20,11 @@
 .methodology h2,
 .about-section-heading h2,
 .about-closing h2,
-.portfolio-holdings-heading h2 {
+.portfolio-holdings-heading h2,
+.legal-section h2 {
   font-size: var(--font-size-section-title);
-  line-height: var(--leading-section);
-  letter-spacing: -.055em;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
   text-wrap: balance;
@@ -34,8 +35,8 @@
 .principles h3,
 .contact-grid h2 {
   font-size: var(--font-size-card-title);
-  line-height: var(--leading-card);
-  letter-spacing: -.045em;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   text-transform: none;
   text-wrap: balance;
@@ -44,9 +45,8 @@
 .about-philosophy-copy h3,
 .memo-subsection h3,
 .article-body h2,
-.article-body blockquote,
-.legal-section h2 {
-  font-size: var(--font-size-subsection-title);
+.article-body blockquote {
+  font-size: var(--font-size-card-title);
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
@@ -60,8 +60,8 @@
 .contact-note,
 .legal .legal-subtitle {
   font-size: var(--font-size-lead);
-  line-height: var(--leading-lead);
-  letter-spacing: 0;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   text-transform: none;
   text-wrap: pretty;
@@ -69,8 +69,8 @@
 
 .performance-copy p {
   font-size: var(--font-size-lead);
-  line-height: var(--leading-caption);
-  letter-spacing: 0;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   text-transform: none;
 }
@@ -78,7 +78,7 @@
 .contact-grid p {
   font-size: var(--font-size-body-large);
   line-height: var(--leading-body);
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   text-transform: none;
 }
@@ -92,7 +92,7 @@
 .legal p {
   font-size: var(--font-size-body-large);
   line-height: var(--leading-body);
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   text-wrap: pretty;
 }
@@ -106,15 +106,15 @@
 .site-footer p,
 .holding-row small {
   font-size: var(--font-size-body);
-  line-height: var(--leading-body-compact);
-  letter-spacing: 0;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
 }
 
 .home-about > div:last-child p {
   font-size: var(--font-size-lead);
-  line-height: var(--leading-lead);
-  letter-spacing: -.02em;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
 }
 
 .eyebrow,
@@ -130,7 +130,7 @@
 .memo-card > div {
   font-family: var(--font-ui);
   font-size: var(--font-size-label);
-  line-height: var(--leading-label);
+  line-height: var(--leading-body);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: none;
@@ -147,15 +147,16 @@
 .article-meta,
 .footer-bottom small {
   font-size: var(--font-size-caption);
-  line-height: var(--leading-caption);
-  letter-spacing: 0;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
 }
 
 .button,
 .text-link {
   font-size: var(--font-size-control);
-  line-height: var(--leading-control);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   font-weight: var(--weight-bold);
 }
 
@@ -163,8 +164,8 @@
 .performance-copy > strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-display);
-  line-height: var(--leading-data-large);
-  letter-spacing: -.065em;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
@@ -174,8 +175,8 @@
 .performance-summary strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-kpi);
-  line-height: var(--leading-data);
-  letter-spacing: -.055em;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
@@ -184,7 +185,8 @@
 .return-row strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
-  line-height: var(--leading-data-row);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
 }
@@ -192,7 +194,8 @@
 .portfolio-total-row > * {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
-  line-height: var(--leading-data-row);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }

@@ -6,18 +6,16 @@ const roleScale = {
   pageTitle: { min: 52, fluidVw: 7.778, max: 112 },
   sectionTitle: { min: 44, fluidVw: 5, max: 72 },
   cardTitle: { min: 32, fluidVw: 2.917, max: 42 },
-  subsectionTitle: { min: 28, fluidVw: 2.084, max: 30 },
   compactTitle: { min: 20, fluidVw: 1.667, max: 24 },
-  utilityTitle: { min: 32, fluidVw: 5, max: 72 },
   lead: { min: 18, fluidVw: 1.528, max: 22 },
-  bodyLarge: { min: 18, fluidVw: 1.32, max: 19 },
+  bodyLarge: { min: 18, max: 18 },
   body: { min: 16, max: 16 },
-  label: { min: 16, fluidVw: 1.181, max: 17 },
+  label: { min: 16, max: 16 },
   control: { min: 15, max: 15 },
   caption: { min: 14, max: 14 },
   dataDisplay: { min: 52, fluidVw: 6.667, max: 96 },
   dataKpi: { min: 48, fluidVw: 4.445, max: 64 },
-  dataRing: { min: 38, fluidVw: 2.778, max: 40 },
+  dataRing: { min: 40, max: 40 },
   dataRow: { min: 20, max: 20 },
 } as const;
 
@@ -51,7 +49,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     sectionTitle: [".portfolio-holdings-heading h2"],
     lead: [".page-intro p"],
     label: [".eyebrow", ".portfolio-kpis span", ".portfolio-holdings-heading > div > span", ".portfolio-mobile-sort label > span"],
-    control: [".portfolio-mobile-sort select", ".portfolio-mobile-sort button"],
+    control: [".portfolio-mobile-sort button"],
     caption: [".page-intro small", ".portfolio-kpis small"],
     dataKpi: [".portfolio-kpis strong"],
     dataRow: [".portfolio-row > *"],
@@ -77,8 +75,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/contact": {
     pageTitle: [".page-hero h1"],
-    cardTitle: [".contact-grid h2"],
-    subsectionTitle: ["#contact-form-title"],
+    cardTitle: [".contact-grid h2", "#contact-form-title"],
     lead: [".contact-note"],
     bodyLarge: [".contact-grid p"],
     label: [".eyebrow"],
@@ -86,13 +83,15 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/disclaimer": {
     pageTitle: [".legal h1"],
-    subsectionTitle: [".legal-section h2"],
+    sectionTitle: [".legal-section h2"],
     lead: [".legal-subtitle"],
     bodyLarge: [".legal-section-copy p"],
     label: [".eyebrow", ".legal-section-label"],
   },
   "/subscription-preferences": {
-    utilityTitle: ["main h1"],
+    pageTitle: ["main h1"],
+    lead: [".page-intro p"],
+    label: [".eyebrow"],
   },
 };
 
@@ -108,15 +107,30 @@ function expectedSize(role: Role, width: number) {
   return Math.min(scale.max, Math.max(scale.min, width * scale.fluidVw / 100));
 }
 
-async function readFontSizes(page: Page, selectors: string[]) {
-  const values: Array<{ selector: string; value: number }> = [];
+const headingRoles = new Set<Role>(["pageTitle", "sectionTitle", "cardTitle", "compactTitle", "dataDisplay", "dataKpi", "dataRing", "dataRow"]);
+
+function expectedRhythm(role: Role) {
+  if (headingRoles.has(role)) return { lineHeight: 1, trackingEm: -0.05 };
+  if (role === "label") return { lineHeight: 1.5, trackingEm: 0.05 };
+  return { lineHeight: 1.5, trackingEm: 0 };
+}
+
+type TypographySample = { selector: string; fontSize: number; lineHeight: number; letterSpacing: number };
+
+async function readTypography(page: Page, selectors: string[]) {
+  const values: TypographySample[] = [];
   for (const selector of selectors) {
     const locator = page.locator(selector);
     expect(await locator.count(), `Missing typography sample: ${selector}`).toBeGreaterThan(0);
-    values.push(...await locator.evaluateAll((elements, sampleSelector) => elements.map((element) => ({
-      selector: sampleSelector,
-      value: Number.parseFloat(getComputedStyle(element).fontSize),
-    })), selector));
+    values.push(...await locator.evaluateAll((elements, sampleSelector) => elements.map((element) => {
+      const style = getComputedStyle(element);
+      return {
+        selector: sampleSelector,
+        fontSize: Number.parseFloat(style.fontSize),
+        lineHeight: Number.parseFloat(style.lineHeight),
+        letterSpacing: style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
+      };
+    }), selector));
   }
   return values;
 }
@@ -125,8 +139,8 @@ for (const viewport of viewports) {
   test.describe(`${viewport.name} typography at ${viewport.width}px`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
 
-    test("each semantic role resolves to one computed font size", async ({ page }) => {
-      const observed = new Map<Role, Array<{ selector: string; value: number }>>();
+    test("each semantic role resolves to one computed type treatment", async ({ page }) => {
+      const observed = new Map<Role, TypographySample[]>();
 
       for (const [route, roles] of Object.entries(routeRoles)) {
         await page.goto(route);
@@ -135,17 +149,20 @@ for (const viewport of viewports) {
           `${route} has horizontal overflow at ${viewport.width}px`,
         ).toBe(true);
         for (const [role, selectors] of Object.entries(roles) as Array<[Role, string[]]>) {
-          const values = await readFontSizes(page, selectors);
+          const values = await readTypography(page, selectors);
           observed.set(role, [...(observed.get(role) ?? []), ...values]);
         }
       }
 
       for (const [role, values] of observed) {
-        const expectedValue = expectedSize(role, viewport.width);
+        const expectedFontSize = expectedSize(role, viewport.width);
+        const rhythm = expectedRhythm(role);
         for (const sample of values) {
-          expect(Math.abs(sample.value - expectedValue), `${role} sample ${sample.selector} resolved to ${sample.value}px instead of ${expectedValue}px`).toBeLessThan(0.15);
+          expect(Math.abs(sample.fontSize - expectedFontSize), `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`).toBeLessThan(0.15);
+          expect(Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight), `${role} sample ${sample.selector} has an inconsistent line height`).toBeLessThan(0.2);
+          expect(Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm), `${role} sample ${sample.selector} has inconsistent letter spacing`).toBeLessThan(0.2);
         }
-        expect(new Set(values.map(({ value }) => value.toFixed(2))).size, `${role} has multiple computed sizes`).toBe(1);
+        expect(new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size, `${role} has multiple computed sizes`).toBe(1);
       }
     });
   });

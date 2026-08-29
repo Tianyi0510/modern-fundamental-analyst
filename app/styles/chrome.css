@@ -144,7 +144,7 @@
 .memo-card-placeholder:hover, .memo-card-placeholder:focus-visible, .memo-card-placeholder:active { background: var(--white); transform: none; }
 .memo-card > div { display: flex; justify-content: space-between; gap: 20px; }
 .memo-card h3 { margin: auto 0 26px; }
-.memo-card p { margin: 0 0 36px; color: var(--text-secondary); line-height: var(--leading-status); }
+.memo-card p { margin: 0 0 36px; color: var(--text-secondary); line-height: var(--leading-body); }
 .memo-card > small { padding-top: 18px; border-top: 1px solid var(--gray); }
 .memos-all { display: table; margin: var(--space-related-content) 0 0 auto; }
 .cta { padding: var(--space-section) 0; display: grid; grid-template-columns: 1fr auto; align-items: end; }

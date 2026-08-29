@@ -84,10 +84,12 @@ The semantic aliases live in `app/styles/colors.css`; the base values and type s
 - Jost variable range: 100-900; semantic UI weights: 400 and 700
 - Dates and financial figures use tabular numerals
 - All `font-size` values are defined once as semantic role tokens in `app/styles/base.css`
-- Fluid roles use bounded `clamp()` values; fixed roles remain stable where fluid scaling would reduce clarity
+- Fluid roles use bounded `clamp()` values; Body Large, Label, and Data Ring use fixed values for cross-viewport consistency
 - Components may reference only their assigned `--font-size-*` role and cannot switch roles at responsive breakpoints
+- Headings and financial data use `line-height: 1` with `letter-spacing: -.05em`
+- Body, caption, and control text use `line-height: 1.5` with zero letter spacing; labels retain `.05em` tracking
 
-The role scale covers page, section, card, subsection, compact, and utility titles; lead and body copy; labels, controls, and captions; plus display, KPI, ring, and row data. `typography.css` maps shared content roles, while `component-typography.css` handles component-specific mappings. `responsive.css` changes layout and interaction behavior only—it contains no `font-size` declarations.
+The role scale covers page, section, card, and compact titles; lead and body copy; labels, controls, and captions; plus display, KPI, ring, and row data. `typography.css` maps shared content roles, while `component-typography.css` handles component-specific mappings. `responsive.css` changes layout and interaction behavior only—it contains no `font-size` declarations.
 
 Global CSS is separated by responsibility:
 

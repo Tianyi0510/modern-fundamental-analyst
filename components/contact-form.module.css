@@ -19,7 +19,7 @@
   margin: 0;
   color: var(--black);
   font-size: var(--font-size-label);
-  line-height: var(--leading-label);
+  line-height: var(--leading-body);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: none;
@@ -28,7 +28,7 @@
 .heading h2 {
   margin: 28px 0 24px;
   max-width: 380px;
-  font-size: var(--font-size-subsection-title);
+  font-size: var(--font-size-card-title);
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
@@ -65,7 +65,7 @@
 
 .fieldLabel {
   font-size: var(--font-size-label);
-  line-height: var(--leading-label);
+  line-height: var(--leading-body);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
   text-transform: none;

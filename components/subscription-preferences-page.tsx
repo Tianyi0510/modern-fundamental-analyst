@@ -21,10 +21,10 @@ export async function SubscriptionPreferencesPage({ locale, searchParams }: { lo
 
   return <main id="main-content">
     <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-    <section className={`${styles.hero} shell`}>
+    <section className="page-hero shell">
       <p className="eyebrow"><span /> {text.label}</p>
       <h1>{text.title}</h1>
-      <p>{text.intro}</p>
+      <div className="page-intro"><p>{text.intro}</p></div>
     </section>
     <section className={`${styles.panel} shell`}>
       {payload

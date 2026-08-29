@@ -23,6 +23,17 @@ test("typography uses centralized semantic role tokens", async () => {
 
   assert.match(base, /--font-size-page-title:\s*clamp\(52px, 7\.778vw, 112px\)/);
   assert.match(base, /--font-size-lead:\s*clamp\(18px, 1\.528vw, 22px\)/);
+  assert.match(base, /--font-size-body-large:\s*18px/);
+  assert.match(base, /--font-size-label:\s*16px/);
+  assert.match(base, /--font-size-data-ring:\s*40px/);
+  assert.match(base, /--tracking-heading:\s*-\.05em/);
+  assert.match(base, /--tracking-body:\s*0/);
+  assert.match(base, /--tracking-label:\s*\.05em/);
+  assert.match(base, /--leading-heading:\s*1/);
+  assert.match(base, /--leading-body:\s*1\.5/);
+  assert.doesNotMatch(css, /font-size-(?:utility|subsection)-title/);
+  assert.doesNotMatch(css, /--leading-(?!heading|body)[a-z-]+/);
+  assert.doesNotMatch(css, /--tracking-(?!heading|body|label)[a-z-]+/);
   assert.match(base, /--font-size-data-kpi:\s*clamp\(48px, 4\.445vw, 64px\)/);
   assert.doesNotMatch(css, /--type-/);
   assert.doesNotMatch(componentCss, /--font-size-[a-z-]+\s*:/);
@@ -142,7 +153,6 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /--space-heading-content:\s*var\(--space-9\)/);
   assert.match(css, /--space-related-content:\s*var\(--space-7\)/);
   assert.match(css, /@media \(max-width: 800px\)[\s\S]*--space-page-gutter:\s*var\(--space-4\);[\s\S]*--space-section:\s*var\(--space-10\);[\s\S]*--space-section-compact:\s*var\(--space-9\);[\s\S]*--space-heading-content:\s*var\(--space-7\);[\s\S]*--space-related-content:\s*var\(--space-6\);/);
-  assert.match(css, /--tracking-caption:\s*\.02em/);
   assert.match(css, /--motion-duration-fast:\s*180ms/);
   assert.match(css, /--motion-duration-base:\s*220ms/);
   assert.match(css, /--motion-duration-slow:\s*360ms/);
