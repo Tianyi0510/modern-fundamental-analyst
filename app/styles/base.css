@@ -18,12 +18,12 @@
   --font-size-section-title: clamp(44px, 5vw, 72px);
   --font-size-card-title: clamp(32px, 2.917vw, 42px);
   --font-size-compact-title: clamp(20px, 1.667vw, 24px);
-  --font-size-lead: clamp(18px, 1.528vw, 22px);
+  --font-size-lead: 22px;
   --font-size-body-large: 18px;
   --font-size-body: 16px;
   --font-size-label: 16px;
   --font-size-control: 15px;
-  --font-size-caption: 14px;
+  --font-size-caption: 15px;
   --font-size-data-display: clamp(52px, 6.667vw, 96px);
   --font-size-data-kpi: clamp(48px, 4.445vw, 64px);
   --font-size-data-ring: 40px;

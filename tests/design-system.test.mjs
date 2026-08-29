@@ -22,9 +22,10 @@ test("typography uses centralized semantic role tokens", async () => {
   const css = `${base}\n${componentCss}`;
 
   assert.match(base, /--font-size-page-title:\s*clamp\(52px, 7\.778vw, 112px\)/);
-  assert.match(base, /--font-size-lead:\s*clamp\(18px, 1\.528vw, 22px\)/);
+  assert.match(base, /--font-size-lead:\s*22px/);
   assert.match(base, /--font-size-body-large:\s*18px/);
   assert.match(base, /--font-size-label:\s*16px/);
+  assert.match(base, /--font-size-caption:\s*15px/);
   assert.match(base, /--font-size-data-ring:\s*40px/);
   assert.match(base, /--tracking-heading:\s*-\.05em/);
   assert.match(base, /--tracking-body:\s*0/);
@@ -191,6 +192,10 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(header, /aria-modal="true"/);
   assert.match(behavior, /event\.key === "Escape"/);
   assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*translateX\(calc\(100% \+ 24px\)\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
+  assert.doesNotMatch(css, /\.site-header nav a::after/);
+  assert.match(css, /\.site-header nav a:hover, \.site-header nav a:focus-visible \{[^}]*background:[^}]*transform: translateY\(-1px\)/s);
+  assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(\.97\)/s);
+  assert.match(css, /\.language-dropdown a:hover, \.language-dropdown a:focus-visible \{[^}]*transform: translateX\(4px\)/s);
   assert.match(css, /\.mobile-menu-drawer nav a::after \{ display: none; \}/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-top/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);

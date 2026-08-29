@@ -112,7 +112,6 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .source-link:focus-visible { color: var(--interactive-accent); }
 .memo-disclosure > summary:hover,
 .memo-disclosure > summary:focus-visible { color: var(--deep-blue); }
-.site-header nav a::after,
 .bar-value { background: var(--interactive-accent); }
 
 /* A light-blue contact band closes the homepage before the inverse footer. */

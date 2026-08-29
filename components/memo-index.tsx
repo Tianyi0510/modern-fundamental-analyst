@@ -19,8 +19,10 @@ export function MemoIndex({ memos, locale, label, basePath }: MemoIndexProps) {
       <details className="memo-disclosure">
         <summary>
           <span>{label}</span>
-          <span className="memo-count">{String(memos.length).padStart(2, "0")}</span>
-          <ChevronDown aria-hidden="true" size={24} strokeWidth={2} />
+          <span className="memo-summary-meta">
+            <span className="memo-count">{String(memos.length).padStart(2, "0")}</span>
+            <ChevronDown aria-hidden="true" size={24} strokeWidth={2} />
+          </span>
         </summary>
         <div className="memo-disclosure-content">
           {memos.map((memo) => (

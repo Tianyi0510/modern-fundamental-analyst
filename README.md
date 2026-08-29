@@ -84,7 +84,7 @@ The semantic aliases live in `app/styles/colors.css`; the base values and type s
 - Jost variable range: 100-900; semantic UI weights: 400 and 700
 - Dates and financial figures use tabular numerals
 - All `font-size` values are defined once as semantic role tokens in `app/styles/base.css`
-- Fluid roles use bounded `clamp()` values; Body Large, Label, and Data Ring use fixed values for cross-viewport consistency
+- Fluid roles use bounded `clamp()` values; Lead, Body Large, Label, Caption, and Data Ring use fixed values for cross-viewport consistency
 - Components may reference only their assigned `--font-size-*` role and cannot switch roles at responsive breakpoints
 - Headings and financial data use `line-height: 1` with `letter-spacing: -.05em`
 - Body, caption, and control text use `line-height: 1.5` with zero letter spacing; labels retain `.05em` tracking

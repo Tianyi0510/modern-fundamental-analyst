@@ -127,7 +127,8 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /\.memo-disclosure > summary:hover, \.memo-disclosure > summary:focus-visible\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(8px\)/s);
   assert.match(index, /import \{ ChevronDown \} from "lucide-react"/);
-  assert.match(index, /<ChevronDown aria-hidden="true" size=\{24\} strokeWidth=\{2\} \/>/);
+  assert.match(index, /className="memo-summary-meta"[\s\S]*className="memo-count"[\s\S]*<ChevronDown aria-hidden="true" size=\{24\} strokeWidth=\{2\} \/>/);
+  assert.match(css, /\.memo-summary-meta \{[^}]*white-space: nowrap/);
   assert.match(css, /\.memo-disclosure > summary svg\s*\{[^}]*transition:\s*transform/);
   assert.match(css, /\.memo-disclosure\[open\] > summary svg\s*\{\s*transform:\s*rotate\(180deg\);/);
   assert.match(css, /\.memo-disclosure > summary:hover,[\s\S]*?\.memo-disclosure > summary:focus-visible\s*\{\s*color:\s*var\(--deep-blue\)/s);
