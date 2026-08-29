@@ -26,6 +26,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - `next/font` with Jost Variable, Noto Sans TC, and Noto Sans SC
 - Resend for contact and subscriber email
 - Redis for shared server-side rate-limit state, with a privacy-preserving in-memory fallback
+- Playwright for browser-level computed-style verification
 - GitHub Actions for continuous integration
 - Vercel for builds, server functions, analytics, and production hosting
 - Wix for domain registration and DNS management
@@ -82,7 +83,11 @@ The semantic aliases live in `app/styles/colors.css`; the base values and type s
 - Simplified Chinese: Jost for Latin characters and numbers, with Noto Sans SC for CJK glyphs
 - Jost variable range: 100-900; semantic UI weights: 400 and 700
 - Dates and financial figures use tabular numerals
-- Desktop and mobile use explicit token values instead of fluid `clamp()` sizing
+- All `font-size` values are defined once as semantic role tokens in `app/styles/base.css`
+- Fluid roles use bounded `clamp()` values; fixed roles remain stable where fluid scaling would reduce clarity
+- Components may reference only their assigned `--font-size-*` role and cannot switch roles at responsive breakpoints
+
+The role scale covers page, section, card, subsection, compact, and utility titles; lead and body copy; labels, controls, and captions; plus display, KPI, ring, and row data. `typography.css` maps shared content roles, while `component-typography.css` handles component-specific mappings. `responsive.css` changes layout and interaction behavior only—it contains no `font-size` declarations.
 
 Global CSS is separated by responsibility:
 
@@ -162,6 +167,7 @@ Install dependencies and start the development server:
 
 ```bash
 npm ci
+npx playwright install chromium
 npm run dev
 ```
 
@@ -179,14 +185,17 @@ This command runs:
 
 1. TypeScript type checking
 2. ESLint
-3. Node tests
-4. A production Next.js build
+3. Node unit and repository-invariant tests
+4. Playwright computed-style tests
+5. A production Next.js build
 
-GitHub Actions runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
+The computed-style suite opens the principal routes in Chromium at 1440px, 801px, and 390px. It verifies that every sampled component resolves to the expected semantic role size, that each role has one computed size per viewport, and that typography changes do not introduce horizontal overflow.
+
+GitHub Actions installs Chromium and runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
 
 Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
 
-Tests are grouped by responsibility: behavioral API, email, preference, Resend, and Rate Limiter tests live in focused files; Redis connection architecture checks live in `tests/redis-config.test.mjs`; broader page, portfolio, memo, and design-system invariants are split across their corresponding test files.
+Tests are grouped by responsibility: behavioral API, email, preference, Resend, and Rate Limiter tests live in focused files; Redis connection architecture checks live in `tests/redis-config.test.mjs`; broader page, portfolio, memo, and design-system invariants are split across their corresponding test files. Browser-level typography role verification lives in `tests/typography-roles.spec.ts`, with shared Playwright settings in `playwright.config.ts`.
 
 ## Deployment
 
