@@ -3,11 +3,18 @@ import test from "node:test";
 
 import { read, readStyles } from "./repository-helpers.mjs";
 
-test("typography uses semantic tokens instead of legacy responsive font clamps", async () => {
-  const css = await readStyles();
-  const fontClamp = /font-size:\s*clamp\(/;
+test("typography uses fluid semantic tokens instead of component-level font clamps", async () => {
+  const [base, typography, componentTypography, responsive] = await Promise.all([
+    read("app/styles/base.css"),
+    read("app/styles/typography.css"),
+    read("app/styles/component-typography.css"),
+    read("app/styles/responsive.css"),
+  ]);
+  const css = `${base}\n${typography}\n${componentTypography}\n${responsive}`;
 
-  assert.doesNotMatch(css, fontClamp);
+  assert.match(base, /--type-display-large:\s*clamp\(52px, 7\.78vw, 112px\)/);
+  assert.match(base, /--type-subtitle:\s*clamp\(18px, 1\.53vw, 22px\)/);
+  assert.doesNotMatch(`${typography}\n${componentTypography}\n${responsive}`, /font-size:\s*clamp\(/);
   assert.doesNotMatch(css, /--weight-medium/);
   assert.doesNotMatch(css, /font-weight:\s*(?:600|650|670|680|750|800)\b/);
 });
@@ -35,6 +42,9 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /--surface-primary:\s*var\(--white\)/);
   assert.match(css, /--surface-inverse:\s*var\(--black\)/);
   assert.match(css, /--surface-brand:\s*var\(--deep-blue\)/);
+  assert.match(css, /--text-secondary:\s*rgba\(0,0,0,\.62\)/);
+  assert.match(css, /--text-tertiary:\s*rgba\(0,0,0,\.56\)/);
+  assert.match(css, /--text-inverse-secondary:\s*rgba\(255,255,255,\.68\)/);
   assert.match(css, /--interactive-accent:\s*var\(--medium-blue\)/);
   assert.match(css, /\.site-footer\s*\{[^}]*background:\s*var\(--surface-inverse\)[^}]*color:\s*var\(--text-inverse\)/s);
   assert.match(css, /\.footer-brand\s*\{[^}]*gap:\s*14px/s);
@@ -79,16 +89,19 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
-test("English hero copy uses sentence case and mobile arrows have intentional touch motion", async () => {
-  const [typography, responsive, subscribe, home, chrome] = await Promise.all([
+test("editorial copy preserves authored casing and mobile arrows have intentional touch motion", async () => {
+  const [typography, responsive, subscribe, contact, home, chrome] = await Promise.all([
     read("app/styles/typography.css"),
     read("app/styles/responsive.css"),
     read("components/subscribe-form.module.css"),
+    read("components/contact-form.module.css"),
     read("components/home-page-content.tsx"),
     read("app/styles/chrome.css"),
   ]);
 
-  assert.match(typography, /\[lang="en"\] \.hero-bottom > p,[\s\S]*?\[lang="en"\] \.page-intro p,[\s\S]*?\[lang="en"\] \.contact-hero > \.contact-note\s*\{\s*text-transform:\s*none;/);
+  assert.match(typography, /\.hero h1,[\s\S]*?text-transform:\s*none;/);
+  assert.match(typography, /\.hero-bottom > p,[\s\S]*?\.legal \.legal-subtitle\s*\{[\s\S]*?font-size:\s*var\(--type-subtitle\);[\s\S]*?text-transform:\s*none;/);
+  assert.doesNotMatch(`${typography}\n${responsive}\n${subscribe}\n${contact}`, /text-transform:\s*capitalize/);
   assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
   assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
@@ -134,6 +147,15 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.return-row\s*\{[^}]*align-items:\s*start/s);
 });
 
+test("tablet navigation compacts before the mobile breakpoint", async () => {
+  const responsive = await read("app/styles/responsive.css");
+
+  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.site-header \.wordmark\s*\{\s*max-width:\s*150px;/);
+  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.site-header nav\s*\{\s*gap:\s*10px;/);
+  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.returns,[\s\S]*?\.methodology\s*\{\s*grid-template-columns:\s*1fr;/);
+  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.home-page \.metric strong\s*\{\s*font-size:\s*40px;/);
+});
+
 test("mobile navigation uses coordinated motion with a reduced-motion fallback", async () => {
   const [header, behavior, css] = await Promise.all([
     read("components/site-header.tsx"),
@@ -149,4 +171,5 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*html\s*\{\s*scroll-behavior:\s*auto;/s);
 });

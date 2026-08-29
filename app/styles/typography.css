@@ -9,7 +9,7 @@
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
   font-weight: var(--weight-bold);
-  text-transform: capitalize;
+  text-transform: none;
   text-wrap: balance;
 }
 
@@ -26,7 +26,7 @@
   line-height: var(--leading-section);
   letter-spacing: -.055em;
   font-weight: var(--weight-bold);
-  text-transform: capitalize;
+  text-transform: none;
   text-wrap: balance;
 }
 
@@ -37,7 +37,7 @@
   line-height: var(--leading-card);
   letter-spacing: -.045em;
   font-weight: var(--weight-bold);
-  text-transform: capitalize;
+  text-transform: none;
   text-wrap: balance;
 }
 
@@ -50,34 +50,37 @@
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
-  text-transform: capitalize;
+  text-transform: none;
   text-wrap: balance;
 }
 
 .hero-bottom > p,
 .page-intro p,
 .article-lead,
-.contact-grid p {
-  font-size: var(--type-title);
+.contact-note,
+.legal .legal-subtitle {
+  font-size: var(--type-subtitle);
   line-height: var(--leading-lead);
-  letter-spacing: -.02em;
+  letter-spacing: 0;
   font-weight: var(--weight-regular);
-  text-transform: capitalize;
-}
-
-[lang="en"] .hero-bottom > p,
-[lang="en"] .page-intro p,
-[lang="en"] .contact-hero > .contact-note {
   text-transform: none;
+  text-wrap: pretty;
 }
 
-.performance-copy p,
-.contact-note {
+.performance-copy p {
   font-size: var(--type-subtitle);
   line-height: var(--leading-caption);
   letter-spacing: 0;
   font-weight: var(--weight-regular);
-  text-transform: capitalize;
+  text-transform: none;
+}
+
+.contact-grid p {
+  font-size: var(--type-body-large);
+  line-height: var(--leading-body);
+  letter-spacing: 0;
+  font-weight: var(--weight-regular);
+  text-transform: none;
 }
 
 .rich-copy,
@@ -130,7 +133,7 @@
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .metric small,

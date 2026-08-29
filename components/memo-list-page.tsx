@@ -7,7 +7,7 @@ import { localeConfig, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
-  en: { eyebrow: "Investment Memos", title: "Detailed Theses for", emphasis: "Independent Investor Evaluation.", subtitle: "Detailed investment theses supported by fundamental research, financial analysis, valuation, and clearly defined risks.", updated: "Last updated on", indexLabel: "View All Investment Memos" },
+  en: { eyebrow: "Investment Memos", title: "Detailed Theses for", emphasis: "Independent Investor Evaluation.", subtitle: "Detailed investment theses supported by fundamental research, financial analysis, valuation, and clearly defined material risks.", updated: "Last updated on", indexLabel: "View All Investment Memos" },
   "zh-tw": { eyebrow: "投資備忘錄", title: "供獨立投資者評估的", emphasis: "詳細投資論點。", subtitle: "以基本面研究、財務分析、估值與明確界定的風險為基礎，呈現詳細投資論點。", updated: "最後更新於", indexLabel: "查看所有投資備忘錄" },
   "zh-cn": { eyebrow: "投资备忘录", title: "供独立投资者评估的", emphasis: "详细投资论点。", subtitle: "以基本面研究、财务分析、估值与明确界定的风险为基础，呈现详细投资论点。", updated: "最后更新于", indexLabel: "查看所有投资备忘录" },
 } as const;

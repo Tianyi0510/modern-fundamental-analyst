@@ -73,9 +73,9 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*\.9fr 1\.1fr;[^}]*gap:\s*var\(--space-11\);[^}]*align-items:\s*start/s);
   assert.match(styles, /\.legal-section-heading\s*\{[^}]*display:\s*grid;[^}]*gap:\s*34px/s);
-  assert.match(styles, /\.legal \.legal-section-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*color:\s*rgba\(0,0,0,\.62\)/s);
+  assert.match(styles, /\.legal \.legal-section-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*\.35em;[^}]*color:\s*var\(--text-secondary\)/s);
   assert.match(styles, /\.legal \.legal-section-label,[\s\S]*?font-size:\s*var\(--type-label\);[\s\S]*?line-height:\s*var\(--leading-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\);[\s\S]*?letter-spacing:\s*var\(--tracking-label\)/s);
-  assert.match(styles, /\.section-number\s*\{[^}]*color:\s*rgba\(0,0,0,\.62\)/s);
+  assert.match(styles, /\.section-number\s*\{[^}]*color:\s*var\(--text-secondary\)/s);
   assert.match(styles, /\.legal-section-copy\s*\{[^}]*max-width:\s*720px/s);
   assert.match(styles, /\.legal-section-copy p \+ p\s*\{[^}]*margin-top:\s*1\.35em/s);
   assert.match(styles, /\.legal h1\s*\{[^}]*color:\s*var\(--text-primary\)/s);

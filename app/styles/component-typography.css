@@ -6,7 +6,7 @@
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .memo-disclosure > summary {
@@ -14,7 +14,7 @@
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .site-header nav,
@@ -34,7 +34,7 @@
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .about-boundaries h2 {
@@ -42,7 +42,7 @@
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .holding-row b {
@@ -111,7 +111,7 @@
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .mobile-menu-drawer nav {
@@ -119,7 +119,7 @@
   font-size: var(--type-title-bold);
   line-height: var(--leading-heading);
   font-weight: var(--weight-bold);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 /* Higher-specificity legacy selectors must retain the new Label treatment. */
@@ -148,7 +148,7 @@
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 [lang="zh-Hant-TW"] .hero h1,

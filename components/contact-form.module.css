@@ -22,7 +22,7 @@
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .heading h2 {
@@ -32,7 +32,7 @@
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-heading);
   font-weight: var(--weight-bold);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .headingIntro {
@@ -68,7 +68,7 @@
   line-height: var(--leading-label);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-label);
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .control {

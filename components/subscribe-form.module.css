@@ -1,5 +1,5 @@
 .section { min-width: 0; align-self: start; }
-.section h2 { margin: 0; color: var(--white); font-size: var(--type-title-bold); line-height: var(--leading-heading); letter-spacing: var(--tracking-heading); font-weight: var(--weight-bold); text-transform: capitalize; }
+.section h2 { margin: 0; color: var(--white); font-size: var(--type-title-bold); line-height: var(--leading-heading); letter-spacing: var(--tracking-heading); font-weight: var(--weight-bold); text-transform: none; }
 .form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--space-3); margin-top: var(--space-5); }
 .field { min-width: 0; }
 .field span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

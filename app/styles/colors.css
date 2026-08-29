@@ -7,8 +7,12 @@
   --surface-brand: var(--deep-blue);
   --surface-highlight: var(--bright-blue);
   --text-primary: var(--black);
+  --text-secondary: rgba(0,0,0,.62);
+  --text-tertiary: rgba(0,0,0,.56);
   --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
+  --text-inverse-secondary: rgba(255,255,255,.68);
+  --text-inverse-tertiary: rgba(255,255,255,.62);
   --text-highlight: var(--bright-blue);
   --interactive-accent: var(--medium-blue);
 }
@@ -65,9 +69,9 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home { background: var(--surface-primary); color: var(--text-primary); }
 .performance-home .performance-copy p,
 .performance-home .performance-copy small,
-.performance-home .year-bar small { color: rgba(0,0,0,.68); }
+.performance-home .year-bar small { color: color-mix(in srgb, var(--text-primary) 68%, transparent); }
 .performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
-.performance-home .inverse .section-number { color: rgba(0,0,0,.62); }
+.performance-home .inverse .section-number { color: var(--text-secondary); }
 .home-page .hero .button-dark, .performance-home .button-white { background: var(--black); color: var(--white); }
 .home-page .hero .button-dark:hover, .home-page .hero .button-dark:focus-visible, .performance-home .button-white:hover, .performance-home .button-white:focus-visible, .site-header .button-dark:hover, .site-header .button-dark:focus-visible { background: var(--bright-blue); color: var(--black); }
 
@@ -126,7 +130,7 @@ body { background: var(--surface-primary); color: var(--text-primary); }
   box-shadow: 0 0 0 100vmax var(--surface-inverse);
   clip-path: inset(0 -100vmax);
 }
-.site-footer p { color: rgba(255,255,255,.68); }
+.site-footer p { color: var(--text-inverse-secondary); }
 .site-footer a { transition: color var(--motion-duration-base) var(--motion-ease-standard); }
 .site-footer a:hover, .site-footer a:focus-visible { color: var(--text-highlight); }
 .site-footer .footer-mark,
