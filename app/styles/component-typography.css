@@ -110,14 +110,6 @@
   text-transform: none;
 }
 
-.mobile-menu-wordmark {
-  font-family: var(--font-ui);
-  font-size: var(--font-size-compact-title);
-  line-height: var(--leading-compact-title);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-heading);
-}
-
 .mobile-menu-drawer nav {
   font-family: var(--font-ui);
   font-size: var(--font-size-compact-title);

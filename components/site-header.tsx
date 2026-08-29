@@ -103,7 +103,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
         <button className="mobile-menu-backdrop" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} />
         <aside ref={menuDrawerRef} className="mobile-menu-drawer" id="mobile-site-menu" role="dialog" aria-modal="true" aria-label={copy.siteMenu}>
           <div className="mobile-menu-top">
-            <Link className="mobile-menu-wordmark" href={homePath} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
+            <Link className="wordmark mobile-menu-wordmark" href={homePath} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
               Modern Fundamental Analyst<span>.</span>
             </Link>
             <button ref={menuCloseButtonRef} className="mobile-menu-close" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>

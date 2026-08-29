@@ -70,6 +70,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-drawer nav svg")).toHaveCount(6);
     await expect(page.locator(".mobile-language-links a")).toHaveCount(3);
     await expect(page.locator(".mobile-language-links svg")).toHaveCount(0);
+    await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "1px");
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(drawer).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
     const drawerBox = await drawer.boundingBox();
@@ -77,6 +78,8 @@ test.describe("mobile content and navigation QA", () => {
     expect(drawerBox!.x).toBe(0);
     expect(drawerBox!.width).toBe(390);
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("background-color", "rgb(0, 41, 145)");
+    await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "14px");
+    await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "14px");
     const menuTop = page.locator(".mobile-menu-top");
     const topBeforeScroll = await menuTop.boundingBox();
     await page.setViewportSize({ width: 390, height: 620 });
