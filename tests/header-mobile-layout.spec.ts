@@ -28,6 +28,19 @@ test.describe("header interaction QA", () => {
 test.describe("mobile content and navigation QA", () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
 
+  test("site header remains fixed while the page scrolls", async ({ page }) => {
+    await page.goto("/");
+    const header = page.locator(".site-header").first();
+    await expect(header).toHaveCSS("position", "fixed");
+    const topBeforeScroll = await header.boundingBox();
+    await page.evaluate(() => window.scrollTo({ top: 700, behavior: "instant" }));
+    const topAfterScroll = await header.boundingBox();
+    expect(topBeforeScroll).not.toBeNull();
+    expect(topAfterScroll).not.toBeNull();
+    expect(topBeforeScroll!.y).toBe(0);
+    expect(topAfterScroll!.y).toBe(0);
+  });
+
   test("performance methodology has compact hierarchy and a top-rule source card", async ({ page }) => {
     await page.goto("/performance");
     const headingBox = await page.locator(".methodology h2").boundingBox();
