@@ -23,8 +23,8 @@ test("Stripe Checkout keeps secrets server-side and applies safety controls", as
 
   assert.match(stripe, /process\.env\.STRIPE_RESTRICTED_KEY/);
   assert.match(stripe, /process\.env\.STRIPE_SECRET_KEY/);
-  assert.match(stripe, /automatic_tax: \{ enabled: false \}/);
-  assert.match(stripe, /managed_payments: \{ enabled: false \}/);
+  assert.match(stripe, /automatic_tax: \{ enabled: true \}/);
+  assert.doesNotMatch(stripe, /managed_payments:/);
   assert.match(stripe, /integration_identifier: CHECKOUT_INTEGRATION_IDENTIFIER/);
   assert.match(route, /isSameOrigin\(request\)/);
   assert.match(route, /createRateLimiter\(\{ namespace: "stripe-checkout"/);

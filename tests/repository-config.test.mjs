@@ -22,6 +22,7 @@ test("Next.js applies a conservative security-header baseline", async () => {
 
   assert.match(config, /poweredByHeader:\s*false/);
   assert.match(config, /Content-Security-Policy/);
+  assert.match(config, /form-action 'self' https:\/\/checkout\.stripe\.com/);
   assert.match(config, /frame-ancestors 'none'/);
   assert.match(config, /Permissions-Policy/);
   assert.match(config, /Referrer-Policy/);

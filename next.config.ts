@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: "base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
+  { key: "Content-Security-Policy", value: "base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Permissions-Policy", value: "camera=(), geolocation=(), microphone=()" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

@@ -64,10 +64,8 @@ export async function createSupportCheckoutSession({
     mode: "payment",
     billing_address_collection: "auto",
     phone_number_collection: { enabled: false },
-    // Stripe Tax remains off until an active tax registration is confirmed.
-    automatic_tax: { enabled: false },
-    // Keep this support payment with the site owner as merchant of record.
-    managed_payments: { enabled: false },
+    // Live tax registrations are active; Managed Payments requires Automatic Tax.
+    automatic_tax: { enabled: true },
     allow_promotion_codes: false,
     submit_type: "auto",
     integration_identifier: CHECKOUT_INTEGRATION_IDENTIFIER,
