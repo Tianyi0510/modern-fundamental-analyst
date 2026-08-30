@@ -56,7 +56,13 @@ export async function POST(request: Request) {
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
     const details = error && typeof error === "object"
-      ? { name: "name" in error ? String(error.name) : "Error", type: "type" in error ? String(error.type) : undefined, code: "code" in error ? String(error.code) : undefined }
+      ? {
+          name: "name" in error ? String(error.name) : "Error",
+          type: "type" in error ? String(error.type) : undefined,
+          code: "code" in error ? String(error.code) : undefined,
+          param: "param" in error ? String(error.param) : undefined,
+          message: "message" in error ? String(error.message).slice(0, 500) : undefined,
+        }
       : { name: "Error" };
     console.error("Stripe Checkout session creation failed.", details);
     return NextResponse.redirect(supportUrl(request, locale, "error"), 303);
