@@ -15,7 +15,7 @@ const copy = {
     portfolioXirr: "Portfolio XIRR",
     portfolioNote: "Cash-flow weighted",
     benchmarkNote: "Same cash-flow period",
-    snapshot: "Performance snapshot",
+    chart: "Performance Chart",
     measured: "Measured consistently.",
     measure: "Measure",
     result: "Result",
@@ -25,7 +25,7 @@ const copy = {
     benchmarkContext: "Benchmark using matching cash flows",
     methodology: "Methodology",
     methodologyCopy: <>Results are presented in USD. Cumulative return compares current market value with net cost basis. XIRR reflects the timing and amount of portfolio cash flows; the {portfolioSnapshot.benchmark} comparison applies those same cash flows to the benchmark.</>,
-    sourceCopy: (asOf: string) => <><p><span>Source Sheet:</span> <a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>The verified snapshot is synchronized to this site monthly. Prices and market values use closing prices as of {asOf} and are not live quotes. Cash and external funding are excluded.</p></>,
+    sourceCopy: (asOf: string) => <><p><span>Source Sheet:</span> <a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>The verified data is synchronized to this site monthly. Prices and market values use closing prices as of {asOf} and are not live quotes. Cash and external funding are excluded.</p></>,
   },
   "zh-tw": {
     eyebrow: "績效",
@@ -36,7 +36,7 @@ const copy = {
     portfolioXirr: "投資組合 XIRR",
     portfolioNote: "現金流加權",
     benchmarkNote: "相同現金流期間",
-    snapshot: "績效快照",
+    chart: "績效圖表",
     measured: "以一致方式衡量。",
     measure: "衡量項目",
     result: "結果",
@@ -57,7 +57,7 @@ const copy = {
     portfolioXirr: "投资组合 XIRR",
     portfolioNote: "现金流加权",
     benchmarkNote: "相同现金流期间",
-    snapshot: "业绩快照",
+    chart: "业绩图表",
     measured: "以一致方式衡量。",
     measure: "衡量项目",
     result: "结果",
@@ -79,7 +79,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
   return <main className="performance-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="performance-summary shell"><div className="summary-primary"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.cumulativeNote}</small></div><div><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><small>{text.portfolioNote}</small></div><div><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><small>{text.benchmarkNote}</small></div></section>
-    <section className="returns shell"><div className="section-heading"><p className="section-number">{text.snapshot}</p><h2>{text.measured}</h2></div>
+    <section className="returns shell"><div className="section-heading"><p className="section-number">{text.chart}</p><h2>{text.measured}</h2></div>
       <div className="returns-table"><div className="table-head"><span>{text.measure}</span><span>{text.result}</span><span>{text.context}</span></div><div className="return-row"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><span>{text.cumulativeContext}</span></div><div className="return-row"><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><span>{text.portfolioContext}</span></div><div className="return-row"><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><span>{text.benchmarkContext}</span></div></div>
     </section>
     <section className="methodology shell section-gray"><h2>{text.methodology}</h2><div className="methodology-content"><p>{text.methodologyCopy}</p><aside className="methodology-source">{text.sourceCopy(asOf)}</aside></div></section><SiteFooter locale={locale} /></main>;

@@ -11,7 +11,7 @@ export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
     ? { description: "獨立研究、透明思考、長期視角。", quickLinks: "快速連結", contact: "聯絡", support: "支持研究", disclaimer: "免責聲明", rights: "版權所有。" }
     : locale === "zh-cn"
       ? { description: "独立研究、透明思考、长期视角。", quickLinks: "快速链接", contact: "联系", support: "支持研究", disclaimer: "免责声明", rights: "版权所有。" }
-      : { description: "Independent research. Transparent thinking. Long-term orientation.", quickLinks: "Quick Links", contact: "Contact", support: "Support Research", disclaimer: "Disclaimer", rights: "All rights reserved." };
+      : { description: "Independent research. Transparent thinking. Long-term orientation.", quickLinks: "Quick Links", contact: "Contact", support: "Support", disclaimer: "Disclaimer", rights: "All rights reserved." };
 
   return (
     <footer className="site-footer shell">

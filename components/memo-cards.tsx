@@ -49,7 +49,7 @@ export function MemoCards({ memos, locale, basePath, className = "" }: MemoCards
       </article>;
 
       return <Link className={`memo-card memo-card-${index + 1}`} href={`${basePath}/${memo.slug}`} key={memo.slug}>
-        <div><span>{memo.number}</span><span>{memo.tag}</span></div>
+        <div><span>{memo.number}</span><span>{memo.category.label}</span></div>
         <h3>{memo.title}</h3>
         <p>{memo.summary}</p>
         <small className="date-text">{formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}</small>

@@ -10,11 +10,12 @@ import { useExclusiveSubmit } from "./use-exclusive-submit";
 export type SubscribeFormCopy = {
   title: string; email: string; placeholder: string; submit: string;
   submitting: string; success: string; error: string;
+  preferences: string;
 };
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function SubscribeFormClient({ copy, locale }: { copy: SubscribeFormCopy; locale: Locale }) {
+export function SubscribeFormClient({ copy, locale, preferencesHref }: { copy: SubscribeFormCopy; locale: Locale; preferencesHref: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const runExclusive = useExclusiveSubmit();
 
@@ -45,6 +46,7 @@ export function SubscribeFormClient({ copy, locale }: { copy: SubscribeFormCopy;
         </label>
         <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
         <button className={styles.submit} type="submit" disabled={status === "submitting"}>{status === "submitting" ? copy.submitting : copy.submit}</button>
+        <a className={styles.preferences} href={preferencesHref}>{copy.preferences}</a>
         <p className={styles.status} role="status" aria-live="polite">{status === "success" ? copy.success : status === "error" ? copy.error : ""}</p>
       </form>
     </section>

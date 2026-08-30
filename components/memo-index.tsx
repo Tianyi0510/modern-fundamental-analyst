@@ -28,7 +28,7 @@ export function MemoIndex({ memos, locale, label, basePath }: MemoIndexProps) {
           {memos.map((memo) => (
             <Link href={`${basePath}/${memo.slug}`} className="memo-index-row" key={memo.slug}>
               <span>{memo.number}</span>
-              <div><small>{memo.tag}</small><h2>{memo.title}</h2><p>{memo.summary}</p></div>
+              <div><small>{memo.category.label}</small><h2>{memo.title}</h2><p>{memo.summary}</p></div>
               <div className="memo-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span></div>
             </Link>
           ))}
