@@ -14,8 +14,6 @@
 
 @media (max-width: 800px) {
   :root {
-    --mobile-safe-area-top: env(safe-area-inset-top, 0px);
-    --mobile-header-height: calc(78px + var(--mobile-safe-area-top));
     --space-page-gutter: var(--space-4);
     --space-section: var(--space-10);
     --space-section-compact: var(--space-9);
@@ -23,7 +21,7 @@
     --space-related-content: var(--space-6);
   }
 
-  body { padding-top: var(--mobile-header-height); }
+  body { padding-top: 78px; }
   .shell { width: min(720px, calc(100% - (var(--space-page-gutter) * 2))); }
   .arrow-icon {
     font-weight: var(--weight-bold);
@@ -42,10 +40,10 @@
     z-index: 90;
     inset: 0 0 auto;
     width: 100%;
-    height: var(--mobile-header-height);
-    min-height: var(--mobile-header-height);
+    height: 78px;
+    min-height: 78px;
     grid-template-columns: 1fr auto;
-    padding: var(--mobile-safe-area-top) max(var(--space-page-gutter), calc((100vw - 720px) / 2)) 0;
+    padding: 0 max(var(--space-page-gutter), calc((100vw - 720px) / 2));
     background: var(--white);
   }
   .site-header::before { content: none; }
@@ -56,7 +54,7 @@
     width: 46px;
     height: 46px;
     padding: 0;
-    border: 0;
+    border: 1px solid var(--black);
     border-radius: 50%;
     background: var(--white);
     color: var(--black);
@@ -77,7 +75,7 @@
     inset: 0;
     width: 100%;
     min-height: 100%;
-    padding: calc(20px + var(--mobile-safe-area-top)) var(--space-page-gutter) max(16px, env(safe-area-inset-bottom));
+    padding: 20px var(--space-page-gutter) max(16px, env(safe-area-inset-bottom));
     background: var(--background-gray);
     color: var(--black);
     display: flex;
@@ -91,7 +89,7 @@
   .mobile-menu-layer.is-open .mobile-menu-drawer { transform: translateX(0); }
   .mobile-menu-top { position: sticky; z-index: 2; top: 0; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); padding-bottom: 16px; background: var(--white); }
   .mobile-menu-wordmark { max-width: 190px; }
-  .mobile-menu-close { flex: 0 0 auto; border: 1px solid var(--black); background: var(--white); color: var(--black); }
+  .mobile-menu-close { flex: 0 0 auto; border-color: var(--black); background: var(--white); color: var(--black); }
   .mobile-menu-close:hover, .mobile-menu-close:focus-visible { background: var(--black); color: var(--white); }
   .mobile-menu-close svg { transform: rotate(-72deg) scale(.84); }
   .mobile-menu-layer.is-open .mobile-menu-close svg { transform: rotate(0) scale(1); transition-delay: .08s; }

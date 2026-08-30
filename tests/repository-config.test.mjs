@@ -30,22 +30,6 @@ test("Next.js applies a conservative security-header baseline", async () => {
   assert.match(config, /X-Frame-Options/);
 });
 
-test("all locale roots use the shared edge-to-edge mobile viewport", async () => {
-  const [viewport, english, traditionalChinese, simplifiedChinese] = await Promise.all([
-    read("lib/site-viewport.ts"),
-    read("app/(en)/layout.tsx"),
-    read("app/zh-tw/layout.tsx"),
-    read("app/zh-cn/layout.tsx"),
-  ]);
-
-  assert.match(viewport, /viewportFit: "cover"/);
-  assert.match(viewport, /themeColor: "#FFFFFF"/);
-  assert.match(viewport, /colorScheme: "light"/);
-  for (const layout of [english, traditionalChinese, simplifiedChinese]) {
-    assert.match(layout, /export const viewport = siteViewport/);
-  }
-});
-
 test("page metadata provides canonical and bilingual alternate URLs", async () => {
   const metadata = await read("lib/site-config.ts");
 

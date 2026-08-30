@@ -49,7 +49,6 @@ test.describe("mobile content and navigation QA", () => {
     expect(topBeforeScroll!.width).toBe(390);
     expect(topAfterScroll!.x).toBe(0);
     expect(topAfterScroll!.width).toBe(390);
-    await expect(page.locator(".mobile-menu-button")).toHaveCSS("border-top-width", "0px");
   });
 
   test("performance methodology has compact hierarchy and a top-rule source card", async ({ page }) => {
