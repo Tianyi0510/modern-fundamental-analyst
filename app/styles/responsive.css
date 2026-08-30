@@ -56,7 +56,7 @@
     width: 46px;
     height: 46px;
     padding: 0;
-    border: 1px solid var(--black);
+    border: 0;
     border-radius: 50%;
     background: var(--white);
     color: var(--black);
@@ -91,7 +91,7 @@
   .mobile-menu-layer.is-open .mobile-menu-drawer { transform: translateX(0); }
   .mobile-menu-top { position: sticky; z-index: 2; top: 0; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); padding-bottom: 16px; background: var(--white); }
   .mobile-menu-wordmark { max-width: 190px; }
-  .mobile-menu-close { flex: 0 0 auto; border-color: var(--black); background: var(--white); color: var(--black); }
+  .mobile-menu-close { flex: 0 0 auto; border: 1px solid var(--black); background: var(--white); color: var(--black); }
   .mobile-menu-close:hover, .mobile-menu-close:focus-visible { background: var(--black); color: var(--white); }
   .mobile-menu-close svg { transform: rotate(-72deg) scale(.84); }
   .mobile-menu-layer.is-open .mobile-menu-close svg { transform: rotate(0) scale(1); transition-delay: .08s; }
