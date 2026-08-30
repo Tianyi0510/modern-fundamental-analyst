@@ -26,7 +26,13 @@ test.describe("header interaction QA", () => {
 });
 
 test.describe("mobile content and navigation QA", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  test.use({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 3,
+    hasTouch: true,
+    isMobile: true,
+    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
+  });
 
   test("site header remains fixed while the page scrolls", async ({ page }) => {
     await page.goto("/");
@@ -39,6 +45,10 @@ test.describe("mobile content and navigation QA", () => {
     expect(topAfterScroll).not.toBeNull();
     expect(topBeforeScroll!.y).toBe(0);
     expect(topAfterScroll!.y).toBe(0);
+    expect(topBeforeScroll!.x).toBe(0);
+    expect(topBeforeScroll!.width).toBe(390);
+    expect(topAfterScroll!.x).toBe(0);
+    expect(topAfterScroll!.width).toBe(390);
   });
 
   test("performance methodology has compact hierarchy and a top-rule source card", async ({ page }) => {

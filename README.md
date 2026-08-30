@@ -12,10 +12,11 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Localized investment memo index and article pages
 - Contact form delivered through Resend
 - Newsletter subscription, localized welcome emails, language preferences, and self-service unsubscribe
+- Localized one-time research support through Stripe Hosted Checkout at USD 6, 12, or 18
 - Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
 - Vercel Analytics and Speed Insights
 - Shared footer navigation with GitHub and LinkedIn profile links
-- Responsive navigation, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
+- Responsive navigation with a viewport-fixed mobile header, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
 
 ## Technology
 
@@ -25,6 +26,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Native CSS and CSS Modules
 - `next/font` with Jost Variable, Noto Sans TC, and Noto Sans SC
 - Resend for contact and subscriber email
+- Stripe Checkout, Managed Payments, and Automatic Tax for one-time research support
 - Redis for shared server-side rate-limit state, with a privacy-preserving in-memory fallback
 - Playwright for browser-level computed-style verification
 - GitHub Actions for continuous integration
@@ -38,7 +40,7 @@ app/                         App Router pages, layouts, APIs, and global styles
   (en)/                      English routes
   zh-tw/                     Traditional Chinese routes
   zh-cn/                     Simplified Chinese routes
-  api/                       Contact, subscribe, and preference endpoints
+  api/                       Contact, subscribe, preference, webhook, and Stripe Checkout endpoints
 components/                  Shared components and isolated client interaction hooks
 content/memos/               Versioned long-form investment memo source content
 data/                        Localized copy, portfolio snapshot, and memo catalog
@@ -58,7 +60,7 @@ The three language versions share page components wherever possible. Locale file
 
 ## Design System
 
-The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts across desktop and mobile.
+The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices. At 800px and below, the header itself becomes a full-viewport-width fixed surface while its contents retain the shared page gutter; the document reserves the same 78px height so content never slides underneath it. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts across desktop and mobile.
 
 ### Color Tokens
 
@@ -123,6 +125,12 @@ The signed Resend webhook at `/api/webhooks/resend` processes bounce, complaint,
 
 Subscribers can request a short-lived secure link to update their preferred language or unsubscribe. Preference links use authenticated AES-256-GCM encryption and a dedicated server-side secret. A migration fallback preserves links created before that secret was introduced.
 
+## Stripe Support Flow
+
+The localized `/support` pages offer voluntary one-time support at USD 6, 12, or 18. A same-origin, rate-limited server endpoint validates the selected amount and locale before creating a Stripe Hosted Checkout Session; Stripe credentials and Price IDs never reach the browser. Dynamic Payment Methods remain Dashboard-controlled because the integration intentionally omits `payment_method_types`.
+
+Live Checkout enables Automatic Tax and uses the account's Managed Payments default. Active Live Tax Registrations were confirmed before Automatic Tax was enabled. Checkout collects the customer location needed to calculate applicable tax, and the site's Content Security Policy permits form navigation only to the same origin and `https://checkout.stripe.com`. No payment webhook is required while support does not unlock content or trigger fulfillment; add a signature-verified webhook before introducing supporter benefits or entitlement state.
+
 ## Redis Rate Limiting
 
 Redis supplies shared rate-limit state across Vercel Functions. The implementation is intentionally small and failure-tolerant:
@@ -151,11 +159,15 @@ CONTACT_TO_EMAIL=
 SUBSCRIPTION_PREFERENCES_SECRET=
 UPSTASH_REDIS_URL=
 RATE_LIMIT_HASH_SECRET=
+STRIPE_RESTRICTED_KEY=
+STRIPE_PRICE_USD_6=
+STRIPE_PRICE_USD_12=
+STRIPE_PRICE_USD_18=
 ```
 
-Production is the only Vercel environment with Resend, contact-delivery, subscription-preference, and shared rate-limit credentials. Preview intentionally has no server-side service credentials, so branch and pull-request deployments can review the interface without sending email, changing the production audience, or accessing production Redis. Development uses uncommitted local `.env.local` values when service integration testing is explicitly needed.
+Production is the only Vercel environment with Resend, contact-delivery, subscription-preference, shared rate-limit, and live Stripe credentials. Preview intentionally has no server-side service credentials, so branch and pull-request deployments can review the interface without sending email, changing the production audience, accessing production Redis, or creating live Checkout Sessions. Development uses uncommitted local `.env.local` values when service integration testing is explicitly needed.
 
-`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, and `RATE_LIMIT_HASH_SECRET` are configured as Sensitive Production variables. `UPSTASH_REDIS_URL` is an integration-managed Production variable created by the Vercel Marketplace connection. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, `RATE_LIMIT_HASH_SECRET`, the Stripe server key, and the three live Stripe Price IDs are Production variables. Prefer a least-privilege `STRIPE_RESTRICTED_KEY`; `STRIPE_SECRET_KEY` is accepted only as a compatibility fallback. `UPSTASH_REDIS_URL` is an integration-managed Production variable created by the Vercel Marketplace connection. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
 
 The three optional `RESEND_SEGMENT_*` variables can override the checked-in language-segment defaults when Resend segments are recreated.
 
@@ -194,13 +206,13 @@ This command runs:
 4. Playwright computed-style tests
 5. A production Next.js build
 
-The computed-style suite opens the principal routes in Chromium at 1440px, 801px, and 390px. It verifies that every sampled component resolves to the expected semantic role size, that each role has one computed size per viewport, and that typography changes do not introduce horizontal overflow.
+The computed-style suite opens the principal routes in Chromium at 1440px, 801px, and 390px. It verifies that every sampled component resolves to the expected semantic role size, that each role has one computed size per viewport, and that typography changes do not introduce horizontal overflow. Mobile interaction tests use an iPhone user agent, touch input, a 3x device scale, and a 390×844 viewport; they verify that the full-width header remains at `top: 0` after scrolling and that the menu still opens, traps focus, and closes correctly.
 
 GitHub Actions installs Chromium and runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
 
 Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
 
-Tests are grouped by responsibility: behavioral API, email, preference, Resend, and Rate Limiter tests live in focused files; Redis connection architecture checks live in `tests/redis-config.test.mjs`; broader page, portfolio, memo, and design-system invariants are split across their corresponding test files. Browser-level typography role verification lives in `tests/typography-roles.spec.ts`, with shared Playwright settings in `playwright.config.ts`.
+Tests are grouped by responsibility: behavioral API, email, preference, Resend, Stripe Checkout, and Rate Limiter tests live in focused files; Redis connection architecture checks live in `tests/redis-config.test.mjs`; broader page, portfolio, memo, and design-system invariants are split across their corresponding test files. Browser-level typography role verification lives in `tests/typography-roles.spec.ts`, mobile header and navigation verification lives in `tests/header-mobile-layout.spec.ts`, and shared Playwright settings live in `playwright.config.ts`.
 
 ## Deployment
 
