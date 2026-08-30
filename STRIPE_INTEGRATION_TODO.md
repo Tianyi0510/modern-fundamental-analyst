@@ -51,6 +51,7 @@ Use these only with the **Modern Fundamental Analyst Live Mode** restricted key.
 | `billing_address_collection` | `auto` |
 | `phone_number_collection.enabled` | `false` |
 | `automatic_tax.enabled` | `false` until an active tax registration is confirmed |
+| `managed_payments.enabled` | `false`; this voluntary support flow keeps the site owner as merchant of record |
 | `allow_promotion_codes` | `false` |
 | `submit_type` | `auto` |
 | `integration_identifier` | `hosted_web_0001_mfaqxkpt` |
@@ -60,6 +61,8 @@ Use these only with the **Modern Fundamental Analyst Live Mode** restricted key.
 | `cancel_url` | Localized `/support?status=cancelled` |
 
 `automatic_tax` differs intentionally from the Checkout Studio value. The sandbox had no active Tax Registrations when checked, so enabling it would silently collect no tax. Confirm the applicable registrations and product tax treatment with a qualified tax professional before changing this value.
+
+`managed_payments` is disabled explicitly for each Checkout Session. Stripe otherwise enables Managed Payments by default for this account and requires Automatic Tax, which conflicts with the current absence of an active tax registration.
 
 The implementation preserves the requested `hosted_web_0001` prefix and appends the required eight-letter tracking suffix for current Stripe API versions.
 
