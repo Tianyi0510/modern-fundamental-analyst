@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { isSameOrigin, readLimitedText, RequestBodyError } from "@/lib/api-request";
 import { resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { createSupportCheckoutSession, parseSupportAmount } from "@/lib/stripe-checkout";
+import { SITE_URL } from "@/lib/site-config";
+import { createSupportCheckoutSession, getStripeErrorDetails, parseSupportAmount } from "@/lib/stripe-checkout";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,10 @@ function supportUrl(request: Request, locale: ReturnType<typeof resolveLocale>, 
   const url = new URL(`${prefix}/support`, request.url);
   url.searchParams.set("status", status);
   return url;
+}
+
+function checkoutOrigin(request: Request) {
+  return process.env.NODE_ENV === "production" ? SITE_URL : new URL(request.url).origin;
 }
 
 export async function POST(request: Request) {
@@ -51,20 +56,11 @@ export async function POST(request: Request) {
   if (!amount) return NextResponse.json({ error: "Choose a valid support amount." }, { status: 400 });
 
   try {
-    const session = await createSupportCheckoutSession({ amount, locale, origin: new URL(request.url).origin });
+    const session = await createSupportCheckoutSession({ amount, locale, origin: checkoutOrigin(request) });
     if (!session.url) throw new Error("Stripe did not return a Checkout URL.");
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
-    const details = error && typeof error === "object"
-      ? {
-          name: "name" in error ? String(error.name) : "Error",
-          type: "type" in error ? String(error.type) : undefined,
-          code: "code" in error ? String(error.code) : undefined,
-          param: "param" in error ? String(error.param) : undefined,
-          message: "message" in error ? String(error.message).slice(0, 500) : undefined,
-        }
-      : { name: "Error" };
-    console.error("Stripe Checkout session creation failed.", details);
+    console.error("Stripe Checkout session creation failed.", getStripeErrorDetails(error));
     return NextResponse.redirect(supportUrl(request, locale, "error"), 303);
   }
 }
