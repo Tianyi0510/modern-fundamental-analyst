@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { SiteDocument } from "@/components/site-document";
 import { SITE_NAME, SITE_URL } from "@/lib/site-config";
+import { siteViewport } from "@/lib/site-viewport";
 import "../globals.css";
 
 const image = `${SITE_URL}/og.png`;
+export const viewport = siteViewport;
 const description = "獨立公開市場股票研究、投資組合、績效紀錄與投資備忘錄。";
 
 export const metadata: Metadata = {

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { SiteDocument } from "@/components/site-document";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site-config";
+import { siteViewport } from "@/lib/site-viewport";
 import "../globals.css";
 
 const image = `${SITE_URL}/og.png`;
+
+export const viewport = siteViewport;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
