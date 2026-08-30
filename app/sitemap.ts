@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE_URL;
-  const routes = ["", "/about", "/portfolio", "/performance", "/memos", "/contact", "/disclaimer"];
+  const routes = ["", "/about", "/portfolio", "/performance", "/memos", "/contact", "/support", "/disclaimer"];
   const entries = routes.flatMap((route) => {
     const english = `${base}${route}`;
     const traditionalChinese = `${base}/zh-tw${route}`;

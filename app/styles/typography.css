@@ -21,7 +21,8 @@
 .about-section-heading h2,
 .about-closing h2,
 .portfolio-holdings-heading h2,
-.legal-section h2 {
+.legal-section h2,
+.support-section h2 {
   font-size: var(--font-size-section-title);
   line-height: var(--leading-section-title);
   letter-spacing: var(--tracking-heading);
@@ -81,6 +82,15 @@
   letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   text-transform: none;
+}
+
+.support-copy p,
+.support-note,
+.support-status {
+  font-size: var(--font-size-body-large);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-weight: var(--weight-regular);
 }
 
 .rich-copy,
@@ -173,6 +183,15 @@
 .home-page .metric strong,
 .portfolio-page .portfolio-kpis strong,
 .performance-summary strong {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-data-kpi);
+  line-height: var(--leading-data);
+  letter-spacing: var(--tracking-heading);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.support-amount-option strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-kpi);
   line-height: var(--leading-data);
