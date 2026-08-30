@@ -105,10 +105,16 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "14px");
     const menuTop = page.locator(".mobile-menu-top");
     const topBeforeScroll = await menuTop.boundingBox();
+    expect(topBeforeScroll).not.toBeNull();
+    expect(topBeforeScroll!.x).toBe(0);
+    expect(topBeforeScroll!.y).toBe(0);
+    expect(topBeforeScroll!.width).toBe(390);
+    await expect(menuTop).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(drawer).toHaveCSS("background-color", "rgb(248, 249, 251)");
+    await expect(drawer).toHaveCSS("padding-top", "0px");
     await page.setViewportSize({ width: 390, height: 620 });
     await drawer.evaluate((element) => element.scrollTo({ top: 160, behavior: "instant" }));
     const topAfterScroll = await menuTop.boundingBox();
-    expect(topBeforeScroll).not.toBeNull();
     expect(topAfterScroll).not.toBeNull();
     expect(topAfterScroll!.y).toBe(topBeforeScroll!.y);
     await page.locator(".mobile-menu-close").tap();
