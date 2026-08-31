@@ -1,6 +1,6 @@
 .section { min-width: 0; align-self: start; }
 .section h2 { margin: 0; color: var(--white); font-size: var(--font-size-compact-title); line-height: var(--leading-compact-title); letter-spacing: var(--tracking-heading); font-weight: var(--weight-bold); text-transform: none; }
-.form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--space-3); margin-top: var(--space-5); }
+.form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; column-gap: var(--space-3); row-gap: var(--space-2); margin-top: var(--space-5); }
 .field { min-width: 0; }
 .field span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .control { display: block; width: 100%; min-height: var(--size-control); padding: 13px 20px; border: 1px solid rgba(255,255,255,.7); border-radius: var(--radius-pill); background: transparent; color: var(--white); font: inherit; font-size: var(--font-size-body); }
@@ -11,7 +11,7 @@
 .submit:active:not(:disabled) { transform: scale(.985); box-shadow: none; }
 .submit:disabled { cursor: wait; opacity: .64; transform: none; }
 .submit:disabled:hover { border-color: var(--white); background: var(--white); color: var(--black); box-shadow: none; }
-.preferences { grid-column: 1; width: fit-content; color: var(--white); font-size: var(--font-size-caption); line-height: var(--leading-body); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
+.preferences { grid-column: 1; width: fit-content; color: var(--white); font-size: var(--font-size-caption); line-height: var(--leading-body); font-weight: var(--weight-bold); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
 .preferences:hover, .preferences:focus-visible { color: var(--bright-blue); }
 .status { grid-column: 1 / -1; min-height: 1.55em; margin: 0; color: var(--white); font-size: var(--font-size-caption); line-height: var(--leading-body); }
 .status { font-weight: var(--weight-bold); }

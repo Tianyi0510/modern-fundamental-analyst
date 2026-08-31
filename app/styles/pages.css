@@ -81,7 +81,7 @@
 .source-link { color: var(--bright-blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
 .source-link:hover { color: var(--medium-blue); }
 .source-link:focus-visible { outline: var(--focus-ring-width) solid var(--deep-blue); outline-offset: var(--focus-ring-offset); }
-.performance-summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1px; margin-top: var(--space-section-compact); background: var(--black); border: 1px solid var(--black); }
+.performance-summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1px; margin-top: 0; background: var(--black); }
 .performance-summary > div { min-height: 310px; padding: 30px; background: var(--white); }
 .performance-summary .summary-primary { background: var(--white); }
 .data-value.positive { color: var(--price-up); }

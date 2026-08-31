@@ -2,7 +2,6 @@
 @media (max-width: 1100px) and (min-width: 801px) {
   .site-header .wordmark { max-width: 150px; }
   .header-actions { gap: 10px; }
-  .header-actions > .button { margin-left: 0; }
   .site-header nav { gap: 10px; }
   .language-trigger { padding-inline: 6px; }
   .site-header .button-small { padding-inline: 14px; }
