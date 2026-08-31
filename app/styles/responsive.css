@@ -160,17 +160,19 @@
   .table-head { display: none; }
   .portfolio-row { grid-template-columns: 1fr auto; padding: 22px 0; }
   .portfolio-row span:nth-child(2) { grid-column: 1 / -1; order: 3; }
-  .performance-page .performance-summary { grid-template-columns: 1fr; margin-top: var(--space-section-compact); }
-  .performance-page .performance-summary > div { min-height: 210px; padding: 24px; }
+  .performance-page .performance-summary { grid-template-columns: 1fr; margin-top: 0; }
+  .performance-page .performance-summary > div { min-height: 168px; padding: var(--space-5) var(--space-page-gutter); }
+  .performance-page .performance-summary strong { margin-top: var(--space-7); }
+  .performance-page .performance-summary small { margin-top: var(--space-2); }
   .returns, .methodology { padding: var(--space-section) 0; }
-  .methodology { gap: var(--space-related-content); }
+  .performance-page .returns,
+  .performance-page .methodology { gap: var(--space-heading-content); }
   .methodology-content { display: grid; gap: var(--space-related-content); }
   .methodology-content > p { margin: 0; }
   .methodology-source { margin-top: 0; padding: var(--space-5); border-left: 0; border-top: 4px solid var(--deep-blue); }
   .methodology-source p + p { margin-top: var(--space-4); }
-  .performance-page .returns { gap: var(--space-related-content); }
   .returns-table .table-head { display: none; }
-  .return-row { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; padding: 24px 0; align-items: start; }
+  .return-row { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2) var(--space-4); min-height: 0; padding: var(--space-5) 0; align-items: start; }
   .return-row > :nth-child(3) { grid-column: 1 / -1; text-align: left; }
   .memo-index-row { grid-template-columns: 44px 1fr; gap: 18px; }
   .memo-index { padding-top: var(--space-section); }

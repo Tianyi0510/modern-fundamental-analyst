@@ -149,6 +149,8 @@ test("editorial copy preserves authored casing and mobile arrows have intentiona
   assert.match(home, /<MoveUpRight className="arrow-icon round-link-arrow"[^>]*strokeWidth=\{3\}/);
   assert.doesNotMatch(home, /<span className="arrow-icon"[^>]*>[→↗]/);
   assert.match(chrome, /\.home-page \.text-link \.arrow-icon, \.home-page \.allocation-card > a \.arrow-icon \{[^}]*stroke-width:\s*3;/);
+  assert.match(chrome, /\.site-header \.wordmark,[\s\S]*?\.site-footer \.wordmark\s*\{\s*transition:\s*none;/);
+  assert.match(chrome, /\.site-header \.wordmark:hover,[\s\S]*?\.site-footer \.wordmark:active\s*\{[^}]*color:\s*inherit;[^}]*transform:\s*none;/s);
   assert.match(responsive, /\.home-page \.round-link \.round-link-arrow\s*\{[^}]*stroke-width:\s*3;/);
   assert.match(subscribe, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/);
   assert.match(subscribe, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/);
@@ -181,6 +183,8 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /\.section-number\s*\{[^}]*margin:\s*0/s);
   assert.match(css, /\.article-meta\s*\{[^}]*align-items:\s*center;[^}]*flex-wrap:\s*wrap/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.return-row\s*\{[^}]*align-items:\s*start/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*168px;[^}]*padding:\s*var\(--space-5\) var\(--space-page-gutter\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.performance-page \.methodology\s*\{[^}]*gap:\s*var\(--space-heading-content\)/s);
 });
 
 test("tablet navigation compacts before the mobile breakpoint", async () => {

@@ -15,18 +15,8 @@
   padding-top: 6px;
 }
 
-.headingLabel {
-  margin: 0;
-  color: var(--black);
-  font-size: var(--font-size-label);
-  line-height: var(--leading-body);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-label);
-  text-transform: none;
-}
-
 .heading h2 {
-  margin: 28px 0 24px;
+  margin: 0 0 24px;
   max-width: 380px;
   font-size: var(--font-size-card-title);
   line-height: var(--leading-card-title);
@@ -167,10 +157,6 @@ textarea.control {
 
   .heading {
     padding-top: 0;
-  }
-
-  .heading h2 {
-    margin-top: 22px;
   }
 
   .form {

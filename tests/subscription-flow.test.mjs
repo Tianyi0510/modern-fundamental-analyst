@@ -17,11 +17,14 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(page, /className="contact-grid"/);
   assert.doesNotMatch(form, /"use client"/);
   assert.match(form, /ContactFormClient copy=\{copy\[locale\]\}/);
+  assert.match(form, /title: "Send a Message"/);
+  assert.doesNotMatch(form, /Start A Conversation|label: "Send A Message"/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
   assert.match(client, /postJson\("\/api\/contact"/);
   assert.match(client, /contact-form\.module\.css/);
+  assert.doesNotMatch(client, /headingLabel/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
   assert.match(styles, /\.form\s*\{[^}]*padding:\s*40px 40px 0/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.form\s*\{[^}]*padding:\s*26px 22px 0/s);

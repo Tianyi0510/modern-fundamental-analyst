@@ -9,7 +9,7 @@ import { useExclusiveSubmit } from "./use-exclusive-submit";
 import { useSubmissionId } from "./use-submission-id";
 
 export type ContactFormCopy = {
-  label: string; title: string; intro: string; name: string; email: string;
+  title: string; intro: string; name: string; email: string;
   subject: string; message: string; send: string; sending: string; success: string; error: string;
 };
 
@@ -40,7 +40,6 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
 
   return <section className={`${styles.section} shell`} aria-labelledby="contact-form-title">
     <div className={styles.heading}>
-      <p className={styles.headingLabel}>{copy.label}</p>
       <h2 id="contact-form-title">{copy.title}</h2>
       <p className={styles.headingIntro}>{copy.intro}</p>
     </div>

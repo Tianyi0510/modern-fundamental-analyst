@@ -64,7 +64,7 @@ export function SupportPageContent({ locale, status }: { locale: Locale; status?
       <h1>{text.title[0]}<br /><em>{text.title[1]}</em></h1>
       <div className="page-intro"><p>{text.intro}</p></div>
     </section>
-    <section className="support-section section-gray">
+    <section className="support-section">
       <div className="support-layout shell">
         <div className="support-copy">
           <h2>{text.sectionTitle}</h2>

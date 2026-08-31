@@ -4,6 +4,14 @@
 .wordmark:hover, .wordmark:focus-visible { color: var(--deep-blue); transform: scale(1.015); }
 .wordmark:active { transform: scale(.99); }
 .wordmark span { color: var(--medium-blue); }
+.site-header .wordmark,
+.site-footer .wordmark { transition: none; }
+.site-header .wordmark:hover,
+.site-header .wordmark:focus-visible,
+.site-header .wordmark:active,
+.site-footer .wordmark:hover,
+.site-footer .wordmark:focus-visible,
+.site-footer .wordmark:active { color: inherit; transform: none; }
 .header-actions { min-width: 0; justify-self: end; display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3); }
 .mobile-menu-button, .mobile-menu-layer { display: none; }
 .site-header nav { display: flex; gap: 12px; }
