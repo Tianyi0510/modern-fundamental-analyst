@@ -11,7 +11,7 @@
 .submit:active:not(:disabled) { transform: scale(.985); box-shadow: none; }
 .submit:disabled { cursor: wait; opacity: .64; transform: none; }
 .submit:disabled:hover { border-color: var(--white); background: var(--white); color: var(--black); box-shadow: none; }
-.preferences { grid-column: 1; width: fit-content; margin-left: 20px; color: var(--text-inverse-secondary); font-size: var(--font-size-caption); line-height: var(--leading-body); transition: color var(--motion-duration-base) var(--motion-ease-standard); }
+.preferences { grid-column: 1; width: fit-content; color: var(--white); font-size: var(--font-size-caption); line-height: var(--leading-body); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
 .preferences:hover, .preferences:focus-visible { color: var(--bright-blue); }
 .status { grid-column: 1 / -1; min-height: 1.55em; margin: 0; color: var(--white); font-size: var(--font-size-caption); line-height: var(--leading-body); }
 .status { font-weight: var(--weight-bold); }
@@ -19,7 +19,7 @@
 @media (max-width: 800px) {
   .form { grid-template-columns: 1fr; }
   .submit { width: 100%; }
-  .preferences { grid-column: auto; margin-left: 0; }
+  .preferences { grid-column: auto; }
   .status { grid-column: auto; }
 }
 @media (hover: none) and (pointer: coarse) {

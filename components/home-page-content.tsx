@@ -45,7 +45,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             </div>
           </div>
         </section>
-        <section className="metric-band shell" aria-label={text.portfolioSnapshot}>
+        <section className="metric-band" aria-label={text.portfolioSnapshot}>
           <div className="metric metric-featured">
             <span>{text.totalReturn}</span>
             <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
