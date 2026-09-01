@@ -15,7 +15,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Localized one-time research support through Stripe Hosted Checkout at USD 6, 12, or 18
 - Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
 - Vercel Analytics and Speed Insights
-- Shared footer navigation with GitHub and LinkedIn profile links
+- Shared footer navigation with GitHub, LinkedIn, and X profile links
 - Responsive navigation with a viewport-fixed mobile header, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
 
 ## Technology
@@ -60,7 +60,7 @@ The three language versions share page components wherever possible. Locale file
 
 ## Design System
 
-The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices. At 800px and below, the header itself becomes a full-viewport-width fixed surface while its contents retain the shared page gutter; the document reserves the same 78px height so content never slides underneath it. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts across desktop and mobile.
+The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Home, Portfolio, and Performance use one shared KPI-block geometry and content rhythm across desktop and mobile. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices. At 800px and below, the header itself becomes a full-viewport-width fixed surface while its contents retain the shared page gutter; the document reserves the same 78px height so content never slides underneath it. The mobile menu reveals from the top, uses staggered navigation motion, supports a right-swipe close gesture, and identifies the current page with the same light-blue surface and Medium Blue text used by desktop navigation. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts across desktop and mobile.
 
 ### Color Tokens
 

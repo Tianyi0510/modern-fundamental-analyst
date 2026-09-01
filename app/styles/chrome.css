@@ -71,13 +71,13 @@
 .home-page .button, .site-header .button { text-decoration: none; transform-origin: center; transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard); }
 .home-page .button:hover, .home-page .button:focus-visible, .site-header .button:hover, .site-header .button:focus-visible { transform: scale(var(--motion-scale-hover)); box-shadow: none; }
 .home-page .button:active, .site-header .button:active { transform: scale(.985); box-shadow: none; }
-.home-page .round-link { transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard); }
+.home-page .round-link { border-color: transparent; transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard); }
 .home-page .round-link:hover, .home-page .round-link:focus-visible { background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-hover)); }
 .home-page .round-link:hover .arrow-icon, .home-page .round-link:focus-visible .arrow-icon { transform: none; }
 .home-page .round-link:active { transform: scale(.985); }
 .metric-band { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--black); }
 .home-page .metric-band { position: relative; }
-.metric { min-height: 280px; padding: 34px; background: var(--white); }
+.metric { background: var(--white); }
 .metric-featured { background: var(--deep-blue); color: var(--white); }
 .metric-accent { background: var(--bright-blue); }
 .metric,

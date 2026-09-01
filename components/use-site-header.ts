@@ -1,12 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type PointerEventHandler } from "react";
+
+export function useHeaderScrollState() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setIsScrolled(window.scrollY > 8));
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", update);
+    };
+  }, []);
+
+  return isScrolled;
+}
 
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -41,10 +63,31 @@ export function useMobileMenu() {
     };
   }, [isOpen]);
 
+  const handlePointerDown: PointerEventHandler<HTMLElement> = (event) => {
+    if (event.pointerType !== "touch") return;
+    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+  };
+
+  const handlePointerUp: PointerEventHandler<HTMLElement> = (event) => {
+    const start = pointerStartRef.current;
+    pointerStartRef.current = null;
+    if (!start || event.pointerType !== "touch") return;
+    const horizontalDistance = event.clientX - start.x;
+    const verticalDistance = Math.abs(event.clientY - start.y);
+    if (horizontalDistance >= 72 && horizontalDistance > verticalDistance * 1.2) setIsOpen(false);
+  };
+
+  const handlePointerCancel: PointerEventHandler<HTMLElement> = () => {
+    pointerStartRef.current = null;
+  };
+
   return {
     close: () => setIsOpen(false),
     closeButtonRef,
     drawerRef,
+    handlePointerCancel,
+    handlePointerDown,
+    handlePointerUp,
     isOpen,
     open: () => setIsOpen(true),
     triggerRef,

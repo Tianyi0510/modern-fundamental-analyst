@@ -125,14 +125,15 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.metric-band\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*480px/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*padding:\s*24px;[^}]*background:\s*var\(--white\)/s);
+  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*background:\s*var\(--white\)/s);
+  assert.match(styles, /\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*240px;[^}]*padding:\s*var\(--space-5\)/s);
   assert.match(styles, /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/);
   assert.match(styles, /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/);
   assert.match(styles, /\.home-page \.metric strong,[\s\S]*?\.portfolio-page \.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{[^}]*font-size:\s*var\(--font-size-data-kpi\);/s);
   assert.doesNotMatch(styles, /@media \(max-width:\s*800px\)[\s\S]*?(?:\.metric|\.portfolio-kpis|\.performance-summary) strong\s*\{[^}]*font-size:/s);
   assert.match(styles, /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
   assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis > div\s*\{[^}]*padding:\s*24px/s);
+  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*168px;[^}]*padding:\s*var\(--space-5\) var\(--space-page-gutter\)/s);
   assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);

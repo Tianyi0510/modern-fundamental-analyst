@@ -82,10 +82,18 @@
 .source-link:hover { color: var(--medium-blue); }
 .source-link:focus-visible { outline: var(--focus-ring-width) solid var(--deep-blue); outline-offset: var(--focus-ring-offset); }
 .performance-summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1px; margin-top: 0; background: var(--black); }
-.performance-summary > div { min-height: 310px; padding: 30px; background: var(--white); }
+.performance-summary > div { background: var(--white); }
 .performance-summary .summary-primary { background: var(--white); }
 .data-value.positive { color: var(--price-up); }
 .data-value.negative { color: var(--price-down); }
+
+/* Shared KPI block geometry across Home, Portfolio, and Performance. */
+.home-page .metric,
+.portfolio-page .portfolio-kpis > div,
+.performance-page .performance-summary > div {
+  min-height: 240px;
+  padding: var(--space-5);
+}
 
 /* Portfolio — shared bilingual editorial layout */
 .portfolio-page .page-hero h1 { max-width: 1080px; }

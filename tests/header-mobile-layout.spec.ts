@@ -49,6 +49,22 @@ test.describe("mobile content and navigation QA", () => {
     expect(topBeforeScroll!.width).toBe(390);
     expect(topAfterScroll!.x).toBe(0);
     expect(topAfterScroll!.width).toBe(390);
+    await expect(header).toHaveClass(/is-scrolled/);
+  });
+
+  test("home metrics form a compact full-width mobile data band", async ({ page }) => {
+    await page.goto("/");
+    const metrics = page.locator(".home-page .metric");
+    await expect(metrics).toHaveCount(3);
+    const boxes = await metrics.evaluateAll((elements) => elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { width: box.width, height: box.height, left: box.left };
+    }));
+    for (const box of boxes) {
+      expect(box.left).toBe(0);
+      expect(box.width).toBe(390);
+      expect(box.height).toBeLessThanOrEqual(190);
+    }
   });
 
   test("performance methodology has compact hierarchy and a top-rule source card", async ({ page }) => {
@@ -96,11 +112,14 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "1px");
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(drawer).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
+    await expect(drawer).toHaveCSS("opacity", "1");
+    await expect(drawer).toHaveCSS("clip-path", "inset(0px)");
     const drawerBox = await drawer.boundingBox();
     expect(drawerBox).not.toBeNull();
     expect(drawerBox!.x).toBe(0);
     expect(drawerBox!.width).toBe(390);
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("background-color", "rgb(0, 41, 145)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("background-color", "color(srgb 0.736471 0.917647 0.996706)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 140, 255)");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "14px");
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "14px");
     const menuTop = page.locator(".mobile-menu-top");
@@ -120,5 +139,14 @@ test.describe("mobile content and navigation QA", () => {
     await page.locator(".mobile-menu-close").tap();
     await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
+  });
+
+  test("mobile menu supports a deliberate right-swipe close gesture", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".mobile-menu-button").tap();
+    const drawer = page.locator(".mobile-menu-drawer");
+    await drawer.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 1, clientX: 40, clientY: 240 });
+    await drawer.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 1, clientX: 150, clientY: 246 });
+    await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
   });
 });

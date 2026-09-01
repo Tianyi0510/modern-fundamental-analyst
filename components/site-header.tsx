@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Check, ChevronDown, Menu, MoveRight, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
+import { useHeaderScrollState, useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
 
@@ -15,10 +15,14 @@ type SiteHeaderProps = {
 export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const prefix = localeConfig[locale].prefix;
   const pathname = usePathname();
+  const isHeaderScrolled = useHeaderScrollState();
   const {
     close: closeMenu,
     closeButtonRef: menuCloseButtonRef,
     drawerRef: menuDrawerRef,
+    handlePointerCancel: handleMenuPointerCancel,
+    handlePointerDown: handleMenuPointerDown,
+    handlePointerUp: handleMenuPointerUp,
     isOpen: isMenuOpen,
     open: openMenu,
     triggerRef: menuButtonRef,
@@ -46,7 +50,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
 
   return (
-    <header className="site-header shell">
+    <header className={`site-header shell${isHeaderScrolled ? " is-scrolled" : ""}${isMenuOpen ? " has-open-menu" : ""}`}>
       <Link className="wordmark" href={prefix || "/"} aria-label={`Modern Fundamental Analyst ${copy.home}`}>
         Modern Fundamental Analyst<span>.</span>
       </Link>
@@ -101,7 +105,17 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
 
       <div className={`mobile-menu-layer${isMenuOpen ? " is-open" : ""}`} aria-hidden={!isMenuOpen}>
         <button className="mobile-menu-backdrop" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} />
-        <aside ref={menuDrawerRef} className="mobile-menu-drawer" id="mobile-site-menu" role="dialog" aria-modal="true" aria-label={copy.siteMenu}>
+        <aside
+          ref={menuDrawerRef}
+          className="mobile-menu-drawer"
+          id="mobile-site-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label={copy.siteMenu}
+          onPointerCancel={handleMenuPointerCancel}
+          onPointerDown={handleMenuPointerDown}
+          onPointerUp={handleMenuPointerUp}
+        >
           <div className="mobile-menu-top">
             <Link className="wordmark mobile-menu-wordmark" href={homePath} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
               Modern Fundamental Analyst<span>.</span>

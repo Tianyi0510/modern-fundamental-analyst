@@ -142,6 +142,7 @@ test("editorial copy preserves authored casing and mobile arrows have intentiona
   assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
   assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
+  assert.match(chrome, /\.home-page \.round-link\s*\{[^}]*border-color:\s*transparent;/s);
   assert.doesNotMatch(responsive, /\.memo-index-row:active \.arrow-icon/);
   assert.match(home, /import \{ MoveRight, MoveUpRight \} from "lucide-react"/);
   assert.equal((home.match(/<MoveRight className="arrow-icon"[^>]*strokeWidth=\{3\} \/>/g) ?? []).length, 4);
@@ -205,7 +206,8 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
 
   assert.match(header, /aria-modal="true"/);
   assert.match(behavior, /event\.key === "Escape"/);
-  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*width:\s*100%;[^}]*background:\s*var\(--background-gray\);[^}]*translateX\(100%\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*width:\s*100%;[^}]*background:\s*var\(--background-gray\);[^}]*clip-path:\s*inset\(0 0 100% 0\);[^}]*translateY\(-12px\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
+  assert.match(css, /\.site-header\.is-scrolled\s*\{[^}]*box-shadow:/s);
   assert.doesNotMatch(css, /\.site-header nav a::after/);
   assert.match(css, /\.site-header nav a:hover, \.site-header nav a:focus-visible \{[^}]*background:[^}]*transform: translateY\(-1px\)/s);
   assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(\.97\)/s);
@@ -216,7 +218,8 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(header, /<MoveRight aria-hidden="true" strokeWidth=\{2\.75\}/);
   assert.match(css, /grid-template-columns:\s*minmax\(0, 1fr\) 28px/);
   assert.match(css, /\.mobile-language-links \.mobile-menu-language:first-child\s*\{[^}]*border-top:\s*1px solid var\(--gray\)/s);
-  assert.match(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]\s*\{[^}]*background:\s*var\(--deep-blue\);[^}]*color:\s*var\(--white\)/s);
+  assert.match(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 42%, var\(--white\)\);[^}]*color:\s*var\(--interactive-accent\)/s);
+  assert.doesNotMatch(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]::before\s*\{[^}]*scaleY\(1\)/s);
   assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
