@@ -206,7 +206,11 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
 
   assert.match(header, /aria-modal="true"/);
   assert.match(behavior, /event\.key === "Escape"/);
-  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*width:\s*100%;[^}]*background:\s*var\(--background-gray\);[^}]*clip-path:\s*inset\(0 0 100% 0\);[^}]*translateY\(-12px\)[^}]*var\(--motion-duration-slow\)[^;]*var\(--motion-ease-emphasized\)/s);
+  assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*width:\s*100%;[^}]*background:\s*var\(--white\);[^}]*overflow-y:\s*auto;[^}]*isolation:\s*isolate;/s);
+  assert.doesNotMatch(css, /\.mobile-menu-drawer\s*\{[^}]*(?:clip-path|opacity|transform|transition):/s);
+  assert.match(css, /\.mobile-menu-drawer::before\s*\{[^}]*inset:\s*70px 0 0;[^}]*background:\s*var\(--background-gray\);[^}]*clip-path:\s*inset\(0 100% 0 0\);[^}]*transition:\s*clip-path var\(--motion-duration-slow\) var\(--motion-ease-emphasized\)/s);
+  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-drawer::before\s*\{\s*clip-path:\s*inset\(0\)/s);
+  assert.match(css, /\.site-header \.mobile-menu-drawer nav a\s*\{[^}]*transform:\s*translateX\(-12px\)/s);
   assert.doesNotMatch(header, /useHeaderScrollState|is-scrolled|has-open-menu/);
   assert.doesNotMatch(behavior, /useHeaderScrollState/);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-header,[\s\S]*?\.home-opening > \.site-header\s*\{[^}]*position:\s*relative;[^}]*height:\s*70px;/s);
@@ -225,6 +229,7 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 42%, var\(--white\)\);[^}]*color:\s*var\(--interactive-accent\)/s);
   assert.doesNotMatch(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]::before\s*\{[^}]*scaleY\(1\)/s);
   assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*padding:\s*var\(--space-8\) 0 var\(--space-3\)/s);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);

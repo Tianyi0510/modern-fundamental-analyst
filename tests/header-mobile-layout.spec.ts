@@ -115,9 +115,9 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-language-links svg")).toHaveCount(0);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "1px");
     const drawer = page.locator(".mobile-menu-drawer");
-    await expect(drawer).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
+    await expect(drawer).toHaveCSS("transform", "none");
     await expect(drawer).toHaveCSS("opacity", "1");
-    await expect(drawer).toHaveCSS("clip-path", "inset(0px)");
+    await expect(drawer).toHaveCSS("clip-path", "none");
     const drawerBox = await drawer.boundingBox();
     expect(drawerBox).not.toBeNull();
     expect(drawerBox!.x).toBe(0);
@@ -133,8 +133,11 @@ test.describe("mobile content and navigation QA", () => {
     expect(topBeforeScroll!.y).toBe(0);
     expect(topBeforeScroll!.width).toBe(390);
     await expect(menuTop).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(drawer).toHaveCSS("background-color", "rgb(248, 249, 251)");
+    await expect(drawer).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    expect(await drawer.evaluate((element) => getComputedStyle(element, "::before").backgroundColor)).toBe("rgb(248, 249, 251)");
+    await expect.poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").clipPath)).toBe("inset(0px)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
+    await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
     await page.setViewportSize({ width: 390, height: 620 });
     await drawer.evaluate((element) => element.scrollTo({ top: 160, behavior: "instant" }));
     const topAfterScroll = await menuTop.boundingBox();
@@ -143,6 +146,11 @@ test.describe("mobile content and navigation QA", () => {
     await page.locator(".mobile-menu-close").tap();
     await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
+  });
+
+  test("mobile footer ends with compact bottom spacing", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".site-footer")).toHaveCSS("padding-bottom", "12px");
   });
 
   test("mobile menu supports a deliberate right-swipe close gesture", async ({ page }) => {
