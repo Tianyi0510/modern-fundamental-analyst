@@ -161,6 +161,7 @@
 .cta .eyebrow { grid-column: 1 / -1; margin: 0 0 46px; }
 .cta h2 { margin: 0; }
 .site-footer { padding: 74px 0; display: grid; grid-template-columns: minmax(220px,.9fr) minmax(140px,.45fr) minmax(360px,1.35fr); column-gap: 64px; row-gap: 74px; align-items: start; text-align: left; }
+.footer-main { display: contents; }
 .footer-brand, .footer-navigation { min-width: 0; align-self: start; text-align: left; }
 .footer-brand { display: grid; justify-items: start; gap: 14px; }
 .footer-mark { max-width: 320px; }

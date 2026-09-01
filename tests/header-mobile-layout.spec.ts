@@ -128,6 +128,7 @@ test.describe("mobile content and navigation QA", () => {
     await page.locator(".mobile-menu-button").tap();
     await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
+    await expect.poll(() => page.locator(".mobile-menu-close").evaluate((element) => getComputedStyle(element).transform)).toBe("none");
     await expect(page.locator(".mobile-menu-drawer nav a")).toHaveCount(6);
     await expect(page.locator(".mobile-menu-index")).toHaveCount(0);
     await expect(page.locator(".mobile-menu-label")).toHaveText(["Home", "About", "Portfolio", "Performance", "Investment Memos", "Contact"]);
@@ -176,14 +177,19 @@ test.describe("mobile content and navigation QA", () => {
   test("mobile footer and legal sections use balanced vertical spacing", async ({ page }) => {
     await page.goto("/disclaimer");
     const footer = page.locator(".site-footer");
-    const upperBlockEnd = await footer.locator(":scope > :nth-child(3)").boundingBox();
+    const upperBlock = footer.locator(".footer-main");
+    const upperBlockEnd = await upperBlock.boundingBox();
     const lowerBlock = await footer.locator(".footer-bottom").boundingBox();
     expect(upperBlockEnd).not.toBeNull();
     expect(lowerBlock).not.toBeNull();
-    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(32);
-    await expect(footer).toHaveCSS("padding-top", "48px");
-    await expect(footer).toHaveCSS("padding-bottom", "48px");
-    await expect(footer).toHaveCSS("row-gap", "32px");
+    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(0);
+    await expect(footer).toHaveCSS("padding-top", "0px");
+    await expect(footer).toHaveCSS("padding-bottom", "0px");
+    await expect(upperBlock).toHaveCSS("padding-top", "48px");
+    await expect(upperBlock).toHaveCSS("padding-bottom", "48px");
+    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "48px");
+    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "48px");
+    await expect(upperBlock).toHaveCSS("row-gap", "32px");
     await expect(footer.locator(".footer-links")).toHaveCSS("grid-template-columns", "358px");
     const legalBody = page.locator(".legal-body");
     await expect(legalBody).toHaveCSS("padding-top", "72px");
