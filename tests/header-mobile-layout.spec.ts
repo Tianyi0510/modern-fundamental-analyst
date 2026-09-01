@@ -185,10 +185,10 @@ test.describe("mobile content and navigation QA", () => {
     expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(0);
     await expect(footer).toHaveCSS("padding-top", "0px");
     await expect(footer).toHaveCSS("padding-bottom", "0px");
-    await expect(upperBlock).toHaveCSS("padding-top", "48px");
-    await expect(upperBlock).toHaveCSS("padding-bottom", "48px");
-    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "48px");
-    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "48px");
+    await expect(upperBlock).toHaveCSS("padding-top", "32px");
+    await expect(upperBlock).toHaveCSS("padding-bottom", "32px");
+    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "24px");
+    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "24px");
     await expect(upperBlock).toHaveCSS("row-gap", "32px");
     await expect(footer.locator(".footer-links")).toHaveCSS("grid-template-columns", "358px");
     const legalBody = page.locator(".legal-body");

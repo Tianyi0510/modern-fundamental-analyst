@@ -17,7 +17,9 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const pathname = usePathname();
   const {
     close: closeMenu,
+    closeWithMotion: closeMenuWithMotion,
     closeButtonRef: menuCloseButtonRef,
+    controlMotion: menuControlMotion,
     drawerRef: menuDrawerRef,
     handlePointerCancel: handleMenuPointerCancel,
     handlePointerDown: handleMenuPointerDown,
@@ -55,7 +57,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
       </Link>
       <button
         ref={menuButtonRef}
-        className="mobile-menu-button"
+        className={`mobile-menu-button${menuControlMotion === "opening" ? " is-activating" : ""}`}
         type="button"
         aria-label={menuLabel}
         aria-expanded={isMenuOpen}
@@ -119,7 +121,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             <Link className="wordmark mobile-menu-wordmark" href={homePath} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
               Modern Fundamental Analyst<span>.</span>
             </Link>
-            <button ref={menuCloseButtonRef} className="mobile-menu-close" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
+            <button ref={menuCloseButtonRef} className={`mobile-menu-close${menuControlMotion === "closing" ? " is-activating" : ""}`} type="button" aria-label={closeLabel} onClick={closeMenuWithMotion} tabIndex={isMenuOpen ? 0 : -1}>
               <X aria-hidden="true" strokeWidth={2} />
             </button>
           </div>

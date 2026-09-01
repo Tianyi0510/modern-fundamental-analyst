@@ -101,13 +101,13 @@
   .mobile-menu-close { flex: 0 0 auto; border-color: var(--black); background: var(--white); color: var(--black); }
   .mobile-menu-close:hover { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: rotate(-4deg) scale(var(--motion-scale-hover)); }
   .mobile-menu-close:focus-visible { outline: 2px solid var(--medium-blue); outline-offset: 3px; border-color: var(--black); background: var(--white); color: var(--black); transform: none; }
-  @keyframes mobile-menu-control-enter {
-    0% { transform: rotate(-4deg) scale(.94); }
-    65% { transform: rotate(1deg) scale(1.02); }
+  @keyframes mobile-menu-control-activate {
+    0% { transform: none; }
+    45% { transform: rotate(4deg) scale(.94); }
     100% { transform: none; }
   }
-  .mobile-menu-layer.is-open .mobile-menu-close { animation: mobile-menu-control-enter var(--motion-duration-medium) var(--motion-ease-emphasized); }
-  .mobile-menu-layer.is-open .mobile-menu-close:active { animation: none; transform: rotate(-4deg) scale(.94); }
+  .mobile-menu-button.is-activating { animation: mobile-menu-control-activate var(--motion-duration-base) var(--motion-ease-emphasized); }
+  .mobile-menu-close.is-activating { animation: mobile-menu-control-activate var(--motion-duration-base) var(--motion-ease-emphasized) reverse; }
   .mobile-menu-close svg { transform: rotate(-90deg) scale(.82); }
   .mobile-menu-layer.is-open .mobile-menu-close svg { transform: rotate(0) scale(1); transition-delay: .08s; }
   .mobile-menu-drawer nav { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0; margin-top: 18px; font-weight: var(--weight-bold); line-height: var(--leading-compact-title); }
@@ -170,8 +170,8 @@
   .memo-card-placeholder { display: none; }
   .cta { grid-template-columns: 1fr; gap: var(--space-heading-content); }
   .site-footer { display: block; padding: 0; }
-  .footer-main { padding: var(--space-8) 0; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
-  .footer-bottom { margin-top: 0; padding: var(--space-8) 0; }
+  .footer-main { padding: var(--space-6) 0; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+  .footer-bottom { margin-top: 0; padding: var(--space-5) 0; }
   .page-hero { padding: var(--space-section) 0; }
   .hero h1,
   .page-hero h1,

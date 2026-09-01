@@ -2,13 +2,35 @@
 
 import { useEffect, useRef, useState, type PointerEventHandler } from "react";
 
+const menuControlMotionMs = 180;
+
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [controlMotion, setControlMotion] = useState<"idle" | "opening" | "closing">("idle");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
+  const controlMotionTimerRef = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (controlMotionTimerRef.current !== null) window.clearTimeout(controlMotionTimerRef.current);
+  }, []);
+
+  const runControlMotion = (motion: "opening" | "closing", complete: () => void) => {
+    if (controlMotion !== "idle") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      complete();
+      return;
+    }
+    setControlMotion(motion);
+    controlMotionTimerRef.current = window.setTimeout(() => {
+      complete();
+      setControlMotion("idle");
+      controlMotionTimerRef.current = null;
+    }, menuControlMotionMs);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -77,7 +99,9 @@ export function useMobileMenu() {
 
   return {
     close: () => setIsOpen(false),
+    closeWithMotion: () => runControlMotion("closing", () => setIsOpen(false)),
     closeButtonRef,
+    controlMotion,
     drawerRef,
     handlePointerCancel,
     handlePointerDown,
@@ -85,7 +109,7 @@ export function useMobileMenu() {
     isOpen,
     open: () => {
       scrollPositionRef.current = window.scrollY;
-      setIsOpen(true);
+      runControlMotion("opening", () => setIsOpen(true));
     },
     triggerRef,
   };
