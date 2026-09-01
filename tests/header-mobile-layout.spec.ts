@@ -5,6 +5,7 @@ test.describe("header interaction QA", () => {
 
   test("desktop navigation uses stable color, motion, and menu states", async ({ page }) => {
     await page.goto("/");
+    await expect(page.locator(".site-header").first()).toHaveCSS("height", "84px");
     const about = page.locator(".header-actions nav a").filter({ hasText: "About" });
     await about.hover();
     const hoverState = await about.evaluate((element) => {
@@ -34,22 +35,22 @@ test.describe("mobile content and navigation QA", () => {
     userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
   });
 
-  test("site header remains fixed while the page scrolls", async ({ page }) => {
+  test("site header stays in document flow while the menu brand remains pinned", async ({ page }) => {
     await page.goto("/");
     const header = page.locator(".site-header").first();
-    await expect(header).toHaveCSS("position", "fixed");
+    await expect(header).toHaveCSS("position", "relative");
+    await expect(header).toHaveCSS("height", "70px");
+    expect(await page.locator("body").evaluate((element) => getComputedStyle(element).paddingTop)).toBe("0px");
     const topBeforeScroll = await header.boundingBox();
     await page.evaluate(() => window.scrollTo({ top: 700, behavior: "instant" }));
     const topAfterScroll = await header.boundingBox();
     expect(topBeforeScroll).not.toBeNull();
     expect(topAfterScroll).not.toBeNull();
     expect(topBeforeScroll!.y).toBe(0);
-    expect(topAfterScroll!.y).toBe(0);
+    expect(topAfterScroll!.y).toBeLessThan(-100);
     expect(topBeforeScroll!.x).toBe(0);
     expect(topBeforeScroll!.width).toBe(390);
-    expect(topAfterScroll!.x).toBe(0);
     expect(topAfterScroll!.width).toBe(390);
-    await expect(header).toHaveClass(/is-scrolled/);
   });
 
   test("home metrics form a compact full-width mobile data band", async ({ page }) => {
@@ -108,6 +109,9 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-label")).toHaveText(["Home", "About", "Portfolio", "Performance", "Investment Memos", "Contact"]);
     await expect(page.locator(".mobile-menu-drawer nav svg")).toHaveCount(6);
     await expect(page.locator(".mobile-language-links a")).toHaveCount(3);
+    for (const language of await page.locator(".mobile-language-links a").all()) {
+      await expect(language).toHaveCSS("color", "rgb(0, 140, 255)");
+    }
     await expect(page.locator(".mobile-language-links svg")).toHaveCount(0);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "1px");
     const drawer = page.locator(".mobile-menu-drawer");

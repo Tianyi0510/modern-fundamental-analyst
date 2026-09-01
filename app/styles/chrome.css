@@ -1,5 +1,5 @@
 /* Shared navigation, controls, and footer. */
-.site-header { height: 92px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+.site-header { height: 84px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
 .wordmark { max-width: 260px; justify-self: start; transform-origin: left center; transition: color var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-emphasized); }
 .wordmark:hover, .wordmark:focus-visible { color: var(--deep-blue); transform: scale(1.015); }
 .wordmark:active { transform: scale(.99); }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Check, ChevronDown, Menu, MoveRight, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useHeaderScrollState, useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
+import { useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
 
@@ -15,7 +15,6 @@ type SiteHeaderProps = {
 export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const prefix = localeConfig[locale].prefix;
   const pathname = usePathname();
-  const isHeaderScrolled = useHeaderScrollState();
   const {
     close: closeMenu,
     closeButtonRef: menuCloseButtonRef,
@@ -50,7 +49,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
 
   return (
-    <header className={`site-header shell${isHeaderScrolled ? " is-scrolled" : ""}${isMenuOpen ? " has-open-menu" : ""}`}>
+    <header className="site-header shell">
       <Link className="wordmark" href={prefix || "/"} aria-label={`Modern Fundamental Analyst ${copy.home}`}>
         Modern Fundamental Analyst<span>.</span>
       </Link>

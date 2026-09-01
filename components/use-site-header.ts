@@ -2,27 +2,6 @@
 
 import { useEffect, useRef, useState, type PointerEventHandler } from "react";
 
-export function useHeaderScrollState() {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    let frame = 0;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setIsScrolled(window.scrollY > 8));
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", update);
-    };
-  }, []);
-
-  return isScrolled;
-}
-
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
