@@ -23,6 +23,7 @@
     --motion-duration-base: 180ms;
     --motion-duration-medium: 220ms;
     --motion-duration-slow: 300ms;
+    --motion-duration-press: 90ms;
     --motion-scale-press: .985;
   }
 
@@ -69,10 +70,10 @@
     transform-origin: center;
     backface-visibility: hidden;
   }
-  .mobile-menu-button svg, .mobile-menu-close svg { width: 23px; height: 23px; }
+  .mobile-menu-button svg, .mobile-menu-close svg { width: 23px; height: 23px; transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized); }
   .mobile-menu-button, .mobile-menu-close { transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), border-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard); }
-  .mobile-menu-button:hover, .mobile-menu-button:focus-visible { background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-hover)); }
-  .mobile-menu-button:active, .mobile-menu-close:active { transform: scale(.96); }
+  .mobile-menu-button:hover, .mobile-menu-button:focus-visible { background: var(--bright-blue); color: var(--black); transform: rotate(4deg) scale(var(--motion-scale-hover)); }
+  .mobile-menu-button:active, .mobile-menu-close:active { transition-duration: var(--motion-duration-press); }
   .mobile-menu-layer { display: block; position: fixed; inset: 0; z-index: 100; pointer-events: none; visibility: hidden; transition: visibility 0s linear var(--motion-duration-slow); }
   .mobile-menu-layer.is-open { pointer-events: auto; visibility: visible; transition-delay: 0s; }
   .mobile-menu-backdrop { display: none; }
@@ -97,7 +98,7 @@
   .mobile-menu-top { position: sticky; z-index: 2; top: 0; min-height: 70px; margin-inline: calc(var(--space-page-gutter) * -1); padding-inline: var(--space-page-gutter); display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); background: var(--white); }
   .mobile-menu-wordmark { max-width: none; }
   .mobile-menu-close { flex: 0 0 auto; border-color: var(--black); background: var(--white); color: var(--black); }
-  .mobile-menu-close:hover, .mobile-menu-close:focus-visible { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-hover)); }
+  .mobile-menu-close:hover, .mobile-menu-close:focus-visible { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: rotate(-4deg) scale(var(--motion-scale-hover)); }
   .mobile-menu-close svg { transform: rotate(-90deg) scale(.82); }
   .mobile-menu-layer.is-open .mobile-menu-close svg { transform: rotate(0) scale(1); transition-delay: .08s; }
   .mobile-menu-drawer nav { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0; margin-top: 18px; font-weight: var(--weight-bold); line-height: var(--leading-compact-title); }
@@ -159,15 +160,7 @@
   .memo-card { min-height: 410px; padding: var(--space-5); }
   .memo-card-placeholder { display: none; }
   .cta { grid-template-columns: 1fr; gap: var(--space-heading-content); }
-  .site-footer { grid-template-columns: 1fr; gap: 0; padding: var(--space-8) 0; }
-  .footer-brand { padding-bottom: var(--space-6); border-bottom: 1px solid rgba(255,255,255,.22); }
-  .footer-navigation { padding: var(--space-6) 0; border-bottom: 1px solid rgba(255,255,255,.22); }
-  .site-footer .footer-heading { margin-bottom: var(--space-5); }
-  .footer-link-groups { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: var(--space-5); }
-  .footer-links { align-content: start; gap: var(--space-3); }
-  .footer-social-links { min-width: 0; }
-  .footer-social-links a { max-width: 100%; }
-  .site-footer > section { padding: var(--space-6) 0; }
+  .site-footer { grid-template-columns: 1fr; gap: var(--space-6); padding: var(--space-8) 0; }
   .footer-bottom { grid-column: auto; margin-top: 0; padding-top: var(--space-5); }
   .page-hero { padding: var(--space-section) 0; }
   .hero h1,
@@ -243,8 +236,8 @@
 @media (hover: none) and (pointer: coarse) {
   .mobile-menu-button:hover { background: var(--white); color: var(--black); transform: none; }
   .mobile-menu-close:hover { border-color: var(--black); background: var(--white); color: var(--black); transform: none; }
-  .mobile-menu-button:active { background: var(--black); color: var(--white); transform: scale(.96); }
-  .mobile-menu-close:active { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(.96); }
+  .mobile-menu-button:active { background: var(--black); color: var(--white); transform: rotate(4deg) scale(.94); }
+  .mobile-menu-close:active { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: rotate(-4deg) scale(.94); }
   .mobile-menu-drawer nav a:hover:not([aria-current="page"]) { background: var(--white); color: var(--black); }
   .mobile-menu-drawer nav a:active { background: var(--bright-blue); color: var(--black); transform: none; }
   .mobile-language-links .mobile-menu-language:hover { background: var(--white); color: var(--black); transform: none; }
@@ -262,12 +255,12 @@
   .home-page .hero .button-dark:active,
   .performance-home .button-white:active { background: var(--bright-blue); color: var(--black); }
   .home-page .cta .button-dark:active { background: var(--deep-blue); color: var(--white); }
-  .home-page .round-link:active { background: var(--bright-blue); color: var(--black); transform: scale(.96); }
+  .home-page .round-link:active { background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-press)); }
   .home-page .text-link:active,
   .allocation-card > a:active { color: var(--deep-blue); }
   .home-page .text-link:active .arrow-icon,
   .allocation-card > a:active .arrow-icon { transform: translateX(5px); }
-  .home-page .round-link:active .arrow-icon { transform: scale(1.08); }
+  .home-page .round-link:active .arrow-icon { transform: none; }
 
   .site-footer .footer-links a:hover { color: var(--black); }
   .site-footer .footer-links a:active { color: var(--deep-blue); }
