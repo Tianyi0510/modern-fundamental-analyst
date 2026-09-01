@@ -17,6 +17,7 @@ test.describe("header interaction QA", () => {
     expect(await about.evaluate((element) => getComputedStyle(element, "::after").content)).toBe("none");
 
     const languageTrigger = page.locator(".language-trigger");
+    await expect(languageTrigger.locator("svg")).toHaveAttribute("stroke-width", "2.75");
     await languageTrigger.click();
     await expect(languageTrigger).toHaveAttribute("aria-expanded", "true");
     await expect(page.locator(".language-dropdown")).toHaveClass(/is-open/);
@@ -155,7 +156,7 @@ test.describe("mobile content and navigation QA", () => {
     const lowerBlock = await footer.locator(".footer-bottom").boundingBox();
     expect(upperBlockEnd).not.toBeNull();
     expect(lowerBlock).not.toBeNull();
-    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(16);
+    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(48);
     await expect(footer).toHaveCSS("padding-bottom", "24px");
   });
 

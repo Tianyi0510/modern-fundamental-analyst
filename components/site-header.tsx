@@ -88,7 +88,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             }}
           >
             {localeConfig[locale].label}
-            <ChevronDown aria-hidden="true" strokeWidth={2} />
+            <ChevronDown aria-hidden="true" strokeWidth={2.75} />
           </button>
           <div className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`} id="desktop-language-menu" role="menu" aria-hidden={!isLanguageOpen}>
             {locales.map((targetLocale) => <Link href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} role="menuitem" aria-current={locale === targetLocale ? "page" : undefined} tabIndex={isLanguageOpen ? 0 : -1} onClick={closeLanguageMenu} key={targetLocale}>

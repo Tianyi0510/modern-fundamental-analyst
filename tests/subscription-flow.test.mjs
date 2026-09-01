@@ -69,7 +69,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(styles, /\.submit:hover:not\(:disabled\), \.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
   assert.match(footer, /className="footer-social-link footer-x" href="https:\/\/x\.com\/DavidLi0510" target="_blank" rel="noreferrer"/);
-  assert.match(footer, /footer-x[\s\S]*?<svg aria-hidden="true"[\s\S]*?<span>X \(Twitter\)<\/span>/);
+  assert.match(footer, /footer-x[\s\S]*?<svg aria-hidden="true"[\s\S]*?<span>X \(formerly Twitter\)<\/span>/);
   assert.match(route, /subscribeContact\(email, locale\)/);
   assert.match(service, /resend\.contacts\.create/);
   assert.match(service, /resend\.contacts\.update/);
