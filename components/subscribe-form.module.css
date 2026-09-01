@@ -28,6 +28,6 @@
   }
 
   .submit:active:not(:disabled) {
-    border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(.97);
+    border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-press));
   }
 }

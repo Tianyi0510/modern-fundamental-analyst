@@ -155,7 +155,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(menuTop).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(drawer).toHaveCSS("background-color", "rgb(255, 255, 255)");
     expect(await drawer.evaluate((element) => getComputedStyle(element, "::before").backgroundColor)).toBe("rgb(248, 249, 251)");
-    await expect.poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").clipPath)).toBe("inset(0px)");
+    await expect.poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").transform)).toBe("matrix(1, 0, 0, 1, 0, 0)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
     await page.setViewportSize({ width: 390, height: 620 });
@@ -190,6 +190,42 @@ test.describe("mobile content and navigation QA", () => {
       await expect(hero, `${path} hero`).toHaveCSS("padding-top", "72px");
       await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "72px");
     }
+  });
+
+  test("mobile page content converges on shared gutters and stack spacing", async ({ page }) => {
+    await page.goto("/about");
+    const aboutBoundary = page.locator(".about-boundaries > article").first();
+    const aboutBoundaryBox = await aboutBoundary.boundingBox();
+    const aboutHeadingBox = await aboutBoundary.locator("h2").boundingBox();
+    expect(aboutBoundaryBox).not.toBeNull();
+    expect(aboutHeadingBox).not.toBeNull();
+    expect(aboutBoundaryBox!.x).toBe(0);
+    expect(aboutBoundaryBox!.width).toBe(390);
+    expect(aboutHeadingBox!.x).toBe(16);
+    await expect(page.locator(".about-section").first()).toHaveCSS("gap", "40px");
+
+    await page.goto("/contact");
+    const contactHeadingBox = await page.locator(".contact-grid > article h2").first().boundingBox();
+    const firstControlBox = await page.locator('input[name="name"]').boundingBox();
+    expect(contactHeadingBox).not.toBeNull();
+    expect(firstControlBox).not.toBeNull();
+    expect(contactHeadingBox!.x).toBe(16);
+    expect(firstControlBox!.x).toBe(16);
+    expect(firstControlBox!.width).toBe(358);
+  });
+
+  test("mobile menu locks and restores the underlying scroll position", async ({ page }) => {
+    await page.goto("/");
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(1000);
+    await page.evaluate(() => window.scrollTo({ top: 700, behavior: "instant" }));
+    const scrollPosition = await page.evaluate(() => window.scrollY);
+    expect(scrollPosition).toBeGreaterThan(0);
+    await page.locator(".mobile-menu-button").evaluate((button) => (button as HTMLButtonElement).click());
+    await expect(page.locator("body")).toHaveCSS("position", "fixed");
+    await expect(page.locator("body")).toHaveCSS("top", `-${scrollPosition}px`);
+    await page.locator(".mobile-menu-close").tap();
+    await expect(page.locator("body")).toHaveCSS("position", "static");
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollPosition);
   });
 
   test("mobile menu supports a deliberate right-swipe close gesture", async ({ page }) => {

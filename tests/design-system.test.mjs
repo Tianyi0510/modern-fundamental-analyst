@@ -210,8 +210,8 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(behavior, /event\.key === "Escape"/);
   assert.match(css, /\.mobile-menu-drawer\s*\{[^}]*width:\s*100%;[^}]*background:\s*var\(--white\);[^}]*overflow-y:\s*auto;[^}]*isolation:\s*isolate;/s);
   assert.doesNotMatch(css, /\.mobile-menu-drawer\s*\{[^}]*(?:clip-path|opacity|transform|transition):/s);
-  assert.match(css, /\.mobile-menu-drawer::before\s*\{[^}]*inset:\s*70px 0 0;[^}]*background:\s*var\(--background-gray\);[^}]*clip-path:\s*inset\(0 100% 0 0\);[^}]*transition:\s*clip-path var\(--motion-duration-slow\) var\(--motion-ease-emphasized\)/s);
-  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-drawer::before\s*\{\s*clip-path:\s*inset\(0\)/s);
+  assert.match(css, /\.mobile-menu-drawer::before\s*\{[^}]*inset:\s*70px 0 0;[^}]*background:\s*var\(--background-gray\);[^}]*transform:\s*scaleX\(0\);[^}]*transform-origin:\s*left center;[^}]*transition:\s*transform var\(--motion-duration-slow\) var\(--motion-ease-emphasized\)/s);
+  assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-menu-drawer::before\s*\{\s*transform:\s*scaleX\(1\)/s);
   assert.match(css, /\.site-header \.mobile-menu-drawer nav a\s*\{[^}]*transform:\s*translateX\(-12px\)/s);
   assert.doesNotMatch(header, /useHeaderScrollState|is-scrolled|has-open-menu/);
   assert.doesNotMatch(behavior, /useHeaderScrollState/);
@@ -238,6 +238,11 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*padding:\s*var\(--space-8\) 0/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-bottom\s*\{[^}]*margin-top:\s*var\(--space-4\)/s);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?--motion-duration-fast:\s*140ms;[\s\S]*?--motion-duration-base:\s*180ms;[\s\S]*?--motion-duration-slow:\s*300ms;/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.home-about\s*\{[^}]*gap:\s*var\(--space-heading-content\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.about-boundaries > article\s*\{[^}]*padding:\s*var\(--space-section\) var\(--space-page-gutter\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.contact-grid > article\s*\{[^}]*padding:\s*var\(--space-section\) var\(--space-page-gutter\)/s);
+  assert.doesNotMatch(css, /@keyframes mobile-metric-enter/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*html\s*\{\s*scroll-behavior:\s*auto;/s);

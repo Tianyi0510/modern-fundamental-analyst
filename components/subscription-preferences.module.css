@@ -6,13 +6,13 @@
 .actions { display: flex; align-items: center; gap: var(--space-5); }
 .unsubscribe { min-height: var(--size-touch-target); padding: 0 6px; border: 0; border-radius: 6px; background: transparent; color: var(--black); cursor: pointer; font: inherit; font-size: var(--font-size-control); line-height: var(--leading-body); letter-spacing: var(--tracking-body); font-weight: var(--weight-bold); transition: color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-emphasized); }
 .unsubscribe:hover, .unsubscribe:focus-visible { background: color-mix(in srgb, var(--bright-blue) 18%, transparent); color: var(--deep-blue); }
-.unsubscribe:active { transform: scale(.97); }
+.unsubscribe:active { transform: scale(var(--motion-scale-press)); }
 .actions button:disabled { cursor: wait; opacity: .55; }
 .actions button:disabled:hover { background: transparent; color: inherit; transform: none; }
 .status, .invalid { min-height: 1.65em; margin: 0; font-size: var(--font-size-body); line-height: var(--leading-body); letter-spacing: var(--tracking-body); }
 .request { max-width: 760px; display: grid; gap: var(--space-6); }
 
 @media (max-width: 800px) {
-  .actions { align-items: stretch; flex-direction: column; }
+  .actions { align-items: stretch; flex-direction: column; gap: var(--space-4); }
   .unsubscribe { align-self: flex-start; }
 }

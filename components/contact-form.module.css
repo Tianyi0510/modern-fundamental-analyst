@@ -150,7 +150,7 @@ textarea.control {
 @media (max-width: 800px) {
   .section {
     grid-template-columns: 1fr;
-    gap: 44px;
+    gap: var(--space-heading-content);
     padding-top: var(--space-section);
     padding-bottom: var(--space-section);
   }
@@ -161,8 +161,8 @@ textarea.control {
 
   .form {
     grid-template-columns: 1fr;
-    gap: 22px;
-    padding: 26px 22px 0;
+    gap: var(--space-5);
+    padding: 0;
   }
 
   .fieldWide,
@@ -173,7 +173,7 @@ textarea.control {
   .actions {
     align-items: flex-start;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--space-4);
   }
 
   .submit {
@@ -191,6 +191,6 @@ textarea.control {
   .section .submit:active:not(:disabled) {
     background: var(--deep-blue);
     color: var(--white);
-    transform: scale(.97);
+    transform: scale(var(--motion-scale-press));
   }
 }

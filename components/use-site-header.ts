@@ -8,10 +8,16 @@ export function useMobileMenu() {
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const scrollPositionRef = useRef(0);
 
   useEffect(() => {
     if (!isOpen) return;
     const previousOverflow = document.documentElement.style.overflow;
+    const previousBodyPosition = document.body.style.position;
+    const previousBodyTop = document.body.style.top;
+    const previousBodyWidth = document.body.style.width;
+    const previousBodyOverflow = document.body.style.overflow;
+    const scrollPosition = scrollPositionRef.current;
     const trigger = triggerRef.current;
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -33,10 +39,19 @@ export function useMobileMenu() {
     };
 
     document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollPosition}px`;
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
     window.addEventListener("keydown", handleKeyboard);
     return () => {
       document.documentElement.style.overflow = previousOverflow;
+      document.body.style.position = previousBodyPosition;
+      document.body.style.top = previousBodyTop;
+      document.body.style.width = previousBodyWidth;
+      document.body.style.overflow = previousBodyOverflow;
+      window.scrollTo({ top: scrollPosition, left: 0, behavior: "instant" });
       window.removeEventListener("keydown", handleKeyboard);
       trigger?.focus();
     };
@@ -68,7 +83,10 @@ export function useMobileMenu() {
     handlePointerDown,
     handlePointerUp,
     isOpen,
-    open: () => setIsOpen(true),
+    open: () => {
+      scrollPositionRef.current = window.scrollY;
+      setIsOpen(true);
+    },
     triggerRef,
   };
 }
