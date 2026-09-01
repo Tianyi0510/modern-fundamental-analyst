@@ -123,10 +123,11 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /\.about-boundaries li\s*\{\s*border-top:\s*0;/s);
   assert.doesNotMatch(css, /\.(?:site-header|home-opening|home-about|page-hero|about-section|about-boundaries|about-closing|portfolio-kpis|portfolio-holdings-heading|methodology|contact-grid|site-footer)\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
+  assert.match(css, /\.legal-body\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
-test("editorial copy preserves authored casing and mobile arrows have intentional touch motion", async () => {
+test("editorial copy preserves authored casing and mobile arrows use intentional touch motion", async () => {
   const [typography, responsive, subscribe, contact, home, chrome] = await Promise.all([
     read("app/styles/typography.css"),
     read("app/styles/responsive.css"),
@@ -141,7 +142,8 @@ test("editorial copy preserves authored casing and mobile arrows have intentiona
   assert.doesNotMatch(`${typography}\n${responsive}\n${subscribe}\n${contact}`, /text-transform:\s*capitalize/);
   assert.match(responsive, /\.arrow-icon\s*\{[^}]*font-weight:\s*var\(--weight-bold\);[^}]*-webkit-text-stroke:\s*\.45px currentColor;[^}]*transition:\s*transform/s);
   assert.match(responsive, /\.home-page \.text-link:active \.arrow-icon,[\s\S]*?\.allocation-card > a:active \.arrow-icon\s*\{\s*transform:\s*translateX\(5px\);/);
-  assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*translate\(3px, -3px\);/);
+  assert.match(responsive, /\.home-page \.round-link:active\s*\{[^}]*transform:\s*none;/);
+  assert.match(responsive, /\.home-page \.round-link:active \.arrow-icon\s*\{\s*transform:\s*none;/);
   assert.match(chrome, /\.home-page \.round-link\s*\{[^}]*border-color:\s*transparent;/s);
   assert.doesNotMatch(responsive, /\.memo-index-row:active \.arrow-icon/);
   assert.match(home, /import \{ MoveRight, MoveUpRight \} from "lucide-react"/);
@@ -222,15 +224,18 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.doesNotMatch(header, /mobile-menu-index/);
   assert.match(header, /mobile-menu-label/);
   assert.match(header, /className="wordmark mobile-menu-wordmark"/);
-  assert.match(header, /<MoveRight aria-hidden="true" strokeWidth=\{2\.75\}/);
-  assert.match(css, /grid-template-columns:\s*minmax\(0, 1fr\) 28px/);
+  assert.doesNotMatch(header, /<MoveRight aria-hidden="true"/);
+  assert.match(css, /\.site-header \.mobile-menu-drawer nav a\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s);
   assert.match(css, /\.mobile-language-links \.mobile-menu-language:first-child\s*\{[^}]*border-top:\s*1px solid var\(--gray\)/s);
-  assert.match(css, /\.mobile-menu-language\s*\{[^}]*color:\s*var\(--interactive-accent\)/s);
+  assert.match(css, /\.mobile-menu-language\s*\{[^}]*color:\s*var\(--black\)/s);
+  assert.match(css, /\.mobile-language-links \.mobile-menu-language\[aria-current="page"\]\s*\{[^}]*color:\s*var\(--interactive-accent\)/s);
   assert.match(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 42%, var\(--white\)\);[^}]*color:\s*var\(--interactive-accent\)/s);
+  assert.match(css, /\.mobile-menu-button:hover, \.mobile-menu-button:focus-visible\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*transform:\s*rotate\(4deg\) scale\(1\.04\)/s);
+  assert.match(css, /\.mobile-menu-close:hover, \.mobile-menu-close:focus-visible\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*transform:\s*rotate\(-4deg\) scale\(1\.04\)/s);
   assert.doesNotMatch(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]::before\s*\{[^}]*scaleY\(1\)/s);
   assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
-  assert.match(css, /\.site-footer\s*\{[^}]*padding:\s*74px 0 30px;[^}]*column-gap:\s*64px;[^}]*row-gap:\s*74px/s);
-  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*padding:\s*var\(--space-8\) 0 var\(--space-5\)/s);
+  assert.match(css, /\.site-footer\s*\{[^}]*padding:\s*74px 0;[^}]*column-gap:\s*64px;[^}]*row-gap:\s*74px/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*padding:\s*var\(--space-8\) 0/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-bottom\s*\{[^}]*margin-top:\s*var\(--space-4\)/s);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);

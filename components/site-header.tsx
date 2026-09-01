@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, ChevronDown, Menu, MoveRight, X } from "lucide-react";
+import { Check, ChevronDown, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
@@ -127,7 +127,6 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             {mobileNavigation.map(({ href, label }) => (
               <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} key={href}>
                 <span className="mobile-menu-label">{label}</span>
-                <MoveRight aria-hidden="true" strokeWidth={2.75} />
               </Link>
             ))}
           </nav>

@@ -25,6 +25,25 @@ test.describe("header interaction QA", () => {
     await expect(languageTrigger).toHaveAttribute("aria-expanded", "false");
     await expect(languageTrigger).toBeFocused();
   });
+
+  test("desktop footer and legal sections use balanced vertical spacing", async ({ page }) => {
+    await page.goto("/disclaimer");
+    const footer = page.locator(".site-footer");
+    await expect(footer).toHaveCSS("padding-top", "74px");
+    await expect(footer).toHaveCSS("padding-bottom", "74px");
+    const legalBody = page.locator(".legal-body");
+    await expect(legalBody).toHaveCSS("padding-top", "96px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "96px");
+  });
+
+  test("desktop page heroes share one vertical rhythm", async ({ page }) => {
+    for (const path of ["/", "/about", "/portfolio", "/performance", "/memos", "/contact", "/support", "/disclaimer", "/subscription-preferences"]) {
+      await page.goto(path);
+      const hero = page.locator(".hero, .page-hero, .legal-hero").first();
+      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
+    }
+  });
 });
 
 test.describe("mobile content and navigation QA", () => {
@@ -108,11 +127,11 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-drawer nav a")).toHaveCount(6);
     await expect(page.locator(".mobile-menu-index")).toHaveCount(0);
     await expect(page.locator(".mobile-menu-label")).toHaveText(["Home", "About", "Portfolio", "Performance", "Investment Memos", "Contact"]);
-    await expect(page.locator(".mobile-menu-drawer nav svg")).toHaveCount(6);
+    await expect(page.locator(".mobile-menu-drawer nav svg")).toHaveCount(0);
     await expect(page.locator(".mobile-language-links a")).toHaveCount(3);
-    for (const language of await page.locator(".mobile-language-links a").all()) {
-      await expect(language).toHaveCSS("color", "rgb(0, 140, 255)");
-    }
+    await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("color", "rgb(0, 140, 255)");
+    await expect(page.locator(".mobile-language-links a").nth(1)).toHaveCSS("color", "rgb(0, 0, 0)");
+    await expect(page.locator(".mobile-language-links a").nth(2)).toHaveCSS("color", "rgb(0, 0, 0)");
     await expect(page.locator(".mobile-language-links svg")).toHaveCount(0);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "1px");
     const drawer = page.locator(".mobile-menu-drawer");
@@ -149,15 +168,28 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
   });
 
-  test("mobile footer separates its two blocks without compressing the page edge", async ({ page }) => {
-    await page.goto("/");
+  test("mobile footer and legal sections use balanced vertical spacing", async ({ page }) => {
+    await page.goto("/disclaimer");
     const footer = page.locator(".site-footer");
     const upperBlockEnd = await footer.locator(":scope > :nth-child(3)").boundingBox();
     const lowerBlock = await footer.locator(".footer-bottom").boundingBox();
     expect(upperBlockEnd).not.toBeNull();
     expect(lowerBlock).not.toBeNull();
     expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(48);
-    await expect(footer).toHaveCSS("padding-bottom", "24px");
+    await expect(footer).toHaveCSS("padding-top", "48px");
+    await expect(footer).toHaveCSS("padding-bottom", "48px");
+    const legalBody = page.locator(".legal-body");
+    await expect(legalBody).toHaveCSS("padding-top", "72px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "72px");
+  });
+
+  test("mobile page heroes share one vertical rhythm", async ({ page }) => {
+    for (const path of ["/", "/about", "/portfolio", "/performance", "/memos", "/contact", "/support", "/disclaimer", "/subscription-preferences"]) {
+      await page.goto(path);
+      const hero = page.locator(".hero, .page-hero, .legal-hero").first();
+      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "72px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "72px");
+    }
   });
 
   test("mobile menu supports a deliberate right-swipe close gesture", async ({ page }) => {

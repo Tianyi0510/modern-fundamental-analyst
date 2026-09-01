@@ -189,7 +189,7 @@
 .legal h1 { max-width: 1000px; margin: var(--space-heading-content) 0 0; }
 .legal h1 em { font-style: normal; }
 .legal .legal-subtitle { max-width: 720px; margin: var(--space-related-content) 0 0; color: var(--black); }
-.legal-body { padding: var(--space-section-compact) 0 var(--space-section); background: var(--white); }
+.legal-body { padding: var(--space-section) 0; background: var(--white); }
 .legal-content { display: grid; gap: var(--space-4); }
 .legal-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: var(--space-11); align-items: start; padding: var(--space-section-compact) 0; }
 .legal-section-heading { align-self: start; display: grid; gap: 34px; }
