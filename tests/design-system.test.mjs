@@ -229,7 +229,9 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 42%, var\(--white\)\);[^}]*color:\s*var\(--interactive-accent\)/s);
   assert.doesNotMatch(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]::before\s*\{[^}]*scaleY\(1\)/s);
   assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
-  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*padding:\s*var\(--space-8\) 0 var\(--space-3\)/s);
+  assert.match(css, /\.site-footer\s*\{[^}]*padding:\s*74px 0 30px;[^}]*column-gap:\s*64px;[^}]*row-gap:\s*var\(--space-4\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*padding:\s*var\(--space-8\) 0 var\(--space-5\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-bottom\s*\{[^}]*margin-top:\s*calc\(var\(--space-4\) \* -1\)/s);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);

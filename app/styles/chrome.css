@@ -160,7 +160,7 @@
 .cta { padding: var(--space-section) 0; display: grid; grid-template-columns: 1fr auto; align-items: end; }
 .cta .eyebrow { grid-column: 1 / -1; margin: 0 0 46px; }
 .cta h2 { margin: 0; }
-.site-footer { padding: 74px 0 var(--space-4); display: grid; grid-template-columns: minmax(220px,.9fr) minmax(140px,.45fr) minmax(360px,1.35fr); gap: 64px; align-items: start; text-align: left; }
+.site-footer { padding: 74px 0 30px; display: grid; grid-template-columns: minmax(220px,.9fr) minmax(140px,.45fr) minmax(360px,1.35fr); column-gap: 64px; row-gap: var(--space-4); align-items: start; text-align: left; }
 .footer-brand, .footer-navigation { min-width: 0; align-self: start; text-align: left; }
 .footer-brand { display: grid; justify-items: start; gap: 14px; }
 .footer-mark { max-width: 320px; }
@@ -170,5 +170,5 @@
 .footer-links a { width: fit-content; min-height: 24px; display: inline-flex; align-items: center; }
 .footer-social-link { gap: var(--space-2); }
 .footer-social-link svg { flex: none; }
-.footer-bottom { grid-column: 1 / -1; margin-top: 34px; padding-top: 26px; border-top: 1px solid rgba(255,255,255,.22); }
+.footer-bottom { grid-column: 1 / -1; margin-top: 0; padding-top: 26px; border-top: 1px solid rgba(255,255,255,.22); }
 .footer-bottom small { color: var(--text-inverse-tertiary); }

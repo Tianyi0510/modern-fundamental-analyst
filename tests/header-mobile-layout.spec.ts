@@ -148,9 +148,15 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
   });
 
-  test("mobile footer ends with compact bottom spacing", async ({ page }) => {
+  test("mobile footer separates its two blocks without compressing the page edge", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".site-footer")).toHaveCSS("padding-bottom", "12px");
+    const footer = page.locator(".site-footer");
+    const upperBlockEnd = await footer.locator(":scope > :nth-child(3)").boundingBox();
+    const lowerBlock = await footer.locator(".footer-bottom").boundingBox();
+    expect(upperBlockEnd).not.toBeNull();
+    expect(lowerBlock).not.toBeNull();
+    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(16);
+    await expect(footer).toHaveCSS("padding-bottom", "24px");
   });
 
   test("mobile menu supports a deliberate right-swipe close gesture", async ({ page }) => {

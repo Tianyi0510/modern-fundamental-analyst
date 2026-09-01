@@ -153,8 +153,8 @@
   .memo-card { min-height: 410px; }
   .memo-card-placeholder { display: none; }
   .cta { grid-template-columns: 1fr; gap: 44px; }
-  .site-footer { grid-template-columns: 1fr; gap: var(--space-6); padding: var(--space-8) 0 var(--space-3); }
-  .footer-bottom { grid-column: auto; margin-top: 0; padding-top: var(--space-5); }
+  .site-footer { grid-template-columns: 1fr; gap: var(--space-6); padding: var(--space-8) 0 var(--space-5); }
+  .footer-bottom { grid-column: auto; margin-top: calc(var(--space-4) * -1); padding-top: var(--space-5); }
   .page-hero { padding: var(--space-section) 0; }
   .hero h1,
   .page-hero h1,
