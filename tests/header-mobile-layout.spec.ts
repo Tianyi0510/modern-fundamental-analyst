@@ -60,6 +60,10 @@ test.describe("mobile content and navigation QA", () => {
     const header = page.locator(".site-header").first();
     await expect(header).toHaveCSS("position", "relative");
     await expect(header).toHaveCSS("height", "70px");
+    await expect(header.locator(":scope > .wordmark")).toHaveCSS("white-space", "nowrap");
+    const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
+    expect(wordmarkBox).not.toBeNull();
+    expect(wordmarkBox!.height).toBeLessThanOrEqual(25);
     expect(await page.locator("body").evaluate((element) => getComputedStyle(element).paddingTop)).toBe("0px");
     const topBeforeScroll = await header.boundingBox();
     await page.evaluate(() => window.scrollTo({ top: 700, behavior: "instant" }));
@@ -158,6 +162,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect.poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").transform)).toBe("matrix(1, 0, 0, 1, 0, 0)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
+    await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("white-space", "nowrap");
     await page.setViewportSize({ width: 390, height: 620 });
     await drawer.evaluate((element) => element.scrollTo({ top: 160, behavior: "instant" }));
     const topAfterScroll = await menuTop.boundingBox();
@@ -175,9 +180,17 @@ test.describe("mobile content and navigation QA", () => {
     const lowerBlock = await footer.locator(".footer-bottom").boundingBox();
     expect(upperBlockEnd).not.toBeNull();
     expect(lowerBlock).not.toBeNull();
-    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(48);
+    expect(lowerBlock!.y - (upperBlockEnd!.y + upperBlockEnd!.height)).toBe(0);
     await expect(footer).toHaveCSS("padding-top", "48px");
     await expect(footer).toHaveCSS("padding-bottom", "48px");
+    await expect(footer.locator(".footer-brand")).toHaveCSS("padding-bottom", "32px");
+    await expect(footer.locator(".footer-navigation")).toHaveCSS("padding-top", "32px");
+    const primaryLinksBox = await footer.locator(".footer-primary-links").boundingBox();
+    const socialLinksBox = await footer.locator(".footer-social-links").boundingBox();
+    expect(primaryLinksBox).not.toBeNull();
+    expect(socialLinksBox).not.toBeNull();
+    expect(socialLinksBox!.x).toBeGreaterThan(primaryLinksBox!.x + primaryLinksBox!.width);
+    await expect(footer.locator(":scope > section")).toHaveCSS("padding-top", "32px");
     const legalBody = page.locator(".legal-body");
     await expect(legalBody).toHaveCSS("padding-top", "72px");
     await expect(legalBody).toHaveCSS("padding-bottom", "72px");

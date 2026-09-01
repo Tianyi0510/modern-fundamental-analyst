@@ -1,6 +1,6 @@
 /* Shared navigation, controls, and footer. */
 .site-header { height: 84px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
-.wordmark { max-width: 260px; justify-self: start; transform-origin: left center; transition: color var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-emphasized); }
+.wordmark { max-width: 260px; justify-self: start; white-space: nowrap; transform-origin: left center; transition: color var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-emphasized); }
 .wordmark:hover, .wordmark:focus-visible { color: var(--deep-blue); transform: scale(1.015); }
 .wordmark:active { transform: scale(.99); }
 .wordmark span { color: var(--medium-blue); }
@@ -166,6 +166,7 @@
 .footer-mark { max-width: 320px; }
 .site-footer p { margin: 0; max-width: 390px; color: var(--text-inverse-secondary); }
 .site-footer .footer-heading { margin-bottom: 14px; color: var(--bright-blue); }
+.footer-link-groups { display: grid; gap: 14px; }
 .footer-links { display: grid; justify-items: start; gap: 14px; }
 .footer-links a { width: fit-content; min-height: 24px; display: inline-flex; align-items: center; }
 .footer-social-link { gap: var(--space-2); }
