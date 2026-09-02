@@ -152,7 +152,7 @@
   .memo-disclosure[open]::details-content { height: auto; opacity: 1; }
 }
 .memo-index-row { display: grid; grid-template-columns: 80px 1fr 160px; align-items: start; gap: var(--space-7); padding: 52px 0; border-bottom: 1px solid var(--black); transform-origin: center; transition: background-color var(--motion-duration-base) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-standard); }
-.memo-index-row:hover, .memo-index-row:focus-visible { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(.995); }
+.memo-index-row:hover, .memo-index-row:focus-visible { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(var(--motion-scale-press)); }
 .memo-index-row:active { transform: scale(var(--motion-scale-press)); }
 .memo-index-row > span { color: var(--text-secondary); }
 .memo-index-row h2 { margin: 16px 0; }

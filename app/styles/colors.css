@@ -140,6 +140,8 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 /* Touch hover may persist after a tap. Reset only idle hover, never keyboard focus
    or active feedback; keep these rules after the editorial color overrides. */
 @media (hover: none) and (pointer: coarse) {
+  .home-page .text-link:hover:not(:active):not(:focus-visible),
+  .allocation-card > a:hover:not(:active):not(:focus-visible) { color: var(--black); }
   .button:hover:not(:active):not(:focus-visible),
   .home-page .button:hover:not(:active):not(:focus-visible),
   .site-header .button:hover:not(:active):not(:focus-visible),

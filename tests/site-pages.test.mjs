@@ -29,7 +29,8 @@ test("all home locales use one shared page structure", async () => {
   assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(210px, 100%\)/s);
   assert.match(styles, /\.allocation-ring::before\s*\{[^}]*inset:\s*15%/s);
   assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: var\(--space-2\);/);
-  assert.match(styles, /\.allocation-card > a:hover, \.allocation-card > a:focus-visible \{ color: var\(--deep-blue\); transform: scale\(var\(--motion-scale-hover\)\); box-shadow: none; \}/);
+  assert.match(styles, /\.allocation-card > a:hover, \.allocation-card > a:focus-visible, \.allocation-card > a:active \{ color: var\(--deep-blue\); \}/);
+  assert.doesNotMatch(styles, /(?:\.text-link|\.allocation-card > a)(?::[\w-]+)?(?:,\s*(?:\.text-link|\.allocation-card > a)(?::[\w-]+)?)*\s*\{[^}]*transform:\s*scale/);
   assert.match(styles, /\.allocation-card > a:hover \.arrow-icon, \.allocation-card > a:focus-visible \.arrow-icon \{ transform: translateX\(4px\); \}/);
 });
 

@@ -14,6 +14,14 @@ test.describe("header interaction QA", () => {
     });
     expect(hoverState.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
     expect(hoverState.transform).not.toBe("none");
+    await expect(about).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+    await about.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault(), { once: true }));
+    await page.mouse.down();
+    try {
+      await expect(about).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+    } finally {
+      await page.mouse.up();
+    }
     expect(await about.evaluate((element) => getComputedStyle(element, "::after").content)).toBe("none");
 
     const languageTrigger = page.locator(".language-trigger");
@@ -61,6 +69,37 @@ test.describe("header interaction QA", () => {
       await control.focus();
       await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
       await expect(control).toHaveCSS("box-shadow", "none");
+    }
+  });
+
+  test("text CTAs keep text stationary and move only their arrows", async ({ page }) => {
+    for (const width of [1440, 801, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto("/");
+      const links = page.locator(".home-page .text-link, .allocation-card > a");
+      await expect(links).toHaveCount(4);
+      for (const link of await links.all()) {
+        await link.hover();
+        await expect(link).toHaveCSS("transform", "none");
+        await expect(link.locator(".arrow-icon")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 4, 0)");
+        // Establish keyboard modality without tabbing to a distant link and
+        // starting a smooth scroll underneath the subsequent pointer press.
+        await page.keyboard.press("Shift");
+        await link.focus();
+        await expect(link).toHaveCSS("transform", "none");
+        await expect(link.locator(".arrow-icon")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 4, 0)");
+        await link.hover();
+        // Release on the same link without navigating. Moving a held link away
+        // starts native drag-and-drop in WebKit and can strand :active state.
+        await link.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault(), { once: true }));
+        await page.mouse.down();
+        try {
+          await expect(link).toHaveCSS("transform", "none");
+          await expect(link.locator(".arrow-icon")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 5, 0)");
+        } finally {
+          await page.mouse.up();
+        }
+      }
     }
   });
 
@@ -309,7 +348,7 @@ test.describe("mobile content and navigation QA", () => {
     }
   });
 
-  test("Escape cancels queued opening and rapid taps do not queue animations", async ({ page }) => {
+  test("Escape dismisses immediately and rapid taps do not queue animations", async ({ page }) => {
     await page.goto("/");
     await page.locator(".mobile-menu-button").evaluate((button) => {
       (button as HTMLButtonElement).click();
@@ -329,6 +368,18 @@ test.describe("mobile content and navigation QA", () => {
 
   test("touch buttons share press scale and footer links stay legible", async ({ page }) => {
     await page.goto("/");
+    const menuButton = page.locator(".mobile-menu-button");
+    await menuButton.hover();
+    await page.mouse.down();
+    try {
+      await expect.poll(() => menuButton.evaluate((element) => {
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+        return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
+      })).toBe(104);
+    } finally {
+      await page.mouse.up();
+    }
+    await page.keyboard.press("Escape");
     const button = page.locator(".hero .button");
     await button.scrollIntoViewIfNeeded();
     const box = (await button.boundingBox())!;
@@ -337,6 +388,20 @@ test.describe("mobile content and navigation QA", () => {
     await expect(button).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
     await page.mouse.move(1, 1);
     await page.mouse.up();
+    const textCta = page.locator(".hero .text-link");
+    await textCta.hover();
+    await page.mouse.down();
+    try {
+      await expect(textCta).toHaveCSS("transform", "none");
+      await expect(textCta.locator(".arrow-icon")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 5, 0)");
+    } finally {
+      await page.mouse.move(1, 1);
+      await page.mouse.up();
+    }
+    await page.keyboard.press("Tab");
+    await textCta.focus();
+    await expect(textCta).toHaveCSS("transform", "none");
+    await expect(textCta.locator(".arrow-icon")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 4, 0)");
     const contact = page.locator(".footer-links a").first();
     await contact.hover();
     await expect(contact).toHaveCSS("color", "rgb(255, 255, 255)");

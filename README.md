@@ -66,11 +66,13 @@ The interface follows a modern financial-editorial direction: strong typography,
 
 - Navigation collapses at 1150px to prevent the single-line brand and desktop links from overlapping; the main mobile content breakpoint remains 800px.
 - The compact header is a 70px, full-width surface in normal document flow. Opening the menu locks the underlying document while keeping the menu's brand and close control pinned at the top. Header and Footer logos remain static.
-- The menu background reveals from left to right, with staggered navigation entries, keyboard focus management, Escape dismissal, and a deliberate right-swipe close gesture. Pending control animations are cancelled on dismissal or a switch to desktop navigation; rapid taps cannot queue overlapping toggles.
-- Standard CTA buttons and primary text CTAs use color changes and a `1.04` hover/focus scale, without upward lift or hover shadows. Press feedback uses the shared `--motion-scale-press: .98` token.
-- Memo cards retain their restrained `0.99` hover/focus scale; memo article rows retain `0.995`. Both press to `0.98`, including on touch devices. Noninteractive placeholder cards remain static.
+- The menu background reveals from left to right, with staggered navigation entries, keyboard focus management, Escape dismissal, and a deliberate right-swipe close gesture. Opening and closing update immediately, without a delayed post-click press animation or animation timers; repeated input cannot queue overlapping toggles.
+- Header navigation, language controls, and Contact use a uniform `1.04` scale for hover, focus, and press without text translation or hover shadows. Menu circles retain their directional rotation with the same scale for pointer and keyboard interaction. Entry movement uses a separate `translate` transition so it cannot override a row's interaction scale. Touch idle-hover resets preserve active and focus feedback; logos remain static. This Header-specific behavior does not change the `0.98` press scale used elsewhere.
+- Standard CTA buttons use color changes and a `1.04` hover/focus scale, without upward lift or hover shadows. Press feedback uses the shared `--motion-scale-press: .98` token.
+- Non-button text CTAs keep their text stationary in every state: only the arrow moves right (4px on hover/focus, 5px while pressed), alongside the existing Deep Blue color feedback. They do not inherit whole-control scaling; touch idle hover resets without suppressing keyboard focus.
+- Interactive Memo cards and article rows share a `0.98` scale for hover, focus, and press. Touch devices use the same press/focus scale without sticky idle hover; noninteractive placeholder cards remain static.
 - The memo disclosure preserves its background/color feedback, desktop text movement, and arrow rotation without enlarging the whole row on hover. Its press scale is `0.98`.
-- Ordinary navigation and inline links retain role-specific feedback rather than inheriting button animations. Touch-only idle-hover resets do not suppress active or keyboard-focus states, and reduced-motion preferences are respected.
+- Inline links retain role-specific feedback rather than inheriting button animations. Touch-only idle-hover resets do not suppress active or keyboard-focus states, and reduced-motion preferences are respected.
 
 ### Vertical Spacing
 

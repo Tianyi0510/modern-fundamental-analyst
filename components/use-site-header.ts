@@ -7,56 +7,31 @@ const compactNavigationQuery = "(max-width: 1150px)";
 
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [controlMotion, setControlMotion] = useState<"idle" | "opening" | "closing">("idle");
+  const isOpenRef = useRef(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
-  const controlMotionTimerRef = useRef<number | null>(null);
-  const motionInProgressRef = useRef(false);
 
   const close = useCallback(() => {
-    if (controlMotionTimerRef.current !== null) window.clearTimeout(controlMotionTimerRef.current);
-    controlMotionTimerRef.current = null;
-    motionInProgressRef.current = false;
+    isOpenRef.current = false;
     pointerStartRef.current = null;
-    setControlMotion("idle");
     setIsOpen(false);
   }, []);
 
   useEffect(() => {
     const compactNavigation = window.matchMedia(compactNavigationQuery);
     const handleBreakpoint = () => { if (!compactNavigation.matches) close(); };
-    // Escape must also cancel a pending opening animation, before isOpen is true.
+    // Keep dismissal independent of render timing and repeated input.
     const handleEscape = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
     compactNavigation.addEventListener("change", handleBreakpoint);
     window.addEventListener("keydown", handleEscape);
     return () => {
       compactNavigation.removeEventListener("change", handleBreakpoint);
       window.removeEventListener("keydown", handleEscape);
-      if (controlMotionTimerRef.current !== null) window.clearTimeout(controlMotionTimerRef.current);
     };
   }, [close]);
-
-  const runControlMotion = (motion: "opening" | "closing", complete: () => void) => {
-    if (motionInProgressRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      complete();
-      return;
-    }
-    motionInProgressRef.current = true;
-    setControlMotion(motion);
-    const control = motion === "opening" ? triggerRef.current : closeButtonRef.current;
-    const duration = control ? getComputedStyle(control).getPropertyValue("--motion-duration-base").trim() : "0ms";
-    const durationMs = Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
-    controlMotionTimerRef.current = window.setTimeout(() => {
-      complete();
-      setControlMotion("idle");
-      controlMotionTimerRef.current = null;
-      motionInProgressRef.current = false;
-    }, Number.isFinite(durationMs) ? durationMs : 0);
-  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -121,20 +96,17 @@ export function useMobileMenu() {
 
   return {
     close,
-    closeWithMotion: () => runControlMotion("closing", close),
     closeButtonRef,
-    controlMotion,
     drawerRef,
     handlePointerCancel,
     handlePointerDown,
     handlePointerUp,
     isOpen,
     open: () => {
-      if (isOpen || !window.matchMedia(compactNavigationQuery).matches) return;
-      runControlMotion("opening", () => {
-        scrollPositionRef.current = window.scrollY;
-        setIsOpen(true);
-      });
+      if (isOpenRef.current || !window.matchMedia(compactNavigationQuery).matches) return;
+      isOpenRef.current = true;
+      scrollPositionRef.current = window.scrollY;
+      setIsOpen(true);
     },
     triggerRef,
   };
