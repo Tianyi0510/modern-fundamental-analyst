@@ -114,7 +114,7 @@ textarea.control {
 }
 
 .section .submit:active:not(:disabled) {
-  transform: scale(.985);
+  transform: scale(var(--motion-scale-press));
   box-shadow: none;
 }
 

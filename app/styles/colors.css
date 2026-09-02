@@ -136,3 +136,26 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .site-footer .footer-mark:hover,
 .site-footer .footer-mark:focus-visible { color: var(--text-inverse); transition: none; }
 .site-footer .wordmark span { color: var(--interactive-accent); }
+
+/* Touch hover may persist after a tap. Reset only idle hover, never keyboard focus
+   or active feedback; keep these rules after the editorial color overrides. */
+@media (hover: none) and (pointer: coarse) {
+  .button:hover:not(:active):not(:focus-visible),
+  .home-page .button:hover:not(:active):not(:focus-visible),
+  .site-header .button:hover:not(:active):not(:focus-visible),
+  .home-page .text-link:hover:not(:active):not(:focus-visible),
+  .allocation-card > a:hover:not(:active):not(:focus-visible),
+  .memo-card:hover:not(:active):not(:focus-visible),
+  .memo-index-row:hover:not(:active):not(:focus-visible),
+  .memo-disclosure > summary:hover:not(:active):not(:focus-visible) { transform: none; box-shadow: none; }
+
+  :is(.home-page .hero .button-dark, .performance-home .button-white, .home-page .cta .button-dark, .site-header .button-dark, .button-dark):hover:not(:active):not(:focus-visible) {
+    background: var(--black); color: var(--white);
+  }
+  .button-dark:active:not(:disabled) { background: var(--deep-blue); color: var(--white); }
+  .home-page .hero .button-dark:active,
+  .performance-home .button-white:active,
+  .site-header .button-dark:active { background: var(--bright-blue); color: var(--black); }
+  .home-page .cta .button-dark:active { background: var(--deep-blue); color: var(--white); }
+  .support-amount-option:active { transform: scale(var(--motion-scale-press)); }
+}

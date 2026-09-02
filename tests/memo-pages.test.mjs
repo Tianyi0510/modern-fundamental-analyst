@@ -121,8 +121,12 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /\.memo-index-row:hover, \.memo-index-row:focus-visible\s*\{[^}]*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*scale\(\.995\)/s);
   assert.match(css, /\.memo-index-row\s*\{[^}]*align-items:\s*start/s);
   assert.doesNotMatch(index, /memo-index-row[\s\S]*?className="arrow-icon"/);
-  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:active\s*\{[^}]*transform:\s*none/s);
-  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*transform:\s*none/s);
+  assert.match(css, /--motion-scale-press:\s*\.98;/);
+  for (const selector of [String.raw`\.memo-card`, String.raw`\.memo-index-row`, String.raw`\.memo-disclosure > summary`]) {
+    assert.match(css, new RegExp(selector + String.raw`:active\s*\{[^}]*transform:\s*scale\(var\(--motion-scale-press\)\)`, "s"));
+  }
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-card:not\(\.memo-card-placeholder\):active\s*\{[^}]*transform:\s*scale\(var\(--motion-scale-press\)\)/s);
+  assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*transform:\s*scale\(var\(--motion-scale-press\)\)/s);
   assert.doesNotMatch(css, /\.memo-disclosure > summary::before/);
   assert.match(css, /\.memo-disclosure > summary:hover, \.memo-disclosure > summary:focus-visible\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(8px\)/s);

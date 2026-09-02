@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEventHandler } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from "react";
 
-const menuControlMotionMs = 180;
+// Keep in sync with the navigation-only breakpoint in responsive.css.
+const compactNavigationQuery = "(max-width: 1150px)";
 
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,23 +14,48 @@ export function useMobileMenu() {
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
   const controlMotionTimerRef = useRef<number | null>(null);
+  const motionInProgressRef = useRef(false);
 
-  useEffect(() => () => {
+  const close = useCallback(() => {
     if (controlMotionTimerRef.current !== null) window.clearTimeout(controlMotionTimerRef.current);
+    controlMotionTimerRef.current = null;
+    motionInProgressRef.current = false;
+    pointerStartRef.current = null;
+    setControlMotion("idle");
+    setIsOpen(false);
   }, []);
 
+  useEffect(() => {
+    const compactNavigation = window.matchMedia(compactNavigationQuery);
+    const handleBreakpoint = () => { if (!compactNavigation.matches) close(); };
+    // Escape must also cancel a pending opening animation, before isOpen is true.
+    const handleEscape = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
+    compactNavigation.addEventListener("change", handleBreakpoint);
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      compactNavigation.removeEventListener("change", handleBreakpoint);
+      window.removeEventListener("keydown", handleEscape);
+      if (controlMotionTimerRef.current !== null) window.clearTimeout(controlMotionTimerRef.current);
+    };
+  }, [close]);
+
   const runControlMotion = (motion: "opening" | "closing", complete: () => void) => {
-    if (controlMotion !== "idle") return;
+    if (motionInProgressRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       complete();
       return;
     }
+    motionInProgressRef.current = true;
     setControlMotion(motion);
+    const control = motion === "opening" ? triggerRef.current : closeButtonRef.current;
+    const duration = control ? getComputedStyle(control).getPropertyValue("--motion-duration-base").trim() : "0ms";
+    const durationMs = Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
     controlMotionTimerRef.current = window.setTimeout(() => {
       complete();
       setControlMotion("idle");
       controlMotionTimerRef.current = null;
-    }, menuControlMotionMs);
+      motionInProgressRef.current = false;
+    }, Number.isFinite(durationMs) ? durationMs : 0);
   };
 
   useEffect(() => {
@@ -42,10 +68,6 @@ export function useMobileMenu() {
     const scrollPosition = scrollPositionRef.current;
     const trigger = triggerRef.current;
     const handleKeyboard = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-        return;
-      }
       if (event.key !== "Tab") return;
       const focusable = drawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
       if (!focusable?.length) return;
@@ -65,7 +87,7 @@ export function useMobileMenu() {
     document.body.style.top = `-${scrollPosition}px`;
     document.body.style.width = "100%";
     document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
+    closeButtonRef.current?.focus({ preventScroll: true });
     window.addEventListener("keydown", handleKeyboard);
     return () => {
       document.documentElement.style.overflow = previousOverflow;
@@ -75,7 +97,7 @@ export function useMobileMenu() {
       document.body.style.overflow = previousBodyOverflow;
       window.scrollTo({ top: scrollPosition, left: 0, behavior: "instant" });
       window.removeEventListener("keydown", handleKeyboard);
-      trigger?.focus();
+      if (trigger?.getClientRects().length) trigger.focus({ preventScroll: true });
     };
   }, [isOpen]);
 
@@ -90,7 +112,7 @@ export function useMobileMenu() {
     if (!start || event.pointerType !== "touch") return;
     const horizontalDistance = event.clientX - start.x;
     const verticalDistance = Math.abs(event.clientY - start.y);
-    if (horizontalDistance >= 72 && horizontalDistance > verticalDistance * 1.2) setIsOpen(false);
+    if (horizontalDistance >= 72 && horizontalDistance > verticalDistance * 1.2) close();
   };
 
   const handlePointerCancel: PointerEventHandler<HTMLElement> = () => {
@@ -98,8 +120,8 @@ export function useMobileMenu() {
   };
 
   return {
-    close: () => setIsOpen(false),
-    closeWithMotion: () => runControlMotion("closing", () => setIsOpen(false)),
+    close,
+    closeWithMotion: () => runControlMotion("closing", close),
     closeButtonRef,
     controlMotion,
     drawerRef,
@@ -108,8 +130,11 @@ export function useMobileMenu() {
     handlePointerUp,
     isOpen,
     open: () => {
-      scrollPositionRef.current = window.scrollY;
-      runControlMotion("opening", () => setIsOpen(true));
+      if (isOpen || !window.matchMedia(compactNavigationQuery).matches) return;
+      runControlMotion("opening", () => {
+        scrollPositionRef.current = window.scrollY;
+        setIsOpen(true);
+      });
     },
     triggerRef,
   };
@@ -133,12 +158,18 @@ export function useLanguageMenu() {
     const closeOnOutsideClick = (event: PointerEvent) => {
       if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false);
     };
+    const closeOnOutsideFocus = (event: FocusEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false);
+    };
+    const compactNavigation = window.matchMedia(compactNavigationQuery);
+    const handleBreakpoint = () => { if (compactNavigation.matches) setIsOpen(false); };
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOpen(false);
         triggerRef.current?.focus();
         return;
       }
+      if (!containerRef.current?.contains(document.activeElement)) return;
       if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
       const items = Array.from(containerRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
       if (!items.length) return;
@@ -149,9 +180,13 @@ export function useLanguageMenu() {
     };
 
     document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("focusin", closeOnOutsideFocus);
+    compactNavigation.addEventListener("change", handleBreakpoint);
     window.addEventListener("keydown", handleKeyboard);
     return () => {
       document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("focusin", closeOnOutsideFocus);
+      compactNavigation.removeEventListener("change", handleBreakpoint);
       window.removeEventListener("keydown", handleKeyboard);
     };
   }, [isOpen]);

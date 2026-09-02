@@ -29,8 +29,10 @@ test.describe("header interaction QA", () => {
   test("desktop footer and legal sections use balanced vertical spacing", async ({ page }) => {
     await page.goto("/disclaimer");
     const footer = page.locator(".site-footer");
-    await expect(footer).toHaveCSS("padding-top", "74px");
-    await expect(footer).toHaveCSS("padding-bottom", "74px");
+    await expect(footer.locator(".footer-main")).toHaveCSS("padding-top", "72px");
+    await expect(footer.locator(".footer-main")).toHaveCSS("padding-bottom", "72px");
+    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "24px");
+    await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "24px");
     const legalBody = page.locator(".legal-body");
     await expect(legalBody).toHaveCSS("padding-top", "96px");
     await expect(legalBody).toHaveCSS("padding-bottom", "96px");
@@ -42,6 +44,44 @@ test.describe("header interaction QA", () => {
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
       await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
       await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
+    }
+  });
+
+  test("CTA focus uses shared scale without lift or shadow", async ({ page }) => {
+    for (const [path, selector] of [
+      ["/", ".hero .button"],
+      ["/", ".round-link"],
+      ["/support", ".support-submit"],
+      ["/subscription-preferences", "main form .button"],
+      ["/contact", "form .button"],
+    ] as const) {
+      await page.goto(path);
+      await page.keyboard.press("Tab");
+      const control = page.locator(selector).first();
+      await control.focus();
+      await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+      await expect(control).toHaveCSS("box-shadow", "none");
+    }
+  });
+
+  test("footer status and input text retain their semantic weight", async ({ page }) => {
+    for (const width of [1440, 801, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto("/subscription-preferences");
+      const status = page.locator(".site-footer [role=status]");
+      await expect(status).toHaveCSS("font-size", "15px");
+      await expect(status).toHaveCSS("font-weight", "700");
+      await expect(status).toBeVisible();
+      await expect(page.locator("main input[name=email]").first()).toHaveCSS("font-weight", "400");
+      await expect(page.locator(".site-footer input[name=email]")).toHaveCSS("font-weight", "400");
+      await page.goto("/disclaimer");
+      await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-size", "15px");
+      await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-weight", "700");
+      const inset = await page.locator(".legal-body").evaluate((body) => {
+        const first = body.querySelector(".legal-section-heading")!;
+        return first.getBoundingClientRect().top - body.getBoundingClientRect().top;
+      });
+      expect(inset).toBe(width <= 800 ? 72 : 96);
     }
   });
 });
@@ -249,5 +289,56 @@ test.describe("mobile content and navigation QA", () => {
     await drawer.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 1, clientX: 40, clientY: 240 });
     await drawer.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 1, clientX: 150, clientY: 246 });
     await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
+  });
+
+  test("navigation switches without overlap or a stranded scroll lock", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".mobile-menu-button").tap();
+    await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+    await page.setViewportSize({ width: 801, height: 1000 });
+    await expect(page.locator(".mobile-menu-close")).toBeVisible();
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
+    await expect(page.locator("body")).toHaveCSS("position", "static");
+    await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
+    for (const width of [801, 1100, 1150, 1151, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const logo = await page.locator(".site-header > .wordmark").boundingBox();
+      const adjacent = await page.locator(width <= 1150 ? ".mobile-menu-button" : ".header-actions").boundingBox();
+      expect(logo!.x + logo!.width).toBeLessThan(adjacent!.x);
+    }
+  });
+
+  test("Escape cancels queued opening and rapid taps do not queue animations", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".mobile-menu-button").evaluate((button) => {
+      (button as HTMLButtonElement).click();
+      (button as HTMLButtonElement).click();
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    });
+    await page.waitForTimeout(350);
+    await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
+    await expect(page.locator("body")).toHaveCSS("position", "static");
+    for (let count = 0; count < 3; count++) {
+      await page.locator(".mobile-menu-button").tap();
+      await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+      await page.locator(".mobile-menu-close").tap();
+      await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
+    }
+  });
+
+  test("touch buttons share press scale and footer links stay legible", async ({ page }) => {
+    await page.goto("/");
+    const button = page.locator(".hero .button");
+    await button.scrollIntoViewIfNeeded();
+    const box = (await button.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect(button).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
+    await page.mouse.move(1, 1);
+    await page.mouse.up();
+    const contact = page.locator(".footer-links a").first();
+    await contact.hover();
+    await expect(contact).toHaveCSS("color", "rgb(255, 255, 255)");
   });
 });

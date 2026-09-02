@@ -179,7 +179,7 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /\.legal-hero\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.match(css, /\.memo-article\s*\{[^}]*padding:\s*0 0 var\(--space-section\)/s);
   assert.match(css, /\.memo-article-header\s*\{[^}]*padding-top:\s*var\(--space-section\)/s);
-  assert.match(css, /\.legal-section\s*\{[^}]*padding:\s*var\(--space-section-compact\) 0/s);
+  assert.match(css, /\.legal-section\s*\{[^}]*padding:\s*0/s);
   assert.match(css, /\.memo-section \+ \.memo-section\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding-top:\s*var\(--space-section-compact\)/s);
   assert.match(css, /\.contact-hero\s*\{[^}]*min-height:\s*0/s);
   assert.match(css, /\.eyebrow\s*\{[^}]*margin:\s*0/s);
@@ -190,11 +190,11 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.performance-page \.methodology\s*\{[^}]*gap:\s*var\(--space-heading-content\)/s);
 });
 
-test("tablet navigation compacts before the mobile breakpoint", async () => {
+test("navigation collapses before the single-line brand collides", async () => {
   const responsive = await read("app/styles/responsive.css");
 
-  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.site-header \.wordmark\s*\{\s*max-width:\s*150px;/);
-  assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.site-header nav\s*\{\s*gap:\s*10px;/);
+  assert.match(responsive, /@media \(max-width: 1150px\)[\s\S]*?\.header-actions\s*\{\s*display:\s*none;/);
+  assert.doesNotMatch(responsive, /max-width:\s*150px/);
   assert.match(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.returns,[\s\S]*?\.methodology\s*\{\s*grid-template-columns:\s*1fr;/);
   assert.doesNotMatch(responsive, /@media \(max-width: 1100px\) and \(min-width: 801px\)[\s\S]*?\.metric strong\s*\{[^}]*font-size:/);
 });
@@ -219,7 +219,7 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.doesNotMatch(css, /@media \(max-width:\s*800px\)[\s\S]*?body\s*\{[^}]*padding-top:/s);
   assert.doesNotMatch(css, /\.site-header nav a::after/);
   assert.match(css, /\.site-header nav a:hover, \.site-header nav a:focus-visible \{[^}]*background:[^}]*transform: translateY\(-1px\)/s);
-  assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(\.97\)/s);
+  assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(var\(--motion-scale-press\)\)/s);
   assert.match(css, /\.language-dropdown a:hover, \.language-dropdown a:focus-visible \{[^}]*transform: translateX\(4px\)/s);
   assert.doesNotMatch(header, /mobile-menu-index/);
   assert.match(header, /mobile-menu-label/);
@@ -234,16 +234,16 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-close:hover\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*transform:\s*rotate\(-4deg\) scale\(var\(--motion-scale-hover\)\)/s);
   assert.match(css, /\.mobile-menu-button:focus-visible\s*\{[^}]*transform:\s*none/s);
   assert.match(css, /\.mobile-menu-close:focus-visible\s*\{[^}]*transform:\s*none/s);
-  assert.match(css, /@keyframes mobile-menu-control-activate\s*\{[\s\S]*?rotate\(4deg\) scale\(\.94\)[\s\S]*?transform:\s*none/s);
+  assert.match(css, /@keyframes mobile-menu-control-activate\s*\{[\s\S]*?rotate\(4deg\) scale\(var\(--motion-scale-press\)\)[\s\S]*?transform:\s*none/s);
   assert.match(css, /\.mobile-menu-button\.is-activating\s*\{[^}]*animation:\s*mobile-menu-control-activate/s);
   assert.match(css, /\.mobile-menu-close\.is-activating\s*\{[^}]*animation:\s*mobile-menu-control-activate[^}]*reverse/s);
   assert.match(css, /\.mobile-menu-button:active, \.mobile-menu-close:active\s*\{[^}]*transition-duration:\s*var\(--motion-duration-press\)/s);
   assert.doesNotMatch(css, /\.mobile-menu-drawer nav a\[aria-current="page"\]::before\s*\{[^}]*scaleY\(1\)/s);
   assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
-  assert.match(css, /\.site-footer\s*\{[^}]*padding:\s*74px 0;[^}]*column-gap:\s*64px;[^}]*row-gap:\s*74px/s);
+  assert.match(css, /\.footer-main\s*\{[^}]*padding:\s*var\(--space-footer-main\) 0;[^}]*column-gap:\s*64px/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*display:\s*block;[^}]*padding:\s*0/s);
-  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-main\s*\{[^}]*padding:\s*var\(--space-8\) 0;[^}]*gap:\s*var\(--space-6\)/s);
-  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-bottom\s*\{[^}]*padding:\s*var\(--space-5\) 0/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-main\s*\{[^}]*padding:\s*var\(--space-footer-main\) 0;[^}]*gap:\s*var\(--space-6\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-bottom\s*\{[^}]*padding:\s*var\(--space-footer-bottom\) 0/s);
   assert.doesNotMatch(css, /\.footer-link-groups/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?--motion-duration-fast:\s*140ms;[\s\S]*?--motion-duration-base:\s*180ms;[\s\S]*?--motion-duration-slow:\s*300ms;/s);

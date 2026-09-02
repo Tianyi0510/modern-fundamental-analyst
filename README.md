@@ -16,7 +16,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
 - Vercel Analytics and Speed Insights
 - Shared footer navigation with GitHub, LinkedIn, and X profile links
-- Responsive navigation with a viewport-fixed mobile header, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
+- Responsive navigation with an in-flow header and a pinned brand while the menu is open, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
 
 ## Technology
 
@@ -60,7 +60,24 @@ The three language versions share page components wherever possible. Locale file
 
 ## Design System
 
-The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Home, Portfolio, and Performance use one shared KPI-block geometry and content rhythm across desktop and mobile. Shared header, footer, button, language-menu, and home-page interactions use consistent color and scale feedback, with touch-specific active states that avoid sticky hover behavior on mobile devices. At 800px and below, the header itself becomes a full-viewport-width fixed surface while its contents retain the shared page gutter; the document reserves the same 78px height so content never slides underneath it. The mobile menu reveals from the top, uses staggered navigation motion, supports a right-swipe close gesture, and identifies the current page with the same light-blue surface and Medium Blue text used by desktop navigation. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts across desktop and mobile.
+The interface follows a modern financial-editorial direction: strong typography, generous spacing, square data surfaces, high-contrast section changes, and restrained motion. Home, Portfolio, and Performance use one shared KPI-block geometry and content rhythm across desktop and mobile. Numbered editorial labels, legal and disclaimer rows, and supporting copy use baseline-aligned layouts.
+
+### Navigation and Interaction
+
+- Navigation collapses at 1150px to prevent the single-line brand and desktop links from overlapping; the main mobile content breakpoint remains 800px.
+- The compact header is a 70px, full-width surface in normal document flow. Opening the menu locks the underlying document while keeping the menu's brand and close control pinned at the top. Header and Footer logos remain static.
+- The menu background reveals from left to right, with staggered navigation entries, keyboard focus management, Escape dismissal, and a deliberate right-swipe close gesture. Pending control animations are cancelled on dismissal or a switch to desktop navigation; rapid taps cannot queue overlapping toggles.
+- Standard CTA buttons and primary text CTAs use color changes and a `1.04` hover/focus scale, without upward lift or hover shadows. Press feedback uses the shared `--motion-scale-press: .98` token.
+- Memo cards retain their restrained `0.99` hover/focus scale; memo article rows retain `0.995`. Both press to `0.98`, including on touch devices. Noninteractive placeholder cards remain static.
+- The memo disclosure preserves its background/color feedback, desktop text movement, and arrow rotation without enlarging the whole row on hover. Its press scale is `0.98`.
+- Ordinary navigation and inline links retain role-specific feedback rather than inheriting button animations. Touch-only idle-hover resets do not suppress active or keyboard-focus states, and reduced-motion preferences are respected.
+
+### Vertical Spacing
+
+- Main sections and heroes share the section-spacing tokens: 96px on desktop and 72px at the mobile content breakpoint.
+- Footer main content uses equal top/bottom padding through `--space-footer-main`: 72px on desktop and 48px on mobile. Footer bottom content uses `--space-footer-bottom`: 24px on both sides at every viewport.
+- The subscription status row stays in the layout, even when empty; reserved message space is distinct from section padding.
+- Disclaimer spacing is owned by the outer body and the gaps between sections, avoiding duplicated section padding at the body's top and bottom.
 
 ### Color Tokens
 
@@ -93,6 +110,7 @@ The semantic aliases live in `app/styles/colors.css`; the base values and type s
 - Financial data keeps `line-height: 1`; all heading and data roles retain `letter-spacing: -.05em`
 - Body, caption, and control text use `line-height: 1.5` with zero letter spacing; labels retain `.05em` tracking
 - Component controls use `em` for internal horizontal spacing where that spacing should scale with the control text
+- Footer subscription status uses the Caption role (`0.9375rem`, 15px at the default root size) at weight 700, including on Disclaimer; preference inputs and selects use regular weight 400 rather than inheriting bold field labels
 
 The role scale covers page, section, card, and compact titles; lead and body copy; labels, controls, and captions; plus display, KPI, ring, and row data. `typography.css` maps shared content roles, while `component-typography.css` handles component-specific mappings. `responsive.css` changes layout and interaction behavior only—it contains no `font-size` declarations.
 
@@ -206,7 +224,9 @@ This command runs:
 4. Playwright computed-style tests
 5. A production Next.js build
 
-The computed-style suite opens the principal routes in Chromium at 1440px, 801px, and 390px. It verifies that every sampled component resolves to the expected semantic role size, that each role has one computed size per viewport, and that typography changes do not introduce horizontal overflow. Mobile interaction tests use an iPhone user agent, touch input, a 3x device scale, and a 390×844 viewport; they verify that the full-width header remains at `top: 0` after scrolling and that the menu still opens, traps focus, and closes correctly.
+The computed-style suite opens the principal routes in Chromium at 1440px, 801px, and 390px. It verifies sampled semantic role sizes, horizontal overflow, CTA focus scale without lift or shadows, balanced Footer and hero padding, and the subscription status role on both Preferences and Disclaimer. Mobile interaction tests use an iPhone user agent, touch input, a 3x device scale, and a 390×844 viewport. They verify that the normal header scrolls with the document, the open menu's brand remains pinned, focus is trapped, scroll position is restored, and repeated taps or Escape during opening do not strand the interface. Additional checks cover navigation overlap and cleanup across the 1150px breakpoint.
+
+For additional Safari-engine coverage, install WebKit and run the existing browser suite with `npx playwright test --browser=webkit`. Browser emulation complements, but does not replace, testing on an actual iPhone.
 
 GitHub Actions installs Chromium and runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
 
@@ -219,7 +239,8 @@ Tests are grouped by responsibility: behavioral API, email, preference, Resend, 
 The production delivery path is:
 
 ```text
-Local repository → GitHub → GitHub Actions → Vercel → Wix-managed DNS
+Local repository → GitHub main → GitHub Actions verification
+                              → Vercel Production → Wix-managed DNS
 ```
 
 Pushes to `main` trigger both the GitHub Actions verification workflow and a Vercel Production deployment through the Git integration. Vercel installs dependencies with `npm ci`, builds the same commit, and assigns the production aliases after a successful deployment. Pull requests and non-production branches receive Preview deployments without production service credentials. The public domain remains managed through Wix DNS, while application hosting and server functions run on Vercel.

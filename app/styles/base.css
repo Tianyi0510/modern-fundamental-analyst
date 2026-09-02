@@ -59,6 +59,8 @@
   --space-section-compact: var(--space-10);
   --space-heading-content: var(--space-9);
   --space-related-content: var(--space-7);
+  --space-footer-main: var(--space-10);
+  --space-footer-bottom: var(--space-5);
 
   /* Shared control geometry. */
   --size-control: 52px;
@@ -71,6 +73,7 @@
   --focus-ring-offset: 4px;
 
   /* One interaction language for pointer, keyboard, and touch. */
+  --motion-duration-press: 90ms;
   --motion-duration-fast: 180ms;
   --motion-duration-base: 220ms;
   --motion-duration-medium: 280ms;
