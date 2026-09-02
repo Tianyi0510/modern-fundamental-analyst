@@ -170,7 +170,7 @@
   .memo-card-placeholder { display: none; }
   .cta { grid-template-columns: 1fr; gap: var(--space-heading-content); }
   .site-footer { display: block; padding: 0; }
-  .footer-main { padding: var(--space-6) 0; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+  .footer-main { padding: var(--space-8) 0; display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
   .footer-bottom { margin-top: 0; padding: var(--space-5) 0; }
   .page-hero { padding: var(--space-section) 0; }
   .hero h1,

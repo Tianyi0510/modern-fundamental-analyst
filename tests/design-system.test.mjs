@@ -242,7 +242,7 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.match(css, /\.mobile-menu-top\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.site-footer\s*\{[^}]*padding:\s*74px 0;[^}]*column-gap:\s*64px;[^}]*row-gap:\s*74px/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.site-footer\s*\{[^}]*display:\s*block;[^}]*padding:\s*0/s);
-  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-main\s*\{[^}]*padding:\s*var\(--space-6\) 0;[^}]*gap:\s*var\(--space-6\)/s);
+  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-main\s*\{[^}]*padding:\s*var\(--space-8\) 0;[^}]*gap:\s*var\(--space-6\)/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.footer-bottom\s*\{[^}]*padding:\s*var\(--space-5\) 0/s);
   assert.doesNotMatch(css, /\.footer-link-groups/);
   assert.match(css, /\.mobile-menu-layer\.is-open \.mobile-language-links/);
