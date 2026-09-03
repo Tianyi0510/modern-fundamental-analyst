@@ -29,6 +29,10 @@ test.describe("header interaction QA", () => {
     await languageTrigger.click();
     await expect(languageTrigger).toHaveAttribute("aria-expanded", "true");
     await expect(page.locator(".language-dropdown")).toHaveClass(/is-open/);
+    await expect(page.locator(".language-dropdown")).toHaveCSS("width", "160px");
+    for (const item of await page.locator(".language-dropdown a").all()) {
+      expect(await item.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    }
     await page.keyboard.press("Escape");
     await expect(languageTrigger).toHaveAttribute("aria-expanded", "false");
     await expect(languageTrigger).toBeFocused();
@@ -99,6 +103,56 @@ test.describe("header interaction QA", () => {
         } finally {
           await page.mouse.up();
         }
+      }
+    }
+  });
+
+  test("reference notes share typography and memo conclusion spacing is balanced", async ({ page }) => {
+    for (const width of [1440, 801, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      for (const path of ["/about", "/performance", "/memos/microsoft-stock-analysis-fiscal-year-2024"]) {
+        await page.goto(path);
+        const note = page.locator(".reference-note");
+        await expect(note).toHaveCount(1);
+        await expect(note).toHaveCSS("font-size", "18px");
+        await expect(note).toHaveCSS("line-height", "27px");
+        await expect(note).toHaveCSS("font-weight", "400");
+        await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
+        if (path !== "/about") {
+          await expect(note.locator(":scope > span")).toHaveCSS("font-weight", "700");
+          await expect(note.locator(":scope > span")).toHaveCSS("color", "rgb(0, 0, 0)");
+        }
+        for (const link of await note.locator("a").all()) {
+          await expect(link).toHaveCSS("font-weight", "400");
+          await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+          await expect(link).toHaveCSS("text-decoration-line", "underline");
+          await expect(link).toHaveCSS("text-underline-offset", "3px");
+          await link.hover();
+          await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+          await page.keyboard.press("Shift");
+          await link.focus();
+          await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+        }
+        if (path.startsWith("/memos/")) {
+          const gaps = await page.locator(".memo-section").last().evaluate((section) => {
+            const conclusion = section.querySelector(".memo-subsection:last-child")!;
+            const previousParagraph = conclusion.previousElementSibling!.lastElementChild!;
+            const heading = conclusion.querySelector("h3")!;
+            const finalParagraph = conclusion.lastElementChild!;
+            const references = section.nextElementSibling!;
+            const style = getComputedStyle(references);
+            return {
+              above: heading.getBoundingClientRect().top - previousParagraph.getBoundingClientRect().bottom,
+              below: references.getBoundingClientRect().top - finalParagraph.getBoundingClientRect().bottom,
+              innerTop: style.paddingTop,
+              innerBottom: style.paddingBottom,
+            };
+          });
+          expect(gaps.above).toBeCloseTo(width <= 800 ? 40 : 56, 1);
+          expect(gaps.below).toBeCloseTo(gaps.above, 1);
+          expect(gaps.innerTop).toBe(gaps.innerBottom);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
     }
   });

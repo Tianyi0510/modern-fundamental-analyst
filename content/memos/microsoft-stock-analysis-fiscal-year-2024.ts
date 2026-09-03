@@ -108,7 +108,7 @@ const sourceContent: MemoContent = {
     "Microsoft Corporation. (2024). Microsoft Fiscal Year 2024 Annual Report.",
     "Buffett, W. (1988). 1987 Letter to Shareholders. In Berkshire Hathaway Inc. 1987 Annual Report.",
   ],
-  sourceLabel: "Source document: Microsoft Stock Analysis Fiscal Year 2024",
+  sourceLabel: "Source Document: Microsoft Stock Analysis Fiscal Year 2024",
   sourceUrl: microsoftSourceUrl,
 };
 

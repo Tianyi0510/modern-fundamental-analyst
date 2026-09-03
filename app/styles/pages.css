@@ -49,7 +49,6 @@
 .about-closing > div { color: var(--black); }
 .about-closing > div p { margin: 0; }
 .about-closing > div p + p { margin-top: 1.35em; }
-.about-closing a { color: var(--deep-blue); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
 .portfolio-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); grid-template-areas: "market return" "cost holdings"; gap: 0; min-height: 480px; background: transparent; }
 .portfolio-kpis > div { min-height: 0; padding: 24px; background: var(--white); }
 .portfolio-kpis > div:nth-child(1) { grid-area: market; }
@@ -78,8 +77,10 @@
 .portfolio-page .portfolio-row span:nth-child(2) { color: var(--black); }
 .portfolio-row > :not(:first-child) { text-align: right; }
 .portfolio-total-row { min-height: 102px; border-top: 1px solid var(--black); background: var(--white); }
-.source-link { color: var(--bright-blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
-.source-link:hover { color: var(--medium-blue); }
+.reference-note { color: var(--text-primary); }
+.reference-note > span { font-weight: var(--weight-bold); }
+.source-link { color: var(--medium-blue); font-weight: var(--weight-regular); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
+.source-link:hover, .source-link:focus-visible, .source-link:active { color: var(--medium-blue); }
 .source-link:focus-visible { outline: var(--focus-ring-width) solid var(--deep-blue); outline-offset: var(--focus-ring-offset); }
 .performance-summary { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1px; margin-top: 0; background: var(--black); }
 .performance-summary > div { background: var(--white); }
@@ -131,7 +132,6 @@
 .methodology-source p { margin: 0; }
 .methodology-source p + p { margin-top: 18px; }
 .methodology-source p:first-child { color: var(--black); }
-.methodology-source span { font-weight: var(--weight-bold); }
 .memo-index { padding: var(--space-section) 0; }
 .memo-index-featured { margin: 0 0 var(--space-section); }
 .memo-disclosure { border-top: 1px solid var(--black); border-bottom: 1px solid var(--black); }
@@ -171,10 +171,10 @@
 .memo-section + .memo-section { margin-top: var(--space-section); padding-top: var(--space-section-compact); border-top: 1px solid var(--black); }
 .memo-subsection { margin-top: var(--space-heading-content); }
 .memo-subsection h3 { margin: 0 0 18px; }
-.memo-references { margin-top: var(--space-section); padding: var(--space-section-compact) 48px; background: var(--background-gray); }
+.memo-references { margin-top: var(--space-heading-content); padding: var(--space-section-compact) 48px; background: var(--background-gray); }
 .memo-references ol { margin: 0; padding-left: 22px; }
 .memo-references li + li { margin-top: 14px; }
-.article-source-note { margin-top: 46px !important; color: var(--text-secondary); line-height: var(--leading-body); }
+.article-body .article-source-note { margin-top: var(--space-related-content); }
 .article-body blockquote { margin: 64px 0; padding: 34px 0; border-top: 3px solid var(--medium-blue); border-bottom: 1px solid var(--gray); }
 .contact-hero { min-height: 0; }
 .contact-note { max-width: 580px; margin: 0; color: var(--text-primary); }

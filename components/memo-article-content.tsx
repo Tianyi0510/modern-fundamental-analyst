@@ -22,7 +22,7 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
       <section className="memo-references">
         <h2>{content.referencesTitle}</h2>
         <ol>{content.references.map((reference) => <li key={reference}>{reference}</li>)}</ol>
-        <p className="article-source-note">{sourcePrefix && <>{sourcePrefix} </>}<a className="source-link" href={content.sourceUrl} target="_blank" rel="noreferrer">{sourceDocument}</a></p>
+        <p className="article-source-note reference-note">{sourcePrefix && <><span>{sourcePrefix}</span> </>}<a className="source-link" href={content.sourceUrl} target="_blank" rel="noreferrer">{sourceDocument}</a></p>
       </section>
     </div>
   );

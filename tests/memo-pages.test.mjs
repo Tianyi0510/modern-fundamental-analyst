@@ -54,7 +54,7 @@ test("memo article uses the source document prose and the wider references layou
   assert.match(styles, /\.article-body\s*\{[^}]*width:\s*min\(1040px, 100%\);[^}]*margin-inline:\s*auto/s);
   assert.doesNotMatch(detailPage, /All Investment Memos|back-link/);
   assert.doesNotMatch(styles, /\.back-link(?:-arrow)?/);
-  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*var\(--space-section\);[^}]*padding:\s*var\(--space-section-compact\) 48px;[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(styles, /\.memo-references\s*\{[^}]*margin-top:\s*var\(--space-heading-content\);[^}]*padding:\s*var\(--space-section-compact\) 48px;[^}]*background:\s*var\(--background-gray\)/s);
   assert.doesNotMatch(styles, /\.memo-references\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.article-source-note\s*\{[^}]*(?:border-top|border-bottom):/s);
 });
