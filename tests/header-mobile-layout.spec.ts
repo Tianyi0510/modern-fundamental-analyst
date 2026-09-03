@@ -134,23 +134,60 @@ test.describe("header interaction QA", () => {
           await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
         }
         if (path.startsWith("/memos/")) {
+          await page.evaluate(() => document.fonts.ready);
           const gaps = await page.locator(".memo-section").last().evaluate((section) => {
             const conclusion = section.querySelector(".memo-subsection:last-child")!;
             const previousParagraph = conclusion.previousElementSibling!.lastElementChild!;
             const heading = conclusion.querySelector("h3")!;
             const finalParagraph = conclusion.lastElementChild!;
             const references = section.nextElementSibling!;
+            window.scrollTo({ top: heading.getBoundingClientRect().top + scrollY - 250, behavior: "instant" });
             const style = getComputedStyle(references);
             return {
               above: heading.getBoundingClientRect().top - previousParagraph.getBoundingClientRect().bottom,
               below: references.getBoundingClientRect().top - finalParagraph.getBoundingClientRect().bottom,
               innerTop: style.paddingTop,
               innerBottom: style.paddingBottom,
+              rects: [previousParagraph, heading, finalParagraph, references].map((node) => node.getBoundingClientRect().toJSON()),
             };
           });
-          expect(gaps.above).toBeCloseTo(width <= 800 ? 40 : 56, 1);
-          expect(gaps.below).toBeCloseTo(gaps.above, 1);
+          expect(gaps.above).toBeCloseTo(width <= 800 ? 47 : 56, 1);
+          expect(gaps.below).toBeCloseTo(width <= 800 ? 50 : 60, 1);
           expect(gaps.innerTop).toBe(gaps.innerBottom);
+          // Line boxes alone hide Jost's optical imbalance. Scan the rendered
+          // text pixels, measuring to the gray surface rather than its heading.
+          const screenshot = await page.screenshot();
+          const visibleGaps = await page.evaluate(async ({ data, rects }) => {
+            const img = new Image();
+            img.src = data;
+            await img.decode();
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const context = canvas.getContext("2d")!;
+            context.drawImage(img, 0, 0);
+            const pixels = context.getImageData(0, 0, img.width, img.height).data;
+            const ink = rects.slice(0, 3).map((rect) => {
+              let top = Infinity;
+              let bottom = -Infinity;
+              for (let y = Math.max(0, Math.ceil(rect.top)); y < Math.min(img.height, Math.floor(rect.bottom)); y++) {
+                for (let x = Math.ceil(rect.left); x < Math.floor(rect.right); x++) {
+                  const index = (y * img.width + x) * 4;
+                  if (pixels[index]! < 128 && pixels[index + 1]! < 128 && pixels[index + 2]! < 128) {
+                    top = Math.min(top, y);
+                    bottom = Math.max(bottom, y);
+                  }
+                }
+              }
+              return { top, bottom };
+            });
+            return {
+              above: ink[1]!.top - ink[0]!.bottom - 1,
+              below: Math.ceil(rects[3].top) - ink[2]!.bottom - 1,
+            };
+          }, { data: `data:image/png;base64,${screenshot.toString("base64")}`, rects: gaps.rects });
+          expect(Number.isFinite(visibleGaps.above) && Number.isFinite(visibleGaps.below)).toBe(true);
+          expect(Math.abs(visibleGaps.above - visibleGaps.below)).toBeLessThanOrEqual(1);
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }

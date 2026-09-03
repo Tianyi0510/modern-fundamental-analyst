@@ -106,7 +106,7 @@
   .memo-summary-meta { align-self: center; gap: 8px; }
   .memo-meta { grid-column: 2; flex-direction: row; align-items: center; }
   .memo-meta b { margin: 0 0 0 auto; }
-  .article-body { margin-left: 0; }
+  .article-body { --memo-conclusion-space-before: 47px; --memo-conclusion-space-after: 50px; margin-left: 0; }
   .memo-section + .memo-section { margin-top: var(--space-section); padding-top: var(--space-section-compact); }
   .memo-references { padding-top: var(--space-section-compact); }
   .contact-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
