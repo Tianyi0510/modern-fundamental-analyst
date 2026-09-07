@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { postJson } from "@/lib/client-post-json";
+import { postJson, PostJsonError } from "@/lib/client-post-json";
 import type { Locale } from "@/lib/i18n";
 import styles from "./subscription-preferences.module.css";
 import { useExclusiveSubmit } from "./use-exclusive-submit";
@@ -25,7 +25,8 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
         form.reset();
         resetSubmissionId();
         setStatus("sent");
-      } catch {
+      } catch (error) {
+        if (error instanceof PostJsonError && error.status === 409) resetSubmissionId();
         setStatus("error");
       }
     });
@@ -35,7 +36,7 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
   return <form className={styles.form} onSubmit={submit} onChange={() => resetSubmissionId()} aria-busy={status === "requesting"}>
     <label className={styles.field}>
       <span>{copy.email}</span>
-      <input name="email" type="email" autoComplete="email" inputMode="email" maxLength={254} required />
+      <input name="email" type="email" autoComplete="email" inputMode="email" maxLength={254} disabled={status === "requesting"} required />
     </label>
     <div className={styles.actions}>
       <button className="button button-dark" type="submit" disabled={status === "requesting"}>{status === "requesting" ? copy.requesting : copy.request}</button>

@@ -42,7 +42,7 @@ export function SubscribeFormClient({ copy, locale, preferencesHref }: { copy: S
       <form className={styles.form} onSubmit={submit} aria-busy={status === "submitting"}>
         <label className={styles.field}>
           <span>{copy.email}</span>
-          <input className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={copy.placeholder} maxLength={254} required />
+          <input disabled={status === "submitting"} className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={copy.placeholder} maxLength={254} required />
         </label>
         <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
         <button className={styles.submit} type="submit" disabled={status === "submitting"}>{status === "submitting" ? copy.submitting : copy.submit}</button>

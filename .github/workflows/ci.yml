@@ -42,3 +42,12 @@ jobs:
         run: npm run test:computed-style -- --browser webkit --workers=1
         env:
           PLAYWRIGHT_USE_PRODUCTION_BUILD: "1"
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-evidence
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,4 +1,12 @@
-const CLIENT_POST_TIMEOUT_MS = 15_000;
+const CLIENT_POST_TIMEOUT_MS = 45_000;
+
+export class PostJsonError extends Error {
+  status: number;
+  constructor(status: number) {
+    super(`Request failed with status ${status}`);
+    this.status = status;
+  }
+}
 
 type PostJsonOptions = {
   idempotencyKey?: string;
@@ -14,6 +22,6 @@ export async function postJson(path: `/api/${string}`, payload: unknown, options
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(CLIENT_POST_TIMEOUT_MS),
   });
-  if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+  if (!response.ok) throw new PostJsonError(response.status);
   return response;
 }

@@ -84,7 +84,9 @@ export async function getRedisClient() {
     state.client.on("error", (error) => logRedisError("Redis client error", error));
   }
 
-  if (state.client.isOpen) return state.client;
+  if (state.client.isReady) return state.client;
+  if (state.connection) return state.connection;
+  if (state.client.isOpen) return null;
 
   if (!state.connection) {
     const pendingClient = state.client;

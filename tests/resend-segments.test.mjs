@@ -66,3 +66,32 @@ test("preferred-language segment sync rolls back a partial failure", async () =>
   assert.equal(mock.segmentIds.has(simplifiedChinese), true);
   assert.equal(mock.segmentIds.has(traditionalChinese), false);
 });
+
+test("segment sync reads later pages and preserves unrelated memberships", async () => {
+  const english = getPreferredLanguageSegmentId("en");
+  const target = getPreferredLanguageSegmentId("zh-tw");
+  const unrelated = Array.from({ length: 100 }, (_, index) => `other-${index}`);
+  const mock = createResendSegmentMock([...unrelated, english]);
+  const cursors = [];
+  mock.client.contacts.segments.list = async ({ after }) => {
+    cursors.push(after);
+    return { data: { data: (after ? [english] : unrelated).map(id => ({ id })), has_more: !after } };
+  };
+  await syncPreferredLanguageSegment(mock.client, "reader@example.com", "zh-tw");
+  assert.deepEqual(cursors, [undefined, "other-99"]);
+  assert.deepEqual([...mock.segmentIds], [...unrelated, target]);
+});
+
+test("failed or non-progressing pagination does not mutate segments", async () => {
+  for (const brokenPage of [{ error: { name: "failed" } }, { data: { data: [{ id: "cursor" }], has_more: true } }]) {
+    const english = getPreferredLanguageSegmentId("en");
+    const mock = createResendSegmentMock([english]);
+    let calls = 0;
+    mock.client.contacts.segments.list = async () => ++calls === 1
+      ? { data: { data: [{ id: "cursor" }], has_more: true } }
+      : brokenPage;
+    await assert.rejects(syncPreferredLanguageSegment(mock.client, "reader@example.com", "zh-tw"));
+    assert.deepEqual([...mock.segmentIds], [english]);
+    assert.equal(calls, 2);
+  }
+});

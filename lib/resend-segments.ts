@@ -1,5 +1,6 @@
 import type { Resend } from "resend";
 import type { Locale } from "@/lib/i18n";
+import { reportResendRollbackFailure } from "@/lib/resend";
 
 const preferredLanguageSegments = {
   en: process.env.RESEND_SEGMENT_EN || "39c96ed5-94c2-4755-876a-b29b414433e0",
@@ -27,17 +28,30 @@ async function restorePreferredLanguageSegments(
     ...(removeTarget ? [resend.contacts.segments.remove({ email, segmentId: targetId })] : []),
   ]);
   const failed = results.some((result) => result.status === "rejected" || result.value.error);
-  if (failed) throw new Error("Unable to restore preferred language segments");
+  if (failed) {
+    reportResendRollbackFailure();
+    throw new Error("Unable to restore preferred language segments");
+  }
 }
 
 export async function syncPreferredLanguageSegment(resend: Resend, email: string, locale: Locale) {
   const targetId = getPreferredLanguageSegmentId(locale);
-  const current = await resend.contacts.segments.list({ email, limit: 100 });
-  if (current.error) throw new Error(`Unable to read contact segments: ${current.error.name}`);
-
-  const currentLanguageIds = current.data?.data
-    .map(({ id }) => id)
-    .filter((id) => languageSegmentIds.has(id)) ?? [];
+  const found = new Set<string>();
+  const cursors = new Set<string>();
+  let after: string | undefined;
+  // Read the entire snapshot before any mutation. Bound malformed pagination
+  // independently of the shared operation deadline.
+  for (let page = 0; ; page += 1) {
+    if (page >= 100) throw new Error("Contact segment pagination limit exceeded");
+    const current = await resend.contacts.segments.list({ email, limit: 100, ...(after ? { after } : {}) });
+    if (current.error || !current.data) throw new Error("Unable to read contact segments");
+    for (const { id } of current.data.data) if (languageSegmentIds.has(id)) found.add(id);
+    if (!current.data.has_more) break;
+    after = current.data.data.at(-1)?.id;
+    if (!after || cursors.has(after)) throw new Error("Invalid contact segment pagination");
+    cursors.add(after);
+  }
+  const currentLanguageIds = [...found];
 
   const targetWasAdded = !currentLanguageIds.includes(targetId);
   let targetAdded = false;

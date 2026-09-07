@@ -5,6 +5,7 @@ import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, runResendOperation } from "@/lib/resend";
 import { syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { readPreferenceToken } from "@/lib/subscription-preferences";
+import { withSubscriberLock } from "@/lib/resend-coordination";
 
 export const runtime = "nodejs";
 
@@ -38,9 +39,17 @@ export async function POST(request: Request) {
   const resend = getResendClient();
   if (!resend) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
 
+  try {
+    return await withSubscriberLock(payload.email, () => updatePreferences(resend, payload, locale, action));
+  } catch {
+    return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
+  }
+}
+
+async function updatePreferences(resend: NonNullable<ReturnType<typeof getResendClient>>, payload: { email: string }, locale: ReturnType<typeof resolveLocale>, action: "save" | "unsubscribe") {
   const existing = await runResendOperation("Resend preferences contact lookup failed", () => resend.contacts.get({ email: payload.email }));
   if (!existing) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
-  if (!existing.data) return NextResponse.json({ error: "Subscription preferences could not be found." }, { status: 404 });
+  if (!existing.data) return NextResponse.json({ error: "Subscription preferences could not be found." }, { status: existing.error?.statusCode === 404 ? 404 : 502 });
 
   if (action === "save") {
     let rollbackLanguageSegments: (() => Promise<void>) | null = null;

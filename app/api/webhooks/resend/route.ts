@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readLimitedText, RequestBodyError } from "@/lib/api-request";
 import { getResendClient, runResendOperation } from "@/lib/resend";
 import { getResendWebhookHeaders, getUnsubscribeRecipients } from "@/lib/resend-webhook";
+import { withSubscriberLock } from "@/lib/resend-coordination";
 
 export const runtime = "nodejs";
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
   const recipients = getUnsubscribeRecipients(event);
   const updates = await Promise.all(recipients.map((email) => runResendOperation(
     "Resend webhook contact update failed",
-    () => resend.contacts.update({ email, unsubscribed: true }),
+    () => withSubscriberLock(email, () => resend.contacts.update({ email, unsubscribed: true })),
   )));
 
   const retryableFailure = updates.some((result) => !result || (result.error && result.error.statusCode !== 404));

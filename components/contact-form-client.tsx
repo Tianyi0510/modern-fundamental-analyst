@@ -44,10 +44,10 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
       <p className={styles.headingIntro}>{copy.intro}</p>
     </div>
     <form className={styles.form} onSubmit={submit} onChange={() => resetSubmissionId()} aria-busy={status === "sending"}>
-      <label className={styles.field}><span className={styles.fieldLabel}>{copy.name}</span><input className={styles.control} name="name" type="text" autoComplete="name" maxLength={100} required /></label>
-      <label className={styles.field}><span className={styles.fieldLabel}>{copy.email}</span><input className={styles.control} name="email" type="email" autoComplete="email" maxLength={254} required /></label>
-      <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{copy.subject}</span><input className={styles.control} name="subject" type="text" maxLength={160} required /></label>
-      <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{copy.message}</span><textarea className={styles.control} name="message" rows={7} minLength={10} maxLength={5000} required /></label>
+      <label className={styles.field}><span className={styles.fieldLabel}>{copy.name}</span><input disabled={status === "sending"} className={styles.control} name="name" type="text" autoComplete="name" maxLength={100} required /></label>
+      <label className={styles.field}><span className={styles.fieldLabel}>{copy.email}</span><input disabled={status === "sending"} className={styles.control} name="email" type="email" autoComplete="email" maxLength={254} required /></label>
+      <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{copy.subject}</span><input disabled={status === "sending"} className={styles.control} name="subject" type="text" maxLength={160} required /></label>
+      <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{copy.message}</span><textarea disabled={status === "sending"} className={styles.control} name="message" rows={7} minLength={10} maxLength={5000} required /></label>
       <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
       <div className={styles.actions}>
         <button className={`${styles.submit} button button-dark`} type="submit" disabled={status === "sending"}>{status === "sending" ? copy.sending : copy.send}</button>
