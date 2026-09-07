@@ -1,5 +1,5 @@
 import { createHmac, randomUUID } from "node:crypto";
-import { getRedisClient } from "@/lib/redis";
+import { executeRedisCommand, getRedisClient } from "@/lib/redis";
 import { resendOperationContext } from "@/lib/resend";
 
 export class ResendCoordinationError extends Error {
@@ -24,13 +24,13 @@ export async function withSubscriberLock<T>(email: string, operation: () => Prom
   const key = privateKey("subscriber", email.trim().toLowerCase());
   const owner = randomUUID();
   // Fail fast on contention: never run an uncoordinated mutation as fallback.
-  if (!await redis.set(key, owner, { NX: true, PX: 120_000 })) throw new ResendCoordinationError();
+  if (!await executeRedisCommand(redis, () => redis.set(key, owner, { NX: true, PX: 120_000 }))) throw new ResendCoordinationError();
   const context = { signal: AbortSignal.timeout(20_000), uncertain: false };
   try {
     return await resendOperationContext.run(context, operation);
   } finally {
     if (!context.uncertain && !context.signal.aborted) {
-      await redis.eval(releaseScript, { keys: [key], arguments: [owner] }).catch(() => {
+      await executeRedisCommand(redis, () => redis.eval(releaseScript, { keys: [key], arguments: [owner] })).catch(() => {
         console.error("Resend subscriber lease release failed");
       });
     }
@@ -44,13 +44,13 @@ export async function getStablePreferenceEmail<T>(requestId: string, identity: s
   if (!redis) throw new ResendCoordinationError();
   const key = privateKey("preference-request", requestId);
   const fingerprint = privateKey("preference-input", identity);
-  let stored = await redis.get(key);
+  let stored = await executeRedisCommand(redis, () => redis.get(key));
   if (!stored) {
     const candidate = JSON.stringify({ fingerprint, createdAt: Date.now(), payload: create() });
     // Cover Resend's 24-hour deduplication window even if the initial send
     // happens shortly after this record is created.
-    const inserted = await redis.set(key, candidate, { NX: true, EX: 90_000 });
-    stored = inserted ? candidate : await redis.get(key);
+    const inserted = await executeRedisCommand(redis, () => redis.set(key, candidate, { NX: true, EX: 90_000 }));
+    stored = inserted ? candidate : await executeRedisCommand(redis, () => redis.get(key));
   }
   if (!stored) throw new ResendCoordinationError();
   const record = JSON.parse(stored) as { fingerprint: string; createdAt: number; payload: T };

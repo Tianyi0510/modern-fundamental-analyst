@@ -1,7 +1,7 @@
 import { createClient } from "@redis/client";
 
 type RedisClient = ReturnType<typeof createClient>;
-type RedisErrorCategory = "Invalid UPSTASH_REDIS_URL" | "Redis client error" | "Redis rate limiter unavailable";
+type RedisErrorCategory = "Invalid UPSTASH_REDIS_URL" | "Redis client error" | "Redis rate limiter unavailable" | "Redis command unavailable";
 type RedisState = {
   client: RedisClient | null;
   connection: Promise<RedisClient> | null;
@@ -10,7 +10,8 @@ type RedisState = {
 };
 
 const CONNECT_TIMEOUT_MS = 2_000;
-const SOCKET_TIMEOUT_MS = 5_000;
+const READY_TIMEOUT_MS = 10_000;
+const COMMAND_TIMEOUT_MS = 5_000;
 const MAX_RECONNECT_ATTEMPTS = 2;
 const CONNECTION_COOLDOWN_MS = 30_000;
 const ERROR_LOG_INTERVAL_MS = 60_000;
@@ -38,16 +39,40 @@ export function logRedisError(message: RedisErrorCategory, error: unknown) {
 }
 
 function suspendRedis(client = state.client) {
-  state.unavailableUntil = Date.now() + CONNECTION_COOLDOWN_MS;
   if (!client || state.client !== client) return;
+  state.unavailableUntil = Date.now() + CONNECTION_COOLDOWN_MS;
 
   state.client = null;
+  state.connection = null;
   if (client.isOpen) client.destroy();
-  client.removeAllListeners();
+  // Keep the error listener until the discarded socket is collected: a late
+  // error event must not become an unhandled EventEmitter error.
 }
 
-export function markRedisUnavailable() {
-  suspendRedis();
+export function markRedisUnavailable(client = state.client) {
+  suspendRedis(client);
+}
+
+export async function executeRedisCommand<T>(client: RedisClient, operation: () => Promise<T>): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    suspendRedis(client);
+    logRedisError("Redis command unavailable", error);
+    throw error;
+  }
+}
+
+function connectUntilReady(client: RedisClient) {
+  // node-redis's socket connect timeout does not cover AUTH/HELLO replies.
+  // Destroying the client on expiry also terminates queued handshake work.
+  return new Promise<RedisClient>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      suspendRedis(client);
+      reject(new Error("Redis readiness timeout"));
+    }, READY_TIMEOUT_MS);
+    client.connect().then(resolve, reject).finally(() => clearTimeout(timer));
+  });
 }
 
 function getRedisUrl() {
@@ -75,9 +100,9 @@ export async function getRedisClient() {
       url,
       disableOfflineQueue: true,
       commandsQueueMaxLength: MAX_COMMAND_QUEUE_LENGTH,
+      commandOptions: { timeout: COMMAND_TIMEOUT_MS },
       socket: {
         connectTimeout: CONNECT_TIMEOUT_MS,
-        socketTimeout: SOCKET_TIMEOUT_MS,
         reconnectStrategy,
       },
     });
@@ -86,12 +111,16 @@ export async function getRedisClient() {
 
   if (state.client.isReady) return state.client;
   if (state.connection) return state.connection;
-  if (state.client.isOpen) return null;
+  if (state.client.isOpen) {
+    suspendRedis(state.client);
+    return null;
+  }
 
   if (!state.connection) {
     const pendingClient = state.client;
-    state.connection = pendingClient.connect()
+    const pendingConnection = connectUntilReady(pendingClient)
       .then(() => {
+        if (state.client !== pendingClient) throw new Error("Redis connection was superseded");
         state.unavailableUntil = 0;
         return pendingClient;
       })
@@ -100,8 +129,9 @@ export async function getRedisClient() {
         throw error;
       })
       .finally(() => {
-        state.connection = null;
+        if (state.connection === pendingConnection) state.connection = null;
       });
+    state.connection = pendingConnection;
   }
 
   return state.connection;

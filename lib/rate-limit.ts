@@ -1,5 +1,5 @@
 import { createHmac, randomBytes } from "node:crypto";
-import { getRedisClient, logRedisError, markRedisUnavailable } from "@/lib/redis";
+import { executeRedisCommand, getRedisClient, logRedisError } from "@/lib/redis";
 
 type RateLimiterOptions = {
   windowMs: number;
@@ -88,14 +88,13 @@ export function createRateLimiter(options: RedisRateLimiterOptions) {
       const redis = await getRedisClient();
       if (!redis) return memoryFallback(identifier);
 
-      const count = await redis.eval(rateLimitScript, {
+      const count = await executeRedisCommand(redis, () => redis.eval(rateLimitScript, {
         keys: [`${RATE_LIMIT_KEY_PREFIX}:${namespace}:${identifier}`],
         arguments: [String(windowMs)],
-      });
+      }));
       if (typeof count !== "number") throw new TypeError("Unexpected Redis rate-limit response");
       return count > maxRequests;
     } catch (error) {
-      markRedisUnavailable();
       logRedisError("Redis rate limiter unavailable", error);
       return memoryFallback(identifier);
     }
