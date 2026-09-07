@@ -118,16 +118,12 @@ body { background: var(--surface-primary); color: var(--text-primary); }
 .home-page .cta {
   background: var(--surface-highlight);
   color: var(--text-primary);
-  box-shadow: 0 0 0 100vmax var(--surface-highlight);
-  clip-path: inset(0 -100vmax);
 }
 .home-page .cta .button-dark { background: var(--black); color: var(--white); }
 .home-page .cta .button-dark:hover, .home-page .cta .button-dark:focus-visible { background: var(--deep-blue); color: var(--white); }
 .site-footer {
   background: var(--surface-inverse);
   color: var(--text-inverse);
-  box-shadow: 0 0 0 100vmax var(--surface-inverse);
-  clip-path: inset(0 -100vmax);
 }
 .site-footer p { color: var(--text-inverse-secondary); }
 .site-footer a { transition: color var(--motion-duration-base) var(--motion-ease-standard); }

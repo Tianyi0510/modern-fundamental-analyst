@@ -1,4 +1,6 @@
 .section {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
   gap: 72px;
@@ -7,8 +9,15 @@
   padding-bottom: var(--space-section);
   background: var(--bright-blue);
   color: var(--black);
-  box-shadow: 0 0 0 100vmax var(--bright-blue);
-  clip-path: inset(0 -100vmax);
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(50% - 50vw);
+  background: inherit;
+  pointer-events: none;
 }
 
 .heading {

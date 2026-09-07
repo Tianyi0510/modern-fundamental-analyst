@@ -51,8 +51,6 @@
 .page-hero,
 .memo-article-header {
   background: var(--background-gray);
-  box-shadow: 0 0 0 100vmax var(--background-gray);
-  clip-path: inset(0 -100vmax);
 }
 .eyebrow { margin: 0; display: flex; align-items: center; gap: 10px; }
 .eyebrow span { width: 9px; height: 9px; background: var(--medium-blue); border-radius: 50%; }
@@ -149,7 +147,7 @@
 .performance-copy small { color: rgba(255,255,255,.6); }
 .button-white { margin-top: 48px; background: var(--white); color: var(--black); }
 .button-white:hover, .button-white:focus-visible { background: var(--bright-blue); }
-.memos-home { padding: var(--space-section) 0; background: var(--background-gray); box-shadow: 0 0 0 100vmax var(--background-gray); clip-path: inset(0 -100vmax); }
+.memos-home { padding: var(--space-section) 0; background: var(--background-gray); }
 .memo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: var(--space-heading-content); background: var(--black); border: 1px solid var(--black); }
 .memo-card { min-height: 510px; padding: 30px; display: flex; flex-direction: column; background: var(--white); transform-origin: center; transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard); }
 .memo-card:hover, .memo-card:focus-visible { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(var(--motion-scale-press)); }

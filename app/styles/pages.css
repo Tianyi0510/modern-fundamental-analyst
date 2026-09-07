@@ -6,7 +6,7 @@
 .page-intro p { max-width: 630px; margin: 0; }
 .page-intro small { color: var(--text-secondary); }
 .body-section { padding: var(--space-section) 0; border-bottom: 1px solid var(--gray); }
-.section-gray { background: var(--background-gray); box-shadow: 0 0 0 100vmax var(--background-gray); clip-path: inset(0 -100vmax); }
+.section-gray { background: var(--background-gray); }
 .two-column { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; }
 .two-column h2, .methodology h2 { margin: 0; }
 .rich-copy p:first-child { margin-top: 0; }

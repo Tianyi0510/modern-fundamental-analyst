@@ -16,7 +16,7 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Canonical URLs, language alternates, sitemap, robots metadata, Open Graph, and Twitter cards
 - Vercel Analytics and Speed Insights
 - Shared footer navigation with GitHub, LinkedIn, and X profile links
-- Responsive navigation with an in-flow header and a pinned brand while the menu is open, mobile-specific portfolio presentation, accessible focus states, touch-specific active feedback, and reduced-motion support
+- Responsive navigation, mobile-specific portfolio presentation, accessible focus states, touch feedback, and reduced-motion support
 
 ## Technology
 
@@ -26,12 +26,11 @@ Production: [modernfundamentalanalyst.com](https://www.modernfundamentalanalyst.
 - Native CSS and CSS Modules
 - `next/font` with Jost Variable, Noto Sans TC, and Noto Sans SC
 - Resend for contact and subscriber email
-- Stripe Checkout, Managed Payments, and Automatic Tax for one-time research support
-- Redis for shared server-side rate-limit state, with a privacy-preserving in-memory fallback
+- Stripe Hosted Checkout and Automatic Tax for one-time research support
+- Redis over TLS for shared server-side rate-limit state, with a privacy-preserving in-memory fallback
 - Playwright for browser-level computed-style verification
 - GitHub Actions for continuous integration
 - Vercel for builds, server functions, analytics, and production hosting
-- Wix for domain registration and DNS management
 
 ## Application Structure
 
@@ -65,14 +64,10 @@ The interface follows a modern financial-editorial direction: strong typography,
 ### Navigation and Interaction
 
 - Navigation collapses at 1150px to prevent the single-line brand and desktop links from overlapping; the main mobile content breakpoint remains 800px.
-- The compact header is a 70px, full-width surface in normal document flow. Opening the menu locks the underlying document while keeping the menu's brand and close control pinned at the top. Header and Footer logos remain static.
-- The menu background reveals from left to right, with staggered navigation entries, keyboard focus management, Escape dismissal, and a deliberate right-swipe close gesture. Opening and closing update immediately, without a delayed post-click press animation or animation timers; repeated input cannot queue overlapping toggles.
-- Header navigation, language controls, and Contact use a uniform `1.04` scale for hover, focus, and press without text translation or hover shadows. Menu circles retain their directional rotation with the same scale for pointer and keyboard interaction. Entry movement uses a separate `translate` transition so it cannot override a row's interaction scale. Touch idle-hover resets preserve active and focus feedback; logos remain static. This Header-specific behavior does not change the `0.98` press scale used elsewhere.
-- Standard CTA buttons use color changes and a `1.04` hover/focus scale, without upward lift or hover shadows. Press feedback uses the shared `--motion-scale-press: .98` token.
-- Non-button text CTAs keep their text stationary in every state: only the arrow moves right (4px on hover/focus, 5px while pressed), alongside the existing Deep Blue color feedback. They do not inherit whole-control scaling; touch idle hover resets without suppressing keyboard focus.
-- Interactive Memo cards and article rows share a `0.98` scale for hover, focus, and press. Touch devices use the same press/focus scale without sticky idle hover; noninteractive placeholder cards remain static.
-- The memo disclosure preserves its background/color feedback, desktop text movement, and arrow rotation without enlarging the whole row on hover. Its press scale is `0.98`.
-- Inline links retain role-specific feedback rather than inheriting button animations. Touch-only idle-hover resets do not suppress active or keyboard-focus states, and reduced-motion preferences are respected.
+- The mobile header remains in document flow. Opening the full-screen menu locks background scrolling, keeps the menu header visible, traps keyboard focus, supports Escape dismissal, and restores the previous scroll position when closed.
+- Header controls and standard buttons use shared color and scale feedback without lift or shadows. Press feedback is controlled by the global motion tokens.
+- Non-button text CTAs keep their text stationary and move only the arrow. Memo cards retain their card-level feedback, while noninteractive placeholders remain static.
+- Pointer, keyboard, and touch states are defined separately to avoid sticky hover behavior. Reduced-motion preferences disable nonessential transitions.
 
 ### Vertical Spacing
 
@@ -112,7 +107,7 @@ The semantic aliases live in `app/styles/colors.css`; the base values and type s
 - Financial data keeps `line-height: 1`; all heading and data roles retain `letter-spacing: -.05em`
 - Body, caption, and control text use `line-height: 1.5` with zero letter spacing; labels retain `.05em` tracking
 - Component controls use `em` for internal horizontal spacing where that spacing should scale with the control text
-- Footer subscription status uses the Caption role (`0.9375rem`, 15px at the default root size) at weight 700, including on Disclaimer; preference inputs and selects use regular weight 400 rather than inheriting bold field labels
+- Footer subscription status uses the Caption role; preference inputs and selects use regular weight rather than inheriting bold field labels
 
 The role scale covers page, section, card, and compact titles; lead and body copy; labels, controls, and captions; plus display, KPI, ring, and row data. `typography.css` maps shared content roles, while `component-typography.css` handles component-specific mappings. `responsive.css` changes layout and interaction behavior only—it contains no `font-size` declarations.
 
@@ -139,7 +134,7 @@ Investment memo metadata is maintained in `data/memos.ts`. `data/memo-content.ts
 
 Resend handles contact delivery, subscribers, segments, templates, automations, and broadcasts. The subscribe API validates the HTTP boundary and delegates provider orchestration to `lib/subscription-service.ts`. New subscriptions store a preferred-language property, synchronize the corresponding language segment, and trigger a localized welcome event containing the latest memo.
 
-One Resend client is reused per runtime instance and recreated automatically if its API key changes. Provider calls pass through a shared exception boundary so transient network failures return controlled API responses without exposing contact data. Direct contact and preference-link emails use request-scoped Resend idempotency keys, allowing a browser to retry the same unchanged submission without creating a duplicate email. Preferred-language segment removals run concurrently and use best-effort compensation: if a multi-step update fails, successfully removed language segments are restored and a newly added target segment is removed.
+One Resend client is reused per runtime instance. Provider calls pass through a shared exception boundary so transient failures return controlled API responses without exposing contact data. Direct contact and preference-link emails use request-scoped idempotency keys. Preferred-language segment updates use best-effort rollback when a multi-step provider operation fails.
 
 The signed Resend webhook at `/api/webhooks/resend` processes bounce, complaint, and suppression events. It verifies the untouched request body and Svix signature before marking matching contacts as unsubscribed; invalid signatures and oversized payloads are rejected before any contact update.
 
@@ -149,7 +144,7 @@ Subscribers can request a short-lived secure link to update their preferred lang
 
 The localized `/support` pages offer voluntary one-time support at USD 6, 12, or 18. A same-origin, rate-limited server endpoint validates the selected amount and locale before creating a Stripe Hosted Checkout Session; Stripe credentials and Price IDs never reach the browser. Dynamic Payment Methods remain Dashboard-controlled because the integration intentionally omits `payment_method_types`.
 
-Live Checkout enables Automatic Tax and uses the account's Managed Payments default. Active Live Tax Registrations were confirmed before Automatic Tax was enabled. Checkout collects the customer location needed to calculate applicable tax. Stripe's Business custom domain serves Checkout at `pay.modernfundamentalanalyst.com/c/...`, Payment Links at `/b/...`, and the Customer Portal at `/p/...`. The site's Content Security Policy permits form navigation to the same origin, the custom payment domain, and `https://checkout.stripe.com` as a fallback. No payment webhook is required while support does not unlock content or trigger fulfillment; add a signature-verified webhook before introducing supporter benefits or entitlement state.
+Checkout enables Automatic Tax and collects the location data needed for tax calculation. Stripe's Business custom domain serves Checkout at `pay.modernfundamentalanalyst.com/c/...`, Payment Links at `/b/...`, and the Customer Portal at `/p/...`. The site's Content Security Policy permits navigation to the custom payment domain and Stripe Checkout fallback. No payment webhook is required while support does not unlock content or trigger fulfillment; add a signature-verified webhook before introducing benefits or entitlement state.
 
 ## Redis Rate Limiting
 
@@ -166,8 +161,7 @@ Redis supplies shared rate-limit state across Vercel Functions. The implementati
 - Client identifiers always use HMAC-SHA256 with one runtime-cached secret; raw IP addresses are never stored in Redis or the memory fallback. If no configured secret is available locally, the runtime generates an ephemeral HMAC key instead of using a predictable unkeyed hash.
 - Redis failures fall back to a bounded process-local limiter so public forms remain available.
 - Repeated connection errors are log-throttled by error category to keep Vercel logs useful during an outage without hiding unrelated failures.
-- Upstash Free is connected through Vercel Marketplace and exposes the native TCP endpoint as `UPSTASH_REDIS_URL` only to Production.
-- The Redis client accepts only authenticated `rediss://` connections, so credentials and rate-limit traffic are protected by TLS.
+- The Redis client reads `UPSTASH_REDIS_URL` and accepts only authenticated `rediss://` connections, so credentials and rate-limit traffic are protected by TLS.
 - Redis authentication is mandatory. Only HMAC-derived client identifiers, counters, and short TTLs are transmitted; raw IP addresses and form contents never enter Redis.
 
 Required server-side environment variables:
@@ -185,9 +179,9 @@ STRIPE_PRICE_USD_12=
 STRIPE_PRICE_USD_18=
 ```
 
-Production is the only Vercel environment with Resend, contact-delivery, subscription-preference, shared rate-limit, and live Stripe credentials. Preview intentionally has no server-side service credentials, so branch and pull-request deployments can review the interface without sending email, changing the production audience, accessing production Redis, or creating live Checkout Sessions. Development uses uncommitted local `.env.local` values when service integration testing is explicitly needed.
+Production requires the live service credentials listed above. Preview environments should omit them unless isolated preview resources are configured. Development uses uncommitted `.env.local` values when integration testing is needed.
 
-`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CONTACT_TO_EMAIL`, `SUBSCRIPTION_PREFERENCES_SECRET`, `RATE_LIMIT_HASH_SECRET`, the Stripe server key, and the three live Stripe Price IDs are Production variables. Prefer a least-privilege `STRIPE_RESTRICTED_KEY`; `STRIPE_SECRET_KEY` is accepted only as a compatibility fallback. `UPSTASH_REDIS_URL` is an integration-managed Production variable created by the Vercel Marketplace connection. The rate-limit secret can fall back to the preference secret and then the Resend key for local compatibility, but separate production secrets provide stronger key separation.
+Prefer a least-privilege `STRIPE_RESTRICTED_KEY`; `STRIPE_SECRET_KEY` is accepted as a compatibility fallback. Use separate values for `RATE_LIMIT_HASH_SECRET` and `SUBSCRIPTION_PREFERENCES_SECRET` in production to preserve key separation.
 
 The three optional `RESEND_SEGMENT_*` variables can override the checked-in language-segment defaults when Resend segments are recreated.
 
@@ -197,14 +191,14 @@ Never commit production credentials. Configure them in Vercel and use `.env.loca
 
 Requirements:
 
-- Node.js 24.19.0 (latest Node.js 24 LTS patch; `24.x` is used in production)
+- Node.js 24 (`24.x`, matching `package.json` and CI)
 - npm
 
 Install dependencies and start the development server:
 
 ```bash
 npm ci
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run dev
 ```
 
@@ -226,11 +220,11 @@ This command runs:
 4. Playwright computed-style tests
 5. A production Next.js build
 
-The computed-style suite opens the principal routes in Chromium at 1440px, 801px, and 390px. It verifies sampled semantic role sizes, horizontal overflow, CTA focus scale without lift or shadows, balanced Footer and hero padding, and the subscription status role on both Preferences and Disclaimer. Mobile interaction tests use an iPhone user agent, touch input, a 3x device scale, and a 390×844 viewport. They verify that the normal header scrolls with the document, the open menu's brand remains pinned, focus is trapped, scroll position is restored, and repeated taps or Escape during opening do not strand the interface. Additional checks cover navigation overlap and cleanup across the 1150px breakpoint.
+The computed-style suite opens representative routes in Chromium at 1440px, 801px, and 390px. It verifies semantic typography, horizontal overflow, CTA states, shared hero and Footer spacing, and mobile navigation behavior. The same suite runs in WebKit in CI for additional Safari-engine coverage.
 
-For additional Safari-engine coverage, install WebKit and run the existing browser suite with `npx playwright test --browser=webkit`. Browser emulation complements, but does not replace, testing on an actual iPhone.
+Browser emulation complements, but does not replace, testing on an actual iPhone.
 
-GitHub Actions installs Chromium and runs the same verification for every pull request and every push to `main`. It also audits production dependencies for high-severity vulnerabilities.
+GitHub Actions installs Chromium and WebKit for every pull request and every push to `main`. It runs the verification pipeline, repeats the computed-style suite in WebKit, and audits production dependencies for high-severity vulnerabilities.
 
 Individual commands are available as `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
 
@@ -242,10 +236,10 @@ The production delivery path is:
 
 ```text
 Local repository → GitHub main → GitHub Actions verification
-                              → Vercel Production → Wix-managed DNS
+                              → Vercel Production
 ```
 
-Pushes to `main` trigger both the GitHub Actions verification workflow and a Vercel Production deployment through the Git integration. Vercel installs dependencies with `npm ci`, builds the same commit, and assigns the production aliases after a successful deployment. Pull requests and non-production branches receive Preview deployments without production service credentials. The public domain remains managed through Wix DNS, while application hosting and server functions run on Vercel.
+Pushes to `main` trigger both the GitHub Actions verification workflow and a Vercel Production deployment through the Git integration. Vercel installs dependencies with `npm ci`, builds the same commit, and assigns the production aliases after a successful deployment. Pull requests and non-production branches receive Preview deployments; production credentials should remain scoped to Production unless isolated preview resources are configured.
 
 ## Content Updates
 

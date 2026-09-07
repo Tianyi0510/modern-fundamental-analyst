@@ -137,3 +137,30 @@ button,
   touch-action: manipulation;
 }
 .shell { width: min(1440px, calc(100% - (var(--space-page-gutter) * 2))); margin-inline: auto; }
+
+/* Extend shell-bound surfaces to the viewport without oversized paint shadows. */
+.hero,
+.page-hero,
+.memo-article-header,
+.section-gray,
+.memos-home,
+.home-page .cta,
+.site-footer {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero::before,
+.page-hero::before,
+.memo-article-header::before,
+.section-gray::before,
+.memos-home::before,
+.home-page .cta::before,
+.site-footer::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(50% - 50vw);
+  background: inherit;
+  pointer-events: none;
+}

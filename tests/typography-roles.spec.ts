@@ -81,6 +81,15 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     label: [".eyebrow"],
     control: ["form .button"],
   },
+  "/support": {
+    pageTitle: [".page-hero h1"],
+    sectionTitle: [".support-section h2"],
+    lead: [".page-intro p"],
+    bodyLarge: [".support-copy p", ".support-note"],
+    label: [".eyebrow", ".support-form legend", ".support-amount-option > span"],
+    control: [".support-submit"],
+    dataKpi: [".support-amount-option strong"],
+  },
   "/disclaimer": {
     pageTitle: [".legal h1"],
     sectionTitle: [".legal-section h2"],
@@ -92,6 +101,14 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     pageTitle: ["main h1"],
     lead: [".page-intro p"],
     label: [".eyebrow"],
+  },
+  "/memos/microsoft-stock-analysis-fiscal-year-2024": {
+    pageTitle: [".memo-article h1"],
+    cardTitle: [".memo-subsection h3", ".article-body h2"],
+    lead: [".article-lead"],
+    bodyLarge: [".article-body", ".reference-note"],
+    label: [".memo-article .eyebrow"],
+    caption: [".article-meta"],
   },
 };
 
