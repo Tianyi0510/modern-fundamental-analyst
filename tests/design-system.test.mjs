@@ -228,8 +228,8 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.doesNotMatch(css, /@media \(max-width:\s*800px\)[\s\S]*?body\s*\{[^}]*padding-top:/s);
   assert.doesNotMatch(css, /\.site-header nav a::after/);
   assert.match(css, /\.site-header nav a:hover, \.site-header nav a:focus-visible \{[^}]*background:[^}]*transform: scale\(var\(--motion-scale-hover\)\)/s);
-  assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(var\(--motion-scale-hover\)\)/s);
-  assert.match(css, /\.language-dropdown a:hover, \.language-dropdown a:focus-visible \{[^}]*transform: scale\(var\(--motion-scale-hover\)\)/s);
+  assert.match(css, /\.site-header nav a:active \{[^}]*background: var\(--bright-blue\);[^}]*transform: scale\(var\(--motion-scale-press\)\)/s);
+  assert.match(css, /\.language-dropdown a:focus-visible \{[^}]*outline-offset: calc\(var\(--focus-ring-width\) \* -2\)/s);
   assert.doesNotMatch(header, /mobile-menu-index/);
   assert.match(header, /mobile-menu-label/);
   assert.doesNotMatch(behavior, /controlMotion|runControlMotion|setTimeout/);

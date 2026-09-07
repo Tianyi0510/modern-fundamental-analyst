@@ -1,5 +1,48 @@
 import { expect, test } from "@playwright/test";
 
+test("narrow navigation keeps its close control and brand inside the drawer", async ({ page }) => {
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto("/zh-tw");
+    await page.locator(".mobile-menu-button").click();
+    const drawer = page.locator(".mobile-menu-drawer");
+    await expect(page.locator(".mobile-menu-close")).toBeFocused();
+    for (const fontSize of [16, 32]) {
+      await page.evaluate((size) => { document.documentElement.style.fontSize = `${size}px`; }, fontSize);
+      const geometry = await drawer.evaluate((element) => {
+        const brand = element.querySelector(".wordmark")!.getBoundingClientRect();
+        const close = element.querySelector(".mobile-menu-close")!.getBoundingClientRect();
+        return { overflow: element.scrollWidth - element.clientWidth, brandRight: brand.right, closeLeft: close.left, closeRight: close.right };
+      });
+      expect(geometry.overflow).toBeLessThanOrEqual(1);
+      expect(geometry.brandRight).toBeLessThanOrEqual(geometry.closeLeft);
+      expect(geometry.closeRight).toBeLessThanOrEqual(width - 8);
+    }
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".mobile-menu-button")).toBeFocused();
+  }
+});
+
+test("allocation chart and legend fit the card around responsive boundaries", async ({ page }) => {
+  for (const width of [390, 801, 1100, 1101, 1151, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/zh-tw");
+    const geometry = await page.locator(".allocation-card").evaluate((card) => {
+      const visual = card.querySelector(".allocation-visual")!;
+      const bounds = card.getBoundingClientRect();
+      return {
+        overflow: visual.scrollWidth - visual.clientWidth,
+        contained: [...card.querySelectorAll(".allocation-ring, .allocation-legend")].every((child) => {
+          const rect = child.getBoundingClientRect();
+          return rect.left >= bounds.left && rect.right <= bounds.right;
+        }),
+      };
+    });
+    expect(geometry.overflow, `chart at ${width}px`).toBeLessThanOrEqual(1);
+    expect(geometry.contained, `card at ${width}px`).toBe(true);
+  }
+});
+
 test.describe("header interaction QA", () => {
   test.use({ viewport: { width: 1440, height: 1000 } });
 
@@ -18,7 +61,7 @@ test.describe("header interaction QA", () => {
     await about.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault(), { once: true }));
     await page.mouse.down();
     try {
-      await expect(about).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+      await expect(about).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
     } finally {
       await page.mouse.up();
     }
@@ -151,7 +194,7 @@ test.describe("header interaction QA", () => {
               rects: [previousParagraph, heading, finalParagraph, references].map((node) => node.getBoundingClientRect().toJSON()),
             };
           });
-          expect(gaps.above).toBeCloseTo(width <= 800 ? 47 : 56, 1);
+          expect(gaps.above).toBeCloseTo(width <= 800 ? 49 : 58, 1);
           expect(gaps.below).toBeCloseTo(width <= 800 ? 50 : 60, 1);
           expect(gaps.innerTop).toBe(gaps.innerBottom);
           // Line boxes alone hide Jost's optical imbalance. Scan the rendered
@@ -230,7 +273,7 @@ test.describe("mobile content and navigation QA", () => {
     const header = page.locator(".site-header").first();
     await expect(header).toHaveCSS("position", "relative");
     await expect(header).toHaveCSS("height", "70px");
-    await expect(header.locator(":scope > .wordmark")).toHaveCSS("white-space", "nowrap");
+    await expect(header.locator(":scope > .wordmark")).toHaveCSS("white-space", "normal");
     const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
     expect(wordmarkBox).not.toBeNull();
     expect(wordmarkBox!.height).toBeLessThanOrEqual(25);
@@ -333,7 +376,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect.poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").transform)).toBe("matrix(1, 0, 0, 1, 0, 0)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
-    await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("white-space", "nowrap");
+    await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("white-space", "normal");
     await page.setViewportSize({ width: 390, height: 620 });
     await drawer.evaluate((element) => element.scrollTo({ top: 160, behavior: "instant" }));
     const topAfterScroll = await menuTop.boundingBox();
@@ -466,7 +509,7 @@ test.describe("mobile content and navigation QA", () => {
       await expect.poll(() => menuButton.evaluate((element) => {
         const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
         return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
-      })).toBe(104);
+      })).toBe(98);
     } finally {
       await page.mouse.up();
     }

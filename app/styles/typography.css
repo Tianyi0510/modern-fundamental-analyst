@@ -44,7 +44,6 @@
 }
 
 .about-philosophy-copy h3,
-.memo-subsection h3,
 .article-body h2,
 .article-body blockquote {
   font-size: var(--font-size-card-title);
@@ -220,3 +219,12 @@
   font-variant-numeric: tabular-nums;
 }
 .portfolio-total-row .portfolio-total-return { font-weight: var(--weight-bold); }
+
+/* Article subsections remain visibly subordinate to section headings. */
+.memo-subsection h3 {
+  font-size: var(--font-size-compact-title);
+  line-height: var(--leading-compact-title);
+  letter-spacing: var(--tracking-heading);
+  font-weight: var(--weight-bold);
+  text-wrap: balance;
+}

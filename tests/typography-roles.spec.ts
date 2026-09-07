@@ -104,7 +104,8 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/memos/microsoft-stock-analysis-fiscal-year-2024": {
     pageTitle: [".memo-article h1"],
-    cardTitle: [".memo-subsection h3", ".article-body h2"],
+    cardTitle: [".article-body h2"],
+    compactTitle: [".memo-subsection h3"],
     lead: [".article-lead"],
     bodyLarge: [".article-body", ".reference-note"],
     label: [".memo-article .eyebrow"],
