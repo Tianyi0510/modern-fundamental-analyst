@@ -230,7 +230,13 @@ test.describe("header interaction QA", () => {
             };
           }, { data: `data:image/png;base64,${screenshot.toString("base64")}`, rects: gaps.rects });
           expect(Number.isFinite(visibleGaps.above) && Number.isFinite(visibleGaps.below)).toBe(true);
-          expect(Math.abs(visibleGaps.above - visibleGaps.below)).toBeLessThanOrEqual(1);
+          // Ink edges can round differently across macOS/Linux and browser
+          // rasterizers. Keep exact line-box assertions above, allowing only
+          // two pixels of variation in this thresholded screenshot scan.
+          expect(
+            Math.abs(visibleGaps.above - visibleGaps.below),
+            `Optical gaps at ${width}px: ${JSON.stringify(visibleGaps)}`,
+          ).toBeLessThanOrEqual(2);
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
