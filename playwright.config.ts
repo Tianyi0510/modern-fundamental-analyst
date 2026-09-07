@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
+const useProductionBuild = process.env.PLAYWRIGHT_USE_PRODUCTION_BUILD === "1";
+
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: false,
@@ -11,7 +13,9 @@ export default defineConfig({
     browserName: "chromium",
   },
   webServer: {
-    command: "npm run dev -- --hostname 127.0.0.1 --port 3210",
+    command: useProductionBuild
+      ? "npm run start -- --hostname 127.0.0.1 --port 3210"
+      : "npm run dev -- --hostname 127.0.0.1 --port 3210",
     url: "http://127.0.0.1:3210",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
