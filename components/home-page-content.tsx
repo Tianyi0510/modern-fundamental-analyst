@@ -46,17 +46,17 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           </div>
         </section>
         <section className="metric-band" aria-label={text.portfolioSnapshot}>
-          <div className="metric metric-featured">
+          <div className="metric metric-featured" data-tone="highlight">
             <span>{text.totalReturn}</span>
             <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
             <small>{text.cumulativeReturn}</small>
           </div>
-          <div className="metric">
+          <div className="metric" data-tone="brand">
             <span>{text.marketValue}</span>
             <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
             <small>{portfolioSnapshot.holdingsCount} {text.holdingsUnit}</small>
           </div>
-          <div className="metric metric-accent">
+          <div className="metric metric-accent" data-tone="paper">
             <span>{text.portfolioXirr}</span>
             <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
             <small className="date-text">{text.asOf} {compactPortfolioDate} · {text.updatedMonthly}</small>

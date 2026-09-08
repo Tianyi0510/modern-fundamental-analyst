@@ -290,6 +290,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root { --motion-scale-hover: 1; --motion-scale-press: 1; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: var(--focus-ring-width) solid Highlight !important;
+    outline-offset: var(--focus-ring-offset);
+  }
 }

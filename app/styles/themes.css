@@ -1,0 +1,141 @@
+/* Component surface treatments and interaction overrides. Loaded after tokens. */
+body { background: var(--surface-primary); color: var(--text-primary); }
+.wordmark span,
+.eyebrow span,
+.memo-count { background-color: transparent; color: var(--interactive-accent); }
+.eyebrow span { background: var(--interactive-accent); }
+.page-hero h1 em,
+.hero h1 em,
+.home-about h2,
+.intro h2,
+.about-section-heading h2,
+.portfolio-holdings-heading h2,
+.returns h2,
+.methodology h2 { color: var(--text-brand); }
+.legal h1 { color: var(--text-primary); }
+.legal h1 em { color: var(--text-brand); }
+
+/* White / Black and White / Deep Blue */
+.metric,
+.memo-card,
+.performance-summary > div { background: var(--surface-primary); color: var(--text-primary); }
+.metric[data-tone="brand"],
+.performance-summary > div[data-tone="brand"] { color: var(--text-brand); }
+
+/* Black / white */
+.metric-featured,
+.performance-summary > div[data-tone="highlight"],
+.about-boundaries > article:first-child,
+.contact-grid > article:first-child {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+}
+.about-boundaries > article:first-child li { border-top-color: rgba(255,255,255,.28); }
+.about-boundaries > article:first-child .about-boundary-number { color: var(--text-highlight); }
+.contact-grid > article:first-child p { color: var(--text-inverse); }
+
+/* Bright Blue / Black and Bright Blue / Deep Blue */
+.metric-accent,
+.allocation-card { background: var(--surface-highlight); color: var(--text-primary); }
+.performance-summary > div[data-tone="paper"],
+.about-boundaries > article:last-child {
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+}
+.about-boundaries > article { border-top-color: var(--deep-blue); }
+.about-boundaries li { border-top: 0; }
+.contact-grid > article:nth-child(2) { background: var(--surface-primary); color: var(--text-primary); }
+.principles article:nth-child(2) { background: var(--surface-highlight); color: var(--text-brand); }
+
+/* Home performance uses the primary white / black editorial treatment. */
+.performance-home { background: var(--surface-primary); color: var(--text-primary); }
+.performance-home .performance-copy p,
+.performance-home .performance-copy small,
+.performance-home .year-bar small { color: color-mix(in srgb, var(--text-primary) 68%, transparent); }
+.performance-home .performance-bars { border-color: rgba(0,0,0,.28); }
+.performance-home .inverse .section-number { color: var(--text-secondary); }
+.home-page .hero .button-dark, .performance-home .button-white { background: var(--black); color: var(--white); }
+.home-page .hero .button-dark:hover, .home-page .hero .button-dark:focus-visible, .performance-home .button-white:hover, .performance-home .button-white:focus-visible, .site-header .button-dark:hover, .site-header .button-dark:focus-visible { background: var(--bright-blue); color: var(--black); }
+
+/* Three-card KPI sequence: Bright Blue, Deep Blue, White. */
+.home-page .metric-band > .metric[data-tone="highlight"],
+.performance-page .performance-summary > div[data-tone="highlight"] {
+  background: var(--surface-highlight);
+  color: var(--text-brand);
+}
+.home-page .metric-band > .metric[data-tone="brand"],
+.performance-page .performance-summary > div[data-tone="brand"] {
+  background: var(--surface-brand);
+  color: var(--text-highlight);
+}
+.home-page .metric-band > .metric[data-tone="paper"],
+.performance-page .performance-summary > div[data-tone="paper"] {
+  background: var(--surface-primary);
+  color: var(--text-brand);
+}
+
+/* Full-page Portfolio KPI matrix: market / return, cost / holdings. */
+.portfolio-page .portfolio-kpis > div[data-tone="plain"] { background: var(--surface-primary); color: var(--text-primary); }
+.portfolio-page .portfolio-kpis > div[data-tone="highlight"] { background: var(--surface-highlight); color: var(--text-brand); }
+.portfolio-page .portfolio-kpis > div[data-tone="brand"] { background: var(--surface-brand); color: var(--text-highlight); }
+.portfolio-page .portfolio-kpis > div[data-tone="paper"] { background: var(--surface-primary); color: var(--text-brand); }
+
+/* Medium Blue remains an auxiliary interaction color. */
+.site-header nav a:hover,
+.site-header nav a:focus-visible,
+.site-header nav a[aria-current="page"],
+.language-trigger:hover,
+.language-trigger:focus-visible,
+.language-trigger[aria-expanded="true"],
+.text-link:hover,
+.text-link:focus-visible,
+.memo-disclosure > summary:hover,
+.source-link:hover,
+.source-link:focus-visible { color: var(--interactive-accent); }
+.memo-disclosure > summary:hover,
+.memo-disclosure > summary:focus-visible { color: var(--deep-blue); }
+.bar-value { background: var(--interactive-accent); }
+
+/* A light-blue contact band closes the homepage before the inverse footer. */
+.home-page .cta {
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+}
+.home-page .cta .button-dark { background: var(--black); color: var(--white); }
+.home-page .cta .button-dark:hover, .home-page .cta .button-dark:focus-visible { background: var(--deep-blue); color: var(--white); }
+.site-footer {
+  background: var(--surface-inverse);
+  color: var(--text-inverse);
+}
+.site-footer p { color: var(--text-inverse-secondary); }
+.site-footer a { transition: color var(--motion-duration-base) var(--motion-ease-standard); }
+.site-footer a:hover, .site-footer a:focus-visible { color: var(--text-highlight); }
+.site-footer .footer-mark,
+.site-footer .footer-mark:hover,
+.site-footer .footer-mark:focus-visible { color: var(--text-inverse); transition: none; }
+.site-footer .wordmark span { color: var(--interactive-accent); }
+
+/* Touch hover may persist after a tap. Reset only idle hover, never keyboard focus
+   or active feedback; keep these rules after the editorial color overrides. */
+@media (hover: none) and (pointer: coarse) {
+  .home-page .text-link:hover:not(:active):not(:focus-visible),
+  .allocation-card > a:hover:not(:active):not(:focus-visible) { color: var(--black); }
+  .button:hover:not(:active):not(:focus-visible),
+  .home-page .button:hover:not(:active):not(:focus-visible),
+  .site-header .button:hover:not(:active):not(:focus-visible),
+  .home-page .text-link:hover:not(:active):not(:focus-visible),
+  .allocation-card > a:hover:not(:active):not(:focus-visible),
+  .memo-card:hover:not(:active):not(:focus-visible),
+  .memo-index-row:hover:not(:active):not(:focus-visible),
+  .memo-disclosure > summary:hover:not(:active):not(:focus-visible) { transform: none; box-shadow: none; }
+
+  :is(.home-page .hero .button-dark, .performance-home .button-white, .home-page .cta .button-dark, .site-header .button-dark, .button-dark):hover:not(:active):not(:focus-visible) {
+    background: var(--black); color: var(--white);
+  }
+  .button-dark:active:not(:disabled) { background: var(--deep-blue); color: var(--white); }
+  .home-page .hero .button-dark:active,
+  .performance-home .button-white:active,
+  .site-header .button-dark:active { background: var(--bright-blue); color: var(--black); }
+  .home-page .cta .button-dark:active { background: var(--deep-blue); color: var(--white); }
+  .support-amount-option:active { transform: scale(var(--motion-scale-press)); }
+}

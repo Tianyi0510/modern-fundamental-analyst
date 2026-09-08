@@ -71,6 +71,16 @@
   --radius-pill: 999px;
   --focus-ring-width: 2px;
   --focus-ring-offset: 4px;
+  --focus-ring-on-light: var(--deep-blue);
+  --focus-ring-on-dark: var(--bright-blue);
+  --space-field-label: var(--space-3);
+  --space-form-row: var(--space-5);
+  --space-form-column: var(--space-5);
+  --space-field-block: var(--space-3);
+  --space-field-inline: var(--space-4);
+  --size-status-reserve: 1.65em;
+  --opacity-disabled: .64;
+  --opacity-disabled-preferences: .55;
 
   /* One interaction language for pointer, keyboard, and touch. */
   --motion-duration-press: 90ms;

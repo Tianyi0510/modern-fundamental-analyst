@@ -21,6 +21,7 @@ const styleModules = [
   "app/styles/component-typography.css",
   "app/styles/responsive.css",
   "app/styles/colors.css",
+  "app/styles/themes.css",
 ];
 
 export const readStyles = async () => (await Promise.all(styleModules.map(read))).join("\n");

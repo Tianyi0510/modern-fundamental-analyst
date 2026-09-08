@@ -26,7 +26,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(client, /contact-form\.module\.css/);
   assert.doesNotMatch(client, /headingLabel/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
-  assert.match(styles, /\.form\s*\{[^}]*padding:\s*40px 40px 0/s);
+  assert.match(styles, /\.form\s*\{[^}]*padding:\s*var\(--space-7\) var\(--space-7\) 0/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.form\s*\{[^}]*padding:\s*0/s);
   assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);

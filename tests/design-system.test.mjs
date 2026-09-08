@@ -13,7 +13,7 @@ test("typography uses centralized semantic role tokens", async () => {
     read("app/styles/chrome.css"),
     read("app/styles/pages.css"),
     read("app/styles/responsive.css"),
-    read("app/styles/colors.css"),
+    Promise.all([read("app/styles/colors.css"), read("app/styles/themes.css")]).then(parts => parts.join("\n")),
     read("components/contact-form.module.css"),
     read("components/subscribe-form.module.css"),
     read("components/subscription-preferences.module.css"),
@@ -91,15 +91,15 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.match(css, /\.site-footer \.footer-heading\s*\{[^}]*line-height:\s*var\(--leading-compact-title\)/s);
   assert.match(css, /\.home-page \.cta\s*\{[^}]*background:\s*var\(--surface-highlight\)[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(css, /\.home-page \.cta \.button-dark\s*\{[^}]*background:\s*var\(--black\)[^}]*color:\s*var\(--white\)/s);
-  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
-  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\)/s);
-  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\)/s);
-  assert.match(css, /\.portfolio-page \.portfolio-kpis > div:nth-child\(4\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\)/s);
-  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(1\),\s*\.performance-page \.performance-summary > div:nth-child\(1\)\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div\[data-tone="plain"\]\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-primary\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div\[data-tone="highlight"\]\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div\[data-tone="brand"\]\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\)/s);
+  assert.match(css, /\.portfolio-page \.portfolio-kpis > div\[data-tone="paper"\]\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\)/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric\[data-tone="highlight"\],\s*\.performance-page \.performance-summary > div\[data-tone="highlight"\]\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-brand\);/s);
   assert.match(css, /\.about-boundaries > article:first-child[^}]*\{[^}]*background:\s*var\(--surface-inverse\);[^}]*color:\s*var\(--text-inverse\);/s);
   assert.match(css, /\.about-boundaries > article:last-child\s*\{[^}]*background:\s*var\(--surface-highlight\);[^}]*color:\s*var\(--text-primary\);/s);
-  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(2\),\s*\.performance-page \.performance-summary > div:nth-child\(2\)\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
-  assert.match(css, /\.home-page \.metric-band > \.metric:nth-child\(3\),\s*\.performance-page \.performance-summary > div:nth-child\(3\)\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric\[data-tone="brand"\],\s*\.performance-page \.performance-summary > div\[data-tone="brand"\]\s*\{[^}]*background:\s*var\(--surface-brand\);[^}]*color:\s*var\(--text-highlight\);/s);
+  assert.match(css, /\.home-page \.metric-band > \.metric\[data-tone="paper"\],\s*\.performance-page \.performance-summary > div\[data-tone="paper"\]\s*\{[^}]*background:\s*var\(--surface-primary\);[^}]*color:\s*var\(--text-brand\);/s);
   assert.match(css, /\.home-opening\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(css, /\.home-opening > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(css, /\.memos-home\s*\{[^}]*background:\s*var\(--background-gray\)/s);
@@ -124,7 +124,7 @@ test("editorial color roles keep the footer inverse and Medium Blue auxiliary", 
   assert.doesNotMatch(css, /\.(?:site-header|home-opening|home-about|page-hero|about-section|about-boundaries|about-closing|portfolio-kpis|portfolio-holdings-heading|methodology|contact-grid|site-footer)\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(css, /\.memo-index\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
   assert.match(css, /\.legal-body\s*\{[^}]*padding:\s*var\(--space-section\) 0/s);
-  assert.doesNotMatch(css, /\.performance-summary > div:nth-child\(3\)[^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
+  assert.doesNotMatch(css, /\.performance-summary > div\[data-tone="paper"\][^{]*\{[^}]*box-shadow:\s*inset 0 0 0 1px var\(--black\)/s);
 });
 
 test("editorial copy preserves authored casing and mobile arrows use intentional touch motion", async () => {
@@ -261,5 +261,5 @@ test("mobile navigation uses coordinated motion with a reduced-motion fallback",
   assert.doesNotMatch(css, /@keyframes mobile-metric-enter/);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*html\s*\{\s*scroll-behavior:\s*auto;/s);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*?html\s*\{\s*scroll-behavior:\s*auto;/s);
 });

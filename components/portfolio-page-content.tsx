@@ -71,10 +71,10 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
   return <main className="portfolio-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="portfolio-kpis" aria-label={text.summaryLabel}>
-      <div><span>{text.marketValue}</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{text.currency}</small></div>
-      <div><span>{text.costBasis}</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>{text.costBasisNote}</small></div>
-      <div><span>{text.totalReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.totalReturnNote}</small></div>
-      <div><span>{text.holdings}</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>{text.holdingsNote}</small></div>
+      <div data-tone="plain"><span>{text.marketValue}</span><strong>{formatUsd(portfolioSnapshot.marketValue)}</strong><small>{text.currency}</small></div>
+      <div data-tone="highlight"><span>{text.costBasis}</span><strong>{formatUsd(portfolioSnapshot.costBasis)}</strong><small>{text.costBasisNote}</small></div>
+      <div data-tone="brand"><span>{text.totalReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.totalReturnNote}</small></div>
+      <div data-tone="paper"><span>{text.holdings}</span><strong>{portfolioSnapshot.holdingsCount}</strong><small>{text.holdingsNote}</small></div>
     </section>
     <section className="portfolio-holdings-section" aria-labelledby="portfolio-holdings-title">
       <div className="portfolio-holdings-heading shell">

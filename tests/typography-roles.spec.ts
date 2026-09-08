@@ -188,3 +188,77 @@ for (const viewport of viewports) {
     });
   });
 }
+
+test.describe("form accessibility and preserved text colors", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    test(`${prefix || "English"} fields retain color and visible focus with larger text`, async ({ page }) => {
+      await page.goto(`${prefix}/contact`);
+      const contactEmail = page.locator('form[action], form').filter({ has: page.locator('textarea') }).locator('input[name="email"]');
+      await contactEmail.focus();
+      await expect(contactEmail).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(contactEmail).toHaveCSS("outline-style", "solid");
+      await expect(contactEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+      const footerEmail = page.locator('.site-footer input[name="email"]');
+      await footerEmail.focus();
+      await expect(footerEmail).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(footerEmail).toHaveCSS("outline-color", "rgb(95, 205, 253)");
+      await page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+      await expect(contactEmail).toHaveCSS("font-size", "32px");
+      const overflow = await page.evaluate(() => [...document.querySelectorAll("body *")].filter(element => element.getBoundingClientRect().right > window.innerWidth + 1).map(element => ({ tag: element.tagName, className: element.className, right: element.getBoundingClientRect().right })).slice(0, 15));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), JSON.stringify(overflow)).toBe(true);
+      for (const field of [contactEmail, footerEmail]) {
+        const box = await field.boundingBox();
+        expect(box).not.toBeNull();
+        expect(box!.x).toBeGreaterThanOrEqual(0);
+        expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+      }
+      await page.goto(`${prefix}/subscription-preferences`);
+      const preferenceEmail = page.locator('main input[name="email"]').first();
+      await preferenceEmail.focus();
+      await expect(preferenceEmail).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(preferenceEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+    });
+  }
+
+  test("KPI treatments preserve colors after card reordering", async ({ page }) => {
+    for (const route of ["/", "/portfolio", "/performance"]) {
+      await page.goto(route);
+      const cards = page.locator("[data-tone]");
+      const before = await cards.evaluateAll(elements => elements.map(element => ({ tone: element.getAttribute("data-tone"), color: getComputedStyle(element).color, background: getComputedStyle(element).backgroundColor })));
+      const expected: Record<string, [string, string]> = {
+        plain: ["rgb(0, 0, 0)", "rgb(255, 255, 255)"],
+        highlight: ["rgb(0, 41, 145)", "rgb(95, 205, 253)"],
+        brand: ["rgb(95, 205, 253)", "rgb(0, 41, 145)"],
+        paper: ["rgb(0, 41, 145)", "rgb(255, 255, 255)"],
+      };
+      for (const sample of before) expect([sample.color, sample.background]).toEqual(expected[sample.tone!]);
+      await cards.evaluateAll(elements => elements.reverse().forEach(element => element.parentElement!.appendChild(element)));
+      const after = await cards.evaluateAll(elements => elements.map(element => ({ tone: element.getAttribute("data-tone"), color: getComputedStyle(element).color, background: getComputedStyle(element).backgroundColor })));
+      expect(after.reverse()).toEqual(before);
+    }
+  });
+
+  test("reduced motion removes button scaling", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/contact");
+    const button = page.locator('form').filter({ has: page.locator('textarea') }).locator('button[type="submit"]');
+    await button.focus();
+    await expect(button).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
+    const durations = await button.evaluate(element => getComputedStyle(element).transitionDuration.split(",").map(value => Number.parseFloat(value)));
+    for (const duration of durations) expect(duration).toBeCloseTo(0.00001, 8);
+  });
+
+  test("forced colors retains a visible field outline", async ({ page, browserName }) => {
+    test.skip(browserName === "webkit", "WebKit does not emulate forced colors");
+    await page.emulateMedia({ forcedColors: "active" });
+    await page.goto("/contact");
+    const field = page.locator('input[name="email"]').first();
+    await field.focus();
+    await expect(field).toHaveCSS("outline-style", "solid");
+    await expect(field).toHaveCSS("outline-width", "2px");
+    const colors = await field.evaluate(element => ({ outline: getComputedStyle(element).outlineColor, background: getComputedStyle(element).backgroundColor }));
+    expect(colors.outline).not.toBe(colors.background);
+  });
+});

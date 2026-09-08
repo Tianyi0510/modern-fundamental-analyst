@@ -45,15 +45,15 @@
 .form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 22px;
-  padding: 40px 40px 0;
+  gap: var(--space-form-row) var(--space-form-column);
+  padding: var(--space-7) var(--space-7) 0;
   border: 0;
   background: transparent;
 }
 
 .field {
   display: grid;
-  gap: 10px;
+  gap: var(--space-field-label);
   min-width: 0;
 }
 
@@ -74,7 +74,7 @@
   display: block;
   width: 100%;
   min-height: var(--size-field);
-  padding: 13px 15px;
+  padding: var(--space-field-block) var(--space-field-inline);
   border: 1px solid var(--black);
   border-radius: 0;
   background: var(--background-gray);
@@ -90,10 +90,9 @@ textarea.control {
   resize: vertical;
 }
 
-.control:focus {
-  outline: none;
-  border-color: var(--medium-blue);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--medium-blue) 20%, transparent);
+.control:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-on-light);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .actions {
@@ -129,7 +128,7 @@ textarea.control {
 
 .submit:disabled {
   cursor: wait;
-  opacity: .64;
+  opacity: var(--opacity-disabled);
   transform: none;
 }
 
@@ -140,7 +139,7 @@ textarea.control {
 }
 
 .status {
-  min-height: 1.65em;
+  min-height: var(--size-status-reserve);
   max-width: 420px;
   margin: 0;
   font-size: var(--font-size-body);
