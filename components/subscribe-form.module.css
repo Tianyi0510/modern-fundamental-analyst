@@ -22,7 +22,7 @@
   .form .status { grid-column: auto; }
 }
 @media (hover: none) and (pointer: coarse) {
-  .submit:hover:not(:disabled) {
+  .submit:hover:not(:disabled):not(:active):not(:focus-visible) {
     border-color: var(--white); background: var(--white); color: var(--black); transform: none;
   }
 

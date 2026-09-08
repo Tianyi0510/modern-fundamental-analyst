@@ -1,5 +1,48 @@
 import { expect, test } from "@playwright/test";
 
+test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const trigger = page.locator(".language-trigger");
+  const items = page.getByRole("menuitem");
+  for (const key of ["Enter", "Space", "ArrowDown", "ArrowUp"]) {
+    await trigger.focus();
+    await page.keyboard.press(key);
+    await expect(key === "ArrowUp" ? items.last() : items.first()).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
+  }
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Tab");
+  // Native Tab order may skip links according to the browser's keyboard settings.
+  expect(await page.evaluate(() => document.activeElement !== document.body
+    && !document.querySelector(".language-menu")?.contains(document.activeElement))).toBe(true);
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Shift+Tab");
+  await expect(trigger).toBeFocused();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+});
+
+test("mobile menu isolates background focus and closes without a visible inert overlay", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto("/");
+  const trigger = page.locator(".mobile-menu-button");
+  await trigger.click();
+  await trigger.evaluate((element: HTMLButtonElement) => element.focus());
+  await expect(page.locator(".mobile-menu-close")).toBeFocused();
+  expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(true);
+  const state = await page.locator(".mobile-menu-close").evaluate(async (element: HTMLButtonElement) => {
+    element.click();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    return getComputedStyle(document.querySelector(".mobile-menu-layer")!).visibility;
+  });
+  expect(state).toBe("hidden");
+  await expect(trigger).toBeFocused();
+  expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(false);
+});
+
 test("narrow navigation keeps its close control and brand inside the drawer", async ({ page }) => {
   for (const width of [320, 360, 390]) {
     await page.setViewportSize({ width, height: 720 });

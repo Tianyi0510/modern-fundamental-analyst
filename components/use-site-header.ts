@@ -42,6 +42,23 @@ export function useMobileMenu() {
     const previousBodyOverflow = document.body.style.overflow;
     const scrollPosition = scrollPositionRef.current;
     const trigger = triggerRef.current;
+    // Isolate siblings at every level without making the drawer's ancestors inert.
+    const background = new Map<HTMLElement, boolean>();
+    let branch: HTMLElement | null = drawerRef.current;
+    while (branch && branch !== document.body) {
+      for (const sibling of branch.parentElement?.children ?? []) {
+        if (sibling instanceof HTMLElement && sibling !== branch) {
+          background.set(sibling, sibling.inert);
+          sibling.inert = true;
+        }
+      }
+      branch = branch.parentElement;
+    }
+    const containFocus = () => {
+      if (!drawerRef.current?.contains(document.activeElement)) {
+        closeButtonRef.current?.focus({ preventScroll: true });
+      }
+    };
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key !== "Tab") return;
       const focusable = drawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
@@ -64,7 +81,10 @@ export function useMobileMenu() {
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus({ preventScroll: true });
     window.addEventListener("keydown", handleKeyboard);
+    document.addEventListener("focusin", containFocus);
     return () => {
+      document.removeEventListener("focusin", containFocus);
+      for (const [element, previousInert] of background) element.inert = previousInert;
       document.documentElement.style.overflow = previousOverflow;
       document.body.style.position = previousBodyPosition;
       document.body.style.top = previousBodyTop;
@@ -119,6 +139,7 @@ export function useLanguageMenu() {
 
   const focusItem = (position: "first" | "last") => {
     requestAnimationFrame(() => {
+      if (triggerRef.current?.getAttribute("aria-expanded") !== "true") return;
       const items = containerRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
       const index = position === "first" ? 0 : (items?.length ?? 1) - 1;
       items?.[index]?.focus();
@@ -142,6 +163,15 @@ export function useLanguageMenu() {
         return;
       }
       if (!containerRef.current?.contains(document.activeElement)) return;
+      if (event.key === "Tab") {
+        // Resume native tab order from the trigger before hiding the focused item.
+        triggerRef.current?.focus();
+        setIsOpen(false);
+        if (event.shiftKey) {
+          event.preventDefault();
+        }
+        return;
+      }
       if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
       const items = Array.from(containerRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
       if (!items.length) return;

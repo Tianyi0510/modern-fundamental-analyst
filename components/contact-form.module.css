@@ -190,7 +190,7 @@ textarea.control {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .section .submit:hover:not(:disabled) {
+  .section .submit:hover:not(:disabled):not(:active):not(:focus-visible) {
     background: var(--black);
     color: var(--white);
     transform: none;

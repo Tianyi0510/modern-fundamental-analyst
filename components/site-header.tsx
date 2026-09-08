@@ -81,17 +81,18 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             aria-controls="desktop-language-menu"
             onClick={toggleLanguageMenu}
             onKeyDown={(event) => {
-              if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+              if (!["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) return;
               event.preventDefault();
+              event.stopPropagation();
               openLanguageMenu();
-              focusLanguageItem(event.key === "ArrowDown" ? "first" : "last");
+              focusLanguageItem(event.key === "ArrowUp" ? "last" : "first");
             }}
           >
             {localeConfig[locale].label}
             <ChevronDown aria-hidden="true" strokeWidth={2.75} />
           </button>
           <div className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`} id="desktop-language-menu" role="menu" aria-hidden={!isLanguageOpen}>
-            {locales.map((targetLocale) => <Link href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} role="menuitem" aria-current={locale === targetLocale ? "page" : undefined} tabIndex={isLanguageOpen ? 0 : -1} onClick={closeLanguageMenu} key={targetLocale}>
+            {locales.map((targetLocale) => <Link href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} role="menuitem" aria-current={locale === targetLocale ? "page" : undefined} tabIndex={-1} onClick={closeLanguageMenu} key={targetLocale}>
               <span>{localeConfig[targetLocale].label}</span>
               {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
             </Link>)}

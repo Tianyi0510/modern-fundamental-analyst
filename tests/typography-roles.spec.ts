@@ -248,6 +248,14 @@ test.describe("form accessibility and preserved text colors", () => {
     await expect(button).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
     const durations = await button.evaluate(element => getComputedStyle(element).transitionDuration.split(",").map(value => Number.parseFloat(value)));
     for (const duration of durations) expect(duration).toBeCloseTo(0.00001, 8);
+    await page.goto("/");
+    const arrow = page.locator(".home-page .text-link .arrow-icon").first();
+    await arrow.locator("..").hover();
+    await expect(arrow).toHaveCSS("transform", "none");
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.locator(".mobile-menu-button").click();
+    await expect(page.locator(".mobile-menu-close svg")).toHaveCSS("transform", "none");
+    await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("translate", "none");
   });
 
   test("forced colors retains a visible field outline", async ({ page, browserName }) => {

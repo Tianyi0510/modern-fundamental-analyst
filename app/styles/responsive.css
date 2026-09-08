@@ -188,7 +188,7 @@
   .mobile-menu-button:focus-visible { outline: 2px solid var(--medium-blue); outline-offset: 3px; background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-hover)); }
   .mobile-menu-button:active { background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-press)); }
   .mobile-menu-button:active, .mobile-menu-close:active { transition-duration: var(--motion-duration-press); }
-  .mobile-menu-layer { display: block; position: fixed; inset: 0; z-index: 100; pointer-events: none; visibility: hidden; transition: visibility 0s linear var(--motion-duration-slow); }
+  .mobile-menu-layer { display: block; position: fixed; inset: 0; z-index: 100; pointer-events: none; visibility: hidden; }
   .mobile-menu-layer.is-open { pointer-events: auto; visibility: visible; transition-delay: 0s; }
   .mobile-menu-backdrop { display: none; }
   .mobile-menu-drawer {
@@ -292,6 +292,11 @@
 @media (prefers-reduced-motion: reduce) {
   :root { --motion-scale-hover: 1; --motion-scale-press: 1; }
   html { scroll-behavior: auto; }
+  .button .arrow-icon, .round-link .arrow-icon,
+  .home-page .text-link .arrow-icon, .allocation-card > a .arrow-icon,
+  .mobile-menu-button, .mobile-menu-close, .mobile-menu-close svg,
+  .language-dropdown, .mobile-language-links { transform: none !important; }
+  .site-header .mobile-menu-drawer nav a { translate: none !important; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
 
