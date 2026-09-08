@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { read } from "./repository-helpers.mjs";
 
-const { parseSupportAmount } = await import("../lib/stripe-checkout.ts");
+const { parseSupportAmount } = await import("../lib/support-config.ts");
 
 test("Stripe support amount parsing accepts only canonical configured values", () => {
   assert.equal(parseSupportAmount("6"), 6);
@@ -18,8 +18,6 @@ test("Stripe support amount parsing accepts only canonical configured values", (
 test("Stripe Checkout accepts only the three configured one-time support amounts", async () => {
   const stripe = await read("lib/stripe-checkout.ts");
 
-  assert.match(stripe, /SUPPORT_AMOUNTS = \[6, 12, 18\] as const/);
-  assert.match(stripe, /SUPPORT_AMOUNT_BY_VALUE\.get\(value\)/);
   assert.doesNotMatch(stripe, /Number\(value\)/);
   assert.match(stripe, /mode: "payment"/);
   assert.match(stripe, /ui_mode: "hosted_page"/);

@@ -2,9 +2,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
-import { SUPPORT_AMOUNTS } from "@/lib/stripe-checkout";
-
-type SupportStatus = "success" | "cancelled" | "error" | undefined;
+import { SUPPORT_AMOUNTS, type SupportStatus } from "@/lib/support-config";
 
 const copy = {
   en: {
@@ -17,6 +15,8 @@ const copy = {
     submit: "Continue to Stripe",
     note: "Securely processed by Stripe. This is voluntary support—not a charitable donation, investment product, or advisory service.",
     statuses: {
+      pending: "Your payment is still processing. Check your Stripe confirmation before trying again.",
+      unverified: "We could not confirm this payment. Check your Stripe confirmation before trying again.",
       success: "Thank you for supporting independent research. Stripe will send your payment confirmation by email.",
       cancelled: "Checkout was cancelled. No payment was made.",
       error: "Checkout is temporarily unavailable. Please try again later.",
@@ -32,6 +32,8 @@ const copy = {
     submit: "前往 Stripe",
     note: "付款由 Stripe 安全處理。這是自願支持，並非慈善捐款、投資產品或投資顧問服務。",
     statuses: {
+      pending: "付款仍在處理中，請先查閱 Stripe 付款確認，再決定是否重試。",
+      unverified: "目前無法確認這筆付款，請先查閱 Stripe 付款確認，再決定是否重試。",
       success: "感謝你支持獨立研究。Stripe 將透過電子郵件寄送付款確認。",
       cancelled: "付款流程已取消，沒有產生任何款項。",
       error: "目前暫時無法開啟付款頁面，請稍後再試。",
@@ -47,6 +49,8 @@ const copy = {
     submit: "前往 Stripe",
     note: "付款由 Stripe 安全处理。这是自愿支持，并非慈善捐款、投资产品或投资顾问服务。",
     statuses: {
+      pending: "付款仍在处理中，请先查阅 Stripe 付款确认，再决定是否重试。",
+      unverified: "目前无法确认这笔付款，请先查阅 Stripe 付款确认，再决定是否重试。",
       success: "感谢你支持独立研究。Stripe 将通过电子邮件发送付款确认。",
       cancelled: "付款流程已取消，没有产生任何款项。",
       error: "目前暂时无法打开付款页面，请稍后再试。",

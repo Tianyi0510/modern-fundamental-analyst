@@ -1,3 +1,4 @@
+import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { localeConfig, type Locale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site-config";

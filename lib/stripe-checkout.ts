@@ -1,9 +1,8 @@
+import "server-only";
 import Stripe from "stripe";
 import type { Locale } from "@/lib/i18n";
-
-export const SUPPORT_AMOUNTS = [6, 12, 18] as const;
-
-export type SupportAmount = (typeof SUPPORT_AMOUNTS)[number];
+import { parseSupportAmount, type SupportAmount, type SupportStatus } from "@/lib/support-config";
+export { parseSupportAmount } from "@/lib/support-config";
 
 const PRICE_ENV_BY_AMOUNT: Record<SupportAmount, string> = {
   6: "STRIPE_PRICE_USD_6",
@@ -14,15 +13,7 @@ const PRICE_ENV_BY_AMOUNT: Record<SupportAmount, string> = {
 const CHECKOUT_INTEGRATION_IDENTIFIER = "hosted_web_0001_mfaqxkpt";
 const STRIPE_API_VERSION = "2026-07-29.dahlia" as const;
 
-const SUPPORT_AMOUNT_BY_VALUE = new Map(
-  SUPPORT_AMOUNTS.map((amount) => [String(amount), amount] as const),
-);
-
 let stripeClient: Stripe | undefined;
-
-export function parseSupportAmount(value: string | null): SupportAmount | null {
-  return value ? SUPPORT_AMOUNT_BY_VALUE.get(value) ?? null : null;
-}
 
 function getStripeClient() {
   if (stripeClient) return stripeClient;
@@ -103,4 +94,20 @@ export function getStripeErrorDetails(error: unknown) {
   }
 
   return { name: error instanceof Error ? error.name : "Error" };
+}
+
+export async function resolveSupportStatus(params: { status?: string; session_id?: string }): Promise<SupportStatus> {
+  if (params.status === "cancelled" || params.status === "error") return params.status;
+  if (params.status !== "success") return undefined;
+  if (!params.session_id || !/^cs_(test|live)_[A-Za-z0-9]{1,240}$/.test(params.session_id)) return "unverified";
+  try {
+    const session = await getStripeClient().checkout.sessions.retrieve(params.session_id, {}, { timeout: 5_000, maxNetworkRetries: 0 });
+    if (session.mode !== "payment" || session.metadata?.purpose !== "research_support"
+      || !parseSupportAmount(session.metadata.support_amount_usd ?? null) || session.currency !== "usd") return "unverified";
+    if (session.status === "complete" && session.payment_status === "paid") return "success";
+    return session.status === "complete" ? "pending" : "unverified";
+  } catch (error) {
+    console.error("Stripe payment status verification failed.", getStripeErrorDetails(error));
+    return "unverified";
+  }
 }

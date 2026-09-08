@@ -1,3 +1,4 @@
+import { resolveSupportStatus } from "@/lib/stripe-checkout";
 import { SupportPageContent } from "@/components/support-page-content";
 import { createPageMetadata } from "@/lib/site-config";
 
@@ -8,8 +9,7 @@ export const metadata = createPageMetadata({
   locale: "zh-cn",
 });
 
-export default async function SupportPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-  const { status } = await searchParams;
-  const normalizedStatus = status === "success" || status === "cancelled" || status === "error" ? status : undefined;
+export default async function SupportPage({ searchParams }: { searchParams: Promise<{ status?: string; session_id?: string }> }) {
+  const normalizedStatus = await resolveSupportStatus(await searchParams);
   return <SupportPageContent locale="zh-cn" status={normalizedStatus} />;
 }

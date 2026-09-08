@@ -12,7 +12,7 @@ The repository contains no real credentials. Configure these values as **Sensiti
 
 | Field | Current Value | What to Set |
 |---|---|---|
-| `STRIPE_RESTRICTED_KEY` | `rk_test_replace_with_restricted_key` | A test restricted key locally and a separate live restricted key in Vercel. Grant only Checkout Sessions write access and the minimum Price access required by Stripe. |
+| `STRIPE_RESTRICTED_KEY` | `rk_test_replace_with_restricted_key` | A test restricted key locally and a separate live restricted key in Vercel. Grant Checkout Sessions read/write access and the minimum Price access required by Stripe. |
 | `STRIPE_SECRET_KEY` | `sk_test_replace_with_secret_key` | Compatibility fallback only. Production currently uses this Sensitive Vercel variable; replace it with `STRIPE_RESTRICTED_KEY` when practical. |
 | `STRIPE_PRICE_USD_6` | `price_replace_with_6_usd_price` | The environment-appropriate one-time USD 6 Price ID. |
 | `STRIPE_PRICE_USD_12` | `price_replace_with_12_usd_price` | The environment-appropriate one-time USD 12 Price ID. |
@@ -74,6 +74,8 @@ The implementation preserves the requested `hosted_web_0001` prefix and appends 
 6. Redeploy Production and complete one small live payment. Refund it from Stripe after verification if desired.
 7. Keep Dynamic Payment Methods enabled in Stripe Dashboard. The code intentionally omits `payment_method_types`.
 8. Before enabling Stripe Tax, confirm an active registration and an appropriate product tax code. Sandbox registrations do not carry into live mode.
+
+The return page retrieves the Checkout Session server-side and confirms success only for a completed, paid USD research-support session. Missing, invalid or unavailable sessions display an unverified message; completed but unpaid sessions display a pending message. The restricted key must allow Checkout Sessions **read and write**. No customer details are returned to the page.
 
 No webhook is required for this voluntary support flow because payment completion does not unlock content or fulfill an order. If supporter benefits, receipts outside Stripe, or entitlement tracking are added later, create a webhook endpoint and verify every Stripe signature before processing events.
 

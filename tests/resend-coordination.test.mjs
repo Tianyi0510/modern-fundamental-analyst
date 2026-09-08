@@ -7,13 +7,15 @@ const values = new Map();
 const redis = {
   isReady: true,
   async set(key, value, options) {
-    if (options.NX && values.has(key)) return null;
+    if (options?.NX && values.has(key)) return null;
     values.set(key, value);
     return "OK";
   },
   async get(key) { return values.get(key) ?? null; },
+  async del(key) { return Number(values.delete(key)); },
   async eval(_script, { keys, arguments: args }) {
     if (values.get(keys[0]) !== args[0]) return 0;
+    if (args.length === 2) { values.set(keys[0], args[1]); return 1; }
     return Number(values.delete(keys[0]));
   },
 };
@@ -28,6 +30,42 @@ registerHooks({ resolve(specifier, context, nextResolve) {
 const { POST: requestPreferences } = await import("../app/api/subscription-preferences/request/route.ts");
 const { subscribeContact } = await import("../lib/subscription-service.ts");
 const { getPreferredLanguageSegmentId } = await import("../lib/resend-segments.ts");
+const { withSubscriptionJournal, readSubscriptionJournal, resolveSubscriptionJournal } = await import("../lib/subscription-journal.ts");
+
+test("subscription journal persists uncertain phases and blocks blind retries after lease expiry", async () => {
+  await withSubscriberLock("reader@example.com", () => withSubscriptionJournal("reader@example.com", "en", async () => {
+    await resendOperationContext.getStore().recordPhase("send-welcome-event");
+    resendOperationContext.getStore().uncertain = true;
+  }));
+  const record = await readSubscriptionJournal("reader@example.com");
+  assert.equal(record.phase, "send-welcome-event");
+  assert.ok(!JSON.stringify([...values]).includes("reader@example.com"));
+  for (const key of values.keys()) if (key.startsWith("mfa:resend:subscriber:")) values.delete(key);
+  await assert.rejects(withSubscriberLock("reader@example.com", () => withSubscriptionJournal("reader@example.com", "en", () => assert.fail("must not retry"))), /reconciliation/);
+  await assert.rejects(withSubscriberLock("reader@example.com", () => resolveSubscriptionJournal("reader@example.com", "wrong-id")), /does not match/);
+  await withSubscriberLock("reader@example.com", () => resolveSubscriptionJournal("reader@example.com", record.id));
+  assert.equal(await readSubscriptionJournal("reader@example.com"), null);
+});
+
+test("subscription journal clears confirmed operations and retains interrupted ones", async () => {
+  assert.equal(await withSubscriberLock("reader@example.com", () => withSubscriptionJournal("reader@example.com", "en", async () => "ok")), "ok");
+  assert.equal(await readSubscriptionJournal("reader@example.com"), null);
+  await assert.rejects(withSubscriberLock("reader@example.com", () => withSubscriptionJournal("reader@example.com", "en", async () => { throw new Error("process interrupted"); })));
+  assert.equal((await readSubscriptionJournal("reader@example.com")).phase, "starting");
+});
+
+test("a stale subscription operation cannot overwrite or delete a replacement journal", async t => {
+  t.mock.method(console, "error", () => {});
+  for (const updatePhase of [false, true]) {
+    values.clear();
+    await assert.rejects(withSubscriberLock("reader@example.com", () => withSubscriptionJournal("reader@example.com", "en", async () => {
+      const key = [...values.keys()].find(key => key.startsWith("mfa:subscription-journal:"));
+      values.set(key, "replacement");
+      if (updatePhase) await resendOperationContext.getStore().recordPhase("create-contact");
+    })), /ownership changed/);
+    assert.ok([...values.values()].includes("replacement"));
+  }
+});
 
 function preferenceRequest() {
   return new Request("https://www.modernfundamentalanalyst.com/api/subscription-preferences/request", {

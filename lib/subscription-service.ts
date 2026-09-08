@@ -1,6 +1,7 @@
 import { getLatestMemo } from "@/data/memos";
 import { localeConfig, type Locale } from "@/lib/i18n";
-import { getResendClient, reportResendRollbackFailure, runResendOperation } from "@/lib/resend";
+import { getResendClient, reportResendRollbackFailure, runResendOperation, resendOperationContext } from "@/lib/resend";
+import { withSubscriptionJournal } from "@/lib/subscription-journal";
 import { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } from "@/lib/resend-segments";
 import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
@@ -30,7 +31,7 @@ async function rollbackSubscription(resend: ResendClient, contactId: string | un
 
 export async function subscribeContact(email: string, locale: Locale): Promise<SubscriptionResult> {
   try {
-    return await withSubscriberLock(email, () => subscribeContactLocked(email, locale));
+    return await withSubscriberLock(email, () => withSubscriptionJournal(email, locale, () => subscribeContactLocked(email, locale)));
   } catch {
     return unavailable(503);
   }
@@ -58,6 +59,7 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
   let rollbackLanguageSegments: (() => Promise<void>) | null = null;
 
   if (existing.data) {
+    await resendOperationContext.getStore()?.recordPhase?.("sync-language-segments");
     try {
       rollbackLanguageSegments = await syncPreferredLanguageSegment(resend, email, locale);
     } catch (error) {
@@ -65,12 +67,14 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
       return unavailable();
     }
     if (!shouldSendWelcome && previousLanguage === properties.preferred_language) return { ok: true };
+    await resendOperationContext.getStore()?.recordPhase?.("update-contact");
     result = await runResendOperation("Resend contact update failed", () => resend.contacts.update({
       id: existing.data.id,
       unsubscribed: false,
       properties,
     }));
   } else if (existing.error?.statusCode === 404) {
+    await resendOperationContext.getStore()?.recordPhase?.("create-contact");
     result = await runResendOperation("Resend contact creation failed", () => resend.contacts.create({
       email,
       unsubscribed: false,
@@ -93,6 +97,7 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
   if (!latestMemo) return unavailable(503);
 
   const prefix = localeConfig[locale].prefix;
+  await resendOperationContext.getStore()?.recordPhase?.("send-welcome-event");
   const welcome = await runResendOperation("Resend welcome automation request failed", () => resend.events.send({
     event: "subscriber.created",
     email,
@@ -106,6 +111,7 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
   }));
 
   if (!welcome || welcome.error) {
+    await resendOperationContext.getStore()?.recordPhase?.("rollback-after-welcome-failure");
     await rollbackSubscription(resend, contactId, rollbackLanguageSegments, previousLanguage);
     if (welcome?.error) console.error("Resend welcome automation failed", welcome.error.name);
     return unavailable();

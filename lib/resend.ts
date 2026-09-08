@@ -1,7 +1,8 @@
+import "server-only";
 import { Resend } from "resend";
 import { AsyncLocalStorage } from "node:async_hooks";
 
-export const resendOperationContext = new AsyncLocalStorage<{ signal: AbortSignal; uncertain: boolean }>();
+export const resendOperationContext = new AsyncLocalStorage<{ signal: AbortSignal; uncertain: boolean; recordPhase?: (phase: string) => Promise<void> }>();
 
 export function reportResendRollbackFailure() {
   const context = resendOperationContext.getStore();
