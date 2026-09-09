@@ -17,3 +17,10 @@ export function getLocalizedPath(pathname: string, locale: Locale) {
   const prefix = localeConfig[locale].prefix;
   return path === "/" ? prefix || "/" : `${prefix}${path}`;
 }
+
+export function getLanguageAlternates(pathname: string) {
+  return {
+    ...Object.fromEntries(locales.map(locale => [localeConfig[locale].hrefLang, getLocalizedPath(pathname, locale)])),
+    "x-default": getLocalizedPath(pathname, "en"),
+  };
+}

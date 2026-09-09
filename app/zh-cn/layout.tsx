@@ -1,3 +1,4 @@
+import { getLanguageAlternates } from "@/lib/i18n";
 import type { Metadata } from "next";
 import { SiteDocument } from "@/components/site-document";
 import { SITE_NAME, SITE_URL } from "@/lib/site-config";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   description,
   alternates: {
     canonical: "/zh-cn",
-    languages: { en: "/", "zh-Hant-TW": "/zh-tw", "zh-Hans-CN": "/zh-cn", "x-default": "/" },
+    languages: getLanguageAlternates("/"),
   },
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
   openGraph: { title: `${SITE_NAME}｜简体中文`, description, images: [{ url: image, width: 1728, height: 910, alt: "Ideas compound. Capital follows." }] },

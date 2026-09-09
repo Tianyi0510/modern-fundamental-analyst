@@ -1,6 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
-import type { Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { parseSupportAmount, type SupportAmount, type SupportStatus } from "@/lib/support-config";
 export { parseSupportAmount } from "@/lib/support-config";
 
@@ -47,12 +47,11 @@ export async function createSupportCheckoutSession({
   locale: Locale;
   origin: string;
 }) {
-  const prefix = locale === "en" ? "" : `/${locale}`;
-  const successUrl = new URL(`${prefix}/support`, origin);
+  const successUrl = new URL(getLocalizedPath("/support", locale), origin);
   successUrl.searchParams.set("status", "success");
   successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
 
-  const cancelUrl = new URL(`${prefix}/support`, origin);
+  const cancelUrl = new URL(getLocalizedPath("/support", locale), origin);
   cancelUrl.searchParams.set("status", "cancelled");
 
   const metadata = {

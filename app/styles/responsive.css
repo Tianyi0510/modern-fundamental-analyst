@@ -132,7 +132,7 @@
   .portfolio-mobile-sort button:hover, .portfolio-mobile-sort button:focus-visible { background: var(--black); color: var(--white); }
   .portfolio-mobile-sort button:active { transform: scale(var(--motion-scale-press)); }
   .portfolio-mobile-sort button svg { width: 17px; height: 17px; margin-left: auto; transition: transform var(--motion-duration-base) var(--motion-ease-emphasized); }
-  .portfolio-mobile-sort button:hover svg, .portfolio-mobile-sort button:focus-visible svg { transform: translateY(-1px); }
+  .portfolio-mobile-sort button:hover svg, .portfolio-mobile-sort button:focus-visible svg { transform: translateY(var(--motion-offset-sort)); }
   .portfolio-table-detailed .portfolio-row { min-height: 0; padding: var(--space-5) 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
   .portfolio-table-detailed .portfolio-row > [role="cell"] { min-width: 0; display: grid; gap: 5px; text-align: left; overflow-wrap: anywhere; }
   .portfolio-table-detailed .portfolio-row > span[role="cell"]:not(:first-child) { text-align: left; }
@@ -278,19 +278,19 @@
   .memo-card:not(.memo-card-placeholder):active { background: color-mix(in srgb, var(--bright-blue) 22%, var(--white)); transform: scale(var(--motion-scale-press)); }
   .memo-index-row:hover:not(:active):not(:focus-visible) { background: transparent; transform: none; }
   .memo-index-row:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); transform: scale(var(--motion-scale-press)); }
-  .memo-disclosure > summary:hover { padding-inline: 0; background: transparent; color: inherit; }
-  .memo-disclosure > summary:hover > span:first-child { transform: none; }
+  .memo-disclosure > summary:hover:not(:active):not(:focus-visible) { padding-inline: 0; background: transparent; color: inherit; }
+  .memo-disclosure > summary:hover:not(:active):not(:focus-visible) > span:first-child { transform: none; }
   .memo-disclosure > summary:active { background: color-mix(in srgb, var(--bright-blue) 18%, var(--white)); color: var(--deep-blue); }
   .memo-disclosure > summary:active > span:first-child { transform: none; }
-  .portfolio-mobile-sort button:hover { background: var(--white); color: var(--black); }
-  .portfolio-mobile-sort button:hover svg { transform: none; }
+  .portfolio-mobile-sort button:hover:not(:active):not(:focus-visible) { background: var(--white); color: var(--black); }
+  .portfolio-mobile-sort button:hover:not(:active):not(:focus-visible) svg { transform: none; }
   .portfolio-mobile-sort button:active { background: var(--black); color: var(--white); transform: scale(var(--motion-scale-press)); }
   .support-amount-option:hover:not(:has(input:checked)) { background: var(--white); color: var(--black); }
   .support-amount-option:active:not(:has(input:checked)) { background: color-mix(in srgb, var(--bright-blue) 24%, var(--white)); transform: scale(var(--motion-scale-press)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root { --motion-scale-hover: 1; --motion-scale-press: 1; }
+  :root { --motion-scale-hover: 1; --motion-scale-press: 1; --motion-offset-summary: 0px; --motion-offset-sort: 0px; }
   html { scroll-behavior: auto; }
   .button .arrow-icon, .round-link .arrow-icon,
   .home-page .text-link .arrow-icon, .allocation-card > a .arrow-icon,

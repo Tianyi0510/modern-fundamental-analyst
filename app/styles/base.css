@@ -91,6 +91,8 @@
   --motion-ease-standard: cubic-bezier(.2, 0, 0, 1);
   --motion-ease-emphasized: cubic-bezier(.22, 1, .36, 1);
   --motion-scale-hover: 1.04;
+  --motion-offset-summary: 8px;
+  --motion-offset-sort: -1px;
   --motion-scale-press: .98;
 }
 

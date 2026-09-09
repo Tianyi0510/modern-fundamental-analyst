@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isSameOrigin, readLimitedText, RequestBodyError } from "@/lib/api-request";
-import { resolveLocale } from "@/lib/i18n";
+import { getLocalizedPath, resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site-config";
 import { createSupportCheckoutSession, getStripeErrorDetails, parseSupportAmount } from "@/lib/stripe-checkout";
@@ -12,8 +12,7 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const isRateLimited = createRateLimiter({ namespace: "stripe-checkout", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 8 });
 
 function supportUrl(request: Request, locale: ReturnType<typeof resolveLocale>, status: "cancelled" | "error") {
-  const prefix = locale === "en" ? "" : `/${locale}`;
-  const url = new URL(`${prefix}/support`, request.url);
+  const url = new URL(getLocalizedPath("/support", locale), request.url);
   url.searchParams.set("status", status);
   return url;
 }

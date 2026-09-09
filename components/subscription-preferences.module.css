@@ -14,6 +14,10 @@
 .status, .invalid { min-height: var(--size-status-reserve); margin: 0; font-size: var(--font-size-body); line-height: var(--leading-body); letter-spacing: var(--tracking-body); }
 .request { max-width: 760px; display: grid; gap: var(--space-6); }
 
+@media (hover: none) and (pointer: coarse) {
+  .unsubscribe:hover:not(:active):not(:focus-visible):not(:disabled) { background: transparent; color: var(--black); }
+}
+
 @media (max-width: 800px) {
   .actions { align-items: stretch; flex-direction: column; gap: var(--space-4); }
   .unsubscribe { align-self: flex-start; }

@@ -68,7 +68,7 @@
 .sort-button:hover, .sort-button:focus-visible, .sort-button.is-active { color: var(--deep-blue); }
 .sort-button:active { transform: scale(var(--motion-scale-press)); }
 .sort-button svg { width: 13px; height: 13px; flex: none; transition: transform var(--motion-duration-base) var(--motion-ease-emphasized); }
-.sort-button:hover svg, .sort-button:focus-visible svg { transform: translateY(-1px); }
+.sort-button:hover svg, .sort-button:focus-visible svg { transform: translateY(var(--motion-offset-sort)); }
 .portfolio-mobile-sort { display: none; }
 .table-head span:last-child { text-align: right; }
 .portfolio-row { min-height: 94px; border-top: 1px solid var(--gray); transition: background var(--motion-duration-fast) var(--motion-ease-standard); }
@@ -140,7 +140,7 @@
 .memo-disclosure > summary:active { transform: scale(var(--motion-scale-press)); }
 .memo-disclosure > summary::-webkit-details-marker { display: none; }
 .memo-disclosure > summary > span:first-child { transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized); }
-.memo-disclosure > summary:hover > span:first-child, .memo-disclosure > summary:focus-visible > span:first-child { transform: translateX(8px); }
+.memo-disclosure > summary:hover > span:first-child, .memo-disclosure > summary:focus-visible > span:first-child { transform: translateX(var(--motion-offset-summary)); }
 .memo-summary-meta { display: inline-flex; align-items: center; gap: 12px; white-space: nowrap; }
 .memo-disclosure > summary svg { flex: none; transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized); }
 .memo-disclosure[open] > summary svg { transform: rotate(180deg); }

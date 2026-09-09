@@ -78,7 +78,7 @@ Light-surface form fields use `--focus-ring-on-light`; inverse fields use `--foc
 
 The default disabled opacity is `--opacity-disabled`; preferences preserve `--opacity-disabled-preferences`. A wait cursor applies while the preferences form is busy, not after unsubscribe has permanently disabled its controls.
 
-Reduced-motion mode removes smooth scrolling, minimizes transition durations, disables hover/press scaling through tokens, and removes decorative arrow movement and menu-control rotation. Touch rules must preserve keyboard focus and active feedback when clearing sticky hover styles.
+Reduced-motion mode removes smooth scrolling, minimizes transition durations, disables hover/press scaling through tokens, and removes decorative arrow movement and menu-control rotation. Summary and sort offsets use `--motion-offset-summary` and `--motion-offset-sort`, both zero in reduced-motion mode. Touch hover resets must exclude `:active` and `:focus-visible` so press and keyboard feedback keep their authored treatment.
 
 The mobile menu opens with coordinated motion and closes immediately, keeping visibility, input blocking and scroll restoration in sync. While open, background siblings are inert; closing restores their previous state and returns focus to the trigger. The language menu supports Enter, Space and arrow-key entry, arrow navigation, Escape dismissal and Tab exit.
 

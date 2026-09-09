@@ -31,9 +31,17 @@ test("Next.js applies a conservative security-header baseline", async () => {
 });
 
 test("page metadata provides canonical and bilingual alternate URLs", async () => {
-  const metadata = await read("lib/site-config.ts");
-
-  assert.match(metadata, /canonical/);
-  assert.match(metadata, /"zh-Hant-TW"/);
-  assert.match(metadata, /"x-default"/);
+  const { createPageMetadata, SITE_NAME } = await import("../lib/site-config.ts");
+  const { locales, localeConfig, getLocalizedPath } = await import("../lib/i18n.ts");
+  for (const locale of locales) {
+    const metadata = createPageMetadata({ title: "About", description: "About research", path: "/about", locale });
+    assert.equal(metadata.alternates.canonical, getLocalizedPath("/about", locale));
+    for (const target of locales) assert.equal(metadata.alternates.languages[localeConfig[target].hrefLang], getLocalizedPath("/about", target));
+    assert.equal(metadata.alternates.languages["x-default"], "/about");
+    assert.equal(metadata.openGraph.title, locale === "en" ? `About | ${SITE_NAME}` : `About｜${SITE_NAME}`);
+    assert.equal(metadata.twitter.title, metadata.openGraph.title);
+    assert.equal(metadata.openGraph.description, metadata.description);
+    assert.equal(metadata.twitter.description, metadata.description);
+    assert.ok(metadata.openGraph.images.length);
+  }
 });

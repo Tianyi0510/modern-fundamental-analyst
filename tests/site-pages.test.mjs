@@ -133,15 +133,18 @@ test("language-specific root layouts preserve html lang without request-time pro
 });
 
 test("all locales provide equivalent navigation paths and SEO alternates", async () => {
-  const [{ getLocalizedPath }, sitemap, siteConfig] = await Promise.all([
+  const [{ getLocalizedPath }, { default: sitemap }, { createPageMetadata }] = await Promise.all([
     import("../lib/i18n.ts"),
-    read("app/sitemap.ts"),
-    read("lib/site-config.ts"),
+    import("../app/sitemap.ts"),
+    import("../lib/site-config.ts"),
   ]);
 
   assert.equal(getLocalizedPath("/portfolio", "zh-cn"), "/zh-cn/portfolio");
   assert.equal(getLocalizedPath("/zh-tw/memos/example", "zh-cn"), "/zh-cn/memos/example");
   assert.equal(getLocalizedPath("/zh-cn/about", "en"), "/about");
-  assert.match(sitemap, /zh-Hans-CN/);
-  assert.match(siteConfig, /zh-Hans-CN/);
+  const metadata = createPageMetadata({ title: "About", description: "About", path: "/about", locale: "zh-cn" });
+  const entries = sitemap();
+  const entry = entries.find(item => item.url.endsWith("/zh-cn/about"));
+  assert.equal(new URL(entry.alternates.languages["zh-Hans-CN"]).pathname, metadata.alternates.languages["zh-Hans-CN"]);
+  assert.equal(new Set(entries.map(item => item.url)).size, entries.length);
 });

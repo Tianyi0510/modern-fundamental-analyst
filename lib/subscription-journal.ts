@@ -3,7 +3,7 @@ import { createHmac, randomUUID } from "node:crypto";
 import { executeRedisCommand, getRedisClient } from "@/lib/redis";
 import { resendOperationContext } from "@/lib/resend";
 
-type JournalRecord = { id: string; startedAt: string; phase: string; locale: string };
+type JournalRecord = { id: string; startedAt: string; phase: string; locale: string; operation?: "subscribe" | "preferences" };
 function keyFor(email: string) {
   const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET || process.env.RESEND_API_KEY;
   if (!secret) throw new Error("Subscription journal secret is unavailable");
@@ -17,12 +17,12 @@ async function client() {
 
 // Caller holds the subscriber lock. No expiry: uncertain writes and process
 // termination must remain discoverable after the short subscriber lease expires.
-export async function withSubscriptionJournal<T>(email: string, locale: string, operation: () => Promise<T>) {
+export async function withSubscriptionJournal<T>(email: string, locale: string, operation: () => Promise<T>, operationType: "subscribe" | "preferences" = "subscribe") {
   const redis = await client();
   const key = keyFor(email);
   const context = resendOperationContext.getStore();
   if (!context) throw new Error("Subscription journal requires a subscriber lock");
-  const record: JournalRecord = { id: randomUUID(), startedAt: new Date().toISOString(), phase: "starting", locale };
+  const record: JournalRecord = { id: randomUUID(), startedAt: new Date().toISOString(), phase: "starting", locale, operation: operationType };
   let serialized = JSON.stringify(record);
   if (!await executeRedisCommand(redis, () => redis.set(key, serialized, { NX: true }))) {
     throw new Error("Subscription reconciliation required");

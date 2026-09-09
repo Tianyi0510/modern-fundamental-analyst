@@ -129,7 +129,7 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-index-row:active\s*\{[^}]*transform:\s*scale\(var\(--motion-scale-press\)\)/s);
   assert.doesNotMatch(css, /\.memo-disclosure > summary::before/);
   assert.match(css, /\.memo-disclosure > summary:hover, \.memo-disclosure > summary:focus-visible\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
-  assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(8px\)/s);
+  assert.match(css, /\.memo-disclosure > summary:hover > span:first-child,[^}]*translateX\(var\(--motion-offset-summary\)\)/s);
   assert.match(index, /import \{ ChevronDown \} from "lucide-react"/);
   assert.match(index, /className="memo-summary-meta"[\s\S]*className="memo-count"[\s\S]*<ChevronDown aria-hidden="true" size=\{24\} strokeWidth=\{2\} \/>/);
   assert.match(css, /\.memo-summary-meta \{[^}]*white-space: nowrap/);

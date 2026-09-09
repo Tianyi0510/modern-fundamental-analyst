@@ -31,6 +31,46 @@ const { POST: requestPreferences } = await import("../app/api/subscription-prefe
 const { subscribeContact } = await import("../lib/subscription-service.ts");
 const { getPreferredLanguageSegmentId } = await import("../lib/resend-segments.ts");
 const { withSubscriptionJournal, readSubscriptionJournal, resolveSubscriptionJournal } = await import("../lib/subscription-journal.ts");
+const { POST: updatePreferences } = await import("../app/api/subscription-preferences/route.ts");
+const { createPreferenceToken } = await import("../lib/subscription-preferences.ts");
+
+function preferencesMutation(action) {
+  return new Request("https://www.modernfundamentalanalyst.com/api/subscription-preferences", {
+    method: "POST", headers: { "content-type": "application/json", host: "www.modernfundamentalanalyst.com", origin: "https://www.modernfundamentalanalyst.com" },
+    body: JSON.stringify({ action, locale: "zh-tw", token: createPreferenceToken("reader@example.com") }),
+  });
+}
+
+test("confirmed preference saves clear their journal", async t => {
+  t.mock.method(globalThis, "fetch", async (url, options) => {
+    if (String(url).includes("/segments")) return Response.json({ data: [{ id: getPreferredLanguageSegmentId("zh-tw") }], has_more: false });
+    if (options.method === "PATCH") assert.equal(JSON.parse(options.body).properties.preferred_language, "繁體中文");
+    return Response.json({ id: "contact-id", unsubscribed: false });
+  });
+  assert.equal((await updatePreferences(preferencesMutation("save"))).status, 200);
+  assert.equal(await readSubscriptionJournal("reader@example.com"), null);
+});
+
+test("ambiguous preference saves retain a journal and do not prevent later unsubscribe", async t => {
+  t.mock.method(console, "error", () => {});
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (url, options) => {
+    requests.push(String(url));
+    if (String(url).includes("/segments")) return Response.json({ data: [{ id: getPreferredLanguageSegmentId("zh-tw") }], has_more: false });
+    if (options.method === "PATCH" && !JSON.parse(options.body).unsubscribed) throw new TypeError("response lost");
+    return Response.json({ id: "contact-id", unsubscribed: false });
+  });
+  assert.equal((await updatePreferences(preferencesMutation("save"))).status, 502);
+  const record = await readSubscriptionJournal("reader@example.com");
+  assert.equal(record.operation, "preferences");
+  assert.equal(record.phase, "rollback-language-segments");
+  for (const key of values.keys()) if (key.startsWith("mfa:resend:subscriber:")) values.delete(key);
+  const previousCount = requests.length;
+  assert.equal((await updatePreferences(preferencesMutation("save"))).status, 503);
+  assert.equal(requests.length, previousCount);
+  assert.equal((await updatePreferences(preferencesMutation("unsubscribe"))).status, 200);
+  assert.equal((await readSubscriptionJournal("reader@example.com")).id, record.id);
+});
 
 test("subscription journal persists uncertain phases and blocks blind retries after lease expiry", async () => {
   await withSubscriberLock("reader@example.com", () => withSubscriptionJournal("reader@example.com", "en", async () => {

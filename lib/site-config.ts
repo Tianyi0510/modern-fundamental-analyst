@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { Locale } from "@/lib/i18n";
+import { getLanguageAlternates, getLocalizedPath, type Locale } from "@/lib/i18n";
 
 export const SITE_URL = "https://www.modernfundamentalanalyst.com";
 export const SITE_NAME = "Modern Fundamental Analyst";
@@ -13,22 +13,21 @@ type PageMetadataOptions = {
 };
 
 export function createPageMetadata({ title, description, path, locale = "en" }: PageMetadataOptions): Metadata {
-  const englishPath = path;
-  const traditionalChinesePath = path === "/" ? "/zh-tw" : `/zh-tw${path}`;
-  const simplifiedChinesePath = path === "/" ? "/zh-cn" : `/zh-cn${path}`;
-  const canonical = locale === "zh-tw" ? traditionalChinesePath : locale === "zh-cn" ? simplifiedChinesePath : englishPath;
+  const canonical = getLocalizedPath(path, locale);
+  const fullTitle = locale === "en" ? `${title} | ${SITE_NAME}` : `${title}｜${SITE_NAME}`;
+  const image = `${SITE_URL}/og.png`;
 
   return {
     title: locale === "en" ? title : { absolute: `${title}｜${SITE_NAME}` },
     description,
+    openGraph: {
+      title: fullTitle, description, url: canonical,
+      images: [{ url: image, width: 1728, height: 910, alt: "Ideas compound. Capital follows." }],
+    },
+    twitter: { card: "summary_large_image", title: fullTitle, description, images: [image] },
     alternates: {
       canonical,
-      languages: {
-        en: englishPath,
-        "zh-Hant-TW": traditionalChinesePath,
-        "zh-Hans-CN": simplifiedChinesePath,
-        "x-default": englishPath,
-      },
+      languages: getLanguageAlternates(path),
     },
   };
 }
