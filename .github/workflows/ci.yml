@@ -32,6 +32,11 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+      # Playwright downloads its own Chromium; the runner's Chrome apt feed is unused.
+      # Exclude it so a feed sync error cannot block Ubuntu dependency installation.
+      - name: Disable unused Google Chrome apt source
+        run: sudo rm -f /etc/apt/sources.list.d/google-chrome.list
+
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
 
