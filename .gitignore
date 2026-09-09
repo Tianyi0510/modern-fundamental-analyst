@@ -32,3 +32,6 @@ output/
 *.tsbuildinfo
 next-env.d.ts.bak
 .vercel
+
+# Local review evidence; retained on disk, excluded from version control.
+audit/

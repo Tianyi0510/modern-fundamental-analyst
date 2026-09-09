@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
-import type { Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 
 const slotIndexes = [0, 1, 2] as const;
 
@@ -29,11 +29,10 @@ const placeholderCopy = {
 type MemoCardsProps = {
   memos: readonly MemoSummary[];
   locale: Locale;
-  basePath: string;
   className?: string;
 };
 
-export function MemoCards({ memos, locale, basePath, className = "" }: MemoCardsProps) {
+export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
   const placeholder = placeholderCopy[locale];
 
   return <div className={`memo-grid${className ? ` ${className}` : ""}`}>
@@ -48,7 +47,7 @@ export function MemoCards({ memos, locale, basePath, className = "" }: MemoCards
         <small>{placeholder.availability}</small>
       </article>;
 
-      return <Link className={`memo-card memo-card-${index + 1}`} href={`${basePath}/${memo.slug}`} key={memo.slug}>
+      return <Link className={`memo-card memo-card-${index + 1}`} href={getLocalizedPath(`/memos/${memo.slug}`, locale)} key={memo.slug}>
         <div><span>{memo.number}</span><span>{memo.category.label}</span></div>
         <h3>{memo.title}</h3>
         <p>{memo.summary}</p>

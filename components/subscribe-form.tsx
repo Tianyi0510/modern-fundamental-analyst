@@ -1,4 +1,4 @@
-import { localeConfig, type Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { SubscribeFormClient, type SubscribeFormCopy } from "./subscribe-form-client";
 
 const copy = {
@@ -8,5 +8,5 @@ const copy = {
 } satisfies Record<Locale, SubscribeFormCopy>;
 
 export function SubscribeForm({ locale }: { locale: Locale }) {
-  return <SubscribeFormClient copy={copy[locale]} locale={locale} preferencesHref={`${localeConfig[locale].prefix}/subscription-preferences`} />;
+  return <SubscribeFormClient copy={copy[locale]} locale={locale} preferencesHref={getLocalizedPath("/subscription-preferences", locale)} />;
 }

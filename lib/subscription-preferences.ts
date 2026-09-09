@@ -1,6 +1,6 @@
 import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
-import { localeConfig, type Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site-config";
 
 const TOKEN_VERSION = 1;
@@ -67,9 +67,8 @@ export function readPreferenceToken(token: string): PreferenceTokenPayload | nul
 }
 
 export function createPreferenceUrl(email: string, locale: Locale, lifetimeMs?: number) {
-  const prefix = localeConfig[locale].prefix;
   const token = createPreferenceToken(email, lifetimeMs);
-  return `${SITE_URL}${prefix}/subscription-preferences?token=${encodeURIComponent(token)}`;
+  return `${SITE_URL}${getLocalizedPath("/subscription-preferences", locale)}?token=${encodeURIComponent(token)}`;
 }
 
 export function maskEmail(email: string) {

@@ -1,19 +1,11 @@
+import { escapeHtml } from "@/lib/escape-html";
+
 export type PreferenceEmailCopy = {
   heading: string;
   body: string;
   action: string;
   note: string;
 };
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>'"]/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    '"': "&quot;",
-  })[character] ?? character);
-}
 
 export function renderPreferenceEmail(copy: PreferenceEmailCopy, preferencesUrl: string) {
   const heading = escapeHtml(copy.heading);

@@ -32,3 +32,25 @@ test.describe("touch and keyboard state consistency", () => {
     await expect(summary).toHaveCSS("background-color", background);
   });
 });
+
+test("localized navigation and memo links retain their language and honeypots stay hidden", async ({ page }) => {
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    await page.goto(`${prefix}/contact`);
+    const traps = page.locator('input[name="website"]');
+    await expect(traps).toHaveCount(2);
+    for (const trap of await traps.all()) {
+      await expect(trap).toHaveAttribute("tabindex", "-1");
+      await expect(trap.locator("..")).toHaveAttribute("aria-hidden", "true");
+      const bounds = await trap.boundingBox();
+      expect(bounds).not.toBeNull();
+      expect(bounds!.x + bounds!.width).toBeLessThan(0);
+    }
+    await expect(page.locator('.footer-mark')).toHaveAttribute("href", prefix || "/");
+    await page.goto(`${prefix}/memos`);
+    const cards = page.locator('a.memo-card');
+    expect(await cards.count()).toBeGreaterThan(0);
+    for (const card of await cards.all()) {
+      expect(await card.getAttribute("href")).toMatch(new RegExp(`^${prefix}/memos/[^/]+$`));
+    }
+  }
+});

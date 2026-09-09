@@ -32,7 +32,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
   assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
   assert.match(styles, /\.control\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
+  assert.match(client, /<HoneypotField \/>/);
   assert.match(route, /CONTACT_TO_EMAIL/);
   assert.match(route, /CONTACT_FROM_EMAIL/);
   assert.match(resend, /contact@mail\.modernfundamentalanalyst\.com/);
@@ -67,7 +67,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*var\(--space-5\)/s);
   assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
   assert.match(styles, /\.submit:hover:not\(:disabled\), \.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
-  assert.match(styles, /\.honeypot\s*\{[^}]*position:\s*absolute !important/s);
+  assert.match(client, /<HoneypotField \/>/);
   assert.match(footer, /className="footer-social-link footer-x" href="https:\/\/x\.com\/DavidLi0510" target="_blank" rel="noreferrer"/);
   assert.match(footer, /footer-x[\s\S]*?<svg aria-hidden="true"[\s\S]*?<span>X \(formerly Twitter\)<\/span>/);
   assert.match(route, /subscribeContact\(email, locale\)/);
@@ -81,7 +81,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(service, /shouldSendWelcome = !existing\.data \|\| existing\.data\.unsubscribed/);
   assert.match(service, /memo_title:\s*latestMemo\.title/);
   assert.match(service, /memo_summary:\s*latestMemo\.summary/);
-  assert.match(service, /memo_url:\s*`\$\{SITE_URL\}\$\{prefix\}\/memos\/\$\{latestMemo\.slug\}`/);
+  assert.match(service, /memo_url:.*getLocalizedPath/);
   assert.match(service, /preferences_url: createPreferenceUrl\(email, locale\)/);
   assert.doesNotMatch(route, /ok: true, preferencesUrl/);
   assert.match(service, /unsubscribed:\s*true/);

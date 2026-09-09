@@ -7,7 +7,7 @@ import { homeCopy } from "@/data/home-copy";
 import { getMemos } from "@/data/memos";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
-import { localeConfig, type Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const featuredHoldings = portfolioHoldings.toSorted((a, b) => b.marketValue - a.marketValue).slice(0, 4);
@@ -22,7 +22,6 @@ const allocationGradient = `conic-gradient(var(--deep-blue) 0 ${firstStop}%, var
 
 export function HomePageContent({ locale }: { locale: Locale }) {
   const text = homeCopy[locale];
-  const prefix = localeConfig[locale].prefix;
   const memos = getMemos(locale);
   const portfolioDate = formatDate(portfolioSnapshot.asOf, locale);
   const compactPortfolioDate = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
@@ -38,10 +37,10 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <div className="hero-bottom">
             <p>{text.heroIntro}</p>
             <div className="hero-actions">
-              <Link className="button button-dark" href={`${prefix}/portfolio`}>
+              <Link className="button button-dark" href={getLocalizedPath("/portfolio", locale)}>
                 {text.viewPortfolio}
               </Link>
-              <Link className="text-link" href={`${prefix}/memos`}>{text.readLatest}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+              <Link className="text-link" href={getLocalizedPath("/memos", locale)}>{text.readLatest}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
             </div>
           </div>
         </section>
@@ -71,7 +70,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
         <div>
           <p>{text.aboutCopy}</p>
-          <Link className="text-link" href={`${prefix}/about`}>{text.aboutLink}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+          <Link className="text-link" href={getLocalizedPath("/about", locale)}>{text.aboutLink}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
         </div>
       </section>
 
@@ -79,7 +78,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         <section className="intro shell">
           <p className="section-number">{text.portfolioLabel}</p>
           <h2>{text.portfolioTitle[0]}<br />{text.portfolioTitle[1]}</h2>
-          <Link className="round-link" href={`${prefix}/portfolio`} aria-label={text.viewPortfolio}>
+          <Link className="round-link" href={getLocalizedPath("/portfolio", locale)} aria-label={text.viewPortfolio}>
             <MoveUpRight className="arrow-icon round-link-arrow" aria-hidden="true" strokeWidth={3} />
           </Link>
         </section>
@@ -114,7 +113,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 <li><i aria-hidden="true" /><span>{text.other}</span><b>{otherWeight.toFixed(1)}%</b></li>
               </ul>
             </div>
-            <Link href={`${prefix}/portfolio`}>
+            <Link href={getLocalizedPath("/portfolio", locale)}>
               <span className="link-label">{text.fullPortfolio}</span>
               <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
             </Link>
@@ -149,7 +148,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <small className="date-text">
                 {text.verified} {portfolioDate}{locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} · {text.updatedMonthly}{locale === "en" ? "." : "。"}
               </small>
-              <Link className="button button-white" href={`${prefix}/performance`}>
+              <Link className="button button-white" href={getLocalizedPath("/performance", locale)}>
                 {text.viewPerformance}
               </Link>
             </div>
@@ -162,14 +161,14 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <p className="section-number">{text.memosLabel}</p>
           <h2>{text.memosTitle[0]}<br />{text.memosTitle[1]}</h2>
         </div>
-        <MemoCards memos={memos} locale={locale} basePath={`${prefix}/memos`} />
-        <Link className="text-link memos-all" href={`${prefix}/memos`}>{text.viewAllMemos}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+        <MemoCards memos={memos} locale={locale} />
+        <Link className="text-link memos-all" href={getLocalizedPath("/memos", locale)}>{text.viewAllMemos}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
       </section>
 
       <section className="cta shell">
         <p className="eyebrow"><span /> {text.contactLabel}</p>
         <h2>{text.contactTitle[0]}<br />{text.contactTitle[1]}</h2>
-        <Link className="button button-dark" href={`${prefix}/contact`}>
+        <Link className="button button-dark" href={getLocalizedPath("/contact", locale)}>
           {text.contactLink}
         </Link>
       </section>

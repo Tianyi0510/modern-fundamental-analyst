@@ -38,8 +38,9 @@ Verification includes type checking, linting, unit tests, Chromium browser tests
 | `content/memos/` | Investment memo content |
 | `lib/` | Services, calculations, and utilities |
 | `tests/` | Unit and browser tests |
+| `scripts/` | CI deployment gate, Node module loader, and subscription journal CLI |
 
-Language routes are `/`, `/zh-tw`, and `/zh-cn`.
+Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](ARCHITECTURE.md#review-evidence).
 
 ## Content and Integrations
 
@@ -49,7 +50,7 @@ Integration details:
 
 - [Resend email and subscriptions](RESEND_INTEGRATION.md)
 - [Upstash Redis](UPSTASH_REDIS.md)
-- [Stripe setup and checklist](STRIPE_INTEGRATION_TODO.md)
+- [Stripe setup and checklist](STRIPE_INTEGRATION.md)
 
 See the [design system and style guide](STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.
 

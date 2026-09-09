@@ -1,5 +1,5 @@
 import { getLatestMemo } from "@/data/memos";
-import { localeConfig, type Locale } from "@/lib/i18n";
+import { getLocalizedPath, localeConfig, type Locale } from "@/lib/i18n";
 import { getResendClient, reportResendRollbackFailure, runResendOperation, resendOperationContext } from "@/lib/resend";
 import { withSubscriptionJournal } from "@/lib/subscription-journal";
 import { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } from "@/lib/resend-segments";
@@ -96,7 +96,6 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
   const contactId = result.data?.id ?? existing.data?.id;
   if (!latestMemo) return unavailable(503);
 
-  const prefix = localeConfig[locale].prefix;
   await resendOperationContext.getStore()?.recordPhase?.("send-welcome-event");
   const welcome = await runResendOperation("Resend welcome automation request failed", () => resend.events.send({
     event: "subscriber.created",
@@ -105,7 +104,7 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
       locale,
       memo_title: latestMemo.title,
       memo_summary: latestMemo.summary,
-      memo_url: `${SITE_URL}${prefix}/memos/${latestMemo.slug}`,
+      memo_url: `${SITE_URL}${getLocalizedPath(`/memos/${latestMemo.slug}`, locale)}`,
       preferences_url: createPreferenceUrl(email, locale),
     },
   }));

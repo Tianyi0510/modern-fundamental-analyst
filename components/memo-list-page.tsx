@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getMemos } from "@/data/memos";
 import { formatDate } from "@/lib/format";
-import { localeConfig, type Locale } from "@/lib/i18n";
+import { type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
@@ -14,14 +14,13 @@ const copy = {
 
 export function MemoListPage({ locale }: { locale: Locale }) {
   const text = copy[locale];
-  const basePath = `${localeConfig[locale].prefix}/memos`;
   const memos = getMemos(locale);
   const latestPublishedAt = memos.reduce((latest, memo) => memo.publishedAt > latest ? memo.publishedAt : latest, "");
   const lastUpdated = latestPublishedAt ? formatDate(latestPublishedAt, locale) : "—";
 
   return <main className="memos-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}<br /><em>{text.emphasis}</em></h1><div className="page-intro"><p>{text.subtitle}</p><small className="date-text">{text.updated} {lastUpdated}</small></div></section>
-    <MemoIndex memos={memos} locale={locale} label={text.indexLabel} basePath={basePath} />
+    <MemoIndex memos={memos} locale={locale} label={text.indexLabel} />
     <SiteFooter locale={locale} />
   </main>;
 }

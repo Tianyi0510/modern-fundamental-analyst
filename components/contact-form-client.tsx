@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { postJson } from "@/lib/client-post-json";
 import type { Locale } from "@/lib/i18n";
 import styles from "./contact-form.module.css";
+import { HoneypotField } from "./honeypot-field";
 import { useExclusiveSubmit } from "./use-exclusive-submit";
 import { useSubmissionId } from "./use-submission-id";
 
@@ -48,7 +49,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
       <label className={styles.field}><span className={styles.fieldLabel}>{copy.email}</span><input disabled={status === "sending"} className={styles.control} name="email" type="email" autoComplete="email" maxLength={254} required /></label>
       <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{copy.subject}</span><input disabled={status === "sending"} className={styles.control} name="subject" type="text" maxLength={160} required /></label>
       <label className={`${styles.field} ${styles.fieldWide}`}><span className={styles.fieldLabel}>{copy.message}</span><textarea disabled={status === "sending"} className={styles.control} name="message" rows={7} minLength={10} maxLength={5000} required /></label>
-      <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
+      <HoneypotField />
       <div className={styles.actions}>
         <button className={`${styles.submit} button button-dark`} type="submit" disabled={status === "sending"}>{status === "sending" ? copy.sending : copy.send}</button>
         <p className={styles.status} role="status" aria-live="polite">{status === "success" ? copy.success : status === "error" ? copy.error : ""}</p>

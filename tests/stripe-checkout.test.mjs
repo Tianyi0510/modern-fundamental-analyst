@@ -64,7 +64,7 @@ test("Support is localized and linked without changing the primary navigation", 
   assert.match(support, /"zh-cn":/);
   assert.match(support, /className="support-section"/);
   assert.doesNotMatch(support, /className="support-section section-gray"/);
-  assert.match(footer, /href=\{`\$\{prefix\}\/support`\}/);
+  assert.match(footer, /href=\{getLocalizedPath\("\/support", locale\)\}/);
   assert.match(sitemap, /"\/support"/);
   assert.doesNotMatch(navigation, /support/i);
 });

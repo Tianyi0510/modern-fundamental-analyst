@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { postJson } from "@/lib/client-post-json";
 import type { Locale } from "@/lib/i18n";
 import styles from "./subscribe-form.module.css";
+import { HoneypotField } from "./honeypot-field";
 import { useExclusiveSubmit } from "./use-exclusive-submit";
 
 export type SubscribeFormCopy = {
@@ -44,7 +45,7 @@ export function SubscribeFormClient({ copy, locale, preferencesHref }: { copy: S
           <span>{copy.email}</span>
           <input disabled={status === "submitting"} className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={copy.placeholder} maxLength={254} required />
         </label>
-        <label className={styles.honeypot} aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
+        <HoneypotField />
         <button className={styles.submit} type="submit" disabled={status === "submitting"}>{status === "submitting" ? copy.submitting : copy.submit}</button>
         <a className={styles.preferences} href={preferencesHref}>{copy.preferences}</a>
         <p className={styles.status} role="status" aria-live="polite">{status === "success" ? copy.success : status === "error" ? copy.error : ""}</p>

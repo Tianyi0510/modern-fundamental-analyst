@@ -3,19 +3,18 @@ import { ChevronDown } from "lucide-react";
 import { MemoCards } from "@/components/memo-cards";
 import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
-import type { Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 
 type MemoIndexProps = {
   memos: readonly MemoSummary[];
   locale: Locale;
   label: string;
-  basePath: string;
 };
 
-export function MemoIndex({ memos, locale, label, basePath }: MemoIndexProps) {
+export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
   return (
     <section className="memo-index shell">
-      <MemoCards memos={memos} locale={locale} basePath={basePath} className="memo-index-featured" />
+      <MemoCards memos={memos} locale={locale} className="memo-index-featured" />
       <details className="memo-disclosure">
         <summary>
           <span>{label}</span>
@@ -26,7 +25,7 @@ export function MemoIndex({ memos, locale, label, basePath }: MemoIndexProps) {
         </summary>
         <div className="memo-disclosure-content">
           {memos.map((memo) => (
-            <Link href={`${basePath}/${memo.slug}`} className="memo-index-row" key={memo.slug}>
+            <Link href={getLocalizedPath(`/memos/${memo.slug}`, locale)} className="memo-index-row" key={memo.slug}>
               <span>{memo.number}</span>
               <div><small>{memo.category.label}</small><h2>{memo.title}</h2><p>{memo.summary}</p></div>
               <div className="memo-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span></div>

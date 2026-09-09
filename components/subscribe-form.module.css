@@ -14,7 +14,6 @@
 .preferences { grid-column: 1; width: fit-content; min-height: 24px; margin-top: var(--space-2); color: var(--white); font-size: var(--font-size-control); line-height: var(--leading-body); font-weight: var(--weight-bold); text-decoration: underline; transition: color var(--motion-duration-base) var(--motion-ease-standard); }
 .preferences:hover, .preferences:focus-visible { color: var(--bright-blue); }
 .form .status { grid-column: 1 / -1; min-height: var(--size-status-reserve); margin: 0; color: var(--white); font-size: var(--font-size-caption); line-height: var(--leading-body); letter-spacing: var(--tracking-body); font-weight: var(--weight-bold); }
-.honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; pointer-events: none !important; }
 @media (max-width: 800px) {
   .form { grid-template-columns: 1fr; }
   .submit { width: 100%; }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import type { Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 
 type Section = { label: string; title: string; paragraphs: string[] };
@@ -61,7 +61,6 @@ const copy: Record<Locale, Copy> = {
 
 export function AboutPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
-  const prefix = locale === "en" ? "" : `/${locale}`;
   return <main className="about-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.headline[0]}<br /><em>{text.headline[1]}</em></h1><div className="page-intro"><p>{text.introduction}</p><small>{text.disciplines}</small></div></section>
     {text.sections.map((section, index) => {
@@ -69,7 +68,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
       return <section className={`about-section shell${index % 2 === 1 ? " section-gray" : ""}`} key={section.label}><div className="about-section-heading"><p className="section-number about-section-label"><span>{number}</span><span aria-hidden="true">·</span><span>{sectionName}</span></p><h2>{section.title}</h2></div><div className="about-copy">{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></section>;
     })}
     <section className="about-boundaries">{text.boundaries.map((boundary) => <article key={boundary.title}><h2>{boundary.title}</h2><ol>{boundary.items.map((item, index) => <li key={item}><span className="about-boundary-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><span>{item}</span></li>)}</ol></article>)}</section>
-    <section className="about-closing shell"><p className="eyebrow"><span /> {text.closingLabel}</p><h2>{text.closingTitle}</h2><div>{text.closingParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<p className="reference-note">{text.legalPrefix}<Link className="source-link" href={`${prefix}/disclaimer`}>{text.disclaimer}</Link>{text.conjunction}<Link className="source-link" href={`${prefix}/performance`}>{text.performance}</Link>{text.legalSuffix}</p></div></section>
+    <section className="about-closing shell"><p className="eyebrow"><span /> {text.closingLabel}</p><h2>{text.closingTitle}</h2><div>{text.closingParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<p className="reference-note">{text.legalPrefix}<Link className="source-link" href={getLocalizedPath("/disclaimer", locale)}>{text.disclaimer}</Link>{text.conjunction}<Link className="source-link" href={getLocalizedPath("/performance", locale)}>{text.performance}</Link>{text.legalSuffix}</p></div></section>
     <SiteFooter locale={locale} />
   </main>;
 }

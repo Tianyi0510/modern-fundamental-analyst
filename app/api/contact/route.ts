@@ -1,3 +1,4 @@
+import { escapeHtml } from "@/lib/escape-html";
 import { NextResponse } from "next/server";
 import { cleanSingleLine, cleanText, isValidEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { createRateLimiter } from "@/lib/rate-limit";
@@ -16,16 +17,6 @@ type ContactRequest = {
   website?: unknown;
   locale?: unknown;
 };
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>'"]/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    '"': "&quot;",
-  })[character] ?? character);
-}
 
 export async function POST(request: Request) {
   const parsed = await readProtectedObjectJson<ContactRequest>(request, {

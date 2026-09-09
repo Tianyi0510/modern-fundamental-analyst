@@ -22,3 +22,7 @@ There is no automatic replay worker: operator reconciliation is deliberate for w
 ## Payment confirmation
 
 The return page reads only server-verified status from Stripe. URL parameters cannot assert payment. Provider failures produce an unverified state, not a prompt to pay again. Checkout Session read permission is required alongside write permission. Entitlements or fulfillment would require a separate verified webhook and durable payment ledger.
+
+## Review evidence
+
+`audit/` holds local screenshots and dated review notes. Git and Vercel exclude it; existing files are retained on disk. These historical observations are not the current issue list and are not shared with a fresh clone. Keep durable decisions and operating instructions in the root documentation. If evidence needs to be shared, prepare a separate reviewed artifact with relative image links and record its date, commit, environment and resolution status; local absolute paths are not portable. CI browser failure evidence is retained for seven days as described in [Resend verification](RESEND_INTEGRATION.md#verification).

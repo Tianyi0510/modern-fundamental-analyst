@@ -1,10 +1,10 @@
 # Stripe Checkout Integration
 
-This file is the single source of truth for the remaining Stripe setup required before accepting live payments.
+This guide describes the Checkout implementation and environment verification steps. Source behavior was reviewed on 2026-09-09; Stripe and Vercel Dashboard state was not rechecked during that review.
 
-## Values to Replace
+## Environment configuration
 
-The repository contains no real credentials. Configure these values as **Sensitive** environment variables in Vercel rather than committing them.
+Use [.env.example](.env.example) for local configuration and environment-scoped Vercel variables for deployments. Store API keys as **Sensitive** values; never commit credentials.
 
 **Files containing placeholders:**
 
@@ -13,10 +13,14 @@ The repository contains no real credentials. Configure these values as **Sensiti
 | Field | Current Value | What to Set |
 |---|---|---|
 | `STRIPE_RESTRICTED_KEY` | `rk_test_replace_with_restricted_key` | A test restricted key locally and a separate live restricted key in Vercel. Grant Checkout Sessions read/write access and the minimum Price access required by Stripe. |
-| `STRIPE_SECRET_KEY` | `sk_test_replace_with_secret_key` | Compatibility fallback only. Production currently uses this Sensitive Vercel variable; replace it with `STRIPE_RESTRICTED_KEY` when practical. |
+| `STRIPE_SECRET_KEY` | `sk_test_replace_with_secret_key` | Compatibility fallback only. Used only when `STRIPE_RESTRICTED_KEY` is absent or empty. Prefer the restricted key. |
 | `STRIPE_PRICE_USD_6` | `price_replace_with_6_usd_price` | The environment-appropriate one-time USD 6 Price ID. |
 | `STRIPE_PRICE_USD_12` | `price_replace_with_12_usd_price` | The environment-appropriate one-time USD 12 Price ID. |
 | `STRIPE_PRICE_USD_18` | `price_replace_with_18_usd_price` | The environment-appropriate one-time USD 18 Price ID. |
+
+### Recorded Price IDs
+
+The IDs below are retained from earlier setup records, not a current inventory. Before use, verify account, mode, active status, currency and amount in Stripe. They are resource identifiers, not credentials.
 
 ### Sandbox Price IDs
 
@@ -50,7 +54,7 @@ Use these only with the **Modern Fundamental Analyst Live Mode** restricted key.
 | `mode` | `payment` |
 | `billing_address_collection` | `auto` |
 | `phone_number_collection.enabled` | `false` |
-| `automatic_tax.enabled` | `true`; active Live tax registrations were confirmed before deployment |
+| `automatic_tax.enabled` | `true` in the application |
 | `managed_payments.enabled` | Uses the Stripe account default |
 | `allow_promotion_codes` | `false` |
 | `submit_type` | `auto` |
@@ -60,20 +64,21 @@ Use these only with the **Modern Fundamental Analyst Live Mode** restricted key.
 | `success_url` | Localized `/support?status=success&session_id={CHECKOUT_SESSION_ID}` |
 | `cancel_url` | Localized `/support?status=cancelled` |
 
-`automatic_tax` is enabled because active Live Tax Registrations were confirmed for Taiwan, New Jersey, Singapore, and Canada. Managed Payments uses the Stripe account default and requires Automatic Tax when enabled.
+The code enables Automatic Tax on every Session and omits a Managed Payments override. Verify account settings, applicable registrations and product tax codes in the target mode before payment testing; the code does not verify those Dashboard settings.
 
-The implementation preserves the requested `hosted_web_0001` prefix and appends the required eight-letter tracking suffix for current Stripe API versions.
+The integration identifier is defined in `lib/stripe-checkout.ts`, which also pins the Stripe API version.
 
-## Setup and Next Steps
+## Environment verification checklist
 
-1. Create a restricted key for the sandbox. Store it only in `.env.local` as `STRIPE_RESTRICTED_KEY`. `STRIPE_SECRET_KEY` is accepted only as a compatibility fallback.
-2. Add the three sandbox Price IDs above to `.env.local`.
-3. Run `npm run dev`, open `/support`, and complete each amount with Stripe test card `4242 4242 4242 4242`, any future expiry, and any CVC.
-4. The equivalent live Product and Price resources have already been created; use the live Price IDs above.
-5. Production currently has `STRIPE_SECRET_KEY` and the live Price IDs as Sensitive Vercel variables. Migrate the key to a least-privilege `STRIPE_RESTRICTED_KEY`, redeploy, then remove the broad secret key.
-6. Redeploy Production and complete one small live payment. Refund it from Stripe after verification if desired.
-7. Keep Dynamic Payment Methods enabled in Stripe Dashboard. The code intentionally omits `payment_method_types`.
-8. Before enabling Stripe Tax, confirm an active registration and an appropriate product tax code. Sandbox registrations do not carry into live mode.
+These are checks to perform for the target environment, not claims that setup is complete.
+
+1. Configure a sandbox restricted key and matching one-time USD 6, 12 and 18 Prices in `.env.local`. The key needs Checkout Sessions read/write access for both creation and return-page verification.
+2. Run `npm run dev` and verify all three amounts and language routes in Stripe test mode, including cancellation and payment confirmation. Use Stripe's documented test payment methods.
+3. Before a production rollout, verify that the configured key and all three Prices belong to the intended live account. If migrating from `STRIPE_SECRET_KEY`, verify the restricted key works after deployment before removing the fallback.
+4. Confirm payment-method settings, applicable live tax registrations and product tax codes. Automatic Tax is already enabled in code; sandbox configuration is not proof of live readiness.
+5. Record the environment, verification date and result in the release record. A real payment is a separate live verification action; local tests and successful builds do not demonstrate successful charging.
+
+## Payment confirmation
 
 The return page retrieves the Checkout Session server-side and confirms success only for a completed, paid USD research-support session. Missing, invalid or unavailable sessions display an unverified message; completed but unpaid sessions display a pending message. The restricted key must allow Checkout Sessions **read and write**. No customer details are returned to the page.
 
@@ -82,7 +87,8 @@ No webhook is required for this voluntary support flow because payment completio
 ## Project Structure
 
 - `app/api/stripe/checkout/route.ts` — same-origin, rate-limited Checkout endpoint.
-- `lib/stripe-checkout.ts` — Stripe client, amount validation, Price mapping, and Session configuration.
+- `lib/stripe-checkout.ts` — Stripe client, Price mapping, Session configuration and payment-status verification.
+- `lib/support-config.ts` — shared amounts, validation and status types.
 - `components/support-page-content.tsx` — localized support interface.
 - `app/(en)/support/page.tsx` — English route.
 - `app/zh-tw/support/page.tsx` — Traditional Chinese route.

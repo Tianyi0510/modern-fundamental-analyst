@@ -13,7 +13,6 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ copy, locale }: SiteHeaderProps) {
-  const prefix = localeConfig[locale].prefix;
   const pathname = usePathname();
   const {
     close: closeMenu,
@@ -37,20 +36,20 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   } = useLanguageMenu();
   const menuLabel = copy.open;
   const closeLabel = copy.close;
-  const homePath = prefix || "/";
+  const homePath = getLocalizedPath("/", locale);
   const navigation = [
     { href: homePath, label: copy.home },
-    { href: `${prefix}/about`, label: copy.about },
-    { href: `${prefix}/portfolio`, label: copy.portfolio },
-    { href: `${prefix}/performance`, label: copy.performance },
-    { href: `${prefix}/memos`, label: copy.memos },
+    { href: getLocalizedPath("/about", locale), label: copy.about },
+    { href: getLocalizedPath("/portfolio", locale), label: copy.portfolio },
+    { href: getLocalizedPath("/performance", locale), label: copy.performance },
+    { href: getLocalizedPath("/memos", locale), label: copy.memos },
   ];
-  const mobileNavigation = [...navigation, { href: `${prefix}/contact`, label: copy.contact }];
+  const mobileNavigation = [...navigation, { href: getLocalizedPath("/contact", locale), label: copy.contact }];
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
 
   return (
     <header className="site-header shell">
-      <Link className="wordmark" href={prefix || "/"} aria-label={`Modern Fundamental Analyst ${copy.home}`}>
+      <Link className="wordmark" href={getLocalizedPath("/", locale)} aria-label={`Modern Fundamental Analyst ${copy.home}`}>
         Modern Fundamental Analyst<span>.</span>
       </Link>
       <button
@@ -98,7 +97,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             </Link>)}
           </div>
         </div>
-        <Link className="button button-dark button-small" href={`${prefix}/contact`} aria-current={isCurrentPath(`${prefix}/contact`) ? "page" : undefined}>
+        <Link className="button button-dark button-small" href={getLocalizedPath("/contact", locale)} aria-current={isCurrentPath(getLocalizedPath("/contact", locale)) ? "page" : undefined}>
           {copy.contact}
         </Link>
       </div>
