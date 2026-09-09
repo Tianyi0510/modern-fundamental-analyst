@@ -35,7 +35,22 @@ jobs:
       # Playwright downloads its own Chromium; the runner's Chrome apt feed is unused.
       # Exclude it so a feed sync error cannot block Ubuntu dependency installation.
       - name: Disable unused Google Chrome apt source
-        run: sudo rm -f /etc/apt/sources.list.d/google-chrome.list
+        run: |
+          sudo python3 - <<'PYTHON'
+          from pathlib import Path
+          import re
+
+          for path in Path("/etc/apt/sources.list.d").iterdir():
+              if path.suffix not in {".list", ".sources"}:
+                  continue
+              original = path.read_text()
+              separator = "\n\n" if path.suffix == ".sources" else "\n"
+              entries = re.split(r"\n\s*\n", original) if path.suffix == ".sources" else original.splitlines()
+              kept = [entry for entry in entries if not re.search(r"https?://dl\.google\.com/linux/chrome(?:-stable)?/deb", entry)]
+              if len(kept) != len(entries):
+                  path.write_text(separator.join(kept) + "\n")
+                  print(f"Disabled unused Chrome source in {path.name}")
+          PYTHON
 
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
