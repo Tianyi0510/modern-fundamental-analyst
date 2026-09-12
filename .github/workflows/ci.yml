@@ -59,9 +59,7 @@ jobs:
         run: npm run verify
 
       - name: Verify WebKit computed styles
-        run: npm run test:computed-style -- --browser webkit --workers=1
-        env:
-          PLAYWRIGHT_USE_PRODUCTION_BUILD: "1"
+        run: npm run test:webkit
 
       - name: Upload browser failure evidence
         if: failure()

@@ -138,22 +138,29 @@ function expectedRhythm(role: Role) {
 
 type TypographySample = { selector: string; fontSize: number; lineHeight: number; letterSpacing: number };
 
-async function readTypography(page: Page, selectors: string[]) {
-  const values: TypographySample[] = [];
-  for (const selector of selectors) {
-    const locator = page.locator(selector);
-    expect(await locator.count(), `Missing typography sample: ${selector}`).toBeGreaterThan(0);
-    values.push(...await locator.evaluateAll((elements, sampleSelector) => elements.map((element) => {
-      const style = getComputedStyle(element);
-      return {
-        selector: sampleSelector,
-        fontSize: Number.parseFloat(style.fontSize),
-        lineHeight: Number.parseFloat(style.lineHeight),
-        letterSpacing: style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
-      };
-    }), selector));
-  }
-  return values;
+async function readTypography(page: Page, roles: Partial<Record<Role, string[]>>) {
+  // Sample the whole page in one browser round trip, retaining every selector.
+  const groups = await page.evaluate((entries) => entries.map(([role, selectors]) => ({
+    role,
+    samples: selectors.map((selector) => ({
+      selector,
+      values: [...document.querySelectorAll(selector)].map((element) => {
+        const style = getComputedStyle(element);
+        return {
+          selector,
+          fontSize: Number.parseFloat(style.fontSize),
+          lineHeight: Number.parseFloat(style.lineHeight),
+          letterSpacing: style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
+        };
+      }),
+    })),
+  })), Object.entries(roles) as Array<[Role, string[]]>);
+  return groups.map(({ role, samples }) => {
+    for (const { selector, values } of samples) {
+      expect(values.length, `Missing typography sample: ${selector}`).toBeGreaterThan(0);
+    }
+    return { role, values: samples.flatMap(({ values }) => values) };
+  });
 }
 
 for (const viewport of viewports) {
@@ -169,8 +176,7 @@ for (const viewport of viewports) {
           await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
           `${route} has horizontal overflow at ${viewport.width}px`,
         ).toBe(true);
-        for (const [role, selectors] of Object.entries(roles) as Array<[Role, string[]]>) {
-          const values = await readTypography(page, selectors);
+        for (const { role, values } of await readTypography(page, roles)) {
           observed.set(role, [...(observed.get(role) ?? []), ...values]);
         }
       }

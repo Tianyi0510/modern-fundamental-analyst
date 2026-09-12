@@ -26,7 +26,7 @@ npx playwright install chromium webkit
 npm run verify
 ```
 
-Verification includes type checking, linting, unit tests, Chromium browser tests, and a production build. GitHub Actions also audits dependencies and runs the browser suite in WebKit.
+Verification includes type checking, linting, unit tests, Chromium browser tests, and a production build. After a successful build, `npm run test:webkit` runs the same browser suite against the production build with one worker. GitHub Actions runs both commands and audits production dependencies.
 
 ## Project Layout
 
@@ -40,7 +40,7 @@ Verification includes type checking, linting, unit tests, Chromium browser tests
 | `tests/` | Unit and browser tests |
 | `scripts/` | CI deployment gate, Node module loader, and subscription journal CLI |
 
-Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](ARCHITECTURE.md#review-evidence).
+Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](TECHNICAL_ARCHITECTURE.md#review-evidence).
 
 ## Content and Integrations
 
@@ -49,13 +49,13 @@ Portfolio data is maintained in `data/portfolio.ts` as a verified monthly snapsh
 Integration details:
 
 - [Resend email and subscriptions](RESEND_INTEGRATION.md)
-- [Upstash Redis runtime](ARCHITECTURE.md#redis-runtime)
+- [Upstash Redis runtime](TECHNICAL_ARCHITECTURE.md#redis-runtime)
 - [Stripe setup and checklist](STRIPE_INTEGRATION.md)
 
 See the [design system and style guide](STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.
 
-See [architecture and operations](ARCHITECTURE.md) for production gating, server boundaries, and subscription reconciliation.
+See [architecture and operations](TECHNICAL_ARCHITECTURE.md) for production gating, server boundaries, and subscription reconciliation.
 
 ## Deployment
 
-Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.
+Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.

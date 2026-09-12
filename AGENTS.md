@@ -38,10 +38,10 @@ This file defines repository-wide defaults. Follow the user's current request wh
 
 ## Service invariants
 
-- Consult [RESEND_INTEGRATION.md](RESEND_INTEGRATION.md), [Redis runtime](ARCHITECTURE.md#redis-runtime) and [STRIPE_INTEGRATION.md](STRIPE_INTEGRATION.md) for the integration being changed.
+- Consult [RESEND_INTEGRATION.md](RESEND_INTEGRATION.md), [Redis runtime](TECHNICAL_ARCHITECTURE.md#redis-runtime) and [STRIPE_INTEGRATION.md](STRIPE_INTEGRATION.md) for the integration being changed.
 - Use `.env.example` as the configuration template. Never commit or print secrets, private email payloads or preference tokens. Historical resource IDs in documentation do not establish current cloud configuration.
 - Route Redis commands through `executeRedisCommand`. Preserve shared subscriber locking and durable journals; an expired lease does not resolve an unknown provider outcome.
-- Follow [ARCHITECTURE.md](ARCHITECTURE.md#subscription-reconciliation) for journal inspection and reconciliation. Do not clear unresolved records or automatically replay ambiguous welcome events as a retry fix. Preserve unsubscribe availability under the shared lock.
+- Follow [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md#subscription-reconciliation) for journal inspection and reconciliation. Do not clear unresolved records or automatically replay ambiguous welcome events as a retry fix. Preserve unsubscribe availability under the shared lock.
 - Payment success requires server-side Stripe Session verification. URL parameters cannot prove payment. Preserve pending and unverified states.
 - Routine tests should mock provider writes. Sending real email, changing production subscriber state or making a live payment requires authorization for that action; deploying alone does not authorize test transactions.
 
@@ -49,7 +49,7 @@ This file defines repository-wide defaults. Follow the user's current request wh
 
 - For application changes, run `npm run verify` (typecheck, lint, unit tests, Chromium tests and production build).
 - Install browser binaries when needed: `npx playwright install chromium webkit`.
-- For shared UI changes, also run `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npm run test:computed-style -- --browser=webkit --workers=1` after a successful build.
+- For shared UI changes, also run `npm run test:webkit` after a successful build.
 - Prefer behavioral regression checks for changed risks. Update source-structure assertions when refactoring, while preserving coverage of user-visible behavior. Do not weaken assertions merely to make a failure disappear.
 - Documentation-only changes need link, reference and diff checks; they do not require the full application suite.
 - Run `git diff --check` before handing off. Preserve ignored `audit/` files as local historical evidence; they are not the current issue list.
@@ -60,7 +60,7 @@ This file defines repository-wide defaults. Follow the user's current request wh
 - Preserve `vercel.json`'s exact-commit CI gate. Do not bypass failed checks or move the gate into `npm run build`, which CI itself must run.
 - Inspect CI failures and fix their cause. Preserve package integrity checks and the browser suite; keep runner-specific installation workarounds in the workflow rather than treating them as permanent application requirements.
 - Confirm GitHub Actions success, Vercel `READY`, the deployed commit and production aliases before reporting deployment complete. Perform read-only smoke checks of affected routes.
-- Keep [README.md](README.md) concise; put detailed operating procedures in [ARCHITECTURE.md](ARCHITECTURE.md) and integration guides. Update documentation when behavior or commands change.
+- Keep [README.md](README.md) concise; put detailed operating procedures in [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) and integration guides. Update documentation when behavior or commands change.
 
 ## Code Review Rules
 

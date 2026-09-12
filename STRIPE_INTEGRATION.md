@@ -18,25 +18,13 @@ Use [.env.example](.env.example) for local configuration and environment-scoped 
 
 The IDs below are retained from earlier setup records, not a current inventory. Before use, verify account, mode, active status, currency and amount in Stripe. They are resource identifiers, not credentials.
 
-### Sandbox Price IDs
+Use sandbox IDs only with the dedicated **Modern Fundamental Analyst sandbox** test key, and live IDs only with the **Modern Fundamental Analyst Live Mode** key.
 
-Use these only with the dedicated **Modern Fundamental Analyst sandbox** and its restricted test key.
-
-| Amount | Price ID |
-|---|---|
-| USD 6 | `price_1U9xCKFrODtHXlgIGZb4mc22` |
-| USD 12 | `price_1U9xCGFrODtHXlgI0sKuYsi7` |
-| USD 18 | `price_1U9xCOFrODtHXlgIAwa2FneY` |
-
-### Live Price IDs
-
-Use these only with the **Modern Fundamental Analyst Live Mode** restricted key.
-
-| Amount | Price ID |
-|---|---|
-| USD 6 | `price_1U9xHLCIXFgQXkh9KUQq9jez` |
-| USD 12 | `price_1U9xHVCIXFgQXkh9nF0Vtknk` |
-| USD 18 | `price_1U9xHQCIXFgQXkh9CnfR6xfQ` |
+| Amount | Sandbox Price ID | Live Price ID |
+|---|---|---|
+| USD 6 | `price_1U9xCKFrODtHXlgIGZb4mc22` | `price_1U9xHLCIXFgQXkh9KUQq9jez` |
+| USD 12 | `price_1U9xCGFrODtHXlgI0sKuYsi7` | `price_1U9xHVCIXFgQXkh9nF0Vtknk` |
+| USD 18 | `price_1U9xCOFrODtHXlgIAwa2FneY` | `price_1U9xHQCIXFgQXkh9CnfR6xfQ` |
 
 ## Checkout behavior
 
@@ -69,12 +57,5 @@ No webhook is required for this voluntary support flow because payment completio
 - `app/(en)/support/page.tsx` — English route.
 - `app/zh-tw/support/page.tsx` — Traditional Chinese route.
 - `app/zh-cn/support/page.tsx` — Simplified Chinese route.
-
-## Flow Overview
-
-1. A reader selects USD 6, 12, or 18 on the localized Support page.
-2. The server validates the amount, locale, request origin, body size, and rate limit.
-3. The server creates a one-time hosted Checkout Session using an environment-specific Price ID.
-4. Stripe securely collects payment details and returns the reader to the localized Support page.
 
 Resources: [Stripe Support](https://support.stripe.com) · [Stripe MCP documentation](https://docs.stripe.com/mcp) · [Hosted Checkout](https://docs.stripe.com/payments/accept-a-payment?payment-ui=checkout&ui=stripe-hosted)

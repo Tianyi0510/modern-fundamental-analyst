@@ -5,6 +5,7 @@ const useProductionBuild = process.env.PLAYWRIGHT_USE_PRODUCTION_BUILD === "1";
 export default defineConfig({
   testDir: "./tests",
   testMatch: "**/*.spec.ts",
+  outputDir: "test-results/chromium",
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,

@@ -15,6 +15,7 @@
     "test:unit": "node --import ./scripts/register-server.mjs --test tests/*.test.mjs",
     "subscription:journal": "node --env-file-if-exists=.env.local --import ./scripts/register-server.mjs scripts/subscription-journal.mjs",
     "test:computed-style": "playwright test",
+    "test:webkit": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --browser=webkit --workers=1 --output=test-results/webkit",
     "verify": "npm run typecheck && npm run lint && npm test && npm run build"
   },
   "dependencies": {

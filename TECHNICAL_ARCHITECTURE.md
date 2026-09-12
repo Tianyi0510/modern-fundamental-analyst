@@ -41,4 +41,4 @@ Payment confirmation uses server-verified Stripe Session status; URL parameters 
 
 `audit/` holds local screenshots and dated review notes. Git and Vercel exclude it; existing files are retained on disk. These historical observations are not the current issue list and are not shared with a fresh clone. Keep durable decisions and operating instructions in the root documentation. If evidence needs to be shared, prepare a separate reviewed artifact with relative image links and record its date, commit, environment and resolution status; local absolute paths are not portable.
 
-GitHub Actions retains failed Playwright traces and screenshots in the `browser-failure-evidence` artifact for seven days.
+Browser evidence is separated into `test-results/chromium/` and `test-results/webkit/`, so running WebKit preserves Chromium evidence. GitHub Actions retains failed Playwright traces and screenshots in the `browser-failure-evidence` artifact for seven days.
