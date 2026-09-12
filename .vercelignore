@@ -31,7 +31,6 @@ output/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts.bak
-.vercel
 
 # Local review evidence is not part of the deployed application.
 audit/

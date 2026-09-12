@@ -43,6 +43,11 @@ export function cleanSingleLine(value: unknown, maxLength: number) {
     .replace(/\s+/g, " ");
 }
 
+// Identity fields must never be truncated or have internal characters rewritten.
+export function normalizeEmail(value: unknown) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
 export function isValidEmail(value: string) {
   return value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }

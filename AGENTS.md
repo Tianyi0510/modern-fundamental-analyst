@@ -38,7 +38,7 @@ This file defines repository-wide defaults. Follow the user's current request wh
 
 ## Service invariants
 
-- Consult [RESEND_INTEGRATION.md](RESEND_INTEGRATION.md), [UPSTASH_REDIS.md](UPSTASH_REDIS.md) and [STRIPE_INTEGRATION.md](STRIPE_INTEGRATION.md) for the integration being changed.
+- Consult [RESEND_INTEGRATION.md](RESEND_INTEGRATION.md), [Redis runtime](ARCHITECTURE.md#redis-runtime) and [STRIPE_INTEGRATION.md](STRIPE_INTEGRATION.md) for the integration being changed.
 - Use `.env.example` as the configuration template. Never commit or print secrets, private email payloads or preference tokens. Historical resource IDs in documentation do not establish current cloud configuration.
 - Route Redis commands through `executeRedisCommand`. Preserve shared subscriber locking and durable journals; an expired lease does not resolve an unknown provider outcome.
 - Follow [ARCHITECTURE.md](ARCHITECTURE.md#subscription-reconciliation) for journal inspection and reconciliation. Do not clear unresolved records or automatically replay ambiguous welcome events as a retry fix. Preserve unsubscribe availability under the shared lock.

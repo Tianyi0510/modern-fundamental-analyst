@@ -1,16 +1,5 @@
 import assert from "node:assert/strict";
-import { registerHooks } from "node:module";
 import test from "node:test";
-
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (specifier === "next/server") return nextResolve("next/server.js", context);
-    if (specifier.startsWith("@/")) {
-      return nextResolve(new URL(`../${specifier.slice(2)}.ts`, import.meta.url).href, context);
-    }
-    return nextResolve(specifier, context);
-  },
-});
 
 const { POST: contact } = await import("../app/api/contact/route.ts");
 const { POST: subscribe } = await import("../app/api/subscribe/route.ts");
@@ -108,4 +97,13 @@ test("route-level rate limits reject the sixth request from one client", async (
   assert.equal(subscribeResponse.status, 429);
   assert.equal(contactResponse.headers.get("retry-after"), "600");
   assert.equal(subscribeResponse.headers.get("retry-after"), "600");
+});
+
+test("email routes reject overlong identities without provider writes", async context => {
+  context.mock.method(globalThis, "fetch", () => { throw new Error("Unexpected provider request"); });
+  const email = 'a'.repeat(64) + '@' + 'b'.repeat(63) + '.' + 'c'.repeat(63) + '.' + 'd'.repeat(60) + 'extra';
+  for (const [handler, path] of [[contact, '/api/contact'], [subscribe, '/api/subscribe'], [preferenceRequest, '/api/subscription-preferences/request']]) {
+    const body = JSON.stringify({ email, name: 'Reader', subject: 'Question', message: 'A valid message body' });
+    assert.equal((await handler(request(path, body))).status, 400);
+  }
 });

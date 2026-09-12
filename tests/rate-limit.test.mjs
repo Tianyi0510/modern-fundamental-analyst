@@ -1,19 +1,8 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import { registerHooks } from "node:module";
 import test from "node:test";
-
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (specifier.startsWith("@/")) {
-      return nextResolve(new URL(`../${specifier.slice(2)}.ts`, import.meta.url).href, context);
-    }
-    return nextResolve(specifier, context);
-  },
-});
+import { read } from "./repository-helpers.mjs";
 
 const { createMemoryRateLimiter, createRateLimiter } = await import("../lib/rate-limit.ts");
-const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("memory limiter isolates client keys and does not group missing IPs", () => {
   const limit = createMemoryRateLimiter({ windowMs: 60_000, maxRequests: 1, maxKeys: 2 });

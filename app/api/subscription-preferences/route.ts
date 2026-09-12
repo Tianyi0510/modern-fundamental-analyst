@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cleanText, readProtectedObjectJson } from "@/lib/api-request";
-import { localeConfig, resolveLocale } from "@/lib/i18n";
+import { localeConfig, locales, resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
 import { syncPreferredLanguageSegment } from "@/lib/resend-segments";
@@ -36,6 +36,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This preferences link is invalid or has expired." }, { status: 400 });
   }
 
+  if (action === "save" && !locales.some(locale => locale === requestedLocale)) {
+    return NextResponse.json({ error: "Choose a valid language." }, { status: 400 });
+  }
   const locale = resolveLocale(requestedLocale);
   const resend = getResendClient();
   if (!resend) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });

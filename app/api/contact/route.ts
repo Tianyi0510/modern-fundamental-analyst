@@ -1,6 +1,6 @@
 import { escapeHtml } from "@/lib/escape-html";
 import { NextResponse } from "next/server";
-import { cleanSingleLine, cleanText, isValidEmail, readProtectedObjectJson } from "@/lib/api-request";
+import { cleanSingleLine, cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { CONTACT_FROM_EMAIL, getResendClient, getResendIdempotencyKey, runResendOperation } from "@/lib/resend";
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   const { body } = parsed;
 
   const name = cleanSingleLine(body.name, 100);
-  const email = cleanSingleLine(body.email, 254).toLowerCase();
+  const email = normalizeEmail(body.email);
   const subject = cleanSingleLine(body.subject, 160);
   const message = cleanText(body.message, 5000);
   const website = cleanText(body.website, 200);

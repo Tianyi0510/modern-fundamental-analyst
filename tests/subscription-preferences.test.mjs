@@ -1,15 +1,5 @@
 import assert from "node:assert/strict";
-import { registerHooks } from "node:module";
 import test from "node:test";
-
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (specifier.startsWith("@/")) {
-      return nextResolve(new URL(`../${specifier.slice(2)}.ts`, import.meta.url).href, context);
-    }
-    return nextResolve(specifier, context);
-  },
-});
 
 const { createPreferenceToken, readPreferenceToken } = await import("../lib/subscription-preferences.ts");
 
@@ -47,5 +37,24 @@ test("preference tokens reject tampering", () => {
   } finally {
     if (previousSecret === undefined) delete process.env.SUBSCRIPTION_PREFERENCES_SECRET;
     else process.env.SUBSCRIPTION_PREFERENCES_SECRET = previousSecret;
+  }
+});
+
+test("saved language comes from the contact and unavailable values remain unknown", async context => {
+  const oldKey = process.env.RESEND_API_KEY;
+  process.env.RESEND_API_KEY = 're_test_preferences';
+  const { getSavedPreferenceLocale } = await import('../lib/subscription-preferences.ts');
+  try {
+    let property;
+    context.mock.method(globalThis, 'fetch', async () => Response.json({ id: 'contact', properties: { preferred_language: { value: property } } }));
+    for (const [value, expected] of [['English', 'en'], ['繁體中文', 'zh-tw'], ['简体中文', 'zh-cn'], ['zh-tw', 'zh-tw'], ['unknown', null], [undefined, null]]) {
+      property = value;
+      assert.equal(await getSavedPreferenceLocale('reader@example.com'), expected);
+    }
+    context.mock.method(globalThis, 'fetch', async () => { throw new TypeError('offline'); });
+    assert.equal(await getSavedPreferenceLocale('reader@example.com'), null);
+  } finally {
+    if (oldKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = oldKey;
   }
 });

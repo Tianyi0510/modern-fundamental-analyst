@@ -20,7 +20,9 @@ export default defineConfig({
       ? "npm run start -- --hostname 127.0.0.1 --port 3210"
       : "npm run dev -- --hostname 127.0.0.1 --port 3210",
     url: "http://127.0.0.1:3210",
-    reuseExistingServer: !process.env.CI,
+    // Always start an isolated server: browser tests must not use local provider credentials.
+    env: { SUBSCRIPTION_PREFERENCES_SECRET: "playwright-preferences-only", RESEND_API_KEY: "", UPSTASH_REDIS_URL: "" },
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

@@ -1,27 +1,13 @@
 import { readFile } from "node:fs/promises";
-import { registerHooks } from "node:module";
-
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (specifier.startsWith("@/")) {
-      return nextResolve(new URL(`../${specifier.slice(2)}.ts`, import.meta.url).href, context);
-    }
-    return nextResolve(specifier, context);
-  },
-});
 
 export const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-const styleModules = [
-  "app/reset.css",
-  "app/styles/base.css",
-  "app/styles/chrome.css",
-  "app/styles/pages.css",
-  "app/styles/typography.css",
-  "app/styles/component-typography.css",
-  "app/styles/responsive.css",
-  "app/styles/colors.css",
-  "app/styles/themes.css",
-];
-
-export const readStyles = async () => (await Promise.all(styleModules.map(read))).join("\n");
+// Follow the application's CSS entry point so tests retain its cascade order.
+export const readStyles = async () => {
+  const entryUrl = new URL("../app/globals.css", import.meta.url);
+  const source = await readFile(entryUrl, "utf8");
+  const imports = [...source.matchAll(/@import\s+["'](\.[^"']+)["'];/g)];
+  const styles = await Promise.all(imports.map((match) => readFile(new URL(match[1], entryUrl), "utf8")));
+  let index = 0;
+  return source.replace(/@import\s+["'](\.[^"']+)["'];/g, () => styles[index++]);
+};

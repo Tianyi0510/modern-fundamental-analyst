@@ -49,7 +49,7 @@ Portfolio data is maintained in `data/portfolio.ts` as a verified monthly snapsh
 Integration details:
 
 - [Resend email and subscriptions](RESEND_INTEGRATION.md)
-- [Upstash Redis](UPSTASH_REDIS.md)
+- [Upstash Redis runtime](ARCHITECTURE.md#redis-runtime)
 - [Stripe setup and checklist](STRIPE_INTEGRATION.md)
 
 See the [design system and style guide](STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.
@@ -58,4 +58,4 @@ See [architecture and operations](ARCHITECTURE.md) for production gating, server
 
 ## Deployment
 
-Pushes to `main` trigger GitHub Actions and Vercel Git builds. Before building Production, `scripts/require-ci.mjs` requires successful CI for the exact commit; failed, unavailable or timed-out checks block deployment. Preview and local builds skip this gate. Configure production credentials in Vercel; use isolated resources for preview integration testing.
+Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.

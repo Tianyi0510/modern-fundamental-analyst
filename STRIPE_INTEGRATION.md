@@ -6,14 +6,10 @@ This guide describes the Checkout implementation and environment verification st
 
 Use [.env.example](.env.example) for local configuration and environment-scoped Vercel variables for deployments. Store API keys as **Sensitive** values; never commit credentials.
 
-**Files containing placeholders:**
-
-- [.env.example](.env.example)
-
-| Field | Current Value | What to Set |
+| Field | Template Value | What to Set |
 |---|---|---|
-| `STRIPE_RESTRICTED_KEY` | `rk_test_replace_with_restricted_key` | A test restricted key locally and a separate live restricted key in Vercel. Grant Checkout Sessions read/write access and the minimum Price access required by Stripe. |
-| `STRIPE_SECRET_KEY` | `sk_test_replace_with_secret_key` | Compatibility fallback only. Used only when `STRIPE_RESTRICTED_KEY` is absent or empty. Prefer the restricted key. |
+| `STRIPE_RESTRICTED_KEY` | Empty | A test restricted key locally and a separate live restricted key in Vercel. Grant Checkout Sessions read/write access and the minimum Price access required by Stripe. |
+| `STRIPE_SECRET_KEY` | Empty | Compatibility fallback only. Used only when `STRIPE_RESTRICTED_KEY` is absent or empty. Prefer the restricted key. |
 | `STRIPE_PRICE_USD_6` | `price_replace_with_6_usd_price` | The environment-appropriate one-time USD 6 Price ID. |
 | `STRIPE_PRICE_USD_12` | `price_replace_with_12_usd_price` | The environment-appropriate one-time USD 12 Price ID. |
 | `STRIPE_PRICE_USD_18` | `price_replace_with_18_usd_price` | The environment-appropriate one-time USD 18 Price ID. |
@@ -42,31 +38,11 @@ Use these only with the **Modern Fundamental Analyst Live Mode** restricted key.
 | USD 12 | `price_1U9xHVCIXFgQXkh9nF0Vtknk` |
 | USD 18 | `price_1U9xHQCIXFgQXkh9CnfR6xfQ` |
 
-## Configured Parameters
+## Checkout behavior
 
-**Checkout Session configuration:**
+[lib/stripe-checkout.ts](lib/stripe-checkout.ts) defines the one-time hosted Checkout Session, Price mapping, pinned API version and integration identifier. Success and cancellation return to the localized Support page; the success URL includes the Session ID for server-side verification.
 
-- [lib/stripe-checkout.ts](lib/stripe-checkout.ts)
-
-| Parameter | Value |
-|---|---|
-| `ui_mode` | `hosted_page` |
-| `mode` | `payment` |
-| `billing_address_collection` | `auto` |
-| `phone_number_collection.enabled` | `false` |
-| `automatic_tax.enabled` | `true` in the application |
-| `managed_payments.enabled` | Uses the Stripe account default |
-| `allow_promotion_codes` | `false` |
-| `submit_type` | `auto` |
-| `integration_identifier` | `hosted_web_0001_mfaqxkpt` |
-| `origin_context` | `web` |
-| `payment_method_collection` | Omitted because this is a one-time payment |
-| `success_url` | Localized `/support?status=success&session_id={CHECKOUT_SESSION_ID}` |
-| `cancel_url` | Localized `/support?status=cancelled` |
-
-The code enables Automatic Tax on every Session and omits a Managed Payments override. Verify account settings, applicable registrations and product tax codes in the target mode before payment testing; the code does not verify those Dashboard settings.
-
-The integration identifier is defined in `lib/stripe-checkout.ts`, which also pins the Stripe API version.
+Automatic Tax is enabled on every Session, with no Managed Payments override. Verify account settings, applicable tax registrations and product tax codes in the target mode before payment testing; the code does not verify Dashboard configuration.
 
 ## Environment verification checklist
 
@@ -80,9 +56,9 @@ These are checks to perform for the target environment, not claims that setup is
 
 ## Payment confirmation
 
-The return page retrieves the Checkout Session server-side and confirms success only for a completed, paid USD research-support session. Missing, invalid or unavailable sessions display an unverified message; completed but unpaid sessions display a pending message. The restricted key must allow Checkout Sessions **read and write**. No customer details are returned to the page.
+The return page retrieves the Checkout Session server-side and confirms success only for a completed, paid USD research-support session. Missing, invalid or unavailable sessions display an unverified message; completed but unpaid sessions display a pending message. Provider failures do not prompt the reader to pay again. The restricted key must allow Checkout Sessions **read and write**. No customer details are returned to the page.
 
-No webhook is required for this voluntary support flow because payment completion does not unlock content or fulfill an order. If supporter benefits, receipts outside Stripe, or entitlement tracking are added later, create a webhook endpoint and verify every Stripe signature before processing events.
+No webhook is required for this voluntary support flow because payment completion does not unlock content or fulfill an order. If supporter benefits, receipts outside Stripe, or entitlement tracking are added later, add a durable payment ledger and a webhook endpoint that verifies every Stripe signature before processing events.
 
 ## Project Structure
 

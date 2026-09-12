@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cleanText, isValidEmail, readProtectedObjectJson } from "@/lib/api-request";
+import { cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { renderPreferenceEmail, type PreferenceEmailCopy } from "@/lib/email-template";
 import { resolveLocale, type Locale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   if (!parsed.ok) return parsed.response;
   const { body } = parsed;
 
-  const email = cleanText(body.email, 254).toLowerCase();
+  const email = normalizeEmail(body.email);
   const locale = resolveLocale(cleanText(body.locale, 10));
   if (!isValidEmail(email)) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
 

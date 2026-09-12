@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
-
-const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+import { read } from "./repository-helpers.mjs";
 
 test("Redis connections are bounded and reused", async () => {
   const [redis, packageSource] = await Promise.all([

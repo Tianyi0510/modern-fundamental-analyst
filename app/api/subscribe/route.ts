@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cleanText, isValidEmail, readProtectedObjectJson } from "@/lib/api-request";
+import { cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { subscribeContact } from "@/lib/subscription-service";
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   if (!parsed.ok) return parsed.response;
   const { body } = parsed;
 
-  const email = cleanText(body.email, 254).toLowerCase();
+  const email = normalizeEmail(body.email);
   const locale = resolveLocale(cleanText(body.locale, 10));
   const website = cleanText(body.website, 200);
   if (website) return NextResponse.json({ ok: true });

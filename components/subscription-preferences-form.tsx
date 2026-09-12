@@ -10,6 +10,7 @@ import { useExclusiveSubmit } from "./use-exclusive-submit";
 export type PreferencesCopy = {
   email: string;
   language: string;
+  chooseLanguage: string;
   save: string;
   saving: string;
   saved: string;
@@ -21,13 +22,13 @@ export type PreferencesCopy = {
 
 type Status = "idle" | "saving" | "saved" | "unsubscribing" | "unsubscribed" | "error";
 
-export function SubscriptionPreferencesForm({ copy, email, initialLocale, token }: { copy: PreferencesCopy; email: string; initialLocale: Locale; token: string }) {
+export function SubscriptionPreferencesForm({ copy, email, initialLocale, token }: { copy: PreferencesCopy; email: string; initialLocale: Locale | null; token: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const runExclusive = useExclusiveSubmit();
 
   async function submit(form: HTMLFormElement, action: "save" | "unsubscribe") {
     await runExclusive(async () => {
-      const locale = String(new FormData(form).get("locale") ?? initialLocale);
+      const locale = String(new FormData(form).get("locale") ?? "");
       setStatus(action === "save" ? "saving" : "unsubscribing");
 
       try {
@@ -49,7 +50,8 @@ export function SubscriptionPreferencesForm({ copy, email, initialLocale, token 
     </div>
     <label className={styles.field}>
       <span>{copy.language}</span>
-      <select name="locale" defaultValue={initialLocale} disabled={busy || status === "unsubscribed"}>
+      <select name="locale" required defaultValue={initialLocale ?? ""} onChange={() => setStatus("idle")} disabled={busy || status === "unsubscribed"}>
+        <option value="" disabled>{copy.chooseLanguage}</option>
         {locales.map((locale) => <option value={locale} key={locale}>{localeConfig[locale].label}</option>)}
       </select>
     </label>

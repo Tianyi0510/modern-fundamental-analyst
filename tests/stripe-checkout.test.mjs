@@ -47,7 +47,8 @@ test("Stripe Checkout keeps secrets server-side and applies safety controls", as
   assert.match(route, /process\.env\.NODE_ENV === "production" \? SITE_URL/);
   assert.match(route, /getStripeErrorDetails\(error\)/);
   assert.doesNotMatch(route, /String\(error\.message\)/);
-  assert.match(environment, /STRIPE_RESTRICTED_KEY=rk_test_replace_with_restricted_key/);
+  assert.match(environment, /^STRIPE_RESTRICTED_KEY=$/m);
+  assert.match(environment, /^STRIPE_SECRET_KEY=$/m);
   assert.doesNotMatch(`${stripe}\n${route}`, /[sr]k_(?:test|live)_[A-Za-z0-9]+/);
 });
 

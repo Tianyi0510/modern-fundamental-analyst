@@ -1,6 +1,7 @@
 import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
-import { getLocalizedPath, type Locale } from "@/lib/i18n";
+import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
+import { getResendClient, runResendOperation } from "@/lib/resend";
 import { SITE_URL } from "@/lib/site-config";
 
 const TOKEN_VERSION = 1;
@@ -75,4 +76,13 @@ export function maskEmail(email: string) {
   const [local, domain] = email.split("@");
   if (!local || !domain) return "";
   return `${local.slice(0, 2)}${"•".repeat(Math.min(Math.max(local.length - 2, 2), 6))}@${domain}`;
+}
+
+// No inferred language when the provider is unavailable or has no recognized value.
+export async function getSavedPreferenceLocale(email: string): Promise<Locale | null> {
+  const resend = getResendClient();
+  if (!resend) return null;
+  const result = await runResendOperation("Preference language lookup failed", () => resend.contacts.get({ email }));
+  const value = result?.data?.properties?.preferred_language?.value;
+  return locales.find(locale => localeConfig[locale].label === value || locale === value) ?? null;
 }
