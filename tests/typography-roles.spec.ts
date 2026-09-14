@@ -62,7 +62,6 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     label: [".eyebrow", ".performance-summary span", ".returns .section-number"],
     caption: [".page-intro small", ".performance-summary small"],
     dataKpi: [".performance-summary strong"],
-    dataRow: [".return-row strong"],
   },
   "/memos": {
     pageTitle: [".page-hero h1"],

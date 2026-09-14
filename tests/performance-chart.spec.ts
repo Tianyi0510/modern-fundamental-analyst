@@ -7,6 +7,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`${prefix}/performance`);
+    await expect(page.locator('a[href*="docs.google.com/spreadsheets"]')).toHaveCount(0);
+    await expect(page.locator(".returns-table")).toHaveCount(0);
+    await expect(page.locator(".methodology-explanation > p")).toHaveCount(3);
     const chart = page.locator('figure[aria-labelledby="performance-chart-title"]');
     await expect(chart.getByRole("img")).toBeVisible();
     await expect(chart.locator("polyline")).toHaveCount(2);
@@ -28,6 +31,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.getByRole("table")).not.toBeVisible();
     await summary.tap();
     await expect(chart.getByRole("table")).toBeVisible();
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const introBox = await page.locator(".page-intro").boundingBox();
+    const dateBox = await page.locator(".page-intro .date-text").boundingBox();
+    expect(Math.abs(introBox!.x + introBox!.width - dateBox!.x - dateBox!.width)).toBeLessThan(1);
     for (const width of [320, 801, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.evaluate(() => { document.documentElement.style.fontSize = "32px"; });

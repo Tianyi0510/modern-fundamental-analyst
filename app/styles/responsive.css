@@ -94,12 +94,8 @@
   .performance-page .returns,
   .performance-page .methodology { gap: var(--space-heading-content); }
   .methodology-content { display: grid; gap: var(--space-related-content); }
-  .methodology-content > p { margin: 0; }
   .methodology-source { margin-top: 0; padding: var(--space-5); border-left: 0; border-top: 4px solid var(--deep-blue); }
   .methodology-source p + p { margin-top: var(--space-4); }
-  .returns-table .table-head { display: none; }
-  .return-row { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2) var(--space-4); min-height: 0; padding: var(--space-5) 0; align-items: start; }
-  .return-row > :nth-child(3) { grid-column: 1 / -1; text-align: left; }
   .memo-index-row { grid-template-columns: 44px 1fr; gap: var(--space-4); }
   .memo-index { padding-top: var(--space-section); }
   .memo-disclosure > summary { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-4); padding: var(--space-5) 0; }
@@ -308,6 +304,6 @@
 }
 
 @media (max-width: 800px) {
-  .performance-page .page-intro,
+  .performance-page .page-intro .date-text { margin-left: 0; }
   .performance-page .performance-summary { grid-template-columns: minmax(0, 1fr); }
 }

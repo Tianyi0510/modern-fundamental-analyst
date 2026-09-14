@@ -112,7 +112,6 @@
 .memo-index-row p,
 .principles p,
 .portfolio-holdings-heading p,
-.return-row span:nth-child(3),
 .footer-brand p,
 .holding-row small {
   font-size: var(--font-size-body);
@@ -200,8 +199,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.portfolio-row strong,
-.return-row strong {
+.portfolio-row strong {
   font-family: var(--font-ui);
   font-size: var(--font-size-data-row);
   line-height: var(--leading-data);

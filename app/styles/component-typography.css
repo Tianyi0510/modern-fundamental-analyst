@@ -138,7 +138,6 @@
 .portfolio-page .portfolio-table-detailed .table-head,
 .performance-page .performance-summary span,
 .performance-page .returns .section-number,
-.performance-page .returns-table .table-head,
 .contact-grid span,
 .memo-card > div {
   font-size: var(--font-size-label);

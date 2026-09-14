@@ -190,7 +190,6 @@ test("page sections share one responsive vertical rhythm", async () => {
   assert.match(css, /\.eyebrow\s*\{[^}]*margin:\s*0/s);
   assert.match(css, /\.section-number\s*\{[^}]*margin:\s*0/s);
   assert.match(css, /\.article-meta\s*\{[^}]*align-items:\s*center;[^}]*flex-wrap:\s*wrap/s);
-  assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.return-row\s*\{[^}]*align-items:\s*start/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*168px;[^}]*padding:\s*var\(--space-5\) var\(--space-page-gutter\)/s);
   assert.match(css, /@media \(max-width:\s*800px\)[\s\S]*?\.performance-page \.methodology\s*\{[^}]*gap:\s*var\(--space-heading-content\)/s);
   assert.doesNotMatch(`${css}\n${contact}`, /100vmax|clip-path:\s*inset\(0 -100vmax\)/);

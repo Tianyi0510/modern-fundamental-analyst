@@ -196,7 +196,7 @@ test.describe("header interaction QA", () => {
   test("reference notes share typography and memo conclusion spacing is balanced", async ({ page }) => {
     for (const width of [1440, 801, 390]) {
       await page.setViewportSize({ width, height: 1000 });
-      for (const path of ["/about", "/performance", "/memos/microsoft-stock-analysis-fiscal-year-2024"]) {
+      for (const path of ["/about", "/memos/microsoft-stock-analysis-fiscal-year-2024"]) {
         await page.goto(path);
         const note = page.locator(".reference-note");
         await expect(note).toHaveCount(1);

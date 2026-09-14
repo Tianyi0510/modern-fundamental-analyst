@@ -56,7 +56,7 @@
 .portfolio-kpis > div:nth-child(3) { grid-area: return; }
 .portfolio-kpis > div:nth-child(4) { grid-area: holdings; }
 .portfolio-table-wrap { overflow-x: auto; scrollbar-width: thin; }
-.portfolio-table, .returns-table { border-top: 1px solid var(--black); }
+.portfolio-table { border-top: 1px solid var(--black); }
 .table-head, .portfolio-row { display: grid; grid-template-columns: 1fr 1fr 120px; gap: 30px; align-items: center; }
 .portfolio-table-detailed { min-width: 1080px; }
 .portfolio-table-detailed .table-head, .portfolio-table-detailed .portfolio-row { grid-template-columns: 1.05fr .5fr .75fr .9fr 1fr .65fr .6fr; gap: 22px; }
@@ -115,19 +115,12 @@
 .returns .section-heading h2 { margin-top: var(--space-related-content); }
 .performance-page .performance-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .performance-page .performance-summary strong { font-variant-numeric: tabular-nums; }
-.returns-table .table-head, .return-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(120px, .62fr) minmax(240px, 1.38fr); column-gap: var(--space-7); align-items: center; }
-.return-row { min-height: 82px; border-top: 1px solid var(--gray); transition: background var(--motion-duration-fast) var(--motion-ease-standard); }
-.return-row:hover { background: color-mix(in srgb, var(--bright-blue) 10%, var(--white)); }
-.returns-table .table-head > :nth-child(2),
-.returns-table .table-head > :nth-child(3),
-.return-row > :nth-child(2),
-.return-row > :nth-child(3) { text-align: left; }
-.return-row strong { font-variant-numeric: tabular-nums; }
-.return-row span:nth-child(3) { color: var(--text-secondary); line-height: var(--leading-body); }
 .methodology { padding: var(--space-section) 0; display: grid; grid-template-columns: .7fr 1.3fr; gap: 80px; }
 .methodology div { color: var(--black); }
 .methodology div p:first-child { margin-top: 0; }
-.methodology-content > p { max-width: 760px; }
+.methodology-explanation { max-width: 760px; }
+.methodology-explanation p { margin: 0; }
+.methodology-explanation p + p { margin-top: var(--space-related-content); }
 .methodology-source { margin-top: var(--space-related-content); padding: 30px; border-left: 4px solid var(--deep-blue); background: var(--white); color: var(--black); }
 .methodology-source p { margin: 0; }
 .methodology-source p + p { margin-top: 18px; }
@@ -234,4 +227,7 @@
 .performance-page .performance-summary > *,
 .performance-page .methodology > *,
 .performance-page .methodology-content > * { min-width: 0; overflow-wrap: anywhere; }
-.performance-page .page-intro { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); }
+.performance-page .page-intro { display: flex; flex-wrap: wrap; gap: var(--space-related-content); align-items: flex-end; }
+.performance-page .page-intro p { flex: 1 1 30rem; }
+.performance-page .page-intro .date-text { margin-left: auto; max-width: 100%; }
+.performance-page .page-hero h1 { overflow-wrap: anywhere; }

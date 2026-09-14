@@ -28,3 +28,34 @@ test("monthly XIRR history preserves unavailable periods and matches the latest 
   assert.equal(latest.portfolioXirr, portfolioSnapshot.xirr);
   assert.equal(latest.benchmarkXirr, portfolioSnapshot.benchmarkXirr);
 });
+
+test("portfolio source data has unique holdings and finite nonnegative inputs", () => {
+  assert.equal(new Set(portfolioHoldings.map(row => row.symbol)).size, portfolioHoldings.length);
+  for (const row of portfolioHoldings) {
+    assert.ok(row.symbol.trim().length > 0);
+    for (const field of ["shares", "costBasis", "price", "marketValue"]) {
+      assert.ok(Number.isFinite(row[field]) && row[field] >= 0, `${row.symbol}: invalid ${field}`);
+    }
+    assert.ok(row.shares > 0, `${row.symbol}: empty position`);
+  }
+  for (const field of ["netDividends", "financingInterest"]) {
+    assert.ok(Number.isFinite(portfolioSnapshot[field]) && portfolioSnapshot[field] >= 0, field);
+  }
+});
+
+test("history contains consecutive calendar month-ends and paired XIRRs", () => {
+  let previousMonth;
+  for (const row of portfolioMonthlyReturns) {
+    assert.match(row.date, /^\d{4}-\d{2}-\d{2}$/);
+    const date = new Date(`${row.date}T00:00:00Z`);
+    assert.equal(date.toISOString().slice(0, 10), row.date);
+    const nextDay = new Date(date.getTime() + 86400000);
+    assert.equal(nextDay.getUTCDate(), 1, `${row.date}: not a month-end`);
+    const month = date.getUTCFullYear() * 12 + date.getUTCMonth();
+    if (previousMonth !== undefined) assert.equal(month, previousMonth + 1, "Missing or duplicate month");
+    previousMonth = month;
+    assert.ok(Number.isFinite(row.marketValue) && row.marketValue >= 0, row.date);
+    assert.equal(row.portfolioXirr === null, row.benchmarkXirr === null, row.date);
+  }
+  assert.ok(Number.isFinite(portfolioSnapshot.xirr) && Number.isFinite(portfolioSnapshot.benchmarkXirr));
+});
