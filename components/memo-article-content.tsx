@@ -1,10 +1,6 @@
 import type { MemoContent } from "@/data/memo-content";
 
 export function MemoArticleContent({ content }: { content: MemoContent }) {
-  const sourceLabelMatch = content.sourceLabel.match(/^(.+?[:：])\s*(.+)$/);
-  const sourcePrefix = sourceLabelMatch?.[1] ?? "";
-  const sourceDocument = sourceLabelMatch?.[2] ?? content.sourceLabel;
-
   return (
     <div className="article-body">
       {content.sections.map((section) => (
@@ -22,7 +18,6 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
       <section className="memo-references">
         <h2>{content.referencesTitle}</h2>
         <ol>{content.references.map((reference) => <li key={reference}>{reference}</li>)}</ol>
-        <p className="article-source-note reference-note">{sourcePrefix && <><span>{sourcePrefix}</span> </>}<a className="source-link" href={content.sourceUrl} target="_blank" rel="noreferrer">{sourceDocument}</a></p>
       </section>
     </div>
   );

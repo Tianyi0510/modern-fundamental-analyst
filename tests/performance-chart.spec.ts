@@ -12,9 +12,15 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".methodology-explanation > p")).toHaveCount(3);
     const chart = page.locator('figure[aria-labelledby="performance-chart-title"]');
     await expect(chart.getByRole("img")).toBeVisible();
+    await expect(chart.getByRole("img")).toHaveAccessibleName(/21\.14%.*21\.00%/);
     await expect(chart.locator("polyline")).toHaveCount(2);
     for (const line of await chart.locator("polyline").all()) {
       expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(20);
+      for (const point of (await line.getAttribute("points"))!.split(" ")) {
+        const y = Number(point.split(",")[1]);
+        expect(y).toBeGreaterThanOrEqual(12);
+        expect(y).toBeLessThanOrEqual(288);
+      }
     }
     await expect(page.locator(".performance-summary")).toContainText("+21.14%");
     await expect(page.locator(".performance-summary")).toContainText("+21.00%");

@@ -6,11 +6,7 @@ export type MemoContent = {
   }>;
   referencesTitle: string;
   references: string[];
-  sourceLabel: string;
-  sourceUrl: string;
 };
-
-const microsoftSourceUrl = "https://docs.google.com/document/d/1X4DwJBuHM0jo77lEtBHMzmTcQSo9Xc5TkrNjcpj2yyw/edit?usp=sharing";
 
 // The article body below mirrors the source Google Doc verbatim. Do not edit its
 // prose independently; update it only from the source document.
@@ -108,12 +104,10 @@ const sourceContent: MemoContent = {
     "Microsoft Corporation. (2024). Microsoft Fiscal Year 2024 Annual Report.",
     "Buffett, W. (1988). 1987 Letter to Shareholders. In Berkshire Hathaway Inc. 1987 Annual Report.",
   ],
-  sourceLabel: "Source Document: Microsoft Stock Analysis Fiscal Year 2024",
-  sourceUrl: microsoftSourceUrl,
 };
 
 export const microsoftMemoContentByLocale = {
   en: sourceContent,
-  "zh-tw": { ...sourceContent, sourceLabel: "來源文件：Microsoft Stock Analysis Fiscal Year 2024" },
-  "zh-cn": { ...sourceContent, sourceLabel: "来源文件：Microsoft Stock Analysis Fiscal Year 2024" },
+  "zh-tw": sourceContent,
+  "zh-cn": sourceContent,
 } as const;

@@ -11,7 +11,7 @@ export function useMobileMenu() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
 
   const close = useCallback(() => {
@@ -98,13 +98,17 @@ export function useMobileMenu() {
 
   const handlePointerDown: PointerEventHandler<HTMLElement> = (event) => {
     if (event.pointerType !== "touch") return;
-    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+    if (!event.isPrimary) {
+      pointerStartRef.current = null;
+      return;
+    }
+    pointerStartRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
   };
 
   const handlePointerUp: PointerEventHandler<HTMLElement> = (event) => {
     const start = pointerStartRef.current;
     pointerStartRef.current = null;
-    if (!start || event.pointerType !== "touch") return;
+    if (!start || event.pointerType !== "touch" || event.pointerId !== start.id || !event.isPrimary) return;
     const horizontalDistance = event.clientX - start.x;
     const verticalDistance = Math.abs(event.clientY - start.y);
     if (horizontalDistance >= 72 && horizontalDistance > verticalDistance * 1.2) close();
@@ -142,7 +146,7 @@ export function useLanguageMenu() {
       if (triggerRef.current?.getAttribute("aria-expanded") !== "true") return;
       const items = containerRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
       const index = position === "first" ? 0 : (items?.length ?? 1) - 1;
-      items?.[index]?.focus();
+      items?.[index]?.focus({ preventScroll: true });
     });
   };
 
@@ -159,13 +163,13 @@ export function useLanguageMenu() {
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOpen(false);
-        triggerRef.current?.focus();
+        triggerRef.current?.focus({ preventScroll: true });
         return;
       }
       if (!containerRef.current?.contains(document.activeElement)) return;
       if (event.key === "Tab") {
         // Resume native tab order from the trigger before hiding the focused item.
-        triggerRef.current?.focus();
+        triggerRef.current?.focus({ preventScroll: true });
         setIsOpen(false);
         if (event.shiftKey) {
           event.preventDefault();
@@ -178,7 +182,7 @@ export function useLanguageMenu() {
       event.preventDefault();
       const currentIndex = items.indexOf(document.activeElement as HTMLElement);
       const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowDown" ? (currentIndex + 1) % items.length : (currentIndex - 1 + items.length) % items.length;
-      items[nextIndex]?.focus();
+      items[nextIndex]?.focus({ preventScroll: true });
     };
 
     document.addEventListener("pointerdown", closeOnOutsideClick);

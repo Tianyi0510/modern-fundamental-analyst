@@ -145,6 +145,21 @@ test.describe("header interaction QA", () => {
     }
   });
 
+  test("holding hover moves text inward", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    const row = page.locator(".holding-row").first();
+    const positions = () => row.evaluate(element => Array.from(element.children, child => {
+      const rect = child.getBoundingClientRect();
+      return { x: rect.x, width: rect.width };
+    }));
+    const before = await positions();
+    await row.hover();
+    await expect(row).toHaveCSS("padding-left", "14px");
+    await expect(row).toHaveCSS("padding-right", "14px");
+    expect((await positions())[0]!.x - before[0]!.x).toBeCloseTo(14, 1);
+  });
+
   test("CTA focus uses shared scale without lift or shadow", async ({ page }) => {
     for (const [path, selector] of [
       ["/", ".hero .button"],
@@ -159,6 +174,15 @@ test.describe("header interaction QA", () => {
       await control.focus();
       await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
       await expect(control).toHaveCSS("box-shadow", "none");
+      await control.hover();
+      await page.mouse.down();
+      try {
+        const durations = await control.evaluate(element => getComputedStyle(element).transitionDuration.split(",").map(value => Number.parseFloat(value)));
+        expect(durations.every(duration => duration === 0.09)).toBe(true);
+      } finally {
+        await page.mouse.move(1, 1);
+        await page.mouse.up();
+      }
     }
   });
 
@@ -199,15 +223,12 @@ test.describe("header interaction QA", () => {
       for (const path of ["/about", "/memos/microsoft-stock-analysis-fiscal-year-2024"]) {
         await page.goto(path);
         const note = page.locator(".reference-note");
+        if (path === "/about") {
         await expect(note).toHaveCount(1);
         await expect(note).toHaveCSS("font-size", "18px");
         await expect(note).toHaveCSS("line-height", "27px");
         await expect(note).toHaveCSS("font-weight", "400");
         await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
-        if (path !== "/about") {
-          await expect(note.locator(":scope > span")).toHaveCSS("font-weight", "700");
-          await expect(note.locator(":scope > span")).toHaveCSS("color", "rgb(0, 0, 0)");
-        }
         for (const link of await note.locator("a").all()) {
           await expect(link).toHaveCSS("font-weight", "400");
           await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
@@ -219,7 +240,10 @@ test.describe("header interaction QA", () => {
           await link.focus();
           await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
         }
+        }
         if (path.startsWith("/memos/")) {
+          await expect(page.locator('.article-body a[href*="docs.google.com/document"]')).toHaveCount(0);
+          await expect(page.locator(".memo-references li")).toHaveCount(5);
           await page.evaluate(() => document.fonts.ready);
           const gaps = await page.locator(".memo-section").last().evaluate((section) => {
             const conclusion = section.querySelector(".memo-subsection:last-child")!;
@@ -508,8 +532,22 @@ test.describe("mobile content and navigation QA", () => {
     await page.goto("/");
     await page.locator(".mobile-menu-button").tap();
     const drawer = page.locator(".mobile-menu-drawer");
-    await drawer.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 1, clientX: 40, clientY: 240 });
-    await drawer.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 1, clientX: 150, clientY: 246 });
+    const start = { pointerType: "touch", pointerId: 1, isPrimary: true, clientX: 40, clientY: 240 };
+    const end = { ...start, clientX: 150, clientY: 246 };
+    // A second finger cancels the gesture, even when the first finger finishes it.
+    await drawer.dispatchEvent("pointerdown", start);
+    await drawer.dispatchEvent("pointerdown", { ...start, pointerId: 2, isPrimary: false });
+    await drawer.dispatchEvent("pointerup", end);
+    await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+    await drawer.dispatchEvent("pointerdown", start);
+    await drawer.dispatchEvent("pointercancel", start);
+    await drawer.dispatchEvent("pointerup", end);
+    await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+    await drawer.dispatchEvent("pointerdown", start);
+    await drawer.dispatchEvent("pointerup", { ...end, pointerId: 2 });
+    await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+    await drawer.dispatchEvent("pointerdown", start);
+    await drawer.dispatchEvent("pointerup", end);
     await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
   });
 

@@ -169,7 +169,6 @@
 .memo-references { margin-top: var(--memo-conclusion-space-after); padding: var(--space-section-compact) 48px; background: var(--background-gray); }
 .memo-references ol { margin: 0; padding-left: 22px; }
 .memo-references li + li { margin-top: 14px; }
-.article-body .article-source-note { margin-top: var(--space-related-content); }
 .article-body blockquote { margin: 64px 0; padding: 34px 0; border-top: 3px solid var(--medium-blue); border-bottom: 1px solid var(--gray); }
 .contact-hero { min-height: 0; }
 .contact-note { max-width: 580px; margin: 0; color: var(--text-primary); }

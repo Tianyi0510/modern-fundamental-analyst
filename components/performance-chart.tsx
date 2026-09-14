@@ -15,7 +15,8 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
   const values = points.flatMap(row => [row.portfolioXirr, row.benchmarkXirr]);
   const lower = Math.floor(Math.min(...values) / 20) * 20;
   const upper = Math.ceil(Math.max(...values) / 20) * 20;
-  const y = (value: number) => 300 * (upper - value) / (upper - lower);
+  const y = (value: number) => 12 + 276 * (upper - value) / (upper - lower);
+  const latest = points[points.length - 1]!;
   const line = (key: "portfolioXirr" | "benchmarkXirr") => points.map((row, index) => `${index * 800 / (points.length - 1)},${y(row[key])}`).join(" ");
   const ticks = Array.from({ length: (upper - lower) / 20 + 1 }, (_, index) => upper - index * 20);
   return <figure className={styles.figure} aria-labelledby="performance-chart-title">
@@ -27,13 +28,13 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
     <p>{text.axis}</p>
     <div className={styles.plot}>
       <div className={styles.ticks} aria-hidden="true">{ticks.map(tick => <span key={tick}>{tick}%</span>)}</div>
-      <svg viewBox="0 0 800 300" preserveAspectRatio="none" role="img" aria-label={`${text.title}. ${text.note}`}>
-        {ticks.map(tick => <line key={tick} x1="0" x2="800" y1={y(tick)} y2={y(tick)} className={styles.grid} />)}
+      <svg viewBox="0 0 800 300" preserveAspectRatio="none" role="img" aria-label={`${text.title}. ${text.note} ${formatDate(latest.date, locale, true)}: ${text.portfolio} ${formatPercent(latest.portfolioXirr)}, SPY ${formatPercent(latest.benchmarkXirr)}.`}>
+        {ticks.map(tick => <line key={tick} x1="0" x2="800" y1={y(tick)} y2={y(tick)} className={tick === 0 ? styles.zeroLine : styles.grid} />)}
         <polyline points={line("benchmarkXirr")} className={styles.benchmarkLine} />
         <polyline points={line("portfolioXirr")} className={styles.portfolioLine} />
       </svg>
     </div>
-    <div className={styles.dates}><span>{formatDate(points[0]!.date, locale, true)}</span><span>{formatDate(points[points.length - 1]!.date, locale, true)}</span></div>
+    <div className={styles.dates}><span>{formatDate(points[0]!.date, locale, true)}</span><span className={styles.midpoint}>{formatDate(points[Math.floor((points.length - 1) / 2)]!.date, locale, true)}</span><span>{formatDate(latest.date, locale, true)}</span></div>
     <details className={styles.details}><summary><span>{text.data}</span><svg className={styles.chevron} viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary>
       <p className={styles.scrollHint} id="performance-table-hint">{text.scroll}</p>
       {/* Keyboard focus allows horizontal scrolling of the monthly table. */}

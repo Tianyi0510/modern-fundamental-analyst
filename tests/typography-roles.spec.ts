@@ -106,7 +106,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     cardTitle: [".article-body h2"],
     compactTitle: [".memo-subsection h3"],
     lead: [".article-lead"],
-    bodyLarge: [".article-body", ".reference-note"],
+    bodyLarge: [".article-body"],
     label: [".memo-article .eyebrow"],
     caption: [".article-meta"],
   },

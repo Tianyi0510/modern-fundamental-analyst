@@ -124,6 +124,7 @@ textarea.control {
 .section .submit:active:not(:disabled) {
   transform: scale(var(--motion-scale-press));
   box-shadow: none;
+  transition-duration: var(--motion-duration-press);
 }
 
 .submit:disabled {
