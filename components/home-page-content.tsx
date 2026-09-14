@@ -23,7 +23,7 @@ const allocationGradient = `conic-gradient(var(--deep-blue) 0 ${firstStop}%, var
 export function HomePageContent({ locale }: { locale: Locale }) {
   const text = homeCopy[locale];
   const memos = getMemos(locale);
-  const portfolioDate = formatDate(portfolioSnapshot.asOf, locale);
+  const portfolioDate = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
   const compactPortfolioDate = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
   const benchmarkReturn = formatPercent(portfolioSnapshot.benchmarkXirr);
 

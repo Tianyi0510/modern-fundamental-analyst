@@ -10,18 +10,18 @@ test("portfolio totals are derived from holdings", async () => {
   ]);
 
   assert.match(calculations, /holdings\.reduce/);
-  assert.match(calculations, /getSafeRatio\(marketValue - costBasis, costBasis\)/);
+  assert.match(calculations, /getSafeRatio\(marketValue - costBasis \+ netDividends - financingInterest, costBasis\)/);
   assert.match(calculations, /holdingsCount: holdings\.length/);
   assert.match(calculations, /getHoldingReturn/);
   assert.match(calculations, /getSafeRatio\(holding\.costBasis, holding\.shares\)/);
-  assert.match(portfolio, /getPortfolioTotals\(portfolioHoldings\)/);
+  assert.match(portfolio, /getPortfolioTotals\(portfolioHoldings, portfolioIncome\)/);
   assert.doesNotMatch(portfolio, /returnPct:/);
   assert.doesNotMatch(portfolio, /totalReturn:\s*22\b/);
 });
 
 test("portfolio calculations remain internally consistent", async () => {
-  const { getHoldingCostPerShare, getHoldingReturn, getHoldingWeight, getPortfolioTotals, portfolioHoldings, portfolioSnapshot } = await import("../data/portfolio.ts");
-  const totals = getPortfolioTotals(portfolioHoldings);
+  const { getHoldingCostPerShare, getHoldingReturn, getHoldingWeight, getPortfolioTotals, portfolioHoldings, portfolioSnapshot, portfolioIncome } = await import("../data/portfolio.ts");
+  const totals = getPortfolioTotals(portfolioHoldings, portfolioIncome);
 
   assert.equal(totals.holdingsCount, portfolioHoldings.length);
   assert.equal(totals.costBasis, portfolioSnapshot.costBasis);

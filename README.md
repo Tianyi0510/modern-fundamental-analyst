@@ -44,7 +44,7 @@ Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in 
 
 ## Content and Integrations
 
-Portfolio data is maintained in `data/portfolio.ts` as a verified monthly snapshot, not live quotes. Memo entries live in `data/memos.ts`, with articles under `content/memos/` registered in `data/memo-content.ts`.
+Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.ts` as monthly snapshots, not live quotes. See [portfolio data updates](TECHNICAL_ARCHITECTURE.md#portfolio-data) for sources and calculation scope. Memo entries live in `data/memos.ts`, with articles under `content/memos/` registered in `data/memo-content.ts`.
 
 Integration details:
 

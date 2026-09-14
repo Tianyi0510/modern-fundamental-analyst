@@ -1,3 +1,4 @@
+import { PerformanceChart } from "@/components/performance-chart";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/data/portfolio";
@@ -14,17 +15,17 @@ const copy = {
     cumulativeNote: "Cost-basis return",
     portfolioXirr: "Portfolio XIRR",
     portfolioNote: "Cash-flow weighted",
-    benchmarkNote: "Same cash-flow period",
+    benchmarkNote: "Same investment dates",
     chart: "Performance Chart",
     measured: "Measured consistently.",
     measure: "Measure",
     result: "Result",
     context: "Context",
-    cumulativeContext: "Market value versus net cost basis",
+    cumulativeContext: "Market value plus net income versus net cost basis",
     portfolioContext: "Money-weighted annualized return",
-    benchmarkContext: "Benchmark using matching cash flows",
+    benchmarkContext: "Benchmark using matching investment dates and costs",
     methodology: "Methodology",
-    methodologyCopy: <>Results are presented in USD. Cumulative return compares current market value with net cost basis. XIRR reflects the timing and amount of portfolio cash flows; the {portfolioSnapshot.benchmark} comparison applies those same cash flows to the benchmark.</>,
+    methodologyCopy: <>Results are presented in USD. Cumulative return includes market value and net dividends, less net cost basis and financing interest, divided by net cost basis. XIRR reflects the timing and amount of portfolio cash flows; the {portfolioSnapshot.benchmark} comparison uses the same investment dates and purchase costs with adjusted prices.</>,
     sourceCopy: (asOf: string) => <><p className="reference-note"><span>Source Sheet:</span> <a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>The verified data is synchronized to this site monthly. Prices and market values use closing prices as of {asOf} and are not live quotes. Cash and external funding are excluded.</p></>,
   },
   "zh-tw": {
@@ -35,17 +36,17 @@ const copy = {
     cumulativeNote: "成本基礎報酬",
     portfolioXirr: "投資組合 XIRR",
     portfolioNote: "現金流加權",
-    benchmarkNote: "相同現金流期間",
+    benchmarkNote: "相同投資日期",
     chart: "績效圖表",
     measured: "以一致方式衡量。",
     measure: "衡量項目",
     result: "結果",
     context: "說明",
-    cumulativeContext: "市場價值相對淨成本基礎",
+    cumulativeContext: "市場價值加淨收益相對淨成本基礎",
     portfolioContext: "資金加權年化報酬",
-    benchmarkContext: "使用相同現金流計算的基準",
+    benchmarkContext: "使用相同投資日期與成本計算的基準",
     methodology: "計算方法",
-    methodologyCopy: <>績效以美元呈現。累積報酬比較目前市場價值與淨成本基礎；XIRR 反映投資組合現金流的時間與金額，{portfolioSnapshot.benchmark} 比較則將相同現金流套用至基準。</>,
+    methodologyCopy: <>績效以美元呈現。累積報酬以市場價值加淨股息、減去淨成本與融資利息後，除以淨成本計算；XIRR 反映投資組合現金流的時間與金額，{portfolioSnapshot.benchmark} 比較則使用相同投資日期、買入成本與調整後價格。</>,
     sourceCopy: (asOf: string) => <><p className="reference-note"><span>來源試算表：</span><a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>已驗證快照每月同步至本網站。價格與市場價值均採用 {asOf} 收盤價，並非即時報價；不包含現金與外部資金流。</p></>,
   },
   "zh-cn": {
@@ -56,17 +57,17 @@ const copy = {
     cumulativeNote: "成本基础回报",
     portfolioXirr: "投资组合 XIRR",
     portfolioNote: "现金流加权",
-    benchmarkNote: "相同现金流期间",
+    benchmarkNote: "相同投资日期",
     chart: "业绩图表",
     measured: "以一致方式衡量。",
     measure: "衡量项目",
     result: "结果",
     context: "说明",
-    cumulativeContext: "市场价值相对净成本基础",
+    cumulativeContext: "市场价值加净收益相对净成本基础",
     portfolioContext: "资金加权年化回报",
-    benchmarkContext: "使用相同现金流计算的基准",
+    benchmarkContext: "使用相同投资日期与成本计算的基准",
     methodology: "计算方法",
-    methodologyCopy: <>业绩以美元呈现。累计回报比较当前市场价值与净成本基础；XIRR 反映投资组合现金流的时间与金额，{portfolioSnapshot.benchmark} 比较则将相同现金流应用于基准。</>,
+    methodologyCopy: <>业绩以美元呈现。累计回报以市场价值加净股息、减去净成本与融资利息后，除以净成本计算；XIRR 反映投资组合现金流的时间与金额，{portfolioSnapshot.benchmark} 比较则使用相同投资日期、买入成本与调整后价格。</>,
     sourceCopy: (asOf: string) => <><p className="reference-note"><span>来源电子表格：</span><a className="source-link" href={portfolioSnapshot.sourceUrl} target="_blank" rel="noreferrer">{portfolioSnapshot.source}</a></p><p>已验证快照每月同步至本网站。价格与市场价值均采用 {asOf} 收盘价，并非实时报价；不包含现金与外部资金流。</p></>,
   },
 } as const;
@@ -74,12 +75,13 @@ const copy = {
 export function PerformancePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const isChinese = locale !== "en";
-  const asOf = formatDate(portfolioSnapshot.asOf, locale);
+  const asOf = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
 
   return <main className="performance-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>
     <section className="performance-summary"><div className="summary-primary" data-tone="highlight"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><small>{text.cumulativeNote}</small></div><div data-tone="brand"><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><small>{text.portfolioNote}</small></div><div data-tone="paper"><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><small>{text.benchmarkNote}</small></div></section>
     <section className="returns shell"><div className="section-heading"><p className="section-number">{text.chart}</p><h2>{text.measured}</h2></div>
+      <PerformanceChart locale={locale} />
       <div className="returns-table"><div className="table-head"><span>{text.measure}</span><span>{text.result}</span><span>{text.context}</span></div><div className="return-row"><span>{text.cumulativeReturn}</span><strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong><span>{text.cumulativeContext}</span></div><div className="return-row"><span>{text.portfolioXirr}</span><strong>{formatPercent(portfolioSnapshot.xirr)}</strong><span>{text.portfolioContext}</span></div><div className="return-row"><span>{portfolioSnapshot.benchmark} XIRR</span><strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong><span>{text.benchmarkContext}</span></div></div>
     </section>
     <section className="methodology shell section-gray"><h2>{text.methodology}</h2><div className="methodology-content"><p>{text.methodologyCopy}</p><aside className="methodology-source">{text.sourceCopy(asOf)}</aside></div></section><SiteFooter locale={locale} /></main>;

@@ -18,7 +18,10 @@ export function getHoldingCostPerShare(holding: Pick<PortfolioHolding, "costBasi
   return getSafeRatio(holding.costBasis, holding.shares);
 }
 
-export function getPortfolioTotals(holdings: ReadonlyArray<PortfolioHolding>) {
+export function getPortfolioTotals(
+  holdings: ReadonlyArray<PortfolioHolding>,
+  { netDividends = 0, financingInterest = 0 }: { netDividends?: number; financingInterest?: number } = {},
+) {
   const { costBasis, marketValue } = holdings.reduce(
     (totals, holding) => ({
       costBasis: totals.costBasis + holding.costBasis,
@@ -30,7 +33,7 @@ export function getPortfolioTotals(holdings: ReadonlyArray<PortfolioHolding>) {
   return {
     costBasis,
     marketValue,
-    totalReturn: getSafeRatio(marketValue - costBasis, costBasis) * 100,
+    totalReturn: getSafeRatio(marketValue - costBasis + netDividends - financingInterest, costBasis) * 100,
     holdingsCount: holdings.length,
   };
 }

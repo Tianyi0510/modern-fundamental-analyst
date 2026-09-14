@@ -66,7 +66,7 @@ const tableCopy = {
 export function PortfolioPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const isChinese = locale !== "en";
-  const asOf = formatDate(portfolioSnapshot.asOf, locale);
+  const asOf = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
 
   return <main className="portfolio-page" id="main-content"><SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
     <section className="page-hero shell"><p className="eyebrow"><span /> {text.eyebrow}</p><h1>{text.title}</h1><div className="page-intro"><p>{text.intro}</p><small className="date-text">{isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}</small></div></section>

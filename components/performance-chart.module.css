@@ -1,0 +1,28 @@
+.figure { margin: 0 0 var(--space-7); min-width: 0; }
+.figure h3 { margin: 0; font-size: var(--font-size-compact-title); line-height: var(--leading-compact-title); }
+.figure p { margin: var(--space-3) 0; font-size: var(--font-size-body); line-height: var(--leading-body); }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-5); list-style: none; padding: 0; margin: var(--space-5) 0; font-size: var(--font-size-control); }
+.legend li { display: flex; align-items: center; gap: var(--space-2); }
+.portfolioKey, .benchmarkKey { width: 32px; border-top: 3px solid var(--deep-blue); }
+.benchmarkKey { border-color: var(--bright-blue); border-top-style: dashed; }
+.plot { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 300px; }
+.plot svg { display: block; width: 100%; height: 100%; min-height: 0; overflow: visible; }
+.ticks { display: flex; flex-direction: column; justify-content: space-between; font-size: var(--font-size-caption); font-variant-numeric: tabular-nums; }
+.ticks span { line-height: 0; }
+.grid { stroke: var(--gray); vector-effect: non-scaling-stroke; }
+.portfolioLine, .benchmarkLine { fill: none; stroke-width: 3; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.portfolioLine { stroke: var(--deep-blue); }
+.benchmarkLine { stroke: var(--bright-blue); stroke-dasharray: 8 5; }
+.dates { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); padding-left: 4.5rem; margin-top: var(--space-4); font-size: var(--font-size-caption); }
+.details { margin-top: var(--space-5); font-size: var(--font-size-body); }
+.details summary { cursor: pointer; padding: var(--space-3) 0; }
+.details summary:focus-visible, .tableScroll:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-on-light); outline-offset: var(--focus-ring-offset); }
+.tableScroll { overflow-x: auto; margin-top: var(--space-3); }
+.tableScroll table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.tableScroll caption { text-align: left; padding-bottom: var(--space-3); }
+.tableScroll th, .tableScroll td { padding: var(--space-3); border-bottom: 1px solid var(--gray); text-align: right; }
+.tableScroll th:first-child { text-align: left; }
+@media (forced-colors: active) {
+  .portfolioLine, .benchmarkLine, .grid { stroke: CanvasText; }
+  .portfolioKey, .benchmarkKey { border-color: CanvasText; }
+}

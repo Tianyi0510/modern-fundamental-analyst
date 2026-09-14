@@ -42,3 +42,11 @@ Payment confirmation uses server-verified Stripe Session status; URL parameters 
 `audit/` holds local screenshots and dated review notes. Git and Vercel exclude it; existing files are retained on disk. These historical observations are not the current issue list and are not shared with a fresh clone. Keep durable decisions and operating instructions in the root documentation. If evidence needs to be shared, prepare a separate reviewed artifact with relative image links and record its date, commit, environment and resolution status; local absolute paths are not portable.
 
 Browser evidence is separated into `test-results/chromium/` and `test-results/webkit/`, so running WebKit preserves Chromium evidence. GitHub Actions retains failed Playwright traces and screenshots in the `browser-failure-evidence` artifact for seven days.
+
+## Portfolio data
+
+`data/portfolio.ts` is the site's portfolio data store; Redis only supports service coordination and rate limiting. Home, Portfolio and Performance share this snapshot. The Performance chart uses since-inception annualized XIRR at each month-end, not single-month returns; horizons below 30 days remain unavailable.
+
+The 2026-08-31 update uses `portfolio-return-analysis-monthly-xirr.xlsx` (statement-backed revision): `August Statement!A16:D33` for 18 holdings and `Monthly XIRR!A5:H25` for the history. The original `portfolio-return-analysis-2026-07-31.xlsx` supplies unchanged cost bases, net dividends and financing interest; the August revision reports no added cash flows. Stocks total USD 121,301.99. Idle cash is excluded. Original July tabs remain historical snapshots; do not use the provisional August estimates.
+
+Keep source precision until display formatting. Portfolio cumulative return includes net dividends and deducts financing interest; individual holding returns remain market-value-versus-cost calculations. On each update, reconcile quantities and price × shares, totals, the latest XIRR observation and snapshot date; run the portfolio regression and browser suites. Do not commit source statements, account identifiers or local source paths.

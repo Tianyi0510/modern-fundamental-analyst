@@ -226,3 +226,12 @@
 .not-found { min-height: 100svh; display: grid; place-content: center; justify-items: center; gap: 30px; text-align: center; }
 .not-found > span { color: var(--medium-blue); }
 .not-found h1 { margin: 0; }
+
+/* Performance history spans the page; allow enlarged text to wrap within grids. */
+.performance-page .returns { grid-template-columns: minmax(0, 1fr); gap: var(--space-heading-content); }
+.performance-page .returns > *,
+.performance-page .page-intro > *,
+.performance-page .performance-summary > *,
+.performance-page .methodology > *,
+.performance-page .methodology-content > * { min-width: 0; overflow-wrap: anywhere; }
+.performance-page .page-intro { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); }

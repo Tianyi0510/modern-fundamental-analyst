@@ -306,3 +306,8 @@
     outline-offset: var(--focus-ring-offset);
   }
 }
+
+@media (max-width: 800px) {
+  .performance-page .page-intro,
+  .performance-page .performance-summary { grid-template-columns: minmax(0, 1fr); }
+}
