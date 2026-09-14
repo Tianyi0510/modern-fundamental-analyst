@@ -4,9 +4,9 @@ import type { Locale } from "@/lib/i18n";
 import styles from "./performance-chart.module.css";
 
 const copy = {
-  en: { title: "Portfolio vs SPY", note: "Since-inception annualized XIRR at each month-end. These are not individual monthly returns.", portfolio: "Portfolio", data: "View monthly data", month: "Month end", value: "Stock market value", unavailable: "Not annualized: less than 30 days", axis: "Annualized XIRR" },
-  "zh-tw": { title: "投資組合與 SPY", note: "每個月底自成立以來的年化 XIRR，並非各月份的單月報酬。", portfolio: "投資組合", data: "查看每月數據", month: "月底日期", value: "股票市場價值", unavailable: "未年化：不足 30 天", axis: "年化 XIRR" },
-  "zh-cn": { title: "投资组合与 SPY", note: "每个月底自成立以来的年化 XIRR，并非各月份的单月回报。", portfolio: "投资组合", data: "查看每月数据", month: "月底日期", value: "股票市场价值", unavailable: "未年化：不足 30 天", axis: "年化 XIRR" },
+  en: { title: "Portfolio vs SPY", note: "Since-inception annualized XIRR at each month-end. These are not individual monthly returns.", portfolio: "Portfolio", data: "View monthly data", month: "Month end", value: "Stock market value", unavailable: "Not annualized: less than 30 days", axis: "Annualized XIRR", caption: "Month-end data · newest first", scroll: "Swipe horizontally to compare columns; scroll vertically for earlier months." },
+  "zh-tw": { title: "投資組合與 SPY", note: "每個月底自成立以來的年化 XIRR，並非各月份的單月報酬。", portfolio: "投資組合", data: "查看每月數據", month: "月底日期", value: "股票市場價值", unavailable: "未年化：不足 30 天", axis: "年化 XIRR", caption: "月底數據・最新月份在前", scroll: "左右滑動比較欄位，上下捲動查看較早月份。" },
+  "zh-cn": { title: "投资组合与 SPY", note: "每个月底自成立以来的年化 XIRR，并非各月份的单月回报。", portfolio: "投资组合", data: "查看每月数据", month: "月底日期", value: "股票市场价值", unavailable: "未年化：不足 30 天", axis: "年化 XIRR", caption: "月底数据・最新月份在前", scroll: "左右滑动比较各列，上下滚动查看较早月份。" },
 } as const;
 
 export function PerformanceChart({ locale }: { locale: Locale }) {
@@ -34,12 +34,13 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
       </svg>
     </div>
     <div className={styles.dates}><span>{formatDate(points[0]!.date, locale, true)}</span><span>{formatDate(points[points.length - 1]!.date, locale, true)}</span></div>
-    <details className={styles.details}><summary>{text.data}</summary>
+    <details className={styles.details}><summary><span>{text.data}</span><svg className={styles.chevron} viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary>
+      <p className={styles.scrollHint} id="performance-table-hint">{text.scroll}</p>
       {/* Keyboard focus allows horizontal scrolling of the monthly table. */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-      <div className={styles.tableScroll} tabIndex={0} role="region" aria-label={text.data}>
-      <table><caption>{text.note}</caption><thead><tr><th scope="col">{text.month}</th><th scope="col">{text.value}</th><th scope="col">{text.portfolio} XIRR</th><th scope="col">SPY XIRR</th></tr></thead>
-        <tbody>{portfolioMonthlyReturns.map(row => <tr key={row.date}><th scope="row">{formatDate(row.date, locale, true)}</th><td>{formatUsd(row.marketValue)}</td><td>{row.portfolioXirr === null ? text.unavailable : formatPercent(row.portfolioXirr)}</td><td>{row.benchmarkXirr === null ? text.unavailable : formatPercent(row.benchmarkXirr)}</td></tr>)}</tbody>
+      <div className={styles.tableScroll} tabIndex={0} role="region" aria-label={text.data} aria-describedby="performance-table-hint">
+      <table><caption>{text.caption}</caption><thead><tr><th scope="col">{text.month}</th><th scope="col">{text.value}</th><th scope="col">{text.portfolio} XIRR</th><th scope="col">SPY XIRR</th></tr></thead>
+        <tbody>{portfolioMonthlyReturns.toReversed().map(row => <tr key={row.date}><th scope="row">{formatDate(row.date, locale, true)}</th><td>{formatUsd(row.marketValue)}</td><td className={row.portfolioXirr === null ? styles.unavailable : undefined}>{row.portfolioXirr === null ? text.unavailable : formatPercent(row.portfolioXirr)}</td><td className={row.benchmarkXirr === null ? styles.unavailable : undefined}>{row.benchmarkXirr === null ? text.unavailable : formatPercent(row.benchmarkXirr)}</td></tr>)}</tbody>
       </table>
     </div></details>
   </figure>;
