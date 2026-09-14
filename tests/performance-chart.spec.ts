@@ -43,9 +43,12 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.locator("details")).toHaveAttribute("open", "");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 1440, height: 900 });
-    const introBox = await page.locator(".page-intro").boundingBox();
-    const dateBox = await page.locator(".page-intro .date-text").boundingBox();
-    expect(Math.abs(introBox!.x + introBox!.width - dateBox!.x - dateBox!.width)).toBeLessThan(1);
+    await page.evaluate(() => document.fonts.ready);
+    await expect.poll(() => page.locator(".page-intro").evaluate(element => {
+      const intro = element.getBoundingClientRect();
+      const date = element.querySelector(".date-text")!.getBoundingClientRect();
+      return Math.abs(intro.right - date.right);
+    }), "Hero date aligns after viewport reflow").toBeLessThan(1);
     for (const width of [320, 801, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.evaluate(() => { document.documentElement.style.fontSize = "32px"; });
