@@ -43,6 +43,33 @@ test("mobile menu isolates background focus and closes without a visible inert o
   expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(false);
 });
 
+test.describe("repeated touch menu animation", () => {
+  test.use({ hasTouch: true });
+  test("each opening replays after the hidden state resets", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+      await page.goto(prefix || "/");
+      const icon = page.locator(".mobile-menu-close svg");
+      await icon.evaluate(element => {
+        element.setAttribute("data-starts", "0");
+        element.addEventListener("transitionrun", event => {
+          if ((event as TransitionEvent).propertyName === "transform") {
+            element.setAttribute("data-starts", String(Number(element.getAttribute("data-starts")) + 1));
+          }
+        });
+      });
+      for (let opening = 1; opening <= 3; opening++) {
+        await page.locator(".mobile-menu-button").tap();
+        await expect(icon).toHaveAttribute("data-starts", String(opening));
+        await page.locator(".mobile-menu-close").tap();
+        await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
+        expect(await icon.evaluate(element => getComputedStyle(element).transform)).toBe("matrix(0, -1, 1, 0, 0, 0)");
+      }
+    }
+  });
+});
+
 test("narrow navigation keeps its close control and brand inside the drawer", async ({ page }) => {
   for (const width of [320, 360, 390]) {
     await page.setViewportSize({ width, height: 720 });

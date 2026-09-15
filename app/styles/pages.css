@@ -108,7 +108,9 @@
 .portfolio-holdings-heading p { max-width: 420px; margin: 0; color: var(--text-secondary); }
 .portfolio-holdings-section .portfolio-table-wrap { padding-bottom: var(--space-section-compact); }
 .portfolio-holdings-section .portfolio-total-row { background: transparent; }
-.portfolio-page .portfolio-row { min-height: 78px; }
+.portfolio-page .portfolio-row { min-height: 64px; }
+.portfolio-page .portfolio-kpis > div { min-width: 0; overflow-wrap: anywhere; }
+.portfolio-holdings-heading > div { min-width: 0; overflow-wrap: anywhere; }
 .portfolio-page .portfolio-total-row { min-height: 88px; }
 .returns { padding: var(--space-section) 0; display: grid; grid-template-columns: .7fr 1.3fr; gap: 80px; }
 .returns .section-heading { display: block; }
