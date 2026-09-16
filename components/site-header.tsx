@@ -16,6 +16,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
   const pathname = usePathname();
   const {
     close: closeMenu,
+    closeImmediately: closeMenuForNavigation,
     closeButtonRef: menuCloseButtonRef,
     drawerRef: menuDrawerRef,
     handlePointerCancel: handleMenuPointerCancel,
@@ -103,7 +104,6 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
       </div>
 
       <div className={`mobile-menu-layer${isMenuOpen ? " is-open" : ""}`} aria-hidden={!isMenuOpen}>
-        <button className="mobile-menu-backdrop" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} />
         <aside
           ref={menuDrawerRef}
           className="mobile-menu-drawer"
@@ -116,7 +116,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
           onPointerUp={handleMenuPointerUp}
         >
           <div className="mobile-menu-top">
-            <Link className="wordmark mobile-menu-wordmark" href={homePath} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
+            <Link className="wordmark mobile-menu-wordmark" href={homePath} onClick={closeMenuForNavigation} tabIndex={isMenuOpen ? 0 : -1}>
               Modern Fundamental Analyst<span>.</span>
             </Link>
             <button ref={menuCloseButtonRef} className="mobile-menu-close" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
@@ -125,12 +125,12 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
           </div>
           <nav aria-label={copy.mobilePrimary}>
             {mobileNavigation.map(({ href, label }) => (
-              <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} key={href}>
+              <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} onClick={closeMenuForNavigation} tabIndex={isMenuOpen ? 0 : -1} key={href}>
                 <span className="mobile-menu-label">{label}</span>
               </Link>
             ))}
           </nav>
-          <div className="mobile-language-links">{locales.map((targetLocale) => <Link className="mobile-menu-language" href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} aria-current={locale === targetLocale ? "page" : undefined} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1} key={targetLocale}>{localeConfig[targetLocale].label}</Link>)}</div>
+          <div className="mobile-language-links">{locales.map((targetLocale) => <Link className="mobile-menu-language" href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} aria-current={locale === targetLocale ? "page" : undefined} onClick={closeMenuForNavigation} tabIndex={isMenuOpen ? 0 : -1} key={targetLocale}>{localeConfig[targetLocale].label}</Link>)}</div>
         </aside>
       </div>
     </header>

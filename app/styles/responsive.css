@@ -180,15 +180,14 @@
     transform-origin: center;
     backface-visibility: hidden;
   }
-  .mobile-menu-button svg, .mobile-menu-close svg { width: 23px; height: 23px; transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized); }
+  .mobile-menu-button svg, .mobile-menu-close svg { width: 23px; height: 23px; }
   .mobile-menu-button, .mobile-menu-close { transition: transform var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), border-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard); }
   .mobile-menu-button:hover { background: var(--bright-blue); color: var(--black); transform: rotate(4deg) scale(var(--motion-scale-hover)); }
   .mobile-menu-button:focus-visible { outline: 2px solid var(--medium-blue); outline-offset: 3px; background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-hover)); }
   .mobile-menu-button:active { background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-press)); }
   .mobile-menu-button:active, .mobile-menu-close:active { transition-duration: var(--motion-duration-press); }
   .mobile-menu-layer { display: block; position: fixed; inset: 0; z-index: 100; pointer-events: none; visibility: hidden; }
-  .mobile-menu-layer.is-open { pointer-events: auto; visibility: visible; transition-delay: 0s; }
-  .mobile-menu-backdrop { display: none; }
+  .mobile-menu-layer.is-open { pointer-events: auto; visibility: visible; }
   .mobile-menu-drawer {
     position: absolute;
     inset: 0;
@@ -210,7 +209,7 @@
   .mobile-menu-top { position: sticky; z-index: 2; top: 0; min-height: 70px; margin-inline: calc(var(--space-page-gutter) * -1); padding: var(--space-2) var(--space-page-gutter); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); flex-shrink: 0; background: var(--white); }
   .mobile-menu-wordmark { max-width: none; }
   .mobile-menu-close { flex: 0 0 auto; border-color: var(--black); background: var(--white); color: var(--black); }
-  .mobile-menu-layer.is-open .mobile-menu-close { outline: 2px solid var(--medium-blue); outline-offset: 3px; }
+  .mobile-menu-layer.is-open .mobile-menu-close { outline: 2px solid var(--medium-blue); outline-offset: 3px; border-color: var(--bright-blue); background: var(--bright-blue); }
   .mobile-menu-close:hover { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: rotate(-4deg) scale(var(--motion-scale-hover)); }
   .mobile-menu-close:focus-visible { outline: 2px solid var(--medium-blue); outline-offset: 3px; border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-hover)); }
   .mobile-menu-close:active { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: scale(var(--motion-scale-press)); }
@@ -238,7 +237,6 @@
   .mobile-menu-layer.is-open .mobile-language-links { opacity: 1; transform: translateX(0); transition-delay: .22s; }
   /* Reset hidden entrance states immediately so every opening starts afresh. */
   .mobile-menu-layer:not(.is-open) .mobile-menu-drawer::before,
-  .mobile-menu-layer:not(.is-open) .mobile-menu-close svg,
   .site-header .mobile-menu-layer:not(.is-open) .mobile-menu-drawer nav a,
   .mobile-menu-layer:not(.is-open) .mobile-language-links { transition: none; }
   .mobile-language-links .mobile-menu-language { margin-top: 0; padding: 0 14px; }
@@ -250,7 +248,7 @@
 
 @media (hover: none) and (pointer: coarse) {
   .mobile-menu-button:hover:not(:active):not(:focus-visible) { background: var(--white); color: var(--black); transform: none; }
-  .mobile-menu-close:hover:not(:active):not(:focus-visible) { border-color: var(--black); background: var(--white); color: var(--black); transform: none; }
+  .mobile-menu-close:hover:not(:active):not(:focus-visible) { border-color: var(--bright-blue); background: var(--bright-blue); color: var(--black); transform: none; }
   .site-header .mobile-menu-drawer nav a:hover:not(:active):not(:focus-visible) { transform: none; }
   .site-header .mobile-menu-drawer nav a:hover:not([aria-current="page"]):not(:active):not(:focus-visible) { background: transparent; color: var(--black); }
   .mobile-language-links .mobile-menu-language:hover:not(:active):not(:focus-visible) { background: transparent; transform: none; }

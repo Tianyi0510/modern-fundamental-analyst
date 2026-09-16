@@ -21,8 +21,8 @@ export function MemoDisclosure({ summary, children }: { summary: ReactNode; chil
 
   const toggle = (event: MouseEvent<HTMLElement>) => {
     const details = ref.current;
-    const summary = details?.querySelector("summary");
-    if (!details || !summary?.contains(event.target as Node)) return;
+    if (!details) return;
+    const summary = event.currentTarget;
     event.preventDefault();
     const startHeight = details.getBoundingClientRect().height;
     const open = animationRef.current ? !targetOpenRef.current : !details.open;

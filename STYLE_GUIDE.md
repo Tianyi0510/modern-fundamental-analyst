@@ -82,11 +82,11 @@ The default disabled opacity is `--opacity-disabled`; preferences preserve `--op
 
 Reduced-motion mode removes smooth scrolling, minimizes transition durations, disables hover/press scaling through tokens, and removes decorative arrow movement and menu-control rotation. Summary and sort offsets use `--motion-offset-summary` and `--motion-offset-sort`, both zero in reduced-motion mode. Touch hover resets must exclude `:active` and `:focus-visible` so press and keyboard feedback keep their authored treatment.
 
-The mobile menu opens with coordinated motion and closes immediately, keeping visibility, input blocking and scroll restoration in sync. While open, background siblings are inert; closing restores their previous state and returns focus to the trigger. The language menu supports Enter, Space and arrow-key entry, arrow navigation, Escape dismissal and Tab exit.
+The mobile menu opens with coordinated motion and dismisses with a short rightward reveal of the page. Background isolation and scroll locking remain active until dismissal finishes; navigation and reduced motion close immediately. Repeated dismissal requests share the running animation, and changing to desktop or reduced motion cancels it safely. While open, background siblings are inert; closing restores their previous state and returns focus to the trigger. The language menu supports Enter, Space and arrow-key entry, arrow navigation, Escape dismissal and Tab exit.
 
 The mobile close icon replays its entrance keyframes on each opening, including after navigation. Memo disclosures keep native details/summary semantics and use a small client wrapper to animate height in both directions, including WebKit. Repeated input reverses from the current height; reduced motion switches immediately. Without JavaScript, the native disclosure remains usable.
 
-The open mobile menu's close button retains its blue outer ring independently of `:focus-visible`, so touch navigation does not remove it. Keep keyboard focus styles intact.
+The open mobile menu's close button retains its Bright Blue fill and blue outer ring independently of `:focus-visible`, so touch navigation does not remove them. Keep its black icon and keyboard focus styles intact.
 
 ## Validation and Changes
 

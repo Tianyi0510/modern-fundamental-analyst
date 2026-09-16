@@ -25,7 +25,7 @@ test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
 });
 
-test("mobile menu isolates background focus and closes without a visible inert overlay", async ({ page }) => {
+test("mobile menu keeps background isolated through dismissal and then restores focus", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/");
   const trigger = page.locator(".mobile-menu-button");
@@ -38,9 +38,43 @@ test("mobile menu isolates background focus and closes without a visible inert o
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     return getComputedStyle(document.querySelector(".mobile-menu-layer")!).visibility;
   });
-  expect(state).toBe("hidden");
+  expect(state).toBe("visible");
+  expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(true);
+  await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
   await expect(trigger).toBeFocused();
   expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(false);
+});
+
+test("menu dismissal handles repeated input and reduced motion in every locale", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    await page.goto(prefix || "/");
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    const trigger = page.locator(".mobile-menu-button");
+    await trigger.click();
+    const result = await page.locator(".mobile-menu-close").evaluate((element: HTMLButtonElement) => {
+      element.click();
+      const layer = document.querySelector(".mobile-menu-layer")!;
+      const animation = layer.getAnimations()[0];
+      if (!animation) throw new Error("Menu dismissal animation did not start");
+      animation.pause();
+      animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+      element.click();
+      return { count: layer.getAnimations().length, clip: getComputedStyle(layer).clipPath, locked: document.body.style.position };
+    });
+    expect(result.count).toBe(1);
+    expect(result.clip).not.toBe("none");
+    expect(result.locked).toBe("fixed");
+    // A preference change must also finish an already-running dismissal.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(trigger).toBeFocused();
+    await trigger.click();
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
+    expect(await page.locator(".mobile-menu-layer").evaluate(element => element.getAnimations().length)).toBe(0);
+  }
 });
 
 test.describe("repeated touch menu animation", () => {
@@ -102,6 +136,8 @@ test.describe("mobile menu touch ring", () => {
         await expect(close).toHaveCSS("outline-style", "solid");
         await expect(close).toHaveCSS("outline-width", "2px");
         await expect(close).toHaveCSS("outline-color", "rgb(0, 140, 255)");
+        await expect(close).toHaveCSS("background-color", "rgb(95, 205, 253)");
+        await expect(close).toHaveCSS("color", "rgb(0, 0, 0)");
         const path = route === "/" ? prefix || "/" : `${prefix}${route}`;
         await page.locator(`.mobile-menu-layer.is-open nav a[href="${path}"]`).tap();
         await expect(page).toHaveURL(path);
@@ -695,7 +731,7 @@ test.describe("mobile content and navigation QA", () => {
     }
   });
 
-  test("Escape dismisses immediately and rapid taps do not queue animations", async ({ page }) => {
+  test("Escape completes dismissal and rapid taps do not queue animations", async ({ page }) => {
     await page.goto("/");
     await page.locator(".mobile-menu-button").evaluate((button) => {
       (button as HTMLButtonElement).click();
@@ -728,6 +764,7 @@ test.describe("mobile content and navigation QA", () => {
     }
     await page.keyboard.press("Escape");
     const button = page.locator(".hero .button");
+    await expect(menuButton).toHaveAttribute("aria-expanded", "false");
     await button.scrollIntoViewIfNeeded();
     const box = (await button.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

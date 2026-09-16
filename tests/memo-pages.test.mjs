@@ -15,16 +15,17 @@ test("memo metadata uses one localized catalog", async () => {
 });
 
 test("memo catalog contains only the Microsoft source memo and uses one shared disclosure", async () => {
-  const [catalog, memoPage] = await Promise.all([
+  const [catalog, memoPage, disclosure] = await Promise.all([
     read("data/memos.ts"),
     read("components/memo-index.tsx"),
+    read("components/memo-disclosure.tsx"),
   ]);
 
   assert.match(catalog, /microsoft-stock-analysis-fiscal-year-2024/);
   assert.doesNotMatch(catalog, /durable-pricing-power|self-funded-growth|capital-allocation/);
   assert.match(memoPage, /<MemoDisclosure/);
-  assert.match(await read("components/memo-disclosure.tsx"), /<details/);
-  assert.match(await read("components/memo-disclosure.tsx"), /<summary/);
+  assert.match(disclosure, /<details/);
+  assert.match(disclosure, /<summary/);
 });
 
 test("memo content is selected by slug and locale", async () => {

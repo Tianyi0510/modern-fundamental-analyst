@@ -5,6 +5,19 @@ import { useCallback, useEffect, useRef, useState, type PointerEventHandler } fr
 // Keep in sync with the navigation-only breakpoint in responsive.css.
 const compactNavigationQuery = "(max-width: 1150px)";
 
+function animateMenuDismissal(layer: HTMLElement) {
+  const style = getComputedStyle(layer);
+  const duration = style.getPropertyValue("--motion-duration-medium").trim();
+  return layer.animate(
+    [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 0 100%)" }],
+    {
+      duration: Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000),
+      easing: style.getPropertyValue("--motion-ease-standard").trim(),
+      fill: "forwards",
+    },
+  );
+}
+
 export function useMobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const isOpenRef = useRef(false);
@@ -13,25 +26,45 @@ export function useMobileMenu() {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
+  const closingAnimationRef = useRef<Animation | null>(null);
 
-  const close = useCallback(() => {
+  const closeImmediately = useCallback(() => {
+    closingAnimationRef.current?.cancel();
+    closingAnimationRef.current = null;
     isOpenRef.current = false;
     pointerStartRef.current = null;
     setIsOpen(false);
   }, []);
 
+  const close = useCallback(() => {
+    if (!isOpenRef.current || closingAnimationRef.current) return;
+    const layer = drawerRef.current?.parentElement;
+    if (!layer || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      closeImmediately();
+      return;
+    }
+    const animation = animateMenuDismissal(layer);
+    closingAnimationRef.current = animation;
+    animation.onfinish = closeImmediately;
+  }, [closeImmediately]);
+
   useEffect(() => {
     const compactNavigation = window.matchMedia(compactNavigationQuery);
-    const handleBreakpoint = () => { if (!compactNavigation.matches) close(); };
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleBreakpoint = () => { if (!compactNavigation.matches) closeImmediately(); };
+    const handleMotion = () => { if (reducedMotion.matches && closingAnimationRef.current) closeImmediately(); };
     // Keep dismissal independent of render timing and repeated input.
     const handleEscape = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
     compactNavigation.addEventListener("change", handleBreakpoint);
+    reducedMotion.addEventListener("change", handleMotion);
     window.addEventListener("keydown", handleEscape);
     return () => {
       compactNavigation.removeEventListener("change", handleBreakpoint);
+      reducedMotion.removeEventListener("change", handleMotion);
+      closingAnimationRef.current?.cancel();
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [close]);
+  }, [close, closeImmediately]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -49,7 +82,7 @@ export function useMobileMenu() {
       for (const sibling of branch.parentElement?.children ?? []) {
         if (sibling instanceof HTMLElement && sibling !== branch) {
           background.set(sibling, sibling.inert);
-          sibling.inert = true;
+          sibling.setAttribute("inert", "");
         }
       }
       branch = branch.parentElement;
@@ -120,6 +153,7 @@ export function useMobileMenu() {
 
   return {
     close,
+    closeImmediately,
     closeButtonRef,
     drawerRef,
     handlePointerCancel,
