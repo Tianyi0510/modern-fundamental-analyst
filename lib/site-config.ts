@@ -5,12 +5,12 @@ export const SITE_URL = "https://www.modernfundamentalanalyst.com";
 export const SITE_NAME = "Modern Fundamental Analyst";
 export const SITE_DESCRIPTION = "An independent public-equity portfolio, performance record, and investment memo archive.";
 
-const sharingImage = { url: `${SITE_URL}/og.png`, width: 1728, height: 910, alt: "Ideas compound. Capital follows." };
+const sharingImage = { url: `${SITE_URL}/og-logo.png`, width: 1200, height: 630, alt: "Modern Fundamental Analyst logo" };
 
 function createSharingMetadata(title: string, description: string, url?: string): Pick<Metadata, "openGraph" | "twitter"> {
   return {
     openGraph: { title, description, ...(url ? { url } : {}), images: [sharingImage] },
-    twitter: { card: "summary_large_image", title, description, images: [sharingImage.url] },
+    twitter: { card: "summary_large_image", title, description, images: [{ url: sharingImage.url, alt: sharingImage.alt }] },
   };
 }
 
@@ -27,7 +27,15 @@ export function createRootMetadata(locale: Locale): Metadata {
     title: locale === "en" ? { default: title, template: `%s | ${SITE_NAME}` } : { absolute: title },
     description,
     alternates: { canonical: getLocalizedPath("/", locale), languages: getLanguageAlternates("/") },
-    icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+    icons: {
+      icon: [
+        { url: "/favicon-mfa.png", type: "image/png", sizes: "32x32" },
+        { url: "/favicon-mfa-64.png", type: "image/png", sizes: "64x64" },
+        { url: "/brand/icon.svg", type: "image/svg+xml", sizes: "any" },
+      ],
+      shortcut: "/favicon-mfa.png",
+      apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    },
     ...createSharingMetadata(title, description),
   };
 }

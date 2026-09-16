@@ -40,6 +40,8 @@ Known deferred issue: Medium Blue on white is about 3.39:1, Price Up is 3.06:1, 
 
 ## Typography and Languages
 
+Brand artwork uses Jost Bold (700) converted to paths in `public/brand/icon.svg` and `public/brand/logo.svg`; these are the scalable masters. Their PNG exports are 1600 × 1600 and 5600 × 1400. Keep the original square monogram and single-line wordmark layouts, including the colored period. Website icons and the 1200 × 630 `public/og-logo.png` sharing image are rendered from these vector outlines, not enlarged JPEGs.
+
 `base.css` is the source of truth for `--font-size-*`, weight, line-height and tracking values. Choose a role by meaning, not by whichever size fits a particular viewport.
 
 | Role | Use |
@@ -81,6 +83,10 @@ The default disabled opacity is `--opacity-disabled`; preferences preserve `--op
 Reduced-motion mode removes smooth scrolling, minimizes transition durations, disables hover/press scaling through tokens, and removes decorative arrow movement and menu-control rotation. Summary and sort offsets use `--motion-offset-summary` and `--motion-offset-sort`, both zero in reduced-motion mode. Touch hover resets must exclude `:active` and `:focus-visible` so press and keyboard feedback keep their authored treatment.
 
 The mobile menu opens with coordinated motion and closes immediately, keeping visibility, input blocking and scroll restoration in sync. While open, background siblings are inert; closing restores their previous state and returns focus to the trigger. The language menu supports Enter, Space and arrow-key entry, arrow navigation, Escape dismissal and Tab exit.
+
+The mobile close icon replays its entrance keyframes on each opening, including after navigation. Memo disclosures keep native details/summary semantics and use a small client wrapper to animate height in both directions, including WebKit. Repeated input reverses from the current height; reduced motion switches immediately. Without JavaScript, the native disclosure remains usable.
+
+The open mobile menu's close button retains its blue outer ring independently of `:focus-visible`, so touch navigation does not remove it. Keep keyboard focus styles intact.
 
 ## Validation and Changes
 

@@ -53,8 +53,8 @@ test.describe("repeated touch menu animation", () => {
       const icon = page.locator(".mobile-menu-close svg");
       await icon.evaluate(element => {
         element.setAttribute("data-starts", "0");
-        element.addEventListener("transitionrun", event => {
-          if ((event as TransitionEvent).propertyName === "transform") {
+        element.addEventListener("animationstart", event => {
+          if ((event as AnimationEvent).animationName === "mobile-menu-icon-enter") {
             element.setAttribute("data-starts", String(Number(element.getAttribute("data-starts")) + 1));
           }
         });
@@ -68,6 +68,105 @@ test.describe("repeated touch menu animation", () => {
       }
     }
   });
+});
+
+test("menu icon replays after navigation and returning to a visited page", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  for (const path of ["/about", "/memos", "/", "/portfolio"]) {
+    const icon = page.locator(".mobile-menu-close:visible svg");
+    await page.locator(".mobile-menu-close svg").evaluate(element => {
+      element.setAttribute("data-started", "false");
+      element.addEventListener("animationstart", () => element.setAttribute("data-started", "true"), { once: true });
+    });
+    await page.locator(".mobile-menu-button").click();
+    await expect(icon).toHaveAttribute("data-started", "true");
+    await page.locator(`.mobile-menu-layer.is-open nav a[href="${path}"]`).click();
+    await expect(page).toHaveURL(path);
+    await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
+  }
+});
+
+test.describe("mobile menu touch ring", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+  test("blue ring persists across routes without keyboard focus and with reduced motion", async ({ page }) => {
+    for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+      await page.goto(prefix || "/");
+      for (const route of ["/about", "/memos", "/"]) {
+        await page.emulateMedia({ reducedMotion: route === "/" ? "reduce" : "no-preference" });
+        await page.locator(".mobile-menu-button").tap();
+        const close = page.locator(".mobile-menu-close");
+        expect(await close.evaluate(e => e.matches(":focus-visible"))).toBe(false);
+        await expect(close).toHaveCSS("outline-style", "solid");
+        await expect(close).toHaveCSS("outline-width", "2px");
+        await expect(close).toHaveCSS("outline-color", "rgb(0, 140, 255)");
+        const path = route === "/" ? prefix || "/" : `${prefix}${route}`;
+        await page.locator(`.mobile-menu-layer.is-open nav a[href="${path}"]`).tap();
+        await expect(page).toHaveURL(path);
+        await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
+      }
+    }
+  });
+});
+
+test("memo disclosure animates both directions and respects reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto(`${prefix}/memos`);
+    const disclosure = page.locator(".memo-disclosure");
+    const summary = disclosure.locator("summary");
+    const closed = await disclosure.evaluate(e => e.getBoundingClientRect().height);
+    await summary.click();
+    const midpoint = await disclosure.evaluate(e => {
+      const animation = e.getAnimations()[0];
+      if (!animation) throw new Error("Expected disclosure height animation");
+      animation.pause();
+      animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+      return { height: e.getBoundingClientRect().height, full: e.scrollHeight };
+    });
+    expect(midpoint.height).toBeGreaterThan(closed);
+    expect(midpoint.height).toBeLessThan(midpoint.full);
+    // Reverse an unfinished opening without waiting for the element to settle.
+    await summary.evaluate((e: HTMLElement) => e.click());
+    await expect(disclosure).toHaveAttribute("data-closing", "");
+    await expect(disclosure).not.toHaveAttribute("open", "");
+    expect(await disclosure.evaluate(e => e.getBoundingClientRect().height)).toBeCloseTo(closed, 0);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await summary.focus();
+    await page.keyboard.press("Enter");
+    await expect(disclosure).toHaveAttribute("open", "");
+    expect(await disclosure.evaluate(e => e.getAnimations().length)).toBe(0);
+    await page.keyboard.press("Space");
+    await expect(disclosure).not.toHaveAttribute("open", "");
+  }
+});
+
+test("home contact and portfolio totals keep consistent spacing in all languages", async ({ page }) => {
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(prefix || "/");
+    for (const size of [16, 32]) {
+      await page.evaluate(size => { document.documentElement.style.fontSize = `${size}px`; }, size);
+      const spacing = await page.locator(".cta").evaluate(e => {
+        const label = e.querySelector(".eyebrow")!.getBoundingClientRect();
+        const heading = e.querySelector("h2")!.getBoundingClientRect();
+        const button = e.querySelector(".button")!.getBoundingClientRect();
+        return { before: heading.top - label.bottom, after: button.top - heading.bottom, gap: parseFloat(getComputedStyle(e).rowGap) };
+      });
+      expect(spacing.before).toBeCloseTo(spacing.gap, 0);
+      expect(spacing.after).toBeCloseTo(spacing.gap, 0);
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(`${prefix}/portfolio`);
+    const heights = await page.locator(".portfolio-table-detailed").evaluate(e => ({
+      row: e.querySelector(".portfolio-row:not(.portfolio-total-row)")!.getBoundingClientRect().height,
+      total: e.querySelector(".portfolio-total-row")!.getBoundingClientRect().height,
+    }));
+    expect(heights.total).toBe(heights.row);
+  }
 });
 
 test("narrow navigation keeps its close control and brand inside the drawer", async ({ page }) => {

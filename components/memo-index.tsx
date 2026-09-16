@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { MemoCards } from "@/components/memo-cards";
+import { MemoDisclosure } from "@/components/memo-disclosure";
 import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
@@ -15,14 +16,15 @@ export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
   return (
     <section className="memo-index shell">
       <MemoCards memos={memos} locale={locale} className="memo-index-featured" />
-      <details className="memo-disclosure">
-        <summary>
+      <MemoDisclosure summary={
+        <>
           <span>{label}</span>
           <span className="memo-summary-meta">
             <span className="memo-count">{String(memos.length).padStart(2, "0")}</span>
             <ChevronDown aria-hidden="true" size={24} strokeWidth={2} />
           </span>
-        </summary>
+        </>
+      }>
         <div className="memo-disclosure-content">
           {memos.map((memo) => (
             <Link href={getLocalizedPath(`/memos/${memo.slug}`, locale)} className="memo-index-row" key={memo.slug}>
@@ -32,7 +34,7 @@ export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
             </Link>
           ))}
         </div>
-      </details>
+      </MemoDisclosure>
     </section>
   );
 }

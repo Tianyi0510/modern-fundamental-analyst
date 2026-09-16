@@ -22,8 +22,9 @@ test("memo catalog contains only the Microsoft source memo and uses one shared d
 
   assert.match(catalog, /microsoft-stock-analysis-fiscal-year-2024/);
   assert.doesNotMatch(catalog, /durable-pricing-power|self-funded-growth|capital-allocation/);
-  assert.match(memoPage, /<details/);
-  assert.match(memoPage, /<summary/);
+  assert.match(memoPage, /<MemoDisclosure/);
+  assert.match(await read("components/memo-disclosure.tsx"), /<details/);
+  assert.match(await read("components/memo-disclosure.tsx"), /<summary/);
 });
 
 test("memo content is selected by slug and locale", async () => {
@@ -134,7 +135,7 @@ test("desktop and touch memo interactions share restrained color and scale feedb
   assert.match(index, /className="memo-summary-meta"[\s\S]*className="memo-count"[\s\S]*<ChevronDown aria-hidden="true" size=\{24\} strokeWidth=\{2\} \/>/);
   assert.match(css, /\.memo-summary-meta \{[^}]*white-space: nowrap/);
   assert.match(css, /\.memo-disclosure > summary svg\s*\{[^}]*transition:\s*transform/);
-  assert.match(css, /\.memo-disclosure\[open\] > summary svg\s*\{\s*transform:\s*rotate\(180deg\);/);
+  assert.match(css, /\.memo-disclosure\[open\]:not\(\[data-closing\]\) > summary svg\s*\{\s*transform:\s*rotate\(180deg\);/);
   assert.match(css, /\.memo-disclosure > summary:hover,[\s\S]*?\.memo-disclosure > summary:focus-visible\s*\{\s*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-disclosure > summary:active\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--bright-blue\) 18%, var\(--white\)\);[^}]*color:\s*var\(--deep-blue\)/s);
   assert.match(css, /@media \(hover: none\) and \(pointer: coarse\)[\s\S]*?\.memo-disclosure > summary:active > span:first-child\s*\{[^}]*transform:\s*none/s);
