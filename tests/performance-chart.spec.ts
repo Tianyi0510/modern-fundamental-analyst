@@ -65,3 +65,48 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     }
   });
 }
+
+test("monthly data animates both ways and reverses smoothly", async ({ page }) => {
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.goto(`${prefix}/performance`);
+      const details = page.locator('figure[aria-labelledby="performance-chart-title"] details');
+      const summary = details.locator("summary");
+      const collapsed = (await details.boundingBox())!.height;
+      await summary.click();
+      await expect.poll(() => details.evaluate(e => e.getAnimations().length)).toBe(0);
+      const expanded = (await details.boundingBox())!.height;
+      expect(expanded).toBeGreaterThan(collapsed + 100);
+      const heights = await details.evaluate(element => {
+        const summary = element.querySelector("summary")!;
+        summary.click();
+        const closing = element.getAnimations()[0]!;
+        closing.pause();
+        closing.currentTime = Number(closing.effect!.getTiming().duration) / 2;
+        const before = element.getBoundingClientRect().height;
+        summary.click();
+        const opening = element.getAnimations()[0]!;
+        opening.pause();
+        opening.currentTime = 0;
+        const after = element.getBoundingClientRect().height;
+        opening.play();
+        return { before, after };
+      });
+      expect(heights.before).toBeGreaterThan(collapsed);
+      expect(heights.before).toBeLessThan(expanded);
+      expect(Math.abs(heights.before - heights.after)).toBeLessThan(1);
+      await expect.poll(() => details.evaluate(e => e.getAnimations().length)).toBe(0);
+      await summary.focus();
+      await page.keyboard.press("Space");
+      await expect(details).not.toHaveAttribute("open");
+      expect(Math.abs((await details.boundingBox())!.height - collapsed)).toBeLessThan(1);
+      await summary.click();
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await expect.poll(() => details.evaluate(e => e.getAnimations().length)).toBe(0);
+      await summary.click();
+      await expect(details).not.toHaveAttribute("open");
+    }
+  }
+});

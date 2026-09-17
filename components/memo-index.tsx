@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { MemoCards } from "@/components/memo-cards";
-import { MemoDisclosure } from "@/components/memo-disclosure";
+import { AnimatedDisclosure } from "@/components/animated-disclosure";
 import type { MemoSummary } from "@/data/memos";
 import { formatDate } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
@@ -16,7 +16,7 @@ export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
   return (
     <section className="memo-index shell">
       <MemoCards memos={memos} locale={locale} className="memo-index-featured" />
-      <MemoDisclosure summary={
+      <AnimatedDisclosure className="memo-disclosure" summary={
         <>
           <span>{label}</span>
           <span className="memo-summary-meta">
@@ -34,7 +34,7 @@ export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
             </Link>
           ))}
         </div>
-      </MemoDisclosure>
+      </AnimatedDisclosure>
     </section>
   );
 }

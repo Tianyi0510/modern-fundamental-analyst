@@ -77,6 +77,30 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
   }
 });
 
+test("menu hides before releasing the final dismissal frame", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.locator(".mobile-menu-button").click();
+    const visibilityAtCancel = await page.locator(".mobile-menu-close").evaluate(async (button: HTMLButtonElement) => {
+      button.click();
+      const layer = document.querySelector(".mobile-menu-layer")!;
+      const animation = layer.getAnimations()[0]!;
+      return await new Promise<string>(resolve => {
+        const cancel = animation.cancel.bind(animation);
+        animation.cancel = () => {
+          const visibility = getComputedStyle(layer).visibility;
+          cancel();
+          resolve(visibility);
+        };
+        animation.finish();
+      });
+    });
+    expect(visibilityAtCancel).toBe("hidden");
+    await expect(page.locator(".mobile-menu-button")).toBeFocused();
+  }
+});
+
 test.describe("repeated touch menu animation", () => {
   test.use({ hasTouch: true });
   test("each opening replays after the hidden state resets", async ({ page }) => {

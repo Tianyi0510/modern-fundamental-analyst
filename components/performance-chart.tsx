@@ -1,6 +1,7 @@
 import { portfolioMonthlyReturns } from "@/data/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
+import { AnimatedDisclosure } from "./animated-disclosure";
 import styles from "./performance-chart.module.css";
 
 const copy = {
@@ -35,7 +36,7 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
       </svg>
     </div>
     <div className={styles.dates}><span>{formatDate(points[0]!.date, locale, true)}</span><span className={styles.midpoint}>{formatDate(points[Math.floor((points.length - 1) / 2)]!.date, locale, true)}</span><span>{formatDate(latest.date, locale, true)}</span></div>
-    <details className={styles.details}><summary><span>{text.data}</span><svg className={styles.chevron} viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary>
+    <AnimatedDisclosure className={styles.details} summary={<><span>{text.data}</span><svg className={styles.chevron} viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></>}>
       <p className={styles.scrollHint} id="performance-table-hint">{text.scroll}</p>
       {/* Keyboard focus allows horizontal scrolling of the monthly table. */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -43,6 +44,6 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
       <table><caption>{text.caption}</caption><thead><tr><th scope="col">{text.month}</th><th scope="col">{text.value}</th><th scope="col">{text.portfolio} XIRR</th><th scope="col">SPY XIRR</th></tr></thead>
         <tbody>{portfolioMonthlyReturns.toReversed().map(row => <tr key={row.date}><th scope="row">{formatDate(row.date, locale, true)}</th><td>{formatUsd(row.marketValue)}</td><td className={row.portfolioXirr === null ? styles.unavailable : undefined}>{row.portfolioXirr === null ? text.unavailable : formatPercent(row.portfolioXirr)}</td><td className={row.benchmarkXirr === null ? styles.unavailable : undefined}>{row.benchmarkXirr === null ? text.unavailable : formatPercent(row.benchmarkXirr)}</td></tr>)}</tbody>
       </table>
-    </div></details>
+    </div></AnimatedDisclosure>
   </figure>;
 }

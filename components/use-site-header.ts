@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEventHandler } from "react";
 
 // Keep in sync with the navigation-only breakpoint in responsive.css.
 const compactNavigationQuery = "(max-width: 1150px)";
@@ -29,12 +29,17 @@ export function useMobileMenu() {
   const closingAnimationRef = useRef<Animation | null>(null);
 
   const closeImmediately = useCallback(() => {
-    closingAnimationRef.current?.cancel();
-    closingAnimationRef.current = null;
     isOpenRef.current = false;
     pointerStartRef.current = null;
     setIsOpen(false);
   }, []);
+
+  // Keep the final frame until React has hidden the layer; cancelling first can flash it open.
+  useLayoutEffect(() => {
+    if (isOpen) return;
+    closingAnimationRef.current?.cancel();
+    closingAnimationRef.current = null;
+  }, [isOpen]);
 
   const close = useCallback(() => {
     if (!isOpenRef.current || closingAnimationRef.current) return;

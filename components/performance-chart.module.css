@@ -19,9 +19,9 @@
 .details summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--size-control); cursor: pointer; padding: var(--space-4) 0; list-style: none; border-top: 1px solid var(--gray); border-bottom: 1px solid var(--gray); touch-action: manipulation; }
 .details summary::-webkit-details-marker { display: none; }
 .chevron { flex: none; fill: none; stroke: currentColor; stroke-width: 2; transition: transform var(--motion-duration-base) var(--motion-ease-standard); }
-.details[open] .chevron { transform: rotate(180deg); }
+.details[open]:not([data-closing]) .chevron { transform: rotate(180deg); }
 .details summary:active .chevron { transform: scale(var(--motion-scale-press)); transition-duration: var(--motion-duration-press); }
-.details[open] summary:active .chevron { transform: rotate(180deg) scale(var(--motion-scale-press)); }
+.details[open]:not([data-closing]) summary:active .chevron { transform: rotate(180deg) scale(var(--motion-scale-press)); }
 .figure .scrollHint { font-size: var(--font-size-caption); line-height: var(--leading-body); margin: var(--space-3) 0; }
 .details summary:focus-visible, .tableScroll:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-on-light); outline-offset: var(--focus-ring-offset); }
 .tableScroll { overflow: auto; max-height: min(28rem, 65svh); overscroll-behavior-x: contain; margin-top: var(--space-3); }

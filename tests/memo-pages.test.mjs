@@ -18,12 +18,12 @@ test("memo catalog contains only the Microsoft source memo and uses one shared d
   const [catalog, memoPage, disclosure] = await Promise.all([
     read("data/memos.ts"),
     read("components/memo-index.tsx"),
-    read("components/memo-disclosure.tsx"),
+    read("components/animated-disclosure.tsx"),
   ]);
 
   assert.match(catalog, /microsoft-stock-analysis-fiscal-year-2024/);
   assert.doesNotMatch(catalog, /durable-pricing-power|self-funded-growth|capital-allocation/);
-  assert.match(memoPage, /<MemoDisclosure/);
+  assert.match(memoPage, /<AnimatedDisclosure/);
   assert.match(disclosure, /<details/);
   assert.match(disclosure, /<summary/);
 });

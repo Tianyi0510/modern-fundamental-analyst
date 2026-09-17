@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type MouseEvent, type ReactNode } from "react";
 
-export function MemoDisclosure({ summary, children }: { summary: ReactNode; children: ReactNode }) {
+export function AnimatedDisclosure({ summary, children, className }: { summary: ReactNode; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDetailsElement>(null);
   const animationRef = useRef<Animation | null>(null);
   const targetOpenRef = useRef(false);
@@ -45,15 +45,17 @@ export function MemoDisclosure({ summary, children }: { summary: ReactNode; chil
     const duration = parseFloat(durationToken) * (durationToken.endsWith("ms") ? 1 : 1000);
     const animation = details.animate(
       [{ height: `${startHeight}px`, overflow: "clip" }, { height: `${endHeight}px`, overflow: "clip" }],
-      { duration, easing: styles.getPropertyValue("--motion-ease-emphasized").trim() },
+      { duration, easing: styles.getPropertyValue("--motion-ease-emphasized").trim(), fill: "forwards" },
     );
     animationRef.current = animation;
     animation.onfinish = () => {
+      if (animationRef.current !== animation) return;
       details.open = open;
       details.removeAttribute("data-closing");
+      animation.cancel();
       animationRef.current = null;
     };
   };
 
-  return <details ref={ref} className="memo-disclosure"><summary onClick={toggle}>{summary}</summary>{children}</details>;
+  return <details ref={ref} className={className}><summary onClick={toggle}>{summary}</summary>{children}</details>;
 }
