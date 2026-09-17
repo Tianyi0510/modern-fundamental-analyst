@@ -25,6 +25,23 @@ test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
 });
 
+test("closed language menu cannot receive focus during its exit", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const trigger = page.locator(".language-trigger");
+  await trigger.click();
+  await expect(page.locator(".language-dropdown")).not.toHaveAttribute("inert");
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".language-dropdown")).toHaveAttribute("inert", "");
+  await page.locator(".language-dropdown a").first().evaluate((link: HTMLAnchorElement) => link.focus());
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await expect(page.locator(".language-dropdown")).not.toHaveAttribute("inert");
+  await trigger.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.locator(".language-dropdown a").first()).toBeFocused();
+});
+
 test("mobile menu keeps background isolated through dismissal and then restores focus", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/");
@@ -61,10 +78,14 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
       animation.pause();
       animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
       element.click();
-      return { count: layer.getAnimations().length, clip: getComputedStyle(layer).clipPath, locked: document.body.style.position };
+      const drawer = layer.querySelector(".mobile-menu-drawer")!.getBoundingClientRect();
+      return { count: layer.getAnimations().length, left: drawer.left, top: drawer.top, width: drawer.width, locked: document.body.style.position };
     });
     expect(result.count).toBe(1);
-    expect(result.clip).not.toBe("none");
+    expect(result.left).toBeGreaterThan(0);
+    expect(result.left).toBeLessThan(320);
+    expect(result.top).toBe(0);
+    expect(result.width).toBeCloseTo(320, 2);
     expect(result.locked).toBe("fixed");
     // A preference change must also finish an already-running dismissal.
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -74,6 +95,43 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
     await page.keyboard.press("Escape");
     await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
     expect(await page.locator(".mobile-menu-layer").evaluate(element => element.getAnimations().length)).toBe(0);
+  }
+});
+
+test("close icon rotates visibly before the panel leaves and replays", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    await page.goto(prefix || "/");
+    for (let repeat = 0; repeat < 2; repeat++) {
+      await page.locator(".mobile-menu-button").click();
+      const icon = page.locator(".mobile-menu-close svg");
+      await expect.poll(() => icon.evaluate(e => e.getAnimations().filter(a => a.playState === "running").length)).toBe(0);
+      const result = await page.locator(".mobile-menu-close").evaluate((button: HTMLButtonElement) => {
+        button.click();
+        const layer = document.querySelector(".mobile-menu-layer")!;
+        const icon = button.querySelector("svg")!;
+        const panelAnimation = layer.getAnimations()[0]!;
+        const iconAnimation = icon.getAnimations().find(a => !(a instanceof CSSAnimation))!;
+        panelAnimation.pause();
+        iconAnimation.pause();
+        const midpoint = Number(iconAnimation.effect!.getTiming().duration) / 2;
+        panelAnimation.currentTime = midpoint;
+        iconAnimation.currentTime = midpoint;
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(icon).transform);
+        const result = { angle: Math.atan2(matrix.b, matrix.a) * 180 / Math.PI, left: layer.getBoundingClientRect().left, right: button.getBoundingClientRect().right };
+        iconAnimation.play();
+        panelAnimation.play();
+        return result;
+      });
+      expect(result.angle).toBeLessThan(-1);
+      expect(result.angle).toBeGreaterThan(-90);
+      expect(result.left).toBe(0);
+      expect(result.right).toBeLessThanOrEqual(390);
+      await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
+      await expect.poll(() => icon.evaluate(e => e.getAnimations().length)).toBe(0);
+      await expect(page.locator(".mobile-menu-button")).toBeFocused();
+    }
   }
 });
 

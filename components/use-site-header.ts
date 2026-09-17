@@ -5,17 +5,25 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Pointer
 // Keep in sync with the navigation-only breakpoint in responsive.css.
 const compactNavigationQuery = "(max-width: 1150px)";
 
-function animateMenuDismissal(layer: HTMLElement) {
+function animateMenuDismissal(layer: HTMLElement, icon: SVGElement | null) {
   const style = getComputedStyle(layer);
-  const duration = style.getPropertyValue("--motion-duration-medium").trim();
-  return layer.animate(
-    [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 0 100%)" }],
+  const duration = style.getPropertyValue("--motion-duration-slow").trim();
+  const feedbackToken = style.getPropertyValue("--motion-duration-fast").trim();
+  const feedbackDuration = Number.parseFloat(feedbackToken) * (feedbackToken.endsWith("ms") ? 1 : 1000);
+  const iconAnimation = icon?.animate(
+    [{ transform: getComputedStyle(icon).transform }, { transform: "rotate(-90deg)" }],
+    { duration: feedbackDuration, easing: style.getPropertyValue("--motion-ease-standard").trim(), fill: "forwards" },
+  );
+  const panelAnimation = layer.animate(
+    [{ transform: "translate3d(0, 0, 0)" }, { transform: "translate3d(100%, 0, 0)" }],
     {
       duration: Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000),
+      delay: iconAnimation ? feedbackDuration : 0,
       easing: style.getPropertyValue("--motion-ease-standard").trim(),
       fill: "forwards",
     },
   );
+  return { panelAnimation, iconAnimation };
 }
 
 export function useMobileMenu() {
@@ -27,6 +35,7 @@ export function useMobileMenu() {
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
   const closingAnimationRef = useRef<Animation | null>(null);
+  const closingIconAnimationRef = useRef<Animation | null>(null);
 
   const closeImmediately = useCallback(() => {
     isOpenRef.current = false;
@@ -39,6 +48,8 @@ export function useMobileMenu() {
     if (isOpen) return;
     closingAnimationRef.current?.cancel();
     closingAnimationRef.current = null;
+    closingIconAnimationRef.current?.cancel();
+    closingIconAnimationRef.current = null;
   }, [isOpen]);
 
   const close = useCallback(() => {
@@ -48,9 +59,10 @@ export function useMobileMenu() {
       closeImmediately();
       return;
     }
-    const animation = animateMenuDismissal(layer);
-    closingAnimationRef.current = animation;
-    animation.onfinish = closeImmediately;
+    const { panelAnimation, iconAnimation } = animateMenuDismissal(layer, closeButtonRef.current?.querySelector("svg") ?? null);
+    closingAnimationRef.current = panelAnimation;
+    closingIconAnimationRef.current = iconAnimation ?? null;
+    panelAnimation.onfinish = closeImmediately;
   }, [closeImmediately]);
 
   useEffect(() => {
@@ -67,6 +79,7 @@ export function useMobileMenu() {
       compactNavigation.removeEventListener("change", handleBreakpoint);
       reducedMotion.removeEventListener("change", handleMotion);
       closingAnimationRef.current?.cancel();
+      closingIconAnimationRef.current?.cancel();
       window.removeEventListener("keydown", handleEscape);
     };
   }, [close, closeImmediately]);

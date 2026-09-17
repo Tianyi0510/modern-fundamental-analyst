@@ -1,23 +1,39 @@
 "use client";
 
-import { useEffect, useRef, type MouseEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, type MouseEvent, type ReactNode } from "react";
 
 export function AnimatedDisclosure({ summary, children, className }: { summary: ReactNode; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDetailsElement>(null);
   const animationRef = useRef<Animation | null>(null);
   const targetOpenRef = useRef(false);
 
+  const settle = useCallback(() => {
+    const details = ref.current;
+    const animation = animationRef.current;
+    if (!details || !animation) return;
+    const summary = details.querySelector("summary");
+    if (!targetOpenRef.current && details.contains(document.activeElement) && !summary?.contains(document.activeElement)) {
+      summary?.focus({ preventScroll: true });
+    }
+    details.open = targetOpenRef.current;
+    details.removeAttribute("data-closing");
+    animationRef.current = null;
+    animation.cancel();
+  }, []);
+
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const finish = () => { if (motion.matches) animationRef.current?.finish(); };
+    const finish = () => { if (motion.matches) settle(); };
     motion.addEventListener("change", finish);
+    // Let the new layout choose its natural height instead of keeping a stale pixel target.
+    window.addEventListener("resize", settle);
     return () => {
       motion.removeEventListener("change", finish);
-      const animation = animationRef.current;
-      animation?.finish();
-      animation?.cancel();
+      window.removeEventListener("resize", settle);
+      animationRef.current?.cancel();
+      animationRef.current = null;
     };
-  }, []);
+  }, [settle]);
 
   const toggle = (event: MouseEvent<HTMLElement>) => {
     const details = ref.current;
@@ -50,10 +66,7 @@ export function AnimatedDisclosure({ summary, children, className }: { summary: 
     animationRef.current = animation;
     animation.onfinish = () => {
       if (animationRef.current !== animation) return;
-      details.open = open;
-      details.removeAttribute("data-closing");
-      animation.cancel();
-      animationRef.current = null;
+      settle();
     };
   };
 
