@@ -4,7 +4,7 @@ A public-equity research website in English, Traditional Chinese, and Simplified
 
 [Visit the website](https://www.modernfundamentalanalyst.com)
 
-Built with Next.js, React, TypeScript, and native CSS. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site.
+Built with Next.js, React, TypeScript, and native CSS. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
 
 ## Local Development
 
@@ -39,23 +39,24 @@ Verification includes type checking, linting, unit tests, Chromium browser tests
 | `lib/` | Services, calculations, and utilities |
 | `tests/` | Unit and browser tests |
 | `scripts/` | CI deployment gate, Node module loader, and subscription journal CLI |
+| `docs/` | Technical architecture, style guide, and service integration guides |
 
-Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](TECHNICAL_ARCHITECTURE.md#review-evidence).
+Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
 ## Content and Integrations
 
-Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.ts` as monthly snapshots, not live quotes. See [portfolio data updates](TECHNICAL_ARCHITECTURE.md#portfolio-data) for sources and calculation scope. Memo entries live in `data/memos.ts`, with articles under `content/memos/` registered in `data/memo-content.ts`.
+Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.ts` as monthly snapshots, not live quotes. See [portfolio data updates](docs/TECHNICAL_ARCHITECTURE.md#portfolio-data) for sources and calculation scope. Memo entries live in `data/memos.ts`, with articles under `content/memos/` registered in `data/memo-content.ts`.
 
 Integration details:
 
-- [Resend email and subscriptions](RESEND_INTEGRATION.md)
-- [Upstash Redis runtime](TECHNICAL_ARCHITECTURE.md#redis-runtime)
-- [Stripe setup and checklist](STRIPE_INTEGRATION.md)
+- [Resend email and subscriptions](docs/RESEND_INTEGRATION.md)
+- [Upstash Redis runtime](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime)
+- [Stripe setup and checklist](docs/STRIPE_INTEGRATION.md)
 
-See the [design system and style guide](STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.
+See the [design system and style guide](docs/STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.
 
-See [architecture and operations](TECHNICAL_ARCHITECTURE.md) for production gating, server boundaries, and subscription reconciliation.
+See [architecture and operations](docs/TECHNICAL_ARCHITECTURE.md) for production gating, server boundaries, and subscription reconciliation.
 
 ## Deployment
 
-Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.
+Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.

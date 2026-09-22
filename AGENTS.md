@@ -1,78 +1,64 @@
 # Repository guidance
 
-This file defines repository-wide defaults. Follow the user's current request when it changes these defaults. More specific instructions in an applicable nested `AGENTS.md` take precedence for that subtree; an `AGENTS.override.md` takes precedence over `AGENTS.md` in the same directory.
+Repository-wide defaults; follow the user's current request when it changes the task scope. More specific `AGENTS.md` instructions apply to their subtree; `AGENTS.override.md` takes precedence in the same directory.
 
 ## Working agreement
 
-- Communicate with the user in Traditional Chinese unless requested otherwise.
-- For a read-only review, report findings with file locations and practical impact; do not edit files.
-- For optimization requests, implement the agreed scope and verify it. Commit or deploy when requested; a deployment request includes the necessary commit and push.
-- Inspect `git status` before editing. Preserve unrelated work and local review evidence. Stage only intended files.
-- Report what changed, what was checked, any remaining limitations, and whether changes were committed or deployed. Distinguish local verification from production verification.
+- Communicate in Traditional Chinese unless requested otherwise. Read-only reviews produce findings with file locations and practical impact, without edits.
+- For implementation or optimization, finish the requested change, verify its behavior, and fix related failures before handing off. Resolve routine choices within the authorized scope; ask when missing information materially changes the outcome.
+- Inspect `git status` before editing, preserve unrelated work, and stage only intended files. Keep ignored `audit/` evidence; it is historical context, not the current issue list.
+- Commit or deploy when requested. Deployment includes the necessary commit and push. Report changes, verification, remaining limitations, and commit/deployment status; distinguish local checks from production checks.
 
-## Project map
+## Project context and task references
 
-- Next.js App Router, React, TypeScript and native CSS; use Node.js 24 and npm. Install dependencies with `npm ci`.
-- `app/(en)/`, `app/zh-tw/`, `app/zh-cn/`: thin language routes and root layouts. English URLs have no language prefix.
-- `components/`: shared page content and interactive controls. Keep static copy in server components and client boundaries small.
-- `data/`: localized copy, portfolio snapshot and memo catalog. `content/memos/`: article content, registered in `data/memo-content.ts`.
-- `lib/`: shared utilities, calculations and service integrations. `scripts/`: CI gate, Node module loader and journal CLI.
-- `tests/*.test.mjs`: Node unit tests. `tests/*.spec.ts`: Playwright browser checks.
+Next.js App Router, React, TypeScript, native CSS; Node.js 24 and npm (`npm ci`). English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. See [README.md](README.md#project-layout) for the directory map.
 
-## Implementation rules
+Read the guide relevant to the change, rather than loading every guide:
 
-- Use `getLocalizedPath` and `getLanguageAlternates` from `lib/i18n.ts` for language URLs. Use `createRootMetadata` and `createPageMetadata` from `lib/site-config.ts` for metadata.
-- Reuse `lib/escape-html.ts` for HTML interpolation and `HoneypotField` for the existing form trap. Do not duplicate helpers or pass values that can be derived from existing props.
-- Preserve each form's submission, idempotency and retry behavior. Similar markup does not imply identical workflows. Reuse the existing submission hooks and `postJson` where appropriate.
-- Keep provider credentials and service modules on the server. Preserve `server-only` boundaries; the Node test loader is not a replacement for Next.js boundary enforcement.
-- Prefer focused changes over new frameworks or broad abstractions. Keep deliberate language, layout and form variants explicit.
-- Preserve verified portfolio data and research content unless the task requests a content update. Portfolio values are monthly snapshots, not live prices.
+- UI and interaction changes: [style guide](docs/STYLE_GUIDE.md), including CSS ownership, cascade, typography and motion tokens.
+- Service boundaries, portfolio data or operations: [technical architecture](docs/TECHNICAL_ARCHITECTURE.md).
+- Email and subscription changes: [Resend integration](docs/RESEND_INTEGRATION.md); coordination and recovery use [Redis runtime](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime) and [subscription reconciliation](docs/TECHNICAL_ARCHITECTURE.md#subscription-reconciliation).
+- Payment changes: [Stripe integration](docs/STRIPE_INTEGRATION.md).
 
-## Visual and interaction rules
+Keep README concise and detailed procedures in `docs/`. Update the relevant guide when behavior or commands change.
 
-- Follow [STYLE_GUIDE.md](STYLE_GUIDE.md) for CSS ownership, cascade, typography, spacing and states.
-- Preserve existing text colors, including hover, active, disabled and inverse states, unless the user requests a color change. Opacity can also change perceived text color.
-- Reuse semantic type, spacing, focus and motion tokens. Preserve the import order in `app/globals.css` and scoped component styles.
-- Check all three languages, narrow layouts, enlarged text, keyboard focus, touch interactions and reduced motion when changing shared UI.
-- Keep focus management, scroll restoration and menu visibility synchronized. Touch hover resets must preserve active and keyboard-focus feedback.
+## Implementation constraints
 
-## Service invariants
+- Use `getLocalizedPath` / `getLanguageAlternates` in `lib/i18n.ts` and `createRootMetadata` / `createPageMetadata` in `lib/site-config.ts`. Links and sharing metadata must resolve to the correct language and page.
+- Keep static copy in server components and client boundaries small. Reuse `lib/escape-html.ts`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
+- Preserve deliberate language, layout and form variants. Preserve verified research and monthly portfolio snapshots unless a content update is requested; these are not live prices.
+- Preserve existing text colors in every state, including opacity, unless a color change is requested. Reuse semantic tokens and preserve the CSS import order in `app/globals.css`.
+- Keep menu visibility, focus and scroll restoration synchronized. Touch hover resets must retain active and keyboard-focus feedback.
 
-- Consult [RESEND_INTEGRATION.md](RESEND_INTEGRATION.md), [Redis runtime](TECHNICAL_ARCHITECTURE.md#redis-runtime) and [STRIPE_INTEGRATION.md](STRIPE_INTEGRATION.md) for the integration being changed.
-- Use `.env.example` as the configuration template. Never commit or print secrets, private email payloads or preference tokens. Historical resource IDs in documentation do not establish current cloud configuration.
-- Route Redis commands through `executeRedisCommand`. Preserve shared subscriber locking and durable journals; an expired lease does not resolve an unknown provider outcome.
-- Follow [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md#subscription-reconciliation) for journal inspection and reconciliation. Do not clear unresolved records or automatically replay ambiguous welcome events as a retry fix. Preserve unsubscribe availability under the shared lock.
-- Payment success requires server-side Stripe Session verification. URL parameters cannot prove payment. Preserve pending and unverified states.
-- Routine tests should mock provider writes. Sending real email, changing production subscriber state or making a live payment requires authorization for that action; deploying alone does not authorize test transactions.
+## Service boundaries
 
-## Verification
+- Keep credentials and service modules server-side, including `server-only` boundaries. The Node test loader does not enforce Next.js boundaries. Use `.env.example`; never print or commit secrets, private email payloads or preference tokens. Verify current cloud configuration rather than trusting historical resource IDs.
+- Route Redis commands through `executeRedisCommand`. Preserve shared subscriber locks and durable journals. Lease expiry does not resolve an unknown provider outcome: do not clear unresolved records or replay ambiguous welcome events. Unsubscribe retains the shared lock and unresolved journal while bypassing the journal gate.
+- Confirm payment through server-side Stripe Session verification; URL parameters cannot establish success. Preserve pending and unverified states.
+- Routine tests mock provider writes. Real email, production subscriber changes and live payments require authorization for those actions; deployment does not authorize test transactions.
 
-- For application changes, run `npm run verify` (typecheck, lint, unit tests, Chromium tests and production build).
-- Install browser binaries when needed: `npx playwright install chromium webkit`.
-- For shared UI changes, also run `npm run test:webkit` after a successful build.
-- Prefer behavioral regression checks for changed risks. Update source-structure assertions when refactoring, while preserving coverage of user-visible behavior. Do not weaken assertions merely to make a failure disappear.
-- Documentation-only changes need link, reference and diff checks; they do not require the full application suite.
-- Run `git diff --check` before handing off. Preserve ignored `audit/` files as local historical evidence; they are not the current issue list.
+## Verification and review
 
-## Deployment
+Use focused checks while iterating, then the applicable completion checks below. Local unit tests mock service operations; Playwright starts an isolated server without Resend/Redis credentials. Run these checks and fix related failures within the requested scope without repeatedly seeking permission. Tool and sandbox permissions still apply.
 
-- Use the existing GitHub Actions and Vercel Git integration. Push authorized releases to `main`; if a new working branch is needed, use `codex/` unless otherwise requested.
-- Preserve `vercel.json`'s exact-commit CI gate. Do not bypass failed checks or move the gate into `npm run build`, which CI itself must run.
-- Inspect CI failures and fix their cause. Preserve package integrity checks and the browser suite; keep runner-specific installation workarounds in the workflow rather than treating them as permanent application requirements.
-- Confirm GitHub Actions success, Vercel `READY`, the deployed commit and production aliases before reporting deployment complete. Perform read-only smoke checks of affected routes.
-- Keep [README.md](README.md) concise; put detailed operating procedures in [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) and integration guides. Update documentation when behavior or commands change.
+| Change | Completion checks |
+| --- | --- |
+| Documentation only | Links, anchors, references and `git diff --check`; no application suite |
+| Application code or configuration | `npm run verify` (types, lint, unit tests, Chromium and production build), then `git diff --check` |
+| Shared UI | Also `npm run test:webkit` after a successful build; cover all three languages, narrow layouts, enlarged text, keyboard, touch and reduced motion |
 
-## Code Review Rules
+Install missing browser binaries with `npx playwright install chromium webkit`. Once checks pass, repeat only when subsequent changes or unresolved failures justify it. Add behavioral regression coverage for changed risks; update source-structure assertions during refactors without weakening user-visible coverage. For animation fixes, check intermediate visual states and repeated/interrupted input, not merely whether an animation was created. WebKit automation does not establish physical iPhone behavior.
 
-- Flag localized links or sharing metadata that point to the wrong language or page. Use the existing i18n and metadata helpers; localized wording may intentionally differ.
-- Flag changes to existing text colors or opacity when color changes are outside the requested scope. Verify keyboard focus and reduced-motion behavior for shared interaction changes.
-- Flag subscription writes that bypass the shared lock or journal, or retries that replay an unknown provider outcome. Unsubscribe intentionally bypasses the journal gate while retaining the lock and unresolved record.
-- Flag payment confirmation derived only from URL parameters. Keep server-side Session verification and preserve pending or unverified outcomes.
-- Flag credentials or private provider payloads crossing client boundaries, entering logs or being committed. Use server modules and bounded diagnostic details.
-- Prioritize demonstrable defects and regressions with precise file locations and consequences. Leave formatting and lint enforcement to CI; do not label intentional variants as defects solely to reduce duplication.
+Reviews should prioritize demonstrable violations of the constraints above, with precise locations and consequences. Leave formatting to lint; intentional variants are not defects solely because they duplicate markup.
 
-## Maintaining this guidance
+## Deployment completion
 
-Keep this file focused on reusable repository rules and executable commands. Link detailed procedures instead of copying them. Add nested guidance only when a subtree needs different rules; avoid duplicate or speculative restrictions. After changing instruction files, verify the active instruction sources in a new Codex run from the intended working directory.
+Use the existing GitHub Actions and Vercel Git integration. Push authorized releases to `main`; new branches use `codex/` unless requested otherwise. Preserve `vercel.json`'s exact-commit CI gate, package integrity checks and browser suite. Keep the gate outside `npm run build` and runner-specific workarounds in the workflow; fix failed checks rather than bypassing them.
 
-Reference: [Official AGENTS.md configuration guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
+Deployment is complete only after GitHub Actions succeeds, Vercel is `READY`, the deployed commit and production aliases match, and affected routes pass read-only production smoke checks.
+
+## Maintaining this file
+
+Keep only durable project constraints, task-specific references and executable completion criteria. Consolidate duplicated rules; put detailed procedures in the linked guides. Add nested instructions only for genuine subtree differences. After changing instruction files, verify the active instruction sources in a fresh Codex run from the intended directory.
+
+References: [AGENTS.md configuration](https://learn.chatgpt.com/docs/agent-configuration/agents-md) · [Rethinking skills and prompts](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra).

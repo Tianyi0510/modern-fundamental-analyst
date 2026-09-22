@@ -4,8 +4,8 @@
 
 This guide describes the repository implementation. Provider resources must be configured in the Resend account used by each environment; their current Dashboard state is not verified by this document.
 
-1. Verify the sending domain `mail.modernfundamentalanalyst.com` in Resend. The sender constants in [lib/resend.ts](lib/resend.ts) use `contact@` for contact messages and `updates@` for preference links. If using another domain, update those constants as well as the provider configuration.
-2. Configure server variables from [.env.example](.env.example): `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_URL`, and `RATE_LIMIT_HASH_SECRET`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [reconciliation and secret rotation](TECHNICAL_ARCHITECTURE.md#subscription-reconciliation).
+1. Verify the sending domain `mail.modernfundamentalanalyst.com` in Resend. The sender constants in [lib/resend.ts](../lib/resend.ts) use `contact@` for contact messages and `updates@` for preference links. If using another domain, update those constants as well as the provider configuration.
+2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_URL`, and `RATE_LIMIT_HASH_SECRET`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [reconciliation and secret rotation](TECHNICAL_ARCHITECTURE.md#subscription-reconciliation).
 3. Create a text contact property named `preferred_language` and three language segments. Set the matching `RESEND_SEGMENT_*` variables below. The default IDs in the code and environment template refer to this project's existing resources; override all three when using another account or isolated test resources.
 
 | Locale | Contact property value | Segment variable |
@@ -16,7 +16,15 @@ This guide describes the repository implementation. Provider resources must be c
 
 4. Configure and enable a welcome automation triggered by `subscriber.created`. The application sends `locale`, `memo_title`, `memo_summary`, `memo_url`, and `preferences_url` in its payload; use these in the localized welcome content. The code sends an event rather than the welcome email itself, so a successful event response does not verify automation delivery. New or previously unsubscribed contacts trigger it; active contacts do not. At least one memo must exist for the selected locale.
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.
-6. Use isolated resources and an owned test recipient to verify contact delivery, welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Preference URLs use `SITE_URL` from [lib/site-config.ts](lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
+6. Use isolated resources and an owned test recipient to verify contact delivery, welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Preference URLs use `SITE_URL` from [lib/site-config.ts](../lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
+
+## Receiving
+
+The project owner confirmed on 2026-09-22 that Receiving is enabled for `mail.modernfundamentalanalyst.com`. The domain has transferred to Vercel; maintain Resend's required receiving MX and sending/verification records in the authoritative DNS zone. Retrieve exact records from Resend rather than hard-coding provider DNS values here. See [domain ownership](TECHNICAL_ARCHITECTURE.md#domain-and-service-ownership).
+
+Receiving is a provider capability, not an application inbox or automatic forwarding rule. The existing `/api/webhooks/resend` handler processes only `email.bounced`, `email.complained`, and `email.suppressed`; other signed events, including `email.received`, are acknowledged without processing their contents. Do not use this endpoint as an inbound-mail processor. An inbound workflow requires a separately designed handler and event subscription before it can retrieve, store or forward messages.
+
+Keep `CONTACT_TO_EMAIL` set to the intended recipient of website contact-form messages. Enabling Receiving does not change that destination, sender addresses, or the existing webhook signing secret. No new environment variable is required for provider-only receiving. Actual inbound delivery has not been verified by this repository update.
 
 ## Preference display
 
@@ -36,4 +44,4 @@ Segment reconciliation reads all pages before changing membership, preserves unr
 
 ## Verification
 
-Follow the [verification commands](README.md#verification). Coordination tests simulate Redis, provider failures, duplicate requests and aborted fetches without accessing production services. See [review evidence](TECHNICAL_ARCHITECTURE.md#review-evidence) for CI artifact retention.
+Follow the [verification commands](../README.md#verification). Coordination tests simulate Redis, provider failures, duplicate requests and aborted fetches without accessing production services. See [review evidence](TECHNICAL_ARCHITECTURE.md#review-evidence) for CI artifact retention.

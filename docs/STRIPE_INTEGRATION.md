@@ -1,10 +1,10 @@
 # Stripe Checkout Integration
 
-This guide describes the Checkout implementation and environment verification steps. Source behavior was reviewed on 2026-09-09; Stripe and Vercel Dashboard state was not rechecked during that review.
+This guide describes the Checkout implementation and environment verification steps. Domain settings were updated from the project owner’s report on 2026-09-22; live Stripe and Vercel Dashboard state was not independently verified.
 
 ## Environment configuration
 
-Use [.env.example](.env.example) for local configuration and environment-scoped Vercel variables for deployments. Store API keys as **Sensitive** values; never commit credentials.
+Use [.env.example](../.env.example) for local configuration and environment-scoped Vercel variables for deployments. Store API keys as **Secret** values; never commit credentials.
 
 | Field | Template Value | What to Set |
 |---|---|---|
@@ -28,7 +28,9 @@ Use sandbox IDs only with the dedicated **Modern Fundamental Analyst sandbox** t
 
 ## Checkout behavior
 
-[lib/stripe-checkout.ts](lib/stripe-checkout.ts) defines the one-time hosted Checkout Session, Price mapping, pinned API version and integration identifier. Success and cancellation return to the localized Support page; the success URL includes the Session ID for server-side verification.
+[lib/stripe-checkout.ts](../lib/stripe-checkout.ts) defines the one-time hosted Checkout Session, Price mapping, pinned API version and integration identifier. Success and cancellation return to the localized Support page; the success URL includes the Session ID for server-side verification.
+
+Stripe Custom domains is disabled, as confirmed by the project owner on 2026-09-22. The Checkout route redirects to the `session.url` returned by Stripe; do not construct or rewrite it to `pay.modernfundamentalanalyst.com`. The Content Security Policy in [next.config.ts](../next.config.ts) permits `https://checkout.stripe.com` for form navigation and no longer allows the old custom payment domain. Website success and cancellation URLs remain unchanged. No custom-domain environment variable is required.
 
 Automatic Tax is enabled on every Session, with no Managed Payments override. Verify account settings, applicable tax registrations and product tax codes in the target mode before payment testing; the code does not verify Dashboard configuration.
 
