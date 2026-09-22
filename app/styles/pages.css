@@ -32,9 +32,6 @@
 .about-copy em { color: var(--deep-blue); font-style: normal; font-weight: 700; }
 .about-philosophy-copy h3 { margin: 54px 0 14px; }
 .about-philosophy-copy h3:first-child { margin-top: 0; }
-.about-list { margin: 34px 0 42px; padding: 0; list-style: none; border-top: 1px solid var(--black); }
-.about-list li { padding: 15px 0; border-bottom: 1px solid var(--gray); display: grid; grid-template-columns: 24px 1fr; gap: var(--space-3); }
-.about-list li::before { content: "↗"; color: var(--medium-blue); }
 .about-boundaries { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--black); }
 .about-boundaries > article { min-height: 0; padding: var(--space-section) 48px; background: var(--white); display: flex; flex-direction: column; }
 .about-boundaries > article:last-child { background: var(--gray); border-top-color: var(--black); }

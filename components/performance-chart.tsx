@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { portfolioMonthlyReturns } from "@/data/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
@@ -36,7 +37,7 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
       </svg>
     </div>
     <div className={styles.dates}><span>{formatDate(points[0]!.date, locale, true)}</span><span className={styles.midpoint}>{formatDate(points[Math.floor((points.length - 1) / 2)]!.date, locale, true)}</span><span>{formatDate(latest.date, locale, true)}</span></div>
-    <AnimatedDisclosure className={styles.details} summary={<><span>{text.data}</span><svg className={styles.chevron} viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></>}>
+    <AnimatedDisclosure className={styles.details} summary={<><span>{text.data}</span><ChevronDown className={styles.chevron} size={20} strokeWidth={2} aria-hidden="true" /></>}>
       <p className={styles.scrollHint} id="performance-table-hint">{text.scroll}</p>
       {/* Keyboard focus allows horizontal scrolling of the monthly table. */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}

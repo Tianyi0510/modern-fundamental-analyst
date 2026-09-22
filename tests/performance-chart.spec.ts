@@ -26,6 +26,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".performance-summary")).toContainText("+21.00%");
     if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText("As of 31 Aug 2026");
     const summary = chart.locator("summary");
+    await expect(summary.locator("svg.lucide-chevron-down")).toBeVisible();
     expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await summary.focus();
     await expect(summary).toHaveCSS("outline-style", "solid");
