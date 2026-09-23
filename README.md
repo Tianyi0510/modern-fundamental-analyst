@@ -26,7 +26,7 @@ npx playwright install chromium webkit
 npm run verify
 ```
 
-Verification includes type checking, linting, unit tests, Chromium browser tests, and a production build. After a successful build, `npm run test:webkit` runs the same browser suite against the production build with one worker. GitHub Actions runs both commands and audits production dependencies.
+Verification runs type checking, linting, unit tests, and a production build, then tests that build in Chromium. Run `npm run test:webkit` afterward to test the same build in WebKit. GitHub Actions runs both browser suites with one worker per browser and audits production dependencies. For a quick browser check during development, use `npm run test:computed-style`; it starts the development server.
 
 ## Project Layout
 

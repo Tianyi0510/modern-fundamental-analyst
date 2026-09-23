@@ -49,6 +49,8 @@ Payment confirmation uses server-verified Stripe Session status; URL parameters 
 
 Browser evidence is separated into `test-results/chromium/` and `test-results/webkit/`, so running WebKit preserves Chromium evidence. GitHub Actions retains failed Playwright traces and screenshots in the `browser-failure-evidence` artifact for seven days.
 
+`npm run verify` builds once and runs Chromium against the production server. The subsequent CI WebKit step tests that same build with one worker. Local `npm run test:computed-style` remains available for faster checks against the development server. Playwright starts and stops its own server on port 3210 for each suite.
+
 ## Portfolio data
 
 `data/portfolio.ts` is the site's portfolio data store; Redis only supports service coordination and rate limiting. Home, Portfolio and Performance share this snapshot. The Performance chart uses since-inception annualized XIRR at each month-end, not single-month returns; horizons below 30 days remain unavailable.

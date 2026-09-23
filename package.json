@@ -16,7 +16,8 @@
     "subscription:journal": "node --env-file-if-exists=.env.local --import ./scripts/register-server.mjs scripts/subscription-journal.mjs",
     "test:computed-style": "playwright test",
     "test:webkit": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --browser=webkit --workers=1 --output=test-results/webkit",
-    "verify": "npm run typecheck && npm run lint && npm test && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm run test:unit && npm run build && npm run test:computed-style:production",
+    "test:computed-style:production": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test"
   },
   "dependencies": {
     "@redis/client": "^6.2.1",

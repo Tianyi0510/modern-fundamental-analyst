@@ -58,7 +58,7 @@ jobs:
       - name: Verify application
         run: npm run verify
 
-      - name: Verify WebKit computed styles
+      - name: Verify WebKit browser suite
         run: npm run test:webkit
 
       - name: Upload browser failure evidence
