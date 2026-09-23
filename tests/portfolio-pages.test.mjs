@@ -241,5 +241,8 @@ test("portfolio table receives only the active locale labels from its server par
   assert.match(table, /copy: PortfolioTableCopy/);
   assert.doesNotMatch(table, /投資組合持股|投资组合持仓|"zh-tw"|"zh-cn"/);
   assert.match(page, /satisfies Record<Locale, PortfolioTableCopy>/);
-  assert.match(page, /PortfolioTable copy=\{tableCopy\[locale\]\} holdings=\{portfolioHoldings\}/);
+  assert.match(
+    page,
+    /PortfolioTable copy=\{tableCopy\[locale\]\} holdings=\{portfolioHoldings\} income=\{portfolioIncome\}/,
+  );
 });

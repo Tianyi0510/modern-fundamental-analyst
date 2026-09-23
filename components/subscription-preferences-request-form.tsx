@@ -50,7 +50,10 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
       onSubmit={(event) => {
         void submit(event);
       }}
-      onChange={() => resetSubmissionId()}
+      onChange={() => {
+        resetSubmissionId();
+        setStatus("idle");
+      }}
       aria-busy={status === "requesting"}
     >
       <label className={styles.field}>

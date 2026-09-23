@@ -17,6 +17,7 @@ type SortDirection = "asc" | "desc";
 type PortfolioTableProps = {
   copy: PortfolioTableCopy;
   holdings: ReadonlyArray<PortfolioHolding>;
+  income: { netDividends: number; financingInterest: number };
 };
 
 export type PortfolioTableCopy = Record<SortKey, string> & {
@@ -29,10 +30,10 @@ export type PortfolioTableCopy = Record<SortKey, string> & {
 
 const columns: SortKey[] = ["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"];
 
-export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
+export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("marketValue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const totals = useMemo(() => getPortfolioTotals(holdings), [holdings]);
+  const totals = useMemo(() => getPortfolioTotals(holdings, income), [holdings, income]);
   const rows = useMemo(
     () =>
       holdings.map((holding) => ({

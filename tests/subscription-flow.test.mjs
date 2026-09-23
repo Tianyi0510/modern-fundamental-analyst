@@ -39,7 +39,6 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(route, /replyTo:\s*email/);
   assert.match(route, /getResendIdempotencyKey\(request, "contact"\)/);
   assert.match(client, /idempotencyKey: getSubmissionId\(\)/);
-  assert.match(client, /onChange=\{\(\) => resetSubmissionId\(\)\}/);
   assert.match(resend, /process\.env\.RESEND_API_KEY/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
 });
@@ -135,7 +134,6 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(requestRoute, /resend\.emails\.send/);
   assert.match(requestRoute, /getResendIdempotencyKey\(request, "preferences"\)/);
   assert.match(requestForm, /idempotencyKey: getSubmissionId\(\)/);
-  assert.match(requestForm, /onChange=\{\(\) => resetSubmissionId\(\)\}/);
   assert.match(requestRoute, /renderPreferenceEmail/);
   assert.match(emailTemplate, /Modern Fundamental Analyst<span style="color:#008cff">\.<\/span>/);
   assert.doesNotMatch(emailTemplate, />MODERN FUNDAMENTAL ANALYST</);

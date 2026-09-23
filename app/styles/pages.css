@@ -392,8 +392,15 @@
   margin: 0;
   color: var(--text-secondary);
 }
-.portfolio-holdings-section .portfolio-table-wrap {
-  padding-bottom: var(--space-section-compact);
+.portfolio-return-note {
+  padding: var(--space-4) 0 var(--space-section-compact);
+}
+.portfolio-return-note p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-caption);
+  line-height: var(--leading-body);
 }
 .portfolio-holdings-section .portfolio-total-row {
   background: transparent;

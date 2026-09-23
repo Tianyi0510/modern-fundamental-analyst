@@ -58,6 +58,7 @@ export function SubscribeFormClient({
         onSubmit={(event) => {
           void submit(event);
         }}
+        onChange={() => setStatus("idle")}
         aria-busy={status === "submitting"}
       >
         <label className={styles.field}>

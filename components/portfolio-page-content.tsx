@@ -1,7 +1,7 @@
 import { PortfolioTable, type PortfolioTableCopy } from "@/components/portfolio-table";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { portfolioHoldings, portfolioSnapshot } from "@/data/portfolio";
+import { portfolioHoldings, portfolioIncome, portfolioSnapshot } from "@/data/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
@@ -29,6 +29,8 @@ const copy = {
     holdingsNote: "Stocks and ETFs",
     currentHoldings: "Current holdings",
     positionCount: `${portfolioSnapshot.holdingsCount} disclosed positions.`,
+    returnNote:
+      "Each position's return compares market value with cost basis. Net dividends and financing interest are not allocated to positions; they are added and deducted, respectively, only in the total return.",
   },
   "zh-tw": {
     eyebrow: "投資組合",
@@ -51,6 +53,7 @@ const copy = {
     holdingsNote: "股票與 ETF",
     currentHoldings: "目前持股",
     positionCount: `${portfolioSnapshot.holdingsCount} 個已揭露部位。`,
+    returnNote: "個別持股報酬僅以市值與成本基礎計算。淨股息與融資利息不分攤至各持股，僅在合計報酬中分別加計與扣除。",
   },
   "zh-cn": {
     eyebrow: "投资组合",
@@ -73,6 +76,7 @@ const copy = {
     holdingsNote: "股票与 ETF",
     currentHoldings: "当前持仓",
     positionCount: `${portfolioSnapshot.holdingsCount} 个已披露持仓。`,
+    returnNote: "单项持仓回报仅以市值与成本基础计算。净股息与融资利息不分摊至各持仓，仅在合计回报中分别加计和扣除。",
   },
 } as const;
 
@@ -185,7 +189,10 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
           </p>
         </div>
         <div className="portfolio-table-wrap shell">
-          <PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} />
+          <PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} income={portfolioIncome} />
+        </div>
+        <div className="portfolio-return-note shell">
+          <p>{text.returnNote}</p>
         </div>
       </section>
       <SiteFooter locale={locale} />

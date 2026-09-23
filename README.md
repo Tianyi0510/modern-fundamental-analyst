@@ -26,7 +26,7 @@ npx playwright install chromium webkit
 npm run verify
 ```
 
-Verification runs type checking, ESLint, Stylelint, a Prettier format check, unit tests, and a production build, then tests that build in the Chromium Playwright project. Run `npm run test:webkit` afterward to test the same build in the WebKit project. GitHub Actions runs both browser suites with one worker per browser and audits production dependencies. Run `npm run format` to apply Prettier formatting. For a quick browser check during development, use `npm run test:computed-style`; it starts the development server.
+Verification runs type checking, ESLint, Stylelint, a Prettier format check, unit tests, and a production build, then tests that build in the Chromium Playwright project. Run `npm run test:webkit` afterward to test the same build in two sequential WebKit shards. GitHub Actions runs WebKit with one worker per shard and audits production dependencies. Run `npm run format` to apply Prettier formatting. For a quick browser check during development, use `npm run test:computed-style`; it starts the development server.
 
 ## Project Layout
 

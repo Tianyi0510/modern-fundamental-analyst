@@ -19,7 +19,7 @@
     "test:unit": "node --import ./scripts/register-server.mjs --test tests/*.test.mjs",
     "subscription:journal": "node --env-file-if-exists=.env.local --import ./scripts/register-server.mjs scripts/subscription-journal.mjs",
     "test:computed-style": "playwright test --project=chromium",
-    "test:webkit": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --project=webkit --workers=1",
+    "test:webkit": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --project=webkit --workers=1 --shard=1/2 && PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --project=webkit --workers=1 --shard=2/2",
     "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit && npm run build && npm run test:computed-style:production",
     "test:computed-style:production": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --project=chromium"
   },

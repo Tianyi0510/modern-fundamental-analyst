@@ -66,7 +66,10 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
         onSubmit={(event) => {
           void submit(event);
         }}
-        onChange={() => resetSubmissionId()}
+        onChange={() => {
+          resetSubmissionId();
+          setStatus("idle");
+        }}
         aria-busy={status === "sending"}
       >
         <label className={styles.field}>

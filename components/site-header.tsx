@@ -18,6 +18,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
     close: closeMenu,
     closeImmediately: closeMenuForNavigation,
     closeButtonRef: menuCloseButtonRef,
+    contentRef: menuContentRef,
     drawerRef: menuDrawerRef,
     handlePointerCancel: handleMenuPointerCancel,
     handlePointerDown: handleMenuPointerDown,
@@ -54,6 +55,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
         className="wordmark"
         href={getLocalizedPath("/", locale)}
         aria-label={`Modern Fundamental Analyst ${copy.home}`}
+        tabIndex={isMenuOpen ? -1 : undefined}
       >
         Modern Fundamental Analyst<span>.</span>
       </Link>
@@ -64,6 +66,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
         aria-label={menuLabel}
         aria-expanded={isMenuOpen}
         aria-controls="mobile-site-menu"
+        tabIndex={isMenuOpen ? -1 : undefined}
         onClick={openMenu}
       >
         <Menu aria-hidden="true" strokeWidth={2} />
@@ -161,33 +164,35 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
               <X aria-hidden="true" strokeWidth={2} />
             </button>
           </div>
-          <nav aria-label={copy.mobilePrimary}>
-            {mobileNavigation.map(({ href, label }) => (
-              <Link
-                href={href}
-                aria-current={isCurrentPath(href) ? "page" : undefined}
-                onClick={closeMenuForNavigation}
-                tabIndex={isMenuOpen ? 0 : -1}
-                key={href}
-              >
-                <span className="mobile-menu-label">{label}</span>
-              </Link>
-            ))}
-          </nav>
-          <div className="mobile-language-links">
-            {locales.map((targetLocale) => (
-              <Link
-                className="mobile-menu-language"
-                href={getLocalizedPath(pathname, targetLocale)}
-                hrefLang={localeConfig[targetLocale].hrefLang}
-                aria-current={locale === targetLocale ? "page" : undefined}
-                onClick={closeMenuForNavigation}
-                tabIndex={isMenuOpen ? 0 : -1}
-                key={targetLocale}
-              >
-                {localeConfig[targetLocale].label}
-              </Link>
-            ))}
+          <div className="mobile-menu-content" ref={menuContentRef}>
+            <nav aria-label={copy.mobilePrimary}>
+              {mobileNavigation.map(({ href, label }) => (
+                <Link
+                  href={href}
+                  aria-current={isCurrentPath(href) ? "page" : undefined}
+                  onClick={closeMenuForNavigation}
+                  tabIndex={isMenuOpen ? 0 : -1}
+                  key={href}
+                >
+                  <span className="mobile-menu-label">{label}</span>
+                </Link>
+              ))}
+            </nav>
+            <div className="mobile-language-links">
+              {locales.map((targetLocale) => (
+                <Link
+                  className="mobile-menu-language"
+                  href={getLocalizedPath(pathname, targetLocale)}
+                  hrefLang={localeConfig[targetLocale].hrefLang}
+                  aria-current={locale === targetLocale ? "page" : undefined}
+                  onClick={closeMenuForNavigation}
+                  tabIndex={isMenuOpen ? 0 : -1}
+                  key={targetLocale}
+                >
+                  {localeConfig[targetLocale].label}
+                </Link>
+              ))}
+            </div>
           </div>
         </aside>
       </div>

@@ -5,8 +5,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Pointer
 // Keep in sync with the navigation-only breakpoint in responsive.css.
 const compactNavigationQuery = "(max-width: 1150px)";
 
-function animateMenuDismissal(layer: HTMLElement, icon: SVGElement | null) {
-  const style = getComputedStyle(layer);
+function animateMenuDismissal(content: HTMLElement, icon: SVGElement | null) {
+  const style = getComputedStyle(content);
   const duration = style.getPropertyValue("--motion-duration-slow").trim();
   const feedbackToken = style.getPropertyValue("--motion-duration-fast").trim();
   const feedbackDuration = Number.parseFloat(feedbackToken) * (feedbackToken.endsWith("ms") ? 1 : 1000);
@@ -14,7 +14,7 @@ function animateMenuDismissal(layer: HTMLElement, icon: SVGElement | null) {
     [{ transform: getComputedStyle(icon).transform }, { transform: "rotate(-90deg)" }],
     { duration: feedbackDuration, easing: style.getPropertyValue("--motion-ease-standard").trim(), fill: "forwards" },
   );
-  const panelAnimation = layer.animate(
+  const panelAnimation = content.animate(
     [{ transform: "translate3d(0, 0, 0)" }, { transform: "translate3d(100%, 0, 0)" }],
     {
       duration: Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000),
@@ -31,6 +31,7 @@ export function useMobileMenu() {
   const isOpenRef = useRef(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
@@ -54,13 +55,13 @@ export function useMobileMenu() {
 
   const close = useCallback(() => {
     if (!isOpenRef.current || closingAnimationRef.current) return;
-    const layer = drawerRef.current?.parentElement;
-    if (!layer || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const content = contentRef.current;
+    if (!content || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       closeImmediately();
       return;
     }
     const { panelAnimation, iconAnimation } = animateMenuDismissal(
-      layer,
+      content,
       closeButtonRef.current?.querySelector("svg") ?? null,
     );
     closingAnimationRef.current = panelAnimation;
@@ -102,12 +103,17 @@ export function useMobileMenu() {
     const previousBodyOverflow = document.body.style.overflow;
     const scrollPosition = scrollPositionRef.current;
     const trigger = triggerRef.current;
+    const layer = drawerRef.current?.parentElement;
+    const wordmark = trigger?.parentElement?.querySelector(":scope > .wordmark");
     // Isolate siblings at every level without making the drawer's ancestors inert.
     const background = new Map<HTMLElement, boolean>();
     let branch: HTMLElement | null = drawerRef.current;
     while (branch && branch !== document.body) {
       for (const sibling of branch.parentElement?.children ?? []) {
         if (sibling instanceof HTMLElement && sibling !== branch) {
+          // Keep the underlying header painted while the fixed layer intercepts
+          // pointer input and React removes these controls from the tab order.
+          if (branch === layer && (sibling === trigger || sibling === wordmark)) continue;
           background.set(sibling, sibling.inert);
           sibling.setAttribute("inert", "");
         }
@@ -182,6 +188,7 @@ export function useMobileMenu() {
     close,
     closeImmediately,
     closeButtonRef,
+    contentRef,
     drawerRef,
     handlePointerCancel,
     handlePointerDown,

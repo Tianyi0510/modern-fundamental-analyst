@@ -57,17 +57,17 @@ test("mobile menu keeps background isolated through dismissal and then restores 
   await trigger.click();
   await trigger.evaluate((element: HTMLButtonElement) => element.focus());
   await expect(page.locator(".mobile-menu-close")).toBeFocused();
-  expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(true);
+  await expect(trigger).toHaveAttribute("tabindex", "-1");
   const state = await page.locator(".mobile-menu-close").evaluate(async (element: HTMLButtonElement) => {
     element.click();
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     return getComputedStyle(document.querySelector(".mobile-menu-layer")!).visibility;
   });
   expect(state).toBe("visible");
-  expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(true);
+  await expect(trigger).toHaveAttribute("tabindex", "-1");
   await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
   await expect(trigger).toBeFocused();
-  expect(await trigger.evaluate((element: HTMLButtonElement) => element.inert)).toBe(false);
+  await expect(trigger).not.toHaveAttribute("tabindex", "-1");
 });
 
 test("menu dismissal handles repeated input and reduced motion in every locale", async ({ page }) => {
@@ -81,25 +81,39 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
     const result = await page.locator(".mobile-menu-close").evaluate((element: HTMLButtonElement) => {
       element.click();
       const layer = document.querySelector(".mobile-menu-layer")!;
-      const animation = layer.getAnimations()[0];
+      const content = layer.querySelector(".mobile-menu-content")!;
+      const animation = content.getAnimations()[0];
       if (!animation) throw new Error("Menu dismissal animation did not start");
       animation.pause();
       animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
       element.click();
-      const drawer = layer.querySelector(".mobile-menu-drawer")!.getBoundingClientRect();
+      const panel = content.getBoundingClientRect();
+      const menuTop = layer.querySelector(".mobile-menu-top")!.getBoundingClientRect();
+      const headerWordmark = document.querySelector<HTMLElement>(".site-header > .wordmark")!;
       return {
-        count: layer.getAnimations().length,
-        left: drawer.left,
-        top: drawer.top,
-        width: drawer.width,
+        count: content.getAnimations().length,
+        left: panel.left,
+        top: panel.top,
+        width: panel.width,
+        layerLeft: layer.getBoundingClientRect().left,
+        menuTopLeft: menuTop.left,
+        menuTopY: menuTop.y,
+        menuTopBottom: menuTop.bottom,
+        headerWordmarkInert: headerWordmark.inert,
+        headerWordmarkTabIndex: headerWordmark.tabIndex,
         locked: document.body.style.position,
       };
     });
     expect(result.count).toBe(1);
     expect(result.left).toBeGreaterThan(0);
     expect(result.left).toBeLessThan(320);
-    expect(result.top).toBe(0);
+    expect(result.top).toBe(result.menuTopBottom);
     expect(result.width).toBeCloseTo(320, 2);
+    expect(result.layerLeft).toBe(0);
+    expect(result.menuTopLeft).toBe(0);
+    expect(result.menuTopY).toBe(0);
+    expect(result.headerWordmarkInert).toBe(false);
+    expect(result.headerWordmarkTabIndex).toBe(-1);
     expect(result.locked).toBe("fixed");
     // A preference change must also finish an already-running dismissal.
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -108,7 +122,7 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
     await trigger.click();
     await page.keyboard.press("Escape");
     await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
-    expect(await page.locator(".mobile-menu-layer").evaluate((element) => element.getAnimations().length)).toBe(0);
+    expect(await page.locator(".mobile-menu-content").evaluate((element) => element.getAnimations().length)).toBe(0);
   }
 });
 
@@ -127,7 +141,7 @@ test("close icon rotates visibly before the panel leaves and replays", async ({ 
         button.click();
         const layer = document.querySelector(".mobile-menu-layer")!;
         const icon = button.querySelector("svg")!;
-        const panelAnimation = layer.getAnimations()[0]!;
+        const panelAnimation = layer.querySelector(".mobile-menu-content")!.getAnimations()[0]!;
         const iconAnimation = icon.getAnimations().find((a) => !(a instanceof CSSAnimation))!;
         panelAnimation.pause();
         iconAnimation.pause();
@@ -138,6 +152,7 @@ test("close icon rotates visibly before the panel leaves and replays", async ({ 
         const result = {
           angle: (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI,
           left: layer.getBoundingClientRect().left,
+          menuTopLeft: layer.querySelector(".mobile-menu-top")!.getBoundingClientRect().left,
           right: button.getBoundingClientRect().right,
         };
         iconAnimation.play();
@@ -147,6 +162,7 @@ test("close icon rotates visibly before the panel leaves and replays", async ({ 
       expect(result.angle).toBeLessThan(-1);
       expect(result.angle).toBeGreaterThan(-90);
       expect(result.left).toBe(0);
+      expect(result.menuTopLeft).toBe(0);
       expect(result.right).toBeLessThanOrEqual(390);
       await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
       await expect.poll(() => icon.evaluate((e) => e.getAnimations().length)).toBe(0);
@@ -163,7 +179,7 @@ test("menu hides before releasing the final dismissal frame", async ({ page }) =
     const visibilityAtCancel = await page.locator(".mobile-menu-close").evaluate(async (button: HTMLButtonElement) => {
       button.click();
       const layer = document.querySelector(".mobile-menu-layer")!;
-      const animation = layer.getAnimations()[0]!;
+      const animation = layer.querySelector(".mobile-menu-content")!.getAnimations()[0]!;
       return await new Promise<string>((resolve) => {
         const cancel = animation.cancel.bind(animation);
         animation.cancel = () => {
@@ -771,18 +787,15 @@ test.describe("mobile content and navigation QA", () => {
     expect(topBeforeScroll!.y).toBe(0);
     expect(topBeforeScroll!.width).toBe(390);
     await expect(menuTop).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(drawer).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    expect(await drawer.evaluate((element) => getComputedStyle(element, "::before").backgroundColor)).toBe(
-      "rgb(248, 249, 251)",
-    );
-    await expect
-      .poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").transform))
-      .toBe("matrix(1, 0, 0, 1, 0, 0)");
+    await expect(drawer).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(page.locator(".mobile-menu-content")).toHaveCSS("background-color", "rgb(248, 249, 251)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("white-space", "normal");
     await page.setViewportSize({ width: 390, height: 620 });
-    await drawer.evaluate((element) => element.scrollTo({ top: 160, behavior: "instant" }));
+    await page
+      .locator(".mobile-menu-content")
+      .evaluate((element) => element.scrollTo({ top: 160, behavior: "instant" }));
     const topAfterScroll = await menuTop.boundingBox();
     expect(topAfterScroll).not.toBeNull();
     expect(topAfterScroll!.y).toBe(topBeforeScroll!.y);
