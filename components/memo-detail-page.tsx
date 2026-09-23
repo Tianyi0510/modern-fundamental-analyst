@@ -20,15 +20,29 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
   if (!memo || !content) notFound();
 
   const text = copy[locale];
-  return <>
-    <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-    <main className="memo-detail-page" id="main-content">
-      <article className="memo-article shell">
-        <header className="memo-article-header"><p className="eyebrow"><span /> {memo.category.label}</p><h1>{memo.title}</h1><div className="article-meta"><span>{formatDate(memo.publishedAt, locale, locale === "en")}</span><span>{memo.readTime}</span><span>{text.memoLabel} {memo.number}</span></div></header>
-        <p className="article-lead">{memo.summary}</p>
-        <MemoArticleContent content={content} />
-      </article>
-    </main>
-    <SiteFooter locale={locale} />
-  </>;
+  return (
+    <>
+      <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+      <main className="memo-detail-page" id="main-content">
+        <article className="memo-article shell">
+          <header className="memo-article-header">
+            <p className="eyebrow">
+              <span /> {memo.category.label}
+            </p>
+            <h1>{memo.title}</h1>
+            <div className="article-meta">
+              <span>{formatDate(memo.publishedAt, locale, locale === "en")}</span>
+              <span>{memo.readTime}</span>
+              <span>
+                {text.memoLabel} {memo.number}
+              </span>
+            </div>
+          </header>
+          <p className="article-lead">{memo.summary}</p>
+          <MemoArticleContent content={content} />
+        </article>
+      </main>
+      <SiteFooter locale={locale} />
+    </>
+  );
 }

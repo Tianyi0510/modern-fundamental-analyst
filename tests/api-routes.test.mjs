@@ -53,7 +53,9 @@ test("all browser-facing API routes reject cross-origin requests", async () => {
 
 test("routes enforce streamed body limits without Content-Length", async () => {
   const contactRequest = request("/api/contact", JSON.stringify({ message: "x".repeat(20_100) }), { stream: true });
-  const subscribeRequest = request("/api/subscribe", JSON.stringify({ email: `${"x".repeat(5_100)}@example.com` }), { stream: true });
+  const subscribeRequest = request("/api/subscribe", JSON.stringify({ email: `${"x".repeat(5_100)}@example.com` }), {
+    stream: true,
+  });
 
   assert.equal(contactRequest.headers.has("content-length"), false);
   assert.equal(subscribeRequest.headers.has("content-length"), false);
@@ -67,7 +69,12 @@ test("routes reject malformed JSON before calling external services", async () =
 });
 
 test("routes reject invalid form values before calling Resend", async () => {
-  const contactPayload = JSON.stringify({ name: "Reader", email: "invalid", subject: "Hello", message: "A valid message body" });
+  const contactPayload = JSON.stringify({
+    name: "Reader",
+    email: "invalid",
+    subject: "Hello",
+    message: "A valid message body",
+  });
   const subscribePayload = JSON.stringify({ email: "invalid" });
 
   assert.equal((await contact(request("/api/contact", contactPayload))).status, 400);
@@ -75,7 +82,13 @@ test("routes reject invalid form values before calling Resend", async () => {
 });
 
 test("honeypot submissions succeed without calling Resend", async () => {
-  const contactPayload = JSON.stringify({ name: "Bot", email: "bot@example.com", subject: "Hello", message: "A valid message body", website: "filled" });
+  const contactPayload = JSON.stringify({
+    name: "Bot",
+    email: "bot@example.com",
+    subject: "Hello",
+    message: "A valid message body",
+    website: "filled",
+  });
   const subscribePayload = JSON.stringify({ email: "bot@example.com", website: "filled" });
 
   assert.deepEqual(await (await contact(request("/api/contact", contactPayload))).json(), { ok: true });
@@ -99,11 +112,17 @@ test("route-level rate limits reject the sixth request from one client", async (
   assert.equal(subscribeResponse.headers.get("retry-after"), "600");
 });
 
-test("email routes reject overlong identities without provider writes", async context => {
-  context.mock.method(globalThis, "fetch", () => { throw new Error("Unexpected provider request"); });
-  const email = 'a'.repeat(64) + '@' + 'b'.repeat(63) + '.' + 'c'.repeat(63) + '.' + 'd'.repeat(60) + 'extra';
-  for (const [handler, path] of [[contact, '/api/contact'], [subscribe, '/api/subscribe'], [preferenceRequest, '/api/subscription-preferences/request']]) {
-    const body = JSON.stringify({ email, name: 'Reader', subject: 'Question', message: 'A valid message body' });
+test("email routes reject overlong identities without provider writes", async (context) => {
+  context.mock.method(globalThis, "fetch", () => {
+    throw new Error("Unexpected provider request");
+  });
+  const email = "a".repeat(64) + "@" + "b".repeat(63) + "." + "c".repeat(63) + "." + "d".repeat(60) + "extra";
+  for (const [handler, path] of [
+    [contact, "/api/contact"],
+    [subscribe, "/api/subscribe"],
+    [preferenceRequest, "/api/subscription-preferences/request"],
+  ]) {
+    const body = JSON.stringify({ email, name: "Reader", subject: "Question", message: "A valid message body" });
     assert.equal((await handler(request(path, body))).status, 400);
   }
 });

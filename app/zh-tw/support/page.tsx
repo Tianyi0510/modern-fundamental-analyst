@@ -9,7 +9,11 @@ export const metadata = createPageMetadata({
   locale: "zh-tw",
 });
 
-export default async function SupportPage({ searchParams }: { searchParams: Promise<{ status?: string; session_id?: string }> }) {
+export default async function SupportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; session_id?: string }>;
+}) {
   const normalizedStatus = await resolveSupportStatus(await searchParams);
   return <SupportPageContent locale="zh-tw" status={normalizedStatus} />;
 }

@@ -10,12 +10,34 @@ import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const isRateLimited = createRateLimiter({ namespace: "subscription-preferences-request", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 5 });
+const isRateLimited = createRateLimiter({
+  namespace: "subscription-preferences-request",
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  maxRequests: 5,
+});
 
 const mailCopy = {
-  en: { subject: "Manage your email preferences", heading: "Manage Your Email Preferences", body: "Use the secure link below to update your preferred language or unsubscribe.", action: "Manage Email Preferences", note: "If you did not request this email, you can ignore it." },
-  "zh-tw": { subject: "管理你的郵件偏好", heading: "管理你的郵件偏好", body: "使用以下安全連結更新偏好語言或取消訂閱。", action: "管理郵件偏好", note: "如果你沒有提出此要求，可以忽略這封郵件。" },
-  "zh-cn": { subject: "管理你的邮件偏好", heading: "管理你的邮件偏好", body: "使用以下安全链接更新偏好语言或取消订阅。", action: "管理邮件偏好", note: "如果你没有提出此请求，可以忽略这封邮件。" },
+  en: {
+    subject: "Manage your email preferences",
+    heading: "Manage Your Email Preferences",
+    body: "Use the secure link below to update your preferred language or unsubscribe.",
+    action: "Manage Email Preferences",
+    note: "If you did not request this email, you can ignore it.",
+  },
+  "zh-tw": {
+    subject: "管理你的郵件偏好",
+    heading: "管理你的郵件偏好",
+    body: "使用以下安全連結更新偏好語言或取消訂閱。",
+    action: "管理郵件偏好",
+    note: "如果你沒有提出此要求，可以忽略這封郵件。",
+  },
+  "zh-cn": {
+    subject: "管理你的邮件偏好",
+    heading: "管理你的邮件偏好",
+    body: "使用以下安全链接更新偏好语言或取消订阅。",
+    action: "管理邮件偏好",
+    note: "如果你没有提出此请求，可以忽略这封邮件。",
+  },
 } satisfies Record<Locale, PreferenceEmailCopy & { subject: string }>;
 
 export async function POST(request: Request) {
@@ -47,10 +69,14 @@ export async function POST(request: Request) {
         html: renderPreferenceEmail(text, preferencesUrl),
       };
     });
-    const existing = await runResendOperation("Preference link contact lookup failed", () => resend.contacts.get({ email }));
+    const existing = await runResendOperation("Preference link contact lookup failed", () =>
+      resend.contacts.get({ email }),
+    );
     if (!existing) throw new ResendCoordinationError();
     if (existing.data) {
-      const result = await runResendOperation("Preference link email request failed", () => resend.emails.send(emailPayload, { idempotencyKey }));
+      const result = await runResendOperation("Preference link email request failed", () =>
+        resend.emails.send(emailPayload, { idempotencyKey }),
+      );
       if (!result || result.error) throw new ResendCoordinationError();
     } else if (existing.error?.statusCode !== 404) {
       console.error("Preference link contact lookup failed", existing.error?.name ?? "UnknownError");

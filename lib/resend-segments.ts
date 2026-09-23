@@ -65,10 +65,12 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
       targetAdded = true;
     }
 
-    const removals = await Promise.allSettled(previousLanguageIds.map(async (segmentId) => ({
-      segmentId,
-      result: await resend.contacts.segments.remove({ email, segmentId }),
-    })));
+    const removals = await Promise.allSettled(
+      previousLanguageIds.map(async (segmentId) => ({
+        segmentId,
+        result: await resend.contacts.segments.remove({ email, segmentId }),
+      })),
+    );
     let removalError: unknown;
     for (const removal of removals) {
       if (removal.status === "rejected") {
@@ -79,11 +81,21 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
         removedLanguageIds.push(removal.value.segmentId);
       }
     }
-    if (removalError) throw removalError;
+    if (removalError)
+      throw removalError instanceof Error ? removalError : new Error("Unable to remove previous language segment");
   } catch (error) {
-    await restorePreferredLanguageSegments(resend, email, removedLanguageIds, targetAdded, targetId).catch(() => undefined);
+    await restorePreferredLanguageSegments(resend, email, removedLanguageIds, targetAdded, targetId).catch(
+      () => undefined,
+    );
     throw error;
   }
 
-  return (() => restorePreferredLanguageSegments(resend, email, previousLanguageIds, targetWasAdded, targetId)) satisfies SegmentRollback;
+  return (() =>
+    restorePreferredLanguageSegments(
+      resend,
+      email,
+      previousLanguageIds,
+      targetWasAdded,
+      targetId,
+    )) satisfies SegmentRollback;
 }

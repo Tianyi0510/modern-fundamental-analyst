@@ -3,7 +3,13 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatPercent, formatShares, formatUsd } from "@/lib/format";
-import { getHoldingCostPerShare, getHoldingReturn, getHoldingWeight, getPortfolioTotals, type PortfolioHolding } from "@/lib/portfolio-calculations";
+import {
+  getHoldingCostPerShare,
+  getHoldingReturn,
+  getHoldingWeight,
+  getPortfolioTotals,
+  type PortfolioHolding,
+} from "@/lib/portfolio-calculations";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 type SortDirection = "asc" | "desc";
@@ -27,12 +33,16 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("marketValue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const totals = useMemo(() => getPortfolioTotals(holdings), [holdings]);
-  const rows = useMemo(() => holdings.map((holding) => ({
-    holding,
-    returnPct: getHoldingReturn(holding),
-    costPerShare: getHoldingCostPerShare(holding),
-    weight: getHoldingWeight(holding.marketValue, totals.marketValue),
-  })), [holdings, totals.marketValue]);
+  const rows = useMemo(
+    () =>
+      holdings.map((holding) => ({
+        holding,
+        returnPct: getHoldingReturn(holding),
+        costPerShare: getHoldingCostPerShare(holding),
+        weight: getHoldingWeight(holding.marketValue, totals.marketValue),
+      })),
+    [holdings, totals.marketValue],
+  );
 
   const sortedRows = useMemo(() => {
     const getSortValue = (row: (typeof rows)[number]) => {
@@ -52,7 +62,7 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
 
   const changeSort = (nextKey: SortKey) => {
     if (nextKey === sortKey) {
-      setSortDirection((current) => current === "asc" ? "desc" : "asc");
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
       return;
     }
 
@@ -66,10 +76,18 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
         <label>
           <span>{copy.sortBy}</span>
           <select value={sortKey} onChange={(event) => changeSort(event.target.value as SortKey)}>
-            {columns.map((column) => <option value={column} key={column}>{copy[column]}</option>)}
+            {columns.map((column) => (
+              <option value={column} key={column}>
+                {copy[column]}
+              </option>
+            ))}
           </select>
         </label>
-        <button type="button" onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")} aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}>
+        <button
+          type="button"
+          onClick={() => setSortDirection((current) => (current === "asc" ? "desc" : "asc"))}
+          aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}
+        >
           <span>{sortDirection === "asc" ? copy.ascending : copy.descending}</span>
           {sortDirection === "asc" ? <ArrowUp aria-hidden="true" /> : <ArrowDown aria-hidden="true" />}
         </button>
@@ -80,31 +98,64 @@ export function PortfolioTable({ copy, holdings }: PortfolioTableProps) {
           const ariaSort = isActive ? (sortDirection === "asc" ? "ascending" : "descending") : "none";
           const Icon = !isActive ? ArrowUpDown : sortDirection === "asc" ? ArrowUp : ArrowDown;
 
-          return <span role="columnheader" aria-sort={ariaSort} key={column}>
-            <button className={`sort-button${isActive ? " is-active" : ""}`} type="button" onClick={() => changeSort(column)} aria-label={`${copy.sortBy} ${copy[column]}`}>
-              {copy[column]} <Icon aria-hidden="true" />
-            </button>
-          </span>;
+          return (
+            <span role="columnheader" aria-sort={ariaSort} key={column}>
+              <button
+                className={`sort-button${isActive ? " is-active" : ""}`}
+                type="button"
+                onClick={() => changeSort(column)}
+                aria-label={`${copy.sortBy} ${copy[column]}`}
+              >
+                {copy[column]} <Icon aria-hidden="true" />
+              </button>
+            </span>
+          );
         })}
       </div>
       {sortedRows.map(({ holding, costPerShare, returnPct, weight }) => (
-          <div className="portfolio-row" role="row" key={holding.symbol}>
-            <span role="cell" data-label={copy.symbol}>{holding.symbol}</span>
-            <span role="cell" data-label={copy.shares}>{formatShares(holding.shares)}</span>
-            <span role="cell" data-label={copy.price}>{formatUsd(holding.price)}</span>
-            <span role="cell" data-label={copy.costBasis}>{formatUsd(costPerShare)}</span>
-            <span role="cell" data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</span>
-            <span role="cell" data-label={copy.returnPct} className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}>{formatPercent(returnPct, 1)}</span>
-            <span role="cell" data-label={copy.weight}>{weight.toFixed(1)}%</span>
-          </div>
+        <div className="portfolio-row" role="row" key={holding.symbol}>
+          <span role="cell" data-label={copy.symbol}>
+            {holding.symbol}
+          </span>
+          <span role="cell" data-label={copy.shares}>
+            {formatShares(holding.shares)}
+          </span>
+          <span role="cell" data-label={copy.price}>
+            {formatUsd(holding.price)}
+          </span>
+          <span role="cell" data-label={copy.costBasis}>
+            {formatUsd(costPerShare)}
+          </span>
+          <span role="cell" data-label={copy.marketValue}>
+            {formatUsd(holding.marketValue)}
+          </span>
+          <span
+            role="cell"
+            data-label={copy.returnPct}
+            className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}
+          >
+            {formatPercent(returnPct, 1)}
+          </span>
+          <span role="cell" data-label={copy.weight}>
+            {weight.toFixed(1)}%
+          </span>
+        </div>
       ))}
       <div className="portfolio-row portfolio-total-row" role="row">
-        <span role="cell" data-label={copy.symbol}>{copy.total}</span>
+        <span role="cell" data-label={copy.symbol}>
+          {copy.total}
+        </span>
         <span role="cell" />
         <span role="cell" />
         <span role="cell" />
-        <span className="portfolio-total-market" role="cell" data-label={copy.marketValue}>{formatUsd(totals.marketValue)}</span>
-        <strong role="cell" data-label={copy.returnPct} className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}>
+        <span className="portfolio-total-market" role="cell" data-label={copy.marketValue}>
+          {formatUsd(totals.marketValue)}
+        </span>
+        <strong
+          role="cell"
+          data-label={copy.returnPct}
+          className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}
+        >
           {formatPercent(totals.totalReturn)}
         </strong>
         <span role="cell" />

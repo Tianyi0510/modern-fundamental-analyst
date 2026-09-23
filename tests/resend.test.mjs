@@ -11,7 +11,13 @@ test("Resend email idempotency keys are scoped and accept only UUID request IDs"
   assert.equal(getResendIdempotencyKey(request, "contact"), "contact/550e8400-e29b-41d4-a716-446655440000");
   assert.equal(getResendIdempotencyKey(request, "preferences"), "preferences/550e8400-e29b-41d4-a716-446655440000");
   assert.equal(getResendIdempotencyKey(new Request("https://example.com"), "contact"), undefined);
-  assert.equal(getResendIdempotencyKey(new Request("https://example.com", { headers: { "Idempotency-Key": "invalid" } }), "contact"), undefined);
+  assert.equal(
+    getResendIdempotencyKey(
+      new Request("https://example.com", { headers: { "Idempotency-Key": "invalid" } }),
+      "contact",
+    ),
+    undefined,
+  );
 });
 
 test("Resend client is reused until its API key changes", () => {

@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useRef, type MouseEvent, type ReactNode } from "react";
 
-export function AnimatedDisclosure({ summary, children, className }: { summary: ReactNode; children: ReactNode; className?: string }) {
+export function AnimatedDisclosure({
+  summary,
+  children,
+  className,
+}: {
+  summary: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
   const ref = useRef<HTMLDetailsElement>(null);
   const animationRef = useRef<Animation | null>(null);
   const targetOpenRef = useRef(false);
@@ -12,7 +20,11 @@ export function AnimatedDisclosure({ summary, children, className }: { summary: 
     const animation = animationRef.current;
     if (!details || !animation) return;
     const summary = details.querySelector("summary");
-    if (!targetOpenRef.current && details.contains(document.activeElement) && !summary?.contains(document.activeElement)) {
+    if (
+      !targetOpenRef.current &&
+      details.contains(document.activeElement) &&
+      !summary?.contains(document.activeElement)
+    ) {
       summary?.focus({ preventScroll: true });
     }
     details.open = targetOpenRef.current;
@@ -23,7 +35,9 @@ export function AnimatedDisclosure({ summary, children, className }: { summary: 
 
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const finish = () => { if (motion.matches) settle(); };
+    const finish = () => {
+      if (motion.matches) settle();
+    };
     motion.addEventListener("change", finish);
     // Let the new layout choose its natural height instead of keeping a stale pixel target.
     window.addEventListener("resize", settle);
@@ -60,7 +74,10 @@ export function AnimatedDisclosure({ summary, children, className }: { summary: 
     const durationToken = styles.getPropertyValue("--motion-duration-slow").trim();
     const duration = parseFloat(durationToken) * (durationToken.endsWith("ms") ? 1 : 1000);
     const animation = details.animate(
-      [{ height: `${startHeight}px`, overflow: "clip" }, { height: `${endHeight}px`, overflow: "clip" }],
+      [
+        { height: `${startHeight}px`, overflow: "clip" },
+        { height: `${endHeight}px`, overflow: "clip" },
+      ],
       { duration, easing: styles.getPropertyValue("--motion-ease-emphasized").trim(), fill: "forwards" },
     );
     animationRef.current = animation;
@@ -70,5 +87,10 @@ export function AnimatedDisclosure({ summary, children, className }: { summary: 
     };
   };
 
-  return <details ref={ref} className={className}><summary onClick={toggle}>{summary}</summary>{children}</details>;
+  return (
+    <details ref={ref} className={className}>
+      <summary onClick={toggle}>{summary}</summary>
+      {children}
+    </details>
+  );
 }

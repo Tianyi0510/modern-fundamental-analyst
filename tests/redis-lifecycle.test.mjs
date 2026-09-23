@@ -4,13 +4,20 @@ import { registerHooks } from "node:module";
 import test from "node:test";
 
 const factoryUrl = `data:text/javascript,${encodeURIComponent("export const createClient = options => globalThis.__redisTestCreate(options);")}`;
-registerHooks({ resolve(specifier, context, nextResolve) {
-  return nextResolve(specifier === "@redis/client" ? factoryUrl : specifier, context);
-} });
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    return nextResolve(specifier === "@redis/client" ? factoryUrl : specifier, context);
+  },
+});
 
-const state = globalThis.__mfaRedisStateV5 = { client: null, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 };
+const state = (globalThis.__mfaRedisStateV5 = {
+  client: null,
+  connection: null,
+  lastErrorLogAt: {},
+  unavailableUntil: 0,
+});
 const clients = [];
-globalThis.__redisTestCreate = options => {
+globalThis.__redisTestCreate = (options) => {
   const client = new EventEmitter();
   client.options = options;
   client.isOpen = false;
@@ -19,18 +26,25 @@ globalThis.__redisTestCreate = options => {
   client.connect = () => {
     client.isOpen = true;
     return new Promise((resolve, reject) => {
-      client.succeed = () => { client.isReady = true; resolve(client); };
+      client.succeed = () => {
+        client.isReady = true;
+        resolve(client);
+      };
       client.fail = reject;
     });
   };
-  client.destroy = () => { client.destroyCount += 1; client.isOpen = false; client.isReady = false; };
+  client.destroy = () => {
+    client.destroyCount += 1;
+    client.isOpen = false;
+    client.isReady = false;
+  };
   clients.push(client);
   return client;
 };
 process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
 const { getRedisClient, executeRedisCommand, markRedisUnavailable } = await import("../lib/redis.ts");
 
-test.beforeEach(context => {
+test.beforeEach((context) => {
   Object.assign(state, { client: null, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 });
   clients.length = 0;
   context.mock.method(console, "error", () => {});
@@ -51,7 +65,9 @@ test("concurrent cold requests wait for one ready connection", async () => {
   assert.equal(clients[0].options.commandOptions.timeout, 5_000);
   assert.equal(clients[0].options.socket.socketTimeout, undefined);
   let settled = false;
-  second.then(() => { settled = true; });
+  second.then(() => {
+    settled = true;
+  });
   await Promise.resolve();
   assert.equal(settled, false);
   clients[0].succeed();
@@ -59,11 +75,15 @@ test("concurrent cold requests wait for one ready connection", async () => {
   assert.equal(await getRedisClient(), clients[0]);
 });
 
-test("command failure destroys only its client and enforces a recovery cooldown", async context => {
+test("command failure destroys only its client and enforces a recovery cooldown", async (context) => {
   let now = 100_000;
   context.mock.method(Date, "now", () => now);
   const client = await connect();
-  await assert.rejects(executeRedisCommand(client, async () => { throw new Error("socket closed"); }));
+  await assert.rejects(
+    executeRedisCommand(client, async () => {
+      throw new Error("socket closed");
+    }),
+  );
   assert.equal(client.destroyCount, 1);
   assert.equal(await getRedisClient(), null);
   assert.equal(clients.length, 1);
@@ -76,7 +96,13 @@ test("command failure destroys only its client and enforces a recovery cooldown"
 test("an old command failure cannot disable a recovered connection", async () => {
   const old = await connect();
   let reject;
-  const pending = executeRedisCommand(old, () => new Promise((_resolve, rejectPromise) => { reject = rejectPromise; }));
+  const pending = executeRedisCommand(
+    old,
+    () =>
+      new Promise((_resolve, rejectPromise) => {
+        reject = rejectPromise;
+      }),
+  );
   markRedisUnavailable(old);
   state.unavailableUntil = 0;
   const recovered = await connect();
@@ -108,7 +134,7 @@ test("discarded sockets retain an error listener for late events", async () => {
   assert.doesNotThrow(() => client.emit("error", new Error("late socket event")));
 });
 
-test("a stalled authentication handshake is destroyed after the readiness deadline", async context => {
+test("a stalled authentication handshake is destroyed after the readiness deadline", async (context) => {
   let expire;
   context.mock.method(globalThis, "setTimeout", (callback, delay) => {
     assert.equal(delay, 10_000);

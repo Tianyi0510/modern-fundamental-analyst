@@ -15,18 +15,43 @@ const {
 
 test("request helpers normalize text and validate forwarded origins", () => {
   assert.equal(cleanSingleLine("  Hello\n\tworld  ", 100), "Hello world");
-  assert.equal(isSameOrigin(new Request("https://example.com/api", {
-    headers: { origin: "https://example.com", host: "internal.vercel.app", "x-forwarded-host": "example.com" },
-  })), true);
-  assert.equal(isSameOrigin(new Request("https://example.com/api", {
-    headers: { origin: "https://attacker.example", host: "example.com" },
-  })), false);
-  assert.equal(isSameOrigin(new Request("https://example.com/api", {
-    headers: { origin: "http://example.com", host: "example.com" },
-  })), false);
-  assert.equal(isSameOrigin(new Request("http://internal.vercel.app/api", {
-    headers: { origin: "https://example.com", host: "internal.vercel.app", "x-forwarded-host": "example.com", "x-forwarded-proto": "https" },
-  })), true);
+  assert.equal(
+    isSameOrigin(
+      new Request("https://example.com/api", {
+        headers: { origin: "https://example.com", host: "internal.vercel.app", "x-forwarded-host": "example.com" },
+      }),
+    ),
+    true,
+  );
+  assert.equal(
+    isSameOrigin(
+      new Request("https://example.com/api", {
+        headers: { origin: "https://attacker.example", host: "example.com" },
+      }),
+    ),
+    false,
+  );
+  assert.equal(
+    isSameOrigin(
+      new Request("https://example.com/api", {
+        headers: { origin: "http://example.com", host: "example.com" },
+      }),
+    ),
+    false,
+  );
+  assert.equal(
+    isSameOrigin(
+      new Request("http://internal.vercel.app/api", {
+        headers: {
+          origin: "https://example.com",
+          host: "internal.vercel.app",
+          "x-forwarded-host": "example.com",
+          "x-forwarded-proto": "https",
+        },
+      }),
+    ),
+    true,
+  );
 });
 
 test("email validation rejects malformed and oversized addresses", () => {
@@ -79,11 +104,12 @@ test("request errors are normalized to stable API details", () => {
 });
 
 test("protected JSON reader centralizes origin, rate-limit, and body failures", async () => {
-  const createRequest = (body = "{}", origin = "https://example.com") => new Request("https://example.com/api", {
-    method: "POST",
-    body,
-    headers: { host: "example.com", origin },
-  });
+  const createRequest = (body = "{}", origin = "https://example.com") =>
+    new Request("https://example.com/api", {
+      method: "POST",
+      body,
+      headers: { host: "example.com", origin },
+    });
   const options = { isRateLimited: async () => false, maxBytes: 100, rateLimitWindowMs: 600_000 };
 
   const valid = await readProtectedObjectJson(createRequest('{"ok":true}'), options);

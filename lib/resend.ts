@@ -2,7 +2,11 @@ import "server-only";
 import { Resend } from "resend";
 import { AsyncLocalStorage } from "node:async_hooks";
 
-export const resendOperationContext = new AsyncLocalStorage<{ signal: AbortSignal; uncertain: boolean; recordPhase?: (phase: string) => Promise<void> }>();
+export const resendOperationContext = new AsyncLocalStorage<{
+  signal: AbortSignal;
+  uncertain: boolean;
+  recordPhase?: (phase: string) => Promise<void>;
+}>();
 
 export function reportResendRollbackFailure() {
   const context = resendOperationContext.getStore();
@@ -20,7 +24,8 @@ class BoundedResend extends Resend {
     const signal = AbortSignal.any(signals);
     signal.throwIfAborted();
     const result = await super.fetchRequest<T>(path, { ...options, signal });
-    if (context && result.error && (result.error.statusCode == null || result.error.statusCode >= 500)) context.uncertain = true;
+    if (context && result.error && (result.error.statusCode == null || result.error.statusCode >= 500))
+      context.uncertain = true;
     // An aborted write may already have reached Resend. Keep the subscriber
     // lease until expiry rather than immediately allowing another mutation.
     if (signal.aborted) {
@@ -47,7 +52,10 @@ const globalForResend = globalThis as typeof globalThis & { __mfaResendState?: R
 export function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return null;
-  if (globalForResend.__mfaResendState?.apiKey !== apiKey || !(globalForResend.__mfaResendState.client instanceof BoundedResend)) {
+  if (
+    globalForResend.__mfaResendState?.apiKey !== apiKey ||
+    !(globalForResend.__mfaResendState.client instanceof BoundedResend)
+  ) {
     globalForResend.__mfaResendState = { apiKey, client: new BoundedResend(apiKey) };
   }
   return globalForResend.__mfaResendState.client;

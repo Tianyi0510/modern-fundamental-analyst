@@ -3,12 +3,15 @@ import test from "node:test";
 import { renderPreferenceEmail } from "../lib/email-template.ts";
 
 test("preference email preserves the brand and escapes interpolated content", () => {
-  const html = renderPreferenceEmail({
-    heading: "Manage <Preferences>",
-    body: "Research & updates",
-    action: 'Open "settings"',
-    note: "Reader's request",
-  }, "https://example.com/preferences?token=a&locale=en");
+  const html = renderPreferenceEmail(
+    {
+      heading: "Manage <Preferences>",
+      body: "Research & updates",
+      action: 'Open "settings"',
+      note: "Reader's request",
+    },
+    "https://example.com/preferences?token=a&locale=en",
+  );
 
   assert.match(html, /Modern Fundamental Analyst<span style="color:#008cff">\.<\/span>/);
   assert.match(html, /Manage &lt;Preferences&gt;/);

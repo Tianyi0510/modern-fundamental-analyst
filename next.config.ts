@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: "base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'" },
+  {
+    key: "Content-Security-Policy",
+    value: "base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'",
+  },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Permissions-Policy", value: "camera=(), geolocation=(), microphone=()" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -12,6 +15,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   agentRules: false,
   poweredByHeader: false,
+  // Next.js requires this configuration hook to return a Promise.
+  // eslint-disable-next-line @typescript-eslint/require-await
   async redirects() {
     const oldSlug = "microsoft-stock-analysis-fy2024";
     const newSlug = "microsoft-stock-analysis-fiscal-year-2024";
@@ -22,6 +27,7 @@ const nextConfig: NextConfig = {
       permanent: true,
     }));
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

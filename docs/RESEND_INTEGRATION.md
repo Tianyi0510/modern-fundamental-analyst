@@ -8,11 +8,11 @@ This guide describes the repository implementation. Provider resources must be c
 2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_URL`, and `RATE_LIMIT_HASH_SECRET`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [reconciliation and secret rotation](TECHNICAL_ARCHITECTURE.md#subscription-reconciliation).
 3. Create a text contact property named `preferred_language` and three language segments. Set the matching `RESEND_SEGMENT_*` variables below. The default IDs in the code and environment template refer to this project's existing resources; override all three when using another account or isolated test resources.
 
-| Locale | Contact property value | Segment variable |
-| --- | --- | --- |
-| `en` | `English` | `RESEND_SEGMENT_EN` |
-| `zh-tw` | `繁體中文` | `RESEND_SEGMENT_ZH_TW` |
-| `zh-cn` | `简体中文` | `RESEND_SEGMENT_ZH_CN` |
+| Locale  | Contact property value | Segment variable       |
+| ------- | ---------------------- | ---------------------- |
+| `en`    | `English`              | `RESEND_SEGMENT_EN`    |
+| `zh-tw` | `繁體中文`             | `RESEND_SEGMENT_ZH_TW` |
+| `zh-cn` | `简体中文`             | `RESEND_SEGMENT_ZH_CN` |
 
 4. Configure and enable a welcome automation triggered by `subscriber.created`. The application sends `locale`, `memo_title`, `memo_summary`, `memo_url`, and `preferences_url` in its payload; use these in the localized welcome content. The code sends an event rather than the welcome email itself, so a successful event response does not verify automation delivery. New or previously unsubscribed contacts trigger it; active contacts do not. At least one memo must exist for the selected locale.
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.

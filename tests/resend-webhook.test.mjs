@@ -5,15 +5,20 @@ const { getResendWebhookHeaders, getUnsubscribeRecipients } = await import("../l
 
 test("webhook headers require the complete Svix signature set", () => {
   assert.equal(getResendWebhookHeaders(new Headers({ "svix-id": "msg_1" })), null);
-  assert.deepEqual(getResendWebhookHeaders(new Headers({
-    "svix-id": "msg_1",
-    "svix-timestamp": "1724500000",
-    "svix-signature": "v1,signature",
-  })), {
-    id: "msg_1",
-    timestamp: "1724500000",
-    signature: "v1,signature",
-  });
+  assert.deepEqual(
+    getResendWebhookHeaders(
+      new Headers({
+        "svix-id": "msg_1",
+        "svix-timestamp": "1724500000",
+        "svix-signature": "v1,signature",
+      }),
+    ),
+    {
+      id: "msg_1",
+      timestamp: "1724500000",
+      signature: "v1,signature",
+    },
+  );
 });
 
 test("delivery failures produce normalized, unique unsubscribe recipients", () => {

@@ -6,11 +6,11 @@ export function useSubmissionId() {
   const submissionId = useRef<string | null>(null);
 
   return {
-    getSubmissionId() {
+    getSubmissionId: () => {
       submissionId.current ??= crypto.randomUUID();
       return submissionId.current;
     },
-    resetSubmissionId() {
+    resetSubmissionId: () => {
       submissionId.current = null;
     },
   };

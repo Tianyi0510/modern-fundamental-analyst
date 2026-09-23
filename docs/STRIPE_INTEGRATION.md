@@ -6,13 +6,13 @@ This guide describes the Checkout implementation and environment verification st
 
 Use [.env.example](../.env.example) for local configuration and environment-scoped Vercel variables for deployments. Store API keys as **Secret** values; never commit credentials.
 
-| Field | Template Value | What to Set |
-|---|---|---|
-| `STRIPE_RESTRICTED_KEY` | Empty | A test restricted key locally and a separate live restricted key in Vercel. Grant Checkout Sessions read/write access and the minimum Price access required by Stripe. |
-| `STRIPE_SECRET_KEY` | Empty | Compatibility fallback only. Used only when `STRIPE_RESTRICTED_KEY` is absent or empty. Prefer the restricted key. |
-| `STRIPE_PRICE_USD_6` | `price_replace_with_6_usd_price` | The environment-appropriate one-time USD 6 Price ID. |
-| `STRIPE_PRICE_USD_12` | `price_replace_with_12_usd_price` | The environment-appropriate one-time USD 12 Price ID. |
-| `STRIPE_PRICE_USD_18` | `price_replace_with_18_usd_price` | The environment-appropriate one-time USD 18 Price ID. |
+| Field                   | Template Value                    | What to Set                                                                                                                                                            |
+| ----------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `STRIPE_RESTRICTED_KEY` | Empty                             | A test restricted key locally and a separate live restricted key in Vercel. Grant Checkout Sessions read/write access and the minimum Price access required by Stripe. |
+| `STRIPE_SECRET_KEY`     | Empty                             | Compatibility fallback only. Used only when `STRIPE_RESTRICTED_KEY` is absent or empty. Prefer the restricted key.                                                     |
+| `STRIPE_PRICE_USD_6`    | `price_replace_with_6_usd_price`  | The environment-appropriate one-time USD 6 Price ID.                                                                                                                   |
+| `STRIPE_PRICE_USD_12`   | `price_replace_with_12_usd_price` | The environment-appropriate one-time USD 12 Price ID.                                                                                                                  |
+| `STRIPE_PRICE_USD_18`   | `price_replace_with_18_usd_price` | The environment-appropriate one-time USD 18 Price ID.                                                                                                                  |
 
 ### Recorded Price IDs
 
@@ -20,9 +20,9 @@ The IDs below are retained from earlier setup records, not a current inventory. 
 
 Use sandbox IDs only with the dedicated **Modern Fundamental Analyst sandbox** test key, and live IDs only with the **Modern Fundamental Analyst Live Mode** key.
 
-| Amount | Sandbox Price ID | Live Price ID |
-|---|---|---|
-| USD 6 | `price_1U9xCKFrODtHXlgIGZb4mc22` | `price_1U9xHLCIXFgQXkh9KUQq9jez` |
+| Amount | Sandbox Price ID                 | Live Price ID                    |
+| ------ | -------------------------------- | -------------------------------- |
+| USD 6  | `price_1U9xCKFrODtHXlgIGZb4mc22` | `price_1U9xHLCIXFgQXkh9KUQq9jez` |
 | USD 12 | `price_1U9xCGFrODtHXlgI0sKuYsi7` | `price_1U9xHVCIXFgQXkh9nF0Vtknk` |
 | USD 18 | `price_1U9xCOFrODtHXlgIAwa2FneY` | `price_1U9xHQCIXFgQXkh9CnfR6xfQ` |
 

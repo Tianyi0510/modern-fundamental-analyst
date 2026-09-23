@@ -7,9 +7,9 @@ test("August snapshot reconciles to statement-backed values and retained income"
   assert.equal(portfolioHoldings.length, 18);
   assert.ok(Math.abs(portfolioSnapshot.marketValue - 121301.99) < 0.001);
   assert.ok(Math.abs(portfolioSnapshot.costBasis - 96425.3742) < 0.001);
-  const expectedReturn = (121301.99 - 96425.3742 + 526.69 - 85.75) / 96425.3742 * 100;
+  const expectedReturn = ((121301.99 - 96425.3742 + 526.69 - 85.75) / 96425.3742) * 100;
   assert.ok(Math.abs(portfolioSnapshot.totalReturn - expectedReturn) < 1e-9);
-  assert.equal(portfolioHoldings.find(row => row.symbol === "PYPL").price, 52.665);
+  assert.equal(portfolioHoldings.find((row) => row.symbol === "PYPL").price, 52.665);
 });
 
 test("monthly XIRR history preserves unavailable periods and matches the latest snapshot", () => {
@@ -30,7 +30,7 @@ test("monthly XIRR history preserves unavailable periods and matches the latest 
 });
 
 test("portfolio source data has unique holdings and finite nonnegative inputs", () => {
-  assert.equal(new Set(portfolioHoldings.map(row => row.symbol)).size, portfolioHoldings.length);
+  assert.equal(new Set(portfolioHoldings.map((row) => row.symbol)).size, portfolioHoldings.length);
   for (const row of portfolioHoldings) {
     assert.ok(row.symbol.trim().length > 0);
     for (const field of ["shares", "costBasis", "price", "marketValue"]) {

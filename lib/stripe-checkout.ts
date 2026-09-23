@@ -100,9 +100,18 @@ export async function resolveSupportStatus(params: { status?: string; session_id
   if (params.status !== "success") return undefined;
   if (!params.session_id || !/^cs_(test|live)_[A-Za-z0-9]{1,240}$/.test(params.session_id)) return "unverified";
   try {
-    const session = await getStripeClient().checkout.sessions.retrieve(params.session_id, {}, { timeout: 5_000, maxNetworkRetries: 0 });
-    if (session.mode !== "payment" || session.metadata?.purpose !== "research_support"
-      || !parseSupportAmount(session.metadata.support_amount_usd ?? null) || session.currency !== "usd") return "unverified";
+    const session = await getStripeClient().checkout.sessions.retrieve(
+      params.session_id,
+      {},
+      { timeout: 5_000, maxNetworkRetries: 0 },
+    );
+    if (
+      session.mode !== "payment" ||
+      session.metadata?.purpose !== "research_support" ||
+      !parseSupportAmount(session.metadata.support_amount_usd ?? null) ||
+      session.currency !== "usd"
+    )
+      return "unverified";
     if (session.status === "complete" && session.payment_status === "paid") return "success";
     return session.status === "complete" ? "pending" : "unverified";
   } catch (error) {

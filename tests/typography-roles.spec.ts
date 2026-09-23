@@ -48,7 +48,12 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     pageTitle: [".page-hero h1"],
     sectionTitle: [".portfolio-holdings-heading h2"],
     lead: [".page-intro p"],
-    label: [".eyebrow", ".portfolio-kpis span", ".portfolio-holdings-heading > div > span", ".portfolio-mobile-sort label > span"],
+    label: [
+      ".eyebrow",
+      ".portfolio-kpis span",
+      ".portfolio-holdings-heading > div > span",
+      ".portfolio-mobile-sort label > span",
+    ],
     control: [".portfolio-mobile-sort button"],
     caption: [".page-intro small", ".portfolio-kpis small"],
     dataKpi: [".portfolio-kpis strong"],
@@ -121,7 +126,7 @@ const viewports = [
 function expectedSize(role: Role, width: number) {
   const scale = roleScale[role];
   if (!("fluidVw" in scale)) return scale.min;
-  return Math.min(scale.max, Math.max(scale.min, scale.fluidRem * 16 + width * scale.fluidVw / 100));
+  return Math.min(scale.max, Math.max(scale.min, scale.fluidRem * 16 + (width * scale.fluidVw) / 100));
 }
 
 const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
@@ -139,21 +144,25 @@ type TypographySample = { selector: string; fontSize: number; lineHeight: number
 
 async function readTypography(page: Page, roles: Partial<Record<Role, string[]>>) {
   // Sample the whole page in one browser round trip, retaining every selector.
-  const groups = await page.evaluate((entries) => entries.map(([role, selectors]) => ({
-    role,
-    samples: selectors.map((selector) => ({
-      selector,
-      values: [...document.querySelectorAll(selector)].map((element) => {
-        const style = getComputedStyle(element);
-        return {
+  const groups = await page.evaluate(
+    (entries) =>
+      entries.map(([role, selectors]) => ({
+        role,
+        samples: selectors.map((selector) => ({
           selector,
-          fontSize: Number.parseFloat(style.fontSize),
-          lineHeight: Number.parseFloat(style.lineHeight),
-          letterSpacing: style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
-        };
-      }),
-    })),
-  })), Object.entries(roles) as Array<[Role, string[]]>);
+          values: [...document.querySelectorAll(selector)].map((element) => {
+            const style = getComputedStyle(element);
+            return {
+              selector,
+              fontSize: Number.parseFloat(style.fontSize),
+              lineHeight: Number.parseFloat(style.lineHeight),
+              letterSpacing: style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
+            };
+          }),
+        })),
+      })),
+    Object.entries(roles) as Array<[Role, string[]]>,
+  );
   return groups.map(({ role, samples }) => {
     for (const { selector, values } of samples) {
       expect(values.length, `Missing typography sample: ${selector}`).toBeGreaterThan(0);
@@ -184,11 +193,23 @@ for (const viewport of viewports) {
         const expectedFontSize = expectedSize(role, viewport.width);
         const rhythm = expectedRhythm(role);
         for (const sample of values) {
-          expect(Math.abs(sample.fontSize - expectedFontSize), `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`).toBeLessThan(0.15);
-          expect(Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight), `${role} sample ${sample.selector} has an inconsistent line height`).toBeLessThan(0.2);
-          expect(Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm), `${role} sample ${sample.selector} has inconsistent letter spacing`).toBeLessThan(0.2);
+          expect(
+            Math.abs(sample.fontSize - expectedFontSize),
+            `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
+          ).toBeLessThan(0.15);
+          expect(
+            Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
+            `${role} sample ${sample.selector} has an inconsistent line height`,
+          ).toBeLessThan(0.2);
+          expect(
+            Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
+            `${role} sample ${sample.selector} has inconsistent letter spacing`,
+          ).toBeLessThan(0.2);
         }
-        expect(new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size, `${role} has multiple computed sizes`).toBe(1);
+        expect(
+          new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
+          `${role} has multiple computed sizes`,
+        ).toBe(1);
       }
     });
   });
@@ -200,7 +221,10 @@ test.describe("form accessibility and preserved text colors", () => {
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     test(`${prefix || "English"} fields retain color and visible focus with larger text`, async ({ page }) => {
       await page.goto(`${prefix}/contact`);
-      const contactEmail = page.locator('form[action], form').filter({ has: page.locator('textarea') }).locator('input[name="email"]');
+      const contactEmail = page
+        .locator("form[action], form")
+        .filter({ has: page.locator("textarea") })
+        .locator('input[name="email"]');
       await contactEmail.focus();
       await expect(contactEmail).toHaveCSS("color", "rgb(0, 0, 0)");
       await expect(contactEmail).toHaveCSS("outline-style", "solid");
@@ -209,10 +233,24 @@ test.describe("form accessibility and preserved text colors", () => {
       await footerEmail.focus();
       await expect(footerEmail).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(footerEmail).toHaveCSS("outline-color", "rgb(95, 205, 253)");
-      await page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = "200%";
+      });
       await expect(contactEmail).toHaveCSS("font-size", "32px");
-      const overflow = await page.evaluate(() => [...document.querySelectorAll("body *")].filter(element => element.getBoundingClientRect().right > window.innerWidth + 1).map(element => ({ tag: element.tagName, className: element.className, right: element.getBoundingClientRect().right })).slice(0, 15));
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), JSON.stringify(overflow)).toBe(true);
+      const overflow = await page.evaluate(() =>
+        [...document.querySelectorAll("body *")]
+          .filter((element) => element.getBoundingClientRect().right > window.innerWidth + 1)
+          .map((element) => ({
+            tag: element.tagName,
+            className: element.className,
+            right: element.getBoundingClientRect().right,
+          }))
+          .slice(0, 15),
+      );
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+        JSON.stringify(overflow),
+      ).toBe(true);
       for (const field of [contactEmail, footerEmail]) {
         const box = await field.boundingBox();
         expect(box).not.toBeNull();
@@ -231,7 +269,13 @@ test.describe("form accessibility and preserved text colors", () => {
     for (const route of ["/", "/portfolio", "/performance"]) {
       await page.goto(route);
       const cards = page.locator("[data-tone]");
-      const before = await cards.evaluateAll(elements => elements.map(element => ({ tone: element.getAttribute("data-tone"), color: getComputedStyle(element).color, background: getComputedStyle(element).backgroundColor })));
+      const before = await cards.evaluateAll((elements) =>
+        elements.map((element) => ({
+          tone: element.getAttribute("data-tone"),
+          color: getComputedStyle(element).color,
+          background: getComputedStyle(element).backgroundColor,
+        })),
+      );
       const expected: Record<string, [string, string]> = {
         plain: ["rgb(0, 0, 0)", "rgb(255, 255, 255)"],
         highlight: ["rgb(0, 41, 145)", "rgb(95, 205, 253)"],
@@ -239,8 +283,16 @@ test.describe("form accessibility and preserved text colors", () => {
         paper: ["rgb(0, 41, 145)", "rgb(255, 255, 255)"],
       };
       for (const sample of before) expect([sample.color, sample.background]).toEqual(expected[sample.tone!]);
-      await cards.evaluateAll(elements => elements.reverse().forEach(element => element.parentElement!.appendChild(element)));
-      const after = await cards.evaluateAll(elements => elements.map(element => ({ tone: element.getAttribute("data-tone"), color: getComputedStyle(element).color, background: getComputedStyle(element).backgroundColor })));
+      await cards.evaluateAll((elements) =>
+        elements.reverse().forEach((element) => element.parentElement!.appendChild(element)),
+      );
+      const after = await cards.evaluateAll((elements) =>
+        elements.map((element) => ({
+          tone: element.getAttribute("data-tone"),
+          color: getComputedStyle(element).color,
+          background: getComputedStyle(element).backgroundColor,
+        })),
+      );
       expect(after.reverse()).toEqual(before);
     }
   });
@@ -248,10 +300,17 @@ test.describe("form accessibility and preserved text colors", () => {
   test("reduced motion removes button scaling", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/contact");
-    const button = page.locator('form').filter({ has: page.locator('textarea') }).locator('button[type="submit"]');
+    const button = page
+      .locator("form")
+      .filter({ has: page.locator("textarea") })
+      .locator('button[type="submit"]');
     await button.focus();
     await expect(button).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
-    const durations = await button.evaluate(element => getComputedStyle(element).transitionDuration.split(",").map(value => Number.parseFloat(value)));
+    const durations = await button.evaluate((element) =>
+      getComputedStyle(element)
+        .transitionDuration.split(",")
+        .map((value) => Number.parseFloat(value)),
+    );
     for (const duration of durations) expect(duration).toBeCloseTo(0.00001, 8);
     await page.goto("/");
     const arrow = page.locator(".home-page .text-link .arrow-icon").first();
@@ -271,7 +330,10 @@ test.describe("form accessibility and preserved text colors", () => {
     await field.focus();
     await expect(field).toHaveCSS("outline-style", "solid");
     await expect(field).toHaveCSS("outline-width", "2px");
-    const colors = await field.evaluate(element => ({ outline: getComputedStyle(element).outlineColor, background: getComputedStyle(element).backgroundColor }));
+    const colors = await field.evaluate((element) => ({
+      outline: getComputedStyle(element).outlineColor,
+      background: getComputedStyle(element).backgroundColor,
+    }));
     expect(colors.outline).not.toBe(colors.background);
   });
 });

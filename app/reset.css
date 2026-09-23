@@ -60,6 +60,8 @@ select {
 
 button,
 input:where([type="button"], [type="reset"], [type="submit"]) {
+  /* Preserve the existing native button reset across browsers. */
+  /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated */
   appearance: button;
 }
 

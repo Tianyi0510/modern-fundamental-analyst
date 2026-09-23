@@ -7,12 +7,12 @@
   --surface-brand: var(--deep-blue);
   --surface-highlight: var(--bright-blue);
   --text-primary: var(--black);
-  --text-secondary: rgba(0,0,0,.62);
-  --text-tertiary: rgba(0,0,0,.56);
+  --text-secondary: rgba(0, 0, 0, 0.62);
+  --text-tertiary: rgba(0, 0, 0, 0.56);
   --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
-  --text-inverse-secondary: rgba(255,255,255,.68);
-  --text-inverse-tertiary: rgba(255,255,255,.62);
+  --text-inverse-secondary: rgba(255, 255, 255, 0.68);
+  --text-inverse-tertiary: rgba(255, 255, 255, 0.62);
   --text-highlight: var(--bright-blue);
   --interactive-accent: var(--medium-blue);
 }

@@ -50,14 +50,19 @@ export async function POST(request: Request) {
   const safeSubject = escapeHtml(subject);
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
   const idempotencyKey = getResendIdempotencyKey(request, "contact");
-  const result = await runResendOperation("Resend contact delivery request failed", () => resend.emails.send({
-    from: CONTACT_FROM_EMAIL,
-    to: recipient,
-    replyTo: email,
-    subject: `[MFA Contact] ${subject}`,
-    text: `Name: ${name}\nEmail: ${email}\nLanguage: ${locale || "unknown"}\nSubject: ${subject}\n\n${message}`,
-    html: `<h1>New website message</h1><p><strong>Name:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><p><strong>Language:</strong> ${escapeHtml(locale || "unknown")}</p><p><strong>Subject:</strong> ${safeSubject}</p><hr /><p>${safeMessage}</p>`,
-  }, idempotencyKey ? { idempotencyKey } : undefined));
+  const result = await runResendOperation("Resend contact delivery request failed", () =>
+    resend.emails.send(
+      {
+        from: CONTACT_FROM_EMAIL,
+        to: recipient,
+        replyTo: email,
+        subject: `[MFA Contact] ${subject}`,
+        text: `Name: ${name}\nEmail: ${email}\nLanguage: ${locale || "unknown"}\nSubject: ${subject}\n\n${message}`,
+        html: `<h1>New website message</h1><p><strong>Name:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><p><strong>Language:</strong> ${escapeHtml(locale || "unknown")}</p><p><strong>Subject:</strong> ${safeSubject}</p><hr /><p>${safeMessage}</p>`,
+      },
+      idempotencyKey ? { idempotencyKey } : undefined,
+    ),
+  );
 
   if (!result || result.error) {
     if (result?.error) console.error("Resend contact delivery failed", result.error.name);

@@ -16,7 +16,8 @@ function privateKey(scope: string, value: string) {
   return `mfa:resend:${scope}:${createHmac("sha256", secret).update(value).digest("hex")}`;
 }
 
-const releaseScript = "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end";
+const releaseScript =
+  "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end";
 
 export async function withSubscriberLock<T>(email: string, operation: () => Promise<T>): Promise<T> {
   const redis = await getRedisClient();
@@ -24,15 +25,18 @@ export async function withSubscriberLock<T>(email: string, operation: () => Prom
   const key = privateKey("subscriber", email.trim().toLowerCase());
   const owner = randomUUID();
   // Fail fast on contention: never run an uncoordinated mutation as fallback.
-  if (!await executeRedisCommand(redis, () => redis.set(key, owner, { NX: true, PX: 120_000 }))) throw new ResendCoordinationError();
+  if (!(await executeRedisCommand(redis, () => redis.set(key, owner, { NX: true, PX: 120_000 }))))
+    throw new ResendCoordinationError();
   const context = { signal: AbortSignal.timeout(20_000), uncertain: false };
   try {
     return await resendOperationContext.run(context, operation);
   } finally {
     if (!context.uncertain && !context.signal.aborted) {
-      await executeRedisCommand(redis, () => redis.eval(releaseScript, { keys: [key], arguments: [owner] })).catch(() => {
-        console.error("Resend subscriber lease release failed");
-      });
+      await executeRedisCommand(redis, () => redis.eval(releaseScript, { keys: [key], arguments: [owner] })).catch(
+        () => {
+          console.error("Resend subscriber lease release failed");
+        },
+      );
     }
   }
 }

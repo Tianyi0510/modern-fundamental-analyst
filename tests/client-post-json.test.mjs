@@ -5,7 +5,9 @@ const { postJson } = await import("../lib/client-post-json.ts");
 
 test("client JSON requests share bounded POST behavior", async (context) => {
   const originalFetch = globalThis.fetch;
-  context.after(() => { globalThis.fetch = originalFetch; });
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
 
   globalThis.fetch = async (input, init) => {
     assert.equal(input, "/api/example");
@@ -22,7 +24,9 @@ test("client JSON requests share bounded POST behavior", async (context) => {
 
 test("client JSON requests reject non-success responses", async (context) => {
   const originalFetch = globalThis.fetch;
-  context.after(() => { globalThis.fetch = originalFetch; });
+  context.after(() => {
+    globalThis.fetch = originalFetch;
+  });
   globalThis.fetch = async () => new Response(null, { status: 503 });
 
   await assert.rejects(postJson("/api/example", {}), /status 503/);

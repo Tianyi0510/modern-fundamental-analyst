@@ -11,7 +11,11 @@ import { withSubscriptionJournal } from "@/lib/subscription-journal";
 export const runtime = "nodejs";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const isRateLimited = createRateLimiter({ namespace: "subscription-preferences", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 10 });
+const isRateLimited = createRateLimiter({
+  namespace: "subscription-preferences",
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  maxRequests: 10,
+});
 
 type PreferenceRequest = {
   action?: unknown;
@@ -36,7 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This preferences link is invalid or has expired." }, { status: 400 });
   }
 
-  if (action === "save" && !locales.some(locale => locale === requestedLocale)) {
+  if (action === "save" && !locales.some((locale) => locale === requestedLocale)) {
     return NextResponse.json({ error: "Choose a valid language." }, { status: 400 });
   }
   const locale = resolveLocale(requestedLocale);
@@ -44,18 +48,37 @@ export async function POST(request: Request) {
   if (!resend) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
 
   try {
-    return await withSubscriberLock(payload.email, () => action === "save"
-      ? withSubscriptionJournal(payload.email, locale, () => updatePreferences(resend, payload, locale, action), "preferences")
-      : updatePreferences(resend, payload, locale, action));
+    return await withSubscriberLock(payload.email, () =>
+      action === "save"
+        ? withSubscriptionJournal(
+            payload.email,
+            locale,
+            () => updatePreferences(resend, payload, locale, action),
+            "preferences",
+          )
+        : updatePreferences(resend, payload, locale, action),
+    );
   } catch {
     return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
   }
 }
 
-async function updatePreferences(resend: NonNullable<ReturnType<typeof getResendClient>>, payload: { email: string }, locale: ReturnType<typeof resolveLocale>, action: "save" | "unsubscribe") {
-  const existing = await runResendOperation("Resend preferences contact lookup failed", () => resend.contacts.get({ email: payload.email }));
-  if (!existing) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
-  if (!existing.data) return NextResponse.json({ error: "Subscription preferences could not be found." }, { status: existing.error?.statusCode === 404 ? 404 : 502 });
+async function updatePreferences(
+  resend: NonNullable<ReturnType<typeof getResendClient>>,
+  payload: { email: string },
+  locale: ReturnType<typeof resolveLocale>,
+  action: "save" | "unsubscribe",
+) {
+  const existing = await runResendOperation("Resend preferences contact lookup failed", () =>
+    resend.contacts.get({ email: payload.email }),
+  );
+  if (!existing)
+    return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
+  if (!existing.data)
+    return NextResponse.json(
+      { error: "Subscription preferences could not be found." },
+      { status: existing.error?.statusCode === 404 ? 404 : 502 },
+    );
 
   if (action === "save") {
     await resendOperationContext.getStore()?.recordPhase?.("sync-language-segments");
@@ -68,10 +91,12 @@ async function updatePreferences(resend: NonNullable<ReturnType<typeof getResend
     }
 
     await resendOperationContext.getStore()?.recordPhase?.("update-preferred-language");
-    const result = await runResendOperation("Resend preferences update request failed", () => resend.contacts.update({
-      email: payload.email,
-      properties: { preferred_language: localeConfig[locale].label },
-    }));
+    const result = await runResendOperation("Resend preferences update request failed", () =>
+      resend.contacts.update({
+        email: payload.email,
+        properties: { preferred_language: localeConfig[locale].label },
+      }),
+    );
     if (!result || result.error) {
       await resendOperationContext.getStore()?.recordPhase?.("rollback-language-segments");
       if (rollbackLanguageSegments) await rollbackLanguageSegments().catch(() => undefined);
@@ -79,7 +104,9 @@ async function updatePreferences(resend: NonNullable<ReturnType<typeof getResend
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
     }
   } else {
-    const result = await runResendOperation("Resend unsubscribe request failed", () => resend.contacts.update({ email: payload.email, unsubscribed: true }));
+    const result = await runResendOperation("Resend unsubscribe request failed", () =>
+      resend.contacts.update({ email: payload.email, unsubscribed: true }),
+    );
     if (!result || result.error) {
       if (result?.error) console.error("Resend preferences update failed", result.error.name);
       return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });

@@ -20,9 +20,7 @@ type ProtectedJsonOptions = {
   rateLimitWindowMs: number;
 };
 
-type ProtectedJsonResult<T extends object> =
-  | { ok: true; body: T }
-  | { ok: false; response: Response };
+type ProtectedJsonResult<T extends object> = { ok: true; body: T } | { ok: false; response: Response };
 
 function jsonError(message: string, status: number, headers?: HeadersInit) {
   return Response.json({ error: message }, { status, headers });

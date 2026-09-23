@@ -2,7 +2,8 @@ import "server-only";
 import { createClient } from "@redis/client";
 
 type RedisClient = ReturnType<typeof createClient>;
-type RedisErrorCategory = "Invalid UPSTASH_REDIS_URL" | "Redis client error" | "Redis rate limiter unavailable" | "Redis command unavailable";
+type RedisErrorCategory =
+  "Invalid UPSTASH_REDIS_URL" | "Redis client error" | "Redis rate limiter unavailable" | "Redis command unavailable";
 type RedisState = {
   client: RedisClient | null;
   connection: Promise<RedisClient> | null;
@@ -19,12 +20,12 @@ const ERROR_LOG_INTERVAL_MS = 60_000;
 const MAX_COMMAND_QUEUE_LENGTH = 100;
 
 const globalForRedis = globalThis as typeof globalThis & { __mfaRedisStateV5?: RedisState };
-const state = globalForRedis.__mfaRedisStateV5 ??= {
+const state = (globalForRedis.__mfaRedisStateV5 ??= {
   client: null,
   connection: null,
   lastErrorLogAt: {},
   unavailableUntil: 0,
-};
+});
 
 function reconnectStrategy(retries: number) {
   if (retries >= MAX_RECONNECT_ATTEMPTS) return false;
@@ -72,7 +73,10 @@ function connectUntilReady(client: RedisClient) {
       suspendRedis(client);
       reject(new Error("Redis readiness timeout"));
     }, READY_TIMEOUT_MS);
-    client.connect().then(resolve, reject).finally(() => clearTimeout(timer));
+    client
+      .connect()
+      .then(resolve, reject)
+      .finally(() => clearTimeout(timer));
   });
 }
 

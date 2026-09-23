@@ -5,15 +5,22 @@ function token() {
   const key = createHash("sha256").update("subscription-preferences:playwright-preferences-only").digest();
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", key, iv);
-  const data = Buffer.concat([cipher.update(JSON.stringify({ email: "reader@example.com", expiresAt: Date.now() + 60_000, version: 1 })), cipher.final()]);
+  const data = Buffer.concat([
+    cipher.update(JSON.stringify({ email: "reader@example.com", expiresAt: Date.now() + 60_000, version: 1 })),
+    cipher.final(),
+  ]);
   return Buffer.concat([iv, cipher.getAuthTag(), data]).toString("base64url");
 }
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} preferences require a selection and clear stale success`, async ({ page }) => {
     const actions: string[] = [];
-    await page.route("**/api/subscription-preferences", async route => {
-      actions.push(route.request().postDataJSON().action);
+    await page.route("**/api/subscription-preferences", async (route) => {
+      const body: unknown = route.request().postDataJSON();
+      if (!body || typeof body !== "object" || !("action" in body) || typeof body.action !== "string") {
+        throw new Error("Expected a preference action");
+      }
+      actions.push(body.action);
       await route.fulfill({ json: { ok: true } });
     });
     await page.goto(`${prefix}/subscription-preferences?token=${token()}`);

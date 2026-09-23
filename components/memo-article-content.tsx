@@ -6,18 +6,26 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
       {content.sections.map((section) => (
         <section className="memo-section" key={section.title}>
           <h2>{section.title}</h2>
-          {section.introduction?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          {section.introduction?.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
           {section.subsections.map((subsection) => (
             <section className="memo-subsection" key={subsection.title}>
               <h3>{subsection.title}</h3>
-              {subsection.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              {subsection.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
             </section>
           ))}
         </section>
       ))}
       <section className="memo-references">
         <h2>{content.referencesTitle}</h2>
-        <ol>{content.references.map((reference) => <li key={reference}>{reference}</li>)}</ol>
+        <ol>
+          {content.references.map((reference) => (
+            <li key={reference}>{reference}</li>
+          ))}
+        </ol>
       </section>
     </div>
   );

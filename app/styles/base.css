@@ -17,22 +17,22 @@
   --font-size-page-title: clamp(3.25rem, 1.75rem + 5vw, 7rem);
   --font-size-section-title: clamp(2.75rem, 2.125rem + 2.5vw, 4.5rem);
   --font-size-card-title: clamp(2rem, 1.75rem + 1vw, 2.625rem);
-  --font-size-compact-title: clamp(1.25rem, 1.125rem + .5vw, 1.5rem);
+  --font-size-compact-title: clamp(1.25rem, 1.125rem + 0.5vw, 1.5rem);
   --font-size-lead: 1.375rem;
   --font-size-body-large: 1.125rem;
   --font-size-body: 1rem;
   --font-size-label: 1rem;
-  --font-size-control: .9375rem;
-  --font-size-caption: .9375rem;
+  --font-size-control: 0.9375rem;
+  --font-size-caption: 0.9375rem;
   --font-size-data-display: clamp(3.25rem, 2rem + 4vw, 6rem);
   --font-size-data-kpi: clamp(3rem, 2.5rem + 1.5vw, 4rem);
   --font-size-data-ring: 2.5rem;
   --font-size-data-row: 1.25rem;
   --weight-regular: 400;
   --weight-bold: 700;
-  --tracking-heading: -.05em;
+  --tracking-heading: -0.05em;
   --tracking-body: 0;
-  --tracking-label: .05em;
+  --tracking-label: 0.05em;
   --leading-page-title: 1.05;
   --leading-section-title: 1.1;
   --leading-card-title: 1.1;
@@ -79,8 +79,8 @@
   --space-field-block: var(--space-3);
   --space-field-inline: var(--space-4);
   --size-status-reserve: 1.65em;
-  --opacity-disabled: .64;
-  --opacity-disabled-preferences: .55;
+  --opacity-disabled: 0.64;
+  --opacity-disabled-preferences: 0.55;
 
   /* One interaction language for pointer, keyboard, and touch. */
   --motion-duration-press: 90ms;
@@ -88,17 +88,24 @@
   --motion-duration-base: 220ms;
   --motion-duration-medium: 280ms;
   --motion-duration-slow: 360ms;
-  --motion-ease-standard: cubic-bezier(.2, 0, 0, 1);
-  --motion-ease-emphasized: cubic-bezier(.22, 1, .36, 1);
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-scale-hover: 1.04;
   --motion-offset-summary: 8px;
   --motion-offset-sort: -1px;
-  --motion-scale-press: .98;
+  --motion-scale-press: 0.98;
 }
 
-* { box-sizing: border-box; }
-*:focus-visible { outline: var(--focus-ring-width) solid var(--medium-blue); outline-offset: var(--focus-ring-offset); }
-html { scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+}
+*:focus-visible {
+  outline: var(--focus-ring-width) solid var(--medium-blue);
+  outline-offset: var(--focus-ring-offset);
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   --font-ui: var(--font-jost), Arial, Helvetica, sans-serif;
   margin: 0;
@@ -127,7 +134,9 @@ body {
   transition: transform var(--motion-duration-base) var(--motion-ease-standard);
 }
 
-.skip-link:focus { transform: translateY(0); }
+.skip-link:focus {
+  transform: translateY(0);
+}
 
 [lang="zh-Hant-TW"] body {
   --font-ui: var(--font-jost), var(--font-noto-sans-tc), "PingFang TC", "Microsoft JhengHei", sans-serif;
@@ -139,7 +148,12 @@ body {
   font-family: var(--font-ui);
 }
 
-a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
 button,
 [role="button"],
 .button {
@@ -148,7 +162,10 @@ button,
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
-.shell { width: min(1440px, calc(100% - (var(--space-page-gutter) * 2))); margin-inline: auto; }
+.shell {
+  width: min(1440px, calc(100% - (var(--space-page-gutter) * 2)));
+  margin-inline: auto;
+}
 
 /* Extend shell-bound surfaces to the viewport without oversized paint shadows. */
 .hero,

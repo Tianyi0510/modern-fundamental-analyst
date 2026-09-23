@@ -59,7 +59,10 @@ export function useMobileMenu() {
       closeImmediately();
       return;
     }
-    const { panelAnimation, iconAnimation } = animateMenuDismissal(layer, closeButtonRef.current?.querySelector("svg") ?? null);
+    const { panelAnimation, iconAnimation } = animateMenuDismissal(
+      layer,
+      closeButtonRef.current?.querySelector("svg") ?? null,
+    );
     closingAnimationRef.current = panelAnimation;
     closingIconAnimationRef.current = iconAnimation ?? null;
     panelAnimation.onfinish = closeImmediately;
@@ -68,10 +71,16 @@ export function useMobileMenu() {
   useEffect(() => {
     const compactNavigation = window.matchMedia(compactNavigationQuery);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handleBreakpoint = () => { if (!compactNavigation.matches) closeImmediately(); };
-    const handleMotion = () => { if (reducedMotion.matches && closingAnimationRef.current) closeImmediately(); };
+    const handleBreakpoint = () => {
+      if (!compactNavigation.matches) closeImmediately();
+    };
+    const handleMotion = () => {
+      if (reducedMotion.matches && closingAnimationRef.current) closeImmediately();
+    };
     // Keep dismissal independent of render timing and repeated input.
-    const handleEscape = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
     compactNavigation.addEventListener("change", handleBreakpoint);
     reducedMotion.addEventListener("change", handleMotion);
     window.addEventListener("keydown", handleEscape);
@@ -211,7 +220,9 @@ export function useLanguageMenu() {
       if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false);
     };
     const compactNavigation = window.matchMedia(compactNavigationQuery);
-    const handleBreakpoint = () => { if (compactNavigation.matches) setIsOpen(false); };
+    const handleBreakpoint = () => {
+      if (compactNavigation.matches) setIsOpen(false);
+    };
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOpen(false);
@@ -233,7 +244,14 @@ export function useLanguageMenu() {
       if (!items.length) return;
       event.preventDefault();
       const currentIndex = items.indexOf(document.activeElement as HTMLElement);
-      const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowDown" ? (currentIndex + 1) % items.length : (currentIndex - 1 + items.length) % items.length;
+      const nextIndex =
+        event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? items.length - 1
+            : event.key === "ArrowDown"
+              ? (currentIndex + 1) % items.length
+              : (currentIndex - 1 + items.length) % items.length;
       items[nextIndex]?.focus({ preventScroll: true });
     };
 

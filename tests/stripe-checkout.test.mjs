@@ -43,7 +43,7 @@ test("Stripe Checkout keeps secrets server-side and applies safety controls", as
   assert.match(stripe, /locale: locale === "en" \? "en" : "zh"/);
   assert.match(stripe, /payment_intent_data: \{ metadata \}/);
   assert.match(route, /isSameOrigin\(request\)/);
-  assert.match(route, /createRateLimiter\(\{ namespace: "stripe-checkout"/);
+  assert.match(route, /createRateLimiter\(\s*\{\s*namespace: "stripe-checkout"/);
   assert.match(route, /process\.env\.NODE_ENV === "production" \? SITE_URL/);
   assert.match(route, /getStripeErrorDetails\(error\)/);
   assert.doesNotMatch(route, /String\(error\.message\)/);

@@ -36,9 +36,12 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.locator("tbody tr").first()).toContainText("121,301.99");
     await expect(chart.locator("tbody tr").first()).toContainText("+21.14%");
     const region = chart.getByRole("region");
-    expect(await region.evaluate(e => e.scrollWidth > e.clientWidth && e.scrollHeight > e.clientHeight)).toBe(true);
-    await region.evaluate(e => { e.scrollLeft = e.scrollWidth; e.scrollTop = e.scrollHeight; });
-    expect(await region.evaluate(e => e.scrollLeft > 0 && e.scrollTop > 0)).toBe(true);
+    expect(await region.evaluate((e) => e.scrollWidth > e.clientWidth && e.scrollHeight > e.clientHeight)).toBe(true);
+    await region.evaluate((e) => {
+      e.scrollLeft = e.scrollWidth;
+      e.scrollTop = e.scrollHeight;
+    });
+    expect(await region.evaluate((e) => e.scrollLeft > 0 && e.scrollTop > 0)).toBe(true);
     await expect(summary.locator("svg")).toHaveCSS("transition-property", "none");
     await summary.tap();
     await expect(chart.getByRole("table")).not.toBeVisible();
@@ -51,25 +54,35 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.evaluate(() => document.fonts.ready);
-    await expect.poll(() => page.locator(".page-intro").evaluate(element => {
-      const intro = element.getBoundingClientRect();
-      const date = element.querySelector(".date-text")!.getBoundingClientRect();
-      return Math.abs(intro.right - date.right);
-    }), "Hero date aligns after viewport reflow").toBeLessThan(1);
+    await expect
+      .poll(
+        () =>
+          page.locator(".page-intro").evaluate((element) => {
+            const intro = element.getBoundingClientRect();
+            const date = element.querySelector(".date-text")!.getBoundingClientRect();
+            return Math.abs(intro.right - date.right);
+          }),
+        "Hero date aligns after viewport reflow",
+      )
+      .toBeLessThan(1);
     for (const width of [320, 801, 1440]) {
       await page.setViewportSize({ width, height: 900 });
-      await page.evaluate(() => { document.documentElement.style.fontSize = "32px"; });
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = "32px";
+      });
       await page.evaluate(() => document.fonts.ready);
-      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth), `Page overflow at ${width}px`).toBeLessThanOrEqual(width);
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollWidth), `Page overflow at ${width}px`)
+        .toBeLessThanOrEqual(width);
       await expect(chart.getByRole("img")).toBeVisible();
       await expect(chart.getByRole("img")).toHaveCSS("height", "300px");
     }
   });
 }
 
-test("monthly data animates both ways and reverses smoothly", async ({ page }) => {
-  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-    for (const width of [390, 1440]) {
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  for (const width of [390, 1440]) {
+    test(`${prefix || "English"} monthly data animates and reverses at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 844 });
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto(`${prefix}/performance`);
@@ -77,10 +90,10 @@ test("monthly data animates both ways and reverses smoothly", async ({ page }) =
       const summary = details.locator("summary");
       const collapsed = (await details.boundingBox())!.height;
       await summary.click();
-      await expect.poll(() => details.evaluate(e => e.getAnimations().length)).toBe(0);
+      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
       const expanded = (await details.boundingBox())!.height;
       expect(expanded).toBeGreaterThan(collapsed + 100);
-      const heights = await details.evaluate(element => {
+      const heights = await details.evaluate((element) => {
         const summary = element.querySelector("summary")!;
         summary.click();
         const closing = element.getAnimations()[0]!;
@@ -98,16 +111,16 @@ test("monthly data animates both ways and reverses smoothly", async ({ page }) =
       expect(heights.before).toBeGreaterThan(collapsed);
       expect(heights.before).toBeLessThan(expanded);
       expect(Math.abs(heights.before - heights.after)).toBeLessThan(1);
-      await expect.poll(() => details.evaluate(e => e.getAnimations().length)).toBe(0);
+      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
       await summary.focus();
       await page.keyboard.press("Space");
       await expect(details).not.toHaveAttribute("open");
       expect(Math.abs((await details.boundingBox())!.height - collapsed)).toBeLessThan(1);
       await summary.click();
       await page.emulateMedia({ reducedMotion: "reduce" });
-      await expect.poll(() => details.evaluate(e => e.getAnimations().length)).toBe(0);
+      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
       await summary.click();
       await expect(details).not.toHaveAttribute("open");
-    }
+    });
   }
-});
+}

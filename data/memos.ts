@@ -1,11 +1,6 @@
 import type { Locale } from "@/lib/i18n";
 
-export const memoCategoryIds = [
-  "company-analysis",
-  "industry-analysis",
-  "monthly-report",
-  "annual-report",
-] as const;
+export const memoCategoryIds = ["company-analysis", "industry-analysis", "monthly-report", "annual-report"] as const;
 
 export type MemoCategoryId = (typeof memoCategoryIds)[number];
 
@@ -41,7 +36,8 @@ const memoCatalog = [
     locales: {
       en: {
         title: "Microsoft Stock Analysis Fiscal Year 2024",
-        summary: "An assessment of Microsoft’s cloud and AI position, Satya Nadella’s leadership, and the company’s fiscal 2024 financial quality.",
+        summary:
+          "An assessment of Microsoft’s cloud and AI position, Satya Nadella’s leadership, and the company’s fiscal 2024 financial quality.",
       },
       "zh-tw": {
         title: "微軟股票分析：2024 財政年度",
@@ -49,7 +45,8 @@ const memoCatalog = [
       },
       "zh-cn": {
         title: "微软股票分析：2024 财政年度",
-        summary: "评估微软在云计算与人工智能领域的竞争地位、Satya Nadella 的领导能力，以及公司 2024 财政年度的财务质量。",
+        summary:
+          "评估微软在云计算与人工智能领域的竞争地位、Satya Nadella 的领导能力，以及公司 2024 财政年度的财务质量。",
       },
     },
   },
@@ -60,11 +57,12 @@ export type MemoSlug = (typeof memoCatalog)[number]["slug"];
 function localizeMemos(locale: Locale): MemoSummary[] {
   return memoCatalog.map((memo) => {
     const localized = memo.locales[locale];
-    const readTime = locale === "en"
-      ? `${memo.readTimeMinutes} min`
-      : locale === "zh-tw"
-        ? `閱讀 ${memo.readTimeMinutes} 分鐘`
-        : `阅读 ${memo.readTimeMinutes} 分钟`;
+    const readTime =
+      locale === "en"
+        ? `${memo.readTimeMinutes} min`
+        : locale === "zh-tw"
+          ? `閱讀 ${memo.readTimeMinutes} 分鐘`
+          : `阅读 ${memo.readTimeMinutes} 分钟`;
     return {
       slug: memo.slug,
       number: memo.number,

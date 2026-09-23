@@ -1,4 +1,7 @@
-import { microsoftMemoContentByLocale, type MemoContent } from "@/content/memos/microsoft-stock-analysis-fiscal-year-2024";
+import {
+  microsoftMemoContentByLocale,
+  type MemoContent,
+} from "@/content/memos/microsoft-stock-analysis-fiscal-year-2024";
 import type { Locale } from "@/lib/i18n";
 
 export type { MemoContent } from "@/content/memos/microsoft-stock-analysis-fiscal-year-2024";

@@ -3,14 +3,29 @@ import { getLanguageAlternates, getLocalizedPath, type Locale } from "@/lib/i18n
 
 export const SITE_URL = "https://www.modernfundamentalanalyst.com";
 export const SITE_NAME = "Modern Fundamental Analyst";
-export const SITE_DESCRIPTION = "An independent public-equity portfolio, performance record, and investment memo archive.";
+export const SITE_DESCRIPTION =
+  "An independent public-equity portfolio, performance record, and investment memo archive.";
 
-const sharingImage = { url: `${SITE_URL}/og-logo.png`, width: 1200, height: 630, alt: "Modern Fundamental Analyst logo" };
+const sharingImage = {
+  url: `${SITE_URL}/og-logo.png`,
+  width: 1200,
+  height: 630,
+  alt: "Modern Fundamental Analyst logo",
+};
 
-function createSharingMetadata(title: string, description: string, url?: string): Pick<Metadata, "openGraph" | "twitter"> {
+function createSharingMetadata(
+  title: string,
+  description: string,
+  url?: string,
+): Pick<Metadata, "openGraph" | "twitter"> {
   return {
     openGraph: { title, description, ...(url ? { url } : {}), images: [sharingImage] },
-    twitter: { card: "summary_large_image", title, description, images: [{ url: sharingImage.url, alt: sharingImage.alt }] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [{ url: sharingImage.url, alt: sharingImage.alt }],
+    },
   };
 }
 

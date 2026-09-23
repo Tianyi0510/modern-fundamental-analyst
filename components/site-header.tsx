@@ -50,7 +50,11 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
 
   return (
     <header className="site-header shell">
-      <Link className="wordmark" href={getLocalizedPath("/", locale)} aria-label={`Modern Fundamental Analyst ${copy.home}`}>
+      <Link
+        className="wordmark"
+        href={getLocalizedPath("/", locale)}
+        aria-label={`Modern Fundamental Analyst ${copy.home}`}
+      >
         Modern Fundamental Analyst<span>.</span>
       </Link>
       <button
@@ -67,7 +71,9 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
       <div className="header-actions">
         <nav aria-label={copy.primary}>
           {navigation.map(({ href, label }) => (
-            <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} key={href}>{label}</Link>
+            <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} key={href}>
+              {label}
+            </Link>
           ))}
         </nav>
         <div className="language-menu" ref={languageMenuRef}>
@@ -91,14 +97,34 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
             {localeConfig[locale].label}
             <ChevronDown aria-hidden="true" strokeWidth={2.75} />
           </button>
-          <div className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`} id="desktop-language-menu" role="menu" aria-hidden={!isLanguageOpen} inert={!isLanguageOpen}>
-            {locales.map((targetLocale) => <Link href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} role="menuitem" aria-current={locale === targetLocale ? "page" : undefined} tabIndex={-1} onClick={closeLanguageMenu} key={targetLocale}>
-              <span>{localeConfig[targetLocale].label}</span>
-              {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
-            </Link>)}
+          <div
+            className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`}
+            id="desktop-language-menu"
+            role="menu"
+            aria-hidden={!isLanguageOpen}
+            inert={!isLanguageOpen}
+          >
+            {locales.map((targetLocale) => (
+              <Link
+                href={getLocalizedPath(pathname, targetLocale)}
+                hrefLang={localeConfig[targetLocale].hrefLang}
+                role="menuitem"
+                aria-current={locale === targetLocale ? "page" : undefined}
+                tabIndex={-1}
+                onClick={closeLanguageMenu}
+                key={targetLocale}
+              >
+                <span>{localeConfig[targetLocale].label}</span>
+                {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
+              </Link>
+            ))}
           </div>
         </div>
-        <Link className="button button-dark button-small" href={getLocalizedPath("/contact", locale)} aria-current={isCurrentPath(getLocalizedPath("/contact", locale)) ? "page" : undefined}>
+        <Link
+          className="button button-dark button-small"
+          href={getLocalizedPath("/contact", locale)}
+          aria-current={isCurrentPath(getLocalizedPath("/contact", locale)) ? "page" : undefined}
+        >
           {copy.contact}
         </Link>
       </div>
@@ -116,21 +142,53 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
           onPointerUp={handleMenuPointerUp}
         >
           <div className="mobile-menu-top">
-            <Link className="wordmark mobile-menu-wordmark" href={homePath} onClick={closeMenuForNavigation} tabIndex={isMenuOpen ? 0 : -1}>
+            <Link
+              className="wordmark mobile-menu-wordmark"
+              href={homePath}
+              onClick={closeMenuForNavigation}
+              tabIndex={isMenuOpen ? 0 : -1}
+            >
               Modern Fundamental Analyst<span>.</span>
             </Link>
-            <button ref={menuCloseButtonRef} className="mobile-menu-close" type="button" aria-label={closeLabel} onClick={closeMenu} tabIndex={isMenuOpen ? 0 : -1}>
+            <button
+              ref={menuCloseButtonRef}
+              className="mobile-menu-close"
+              type="button"
+              aria-label={closeLabel}
+              onClick={closeMenu}
+              tabIndex={isMenuOpen ? 0 : -1}
+            >
               <X aria-hidden="true" strokeWidth={2} />
             </button>
           </div>
           <nav aria-label={copy.mobilePrimary}>
             {mobileNavigation.map(({ href, label }) => (
-              <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} onClick={closeMenuForNavigation} tabIndex={isMenuOpen ? 0 : -1} key={href}>
+              <Link
+                href={href}
+                aria-current={isCurrentPath(href) ? "page" : undefined}
+                onClick={closeMenuForNavigation}
+                tabIndex={isMenuOpen ? 0 : -1}
+                key={href}
+              >
                 <span className="mobile-menu-label">{label}</span>
               </Link>
             ))}
           </nav>
-          <div className="mobile-language-links">{locales.map((targetLocale) => <Link className="mobile-menu-language" href={getLocalizedPath(pathname, targetLocale)} hrefLang={localeConfig[targetLocale].hrefLang} aria-current={locale === targetLocale ? "page" : undefined} onClick={closeMenuForNavigation} tabIndex={isMenuOpen ? 0 : -1} key={targetLocale}>{localeConfig[targetLocale].label}</Link>)}</div>
+          <div className="mobile-language-links">
+            {locales.map((targetLocale) => (
+              <Link
+                className="mobile-menu-language"
+                href={getLocalizedPath(pathname, targetLocale)}
+                hrefLang={localeConfig[targetLocale].hrefLang}
+                aria-current={locale === targetLocale ? "page" : undefined}
+                onClick={closeMenuForNavigation}
+                tabIndex={isMenuOpen ? 0 : -1}
+                key={targetLocale}
+              >
+                {localeConfig[targetLocale].label}
+              </Link>
+            ))}
+          </div>
         </aside>
       </div>
     </header>

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-test("localized page titles and sharing metadata describe the same page", async ({ page }) => {
-  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} page titles and sharing metadata describe the same page`, async ({ page }) => {
     await page.goto(`${prefix}/about`);
     const title = await page.title();
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", title);
@@ -9,8 +9,8 @@ test("localized page titles and sharing metadata describe the same page", async 
     const description = await page.locator('meta[name="description"]').getAttribute("content");
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", description!);
     await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute("content", description!);
-  }
-});
+  });
+}
 
 test("reduced motion keeps memo summary text stationary during keyboard focus", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -27,14 +27,16 @@ test.describe("touch and keyboard state consistency", () => {
     const summary = page.locator(".memo-disclosure > summary");
     await summary.focus();
     await expect(summary.locator("span").first()).toHaveCSS("transform", "matrix(1, 0, 0, 1, 8, 0)");
-    const background = await summary.evaluate(element => getComputedStyle(element).backgroundColor);
+    const background = await summary.evaluate((element) => getComputedStyle(element).backgroundColor);
     await summary.hover();
     await expect(summary).toHaveCSS("background-color", background);
   });
 });
 
-test("localized navigation and memo links retain their language and honeypots stay hidden", async ({ page }) => {
-  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} navigation and memo links retain their language and honeypots stay hidden`, async ({
+    page,
+  }) => {
     await page.goto(`${prefix}/contact`);
     const traps = page.locator('input[name="website"]');
     await expect(traps).toHaveCount(2);
@@ -45,12 +47,12 @@ test("localized navigation and memo links retain their language and honeypots st
       expect(bounds).not.toBeNull();
       expect(bounds!.x + bounds!.width).toBeLessThan(0);
     }
-    await expect(page.locator('.footer-mark')).toHaveAttribute("href", prefix || "/");
+    await expect(page.locator(".footer-mark")).toHaveAttribute("href", prefix || "/");
     await page.goto(`${prefix}/memos`);
-    const cards = page.locator('a.memo-card');
+    const cards = page.locator("a.memo-card");
     expect(await cards.count()).toBeGreaterThan(0);
     for (const card of await cards.all()) {
       expect(await card.getAttribute("href")).toMatch(new RegExp(`^${prefix}/memos/[^/]+$`));
     }
-  }
-});
+  });
+}

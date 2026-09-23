@@ -8,10 +8,17 @@ const copy = {
   en: {
     label: "Contact",
     title: ["Connect Through Research,", "Ideas, and Opportunities."],
-    intro: "Reach out to discuss investment research, financial modeling, business opportunities, or ideas that empower retail investors.",
+    intro:
+      "Reach out to discuss investment research, financial modeling, business opportunities, or ideas that empower retail investors.",
     cards: [
-      ["Research", "Share feedback, challenge my assumptions, or discuss detailed investment theses, valuation methods, and portfolio decisions."],
-      ["Business", "Contact me about internships, collaborations, tutoring, financial modeling projects, or other professional opportunities across finance."],
+      [
+        "Research",
+        "Share feedback, challenge my assumptions, or discuss detailed investment theses, valuation methods, and portfolio decisions.",
+      ],
+      [
+        "Business",
+        "Contact me about internships, collaborations, tutoring, financial modeling projects, or other professional opportunities across finance.",
+      ],
     ],
   },
   "zh-tw": {
@@ -37,17 +44,34 @@ const copy = {
 export function ContactPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
-  return <main className="contact-page" id="main-content">
-    <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-    <section className="page-hero contact-hero shell">
-      <p className="eyebrow"><span /> {text.label}</p>
-      <h1>{text.title[0]}<br /><em>{text.title[1]}</em></h1>
-      <div className="page-intro"><p className="contact-note">{text.intro}</p></div>
-    </section>
-    <section className="contact-grid">
-      {text.cards.map(([title, description]) => <article key={title}><header><h2>{title}</h2></header><p>{description}</p></article>)}
-    </section>
-    <ContactForm locale={locale} />
-    <SiteFooter locale={locale} />
-  </main>;
+  return (
+    <main className="contact-page" id="main-content">
+      <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+      <section className="page-hero contact-hero shell">
+        <p className="eyebrow">
+          <span /> {text.label}
+        </p>
+        <h1>
+          {text.title[0]}
+          <br />
+          <em>{text.title[1]}</em>
+        </h1>
+        <div className="page-intro">
+          <p className="contact-note">{text.intro}</p>
+        </div>
+      </section>
+      <section className="contact-grid">
+        {text.cards.map(([title, description]) => (
+          <article key={title}>
+            <header>
+              <h2>{title}</h2>
+            </header>
+            <p>{description}</p>
+          </article>
+        ))}
+      </section>
+      <ContactForm locale={locale} />
+      <SiteFooter locale={locale} />
+    </main>
+  );
 }

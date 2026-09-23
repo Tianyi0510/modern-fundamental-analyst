@@ -5,7 +5,9 @@ import { createMemoPageMetadata } from "@/lib/memo-pages";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() { return getMemoStaticParams(); }
+export function generateStaticParams() {
+  return getMemoStaticParams();
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return createMemoPageMetadata((await params).slug, "zh-cn");

@@ -38,7 +38,10 @@ test("rate limiter rejects invalid resource bounds and namespaces", () => {
   assert.throws(() => createMemoryRateLimiter({ windowMs: 0, maxRequests: 1 }), RangeError);
   assert.throws(() => createMemoryRateLimiter({ windowMs: 1000, maxRequests: 0 }), RangeError);
   assert.throws(() => createMemoryRateLimiter({ windowMs: 1000, maxRequests: 1, maxKeys: 0 }), RangeError);
-  assert.throws(() => createRateLimiter({ namespace: "invalid:namespace", windowMs: 1000, maxRequests: 1 }), RangeError);
+  assert.throws(
+    () => createRateLimiter({ namespace: "invalid:namespace", windowMs: 1000, maxRequests: 1 }),
+    RangeError,
+  );
 });
 
 test("Redis rate-limit keys use a compact versioned HMAC identifier", async () => {

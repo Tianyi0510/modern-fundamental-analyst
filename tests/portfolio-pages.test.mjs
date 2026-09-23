@@ -20,7 +20,15 @@ test("portfolio totals are derived from holdings", async () => {
 });
 
 test("portfolio calculations remain internally consistent", async () => {
-  const { getHoldingCostPerShare, getHoldingReturn, getHoldingWeight, getPortfolioTotals, portfolioHoldings, portfolioSnapshot, portfolioIncome } = await import("../data/portfolio.ts");
+  const {
+    getHoldingCostPerShare,
+    getHoldingReturn,
+    getHoldingWeight,
+    getPortfolioTotals,
+    portfolioHoldings,
+    portfolioSnapshot,
+    portfolioIncome,
+  } = await import("../data/portfolio.ts");
   const totals = getPortfolioTotals(portfolioHoldings, portfolioIncome);
 
   assert.equal(totals.holdingsCount, portfolioHoldings.length);
@@ -31,9 +39,15 @@ test("portfolio calculations remain internally consistent", async () => {
   for (const holding of portfolioHoldings) {
     assert.ok(holding.costBasis > 0, `${holding.symbol} must have a positive cost basis`);
     assert.ok(getHoldingCostPerShare(holding) > 0, `${holding.symbol} must have a positive per-share cost`);
-    assert.ok(Math.abs(getHoldingCostPerShare(holding) * holding.shares - holding.costBasis) < 0.001, `${holding.symbol} per-share cost must reconcile to net cost basis`);
+    assert.ok(
+      Math.abs(getHoldingCostPerShare(holding) * holding.shares - holding.costBasis) < 0.001,
+      `${holding.symbol} per-share cost must reconcile to net cost basis`,
+    );
     assert.ok(Number.isFinite(getHoldingReturn(holding)), `${holding.symbol} must have a finite return`);
-    assert.ok(Math.abs(holding.shares * holding.price - holding.marketValue) < 0.01, `${holding.symbol} market value must equal shares × price`);
+    assert.ok(
+      Math.abs(holding.shares * holding.price - holding.marketValue) < 0.01,
+      `${holding.symbol} market value must equal shares × price`,
+    );
   }
 
   assert.equal(getHoldingCostPerShare({ costBasis: 0, shares: 0 }), 0);
@@ -77,7 +91,7 @@ test("percent formatting handles positive, zero, and negative values", async () 
 test("portfolio sorting precomputes derived values once per holding", async () => {
   const source = await read("components/portfolio-table.tsx");
 
-  assert.match(source, /const rows = useMemo\(\(\) => holdings\.map/);
+  assert.match(source, /const rows = useMemo\(\s*\(\) =>\s*holdings\.map/);
   assert.match(source, /returnPct: getHoldingReturn\(holding\)/);
   assert.match(source, /weight: getHoldingWeight\(holding\.marketValue, totals\.marketValue\)/);
   assert.match(source, /const sortedRows = useMemo\(\(\) => \{[\s\S]*?const getSortValue[\s\S]*?return rows\.toSorted/);
@@ -85,7 +99,18 @@ test("portfolio sorting precomputes derived values once per holding", async () =
 });
 
 test("all portfolio and performance locales share page structures", async () => {
-  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, portfolioShared, performanceShared, portfolioTable, styles] = await Promise.all([
+  const [
+    portfolioEn,
+    portfolioZhTw,
+    portfolioZhCn,
+    performanceEn,
+    performanceZhTw,
+    performanceZhCn,
+    portfolioShared,
+    performanceShared,
+    portfolioTable,
+    styles,
+  ] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
     read("app/zh-cn/portfolio/page.tsx"),
@@ -111,10 +136,13 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
   assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
   assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
-  assert.match(portfolioTable, /const columns: SortKey\[\] = \["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"\]/);
+  assert.match(
+    portfolioTable,
+    /const columns: SortKey\[\] = \["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"\]/,
+  );
   assert.doesNotMatch(portfolioTable, /toSorted\(\(a, b\) => \{\s*const getSortValue/);
   assert.doesNotMatch(portfolioTable, /formatUsd\(totals\.costBasis\)|100\.0%/);
-  assert.match(portfolioTable, /portfolio-total-market[^>]*>\{formatUsd\(totals\.marketValue\)\}<\/span>/);
+  assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/span>/);
   assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
   assert.doesNotMatch(portfolioTable, /portfolio-total-(?:cost|weight)/);
   assert.doesNotMatch(portfolioTable, /role="cell" data-label=\{copy\.(?:costBasis|weight)\} \/>/);
@@ -126,33 +154,81 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*480px/s);
   assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
   assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*background:\s*var\(--white\)/s);
-  assert.match(styles, /\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*240px;[^}]*padding:\s*var\(--space-5\)/s);
-  assert.match(styles, /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/);
-  assert.match(styles, /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/);
-  assert.match(styles, /\.home-page \.metric strong,[\s\S]*?\.portfolio-page \.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{[^}]*font-size:\s*var\(--font-size-data-kpi\);/s);
-  assert.doesNotMatch(styles, /@media \(max-width:\s*800px\)[\s\S]*?(?:\.metric|\.portfolio-kpis|\.performance-summary) strong\s*\{[^}]*font-size:/s);
-  assert.match(styles, /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*\.62/s);
+  assert.match(
+    styles,
+    /\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*240px;[^}]*padding:\s*var\(--space-5\)/s,
+  );
+  assert.match(
+    styles,
+    /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/,
+  );
+  assert.match(
+    styles,
+    /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/,
+  );
+  assert.match(
+    styles,
+    /\.home-page \.metric strong,[\s\S]*?\.portfolio-page \.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{[^}]*font-size:\s*var\(--font-size-data-kpi\);/s,
+  );
+  assert.doesNotMatch(
+    styles,
+    /@media \(max-width:\s*800px\)[\s\S]*?(?:\.metric|\.portfolio-kpis|\.performance-summary) strong\s*\{[^}]*font-size:/s,
+  );
+  assert.match(
+    styles,
+    /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*0?\.62/s,
+  );
   assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*168px;[^}]*padding:\s*var\(--space-5\) var\(--space-page-gutter\)/s);
+  assert.match(
+    styles,
+    /@media \(max-width:\s*800px\)[\s\S]*?\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*168px;[^}]*padding:\s*var\(--space-5\) var\(--space-page-gutter\)/s,
+  );
   assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
   assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);
   assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-mobile-sort\s*\{[^}]*display:\s*grid;/s);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*grid-template-areas:\s*"market" "cost" "return" "holdings"/s);
-  assert.match(styles, /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*var\(--space-2\) var\(--space-3\)/s);
+  assert.match(
+    styles,
+    /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*grid-template-areas:\s*"market" "cost" "return" "holdings"/s,
+  );
+  assert.match(
+    styles,
+    /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*var\(--space-2\) var\(--space-3\)/s,
+  );
   assert.match(styles, /\.portfolio-mobile-sort label\s*\{[^}]*display:\s*contents/s);
   assert.match(styles, /\.portfolio-mobile-sort label > span\s*\{[^}]*grid-column:\s*1 \/ -1/s);
-  assert.match(styles, /\.portfolio-mobile-sort select,\s*\.portfolio-mobile-sort button\s*\{[^}]*box-sizing:\s*border-box;[^}]*width:\s*100%;[^}]*height:\s*var\(--size-control\);[^}]*margin:\s*0;/s);
-  assert.match(styles, /\.portfolio-mobile-sort button\s*\{[^}]*display:\s*inline-flex;[^}]*justify-content:\s*center/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s);
+  assert.match(
+    styles,
+    /\.portfolio-mobile-sort select,\s*\.portfolio-mobile-sort button\s*\{[^}]*box-sizing:\s*border-box;[^}]*width:\s*100%;[^}]*height:\s*var\(--size-control\);[^}]*margin:\s*0;/s,
+  );
+  assert.match(
+    styles,
+    /\.portfolio-mobile-sort button\s*\{[^}]*display:\s*inline-flex;[^}]*justify-content:\s*center/s,
+  );
+  assert.match(
+    styles,
+    /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s,
+  );
+  assert.match(
+    styles,
+    /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s,
+  );
   assert.doesNotMatch(styles, /--portfolio-mobile-inline/);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-market\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s);
-  assert.match(styles, /\.portfolio-table-detailed \.portfolio-total-return\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*2;/s);
+  assert.match(
+    styles,
+    /\.portfolio-table-detailed \.portfolio-total-market\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s,
+  );
+  assert.match(
+    styles,
+    /\.portfolio-table-detailed \.portfolio-total-return\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*2;/s,
+  );
   assert.match(performanceShared, /className="methodology shell section-gray"/);
   assert.match(styles, /--background-gray:\s*#f8f9fb/);
   assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s);
+  assert.match(
+    styles,
+    /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s,
+  );
 });
 
 test("portfolio table receives only the active locale labels from its server parent", async () => {

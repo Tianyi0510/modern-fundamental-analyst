@@ -6,18 +6,18 @@ Use a financial editorial style: clear typographic hierarchy, generous section s
 
 ## Ownership and Cascade
 
-| File | Responsibility |
-| --- | --- |
-| `app/reset.css` | Browser normalization and border-box sizing, including pseudo-elements |
-| `app/styles/base.css` | Palette primitives, type, spacing, control and motion tokens |
-| `app/styles/colors.css` | Semantic surface and text aliases only |
-| `app/styles/chrome.css` | Shared navigation, controls and footer geometry |
-| `app/styles/pages.css` | Page and data layouts |
-| `app/styles/typography.css` | Shared type-role mappings |
-| `app/styles/component-typography.css` | Additional component type-role mappings |
-| `app/styles/responsive.css` | Responsive layout and accessibility preferences |
-| `app/styles/themes.css` | Component surface treatments and interaction overrides |
-| `components/*.module.css` | Scoped component layout and states |
+| File                                  | Responsibility                                                         |
+| ------------------------------------- | ---------------------------------------------------------------------- |
+| `app/reset.css`                       | Browser normalization and border-box sizing, including pseudo-elements |
+| `app/styles/base.css`                 | Palette primitives, type, spacing, control and motion tokens           |
+| `app/styles/colors.css`               | Semantic surface and text aliases only                                 |
+| `app/styles/chrome.css`               | Shared navigation, controls and footer geometry                        |
+| `app/styles/pages.css`                | Page and data layouts                                                  |
+| `app/styles/typography.css`           | Shared type-role mappings                                              |
+| `app/styles/component-typography.css` | Additional component type-role mappings                                |
+| `app/styles/responsive.css`           | Responsive layout and accessibility preferences                        |
+| `app/styles/themes.css`               | Component surface treatments and interaction overrides                 |
+| `components/*.module.css`             | Scoped component layout and states                                     |
 
 `app/globals.css` defines the import order. Semantic aliases and theme rules remain at the end to preserve the existing cascade. New color aliases belong in `colors.css`; component selectors do not. Theme rules may own background, border and interaction treatments, but should not own type sizes or page geometry.
 
@@ -27,12 +27,12 @@ Use `--surface-*` and `--text-*` aliases where possible. Preserve existing text 
 
 KPI cards declare `data-tone` explicitly. Reordering cards must not change their treatment:
 
-| Tone | Surface | Text |
-| --- | --- | --- |
-| `plain` | Primary white | Primary black |
-| `highlight` | Bright Blue | Deep Blue |
-| `brand` | Deep Blue | Bright Blue |
-| `paper` | Primary white | Deep Blue |
+| Tone        | Surface       | Text          |
+| ----------- | ------------- | ------------- |
+| `plain`     | Primary white | Primary black |
+| `highlight` | Bright Blue   | Deep Blue     |
+| `brand`     | Deep Blue     | Bright Blue   |
+| `paper`     | Primary white | Deep Blue     |
 
 Use positive/negative colors only with an accompanying number or sign that communicates the result. Do not rely on hue alone.
 
@@ -44,12 +44,12 @@ Brand artwork uses Jost Bold (700) converted to paths in `public/brand/icon.svg`
 
 `base.css` is the source of truth for `--font-size-*`, weight, line-height and tracking values. Choose a role by meaning, not by whichever size fits a particular viewport.
 
-| Role | Use |
-| --- | --- |
-| Page / section / card / compact title | Progressively subordinate headings |
-| Lead / body-large / body | Introductory, editorial and supporting copy |
-| Label / control / caption | Field labels, actions and metadata |
-| Data-display / data-kpi / data-ring / data-row | Financial figures by presentation context |
+| Role                                           | Use                                         |
+| ---------------------------------------------- | ------------------------------------------- |
+| Page / section / card / compact title          | Progressively subordinate headings          |
+| Lead / body-large / body                       | Introductory, editorial and supporting copy |
+| Label / control / caption                      | Field labels, actions and metadata          |
+| Data-display / data-kpi / data-ring / data-row | Financial figures by presentation context   |
 
 Heading levels express document structure; they do not determine the visual role automatically. Do not add raw component font sizes or switch type roles at breakpoints. Text uses `rem`; display roles use bounded `clamp()` expressions. Financial figures use tabular numerals.
 
@@ -67,14 +67,14 @@ Contact and preferences fields use square borders; the compact inverse footer fo
 
 ## Interaction and Accessibility
 
-| State | Rule |
-| --- | --- |
-| Hover | Use shared motion tokens and the component's existing color treatment |
-| Keyboard focus | Keep an outline; never rely on a faint shadow alone |
-| Active | Use the shared press scale; preserve text colors |
-| Busy | Disable duplicate submission and editable fields; announce status through a live region |
-| Disabled | Suppress movement; use the existing opacity variant |
-| Error / success | Supply meaningful localized text; do not communicate status using color alone |
+| State           | Rule                                                                                    |
+| --------------- | --------------------------------------------------------------------------------------- |
+| Hover           | Use shared motion tokens and the component's existing color treatment                   |
+| Keyboard focus  | Keep an outline; never rely on a faint shadow alone                                     |
+| Active          | Use the shared press scale; preserve text colors                                        |
+| Busy            | Disable duplicate submission and editable fields; announce status through a live region |
+| Disabled        | Suppress movement; use the existing opacity variant                                     |
+| Error / success | Supply meaningful localized text; do not communicate status using color alone           |
 
 Light-surface form fields use `--focus-ring-on-light`; inverse fields use `--focus-ring-on-dark`. Width and offset use shared focus tokens. Forced-colors mode uses the system Highlight outline. Do not disable the browser's forced-color adjustment.
 
@@ -90,6 +90,6 @@ The open mobile menu's close button retains its Bright Blue fill and blue outer 
 
 ## Validation and Changes
 
-Run `npm run verify`; CI also runs WebKit. Browser checks should cover all three locales, narrow layouts, larger text, visible focus and reduced-motion behavior. Test forced colors separately when supported. A test matching CSS source syntax is not a substitute for a rendered interaction check.
+Run `npm run verify`; CI also runs WebKit. ESLint, Stylelint and Prettier check static rules and formatting. Browser checks should cover all three locales, narrow layouts, larger text, visible focus and reduced-motion behavior. Test forced colors separately when supported. Use rendered interaction checks for layout and behavior; avoid duplicating them with CSS source-pattern tests.
 
 When adding a component, select existing roles, document intentional variants, verify its interaction states, and add behavior checks where the risk warrants them. Add a token only for a reusable purpose; record exceptions here. Keep the README concise and link to this guide rather than duplicating its rules.

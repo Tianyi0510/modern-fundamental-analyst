@@ -9,7 +9,7 @@ export const localeConfig = {
 } as const;
 
 export function resolveLocale(value: unknown, fallback: Locale = "en"): Locale {
-  return typeof value === "string" && locales.includes(value as Locale) ? value as Locale : fallback;
+  return typeof value === "string" && locales.includes(value as Locale) ? (value as Locale) : fallback;
 }
 
 export function getLocalizedPath(pathname: string, locale: Locale) {
@@ -20,7 +20,7 @@ export function getLocalizedPath(pathname: string, locale: Locale) {
 
 export function getLanguageAlternates(pathname: string) {
   return {
-    ...Object.fromEntries(locales.map(locale => [localeConfig[locale].hrefLang, getLocalizedPath(pathname, locale)])),
+    ...Object.fromEntries(locales.map((locale) => [localeConfig[locale].hrefLang, getLocalizedPath(pathname, locale)])),
     "x-default": getLocalizedPath(pathname, "en"),
   };
 }

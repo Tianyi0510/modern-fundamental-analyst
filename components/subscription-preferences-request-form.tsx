@@ -7,7 +7,13 @@ import styles from "./subscription-preferences.module.css";
 import { useExclusiveSubmit } from "./use-exclusive-submit";
 import { useSubmissionId } from "./use-submission-id";
 
-export type PreferencesRequestCopy = { email: string; request: string; requesting: string; sent: string; error: string };
+export type PreferencesRequestCopy = {
+  email: string;
+  request: string;
+  requesting: string;
+  sent: string;
+  error: string;
+};
 
 export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: PreferencesRequestCopy; locale: Locale }) {
   const [status, setStatus] = useState<"idle" | "requesting" | "sent" | "error">("idle");
@@ -17,11 +23,16 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const email = String(new FormData(form).get("email") ?? "");
+    const submittedEmail = new FormData(form).get("email");
+    const email = typeof submittedEmail === "string" ? submittedEmail : "";
     await runExclusive(async () => {
       setStatus("requesting");
       try {
-        await postJson("/api/subscription-preferences/request", { email, locale }, { idempotencyKey: getSubmissionId() });
+        await postJson(
+          "/api/subscription-preferences/request",
+          { email, locale },
+          { idempotencyKey: getSubmissionId() },
+        );
         form.reset();
         resetSubmissionId();
         setStatus("sent");
@@ -33,14 +44,35 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
   }
 
   const message = status === "sent" ? copy.sent : status === "error" ? copy.error : "";
-  return <form className={styles.form} onSubmit={submit} onChange={() => resetSubmissionId()} aria-busy={status === "requesting"}>
-    <label className={styles.field}>
-      <span>{copy.email}</span>
-      <input name="email" type="email" autoComplete="email" inputMode="email" maxLength={254} disabled={status === "requesting"} required />
-    </label>
-    <div className={styles.actions}>
-      <button className="button button-dark" type="submit" disabled={status === "requesting"}>{status === "requesting" ? copy.requesting : copy.request}</button>
-    </div>
-    <p className={styles.status} role="status" aria-live="polite">{message}</p>
-  </form>;
+  return (
+    <form
+      className={styles.form}
+      onSubmit={(event) => {
+        void submit(event);
+      }}
+      onChange={() => resetSubmissionId()}
+      aria-busy={status === "requesting"}
+    >
+      <label className={styles.field}>
+        <span>{copy.email}</span>
+        <input
+          name="email"
+          type="email"
+          autoComplete="email"
+          inputMode="email"
+          maxLength={254}
+          disabled={status === "requesting"}
+          required
+        />
+      </label>
+      <div className={styles.actions}>
+        <button className="button button-dark" type="submit" disabled={status === "requesting"}>
+          {status === "requesting" ? copy.requesting : copy.request}
+        </button>
+      </div>
+      <p className={styles.status} role="status" aria-live="polite">
+        {message}
+      </p>
+    </form>
+  );
 }

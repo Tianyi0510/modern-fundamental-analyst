@@ -8,9 +8,11 @@ const copy = {
   en: {
     label: "Support",
     title: ["Support Independent", "Research."],
-    intro: "Help sustain rigorous, transparent public-equity research and keep every investment memo freely accessible to all readers.",
+    intro:
+      "Help sustain rigorous, transparent public-equity research and keep every investment memo freely accessible to all readers.",
     sectionTitle: "Choose an amount.",
-    sectionText: "Your one-time contribution supports research tools, data access, and the time required to publish accountable analysis.",
+    sectionText:
+      "Your one-time contribution supports research tools, data access, and the time required to publish accountable analysis.",
     legend: "One-time support amount",
     submit: "Continue to Stripe",
     note: "Securely processed by Stripe. This is voluntary support—not a charitable donation, investment product, or advisory service.",
@@ -61,40 +63,61 @@ const copy = {
 export function SupportPageContent({ locale, status }: { locale: Locale; status?: SupportStatus }) {
   const text = copy[locale];
 
-  return <main className="support-page" id="main-content">
-    <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-    <section className="page-hero support-hero shell">
-      <p className="eyebrow"><span /> {text.label}</p>
-      <h1>{text.title[0]}<br /><em>{text.title[1]}</em></h1>
-      <div className="page-intro"><p>{text.intro}</p></div>
-    </section>
-    <section className="support-section">
-      <div className="support-layout shell">
-        <div className="support-copy">
-          <h2>{text.sectionTitle}</h2>
-          <p>{text.sectionText}</p>
+  return (
+    <main className="support-page" id="main-content">
+      <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+      <section className="page-hero support-hero shell">
+        <p className="eyebrow">
+          <span /> {text.label}
+        </p>
+        <h1>
+          {text.title[0]}
+          <br />
+          <em>{text.title[1]}</em>
+        </h1>
+        <div className="page-intro">
+          <p>{text.intro}</p>
         </div>
-        <form className="support-form" action="/api/stripe/checkout" method="post">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="support-honeypot" aria-hidden="true">
-            <label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+      </section>
+      <section className="support-section">
+        <div className="support-layout shell">
+          <div className="support-copy">
+            <h2>{text.sectionTitle}</h2>
+            <p>{text.sectionText}</p>
           </div>
-          <fieldset>
-            <legend>{text.legend}</legend>
-            <div className="support-amounts">
-              {SUPPORT_AMOUNTS.map((amount) => <label className="support-amount-option" key={amount}>
-                <input type="radio" name="amount" value={amount} defaultChecked={amount === 12} />
-                <span>USD</span>
-                <strong>${amount}</strong>
-              </label>)}
+          <form className="support-form" action="/api/stripe/checkout" method="post">
+            <input type="hidden" name="locale" value={locale} />
+            <div className="support-honeypot" aria-hidden="true">
+              <label>
+                Website
+                <input name="website" tabIndex={-1} autoComplete="off" />
+              </label>
             </div>
-          </fieldset>
-          {status ? <p className={`support-status support-status-${status}`} role="status" aria-live="polite">{text.statuses[status]}</p> : null}
-          <button className="button button-dark support-submit" type="submit">{text.submit}</button>
-          <p className="support-note">{text.note}</p>
-        </form>
-      </div>
-    </section>
-    <SiteFooter locale={locale} />
-  </main>;
+            <fieldset>
+              <legend>{text.legend}</legend>
+              <div className="support-amounts">
+                {SUPPORT_AMOUNTS.map((amount) => (
+                  <label className="support-amount-option" key={amount}>
+                    <input type="radio" name="amount" value={amount} defaultChecked={amount === 12} />
+                    <span>USD</span>
+                    <strong>${amount}</strong>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            {status ? (
+              <p className={`support-status support-status-${status}`} role="status" aria-live="polite">
+                {text.statuses[status]}
+              </p>
+            ) : null}
+            <button className="button button-dark support-submit" type="submit">
+              {text.submit}
+            </button>
+            <p className="support-note">{text.note}</p>
+          </form>
+        </div>
+      </section>
+      <SiteFooter locale={locale} />
+    </main>
+  );
 }

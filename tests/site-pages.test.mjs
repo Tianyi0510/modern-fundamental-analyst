@@ -24,14 +24,26 @@ test("all home locales use one shared page structure", async () => {
   assert.match(shared, /const allocationGradient = `conic-gradient/);
   assert.match(shared, /className="allocation-legend"/);
   assert.match(styles, /\.home-portfolio-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, \.75fr\);[^}]*column-gap:\s*var\(--space-7\)/s);
+  assert.match(
+    styles,
+    /\.intro\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1\.65fr\) minmax\(220px, 0?\.75fr\);[^}]*column-gap:\s*var\(--space-7\)/s,
+  );
   assert.doesNotMatch(styles, /\.intro\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.match(styles, /\.allocation-ring\s*\{[^}]*width:\s*min\(210px, 100%\)/s);
   assert.match(styles, /\.allocation-ring::before\s*\{[^}]*inset:\s*15%/s);
-  assert.match(styles, /\.allocation-card > a \{[^}]*justify-content: flex-start; gap: var\(--space-2\);/);
-  assert.match(styles, /\.allocation-card > a:hover, \.allocation-card > a:focus-visible, \.allocation-card > a:active \{ color: var\(--deep-blue\); \}/);
-  assert.doesNotMatch(styles, /(?:\.text-link|\.allocation-card > a)(?::[\w-]+)?(?:,\s*(?:\.text-link|\.allocation-card > a)(?::[\w-]+)?)*\s*\{[^}]*transform:\s*scale/);
-  assert.match(styles, /\.allocation-card > a:hover \.arrow-icon, \.allocation-card > a:focus-visible \.arrow-icon \{ transform: translateX\(4px\); \}/);
+  assert.match(styles, /\.allocation-card > a\s*\{[^}]*justify-content:\s*flex-start;\s*gap:\s*var\(--space-2\);/);
+  assert.match(
+    styles,
+    /\.allocation-card > a:hover,\s*\.allocation-card > a:focus-visible,\s*\.allocation-card > a:active\s*\{\s*color:\s*var\(--deep-blue\);\s*\}/,
+  );
+  assert.doesNotMatch(
+    styles,
+    /(?:\.text-link|\.allocation-card > a)(?::[\w-]+)?(?:,\s*(?:\.text-link|\.allocation-card > a)(?::[\w-]+)?)*\s*\{[^}]*transform:\s*scale/,
+  );
+  assert.match(
+    styles,
+    /\.allocation-card > a:hover \.arrow-icon,\s*\.allocation-card > a:focus-visible \.arrow-icon\s*\{\s*transform:\s*translateX\(4px\);\s*\}/,
+  );
 });
 
 test("all contact and disclaimer locales share page structures", async () => {
@@ -48,10 +60,7 @@ test("all contact and disclaimer locales share page structures", async () => {
   for (const page of pages.slice(0, 3)) assert.match(page, /ContactPageContent/);
   for (const page of pages.slice(3)) assert.match(page, /DisclaimerPageContent/);
 
-  const [disclaimer, styles] = await Promise.all([
-    read("components/disclaimer-page-content.tsx"),
-    readStyles(),
-  ]);
+  const [disclaimer, styles] = await Promise.all([read("components/disclaimer-page-content.tsx"), readStyles()]);
   assert.match(disclaimer, /className="legal-hero"/);
   assert.match(disclaimer, /className="legal-body"/);
   assert.match(disclaimer, /className="section-number legal-section-label"/);
@@ -59,45 +68,76 @@ test("all contact and disclaimer locales share page structures", async () => {
   assert.match(disclaimer, /className="legal-section-copy"/);
   assert.match(disclaimer, /title: "Legal Disclaimer and Important"/);
   assert.match(disclaimer, /titleAccent: "Investment Risk Disclosures"/);
-  assert.match(disclaimer, /Please read these terms carefully before relying on any research, financial information, valuation, or performance data/);
+  assert.match(
+    disclaimer,
+    /Please read these terms carefully before relying on any research, financial information, valuation, or performance data/,
+  );
   assert.match(disclaimer, /className="legal-subtitle"/);
-  assert.match(disclaimer, /"No Investment Advice", "Research and Education, Not Personalized Financial Advice"/);
-  assert.match(disclaimer, /"Investment Risks", "Investment Outcomes and Future Events Remain Uncertain"/);
-  assert.match(disclaimer, /"Limitation of Liability", "Content Provided Without Warranties or Guaranteed Results"/);
+  assert.match(disclaimer, /"No Investment Advice",\s*"Research and Education, Not Personalized Financial Advice"/);
+  assert.match(disclaimer, /"Investment Risks",\s*"Investment Outcomes and Future Events Remain Uncertain"/);
+  assert.match(disclaimer, /"Limitation of Liability",\s*"Content Provided Without Warranties or Guaranteed Results"/);
   assert.doesNotMatch(disclaimer, /legal-section-number|numbered-label/);
   assert.match(styles, /\.legal > \.site-header\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal-hero\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--font-size-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(
+    styles,
+    /\.legal \.legal-hero \.eyebrow,[\s\S]*?font-size:\s*var\(--font-size-label\);[\s\S]*?font-weight:\s*var\(--weight-bold\)/s,
+  );
   assert.match(styles, /\.legal-body\s*\{[^}]*background:\s*var\(--white\)/s);
   assert.match(styles, /\.legal p\s*\{[^}]*color:\s*var\(--black\)/s);
   assert.doesNotMatch(styles, /\.legal-content\s*\{[^}]*(?:border-top|border-bottom):/s);
   assert.doesNotMatch(styles, /\.legal-section\s*\{[^}]*(?:border-top|border-bottom):/s);
-  assert.match(styles, /\.legal-section\s*\{[^}]*grid-template-columns:\s*\.9fr 1\.1fr;[^}]*gap:\s*var\(--space-11\);[^}]*align-items:\s*start/s);
+  assert.match(
+    styles,
+    /\.legal-section\s*\{[^}]*grid-template-columns:\s*0?\.9fr 1\.1fr;[^}]*gap:\s*var\(--space-11\);[^}]*align-items:\s*start/s,
+  );
   assert.match(styles, /\.legal-section-heading\s*\{[^}]*display:\s*grid;[^}]*gap:\s*34px/s);
-  assert.match(styles, /\.legal \.legal-section-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*\.35em;[^}]*color:\s*var\(--text-secondary\)/s);
-  assert.match(styles, /\.legal \.legal-section-label,[\s\S]*?font-size:\s*var\(--font-size-label\);[\s\S]*?line-height:\s*var\(--leading-body\);[\s\S]*?font-weight:\s*var\(--weight-bold\);[\s\S]*?letter-spacing:\s*var\(--tracking-label\)/s);
+  assert.match(
+    styles,
+    /\.legal \.legal-section-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*0?\.35em;[^}]*color:\s*var\(--text-secondary\)/s,
+  );
+  assert.match(
+    styles,
+    /\.legal \.legal-section-label,[\s\S]*?font-size:\s*var\(--font-size-label\);[\s\S]*?line-height:\s*var\(--leading-body\);[\s\S]*?font-weight:\s*var\(--weight-bold\);[\s\S]*?letter-spacing:\s*var\(--tracking-label\)/s,
+  );
   assert.match(styles, /\.section-number\s*\{[^}]*color:\s*var\(--text-secondary\)/s);
   assert.match(styles, /\.legal-section-copy\s*\{[^}]*max-width:\s*720px/s);
   assert.match(styles, /\.legal-section-copy p \+ p\s*\{[^}]*margin-top:\s*1\.35em/s);
   assert.match(styles, /\.legal h1\s*\{[^}]*color:\s*var\(--text-primary\)/s);
   assert.match(styles, /\.legal h1 em\s*\{[^}]*color:\s*var\(--text-brand\)/s);
   assert.match(styles, /\.legal \.legal-subtitle\s*\{[^}]*margin:\s*var\(--space-related-content\) 0 0/s);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*gap:\s*var\(--space-related-content\)/s);
+  assert.match(
+    styles,
+    /@media \(max-width:\s*800px\)[\s\S]*?\.legal-section\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*gap:\s*var\(--space-related-content\)/s,
+  );
 });
 
 test("all about locales use one shared page structure", async () => {
   const paths = ["app/(en)/about/page.tsx", "app/zh-tw/about/page.tsx", "app/zh-cn/about/page.tsx"];
-  const [english, traditionalChinese, simplifiedChinese, shared, styles] = await Promise.all([...paths.map(read), read("components/about-page-content.tsx"), readStyles()]);
+  const [english, traditionalChinese, simplifiedChinese, shared, styles] = await Promise.all([
+    ...paths.map(read),
+    read("components/about-page-content.tsx"),
+    readStyles(),
+  ]);
 
   for (const page of [english, traditionalChinese, simplifiedChinese]) assert.match(page, /AboutPageContent/);
   assert.match(shared, /text\.sections\.map/);
   assert.match(shared, /index % 2 === 1 \? " section-gray"/);
-  assert.match(styles, /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/);
+  assert.match(
+    styles,
+    /\.about-page \.page-intro p,[\s\S]*?\.about-page \.about-copy,[\s\S]*?\.about-page \.about-boundaries > article:last-child ol,[\s\S]*?\.about-page \.about-closing > div\s*\{\s*color:\s*var\(--black\)/,
+  );
   assert.match(shared, /text\.boundaries\.map/);
   assert.match(shared, /className="about-boundary-number"/);
   assert.doesNotMatch(shared, /about-boundary-item|numbered-label/);
-  assert.match(styles, /\.about-boundaries li\s*\{[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*align-items:\s*baseline/s);
-  assert.match(styles, /\.about-boundary-number\s*\{[^}]*font-size:\s*var\(--font-size-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s);
+  assert.match(
+    styles,
+    /\.about-boundaries li\s*\{[^}]*grid-template-columns:\s*42px minmax\(0, 1fr\);[^}]*align-items:\s*baseline/s,
+  );
+  assert.match(
+    styles,
+    /\.about-boundary-number\s*\{[^}]*font-size:\s*var\(--font-size-body-large\);[^}]*line-height:\s*var\(--leading-body\);[^}]*font-weight:\s*var\(--weight-bold\)/s,
+  );
 });
 
 test("shared client navigation receives only the active locale copy from server components", async () => {
@@ -144,7 +184,7 @@ test("all locales provide equivalent navigation paths and SEO alternates", async
   assert.equal(getLocalizedPath("/zh-cn/about", "en"), "/about");
   const metadata = createPageMetadata({ title: "About", description: "About", path: "/about", locale: "zh-cn" });
   const entries = sitemap();
-  const entry = entries.find(item => item.url.endsWith("/zh-cn/about"));
+  const entry = entries.find((item) => item.url.endsWith("/zh-cn/about"));
   assert.equal(new URL(entry.alternates.languages["zh-Hans-CN"]).pathname, metadata.alternates.languages["zh-Hans-CN"]);
-  assert.equal(new Set(entries.map(item => item.url)).size, entries.length);
+  assert.equal(new Set(entries.map((item) => item.url)).size, entries.length);
 });

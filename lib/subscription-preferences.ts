@@ -56,8 +56,11 @@ export function readPreferenceToken(token: string): PreferenceTokenPayload | nul
     try {
       const decipher = createDecipheriv("aes-256-gcm", getEncryptionKey(secret), value.subarray(0, 12));
       decipher.setAuthTag(value.subarray(12, 28));
-      const payload = JSON.parse(Buffer.concat([decipher.update(value.subarray(28)), decipher.final()]).toString("utf8")) as PreferenceTokenPayload;
-      if (payload.version !== TOKEN_VERSION || payload.expiresAt <= Date.now() || typeof payload.email !== "string") return null;
+      const payload = JSON.parse(
+        Buffer.concat([decipher.update(value.subarray(28)), decipher.final()]).toString("utf8"),
+      ) as PreferenceTokenPayload;
+      if (payload.version !== TOKEN_VERSION || payload.expiresAt <= Date.now() || typeof payload.email !== "string")
+        return null;
       return payload;
     } catch {
       // Try the migration fallback, if present.
@@ -84,5 +87,5 @@ export async function getSavedPreferenceLocale(email: string): Promise<Locale | 
   if (!resend) return null;
   const result = await runResendOperation("Preference language lookup failed", () => resend.contacts.get({ email }));
   const value = result?.data?.properties?.preferred_language?.value;
-  return locales.find(locale => localeConfig[locale].label === value || locale === value) ?? null;
+  return locales.find((locale) => localeConfig[locale].label === value || locale === value) ?? null;
 }

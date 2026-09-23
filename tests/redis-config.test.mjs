@@ -3,10 +3,7 @@ import test from "node:test";
 import { read } from "./repository-helpers.mjs";
 
 test("Redis connections are bounded and reused", async () => {
-  const [redis, packageSource] = await Promise.all([
-    read("lib/redis.ts"),
-    read("package.json"),
-  ]);
+  const [redis, packageSource] = await Promise.all([read("lib/redis.ts"), read("package.json")]);
   const dependencies = JSON.parse(packageSource).dependencies;
 
   assert.match(redis, /from "@redis\/client"/);
@@ -42,10 +39,7 @@ test("Redis errors use bounded categories and are throttled independently", asyn
 });
 
 test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {
-  const [requestHelpers, rateLimiter] = await Promise.all([
-    read("lib/api-request.ts"),
-    read("lib/rate-limit.ts"),
-  ]);
+  const [requestHelpers, rateLimiter] = await Promise.all([read("lib/api-request.ts"), read("lib/rate-limit.ts")]);
 
   assert.doesNotMatch(requestHelpers, /Redis|RateLimiter|createHmac/);
   assert.match(rateLimiter, /randomBytes\(32\)/);

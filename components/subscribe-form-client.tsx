@@ -9,14 +9,27 @@ import { HoneypotField } from "./honeypot-field";
 import { useExclusiveSubmit } from "./use-exclusive-submit";
 
 export type SubscribeFormCopy = {
-  title: string; email: string; placeholder: string; submit: string;
-  submitting: string; success: string; error: string;
+  title: string;
+  email: string;
+  placeholder: string;
+  submit: string;
+  submitting: string;
+  success: string;
+  error: string;
   preferences: string;
 };
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function SubscribeFormClient({ copy, locale, preferencesHref }: { copy: SubscribeFormCopy; locale: Locale; preferencesHref: string }) {
+export function SubscribeFormClient({
+  copy,
+  locale,
+  preferencesHref,
+}: {
+  copy: SubscribeFormCopy;
+  locale: Locale;
+  preferencesHref: string;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const runExclusive = useExclusiveSubmit();
 
@@ -40,15 +53,37 @@ export function SubscribeFormClient({ copy, locale, preferencesHref }: { copy: S
   return (
     <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
       <h2 id="subscribe-title">{copy.title}</h2>
-      <form className={styles.form} onSubmit={submit} aria-busy={status === "submitting"}>
+      <form
+        className={styles.form}
+        onSubmit={(event) => {
+          void submit(event);
+        }}
+        aria-busy={status === "submitting"}
+      >
         <label className={styles.field}>
           <span>{copy.email}</span>
-          <input disabled={status === "submitting"} className={styles.control} name="email" type="email" autoComplete="email" inputMode="email" placeholder={copy.placeholder} maxLength={254} required />
+          <input
+            disabled={status === "submitting"}
+            className={styles.control}
+            name="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            placeholder={copy.placeholder}
+            maxLength={254}
+            required
+          />
         </label>
         <HoneypotField />
-        <button className={styles.submit} type="submit" disabled={status === "submitting"}>{status === "submitting" ? copy.submitting : copy.submit}</button>
-        <a className={styles.preferences} href={preferencesHref}>{copy.preferences}</a>
-        <p className={styles.status} role="status" aria-live="polite">{status === "success" ? copy.success : status === "error" ? copy.error : ""}</p>
+        <button className={styles.submit} type="submit" disabled={status === "submitting"}>
+          {status === "submitting" ? copy.submitting : copy.submit}
+        </button>
+        <a className={styles.preferences} href={preferencesHref}>
+          {copy.preferences}
+        </a>
+        <p className={styles.status} role="status" aria-live="polite">
+          {status === "success" ? copy.success : status === "error" ? copy.error : ""}
+        </p>
       </form>
     </section>
   );

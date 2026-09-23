@@ -16,13 +16,13 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(page, /ContactForm locale=\{locale\}/);
   assert.match(page, /className="contact-grid"/);
   assert.doesNotMatch(form, /"use client"/);
-  assert.match(form, /ContactFormClient copy=\{copy\[locale\]\}/);
+  assert.match(form, /ContactFormClient\s+copy=\{copy\[locale\]\}/);
   assert.match(form, /title: "Send a Message"/);
   assert.doesNotMatch(form, /Start A Conversation|label: "Send A Message"/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
-  assert.match(client, /postJson\("\/api\/contact"/);
+  assert.match(client, /postJson\(\s*"\/api\/contact"/);
   assert.match(client, /contact-form\.module\.css/);
   assert.doesNotMatch(client, /headingLabel/);
   assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
@@ -57,7 +57,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 
   assert.doesNotMatch(page, /SubscribeForm/);
   assert.doesNotMatch(form, /"use client"/);
-  assert.match(form, /SubscribeFormClient copy=\{copy\[locale\]\}/);
+  assert.match(form, /SubscribeFormClient\s+copy=\{copy\[locale\]\}/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
@@ -66,9 +66,15 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
   assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*var\(--space-5\)/s);
   assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
-  assert.match(styles, /\.submit:hover:not\(:disabled\), \.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
+  assert.match(
+    styles,
+    /\.submit:hover:not\(:disabled\),\s*\.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s,
+  );
   assert.match(client, /<HoneypotField \/>/);
-  assert.match(footer, /className="footer-social-link footer-x" href="https:\/\/x\.com\/DavidLi0510" target="_blank" rel="noreferrer"/);
+  assert.match(
+    footer,
+    /className="footer-social-link footer-x"\s+href="https:\/\/x\.com\/DavidLi0510"\s+target="_blank"\s+rel="noreferrer"/,
+  );
   assert.match(footer, /footer-x[\s\S]*?<svg aria-hidden="true"[\s\S]*?<span>X \(formerly Twitter\)<\/span>/);
   assert.match(route, /subscribeContact\(email, locale\)/);
   assert.match(service, /resend\.contacts\.create/);
@@ -94,17 +100,18 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 });
 
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
-  const [tokens, route, requestRoute, page, form, requestForm, segments, subscriptionService, emailTemplate] = await Promise.all([
-    read("lib/subscription-preferences.ts"),
-    read("app/api/subscription-preferences/route.ts"),
-    read("app/api/subscription-preferences/request/route.ts"),
-    read("components/subscription-preferences-page.tsx"),
-    read("components/subscription-preferences-form.tsx"),
-    read("components/subscription-preferences-request-form.tsx"),
-    read("lib/resend-segments.ts"),
-    read("lib/subscription-service.ts"),
-    read("lib/email-template.ts"),
-  ]);
+  const [tokens, route, requestRoute, page, form, requestForm, segments, subscriptionService, emailTemplate] =
+    await Promise.all([
+      read("lib/subscription-preferences.ts"),
+      read("app/api/subscription-preferences/route.ts"),
+      read("app/api/subscription-preferences/request/route.ts"),
+      read("components/subscription-preferences-page.tsx"),
+      read("components/subscription-preferences-form.tsx"),
+      read("components/subscription-preferences-request-form.tsx"),
+      read("lib/resend-segments.ts"),
+      read("lib/subscription-service.ts"),
+      read("lib/email-template.ts"),
+    ]);
 
   assert.match(tokens, /createCipheriv\("aes-256-gcm"/);
   assert.match(tokens, /payload\.expiresAt <= Date\.now\(\)/);
@@ -115,7 +122,10 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(route, /await rollbackLanguageSegments\(\)\.catch/);
   assert.match(subscriptionService, /await rollbackLanguageSegments\(\)\.catch/);
   assert.match(route, /syncPreferredLanguageSegment\(resend, payload\.email, locale\)/);
-  assert.match(route, /rollbackLanguageSegments = await syncPreferredLanguageSegment\(resend, payload\.email, locale\)/);
+  assert.match(
+    route,
+    /rollbackLanguageSegments = await syncPreferredLanguageSegment\(resend, payload\.email, locale\)/,
+  );
   assert.match(route, /unsubscribed: true/);
   assert.match(route, /readProtectedObjectJson/);
   assert.match(page, /maskEmail\(payload\.email\)/);

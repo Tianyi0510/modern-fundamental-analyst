@@ -32,15 +32,24 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       <div className="home-opening">
         <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
         <section className="hero shell">
-          <p className="eyebrow"><span /> {text.researchLabel}</p>
-          <h1>{text.hero[0]}<br /><em>{text.hero[1]}</em></h1>
+          <p className="eyebrow">
+            <span /> {text.researchLabel}
+          </p>
+          <h1>
+            {text.hero[0]}
+            <br />
+            <em>{text.hero[1]}</em>
+          </h1>
           <div className="hero-bottom">
             <p>{text.heroIntro}</p>
             <div className="hero-actions">
               <Link className="button button-dark" href={getLocalizedPath("/portfolio", locale)}>
                 {text.viewPortfolio}
               </Link>
-              <Link className="text-link" href={getLocalizedPath("/memos", locale)}>{text.readLatest}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+              <Link className="text-link" href={getLocalizedPath("/memos", locale)}>
+                {text.readLatest}
+                <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+              </Link>
             </div>
           </div>
         </section>
@@ -53,12 +62,16 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <div className="metric" data-tone="brand">
             <span>{text.marketValue}</span>
             <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
-            <small>{portfolioSnapshot.holdingsCount} {text.holdingsUnit}</small>
+            <small>
+              {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
+            </small>
           </div>
           <div className="metric metric-accent" data-tone="paper">
             <span>{text.portfolioXirr}</span>
             <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
-            <small className="date-text">{text.asOf} {compactPortfolioDate} · {text.updatedMonthly}</small>
+            <small className="date-text">
+              {text.asOf} {compactPortfolioDate} · {text.updatedMonthly}
+            </small>
           </div>
         </section>
       </div>
@@ -66,18 +79,29 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       <section className="home-about shell">
         <div>
           <p className="section-number">{text.aboutLabel}</p>
-          <h2>{text.aboutTitle[0]}<br />{text.aboutTitle[1]}</h2>
+          <h2>
+            {text.aboutTitle[0]}
+            <br />
+            {text.aboutTitle[1]}
+          </h2>
         </div>
         <div>
           <p>{text.aboutCopy}</p>
-          <Link className="text-link" href={getLocalizedPath("/about", locale)}>{text.aboutLink}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+          <Link className="text-link" href={getLocalizedPath("/about", locale)}>
+            {text.aboutLink}
+            <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+          </Link>
         </div>
       </section>
 
       <div className="home-portfolio-section">
         <section className="intro shell">
           <p className="section-number">{text.portfolioLabel}</p>
-          <h2>{text.portfolioTitle[0]}<br />{text.portfolioTitle[1]}</h2>
+          <h2>
+            {text.portfolioTitle[0]}
+            <br />
+            {text.portfolioTitle[1]}
+          </h2>
           <Link className="round-link" href={getLocalizedPath("/portfolio", locale)} aria-label={text.viewPortfolio}>
             <MoveUpRight className="arrow-icon round-link-arrow" aria-hidden="true" strokeWidth={3} />
           </Link>
@@ -89,7 +113,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <div>
                   <strong>{holding.symbol}</strong>
-                  <small>{formatUsd(holding.marketValue, 0)} {text.marketValueSuffix}</small>
+                  <small>
+                    {formatUsd(holding.marketValue, 0)} {text.marketValueSuffix}
+                  </small>
                 </div>
                 <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
               </div>
@@ -98,7 +124,12 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <aside className="allocation-card">
             <span>{text.holdingsAllocation}</span>
             <div className="allocation-visual">
-              <div className="allocation-ring" style={{ background: allocationGradient }} role="img" aria-label={text.topHoldings}>
+              <div
+                className="allocation-ring"
+                style={{ background: allocationGradient }}
+                role="img"
+                aria-label={text.topHoldings}
+              >
                 <span>{portfolioSnapshot.holdingsCount}</span>
                 <small>{text.holdingsAllocation}</small>
               </div>
@@ -110,7 +141,11 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                     <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
                   </li>
                 ))}
-                <li><i aria-hidden="true" /><span>{text.other}</span><b>{otherWeight.toFixed(1)}%</b></li>
+                <li>
+                  <i aria-hidden="true" />
+                  <span>{text.other}</span>
+                  <b>{otherWeight.toFixed(1)}%</b>
+                </li>
               </ul>
             </div>
             <Link href={getLocalizedPath("/portfolio", locale)}>
@@ -125,7 +160,11 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         <div className="shell">
           <div className="section-heading inverse">
             <p className="section-number">{text.performanceLabel}</p>
-            <h2>{text.performanceTitle[0]}<br />{text.performanceTitle[1]}</h2>
+            <h2>
+              {text.performanceTitle[0]}
+              <br />
+              {text.performanceTitle[1]}
+            </h2>
           </div>
           <div className="performance-grid">
             <div className="performance-bars" aria-label={text.chartLabel}>
@@ -146,7 +185,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
               <p>{text.performanceCopy(benchmarkReturn)}</p>
               <small className="date-text">
-                {text.verified} {portfolioDate}{locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} · {text.updatedMonthly}{locale === "en" ? "." : "。"}
+                {text.verified} {portfolioDate}
+                {locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} · {text.updatedMonthly}
+                {locale === "en" ? "." : "。"}
               </small>
               <Link className="button button-white" href={getLocalizedPath("/performance", locale)}>
                 {text.viewPerformance}
@@ -159,15 +200,28 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       <section className="memos-home shell">
         <div className="section-heading">
           <p className="section-number">{text.memosLabel}</p>
-          <h2>{text.memosTitle[0]}<br />{text.memosTitle[1]}</h2>
+          <h2>
+            {text.memosTitle[0]}
+            <br />
+            {text.memosTitle[1]}
+          </h2>
         </div>
         <MemoCards memos={memos} locale={locale} />
-        <Link className="text-link memos-all" href={getLocalizedPath("/memos", locale)}>{text.viewAllMemos}<MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} /></Link>
+        <Link className="text-link memos-all" href={getLocalizedPath("/memos", locale)}>
+          {text.viewAllMemos}
+          <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+        </Link>
       </section>
 
       <section className="cta shell">
-        <p className="eyebrow"><span /> {text.contactLabel}</p>
-        <h2>{text.contactTitle[0]}<br />{text.contactTitle[1]}</h2>
+        <p className="eyebrow">
+          <span /> {text.contactLabel}
+        </p>
+        <h2>
+          {text.contactTitle[0]}
+          <br />
+          {text.contactTitle[1]}
+        </h2>
         <Link className="button button-dark" href={getLocalizedPath("/contact", locale)}>
           {text.contactLink}
         </Link>

@@ -26,20 +26,20 @@ npx playwright install chromium webkit
 npm run verify
 ```
 
-Verification runs type checking, linting, unit tests, and a production build, then tests that build in Chromium. Run `npm run test:webkit` afterward to test the same build in WebKit. GitHub Actions runs both browser suites with one worker per browser and audits production dependencies. For a quick browser check during development, use `npm run test:computed-style`; it starts the development server.
+Verification runs type checking, ESLint, Stylelint, a Prettier format check, unit tests, and a production build, then tests that build in the Chromium Playwright project. Run `npm run test:webkit` afterward to test the same build in the WebKit project. GitHub Actions runs both browser suites with one worker per browser and audits production dependencies. Run `npm run format` to apply Prettier formatting. For a quick browser check during development, use `npm run test:computed-style`; it starts the development server.
 
 ## Project Layout
 
-| Directory | Purpose |
-| --- | --- |
-| `app/` | Pages, API routes, and global styles |
-| `components/` | Shared UI and interactions |
-| `data/` | Localized copy, portfolio snapshot, and memo catalog |
-| `content/memos/` | Investment memo content |
-| `lib/` | Services, calculations, and utilities |
-| `tests/` | Unit and browser tests |
-| `scripts/` | CI deployment gate, Node module loader, and subscription journal CLI |
-| `docs/` | Technical architecture, style guide, and service integration guides |
+| Directory        | Purpose                                                              |
+| ---------------- | -------------------------------------------------------------------- |
+| `app/`           | Pages, API routes, and global styles                                 |
+| `components/`    | Shared UI and interactions                                           |
+| `data/`          | Localized copy, portfolio snapshot, and memo catalog                 |
+| `content/memos/` | Investment memo content                                              |
+| `lib/`           | Services, calculations, and utilities                                |
+| `tests/`         | Unit and browser tests                                               |
+| `scripts/`       | CI deployment gate, Node module loader, and subscription journal CLI |
+| `docs/`          | Technical architecture, style guide, and service integration guides  |
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
@@ -50,7 +50,7 @@ Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.
 Integration details:
 
 - [Resend email and subscriptions](docs/RESEND_INTEGRATION.md)
-- [Upstash Redis runtime](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime)
+- [Upstash Redis runtime and ACL setup](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime)
 - [Stripe setup and checklist](docs/STRIPE_INTEGRATION.md)
 
 See the [design system and style guide](docs/STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.

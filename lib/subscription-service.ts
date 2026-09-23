@@ -7,9 +7,7 @@ import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 import { withSubscriberLock } from "@/lib/resend-coordination";
 
-export type SubscriptionResult =
-  | { ok: true }
-  | { ok: false; message: string; status: 502 | 503 };
+export type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 502 | 503 };
 
 const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
   ok: false,
@@ -19,11 +17,23 @@ const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
 
 type ResendClient = NonNullable<ReturnType<typeof getResendClient>>;
 
-async function rollbackSubscription(resend: ResendClient, contactId: string | undefined, rollbackLanguageSegments: (() => Promise<void>) | null, previousLanguage: string | number | null) {
+async function rollbackSubscription(
+  resend: ResendClient,
+  contactId: string | undefined,
+  rollbackLanguageSegments: (() => Promise<void>) | null,
+  previousLanguage: string | number | null,
+) {
   await Promise.all([
     contactId
-      ? runResendOperation("Resend subscription rollback failed", () => resend.contacts.update({ id: contactId, unsubscribed: true, properties: { preferred_language: previousLanguage } }))
-        .then((result) => { if (!result || result.error) reportResendRollbackFailure(); })
+      ? runResendOperation("Resend subscription rollback failed", () =>
+          resend.contacts.update({
+            id: contactId,
+            unsubscribed: true,
+            properties: { preferred_language: previousLanguage },
+          }),
+        ).then((result) => {
+          if (!result || result.error) reportResendRollbackFailure();
+        })
       : Promise.resolve(null),
     rollbackLanguageSegments ? rollbackLanguageSegments().catch(() => undefined) : Promise.resolve(),
   ]);
@@ -31,7 +41,9 @@ async function rollbackSubscription(resend: ResendClient, contactId: string | un
 
 export async function subscribeContact(email: string, locale: Locale): Promise<SubscriptionResult> {
   try {
-    return await withSubscriberLock(email, () => withSubscriptionJournal(email, locale, () => subscribeContactLocked(email, locale)));
+    return await withSubscriberLock(email, () =>
+      withSubscriptionJournal(email, locale, () => subscribeContactLocked(email, locale)),
+    );
   } catch {
     return unavailable(503);
   }
@@ -68,19 +80,23 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
     }
     if (!shouldSendWelcome && previousLanguage === properties.preferred_language) return { ok: true };
     await resendOperationContext.getStore()?.recordPhase?.("update-contact");
-    result = await runResendOperation("Resend contact update failed", () => resend.contacts.update({
-      id: existing.data.id,
-      unsubscribed: false,
-      properties,
-    }));
+    result = await runResendOperation("Resend contact update failed", () =>
+      resend.contacts.update({
+        id: existing.data.id,
+        unsubscribed: false,
+        properties,
+      }),
+    );
   } else if (existing.error?.statusCode === 404) {
     await resendOperationContext.getStore()?.recordPhase?.("create-contact");
-    result = await runResendOperation("Resend contact creation failed", () => resend.contacts.create({
-      email,
-      unsubscribed: false,
-      properties,
-      segments: [{ id: getPreferredLanguageSegmentId(locale) }],
-    }));
+    result = await runResendOperation("Resend contact creation failed", () =>
+      resend.contacts.create({
+        email,
+        unsubscribed: false,
+        properties,
+        segments: [{ id: getPreferredLanguageSegmentId(locale) }],
+      }),
+    );
   } else {
     result = existing;
   }
@@ -97,17 +113,19 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
   if (!latestMemo) return unavailable(503);
 
   await resendOperationContext.getStore()?.recordPhase?.("send-welcome-event");
-  const welcome = await runResendOperation("Resend welcome automation request failed", () => resend.events.send({
-    event: "subscriber.created",
-    email,
-    payload: {
-      locale,
-      memo_title: latestMemo.title,
-      memo_summary: latestMemo.summary,
-      memo_url: `${SITE_URL}${getLocalizedPath(`/memos/${latestMemo.slug}`, locale)}`,
-      preferences_url: createPreferenceUrl(email, locale),
-    },
-  }));
+  const welcome = await runResendOperation("Resend welcome automation request failed", () =>
+    resend.events.send({
+      event: "subscriber.created",
+      email,
+      payload: {
+        locale,
+        memo_title: latestMemo.title,
+        memo_summary: latestMemo.summary,
+        memo_url: `${SITE_URL}${getLocalizedPath(`/memos/${latestMemo.slug}`, locale)}`,
+        preferences_url: createPreferenceUrl(email, locale),
+      },
+    }),
+  );
 
   if (!welcome || welcome.error) {
     await resendOperationContext.getStore()?.recordPhase?.("rollback-after-welcome-failure");

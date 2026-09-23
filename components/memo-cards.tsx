@@ -35,24 +35,43 @@ type MemoCardsProps = {
 export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
   const placeholder = placeholderCopy[locale];
 
-  return <div className={`memo-grid${className ? ` ${className}` : ""}`}>
-    {slotIndexes.map((index) => {
-      const memo = memos[index];
-      const cardNumber = String(index + 1).padStart(3, "0");
+  return (
+    <div className={`memo-grid${className ? ` ${className}` : ""}`}>
+      {slotIndexes.map((index) => {
+        const memo = memos[index];
+        const cardNumber = String(index + 1).padStart(3, "0");
 
-      if (!memo) return <article className={`memo-card memo-card-placeholder memo-card-${index + 1}`} key={cardNumber}>
-        <div><span>{cardNumber}</span><span>{placeholder.status}</span></div>
-        <h3>{placeholder.title(cardNumber)}</h3>
-        <p>{placeholder.summary}</p>
-        <small>{placeholder.availability}</small>
-      </article>;
+        if (!memo)
+          return (
+            <article className={`memo-card memo-card-placeholder memo-card-${index + 1}`} key={cardNumber}>
+              <div>
+                <span>{cardNumber}</span>
+                <span>{placeholder.status}</span>
+              </div>
+              <h3>{placeholder.title(cardNumber)}</h3>
+              <p>{placeholder.summary}</p>
+              <small>{placeholder.availability}</small>
+            </article>
+          );
 
-      return <Link className={`memo-card memo-card-${index + 1}`} href={getLocalizedPath(`/memos/${memo.slug}`, locale)} key={memo.slug}>
-        <div><span>{memo.number}</span><span>{memo.category.label}</span></div>
-        <h3>{memo.title}</h3>
-        <p>{memo.summary}</p>
-        <small className="date-text">{formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}</small>
-      </Link>;
-    })}
-  </div>;
+        return (
+          <Link
+            className={`memo-card memo-card-${index + 1}`}
+            href={getLocalizedPath(`/memos/${memo.slug}`, locale)}
+            key={memo.slug}
+          >
+            <div>
+              <span>{memo.number}</span>
+              <span>{memo.category.label}</span>
+            </div>
+            <h3>{memo.title}</h3>
+            <p>{memo.summary}</p>
+            <small className="date-text">
+              {formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}
+            </small>
+          </Link>
+        );
+      })}
+    </div>
+  );
 }

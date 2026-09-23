@@ -9,7 +9,11 @@ export const runtime = "nodejs";
 
 const MAX_FORM_BYTES = 5_000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const isRateLimited = createRateLimiter({ namespace: "stripe-checkout", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 8 });
+const isRateLimited = createRateLimiter({
+  namespace: "stripe-checkout",
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  maxRequests: 8,
+});
 
 function supportUrl(request: Request, locale: ReturnType<typeof resolveLocale>, status: "cancelled" | "error") {
   const url = new URL(getLocalizedPath("/support", locale), request.url);

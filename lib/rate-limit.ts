@@ -12,26 +12,28 @@ type RedisRateLimiterOptions = RateLimiterOptions & {
 };
 
 const RATE_LIMIT_KEY_PREFIX = "mfa:rl:v2";
-const rateLimitHashSecret = process.env.RATE_LIMIT_HASH_SECRET
-  || process.env.SUBSCRIPTION_PREFERENCES_SECRET
-  || process.env.RESEND_API_KEY
-  || randomBytes(32);
+const rateLimitHashSecret =
+  process.env.RATE_LIMIT_HASH_SECRET ||
+  process.env.SUBSCRIPTION_PREFERENCES_SECRET ||
+  process.env.RESEND_API_KEY ||
+  randomBytes(32);
 
 function validateRateLimiterOptions({ windowMs, maxRequests, maxKeys = 1000 }: RateLimiterOptions) {
-  if (!Number.isSafeInteger(windowMs) || windowMs <= 0) throw new RangeError("Rate-limit window must be a positive integer");
-  if (!Number.isSafeInteger(maxRequests) || maxRequests <= 0) throw new RangeError("Rate-limit maximum must be a positive integer");
-  if (!Number.isSafeInteger(maxKeys) || maxKeys <= 0) throw new RangeError("Rate-limit key limit must be a positive integer");
+  if (!Number.isSafeInteger(windowMs) || windowMs <= 0)
+    throw new RangeError("Rate-limit window must be a positive integer");
+  if (!Number.isSafeInteger(maxRequests) || maxRequests <= 0)
+    throw new RangeError("Rate-limit maximum must be a positive integer");
+  if (!Number.isSafeInteger(maxKeys) || maxKeys <= 0)
+    throw new RangeError("Rate-limit key limit must be a positive integer");
   return maxKeys;
 }
 
 function getRequestIdentifier(request: Request) {
-  const clientKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || request.headers.get("x-real-ip")?.trim();
+  const clientKey =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip")?.trim();
   if (!clientKey) return null;
 
-  return createHmac("sha256", rateLimitHashSecret)
-    .update(`rate-limit:${clientKey}`)
-    .digest("base64url");
+  return createHmac("sha256", rateLimitHashSecret).update(`rate-limit:${clientKey}`).digest("base64url");
 }
 
 function createIdentifierRateLimiter(options: RateLimiterOptions) {
@@ -46,9 +48,10 @@ function createIdentifierRateLimiter(options: RateLimiterOptions) {
 
     const now = Date.now();
     const current = requests.get(key);
-    const window = current && current.expiresAt > now
-      ? { count: current.count + 1, expiresAt: current.expiresAt }
-      : { count: 1, expiresAt: now + windowMs };
+    const window =
+      current && current.expiresAt > now
+        ? { count: current.count + 1, expiresAt: current.expiresAt }
+        : { count: 1, expiresAt: now + windowMs };
     requests.set(key, window);
 
     if (requests.size > maxKeys) {
@@ -88,10 +91,12 @@ export function createRateLimiter(options: RedisRateLimiterOptions) {
       const redis = await getRedisClient();
       if (!redis) return memoryFallback(identifier);
 
-      const count = await executeRedisCommand(redis, () => redis.eval(rateLimitScript, {
-        keys: [`${RATE_LIMIT_KEY_PREFIX}:${namespace}:${identifier}`],
-        arguments: [String(windowMs)],
-      }));
+      const count = await executeRedisCommand(redis, () =>
+        redis.eval(rateLimitScript, {
+          keys: [`${RATE_LIMIT_KEY_PREFIX}:${namespace}:${identifier}`],
+          arguments: [String(windowMs)],
+        }),
+      );
       if (typeof count !== "number") throw new TypeError("Unexpected Redis rate-limit response");
       return count > maxRequests;
     } catch (error) {

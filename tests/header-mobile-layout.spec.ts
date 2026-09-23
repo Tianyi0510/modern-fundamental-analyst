@@ -15,8 +15,13 @@ test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
   await page.keyboard.press("Enter");
   await page.keyboard.press("Tab");
   // Native Tab order may skip links according to the browser's keyboard settings.
-  expect(await page.evaluate(() => document.activeElement !== document.body
-    && !document.querySelector(".language-menu")?.contains(document.activeElement))).toBe(true);
+  expect(
+    await page.evaluate(
+      () =>
+        document.activeElement !== document.body &&
+        !document.querySelector(".language-menu")?.contains(document.activeElement),
+    ),
+  ).toBe(true);
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
   await trigger.focus();
   await page.keyboard.press("Enter");
@@ -33,7 +38,10 @@ test("closed language menu cannot receive focus during its exit", async ({ page 
   await expect(page.locator(".language-dropdown")).not.toHaveAttribute("inert");
   await page.keyboard.press("Escape");
   await expect(page.locator(".language-dropdown")).toHaveAttribute("inert", "");
-  await page.locator(".language-dropdown a").first().evaluate((link: HTMLAnchorElement) => link.focus());
+  await page
+    .locator(".language-dropdown a")
+    .first()
+    .evaluate((link: HTMLAnchorElement) => link.focus());
   await expect(trigger).toBeFocused();
   await trigger.click();
   await expect(page.locator(".language-dropdown")).not.toHaveAttribute("inert");
@@ -79,7 +87,13 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
       animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
       element.click();
       const drawer = layer.querySelector(".mobile-menu-drawer")!.getBoundingClientRect();
-      return { count: layer.getAnimations().length, left: drawer.left, top: drawer.top, width: drawer.width, locked: document.body.style.position };
+      return {
+        count: layer.getAnimations().length,
+        left: drawer.left,
+        top: drawer.top,
+        width: drawer.width,
+        locked: document.body.style.position,
+      };
     });
     expect(result.count).toBe(1);
     expect(result.left).toBeGreaterThan(0);
@@ -94,7 +108,7 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
     await trigger.click();
     await page.keyboard.press("Escape");
     await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
-    expect(await page.locator(".mobile-menu-layer").evaluate(element => element.getAnimations().length)).toBe(0);
+    expect(await page.locator(".mobile-menu-layer").evaluate((element) => element.getAnimations().length)).toBe(0);
   }
 });
 
@@ -106,20 +120,26 @@ test("close icon rotates visibly before the panel leaves and replays", async ({ 
     for (let repeat = 0; repeat < 2; repeat++) {
       await page.locator(".mobile-menu-button").click();
       const icon = page.locator(".mobile-menu-close svg");
-      await expect.poll(() => icon.evaluate(e => e.getAnimations().filter(a => a.playState === "running").length)).toBe(0);
+      await expect
+        .poll(() => icon.evaluate((e) => e.getAnimations().filter((a) => a.playState === "running").length))
+        .toBe(0);
       const result = await page.locator(".mobile-menu-close").evaluate((button: HTMLButtonElement) => {
         button.click();
         const layer = document.querySelector(".mobile-menu-layer")!;
         const icon = button.querySelector("svg")!;
         const panelAnimation = layer.getAnimations()[0]!;
-        const iconAnimation = icon.getAnimations().find(a => !(a instanceof CSSAnimation))!;
+        const iconAnimation = icon.getAnimations().find((a) => !(a instanceof CSSAnimation))!;
         panelAnimation.pause();
         iconAnimation.pause();
         const midpoint = Number(iconAnimation.effect!.getTiming().duration) / 2;
         panelAnimation.currentTime = midpoint;
         iconAnimation.currentTime = midpoint;
         const matrix = new DOMMatrixReadOnly(getComputedStyle(icon).transform);
-        const result = { angle: Math.atan2(matrix.b, matrix.a) * 180 / Math.PI, left: layer.getBoundingClientRect().left, right: button.getBoundingClientRect().right };
+        const result = {
+          angle: (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI,
+          left: layer.getBoundingClientRect().left,
+          right: button.getBoundingClientRect().right,
+        };
         iconAnimation.play();
         panelAnimation.play();
         return result;
@@ -129,7 +149,7 @@ test("close icon rotates visibly before the panel leaves and replays", async ({ 
       expect(result.left).toBe(0);
       expect(result.right).toBeLessThanOrEqual(390);
       await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
-      await expect.poll(() => icon.evaluate(e => e.getAnimations().length)).toBe(0);
+      await expect.poll(() => icon.evaluate((e) => e.getAnimations().length)).toBe(0);
       await expect(page.locator(".mobile-menu-button")).toBeFocused();
     }
   }
@@ -144,7 +164,7 @@ test("menu hides before releasing the final dismissal frame", async ({ page }) =
       button.click();
       const layer = document.querySelector(".mobile-menu-layer")!;
       const animation = layer.getAnimations()[0]!;
-      return await new Promise<string>(resolve => {
+      return await new Promise<string>((resolve) => {
         const cancel = animation.cancel.bind(animation);
         animation.cancel = () => {
           const visibility = getComputedStyle(layer).visibility;
@@ -167,9 +187,9 @@ test.describe("repeated touch menu animation", () => {
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.goto(prefix || "/");
       const icon = page.locator(".mobile-menu-close svg");
-      await icon.evaluate(element => {
+      await icon.evaluate((element) => {
         element.setAttribute("data-starts", "0");
-        element.addEventListener("animationstart", event => {
+        element.addEventListener("animationstart", (event) => {
           if ((event as AnimationEvent).animationName === "mobile-menu-icon-enter") {
             element.setAttribute("data-starts", String(Number(element.getAttribute("data-starts")) + 1));
           }
@@ -180,7 +200,7 @@ test.describe("repeated touch menu animation", () => {
         await expect(icon).toHaveAttribute("data-starts", String(opening));
         await page.locator(".mobile-menu-close").tap();
         await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
-        expect(await icon.evaluate(element => getComputedStyle(element).transform)).toBe("matrix(0, -1, 1, 0, 0, 0)");
+        expect(await icon.evaluate((element) => getComputedStyle(element).transform)).toBe("matrix(0, -1, 1, 0, 0, 0)");
       }
     }
   });
@@ -192,7 +212,7 @@ test("menu icon replays after navigation and returning to a visited page", async
   await page.goto("/");
   for (const path of ["/about", "/memos", "/", "/portfolio"]) {
     const icon = page.locator(".mobile-menu-close:visible svg");
-    await page.locator(".mobile-menu-close svg").evaluate(element => {
+    await page.locator(".mobile-menu-close svg").evaluate((element) => {
       element.setAttribute("data-started", "false");
       element.addEventListener("animationstart", () => element.setAttribute("data-started", "true"), { once: true });
     });
@@ -214,7 +234,7 @@ test.describe("mobile menu touch ring", () => {
         await page.emulateMedia({ reducedMotion: route === "/" ? "reduce" : "no-preference" });
         await page.locator(".mobile-menu-button").tap();
         const close = page.locator(".mobile-menu-close");
-        expect(await close.evaluate(e => e.matches(":focus-visible"))).toBe(false);
+        expect(await close.evaluate((e) => e.matches(":focus-visible"))).toBe(false);
         await expect(close).toHaveCSS("outline-style", "solid");
         await expect(close).toHaveCSS("outline-width", "2px");
         await expect(close).toHaveCSS("outline-color", "rgb(0, 140, 255)");
@@ -236,9 +256,9 @@ test("memo disclosure animates both directions and respects reduced motion", asy
     await page.goto(`${prefix}/memos`);
     const disclosure = page.locator(".memo-disclosure");
     const summary = disclosure.locator("summary");
-    const closed = await disclosure.evaluate(e => e.getBoundingClientRect().height);
+    const closed = await disclosure.evaluate((e) => e.getBoundingClientRect().height);
     await summary.click();
-    const midpoint = await disclosure.evaluate(e => {
+    const midpoint = await disclosure.evaluate((e) => {
       const animation = e.getAnimations()[0];
       if (!animation) throw new Error("Expected disclosure height animation");
       animation.pause();
@@ -251,12 +271,12 @@ test("memo disclosure animates both directions and respects reduced motion", asy
     await summary.evaluate((e: HTMLElement) => e.click());
     await expect(disclosure).toHaveAttribute("data-closing", "");
     await expect(disclosure).not.toHaveAttribute("open", "");
-    expect(await disclosure.evaluate(e => e.getBoundingClientRect().height)).toBeCloseTo(closed, 0);
+    expect(await disclosure.evaluate((e) => e.getBoundingClientRect().height)).toBeCloseTo(closed, 0);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await summary.focus();
     await page.keyboard.press("Enter");
     await expect(disclosure).toHaveAttribute("open", "");
-    expect(await disclosure.evaluate(e => e.getAnimations().length)).toBe(0);
+    expect(await disclosure.evaluate((e) => e.getAnimations().length)).toBe(0);
     await page.keyboard.press("Space");
     await expect(disclosure).not.toHaveAttribute("open", "");
   }
@@ -267,19 +287,25 @@ test("home contact and portfolio totals keep consistent spacing in all languages
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(prefix || "/");
     for (const size of [16, 32]) {
-      await page.evaluate(size => { document.documentElement.style.fontSize = `${size}px`; }, size);
-      const spacing = await page.locator(".cta").evaluate(e => {
+      await page.evaluate((size) => {
+        document.documentElement.style.fontSize = `${size}px`;
+      }, size);
+      const spacing = await page.locator(".cta").evaluate((e) => {
         const label = e.querySelector(".eyebrow")!.getBoundingClientRect();
         const heading = e.querySelector("h2")!.getBoundingClientRect();
         const button = e.querySelector(".button")!.getBoundingClientRect();
-        return { before: heading.top - label.bottom, after: button.top - heading.bottom, gap: parseFloat(getComputedStyle(e).rowGap) };
+        return {
+          before: heading.top - label.bottom,
+          after: button.top - heading.bottom,
+          gap: parseFloat(getComputedStyle(e).rowGap),
+        };
       });
       expect(spacing.before).toBeCloseTo(spacing.gap, 0);
       expect(spacing.after).toBeCloseTo(spacing.gap, 0);
     }
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${prefix}/portfolio`);
-    const heights = await page.locator(".portfolio-table-detailed").evaluate(e => ({
+    const heights = await page.locator(".portfolio-table-detailed").evaluate((e) => ({
       row: e.querySelector(".portfolio-row:not(.portfolio-total-row)")!.getBoundingClientRect().height,
       total: e.querySelector(".portfolio-total-row")!.getBoundingClientRect().height,
     }));
@@ -295,11 +321,18 @@ test("narrow navigation keeps its close control and brand inside the drawer", as
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
     for (const fontSize of [16, 32]) {
-      await page.evaluate((size) => { document.documentElement.style.fontSize = `${size}px`; }, fontSize);
+      await page.evaluate((size) => {
+        document.documentElement.style.fontSize = `${size}px`;
+      }, fontSize);
       const geometry = await drawer.evaluate((element) => {
         const brand = element.querySelector(".wordmark")!.getBoundingClientRect();
         const close = element.querySelector(".mobile-menu-close")!.getBoundingClientRect();
-        return { overflow: element.scrollWidth - element.clientWidth, brandRight: brand.right, closeLeft: close.left, closeRight: close.right };
+        return {
+          overflow: element.scrollWidth - element.clientWidth,
+          brandRight: brand.right,
+          closeLeft: close.left,
+          closeRight: close.right,
+        };
       });
       expect(geometry.overflow).toBeLessThanOrEqual(1);
       expect(geometry.brandRight).toBeLessThanOrEqual(geometry.closeLeft);
@@ -345,7 +378,9 @@ test.describe("header interaction QA", () => {
     expect(hoverState.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
     expect(hoverState.transform).not.toBe("none");
     await expect(about).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
-    await about.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault(), { once: true }));
+    await about.evaluate((element) =>
+      element.addEventListener("click", (event) => event.preventDefault(), { once: true }),
+    );
     await page.mouse.down();
     try {
       await expect(about).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
@@ -381,7 +416,17 @@ test.describe("header interaction QA", () => {
   });
 
   test("desktop page heroes share one vertical rhythm", async ({ page }) => {
-    for (const path of ["/", "/about", "/portfolio", "/performance", "/memos", "/contact", "/support", "/disclaimer", "/subscription-preferences"]) {
+    for (const path of [
+      "/",
+      "/about",
+      "/portfolio",
+      "/performance",
+      "/memos",
+      "/contact",
+      "/support",
+      "/disclaimer",
+      "/subscription-preferences",
+    ]) {
       await page.goto(path);
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
       await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
@@ -393,10 +438,13 @@ test.describe("header interaction QA", () => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
     const row = page.locator(".holding-row").first();
-    const positions = () => row.evaluate(element => Array.from(element.children, child => {
-      const rect = child.getBoundingClientRect();
-      return { x: rect.x, width: rect.width };
-    }));
+    const positions = () =>
+      row.evaluate((element) =>
+        Array.from(element.children, (child) => {
+          const rect = child.getBoundingClientRect();
+          return { x: rect.x, width: rect.width };
+        }),
+      );
     const before = await positions();
     await row.hover();
     await expect(row).toHaveCSS("padding-left", "14px");
@@ -421,8 +469,12 @@ test.describe("header interaction QA", () => {
       await control.hover();
       await page.mouse.down();
       try {
-        const durations = await control.evaluate(element => getComputedStyle(element).transitionDuration.split(",").map(value => Number.parseFloat(value)));
-        expect(durations.every(duration => duration === 0.09)).toBe(true);
+        const durations = await control.evaluate((element) =>
+          getComputedStyle(element)
+            .transitionDuration.split(",")
+            .map((value) => Number.parseFloat(value)),
+        );
+        expect(durations.every((duration) => duration === 0.09)).toBe(true);
       } finally {
         await page.mouse.move(1, 1);
         await page.mouse.up();
@@ -449,7 +501,9 @@ test.describe("header interaction QA", () => {
         await link.hover();
         // Release on the same link without navigating. Moving a held link away
         // starts native drag-and-drop in WebKit and can strand :active state.
-        await link.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault(), { once: true }));
+        await link.evaluate((element) =>
+          element.addEventListener("click", (event) => event.preventDefault(), { once: true }),
+        );
         await page.mouse.down();
         try {
           await expect(link).toHaveCSS("transform", "none");
@@ -468,78 +522,87 @@ test.describe("header interaction QA", () => {
         await page.goto(path);
         const note = page.locator(".reference-note");
         if (path === "/about") {
-        await expect(note).toHaveCount(1);
-        await expect(note).toHaveCSS("font-size", "18px");
-        await expect(note).toHaveCSS("line-height", "27px");
-        await expect(note).toHaveCSS("font-weight", "400");
-        await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
-        for (const link of await note.locator("a").all()) {
-          await expect(link).toHaveCSS("font-weight", "400");
-          await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
-          await expect(link).toHaveCSS("text-decoration-line", "underline");
-          await expect(link).toHaveCSS("text-underline-offset", "3px");
-          await link.hover();
-          await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
-          await page.keyboard.press("Shift");
-          await link.focus();
-          await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
-        }
+          await expect(note).toHaveCount(1);
+          await expect(note).toHaveCSS("font-size", "18px");
+          await expect(note).toHaveCSS("line-height", "27px");
+          await expect(note).toHaveCSS("font-weight", "400");
+          await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
+          for (const link of await note.locator("a").all()) {
+            await expect(link).toHaveCSS("font-weight", "400");
+            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+            await expect(link).toHaveCSS("text-decoration-line", "underline");
+            await expect(link).toHaveCSS("text-underline-offset", "3px");
+            await link.hover();
+            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+            await page.keyboard.press("Shift");
+            await link.focus();
+            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+          }
         }
         if (path.startsWith("/memos/")) {
           await expect(page.locator('.article-body a[href*="docs.google.com/document"]')).toHaveCount(0);
           await expect(page.locator(".memo-references li")).toHaveCount(5);
           await page.evaluate(() => document.fonts.ready);
-          const gaps = await page.locator(".memo-section").last().evaluate((section) => {
-            const conclusion = section.querySelector(".memo-subsection:last-child")!;
-            const previousParagraph = conclusion.previousElementSibling!.lastElementChild!;
-            const heading = conclusion.querySelector("h3")!;
-            const finalParagraph = conclusion.lastElementChild!;
-            const references = section.nextElementSibling!;
-            window.scrollTo({ top: heading.getBoundingClientRect().top + scrollY - 250, behavior: "instant" });
-            const style = getComputedStyle(references);
-            return {
-              above: heading.getBoundingClientRect().top - previousParagraph.getBoundingClientRect().bottom,
-              below: references.getBoundingClientRect().top - finalParagraph.getBoundingClientRect().bottom,
-              innerTop: style.paddingTop,
-              innerBottom: style.paddingBottom,
-              rects: [previousParagraph, heading, finalParagraph, references].map((node) => node.getBoundingClientRect().toJSON()),
-            };
-          });
+          const gaps = await page
+            .locator(".memo-section")
+            .last()
+            .evaluate((section) => {
+              const conclusion = section.querySelector(".memo-subsection:last-child")!;
+              const previousParagraph = conclusion.previousElementSibling!.lastElementChild!;
+              const heading = conclusion.querySelector("h3")!;
+              const finalParagraph = conclusion.lastElementChild!;
+              const references = section.nextElementSibling!;
+              window.scrollTo({ top: heading.getBoundingClientRect().top + scrollY - 250, behavior: "instant" });
+              const style = getComputedStyle(references);
+              return {
+                above: heading.getBoundingClientRect().top - previousParagraph.getBoundingClientRect().bottom,
+                below: references.getBoundingClientRect().top - finalParagraph.getBoundingClientRect().bottom,
+                innerTop: style.paddingTop,
+                innerBottom: style.paddingBottom,
+                rects: [previousParagraph, heading, finalParagraph, references].map((node) => {
+                  const { top, bottom, left, right } = node.getBoundingClientRect();
+                  return { top, bottom, left, right };
+                }),
+              };
+            });
           expect(gaps.above).toBeCloseTo(width <= 800 ? 49 : 58, 1);
           expect(gaps.below).toBeCloseTo(width <= 800 ? 50 : 60, 1);
           expect(gaps.innerTop).toBe(gaps.innerBottom);
           // Line boxes alone hide Jost's optical imbalance. Scan the rendered
           // text pixels, measuring to the gray surface rather than its heading.
           const screenshot = await page.screenshot();
-          const visibleGaps = await page.evaluate(async ({ data, rects }) => {
-            const img = new Image();
-            img.src = data;
-            await img.decode();
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const context = canvas.getContext("2d")!;
-            context.drawImage(img, 0, 0);
-            const pixels = context.getImageData(0, 0, img.width, img.height).data;
-            const ink = rects.slice(0, 3).map((rect) => {
-              let top = Infinity;
-              let bottom = -Infinity;
-              for (let y = Math.max(0, Math.ceil(rect.top)); y < Math.min(img.height, Math.floor(rect.bottom)); y++) {
-                for (let x = Math.ceil(rect.left); x < Math.floor(rect.right); x++) {
-                  const index = (y * img.width + x) * 4;
-                  if (pixels[index]! < 128 && pixels[index + 1]! < 128 && pixels[index + 2]! < 128) {
-                    top = Math.min(top, y);
-                    bottom = Math.max(bottom, y);
+          const visibleGaps = await page.evaluate(
+            async ({ data, rects }) => {
+              const img = new Image();
+              img.src = data;
+              await img.decode();
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const context = canvas.getContext("2d")!;
+              context.drawImage(img, 0, 0);
+              const pixels = context.getImageData(0, 0, img.width, img.height).data;
+              const ink = rects.slice(0, 3).map((rect) => {
+                let top = Infinity;
+                let bottom = -Infinity;
+                for (let y = Math.max(0, Math.ceil(rect.top)); y < Math.min(img.height, Math.floor(rect.bottom)); y++) {
+                  for (let x = Math.ceil(rect.left); x < Math.floor(rect.right); x++) {
+                    const index = (y * img.width + x) * 4;
+                    if (pixels[index]! < 128 && pixels[index + 1]! < 128 && pixels[index + 2]! < 128) {
+                      top = Math.min(top, y);
+                      bottom = Math.max(bottom, y);
+                    }
                   }
                 }
-              }
-              return { top, bottom };
-            });
-            return {
-              above: ink[1]!.top - ink[0]!.bottom - 1,
-              below: Math.ceil(rects[3].top) - ink[2]!.bottom - 1,
-            };
-          }, { data: `data:image/png;base64,${screenshot.toString("base64")}`, rects: gaps.rects });
+                return { top, bottom };
+              });
+              return {
+                above: ink[1]!.top - ink[0]!.bottom - 1,
+                below: Math.ceil(rects[3]!.top) - ink[2]!.bottom - 1,
+              };
+            },
+            { data: `data:image/png;base64,${screenshot.toString("base64")}`, rects: gaps.rects },
+          );
           expect(Number.isFinite(visibleGaps.above) && Number.isFinite(visibleGaps.below)).toBe(true);
           // Ink edges can round differently across macOS/Linux and browser
           // rasterizers. Keep exact line-box assertions above, allowing only
@@ -582,7 +645,8 @@ test.describe("mobile content and navigation QA", () => {
     deviceScaleFactor: 3,
     hasTouch: true,
     isMobile: true,
-    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
   });
 
   test("site header stays in document flow while the menu brand remains pinned", async ({ page }) => {
@@ -611,10 +675,12 @@ test.describe("mobile content and navigation QA", () => {
     await page.goto("/");
     const metrics = page.locator(".home-page .metric");
     await expect(metrics).toHaveCount(3);
-    const boxes = await metrics.evaluateAll((elements) => elements.map((element) => {
-      const box = element.getBoundingClientRect();
-      return { width: box.width, height: box.height, left: box.left };
-    }));
+    const boxes = await metrics.evaluateAll((elements) =>
+      elements.map((element) => {
+        const box = element.getBoundingClientRect();
+        return { width: box.width, height: box.height, left: box.left };
+      }),
+    );
     for (const box of boxes) {
       expect(box.left).toBe(0);
       expect(box.width).toBe(390);
@@ -632,7 +698,11 @@ test.describe("mobile content and navigation QA", () => {
 
     const sourceStyle = await page.locator(".methodology-source").evaluate((element) => {
       const style = getComputedStyle(element);
-      return { borderTopWidth: style.borderTopWidth, borderLeftWidth: style.borderLeftWidth, marginTop: style.marginTop };
+      return {
+        borderTopWidth: style.borderTopWidth,
+        borderLeftWidth: style.borderLeftWidth,
+        marginTop: style.marginTop,
+      };
     });
     expect(sourceStyle).toEqual({ borderTopWidth: "4px", borderLeftWidth: "0px", marginTop: "0px" });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -645,7 +715,7 @@ test.describe("mobile content and navigation QA", () => {
     expect(countBox).not.toBeNull();
     expect(arrowBox).not.toBeNull();
     expect(countBox!.x + countBox!.width).toBeLessThan(arrowBox!.x);
-    expect(Math.abs((countBox!.y + countBox!.height / 2) - (arrowBox!.y + arrowBox!.height / 2))).toBeLessThan(2);
+    expect(Math.abs(countBox!.y + countBox!.height / 2 - (arrowBox!.y + arrowBox!.height / 2))).toBeLessThan(2);
 
     const disclosure = page.locator(".memo-disclosure");
     await disclosure.locator("summary").tap();
@@ -657,11 +727,21 @@ test.describe("mobile content and navigation QA", () => {
     await page.goto("/");
     await page.locator(".mobile-menu-button").tap();
     await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+    await expect(page.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
-    await expect.poll(() => page.locator(".mobile-menu-close").evaluate((element) => getComputedStyle(element).transform)).toBe("none");
+    await expect
+      .poll(() => page.locator(".mobile-menu-close").evaluate((element) => getComputedStyle(element).transform))
+      .toBe("none");
     await expect(page.locator(".mobile-menu-drawer nav a")).toHaveCount(6);
     await expect(page.locator(".mobile-menu-index")).toHaveCount(0);
-    await expect(page.locator(".mobile-menu-label")).toHaveText(["Home", "About", "Portfolio", "Performance", "Investment Memos", "Contact"]);
+    await expect(page.locator(".mobile-menu-label")).toHaveText([
+      "Home",
+      "About",
+      "Portfolio",
+      "Performance",
+      "Investment Memos",
+      "Contact",
+    ]);
     await expect(page.locator(".mobile-menu-drawer nav svg")).toHaveCount(0);
     await expect(page.locator(".mobile-language-links a")).toHaveCount(3);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("color", "rgb(0, 140, 255)");
@@ -677,7 +757,10 @@ test.describe("mobile content and navigation QA", () => {
     expect(drawerBox).not.toBeNull();
     expect(drawerBox!.x).toBe(0);
     expect(drawerBox!.width).toBe(390);
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("background-color", "color(srgb 0.736471 0.917647 0.996706)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS(
+      "background-color",
+      "color(srgb 0.736471 0.917647 0.996706)",
+    );
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 140, 255)");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "14px");
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "14px");
@@ -689,8 +772,12 @@ test.describe("mobile content and navigation QA", () => {
     expect(topBeforeScroll!.width).toBe(390);
     await expect(menuTop).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(drawer).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    expect(await drawer.evaluate((element) => getComputedStyle(element, "::before").backgroundColor)).toBe("rgb(248, 249, 251)");
-    await expect.poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").transform)).toBe("matrix(1, 0, 0, 1, 0, 0)");
+    expect(await drawer.evaluate((element) => getComputedStyle(element, "::before").backgroundColor)).toBe(
+      "rgb(248, 249, 251)",
+    );
+    await expect
+      .poll(() => drawer.evaluate((element) => getComputedStyle(element, "::before").transform))
+      .toBe("matrix(1, 0, 0, 1, 0, 0)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("white-space", "normal");
@@ -728,7 +815,17 @@ test.describe("mobile content and navigation QA", () => {
   });
 
   test("mobile page heroes share one vertical rhythm", async ({ page }) => {
-    for (const path of ["/", "/about", "/portfolio", "/performance", "/memos", "/contact", "/support", "/disclaimer", "/subscription-preferences"]) {
+    for (const path of [
+      "/",
+      "/about",
+      "/portfolio",
+      "/performance",
+      "/memos",
+      "/contact",
+      "/support",
+      "/disclaimer",
+      "/subscription-preferences",
+    ]) {
       await page.goto(path);
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
       await expect(hero, `${path} hero`).toHaveCSS("padding-top", "72px");
@@ -837,10 +934,14 @@ test.describe("mobile content and navigation QA", () => {
     await menuButton.hover();
     await page.mouse.down();
     try {
-      await expect.poll(() => menuButton.evaluate((element) => {
-        const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
-        return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
-      })).toBe(98);
+      await expect
+        .poll(() =>
+          menuButton.evaluate((element) => {
+            const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+            return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
+          }),
+        )
+        .toBe(98);
     } finally {
       await page.mouse.up();
     }

@@ -16,6 +16,10 @@ Vercel's configured build command waits up to ten minutes for the latest push CI
 
 The application shares one authenticated TLS connection per Node.js process. Concurrent cold requests wait for the same connection to become ready. Configure `UPSTASH_REDIS_URL` with a `rediss://` URL; credentials are never logged.
 
+For production ACL, create a dedicated `mfa_app` user with a generated password and the key pattern `~mfa:*`. Start with no command categories, then allow `+get +set +del +eval +incr +pexpire`. These are the only data commands used by the application, including commands inside its Lua scripts. Allow the connection commands required by node-redis (`+hello +ping +client|setinfo`) if the provider supports them. Do not grant `+@all`, administrative commands, or other key patterns. ACL key patterns do not constrain commands that take no key, so the command allowlist is essential. Keep the `default` credential available until the new user passes an authenticated connection and representative rate-limit, subscription, and journal checks.
+
+The production database currently uses Upstash Free Tier, which does not include ACL according to Upstash's published plan documentation. The owner chose not to upgrade on 2026-09-22, so the ACL user and credential rotation remain pending. After a plan with ACL is approved, create the user in Upstash, verify `ACL DRYRUN` for permitted and denied commands (including another key prefix), and test through a separate TLS connection before changing the Vercel production `UPSTASH_REDIS_URL` to `rediss://mfa_app:<password>@<host>:6379`. Encode URL-sensitive password characters. Redeploy and test the public forms and journal operator CLI, then revoke the old application credential. Keep the password in the provider and Vercel secret settings only; do not put it in Git, logs, test fixtures, or command output. If the new credential fails, restore the previous Vercel value while the old user remains enabled.
+
 Connection attempts have a 2-second timeout with at most two reconnect retries. Individual commands have a 5-second timeout through node-redis `commandOptions`. There is no socket inactivity timeout, so an idle healthy connection is not closed every five seconds. Offline commands are rejected and the command queue is capped at 100.
 
 Initial connection readiness, including authentication, has a separate 10-second deadline that destroys a stalled socket. Requests encountering a reconnecting client without a shared initial connection attempt fail fast into cooldown.
@@ -47,9 +51,11 @@ Payment confirmation uses server-verified Stripe Session status; URL parameters 
 
 `audit/` holds local screenshots and dated review notes. Git and Vercel exclude it; existing files are retained on disk. These historical observations are not the current issue list and are not shared with a fresh clone. Keep durable decisions and operating instructions in the root documentation. If evidence needs to be shared, prepare a separate reviewed artifact with relative image links and record its date, commit, environment and resolution status; local absolute paths are not portable.
 
-Browser evidence is separated into `test-results/chromium/` and `test-results/webkit/`, so running WebKit preserves Chromium evidence. GitHub Actions retains failed Playwright traces and screenshots in the `browser-failure-evidence` artifact for seven days.
+Playwright defines named Chromium and WebKit projects with separate `test-results/chromium/` and `test-results/webkit/` evidence, so running one browser preserves the other's results. CI retries a failed case once and records its first retry trace; local runs keep a trace only for failed cases. Failure screenshots are retained in both environments. GitHub Actions uploads failed browser evidence for seven days. Locale and viewport variants are separate tests so a retry targets the failing case rather than rerunning every variant.
 
 `npm run verify` builds once and runs Chromium against the production server. The subsequent CI WebKit step tests that same build with one worker. Local `npm run test:computed-style` remains available for faster checks against the development server. Playwright starts and stops its own server on port 3210 for each suite.
+
+The split follows the [Next.js testing guide](https://nextjs.org/docs/app/guides/testing): Node's isolated test runner covers service logic, while Playwright checks rendered pages and interactions against a production build. Browser project and retry-trace settings follow the [Playwright projects](https://playwright.dev/docs/test-projects) and [trace viewer](https://playwright.dev/docs/trace-viewer) guides.
 
 ## Portfolio data
 

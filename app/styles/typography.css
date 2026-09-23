@@ -216,7 +216,9 @@
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
 }
-.portfolio-total-row .portfolio-total-return { font-weight: var(--weight-bold); }
+.portfolio-total-row .portfolio-total-return {
+  font-weight: var(--weight-bold);
+}
 
 /* Article subsections remain visibly subordinate to section headings. */
 .memo-subsection h3 {
