@@ -601,6 +601,7 @@
   .mobile-menu-close {
     flex: 0 0 auto;
     border-color: var(--black);
+    position: relative;
   }
   .mobile-menu-layer.is-open .mobile-menu-close {
     outline: 2px solid var(--medium-blue);
@@ -628,10 +629,18 @@
     color: var(--black);
     transform: scale(var(--motion-scale-press));
   }
-  .mobile-menu-close svg {
+  .mobile-menu-close-icon,
+  .mobile-menu-return-icon {
+    grid-area: 1 / 1;
+  }
+  .mobile-menu-close-icon {
     transform: rotate(-90deg);
   }
-  .mobile-menu-layer.is-open .mobile-menu-close svg {
+  .mobile-menu-return-icon {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  .mobile-menu-layer.is-open .mobile-menu-close-icon {
     transform: rotate(0);
     animation: mobile-menu-icon-enter var(--motion-duration-medium) var(--motion-ease-emphasized);
   }

@@ -128,7 +128,7 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
   }
 });
 
-test("close icon and panel depart together while the header crossfades", async ({ page }) => {
+test("close button becomes the menu button before the header crossfades", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
@@ -137,17 +137,20 @@ test("close icon and panel depart together while the header crossfades", async (
       await page.locator(".mobile-menu-button").click();
       await expect(page.locator(".mobile-menu-close")).toHaveCSS("opacity", "1");
       await expect(page.locator(".mobile-menu-top")).toHaveCSS("opacity", "1");
-      const icon = page.locator(".mobile-menu-close svg");
+      const icon = page.locator(".mobile-menu-close-icon");
       await expect
         .poll(() => icon.evaluate((e) => e.getAnimations().filter((a) => a.playState === "running").length))
         .toBe(0);
       const result = await page.locator(".mobile-menu-close").evaluate((button: HTMLButtonElement) => {
         button.click();
         const layer = document.querySelector(".mobile-menu-layer")!;
-        const icon = button.querySelector("svg")!;
+        const icon = button.querySelector(".mobile-menu-close-icon")!;
+        const returnIcon = button.querySelector(".mobile-menu-return-icon")!;
+        const trigger = document.querySelector(".mobile-menu-button")!;
         const content = layer.querySelector(".mobile-menu-content")!;
         const panelAnimation = content.getAnimations()[0]!;
         const iconAnimation = icon.getAnimations().find((a) => !(a instanceof CSSAnimation))!;
+        const returnAnimation = returnIcon.getAnimations()[0]!;
         const topBar = layer.querySelector(".mobile-menu-top")!;
         const topBarAnimation = topBar.getAnimations()[0]!;
         const buttonAnimation = button.getAnimations().find((a) => !(a instanceof CSSTransition))!;
@@ -155,18 +158,20 @@ test("close icon and panel depart together while the header crossfades", async (
         const navAnimation = nav.getAnimations()[0]!;
         panelAnimation.pause();
         iconAnimation.pause();
+        returnAnimation.pause();
         buttonAnimation.pause();
         topBarAnimation.pause();
         navAnimation.pause();
-        const midpoint = Number(iconAnimation.effect!.getTiming().duration) / 2;
+        const midpoint = Number(iconAnimation.effect!.getTiming().duration) * 0.3;
         panelAnimation.currentTime = midpoint;
         iconAnimation.currentTime = midpoint;
+        returnAnimation.currentTime = midpoint;
         buttonAnimation.currentTime = midpoint;
         topBarAnimation.currentTime = midpoint;
         navAnimation.currentTime = midpoint;
-        const matrix = new DOMMatrixReadOnly(getComputedStyle(icon).transform);
         const early = {
-          angle: (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI,
+          closeIconOpacity: Number(getComputedStyle(icon).opacity),
+          returnIconOpacity: Number(getComputedStyle(returnIcon).opacity),
           panelLeft: content.getBoundingClientRect().left,
           navOpacity: Number(getComputedStyle(nav).opacity),
           topBarOpacity: Number(getComputedStyle(topBar).opacity),
@@ -176,30 +181,41 @@ test("close icon and panel depart together while the header crossfades", async (
         };
         const duration = Number(panelAnimation.effect!.getTiming().duration);
         panelAnimation.currentTime = duration * 0.82;
+        iconAnimation.currentTime = Number(iconAnimation.effect!.getTiming().duration);
         buttonAnimation.currentTime = duration * 0.82;
+        returnAnimation.currentTime = Number(returnAnimation.effect!.getTiming().duration);
         topBarAnimation.currentTime = duration * 0.82;
         navAnimation.currentTime = Number(navAnimation.effect!.getTiming().duration);
         const late = {
           panelLeft: content.getBoundingClientRect().left,
           navOpacity: Number(getComputedStyle(nav).opacity),
           closeOpacity: Number(getComputedStyle(button).opacity),
+          closeIconOpacity: Number(getComputedStyle(icon).opacity),
+          returnIconOpacity: Number(getComputedStyle(returnIcon).opacity),
+          buttonBackground: getComputedStyle(button).backgroundColor,
+          triggerBackground: getComputedStyle(trigger).backgroundColor,
           topBarOpacity: Number(getComputedStyle(topBar).opacity),
         };
         iconAnimation.play();
+        returnAnimation.play();
         buttonAnimation.play();
         navAnimation.play();
         topBarAnimation.play();
         panelAnimation.play();
         return { early, late };
       });
-      expect(result.early.angle).toBeLessThan(-1);
-      expect(result.early.angle).toBeGreaterThan(-90);
+      expect(result.early.closeIconOpacity).toBeGreaterThan(0);
+      expect(result.early.closeIconOpacity).toBeLessThan(1);
+      expect(result.early.returnIconOpacity).toBe(0);
       expect(result.early.panelLeft).toBeGreaterThan(0);
       expect(result.early.panelLeft).toBeLessThan(result.late.panelLeft);
       expect(result.early.navOpacity).toBeGreaterThan(result.late.navOpacity);
       expect(result.early.topBarOpacity).toBe(1);
       expect(result.late.navOpacity).toBe(0);
-      expect(result.late.closeOpacity).toBe(0);
+      expect(result.late.closeOpacity).toBe(1);
+      expect(result.late.closeIconOpacity).toBe(0);
+      expect(result.late.returnIconOpacity).toBe(1);
+      expect(result.late.buttonBackground).toBe(result.late.triggerBackground);
       expect(result.late.topBarOpacity).toBeGreaterThan(0);
       expect(result.late.topBarOpacity).toBeLessThan(1);
       expect(result.early.left).toBe(0);
@@ -243,7 +259,7 @@ test.describe("repeated touch menu animation", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.goto(prefix || "/");
-      const icon = page.locator(".mobile-menu-close svg");
+      const icon = page.locator(".mobile-menu-close-icon");
       await icon.evaluate((element) => {
         element.setAttribute("data-starts", "0");
         element.addEventListener("animationstart", (event) => {
@@ -268,8 +284,8 @@ test("menu icon replays after navigation and returning to a visited page", async
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   for (const path of ["/about", "/memos", "/", "/portfolio"]) {
-    const icon = page.locator(".mobile-menu-close:visible svg");
-    await page.locator(".mobile-menu-close svg").evaluate((element) => {
+    const icon = page.locator(".mobile-menu-close:visible .mobile-menu-close-icon");
+    await page.locator(".mobile-menu-close-icon").evaluate((element) => {
       element.setAttribute("data-started", "false");
       element.addEventListener("animationstart", () => element.setAttribute("data-started", "true"), { once: true });
     });

@@ -361,7 +361,7 @@ test.describe("form accessibility and preserved text colors", () => {
     await expect(arrow).toHaveCSS("transform", "none");
     await page.setViewportSize({ width: 390, height: 800 });
     await page.locator(".mobile-menu-button").click();
-    await expect(page.locator(".mobile-menu-close svg")).toHaveCSS("transform", "none");
+    await expect(page.locator(".mobile-menu-close-icon")).toHaveCSS("transform", "none");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("translate", "none");
   });
 

@@ -155,7 +155,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
         </div>
       </section>
       <section className="performance-summary">
-        <div className="summary-primary" data-tone="highlight">
+        <div data-tone="highlight">
           <span>{text.cumulativeReturn}</span>
           <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
           <small>{text.cumulativeNote}</small>

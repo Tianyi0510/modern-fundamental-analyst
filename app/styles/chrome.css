@@ -9,9 +9,6 @@
   justify-self: start;
   white-space: nowrap;
 }
-.wordmark span {
-  color: var(--medium-blue);
-}
 .site-header .wordmark,
 .site-footer .wordmark {
   transition: none;
@@ -58,12 +55,10 @@
 .site-header nav a:hover,
 .site-header nav a:focus-visible {
   background: color-mix(in srgb, var(--bright-blue) 26%, transparent);
-  color: var(--deep-blue);
   transform: scale(var(--motion-scale-hover));
 }
 .site-header nav a[aria-current="page"] {
   background: color-mix(in srgb, var(--bright-blue) 42%, var(--white));
-  color: var(--deep-blue);
 }
 .site-header nav a:active {
   background: var(--bright-blue);
@@ -94,7 +89,6 @@
 .language-trigger:focus-visible,
 .language-trigger[aria-expanded="true"] {
   background: color-mix(in srgb, var(--bright-blue) 18%, transparent);
-  color: var(--medium-blue);
 }
 .language-trigger:hover,
 .language-trigger:focus-visible {
@@ -267,7 +261,6 @@
 .eyebrow span {
   width: 9px;
   height: 9px;
-  background: var(--medium-blue);
   border-radius: 50%;
 }
 .hero h1 {
@@ -275,7 +268,6 @@
   max-width: 1160px;
 }
 .hero h1 em {
-  color: var(--deep-blue);
   font-style: normal;
 }
 .hero-bottom {
@@ -301,10 +293,6 @@
   transition:
     color var(--motion-duration-base) var(--motion-ease-standard),
     border-color var(--motion-duration-base) var(--motion-ease-standard);
-}
-.text-link:hover,
-.text-link:focus-visible {
-  color: var(--medium-blue);
 }
 .home-page .text-link {
   display: inline-flex;
@@ -391,16 +379,6 @@
 }
 .home-page .metric-band {
   position: relative;
-}
-.metric {
-  background: var(--white);
-}
-.metric-featured {
-  background: var(--deep-blue);
-  color: var(--white);
-}
-.metric-accent {
-  background: var(--bright-blue);
 }
 .metric,
 .portfolio-kpis > div,
@@ -535,7 +513,6 @@
   padding: 28px;
   display: flex;
   flex-direction: column;
-  background: var(--bright-blue);
 }
 .allocation-visual {
   margin: 24px 0;
@@ -671,7 +648,6 @@
 .bar-value {
   min-height: 36px;
   position: relative;
-  background: var(--medium-blue);
 }
 .year-bar:nth-child(2) .bar-value {
   background: var(--bright-blue);
@@ -731,7 +707,6 @@
   padding: 30px;
   display: flex;
   flex-direction: column;
-  background: var(--white);
   transform-origin: center;
   transition:
     transform var(--motion-duration-base) var(--motion-ease-standard),

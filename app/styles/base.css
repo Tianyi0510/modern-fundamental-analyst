@@ -10,8 +10,6 @@
   --background-gray: #f8f9fb;
   --price-up: #34a853;
   --price-down: #ff0000;
-  --background: var(--white);
-  --foreground: var(--black);
 
   /* Semantic type roles: rem for text, bounded rem + vw for fluid display roles. */
   --font-size-page-title: clamp(3.25rem, 1.75rem + 5vw, 7rem);
@@ -41,7 +39,6 @@
   --leading-body: 1.5;
 
   /* 4px-based spacing scale with semantic layout aliases. */
-  --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;

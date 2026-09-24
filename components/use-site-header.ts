@@ -5,29 +5,73 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Pointer
 // Keep in sync with the navigation-only breakpoint in responsive.css.
 const compactNavigationQuery = "(max-width: 1150px)";
 
-function animateMenuDismissal(content: HTMLElement, icon: SVGElement | null) {
+function animateMenuDismissal(
+  content: HTMLElement,
+  closeButton: HTMLButtonElement | null,
+  trigger: HTMLButtonElement | null,
+) {
   const style = getComputedStyle(content);
   const duration = style.getPropertyValue("--motion-duration-slow").trim();
   const panelDuration = Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
   const feedbackToken = style.getPropertyValue("--motion-duration-fast").trim();
   const feedbackDuration = Number.parseFloat(feedbackToken) * (feedbackToken.endsWith("ms") ? 1 : 1000);
   const supportingAnimations: Animation[] = [];
-  const iconAnimation = icon?.animate(
-    [{ transform: getComputedStyle(icon).transform }, { transform: "rotate(-90deg)" }],
-    { duration: feedbackDuration, easing: style.getPropertyValue("--motion-ease-standard").trim(), fill: "forwards" },
+  const closeIcon = closeButton?.querySelector<SVGElement>(".mobile-menu-close-icon");
+  const returnIcon = closeButton?.querySelector<SVGElement>(".mobile-menu-return-icon");
+  const closeIconTransform = closeIcon ? getComputedStyle(closeIcon).transform : "none";
+  const returnIconTransform = returnIcon ? getComputedStyle(returnIcon).transform : "none";
+  const iconAnimation = closeIcon?.animate(
+    [
+      { transform: closeIconTransform, opacity: 1, offset: 0 },
+      { transform: closeIconTransform, opacity: 0, offset: 0.5 },
+      { transform: closeIconTransform, opacity: 0, offset: 1 },
+    ],
+    { duration: feedbackDuration, easing: "linear", fill: "forwards" },
   );
   if (iconAnimation) supportingAnimations.push(iconAnimation);
-  const closeButton = icon?.closest("button");
-  if (closeButton) {
+  if (returnIcon) {
+    supportingAnimations.push(
+      returnIcon.animate(
+        [
+          { transform: returnIconTransform, opacity: 0, offset: 0 },
+          { transform: returnIconTransform, opacity: 0, offset: 0.4 },
+          { transform: "none", opacity: 1, offset: 0.9 },
+          { transform: "none", opacity: 1, offset: 1 },
+        ],
+        {
+          duration: feedbackDuration,
+          easing: "linear",
+          fill: "forwards",
+        },
+      ),
+    );
+  }
+  if (closeButton && trigger) {
+    const source = getComputedStyle(closeButton);
+    const target = getComputedStyle(trigger);
     supportingAnimations.push(
       closeButton.animate(
         [
-          { opacity: 1, offset: 0 },
-          { opacity: 1, offset: 0.3 },
-          { opacity: 0, offset: 0.55 },
-          { opacity: 0, offset: 1 },
+          {
+            backgroundColor: source.backgroundColor,
+            borderColor: source.borderColor,
+            color: source.color,
+            outlineColor: source.outlineColor,
+            transform: source.transform,
+          },
+          {
+            backgroundColor: target.backgroundColor,
+            borderColor: target.borderColor,
+            color: target.color,
+            outlineColor: closeButton.matches(":focus-visible") ? source.outlineColor : "transparent",
+            transform: target.transform,
+          },
         ],
-        { duration: panelDuration, fill: "forwards" },
+        {
+          duration: feedbackDuration,
+          easing: style.getPropertyValue("--motion-ease-standard").trim(),
+          fill: "forwards",
+        },
       ),
     );
   }
@@ -104,7 +148,8 @@ export function useMobileMenu() {
     }
     const { panelAnimation, supportingAnimations } = animateMenuDismissal(
       content,
-      closeButtonRef.current?.querySelector("svg") ?? null,
+      closeButtonRef.current,
+      triggerRef.current,
     );
     closingAnimationRef.current = panelAnimation;
     closingSupportingAnimationsRef.current = supportingAnimations;

@@ -161,7 +161,8 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
               onClick={closeMenu}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              <X aria-hidden="true" strokeWidth={2} />
+              <X className="mobile-menu-close-icon" aria-hidden="true" strokeWidth={2} />
+              <Menu className="mobile-menu-return-icon" aria-hidden="true" strokeWidth={2} />
             </button>
           </div>
           <div className="mobile-menu-content" ref={menuContentRef}>

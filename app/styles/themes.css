@@ -6,7 +6,6 @@ body {
 .wordmark span,
 .eyebrow span,
 .memo-count {
-  background-color: transparent;
   color: var(--interactive-accent);
 }
 .eyebrow span {
@@ -42,15 +41,11 @@ body {
 }
 
 /* Black / white */
-.metric-featured,
 .performance-summary > div[data-tone="highlight"],
 .about-boundaries > article:first-child,
 .contact-grid > article:first-child {
   background: var(--surface-inverse);
   color: var(--text-inverse);
-}
-.about-boundaries > article:first-child li {
-  border-top-color: rgba(255, 255, 255, 0.28);
 }
 .about-boundaries > article:first-child .about-boundary-number {
   color: var(--text-highlight);
@@ -60,7 +55,6 @@ body {
 }
 
 /* Bright Blue / Black and Bright Blue / Deep Blue */
-.metric-accent,
 .allocation-card {
   background: var(--surface-highlight);
   color: var(--text-primary);
@@ -69,12 +63,6 @@ body {
 .about-boundaries > article:last-child {
   background: var(--surface-highlight);
   color: var(--text-primary);
-}
-.about-boundaries > article {
-  border-top-color: var(--deep-blue);
-}
-.about-boundaries li {
-  border-top: 0;
 }
 .contact-grid > article:nth-child(2) {
   background: var(--surface-primary);
@@ -206,10 +194,6 @@ body {
   color: var(--text-inverse);
   transition: none;
 }
-.site-footer .wordmark span {
-  color: var(--interactive-accent);
-}
-
 /* Touch hover may persist after a tap. Reset only idle hover, never keyboard focus
    or active feedback; keep these rules after the editorial color overrides. */
 @media (hover: none) and (pointer: coarse) {
