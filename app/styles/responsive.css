@@ -820,10 +820,7 @@
   .holding-row:active {
     background: color-mix(in srgb, var(--bright-blue) 14%, var(--white));
   }
-  .memo-card:hover:not(:active):not(:focus-visible),
-  .memo-card-1:hover:not(:active):not(:focus-visible),
-  .memo-card-2:hover:not(:active):not(:focus-visible),
-  .memo-card-3:hover:not(:active):not(:focus-visible) {
+  .memo-card:hover:not(:active):not(:focus-visible) {
     background: var(--white);
     transform: none;
   }

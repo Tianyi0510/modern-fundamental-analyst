@@ -3,8 +3,7 @@ import { getLanguageAlternates, getLocalizedPath, type Locale } from "@/lib/i18n
 
 export const SITE_URL = "https://www.modernfundamentalanalyst.com";
 export const SITE_NAME = "Modern Fundamental Analyst";
-export const SITE_DESCRIPTION =
-  "An independent public-equity portfolio, performance record, and investment memo archive.";
+const SITE_DESCRIPTION = "An independent public-equity portfolio, performance record, and investment memo archive.";
 
 const sharingImage = {
   url: `${SITE_URL}/og-logo.png`,

@@ -43,7 +43,7 @@ export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
 
         if (!memo)
           return (
-            <article className={`memo-card memo-card-placeholder memo-card-${index + 1}`} key={cardNumber}>
+            <article className="memo-card memo-card-placeholder" key={cardNumber}>
               <div>
                 <span>{cardNumber}</span>
                 <span>{placeholder.status}</span>
@@ -55,11 +55,7 @@ export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
           );
 
         return (
-          <Link
-            className={`memo-card memo-card-${index + 1}`}
-            href={getLocalizedPath(`/memos/${memo.slug}`, locale)}
-            key={memo.slug}
-          >
+          <Link className="memo-card" href={getLocalizedPath(`/memos/${memo.slug}`, locale)} key={memo.slug}>
             <div>
               <span>{memo.number}</span>
               <span>{memo.category.label}</span>

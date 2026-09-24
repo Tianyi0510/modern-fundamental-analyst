@@ -609,9 +609,6 @@
 .section-heading h2 {
   margin: 0;
 }
-.inverse .section-number {
-  color: rgba(255, 255, 255, 0.58);
-}
 .performance-grid {
   display: grid;
   grid-template-columns: 1.45fr 0.7fr;
@@ -625,8 +622,8 @@
   align-items: end;
   gap: clamp(18px, 4vw, 62px);
   padding: 40px 26px 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.35);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  border-left: 1px solid;
+  border-bottom: 1px solid;
 }
 .year-bar {
   flex: 1;
@@ -643,12 +640,6 @@
 .year-bar:nth-child(2) .bar-value {
   background: var(--bright-blue);
 }
-.year-bar:nth-child(3) .bar-value {
-  background: var(--gray);
-}
-.year-bar:nth-child(4) .bar-value {
-  background: var(--white);
-}
 .bar-value span {
   position: absolute;
   top: -28px;
@@ -658,7 +649,6 @@
 }
 .year-bar small {
   height: 26px;
-  color: rgba(255, 255, 255, 0.7);
 }
 .performance-copy {
   display: flex;
@@ -669,17 +659,8 @@
   margin: 40px 0 12px;
   max-width: 370px;
 }
-.performance-copy small {
-  color: rgba(255, 255, 255, 0.6);
-}
 .button-white {
   margin-top: 48px;
-  background: var(--white);
-  color: var(--black);
-}
-.button-white:hover,
-.button-white:focus-visible {
-  background: var(--bright-blue);
 }
 .memos-home {
   padding: var(--space-section) 0;

@@ -7,7 +7,7 @@ import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 import { withSubscriberLock } from "@/lib/resend-coordination";
 
-export type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 502 | 503 };
+type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 502 | 503 };
 
 const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
   ok: false,
