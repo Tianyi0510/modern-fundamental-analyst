@@ -122,7 +122,9 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
     await trigger.click();
     await page.keyboard.press("Escape");
     await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
-    expect(await page.locator(".mobile-menu-content").evaluate((element) => element.getAnimations().length)).toBe(0);
+    await expect
+      .poll(() => page.locator(".mobile-menu-content").evaluate((element) => element.getAnimations().length))
+      .toBe(0);
   }
 });
 
@@ -312,13 +314,14 @@ test("memo disclosure animates both directions and respects reduced motion", asy
     const disclosure = page.locator(".memo-disclosure");
     const summary = disclosure.locator("summary");
     const closed = await disclosure.evaluate((e) => e.getBoundingClientRect().height);
-    await summary.click();
-    const midpoint = await disclosure.evaluate((e) => {
-      const animation = e.getAnimations()[0];
+    const midpoint = await summary.evaluate((element: HTMLElement) => {
+      element.click();
+      const details = element.closest("details")!;
+      const animation = details.getAnimations()[0];
       if (!animation) throw new Error("Expected disclosure height animation");
       animation.pause();
       animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-      return { height: e.getBoundingClientRect().height, full: e.scrollHeight };
+      return { height: details.getBoundingClientRect().height, full: details.scrollHeight };
     });
     expect(midpoint.height).toBeGreaterThan(closed);
     expect(midpoint.height).toBeLessThan(midpoint.full);
