@@ -9,37 +9,40 @@ function animateMenuDismissal(
   content: HTMLElement,
   closeButton: HTMLButtonElement | null,
   trigger: HTMLButtonElement | null,
+  startingTransform: string,
 ) {
   const style = getComputedStyle(content);
   const duration = style.getPropertyValue("--motion-duration-slow").trim();
   const panelDuration = Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
   const feedbackToken = style.getPropertyValue("--motion-duration-fast").trim();
   const feedbackDuration = Number.parseFloat(feedbackToken) * (feedbackToken.endsWith("ms") ? 1 : 1000);
+  const iconToken = style.getPropertyValue("--motion-duration-medium").trim();
+  const iconDuration = Number.parseFloat(iconToken) * (iconToken.endsWith("ms") ? 1 : 1000);
   const supportingAnimations: Animation[] = [];
   const closeIcon = closeButton?.querySelector<SVGElement>(".mobile-menu-close-icon");
   const returnIcon = closeButton?.querySelector<SVGElement>(".mobile-menu-return-icon");
   const closeIconTransform = closeIcon ? getComputedStyle(closeIcon).transform : "none";
-  const returnIconTransform = returnIcon ? getComputedStyle(returnIcon).transform : "none";
   const iconAnimation = closeIcon?.animate(
     [
       { transform: closeIconTransform, opacity: 1, offset: 0 },
-      { transform: closeIconTransform, opacity: 0, offset: 0.5 },
-      { transform: closeIconTransform, opacity: 0, offset: 1 },
+      { opacity: 1, offset: 0.35 },
+      { transform: "rotate(-90deg)", opacity: 0, offset: 0.75 },
+      { transform: "rotate(-90deg)", opacity: 0, offset: 1 },
     ],
-    { duration: feedbackDuration, easing: "linear", fill: "forwards" },
+    { duration: iconDuration, easing: "linear", fill: "forwards" },
   );
   if (iconAnimation) supportingAnimations.push(iconAnimation);
   if (returnIcon) {
     supportingAnimations.push(
       returnIcon.animate(
         [
-          { transform: returnIconTransform, opacity: 0, offset: 0 },
-          { transform: returnIconTransform, opacity: 0, offset: 0.4 },
+          { transform: "rotate(90deg) scale(0.85)", opacity: 0, offset: 0 },
+          { transform: "rotate(90deg) scale(0.85)", opacity: 0, offset: 0.4 },
           { transform: "none", opacity: 1, offset: 0.9 },
           { transform: "none", opacity: 1, offset: 1 },
         ],
         {
-          duration: feedbackDuration,
+          duration: iconDuration,
           easing: "linear",
           fill: "forwards",
         },
@@ -68,21 +71,18 @@ function animateMenuDismissal(
           },
         ],
         {
-          duration: feedbackDuration,
+          duration: iconDuration,
           easing: style.getPropertyValue("--motion-ease-standard").trim(),
           fill: "forwards",
         },
       ),
     );
   }
-  const panelAnimation = content.animate(
-    [{ transform: "translate3d(0, 0, 0)" }, { transform: "translate3d(100%, 0, 0)" }],
-    {
-      duration: panelDuration,
-      easing: style.getPropertyValue("--motion-ease-exit").trim(),
-      fill: "forwards",
-    },
-  );
+  const panelAnimation = content.animate([{ transform: startingTransform }, { transform: "translate3d(100%, 0, 0)" }], {
+    duration: panelDuration,
+    easing: style.getPropertyValue("--motion-ease-exit").trim(),
+    fill: "forwards",
+  });
   for (const element of [content.querySelector("nav"), content.querySelector(".mobile-language-links")]) {
     if (!(element instanceof HTMLElement)) continue;
     supportingAnimations.push(
@@ -121,14 +121,41 @@ export function useMobileMenu() {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
+  const openingAnimationRef = useRef<Animation | null>(null);
   const closingAnimationRef = useRef<Animation | null>(null);
   const closingSupportingAnimationsRef = useRef<Animation[]>([]);
 
   const closeImmediately = useCallback(() => {
+    openingAnimationRef.current?.cancel();
+    openingAnimationRef.current = null;
     isOpenRef.current = false;
     pointerStartRef.current = null;
     setIsOpen(false);
   }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const content = contentRef.current;
+    if (!content) return;
+    const style = getComputedStyle(content);
+    const token = style.getPropertyValue("--motion-duration-slow").trim();
+    const duration = Number.parseFloat(token) * (token.endsWith("ms") ? 1 : 1000);
+    const animation = content.animate(
+      [{ transform: "translate3d(100%, 0, 0)" }, { transform: "translate3d(0, 0, 0)" }],
+      { duration, easing: style.getPropertyValue("--motion-ease-emphasized").trim(), fill: "backwards" },
+    );
+    openingAnimationRef.current = animation;
+    animation.onfinish = () => {
+      if (openingAnimationRef.current !== animation) return;
+      openingAnimationRef.current = null;
+      animation.cancel();
+    };
+    return () => {
+      if (openingAnimationRef.current !== animation) return;
+      openingAnimationRef.current = null;
+      animation.cancel();
+    };
+  }, [isOpen]);
 
   // Keep the final frame until React has hidden the layer; cancelling first can flash it open.
   useLayoutEffect(() => {
@@ -146,10 +173,14 @@ export function useMobileMenu() {
       closeImmediately();
       return;
     }
+    const startingTransform = getComputedStyle(content).transform;
+    openingAnimationRef.current?.cancel();
+    openingAnimationRef.current = null;
     const { panelAnimation, supportingAnimations } = animateMenuDismissal(
       content,
       closeButtonRef.current,
       triggerRef.current,
+      startingTransform,
     );
     closingAnimationRef.current = panelAnimation;
     closingSupportingAnimationsRef.current = supportingAnimations;
@@ -164,6 +195,10 @@ export function useMobileMenu() {
     };
     const handleMotion = () => {
       if (reducedMotion.matches && closingAnimationRef.current) closeImmediately();
+      if (reducedMotion.matches) {
+        openingAnimationRef.current?.cancel();
+        openingAnimationRef.current = null;
+      }
     };
     // Keep dismissal independent of render timing and repeated input.
     const handleEscape = (event: KeyboardEvent) => {
@@ -175,6 +210,7 @@ export function useMobileMenu() {
     return () => {
       compactNavigation.removeEventListener("change", handleBreakpoint);
       reducedMotion.removeEventListener("change", handleMotion);
+      openingAnimationRef.current?.cancel();
       closingAnimationRef.current?.cancel();
       for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
       window.removeEventListener("keydown", handleEscape);

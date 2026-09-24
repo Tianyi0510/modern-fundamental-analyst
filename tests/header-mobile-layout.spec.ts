@@ -70,6 +70,58 @@ test("mobile menu keeps background isolated through dismissal and then restores 
   await expect(trigger).not.toHaveAttribute("tabindex", "-1");
 });
 
+test("mobile menu enters leftward and can exit rightward from an intermediate position", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const trigger = page.locator(".mobile-menu-button");
+  await trigger.click();
+  const positions = await page.locator(".mobile-menu-content").evaluate((content: HTMLDivElement) => {
+    const entrance = content.getAnimations()[0];
+    if (!entrance) throw new Error("Menu entrance animation did not start");
+    entrance.pause();
+    entrance.currentTime = Number(entrance.effect!.getTiming().duration) * 0.45;
+    const enteringLeft = content.getBoundingClientRect().left;
+    document.querySelector<HTMLButtonElement>(".mobile-menu-close")!.click();
+    const dismissal = content.getAnimations()[0];
+    if (!dismissal) throw new Error("Menu dismissal animation did not start");
+    dismissal.pause();
+    dismissal.currentTime = 0;
+    const dismissalStartLeft = content.getBoundingClientRect().left;
+    dismissal.currentTime = Number(dismissal.effect!.getTiming().duration) * 0.5;
+    const dismissalMidLeft = content.getBoundingClientRect().left;
+    dismissal.play();
+    return { enteringLeft, dismissalStartLeft, dismissalMidLeft };
+  });
+  expect(positions.enteringLeft).toBeGreaterThan(0);
+  expect(positions.enteringLeft).toBeLessThan(390);
+  expect(positions.dismissalStartLeft).toBeCloseTo(positions.enteringLeft, 1);
+  expect(positions.dismissalMidLeft).toBeGreaterThan(positions.dismissalStartLeft);
+  expect(positions.dismissalMidLeft).toBeLessThan(390);
+  await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
+  await trigger.click();
+  await page.locator(".mobile-menu-content").evaluate((content) => {
+    const entrance = content.getAnimations()[0];
+    if (!entrance) throw new Error("Menu entrance animation did not restart");
+    entrance.pause();
+    entrance.currentTime = Number(entrance.effect!.getTiming().duration) / 2;
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator(".mobile-menu-content")).toHaveCSS("transform", "none");
+  await expect
+    .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+    .toBe(0);
+  await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
+  await trigger.click();
+  await expect(page.locator(".mobile-menu-layer")).toHaveClass(/is-open/);
+  await expect(page.locator(".mobile-menu-content")).toHaveCSS("transform", "none");
+  await expect
+    .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+    .toBe(0);
+});
+
 test("menu dismissal handles repeated input and reduced motion in every locale", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
@@ -78,6 +130,9 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
     await page.emulateMedia({ reducedMotion: "no-preference" });
     const trigger = page.locator(".mobile-menu-button");
     await trigger.click();
+    await expect
+      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+      .toBe(0);
     const result = await page.locator(".mobile-menu-close").evaluate((element: HTMLButtonElement) => {
       element.click();
       const layer = document.querySelector(".mobile-menu-layer")!;
@@ -141,6 +196,9 @@ test("close button becomes the menu button before the header crossfades", async 
       await expect
         .poll(() => icon.evaluate((e) => e.getAnimations().filter((a) => a.playState === "running").length))
         .toBe(0);
+      await expect
+        .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+        .toBe(0);
       const result = await page.locator(".mobile-menu-close").evaluate((button: HTMLButtonElement) => {
         button.click();
         const layer = document.querySelector(".mobile-menu-layer")!;
@@ -162,15 +220,19 @@ test("close button becomes the menu button before the header crossfades", async 
         buttonAnimation.pause();
         topBarAnimation.pause();
         navAnimation.pause();
-        const midpoint = Number(iconAnimation.effect!.getTiming().duration) * 0.3;
+        const midpoint = Number(iconAnimation.effect!.getTiming().duration) * 0.55;
         panelAnimation.currentTime = midpoint;
         iconAnimation.currentTime = midpoint;
         returnAnimation.currentTime = midpoint;
         buttonAnimation.currentTime = midpoint;
         topBarAnimation.currentTime = midpoint;
         navAnimation.currentTime = midpoint;
+        const closeMatrix = new DOMMatrixReadOnly(getComputedStyle(icon).transform);
+        const returnMatrix = new DOMMatrixReadOnly(getComputedStyle(returnIcon).transform);
         const early = {
+          closeIconAngle: (Math.atan2(closeMatrix.b, closeMatrix.a) * 180) / Math.PI,
           closeIconOpacity: Number(getComputedStyle(icon).opacity),
+          returnIconAngle: (Math.atan2(returnMatrix.b, returnMatrix.a) * 180) / Math.PI,
           returnIconOpacity: Number(getComputedStyle(returnIcon).opacity),
           panelLeft: content.getBoundingClientRect().left,
           navOpacity: Number(getComputedStyle(nav).opacity),
@@ -206,7 +268,12 @@ test("close button becomes the menu button before the header crossfades", async 
       });
       expect(result.early.closeIconOpacity).toBeGreaterThan(0);
       expect(result.early.closeIconOpacity).toBeLessThan(1);
-      expect(result.early.returnIconOpacity).toBe(0);
+      expect(result.early.closeIconAngle).toBeLessThan(-1);
+      expect(result.early.closeIconAngle).toBeGreaterThan(-90);
+      expect(result.early.returnIconAngle).toBeGreaterThan(1);
+      expect(result.early.returnIconAngle).toBeLessThan(90);
+      expect(result.early.returnIconOpacity).toBeGreaterThan(0);
+      expect(result.early.returnIconOpacity).toBeLessThan(1);
       expect(result.early.panelLeft).toBeGreaterThan(0);
       expect(result.early.panelLeft).toBeLessThan(result.late.panelLeft);
       expect(result.early.navOpacity).toBeGreaterThan(result.late.navOpacity);
@@ -392,6 +459,9 @@ test("narrow navigation keeps its close control and brand inside the drawer", as
     await page.setViewportSize({ width, height: 720 });
     await page.goto("/zh-tw");
     await page.locator(".mobile-menu-button").click();
+    await expect
+      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+      .toBe(0);
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
     for (const fontSize of [16, 32]) {
