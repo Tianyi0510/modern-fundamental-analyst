@@ -126,13 +126,15 @@ test("menu dismissal handles repeated input and reduced motion in every locale",
   }
 });
 
-test("close icon rotates visibly before the panel leaves and replays", async ({ page }) => {
+test("close icon and panel depart together while the header crossfades", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.goto(prefix || "/");
     for (let repeat = 0; repeat < 2; repeat++) {
       await page.locator(".mobile-menu-button").click();
+      await expect(page.locator(".mobile-menu-close")).toHaveCSS("opacity", "1");
+      await expect(page.locator(".mobile-menu-top")).toHaveCSS("opacity", "1");
       const icon = page.locator(".mobile-menu-close svg");
       await expect
         .poll(() => icon.evaluate((e) => e.getAnimations().filter((a) => a.playState === "running").length))
@@ -141,29 +143,66 @@ test("close icon rotates visibly before the panel leaves and replays", async ({ 
         button.click();
         const layer = document.querySelector(".mobile-menu-layer")!;
         const icon = button.querySelector("svg")!;
-        const panelAnimation = layer.querySelector(".mobile-menu-content")!.getAnimations()[0]!;
+        const content = layer.querySelector(".mobile-menu-content")!;
+        const panelAnimation = content.getAnimations()[0]!;
         const iconAnimation = icon.getAnimations().find((a) => !(a instanceof CSSAnimation))!;
+        const topBar = layer.querySelector(".mobile-menu-top")!;
+        const topBarAnimation = topBar.getAnimations()[0]!;
+        const buttonAnimation = button.getAnimations().find((a) => !(a instanceof CSSTransition))!;
+        const nav = content.querySelector("nav")!;
+        const navAnimation = nav.getAnimations()[0]!;
         panelAnimation.pause();
         iconAnimation.pause();
+        buttonAnimation.pause();
+        topBarAnimation.pause();
+        navAnimation.pause();
         const midpoint = Number(iconAnimation.effect!.getTiming().duration) / 2;
         panelAnimation.currentTime = midpoint;
         iconAnimation.currentTime = midpoint;
+        buttonAnimation.currentTime = midpoint;
+        topBarAnimation.currentTime = midpoint;
+        navAnimation.currentTime = midpoint;
         const matrix = new DOMMatrixReadOnly(getComputedStyle(icon).transform);
-        const result = {
+        const early = {
           angle: (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI,
+          panelLeft: content.getBoundingClientRect().left,
+          navOpacity: Number(getComputedStyle(nav).opacity),
+          topBarOpacity: Number(getComputedStyle(topBar).opacity),
           left: layer.getBoundingClientRect().left,
-          menuTopLeft: layer.querySelector(".mobile-menu-top")!.getBoundingClientRect().left,
+          menuTopLeft: topBar.getBoundingClientRect().left,
           right: button.getBoundingClientRect().right,
         };
+        const duration = Number(panelAnimation.effect!.getTiming().duration);
+        panelAnimation.currentTime = duration * 0.82;
+        buttonAnimation.currentTime = duration * 0.82;
+        topBarAnimation.currentTime = duration * 0.82;
+        navAnimation.currentTime = Number(navAnimation.effect!.getTiming().duration);
+        const late = {
+          panelLeft: content.getBoundingClientRect().left,
+          navOpacity: Number(getComputedStyle(nav).opacity),
+          closeOpacity: Number(getComputedStyle(button).opacity),
+          topBarOpacity: Number(getComputedStyle(topBar).opacity),
+        };
         iconAnimation.play();
+        buttonAnimation.play();
+        navAnimation.play();
+        topBarAnimation.play();
         panelAnimation.play();
-        return result;
+        return { early, late };
       });
-      expect(result.angle).toBeLessThan(-1);
-      expect(result.angle).toBeGreaterThan(-90);
-      expect(result.left).toBe(0);
-      expect(result.menuTopLeft).toBe(0);
-      expect(result.right).toBeLessThanOrEqual(390);
+      expect(result.early.angle).toBeLessThan(-1);
+      expect(result.early.angle).toBeGreaterThan(-90);
+      expect(result.early.panelLeft).toBeGreaterThan(0);
+      expect(result.early.panelLeft).toBeLessThan(result.late.panelLeft);
+      expect(result.early.navOpacity).toBeGreaterThan(result.late.navOpacity);
+      expect(result.early.topBarOpacity).toBe(1);
+      expect(result.late.navOpacity).toBe(0);
+      expect(result.late.closeOpacity).toBe(0);
+      expect(result.late.topBarOpacity).toBeGreaterThan(0);
+      expect(result.late.topBarOpacity).toBeLessThan(1);
+      expect(result.early.left).toBe(0);
+      expect(result.early.menuTopLeft).toBe(0);
+      expect(result.early.right).toBeLessThanOrEqual(390);
       await expect(page.locator(".mobile-menu-layer")).toHaveCSS("visibility", "hidden");
       await expect.poll(() => icon.evaluate((e) => e.getAnimations().length)).toBe(0);
       await expect(page.locator(".mobile-menu-button")).toBeFocused();
@@ -925,12 +964,12 @@ test.describe("mobile content and navigation QA", () => {
 
   test("Escape completes dismissal and rapid taps do not queue animations", async ({ page }) => {
     await page.goto("/");
-    await page.locator(".mobile-menu-button").evaluate((button) => {
+    await page.locator(".mobile-menu-button").evaluate(async (button) => {
       (button as HTMLButtonElement).click();
       (button as HTMLButtonElement).click();
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     });
-    await page.waitForTimeout(350);
     await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
     await expect(page.locator("body")).toHaveCSS("position", "static");
     for (let count = 0; count < 3; count++) {

@@ -631,8 +631,6 @@
   transform: translateX(5px);
 }
 .performance-home {
-  background: var(--deep-blue);
-  color: var(--white);
   padding: var(--space-section) 0;
 }
 .section-heading {
@@ -768,7 +766,6 @@
 .memo-card p {
   margin: 0 0 36px;
   color: var(--text-secondary);
-  line-height: var(--leading-body);
 }
 .memo-card > small {
   padding-top: 18px;

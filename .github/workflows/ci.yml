@@ -52,11 +52,42 @@ jobs:
                   print(f"Disabled unused Chrome source in {path.name}")
           PYTHON
 
-      - name: Install Chromium and WebKit
-        run: npx playwright install --with-deps chromium webkit
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Verify application
         run: npm run verify
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-evidence-chromium
+          path: test-results/chromium/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  webkit:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install WebKit
+        run: npx playwright install webkit
+
+      - name: Build application
+        run: npm run build
 
       - name: Verify WebKit browser suite
         run: npm run test:webkit
@@ -65,7 +96,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-failure-evidence
-          path: test-results/
+          name: browser-failure-evidence-webkit
+          path: test-results/webkit/
           if-no-files-found: ignore
           retention-days: 7

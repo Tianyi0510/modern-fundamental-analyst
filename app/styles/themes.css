@@ -160,7 +160,6 @@ body {
 .language-trigger[aria-expanded="true"],
 .text-link:hover,
 .text-link:focus-visible,
-.memo-disclosure > summary:hover,
 .source-link:hover,
 .source-link:focus-visible {
   color: var(--interactive-accent);

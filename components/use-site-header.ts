@@ -8,22 +8,64 @@ const compactNavigationQuery = "(max-width: 1150px)";
 function animateMenuDismissal(content: HTMLElement, icon: SVGElement | null) {
   const style = getComputedStyle(content);
   const duration = style.getPropertyValue("--motion-duration-slow").trim();
+  const panelDuration = Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
   const feedbackToken = style.getPropertyValue("--motion-duration-fast").trim();
   const feedbackDuration = Number.parseFloat(feedbackToken) * (feedbackToken.endsWith("ms") ? 1 : 1000);
+  const supportingAnimations: Animation[] = [];
   const iconAnimation = icon?.animate(
     [{ transform: getComputedStyle(icon).transform }, { transform: "rotate(-90deg)" }],
     { duration: feedbackDuration, easing: style.getPropertyValue("--motion-ease-standard").trim(), fill: "forwards" },
   );
+  if (iconAnimation) supportingAnimations.push(iconAnimation);
+  const closeButton = icon?.closest("button");
+  if (closeButton) {
+    supportingAnimations.push(
+      closeButton.animate(
+        [
+          { opacity: 1, offset: 0 },
+          { opacity: 1, offset: 0.3 },
+          { opacity: 0, offset: 0.55 },
+          { opacity: 0, offset: 1 },
+        ],
+        { duration: panelDuration, fill: "forwards" },
+      ),
+    );
+  }
   const panelAnimation = content.animate(
     [{ transform: "translate3d(0, 0, 0)" }, { transform: "translate3d(100%, 0, 0)" }],
     {
-      duration: Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000),
-      delay: iconAnimation ? feedbackDuration : 0,
-      easing: style.getPropertyValue("--motion-ease-standard").trim(),
+      duration: panelDuration,
+      easing: style.getPropertyValue("--motion-ease-exit").trim(),
       fill: "forwards",
     },
   );
-  return { panelAnimation, iconAnimation };
+  for (const element of [content.querySelector("nav"), content.querySelector(".mobile-language-links")]) {
+    if (!(element instanceof HTMLElement)) continue;
+    supportingAnimations.push(
+      element.animate([{ opacity: getComputedStyle(element).opacity }, { opacity: 0 }], {
+        duration: feedbackDuration,
+        easing: style.getPropertyValue("--motion-ease-standard").trim(),
+        fill: "forwards",
+      }),
+    );
+  }
+  const topBar = content.previousElementSibling;
+  if (topBar instanceof HTMLElement) {
+    supportingAnimations.push(
+      topBar.animate(
+        [
+          { opacity: 1, offset: 0 },
+          { opacity: 1, offset: 0.55 },
+          { opacity: 0, offset: 1 },
+        ],
+        {
+          duration: panelDuration,
+          fill: "forwards",
+        },
+      ),
+    );
+  }
+  return { panelAnimation, supportingAnimations };
 }
 
 export function useMobileMenu() {
@@ -36,7 +78,7 @@ export function useMobileMenu() {
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
   const closingAnimationRef = useRef<Animation | null>(null);
-  const closingIconAnimationRef = useRef<Animation | null>(null);
+  const closingSupportingAnimationsRef = useRef<Animation[]>([]);
 
   const closeImmediately = useCallback(() => {
     isOpenRef.current = false;
@@ -49,8 +91,8 @@ export function useMobileMenu() {
     if (isOpen) return;
     closingAnimationRef.current?.cancel();
     closingAnimationRef.current = null;
-    closingIconAnimationRef.current?.cancel();
-    closingIconAnimationRef.current = null;
+    for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
+    closingSupportingAnimationsRef.current = [];
   }, [isOpen]);
 
   const close = useCallback(() => {
@@ -60,12 +102,12 @@ export function useMobileMenu() {
       closeImmediately();
       return;
     }
-    const { panelAnimation, iconAnimation } = animateMenuDismissal(
+    const { panelAnimation, supportingAnimations } = animateMenuDismissal(
       content,
       closeButtonRef.current?.querySelector("svg") ?? null,
     );
     closingAnimationRef.current = panelAnimation;
-    closingIconAnimationRef.current = iconAnimation ?? null;
+    closingSupportingAnimationsRef.current = supportingAnimations;
     panelAnimation.onfinish = closeImmediately;
   }, [closeImmediately]);
 
@@ -89,7 +131,7 @@ export function useMobileMenu() {
       compactNavigation.removeEventListener("change", handleBreakpoint);
       reducedMotion.removeEventListener("change", handleMotion);
       closingAnimationRef.current?.cancel();
-      closingIconAnimationRef.current?.cancel();
+      for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
       window.removeEventListener("keydown", handleEscape);
     };
   }, [close, closeImmediately]);

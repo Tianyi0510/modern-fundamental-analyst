@@ -23,24 +23,11 @@
 .page-intro small {
   color: var(--text-secondary);
 }
-.body-section {
-  padding: var(--space-section) 0;
-  border-bottom: 1px solid var(--gray);
-}
 .section-gray {
   background: var(--background-gray);
 }
-.two-column {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 80px;
-}
-.two-column h2,
 .methodology h2 {
   margin: 0;
-}
-.rich-copy p:first-child {
-  margin-top: 0;
 }
 .principles {
   display: grid;
@@ -67,7 +54,6 @@
 .principles p {
   margin: 0;
   color: var(--text-secondary);
-  line-height: var(--leading-body);
 }
 .about-section {
   padding: var(--space-section) 0;
@@ -116,12 +102,6 @@
   color: var(--deep-blue);
   font-style: normal;
   font-weight: 700;
-}
-.about-philosophy-copy h3 {
-  margin: 54px 0 14px;
-}
-.about-philosophy-copy h3:first-child {
-  margin-top: 0;
 }
 .about-boundaries {
   display: grid;
@@ -558,7 +538,6 @@
   margin: 0;
   max-width: 670px;
   color: var(--text-secondary);
-  line-height: var(--leading-body);
 }
 .memo-meta {
   display: flex;

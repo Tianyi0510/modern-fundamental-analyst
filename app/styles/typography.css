@@ -16,7 +16,6 @@
 .intro h2,
 .section-heading h2,
 .cta h2,
-.two-column h2,
 .methodology h2,
 .about-section-heading h2,
 .about-closing h2,
@@ -43,7 +42,6 @@
   text-wrap: balance;
 }
 
-.about-philosophy-copy h3,
 .article-body h2,
 .article-body blockquote {
   font-size: var(--font-size-card-title);
@@ -92,7 +90,6 @@
   font-weight: var(--weight-regular);
 }
 
-.rich-copy,
 .reference-note,
 .about-copy,
 .about-boundaries ol,
@@ -107,7 +104,6 @@
   text-wrap: pretty;
 }
 
-.home-about > div:last-child p,
 .memo-card p,
 .memo-index-row p,
 .principles p,
@@ -124,6 +120,7 @@
   font-size: var(--font-size-lead);
   line-height: var(--leading-body);
   letter-spacing: var(--tracking-body);
+  font-weight: var(--weight-regular);
 }
 
 .eyebrow,
@@ -134,9 +131,7 @@
 .portfolio-kpis span,
 .portfolio-holdings-heading span,
 .performance-summary span,
-.table-head,
-.contact-grid span,
-.memo-card > div {
+.table-head {
   font-family: var(--font-ui);
   font-size: var(--font-size-label);
   line-height: var(--leading-body);

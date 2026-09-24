@@ -94,10 +94,15 @@
 
 .date-text,
 .memo-meta,
+.article-meta {
+  font-family: var(--font-ui);
+}
+
+.date-text,
+.memo-meta,
 .article-meta,
 .bar-value span,
 .holding-row > span {
-  font-family: var(--font-ui);
   font-variant-numeric: tabular-nums;
 }
 

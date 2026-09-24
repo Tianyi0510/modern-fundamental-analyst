@@ -109,7 +109,6 @@
   }
   .holdings-preview,
   .performance-grid,
-  .two-column,
   .returns,
   .methodology {
     grid-template-columns: 1fr;
@@ -239,7 +238,7 @@
     order: 3;
   }
   .performance-page .performance-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     margin-top: 0;
   }
   .returns,
@@ -375,8 +374,6 @@
     line-height: var(--leading-body);
   }
   .portfolio-mobile-sort select {
-    width: 100%;
-    min-width: 0;
     padding: 0 36px 0 14px;
   }
   .portfolio-mobile-sort button {
@@ -604,8 +601,6 @@
   .mobile-menu-close {
     flex: 0 0 auto;
     border-color: var(--black);
-    background: var(--white);
-    color: var(--black);
   }
   .mobile-menu-layer.is-open .mobile-menu-close {
     outline: 2px solid var(--medium-blue);
@@ -971,8 +966,5 @@
 @media (max-width: 800px) {
   .performance-page .page-intro .date-text {
     margin-left: 0;
-  }
-  .performance-page .performance-summary {
-    grid-template-columns: minmax(0, 1fr);
   }
 }

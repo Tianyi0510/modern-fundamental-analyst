@@ -123,6 +123,49 @@ const viewports = [
   { name: "mobile", width: 390, height: 844 },
 ] as const;
 
+for (const [prefix, fallback] of [
+  ["", null],
+  ["/zh-tw", "Noto Sans TC"],
+  ["/zh-cn", "Noto Sans SC"],
+] as const) {
+  test((prefix || "English") + " uses Jost before its locale fallback", async ({ page }) => {
+    await page.goto(prefix || "/");
+    const fontFamily = await page.locator("body").evaluate((element) => getComputedStyle(element).fontFamily);
+    const families = fontFamily
+      .replaceAll('"', "")
+      .split(",")
+      .map((family) => family.trim());
+    expect(families[0]).toBe("Jost");
+    if (fallback) {
+      expect(families).toContain(fallback);
+      expect(families.indexOf("Jost")).toBeLessThan(families.indexOf(fallback));
+    }
+  });
+}
+
+for (const viewport of [viewports[0], viewports[2]]) {
+  test(viewport.name + " editorial surfaces retain their computed colors", async ({ page }) => {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto("/");
+    await expect(page.locator(".site-footer")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator(".site-footer")).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(page.locator(".performance-home")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(page.locator(".performance-home")).toHaveCSS("color", "rgb(0, 0, 0)");
+
+    await page.goto("/about");
+    await expect(page.locator(".about-boundaries > article").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator(".about-boundaries > article").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(page.locator(".about-boundaries > article").last()).toHaveCSS("background-color", "rgb(95, 205, 253)");
+    await expect(page.locator(".about-boundaries > article").last()).toHaveCSS("color", "rgb(0, 0, 0)");
+
+    await page.goto("/contact");
+    await expect(page.locator(".contact-grid > article").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator(".contact-grid > article").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(page.locator(".contact-grid > article").last()).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(page.locator(".contact-grid > article").last()).toHaveCSS("color", "rgb(0, 0, 0)");
+  });
+}
+
 function expectedSize(role: Role, width: number) {
   const scale = roleScale[role];
   if (!("fluidVw" in scale)) return scale.min;

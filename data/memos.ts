@@ -52,8 +52,6 @@ const memoCatalog = [
   },
 ] as const;
 
-export type MemoSlug = (typeof memoCatalog)[number]["slug"];
-
 function localizeMemos(locale: Locale): MemoSummary[] {
   return memoCatalog.map((memo) => {
     const localized = memo.locales[locale];
@@ -75,10 +73,6 @@ function localizeMemos(locale: Locale): MemoSummary[] {
       ...localized,
     };
   });
-}
-
-export function getMemoCategories(locale: Locale): readonly MemoCategory[] {
-  return memoCategoryIds.map((id) => ({ id, label: memoCategoryLabels[id][locale] }));
 }
 
 export const memos = localizeMemos("en");
