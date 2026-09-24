@@ -363,10 +363,6 @@
   color: var(--black);
   transform: scale(var(--motion-scale-hover));
 }
-.home-page .round-link:hover .arrow-icon,
-.home-page .round-link:focus-visible .arrow-icon {
-  transform: none;
-}
 .home-page .round-link:active {
   transform: scale(var(--motion-scale-press));
   transition-duration: var(--motion-duration-press);
@@ -457,10 +453,6 @@
   background: var(--black);
   color: var(--white);
 }
-.round-link:hover .arrow-icon,
-.round-link:focus-visible .arrow-icon {
-  transform: translate(3px, -3px);
-}
 .round-link:active {
   transform: scale(var(--motion-scale-press));
 }
@@ -469,7 +461,6 @@
   height: 32px;
   font-weight: var(--weight-bold);
   stroke-width: 3;
-  transition: transform var(--motion-duration-base) var(--motion-ease-emphasized);
 }
 .holdings-preview {
   display: grid;

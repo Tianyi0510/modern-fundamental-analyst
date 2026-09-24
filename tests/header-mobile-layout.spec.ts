@@ -82,6 +82,12 @@ test("mobile menu enters leftward and can exit rightward from an intermediate po
     entrance.pause();
     entrance.currentTime = Number(entrance.effect!.getTiming().duration) * 0.45;
     const enteringLeft = content.getBoundingClientRect().left;
+    const linksVisible = Array.from(content.querySelectorAll("nav a, .mobile-language-links a")).every((link) => {
+      const style = getComputedStyle(link);
+      return style.opacity === "1" && style.translate === "none" && link.getAnimations().length === 0;
+    });
+    const languageLinks = getComputedStyle(content.querySelector(".mobile-language-links")!);
+    const languageLinksVisible = languageLinks.opacity === "1" && languageLinks.transform === "none";
     document.querySelector<HTMLButtonElement>(".mobile-menu-close")!.click();
     const dismissal = content.getAnimations()[0];
     if (!dismissal) throw new Error("Menu dismissal animation did not start");
@@ -91,10 +97,12 @@ test("mobile menu enters leftward and can exit rightward from an intermediate po
     dismissal.currentTime = Number(dismissal.effect!.getTiming().duration) * 0.5;
     const dismissalMidLeft = content.getBoundingClientRect().left;
     dismissal.play();
-    return { enteringLeft, dismissalStartLeft, dismissalMidLeft };
+    return { enteringLeft, linksVisible, languageLinksVisible, dismissalStartLeft, dismissalMidLeft };
   });
   expect(positions.enteringLeft).toBeGreaterThan(0);
   expect(positions.enteringLeft).toBeLessThan(390);
+  expect(positions.linksVisible).toBe(true);
+  expect(positions.languageLinksVisible).toBe(true);
   expect(positions.dismissalStartLeft).toBeCloseTo(positions.enteringLeft, 1);
   expect(positions.dismissalMidLeft).toBeGreaterThan(positions.dismissalStartLeft);
   expect(positions.dismissalMidLeft).toBeLessThan(390);
@@ -906,6 +914,7 @@ test.describe("mobile content and navigation QA", () => {
       "color(srgb 0.736471 0.917647 0.996706)",
     );
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 140, 255)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "8px");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "14px");
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "14px");
     const menuTop = page.locator(".mobile-menu-top");
