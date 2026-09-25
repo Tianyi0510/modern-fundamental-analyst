@@ -12,7 +12,11 @@ function token() {
   return Buffer.concat([iv, cipher.getAuthTag(), data]).toString("base64url");
 }
 
-for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+for (const { prefix, saved, unsubscribed } of [
+  { prefix: "", saved: "Your preferred language has been updated.", unsubscribed: "You have been unsubscribed." },
+  { prefix: "/zh-tw", saved: "你的偏好語言已更新。", unsubscribed: "你已取消訂閱。" },
+  { prefix: "/zh-cn", saved: "你的偏好语言已更新。", unsubscribed: "你已取消订阅。" },
+]) {
   test(`${prefix || "English"} preferences require a selection and clear stale success`, async ({ page }) => {
     const actions: string[] = [];
     await page.route("**/api/subscription-preferences", async (route) => {
@@ -32,12 +36,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     expect(actions).toEqual([]);
     await select.selectOption("zh-tw");
     await form.locator('button[type="submit"]').click();
-    await expect(status).not.toBeEmpty();
+    await expect(status).toHaveText(saved);
     await select.selectOption("en");
     await expect(status).toBeEmpty();
     await page.reload();
     await expect(select).toHaveValue("");
     await form.locator('button[type="button"]').click();
+    await expect(status).toHaveText(unsubscribed);
     await expect(select).toBeDisabled();
     expect(actions).toEqual(["save", "unsubscribe"]);
   });

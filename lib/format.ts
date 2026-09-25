@@ -45,8 +45,11 @@ export function formatUsd(value: number, fractionDigits = 2) {
 export const formatShares = (value: number) => sharesFormatter.format(value);
 
 export function formatDate(value: string, locale: Locale, compact = false) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new RangeError(`Invalid ISO date: ${value}`);
   const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) throw new RangeError(`Invalid ISO date: ${value}`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) {
+    throw new RangeError(`Invalid ISO date: ${value}`);
+  }
 
   return getDateFormatter(locale, compact).format(date);
 }

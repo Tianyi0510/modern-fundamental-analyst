@@ -8,11 +8,13 @@ This guide describes the repository implementation. Provider resources must be c
 2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_URL`, and `RATE_LIMIT_HASH_SECRET`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [reconciliation and secret rotation](TECHNICAL_ARCHITECTURE.md#subscription-reconciliation).
 3. Create a text contact property named `preferred_language` and three language segments. Set the matching `RESEND_SEGMENT_*` variables below. The default IDs in the code and environment template refer to this project's existing resources; override all three when using another account or isolated test resources.
 
-| Locale  | Contact property value | Segment variable       |
-| ------- | ---------------------- | ---------------------- |
-| `en`    | `English`              | `RESEND_SEGMENT_EN`    |
-| `zh-tw` | `繁體中文`             | `RESEND_SEGMENT_ZH_TW` |
-| `zh-cn` | `简体中文`             | `RESEND_SEGMENT_ZH_CN` |
+| Locale  | Exact `preferred_language` value | Segment variable       |
+| ------- | -------------------------------- | ---------------------- |
+| `en`    | `English`                        | `RESEND_SEGMENT_EN`    |
+| `zh-tw` | `繁體中文`                       | `RESEND_SEGMENT_ZH_TW` |
+| `zh-cn` | `简体中文`                       | `RESEND_SEGMENT_ZH_CN` |
+
+These are the exact values written to Resend contacts, not translations of the documentation. [`localeConfig` in `lib/i18n.ts`](../lib/i18n.ts) is authoritative; update this table if those labels change. Use the literal values when configuring or inspecting contacts.
 
 4. Configure and enable a welcome automation triggered by `subscriber.created`. The application sends `locale`, `memo_title`, `memo_summary`, `memo_url`, and `preferences_url` in its payload; use these in the localized welcome content. The code sends an event rather than the welcome email itself, so a successful event response does not verify automation delivery. New or previously unsubscribed contacts trigger it; active contacts do not. At least one memo must exist for the selected locale.
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.
@@ -35,6 +37,8 @@ A valid preference token allows a server-side contact lookup. The form displays 
 `UPSTASH_REDIS_URL` is required for subscriber mutations and preference-link requests. Unlike rate limiting, these operations fail with a retryable error if Redis is unavailable. No live email is sent by the unit tests.
 
 Preference requests store the complete email payload for 25 hours using atomic `SET NX`, covering Resend's 24-hour deduplication window plus a delay before the initial send. Retries reuse the original encrypted link, text, HTML and provider idempotency key. Changing the input under the same key returns 409. After 25 minutes, a fresh submission ID is required so users do not receive a nearly expired 30-minute link. The form resets its ID on that response. Redis records contain the recipient and email content; use the existing authenticated TLS connection and restrict database access.
+
+Before a retry, the application validates the stored record's age, email fields and recipient. A malformed or mismatched record fails closed without sending an email; it is not overwritten under the same idempotency key.
 
 Subscribe, preference updates and unsubscribe webhooks share a per-email Redis lease. Contention returns a retryable failure instead of performing overlapping writes. Each Resend HTTP call has an 8-second abort deadline; a subscriber operation has a shared 20-second deadline. The browser allows 45 seconds for service work and Redis overhead.
 

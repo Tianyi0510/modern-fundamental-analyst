@@ -39,7 +39,7 @@ Verification runs type checking, ESLint, Stylelint, a Prettier format check, uni
 | `lib/`           | Services, calculations, and utilities                                |
 | `tests/`         | Unit and browser tests                                               |
 | `scripts/`       | CI deployment gate, Node module loader, and subscription journal CLI |
-| `docs/`          | Technical architecture, style guide, and service integration guides  |
+| `docs/`          | Shared quality guide, technical architecture, and service guides     |
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
@@ -53,7 +53,7 @@ Integration details:
 - [Upstash Redis runtime and ACL setup](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime)
 - [Stripe setup and checklist](docs/STRIPE_INTEGRATION.md)
 
-See the [design system and style guide](docs/STYLE_GUIDE.md) for tokens, component states, accessibility, and contribution rules.
+Start with the [shared quality and design guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
 
 See [architecture and operations](docs/TECHNICAL_ARCHITECTURE.md) for production gating, server boundaries, and subscription reconciliation.
 

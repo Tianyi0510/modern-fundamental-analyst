@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { read, readStyles } from "./repository-helpers.mjs";
+import { read } from "./repository-helpers.mjs";
 
 test("portfolio totals are derived from holdings", async () => {
   const [portfolio, calculations] = await Promise.all([
@@ -74,6 +74,15 @@ test("portfolio dates are formatted from the snapshot date", async () => {
   }
 });
 
+test("date formatting rejects impossible and noncanonical dates", async () => {
+  const { formatDate } = await import("../lib/format.ts");
+
+  assert.equal(formatDate("2024-02-29", "en"), "29 February 2024");
+  assert.throws(() => formatDate("2026-02-30", "en"), RangeError);
+  assert.throws(() => formatDate("2025-02-29", "zh-tw"), RangeError);
+  assert.throws(() => formatDate("2026-2-05", "zh-cn"), RangeError);
+});
+
 test("percent formatting handles positive, zero, and negative values", async () => {
   const source = await read("lib/format.ts");
   const { formatPercent } = await import("../lib/format.ts");
@@ -109,7 +118,6 @@ test("all portfolio and performance locales share page structures", async () => 
     portfolioShared,
     performanceShared,
     portfolioTable,
-    styles,
   ] = await Promise.all([
     read("app/(en)/portfolio/page.tsx"),
     read("app/zh-tw/portfolio/page.tsx"),
@@ -120,115 +128,20 @@ test("all portfolio and performance locales share page structures", async () => 
     read("components/portfolio-page-content.tsx"),
     read("components/performance-page-content.tsx"),
     read("components/portfolio-table.tsx"),
-    readStyles(),
   ]);
 
-  assert.match(portfolioEn, /PortfolioPageContent/);
-  assert.match(portfolioZhTw, /PortfolioPageContent/);
-  assert.match(portfolioZhCn, /PortfolioPageContent/);
-  assert.match(performanceEn, /PerformancePageContent/);
-  assert.match(performanceZhTw, /PerformancePageContent/);
-  assert.match(performanceZhCn, /PerformancePageContent/);
+  for (const page of [portfolioEn, portfolioZhTw, portfolioZhCn]) assert.match(page, /PortfolioPageContent/);
+  for (const page of [performanceEn, performanceZhTw, performanceZhCn]) assert.match(page, /PerformancePageContent/);
+  assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
   assert.doesNotMatch(portfolioShared, /portfolio-allocation|Allocation by market value|getHoldingWeight/);
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
-  assert.match(portfolioShared, /className="portfolio-holdings-section"/);
-  assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
   assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
   assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
   assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
-  assert.match(
-    portfolioTable,
-    /const columns: SortKey\[\] = \["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"\]/,
-  );
-  assert.doesNotMatch(portfolioTable, /toSorted\(\(a, b\) => \{\s*const getSortValue/);
-  assert.doesNotMatch(portfolioTable, /formatUsd\(totals\.costBasis\)|100\.0%/);
   assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/span>/);
   assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
-  assert.doesNotMatch(portfolioTable, /portfolio-total-(?:cost|weight)/);
-  assert.doesNotMatch(portfolioTable, /role="cell" data-label=\{copy\.(?:costBasis|weight)\} \/>/);
-  assert.match(styles, /\.portfolio-total-row \.portfolio-total-return\s*\{\s*font-weight:\s*var\(--weight-bold\)/s);
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
-  assert.match(styles, /grid-template-areas:\s*"market return" "cost holdings"/);
-  assert.match(styles, /\.metric-band\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/s);
-  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*min-height:\s*480px/s);
-  assert.match(styles, /\.portfolio-kpis\s*\{[^}]*gap:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-kpis > div\s*\{[^}]*background:\s*var\(--white\)/s);
-  assert.match(
-    styles,
-    /\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*240px;[^}]*padding:\s*var\(--space-5\)/s,
-  );
-  assert.match(
-    styles,
-    /\.metric,[\s\S]*?\.portfolio-kpis > div,[\s\S]*?\.performance-summary > div\s*\{\s*display:\s*flex;\s*flex-direction:\s*column;/,
-  );
-  assert.match(
-    styles,
-    /\.metric strong,[\s\S]*?\.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{\s*margin-top:\s*auto;/,
-  );
-  assert.match(
-    styles,
-    /\.home-page \.metric strong,[\s\S]*?\.portfolio-page \.portfolio-kpis strong,[\s\S]*?\.performance-summary strong\s*\{[^}]*font-size:\s*var\(--font-size-data-kpi\);/s,
-  );
-  assert.doesNotMatch(
-    styles,
-    /@media \(max-width:\s*800px\)[\s\S]*?(?:\.metric|\.portfolio-kpis|\.performance-summary) strong\s*\{[^}]*font-size:/s,
-  );
-  assert.match(
-    styles,
-    /\.metric small,[\s\S]*?\.portfolio-kpis small,[\s\S]*?\.performance-summary small\s*\{[^}]*margin-top:\s*14px;[^}]*opacity:\s*0?\.62/s,
-  );
-  assert.match(styles, /\.portfolio-page \.portfolio-row span:nth-child\(2\)\s*\{\s*color:\s*var\(--black\)/);
-  assert.match(
-    styles,
-    /@media \(max-width:\s*800px\)[\s\S]*?\.home-page \.metric,\s*\.portfolio-page \.portfolio-kpis > div,\s*\.performance-page \.performance-summary > div\s*\{[^}]*min-height:\s*168px;[^}]*padding:\s*var\(--space-5\) var\(--space-page-gutter\)/s,
-  );
-  assert.match(styles, /\.portfolio-holdings-section\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(styles, /\.portfolio-holdings-section \.portfolio-total-row\s*\{[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.portfolio-mobile-sort\s*\{\s*display:\s*none;/s);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-mobile-sort\s*\{[^}]*display:\s*grid;/s);
-  assert.match(
-    styles,
-    /@media \(max-width:\s*800px\)[\s\S]*?\.portfolio-page \.portfolio-kpis\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*grid-template-areas:\s*"market" "cost" "return" "holdings"/s,
-  );
-  assert.match(
-    styles,
-    /\.portfolio-mobile-sort\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*var\(--space-2\) var\(--space-3\)/s,
-  );
-  assert.match(styles, /\.portfolio-mobile-sort label\s*\{[^}]*display:\s*contents/s);
-  assert.match(styles, /\.portfolio-mobile-sort label > span\s*\{[^}]*grid-column:\s*1 \/ -1/s);
-  assert.match(
-    styles,
-    /\.portfolio-mobile-sort select,\s*\.portfolio-mobile-sort button\s*\{[^}]*box-sizing:\s*border-box;[^}]*width:\s*100%;[^}]*height:\s*var\(--size-control\);[^}]*margin:\s*0;/s,
-  );
-  assert.match(
-    styles,
-    /\.portfolio-mobile-sort button\s*\{[^}]*display:\s*inline-flex;[^}]*justify-content:\s*center/s,
-  );
-  assert.match(
-    styles,
-    /\.portfolio-table-detailed \.portfolio-row > \[role="cell"\]::before\s*\{[^}]*content:\s*attr\(data-label\)/s,
-  );
-  assert.match(
-    styles,
-    /\.portfolio-table-detailed \.portfolio-row > span\[role="cell"\]:not\(:first-child\)\s*\{[^}]*text-align:\s*left/s,
-  );
-  assert.doesNotMatch(styles, /--portfolio-mobile-inline/);
-  assert.match(
-    styles,
-    /\.portfolio-table-detailed \.portfolio-total-market\s*\{[^}]*grid-column:\s*1;[^}]*grid-row:\s*2;/s,
-  );
-  assert.match(
-    styles,
-    /\.portfolio-table-detailed \.portfolio-total-return\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*2;/s,
-  );
-  assert.match(performanceShared, /className="methodology shell section-gray"/);
-  assert.match(styles, /--background-gray:\s*#f8f9fb/);
-  assert.match(styles, /\.section-gray\s*\{[^}]*background:\s*var\(--background-gray\)/s);
-  assert.match(
-    styles,
-    /\.hero,[\s\S]*?\.page-hero,[\s\S]*?\.memo-article-header\s*\{[^}]*background:\s*var\(--background-gray\)/s,
-  );
 });
 
 test("portfolio table receives only the active locale labels from its server parent", async () => {

@@ -5,6 +5,7 @@ Repository-wide defaults; follow the user's current request when it changes the 
 ## Working agreement
 
 - Communicate in Traditional Chinese unless requested otherwise. Read-only reviews produce findings with file locations and practical impact, without edits.
+- Write project documentation prose in English. Include non-English text only when an exact runtime or provider value is needed for an operation, and identify its source in code.
 - For implementation or optimization, finish the requested change, verify its behavior, and fix related failures before handing off. Resolve routine choices within the authorized scope; ask when missing information materially changes the outcome.
 - Inspect `git status` before editing, preserve unrelated work, and stage only intended files. Keep ignored `audit/` evidence; it is historical context, not the current issue list.
 - Commit or deploy when requested. Deployment includes the necessary commit and push. Report changes, verification, remaining limitations, and commit/deployment status; distinguish local checks from production checks.
@@ -39,13 +40,14 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 
 ## Verification and review
 
-Use focused checks while iterating, then the applicable completion checks below. Local unit tests mock service operations; Playwright starts an isolated server without Resend/Redis credentials. Run these checks and fix related failures within the requested scope without repeatedly seeking permission. Tool and sandbox permissions still apply.
+For non-deployment work, run only checks relevant to the changed behavior; do not run the full `npm run verify` or complete browser suites unless the user explicitly requests them. Local unit tests mock service operations; Playwright starts an isolated server without Resend/Redis credentials. Fix failures related to the change without repeatedly seeking permission. Tool and sandbox permissions still apply.
 
 | Change | Completion checks |
 | --- | --- |
-| Documentation only | Links, anchors, references and `git diff --check`; no application suite |
-| Application code or configuration | `npm run verify` (types, lint, unit tests, Chromium and production build), then `git diff --check` |
-| Shared UI | Also `npm run test:webkit` after a successful build; cover all three languages, narrow layouts, enlarged text, keyboard, touch and reduced motion |
+| Documentation only, without deployment | Links, anchors, references and `git diff --check`; no application suite |
+| Application code or configuration, without deployment | Focused type, lint, format, unit or browser checks for the affected files and behavior, then `git diff --check` |
+| Shared UI, without deployment | Targeted browser checks for affected languages, layouts and interactions; include enlarged text, keyboard, touch or reduced motion when relevant |
+| Deployment | `npm run verify` (types, lint, unit tests, Chromium and production build), plus `npm run test:webkit` for shared UI changes; then `git diff --check` |
 
 Install missing browser binaries with `npx playwright install chromium webkit`. Once checks pass, repeat only when subsequent changes or unresolved failures justify it. Add behavioral regression coverage for changed risks; update source-structure assertions during refactors without weakening user-visible coverage. For animation fixes, check intermediate visual states and repeated/interrupted input, not merely whether an animation was created. WebKit automation does not establish physical iPhone behavior.
 

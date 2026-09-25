@@ -380,3 +380,45 @@ test.describe("form accessibility and preserved text colors", () => {
     expect(colors.outline).not.toBe(colors.background);
   });
 });
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} content reflows at 200% text size`, async ({ context }) => {
+    for (const width of [320, 390]) {
+      for (const route of [
+        "/",
+        "/about",
+        "/portfolio",
+        "/performance",
+        "/disclaimer",
+        "/subscription-preferences",
+        "/memos/microsoft-stock-analysis-fiscal-year-2024",
+      ]) {
+        const path = `${prefix}${route === "/" ? "" : route}` || "/";
+        const page = await context.newPage();
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto(path);
+        await page.waitForLoadState("networkidle");
+        await page.addStyleTag({ content: "html { font-size: 200%; }" });
+        expect(
+          await page.evaluate(() => document.documentElement.scrollWidth),
+          `${path} overflows at ${width}px with enlarged text`,
+        ).toBeLessThanOrEqual(width);
+        if (route === "/") {
+          const clipped = await page
+            .locator(".metric strong, .performance-copy > strong, .holding-row")
+            .evaluateAll((elements) =>
+              elements
+                .filter((element) => element.scrollWidth > element.clientWidth + 1)
+                .map((element) => ({
+                  text: element.textContent?.trim(),
+                  scrollWidth: element.scrollWidth,
+                  clientWidth: element.clientWidth,
+                })),
+            );
+          expect(clipped, `${path} clips enlarged financial values`).toEqual([]);
+        }
+        await page.close();
+      }
+    }
+  });
+}

@@ -5,11 +5,14 @@
 .form {
   max-width: 760px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
 }
 .field {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-field-label);
+  min-width: 0;
   font-size: var(--font-size-label);
   line-height: var(--leading-body);
   font-weight: var(--weight-bold);
@@ -22,6 +25,8 @@
 }
 .field select,
 .field input {
+  min-width: 0;
+  width: 100%;
   min-height: var(--size-field);
   padding: var(--space-field-block) var(--space-field-inline);
   border: 1px solid var(--black);
@@ -43,6 +48,11 @@
   display: flex;
   align-items: center;
   gap: var(--space-5);
+}
+.actions button {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .unsubscribe {
   min-height: var(--size-touch-target);
@@ -87,6 +97,7 @@
 .invalid {
   min-height: var(--size-status-reserve);
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: var(--font-size-body);
   line-height: var(--leading-body);
   letter-spacing: var(--tracking-body);
@@ -94,6 +105,7 @@
 .request {
   max-width: 760px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
 }
 

@@ -165,34 +165,74 @@ function preferenceRequest() {
 
 test.beforeEach(() => values.clear());
 
+function preferenceEmail(html = "secure-link") {
+  return {
+    from: "updates@example.com",
+    to: "reader@example.com",
+    subject: "Manage preferences",
+    text: "Manage preferences with a secure link.",
+    html,
+  };
+}
+
 test("concurrent preference retries return identical randomized payloads", async () => {
   let generated = 0;
-  const create = () => ({ html: `random-token-${++generated}`, to: "reader@example.com" });
+  const create = () => preferenceEmail(`random-token-${++generated}`);
   const [first, second] = await Promise.all([
-    getStablePreferenceEmail("request", "reader/en", create),
-    getStablePreferenceEmail("request", "reader/en", create),
+    getStablePreferenceEmail("request", "reader/en", "reader@example.com", create),
+    getStablePreferenceEmail("request", "reader/en", "reader@example.com", create),
   ]);
   assert.deepEqual(first, second);
-  assert.deepEqual(await getStablePreferenceEmail("request", "reader/en", create), first);
+  assert.deepEqual(await getStablePreferenceEmail("request", "reader/en", "reader@example.com", create), first);
   assert.ok([...values.keys()].every((key) => !key.includes("reader")));
 });
 
 test("reusing a request ID with different input is rejected", async () => {
-  await getStablePreferenceEmail("request", "reader/en", () => ({}));
-  await assert.rejects(
-    getStablePreferenceEmail("request", "reader/zh-tw", () => ({})),
-    { status: 409 },
-  );
+  await getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail);
+  await assert.rejects(getStablePreferenceEmail("request", "reader/zh-tw", "reader@example.com", preferenceEmail), {
+    status: 409,
+  });
 });
 
 test("expired preference links require a new submission ID", async () => {
-  await getStablePreferenceEmail("request", "reader/en", () => ({}));
+  await getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail);
   const [key, value] = [...values][0];
   values.set(key, JSON.stringify({ ...JSON.parse(value), createdAt: Date.now() - 26 * 60_000 }));
-  await assert.rejects(
-    getStablePreferenceEmail("request", "reader/en", () => ({})),
-    { status: 409 },
-  );
+  await assert.rejects(getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail), {
+    status: 409,
+  });
+});
+
+test("malformed preference email records fail closed without replacing the retry payload", async () => {
+  await getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail);
+  const [key, value] = [...values][0];
+  const original = JSON.parse(value);
+  for (const stored of [
+    "not json",
+    JSON.stringify({ ...original, payload: null }),
+    JSON.stringify({ ...original, payload: { ...original.payload, to: "other@example.com" } }),
+    JSON.stringify({ ...original, payload: { ...original.payload, html: null } }),
+    JSON.stringify({ ...original, createdAt: Date.now() + 120_000 }),
+  ]) {
+    values.set(key, stored);
+    await assert.rejects(
+      getStablePreferenceEmail("request", "reader/en", "reader@example.com", () => assert.fail("must not create")),
+      { status: 503 },
+    );
+    assert.equal(values.get(key), stored);
+  }
+});
+
+test("a malformed cached preference email stops before provider I/O", async (context) => {
+  const requestId = "preferences/550e8400-e29b-41d4-a716-446655440000";
+  const email = "reader@example.com";
+  await getStablePreferenceEmail(requestId, JSON.stringify({ email, locale: "en" }), email, preferenceEmail);
+  const [key, value] = [...values][0];
+  values.set(key, JSON.stringify({ ...JSON.parse(value), payload: null }));
+  context.mock.method(globalThis, "fetch", () => assert.fail("provider must not be called"));
+
+  assert.equal((await requestPreferences(preferenceRequest())).status, 503);
+  assert.equal(globalThis.fetch.mock.callCount(), 0);
 });
 
 test("same subscriber cannot mutate concurrently; another subscriber can", async () => {
@@ -284,7 +324,7 @@ test("Redis unavailability never falls back to an unprotected mutation", async (
       { status: 503 },
     );
     await assert.rejects(
-      getStablePreferenceEmail("request", "reader/en", () => assert.fail("must not run")),
+      getStablePreferenceEmail("request", "reader/en", "reader@example.com", () => assert.fail("must not run")),
       { status: 503 },
     );
   } finally {

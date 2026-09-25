@@ -24,7 +24,6 @@ export function HomePageContent({ locale }: { locale: Locale }) {
   const text = homeCopy[locale];
   const memos = getMemos(locale);
   const portfolioDate = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
-  const compactPortfolioDate = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
   const benchmarkReturn = formatPercent(portfolioSnapshot.benchmarkXirr);
 
   return (
@@ -70,7 +69,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <span>{text.portfolioXirr}</span>
             <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
             <small className="date-text">
-              {text.asOf} {compactPortfolioDate} · {text.updatedMonthly}
+              {text.asOf} {portfolioDate} · {text.updatedMonthly}
             </small>
           </div>
         </section>

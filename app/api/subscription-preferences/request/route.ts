@@ -58,17 +58,22 @@ export async function POST(request: Request) {
 
   try {
     const idempotencyKey = getResendIdempotencyKey(request, "preferences") ?? `preferences/${randomUUID()}`;
-    const emailPayload = await getStablePreferenceEmail(idempotencyKey, JSON.stringify({ email, locale }), () => {
-      const text = mailCopy[locale];
-      const preferencesUrl = createPreferenceUrl(email, locale, 30 * 60 * 1000);
-      return {
-        from: UPDATES_FROM_EMAIL,
-        to: email,
-        subject: text.subject,
-        text: `${text.heading}\n\n${text.body}\n\n${preferencesUrl}\n\n${text.note}`,
-        html: renderPreferenceEmail(text, preferencesUrl),
-      };
-    });
+    const emailPayload = await getStablePreferenceEmail(
+      idempotencyKey,
+      JSON.stringify({ email, locale }),
+      email,
+      () => {
+        const text = mailCopy[locale];
+        const preferencesUrl = createPreferenceUrl(email, locale, 30 * 60 * 1000);
+        return {
+          from: UPDATES_FROM_EMAIL,
+          to: email,
+          subject: text.subject,
+          text: `${text.heading}\n\n${text.body}\n\n${preferencesUrl}\n\n${text.note}`,
+          html: renderPreferenceEmail(text, preferencesUrl),
+        };
+      },
+    );
     const existing = await runResendOperation("Preference link contact lookup failed", () =>
       resend.contacts.get({ email }),
     );

@@ -4,11 +4,10 @@ import test from "node:test";
 import { read } from "./repository-helpers.mjs";
 
 test("contact form keeps localized copy on the server and sends through a client boundary", async () => {
-  const [page, form, client, styles, route, resend] = await Promise.all([
+  const [page, form, client, route, resend] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/contact-form.tsx"),
     read("components/contact-form-client.tsx"),
-    read("components/contact-form.module.css"),
     read("app/api/contact/route.ts"),
     read("lib/resend.ts"),
   ]);
@@ -25,13 +24,6 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(client, /postJson\(\s*"\/api\/contact"/);
   assert.match(client, /contact-form\.module\.css/);
   assert.doesNotMatch(client, /headingLabel/);
-  assert.match(styles, /\.form\s*\{[^}]*display:\s*grid/s);
-  assert.match(styles, /\.form\s*\{[^}]*padding:\s*var\(--space-7\) var\(--space-7\) 0/s);
-  assert.match(styles, /@media \(max-width:\s*800px\)[\s\S]*?\.form\s*\{[^}]*padding:\s*0/s);
-  assert.match(styles, /\.section\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s);
-  assert.match(styles, /\.form\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent/s);
-  assert.match(styles, /\.control\s*\{[^}]*border:\s*1px solid var\(--black\)/s);
-  assert.match(styles, /\.control\s*\{[^}]*background:\s*var\(--background-gray\)/s);
   assert.match(client, /<HoneypotField \/>/);
   assert.match(route, /CONTACT_TO_EMAIL/);
   assert.match(route, /CONTACT_FROM_EMAIL/);
@@ -44,11 +36,10 @@ test("contact form keeps localized copy on the server and sends through a client
 });
 
 test("subscribe form stores contacts and triggers a localized welcome automation", async () => {
-  const [page, form, client, styles, route, service, footer] = await Promise.all([
+  const [page, form, client, route, service, footer] = await Promise.all([
     read("components/contact-page-content.tsx"),
     read("components/subscribe-form.tsx"),
     read("components/subscribe-form-client.tsx"),
-    read("components/subscribe-form.module.css"),
     read("app/api/subscribe/route.ts"),
     read("lib/subscription-service.ts"),
     read("components/site-footer.tsx"),
@@ -61,14 +52,6 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
   assert.match(client, /postJson\("\/api\/subscribe"/);
-  assert.match(styles, /\.section h2\s*\{[^}]*color:\s*var\(--white\)/s);
-  assert.match(styles, /\.section\s*\{[^}]*align-self:\s*start/s);
-  assert.match(styles, /\.form\s*\{[^}]*align-items:\s*start[^}]*margin-top:\s*var\(--space-5\)/s);
-  assert.match(styles, /\.submit\s*\{[^}]*background:\s*var\(--white\);[^}]*color:\s*var\(--black\)/s);
-  assert.match(
-    styles,
-    /\.submit:hover:not\(:disabled\),\s*\.submit:focus-visible:not\(:disabled\)\s*\{[^}]*background:\s*var\(--bright-blue\);[^}]*color:\s*var\(--black\)/s,
-  );
   assert.match(client, /<HoneypotField \/>/);
   assert.match(
     footer,

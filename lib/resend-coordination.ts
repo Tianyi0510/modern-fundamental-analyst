@@ -1,3 +1,4 @@
+import "server-only";
 import { createHmac, randomUUID } from "node:crypto";
 import { executeRedisCommand, getRedisClient } from "@/lib/redis";
 import { resendOperationContext } from "@/lib/resend";
@@ -43,7 +44,22 @@ export async function withSubscriberLock<T>(email: string, operation: () => Prom
 
 // Store the complete immutable payload: randomized encrypted links must not
 // change between retries using the same Resend idempotency key.
-export async function getStablePreferenceEmail<T>(requestId: string, identity: string, create: () => T): Promise<T> {
+type PreferenceEmail = { from: string; to: string; subject: string; text: string; html: string };
+
+function isPreferenceEmail(value: unknown): value is PreferenceEmail {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const payload = value as Record<string, unknown>;
+  return ["from", "to", "subject", "text", "html"].every(
+    (field) => typeof payload[field] === "string" && payload[field].length > 0,
+  );
+}
+
+export async function getStablePreferenceEmail(
+  requestId: string,
+  identity: string,
+  recipient: string,
+  create: () => PreferenceEmail,
+): Promise<PreferenceEmail> {
   const redis = await getRedisClient();
   if (!redis) throw new ResendCoordinationError();
   const key = privateKey("preference-request", requestId);
@@ -57,9 +73,22 @@ export async function getStablePreferenceEmail<T>(requestId: string, identity: s
     stored = inserted ? candidate : await executeRedisCommand(redis, () => redis.get(key));
   }
   if (!stored) throw new ResendCoordinationError();
-  const record = JSON.parse(stored) as { fingerprint: string; createdAt: number; payload: T };
-  if (record.fingerprint !== fingerprint || Date.now() - record.createdAt >= 25 * 60 * 1000) {
+  let record: unknown;
+  try {
+    record = JSON.parse(stored) as unknown;
+  } catch {
+    throw new ResendCoordinationError();
+  }
+  if (!record || typeof record !== "object" || Array.isArray(record)) throw new ResendCoordinationError();
+  const { fingerprint: storedFingerprint, createdAt, payload } = record as Record<string, unknown>;
+  if (typeof storedFingerprint !== "string" || typeof createdAt !== "number" || !Number.isSafeInteger(createdAt)) {
+    throw new ResendCoordinationError();
+  }
+  const age = Date.now() - createdAt;
+  if (age < -60_000) throw new ResendCoordinationError();
+  if (storedFingerprint !== fingerprint || age >= 25 * 60 * 1000) {
     throw new ResendCoordinationError("Please submit a new preferences request.", 409);
   }
-  return record.payload;
+  if (!isPreferenceEmail(payload) || payload.to !== recipient) throw new ResendCoordinationError();
+  return payload;
 }
