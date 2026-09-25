@@ -1,4 +1,4 @@
-# Repository guidance
+# AGENTS
 
 Repository-wide defaults; follow the user's current request when it changes the task scope. More specific `AGENTS.md` instructions apply to their subtree; `AGENTS.override.md` takes precedence in the same directory.
 
@@ -17,8 +17,9 @@ Next.js App Router, React, TypeScript, native CSS; Node.js 24 and npm (`npm ci`)
 Read the guide relevant to the change, rather than loading every guide:
 
 - UI and interaction changes: [style guide](docs/STYLE_GUIDE.md), including CSS ownership, cascade, typography and motion tokens.
-- Service boundaries, portfolio data or operations: [technical architecture](docs/TECHNICAL_ARCHITECTURE.md).
-- Email and subscription changes: [Resend integration](docs/RESEND_INTEGRATION.md); coordination and recovery use [Redis runtime](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime) and [subscription reconciliation](docs/TECHNICAL_ARCHITECTURE.md#subscription-reconciliation).
+- Service boundaries, domain, deployment or review operations: [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md).
+- Portfolio snapshots and calculations: [Portfolio Data](docs/PORTFOLIO_DATA.md).
+- Email and subscription changes: [Resend integration](docs/RESEND_INTEGRATION.md); coordination and recovery use [Redis runtime](docs/UPSTASH_REDIS_INTEGRATION.md#redis-runtime) and [subscription reconciliation](docs/UPSTASH_REDIS_INTEGRATION.md#subscription-reconciliation).
 - Payment changes: [Stripe integration](docs/STRIPE_INTEGRATION.md).
 
 Keep README concise and detailed procedures in `docs/`. Update the relevant guide when behavior or commands change.
@@ -26,7 +27,7 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 ## Implementation constraints
 
 - Use `getLocalizedPath` / `getLanguageAlternates` in `lib/i18n.ts` and `createRootMetadata` / `createPageMetadata` in `lib/site-config.ts`. Links and sharing metadata must resolve to the correct language and page.
-- Keep static copy in server components and client boundaries small. Reuse `lib/escape-html.ts`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
+- Keep interface copy with its owning page or shared component, use server components for static copy, and keep client boundaries small. Reuse `lib/escape-html.ts`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
 - Preserve deliberate language, layout and form variants. Preserve verified research and monthly portfolio snapshots unless a content update is requested; these are not live prices.
 - Preserve existing text colors in every state, including opacity, unless a color change is requested. Reuse semantic tokens and preserve the CSS import order in `app/globals.css`.
 - Keep menu visibility, focus and scroll restoration synchronized. Touch hover resets must retain active and keyboard-focus feedback.

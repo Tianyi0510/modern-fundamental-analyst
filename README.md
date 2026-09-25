@@ -19,43 +19,46 @@ Open [localhost:3000](http://localhost:3000). For service integrations, use [.en
 
 ## Verification
 
-Install the test browsers once, then run all local checks:
+For routine changes, run the focused checks in [AGENTS.md](AGENTS.md#verification-and-review). Before deployment, install the test browsers once and run the full gate:
 
 ```bash
 npx playwright install chromium webkit
 npm run verify
 ```
 
-Verification runs type checking, ESLint, Stylelint, a Prettier format check, unit tests, and a production build, then tests that build in the Chromium Playwright project. Run `npm run test:webkit` afterward to test the same local build in two sequential, test-level WebKit shards. GitHub Actions starts independent Ubuntu Chromium and macOS WebKit jobs in parallel; each builds on its own runner, and the Ubuntu job also audits production dependencies. Run `npm run format` to apply Prettier formatting. For a quick browser check during development, use `npm run test:computed-style`; it starts the development server.
+`npm run verify` checks types, lint, formatting, unit tests, the production build, and Chromium browser behavior. For shared UI releases, also run `npm run test:webkit`. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#review-evidence) for CI browser jobs and evidence retention. Use `npm run format` to apply Prettier formatting.
 
 ## Project Layout
 
-| Directory        | Purpose                                                              |
-| ---------------- | -------------------------------------------------------------------- |
-| `app/`           | Pages, API routes, and global styles                                 |
-| `components/`    | Shared UI and interactions                                           |
-| `data/`          | Localized copy, portfolio snapshot, and memo catalog                 |
-| `content/memos/` | Investment memo content                                              |
-| `lib/`           | Services, calculations, and utilities                                |
-| `tests/`         | Unit and browser tests                                               |
-| `scripts/`       | CI deployment gate, Node module loader, and subscription journal CLI |
-| `docs/`          | Shared quality guide, technical architecture, and service guides     |
+| Directory     | Purpose                                                              |
+| ------------- | -------------------------------------------------------------------- |
+| `app/`        | Pages, API routes, and global styles                                 |
+| `components/` | Shared UI, page copy, and interactions                               |
+| `data/`       | Portfolio snapshot, memo catalog, and memo articles                  |
+| `lib/`        | Services, calculations, and utilities                                |
+| `tests/`      | Unit and browser tests                                               |
+| `scripts/`    | CI deployment gate, Node module loader, and subscription journal CLI |
+| `docs/`       | Style guide, operations, data, and service integration guides        |
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
+Under `app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, and `route.ts`).
+
 ## Content and Integrations
 
-Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.ts` as monthly snapshots, not live quotes. See [portfolio data updates](docs/TECHNICAL_ARCHITECTURE.md#portfolio-data) for sources and calculation scope. Memo entries live in `data/memos.ts`, with articles under `content/memos/` registered in `data/memo-content.ts`.
+Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.ts` as monthly snapshots, not live quotes. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for sources and calculation scope. Memo entries live in `data/memos.ts`, with articles under `data/memos/` registered in `data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
 
 Integration details:
 
-- [Resend email and subscriptions](docs/RESEND_INTEGRATION.md)
-- [Upstash Redis runtime and ACL setup](docs/TECHNICAL_ARCHITECTURE.md#redis-runtime)
-- [Stripe setup and checklist](docs/STRIPE_INTEGRATION.md)
+- [Resend Integration](docs/RESEND_INTEGRATION.md)
+- [Upstash Redis Integration](docs/UPSTASH_REDIS_INTEGRATION.md)
+- [Stripe Integration](docs/STRIPE_INTEGRATION.md)
+- [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
+- [Portfolio Data](docs/PORTFOLIO_DATA.md)
 
-Start with the [shared quality and design guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
+Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
 
-See [architecture and operations](docs/TECHNICAL_ARCHITECTURE.md) for production gating, server boundaries, and subscription reconciliation.
+The [Upstash Redis Integration](docs/UPSTASH_REDIS_INTEGRATION.md) guide covers Redis access, coordination, and subscription reconciliation.
 
 ## Deployment
 

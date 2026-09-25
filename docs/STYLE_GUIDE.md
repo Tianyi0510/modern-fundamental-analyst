@@ -1,4 +1,4 @@
-# Shared Quality and Design Guide
+# Style Guide
 
 This guide is the shared entry point for code, interface, interaction, content, and documentation quality. It uses common design principles to guide tradeoffs; domain guides retain the detailed procedures for service setup, deployment, and troubleshooting. It draws on the Airbnb and Google engineering style guides' emphasis on readability, consistency, and maintainability, and applies those principles to the website and its documentation.
 
@@ -27,7 +27,7 @@ The goal is for maintainers to understand behavior from names, types, and struct
 - Share implementations when responsibilities and behavior match. Preserve justified language, form, and service variants.
 - Use comments to explain reasons, constraints, and tradeoffs rather than restating the code. Let Next.js and React rules enforce framework requirements.
 
-See the [technical architecture](TECHNICAL_ARCHITECTURE.md) for service boundaries, data flows, and operating constraints. Detailed integration procedures are in the [Resend](RESEND_INTEGRATION.md) and [Stripe](STRIPE_INTEGRATION.md) guides and the architecture's [Redis runtime section](TECHNICAL_ARCHITECTURE.md#redis-runtime).
+See [Technical Architecture](TECHNICAL_ARCHITECTURE.md#application-boundaries) for application boundaries and deployment constraints. Service procedures are in the [Resend Integration](RESEND_INTEGRATION.md), [Stripe Integration](STRIPE_INTEGRATION.md), and [Upstash Redis Integration](UPSTASH_REDIS_INTEGRATION.md) guides.
 
 ## CSS, layout, and visual language
 
@@ -85,12 +85,12 @@ Memos and monthly data retain native `details`/`summary` semantics. Height anima
 The goal is to keep information equivalent while respecting language differences.
 
 - Use consistent terminology for the same concepts. State the outcome first, then give the next step when needed.
-- Present dates, currency, percentages, and data timestamps clearly and consistently. Portfolio and performance data are timestamped snapshots and must not imply live quotes; see [portfolio data](TECHNICAL_ARCHITECTURE.md#portfolio-data) for definitions.
+- Present dates, currency, percentages, and data timestamps clearly and consistently. Portfolio and performance data are timestamped snapshots and must not imply live quotes; see [Portfolio Data](PORTFOLIO_DATA.md) for definitions.
 - Preserve meaning, tone, and action intent in translation rather than matching words or line counts literally. Language differences may justify layout and content variants.
 
 ## Markdown documentation
 
-Write all project documentation prose in English. Keep localized website copy in application data. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
+Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep independently maintained memo articles and portfolio snapshots in `data/`. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
 
 Each document should solve a clear problem and have a primary place to maintain its information:
 
@@ -99,7 +99,9 @@ Each document should solve a clear problem and have a primary place to maintain 
 | [`README.md`](../README.md)                                                                    | Project introduction, quick start, verification commands, and document navigation. |
 | [`AGENTS.md`](../AGENTS.md)                                                                    | Agent constraints, task guidance, and completion criteria.                         |
 | `STYLE_GUIDE.md` (this file)                                                                   | The single entry point for shared quality principles and cross-domain conventions. |
-| [`TECHNICAL_ARCHITECTURE.md`](TECHNICAL_ARCHITECTURE.md)                                       | System structure, data flow, design decisions, and operating boundaries.           |
+| [`TECHNICAL_ARCHITECTURE.md`](TECHNICAL_ARCHITECTURE.md)                                       | Application boundaries, domain ownership, deployment gate, and review evidence.    |
+| [`PORTFOLIO_DATA.md`](PORTFOLIO_DATA.md)                                                       | Portfolio snapshot, calculations, sources, and update procedure.                   |
+| [`UPSTASH_REDIS_INTEGRATION.md`](UPSTASH_REDIS_INTEGRATION.md)                                 | Redis access, stored data, subscriber coordination, and reconciliation.            |
 | Integration guides such as [Resend](RESEND_INTEGRATION.md) and [Stripe](STRIPE_INTEGRATION.md) | Service setup, procedures, troubleshooting, and verification.                      |
 
 Answer the reader's most urgent question first. Distinguish current facts, required rules, and future proposals. Give each item of information one primary maintenance location and link to it elsewhere. Commands and examples must be usable, with placeholders clearly marked. Date and source volatile external state. Organize each document by purpose rather than forcing a common template.
@@ -114,7 +116,7 @@ For example, shared components reduce behavior drift: share when responsibilitie
 
 | Layer                                            | Responsibility and configuration source                                                           |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Prettier                                         | Consistent formatting; see [`.prettierrc.json`](../.prettierrc.json).                             |
+| Prettier                                         | Consistent formatting; see the `prettier` field in [`package.json`](../package.json).             |
 | ESLint, typescript-eslint, and framework plugins | Code, type usage, and framework rules; see [`eslint.config.mjs`](../eslint.config.mjs).           |
 | Stylelint                                        | CSS static checks; see [`stylelint.config.mjs`](../stylelint.config.mjs).                         |
 | TypeScript                                       | Type checking; see [`tsconfig.json`](../tsconfig.json).                                           |

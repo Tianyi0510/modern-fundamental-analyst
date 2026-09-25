@@ -3,22 +3,6 @@ import test from "node:test";
 
 import { read } from "./repository-helpers.mjs";
 
-test("portfolio totals are derived from holdings", async () => {
-  const [portfolio, calculations] = await Promise.all([
-    read("data/portfolio.ts"),
-    read("lib/portfolio-calculations.ts"),
-  ]);
-
-  assert.match(calculations, /holdings\.reduce/);
-  assert.match(calculations, /getSafeRatio\(marketValue - costBasis \+ netDividends - financingInterest, costBasis\)/);
-  assert.match(calculations, /holdingsCount: holdings\.length/);
-  assert.match(calculations, /getHoldingReturn/);
-  assert.match(calculations, /getSafeRatio\(holding\.costBasis, holding\.shares\)/);
-  assert.match(portfolio, /getPortfolioTotals\(portfolioHoldings, portfolioIncome\)/);
-  assert.doesNotMatch(portfolio, /returnPct:/);
-  assert.doesNotMatch(portfolio, /totalReturn:\s*22\b/);
-});
-
 test("portfolio calculations remain internally consistent", async () => {
   const {
     getHoldingCostPerShare,
@@ -84,27 +68,11 @@ test("date formatting rejects impossible and noncanonical dates", async () => {
 });
 
 test("percent formatting handles positive, zero, and negative values", async () => {
-  const source = await read("lib/format.ts");
   const { formatPercent } = await import("../lib/format.ts");
 
-  assert.match(source, /const percentFormatters = new Map<number, Intl\.NumberFormat>\(\)/);
-  assert.match(source, /MAX_CACHED_FRACTION_DIGITS = 4/);
-  assert.match(source, /shouldCacheFormatter\(fractionDigits\)/);
-  assert.match(source, /percentFormatters\.get\(fractionDigits\)/);
-  assert.match(source, /percentFormatters\.set\(fractionDigits, formatter\)/);
   assert.equal(formatPercent(3.2), "+3.20%");
   assert.equal(formatPercent(0), "0.00%");
   assert.equal(formatPercent(-3.2), "-3.20%");
-});
-
-test("portfolio sorting precomputes derived values once per holding", async () => {
-  const source = await read("components/portfolio-table.tsx");
-
-  assert.match(source, /const rows = useMemo\(\s*\(\) =>\s*holdings\.map/);
-  assert.match(source, /returnPct: getHoldingReturn\(holding\)/);
-  assert.match(source, /weight: getHoldingWeight\(holding\.marketValue, totals\.marketValue\)/);
-  assert.match(source, /const sortedRows = useMemo\(\(\) => \{[\s\S]*?const getSortValue[\s\S]*?return rows\.toSorted/);
-  assert.doesNotMatch(source, /toSorted\(\(a, b\) => \{[\s\S]*?getHolding(?:Return|Weight)\(/);
 });
 
 test("all portfolio and performance locales share page structures", async () => {

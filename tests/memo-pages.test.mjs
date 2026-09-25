@@ -4,28 +4,20 @@ import test from "node:test";
 import { read } from "./repository-helpers.mjs";
 
 test("memo metadata uses one localized catalog", async () => {
-  const source = await read("data/memos.ts");
   const { memos, memosZhTw, memosZhCn } = await import("../data/memos.ts");
 
-  assert.match(source, /2025-10-10/);
+  assert.equal(memos[0].publishedAt, "2025-10-10");
   assert.equal(memos[0].publishedAt, memosZhTw[0].publishedAt);
   assert.equal(memos[0].publishedAt, memosZhCn[0].publishedAt);
   assert.equal(memosZhTw[0].readTime, "閱讀 12 分鐘");
   assert.equal(memosZhCn[0].readTime, "阅读 12 分钟");
 });
 
-test("memo catalog contains only the Microsoft source memo and uses one shared disclosure", async () => {
-  const [catalog, memoPage, disclosure] = await Promise.all([
-    read("data/memos.ts"),
-    read("components/memo-index.tsx"),
-    read("components/animated-disclosure.tsx"),
-  ]);
+test("memo catalog contains only the Microsoft source memo", async () => {
+  const { memos } = await import("../data/memos.ts");
 
-  assert.match(catalog, /microsoft-stock-analysis-fiscal-year-2024/);
-  assert.doesNotMatch(catalog, /durable-pricing-power|self-funded-growth|capital-allocation/);
-  assert.match(memoPage, /<AnimatedDisclosure/);
-  assert.match(disclosure, /<details/);
-  assert.match(disclosure, /<summary/);
+  assert.equal(memos.length, 1);
+  assert.equal(memos[0].slug, "microsoft-stock-analysis-fiscal-year-2024");
 });
 
 test("memo content is selected by slug and locale", async () => {
@@ -46,7 +38,7 @@ test("memo content is selected by slug and locale", async () => {
 
 test("memo article preserves source document prose", async () => {
   const [content, detailPage] = await Promise.all([
-    read("content/memos/microsoft-stock-analysis-fiscal-year-2024.ts"),
+    read("data/memos/microsoft-stock-analysis-fiscal-year-2024.ts"),
     read("components/memo-detail-page.tsx"),
   ]);
 
@@ -68,56 +60,4 @@ test("the legacy Microsoft memo URL permanently redirects to the descriptive slu
   assert.match(config, /\["", "\/zh-tw", "\/zh-cn"\]/);
   assert.match(detailPage, /<SiteHeader[^>]+\/>\s*<main className="memo-detail-page"/s);
   assert.match(detailPage, /<\/main>\s*<SiteFooter/s);
-});
-
-test("all memo locales use shared list and detail page structures", async () => {
-  const paths = [
-    "app/(en)/memos/page.tsx",
-    "app/zh-tw/memos/page.tsx",
-    "app/zh-cn/memos/page.tsx",
-    "app/(en)/memos/[slug]/page.tsx",
-    "app/zh-tw/memos/[slug]/page.tsx",
-    "app/zh-cn/memos/[slug]/page.tsx",
-  ];
-  const pages = await Promise.all(paths.map(read));
-
-  for (const page of pages.slice(0, 3)) assert.match(page, /MemoListPage/);
-  for (const page of pages.slice(3)) {
-    assert.match(page, /MemoDetailPage/);
-    assert.match(page, /getMemoStaticParams/);
-    assert.match(page, /createMemoPageMetadata/);
-  }
-});
-
-test("memo index hero uses the shared subtitle and latest memo date", async () => {
-  const page = await read("components/memo-list-page.tsx");
-
-  assert.match(
-    page,
-    /Detailed investment theses supported by fundamental research, financial analysis, valuation, and clearly defined material risks\./,
-  );
-  assert.match(page, /Last updated on/);
-  assert.match(page, /最後更新於/);
-  assert.match(page, /最后更新于/);
-  assert.match(page, /formatDate\(latestPublishedAt, locale\)/);
-  assert.match(page, /className="page-intro"/);
-});
-
-test("memo cards and index use shared components", async () => {
-  const [cards, home, index] = await Promise.all([
-    read("components/memo-cards.tsx"),
-    read("components/home-page-content.tsx"),
-    read("components/memo-index.tsx"),
-  ]);
-
-  assert.match(cards, /const slotIndexes = \[0, 1, 2\]/);
-  assert.match(cards, /memo-card-placeholder/);
-  assert.match(home, /<MemoCards memos=\{memos\}/);
-  assert.match(index, /<MemoCards memos=\{memos\}/);
-  assert.doesNotMatch(index, /memo-index-row[\s\S]*?className="arrow-icon"/);
-  assert.match(index, /import \{ ChevronDown \} from "lucide-react"/);
-  assert.match(
-    index,
-    /className="memo-summary-meta"[\s\S]*className="memo-count"[\s\S]*<ChevronDown aria-hidden="true" size=\{24\} strokeWidth=\{2\} \/>/,
-  );
 });

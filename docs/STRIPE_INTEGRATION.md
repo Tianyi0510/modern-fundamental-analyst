@@ -1,4 +1,4 @@
-# Stripe Checkout Integration
+# Stripe Integration
 
 This guide describes the Checkout implementation and environment verification steps. Domain settings were updated from the project owner’s report on 2026-09-22; live Stripe and Vercel Dashboard state was not independently verified.
 

@@ -5,6 +5,9 @@
   "engines": {
     "node": "24.x"
   },
+  "prettier": {
+    "printWidth": 120
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
