@@ -3,12 +3,18 @@ import {
   getPortfolioTotals,
   type PortfolioHolding,
 } from "@/lib/portfolio-calculations";
-import { portfolioCashEvents, portfolioMonthlyValuations, portfolioPurchases } from "@/data/portfolio-detail";
+import {
+  portfolioCashEvents,
+  portfolioMonthlyValuations,
+  portfolioPurchases,
+  spyAdjustedClosesByDate,
+} from "@/data/portfolio-detail";
 
 export { getHoldingCostPerShare, getHoldingReturn, getPortfolioTotals } from "@/lib/portfolio-calculations";
 export type { PortfolioHolding } from "@/lib/portfolio-calculations";
 
-const latestValuation = portfolioMonthlyValuations.at(-1)!;
+const latestValuation = portfolioMonthlyValuations.at(-1);
+if (!latestValuation) throw new Error("The portfolio needs at least one monthly valuation");
 const costBasisBySymbol = new Map<string, number>();
 for (const purchase of portfolioPurchases) {
   costBasisBySymbol.set(
@@ -25,18 +31,38 @@ export const portfolioHoldings: ReadonlyArray<PortfolioHolding> = Object.entries
 );
 
 const roundCents = (amount: number) => Math.round(amount * 100) / 100;
+const cashTotals = portfolioCashEvents.reduce(
+  (totals, event) => {
+    if (event.kind === "financingInterest") totals.financingInterest -= event.amount;
+    else totals.netDividends += event.amount;
+    return totals;
+  },
+  { netDividends: 0, financingInterest: 0 },
+);
 export const portfolioIncome = {
-  netDividends: roundCents(
-    portfolioCashEvents
-      .filter((event) => event.kind !== "financingInterest")
-      .reduce((sum, event) => sum + event.amount, 0),
-  ),
-  financingInterest: roundCents(
-    -portfolioCashEvents
-      .filter((event) => event.kind === "financingInterest")
-      .reduce((sum, event) => sum + event.amount, 0),
-  ),
+  netDividends: roundCents(cashTotals.netDividends),
+  financingInterest: roundCents(cashTotals.financingInterest),
 } as const;
+
+function getSpyObservation(date: string, priceDate: string, adjustedClose: number, xirr: number | null) {
+  const simulatedUnits = portfolioPurchases.reduce(
+    (units, purchase) =>
+      purchase.spyPriceDate <= date
+        ? units + purchase.grossAmount / spyAdjustedClosesByDate[purchase.spyPriceDate]
+        : units,
+    0,
+  );
+  return { date, priceDate, adjustedClose, simulatedUnits, simulatedValue: simulatedUnits * adjustedClose, xirr };
+}
+
+export const portfolioSpyMonthlyReturns = portfolioMonthlyValuations.map(
+  ({ date, spyPriceDate, spyAdjustedClose, benchmarkXirr }) =>
+    getSpyObservation(date, spyPriceDate, spyAdjustedClose, benchmarkXirr),
+);
+
+const latestSpyMonth = portfolioSpyMonthlyReturns.at(-1);
+if (!latestSpyMonth) throw new Error("The portfolio needs at least one SPY valuation");
+export const portfolioSpySnapshot = latestSpyMonth;
 // Month-end since-inception annualized XIRR; null denotes a horizon below 30 days.
 export const portfolioMonthlyReturns = portfolioMonthlyValuations.map(
   ({ date, stockValue, portfolioXirr, benchmarkXirr }) => ({

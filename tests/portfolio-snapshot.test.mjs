@@ -1,8 +1,40 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-const { portfolioSnapshot, portfolioHoldings, portfolioMonthlyReturns } = await import("../data/portfolio.ts");
-const { portfolioPurchases, portfolioCashEvents, portfolioCorporateActions, portfolioMonthlyValuations } =
-  await import("../data/portfolio-detail.ts");
+const {
+  portfolioSnapshot,
+  portfolioHoldings,
+  portfolioMonthlyReturns,
+  portfolioSpyMonthlyReturns,
+  portfolioSpySnapshot,
+} = await import("../data/portfolio.ts");
+const {
+  spyAdjustedClosesByDate,
+  portfolioPurchases,
+  portfolioCashEvents,
+  portfolioCorporateActions,
+  portfolioMonthlyValuations,
+} = await import("../data/portfolio-detail.ts");
+
+function calculateXirr(date, terminalValue) {
+  const day = (value) => Date.parse(`${value}T00:00:00Z`) / 86400000;
+  const firstDay = day(portfolioPurchases[0].spyPriceDate);
+  const flows = portfolioPurchases
+    .filter((purchase) => purchase.spyPriceDate <= date)
+    .map((purchase) => ({
+      years: (day(purchase.spyPriceDate) - firstDay) / 365,
+      amount: -(purchase.grossAmount + purchase.fees),
+    }));
+  flows.push({ years: (day(date) - firstDay) / 365, amount: terminalValue });
+  const npv = (rate) => flows.reduce((sum, flow) => sum + flow.amount / (1 + rate) ** flow.years, 0);
+  let lower = -0.999;
+  let upper = 10;
+  for (let step = 0; step < 100; step++) {
+    const middle = (lower + upper) / 2;
+    if (npv(middle) > 0) lower = middle;
+    else upper = middle;
+  }
+  return ((lower + upper) / 2) * 100;
+}
 
 test("published August snapshot retains verified values and income", () => {
   assert.equal(portfolioSnapshot.asOf, "2026-08-31");
@@ -16,6 +48,7 @@ test("published August snapshot retains verified values and income", () => {
 
 test("monthly XIRR history preserves unavailable periods and matches the latest snapshot", () => {
   assert.equal(portfolioMonthlyReturns.length, 21);
+  assert.equal(portfolioSpyMonthlyReturns.length, 21);
   assert.equal(portfolioMonthlyReturns[0].date, "2024-12-31");
   assert.equal(portfolioMonthlyReturns[0].portfolioXirr, null);
   assert.equal(portfolioMonthlyReturns[0].benchmarkXirr, null);
@@ -29,6 +62,7 @@ test("monthly XIRR history preserves unavailable periods and matches the latest 
   assert.ok(Math.abs(latest.marketValue - portfolioSnapshot.marketValue) < 0.001);
   assert.equal(latest.portfolioXirr, portfolioSnapshot.xirr);
   assert.equal(latest.benchmarkXirr, portfolioSnapshot.benchmarkXirr);
+  assert.equal(portfolioSpySnapshot.xirr, portfolioSnapshot.benchmarkXirr);
 });
 
 test("portfolio source data has unique holdings and finite nonnegative inputs", () => {
@@ -77,11 +111,12 @@ test("dated purchases and cash events reconcile to the published totals", () => 
   assert.ok(Math.abs(financingInterest - portfolioSnapshot.financingInterest) < 0.001);
   for (const purchase of portfolioPurchases) {
     assert.ok(Math.abs(purchase.shares * purchase.unitPrice - purchase.grossAmount) < 0.0001);
-    for (const price of Object.values(purchase.benchmarkAdjustedClose)) assert.ok(price > 0);
+    const spyPrice = spyAdjustedClosesByDate[purchase.spyPriceDate];
+    assert.ok(spyPrice > 0, `Missing SPY price for ${purchase.spyPriceDate}`);
   }
 });
 
-test("monthly positions, values, and simulated SPY units reconcile with detailed events", () => {
+test("monthly positions and values reconcile with detailed events", () => {
   assert.equal(portfolioCorporateActions.length, 3);
   assert.equal(portfolioMonthlyValuations.length, portfolioMonthlyReturns.length);
   const events = [
@@ -107,10 +142,27 @@ test("monthly positions, values, and simulated SPY units reconcile with detailed
       computedValue += reportedShares * valuation.prices[symbol];
     }
     assert.ok(Math.abs(computedValue - valuation.stockValue) < 0.011, valuation.date);
-    const spyUnits = portfolioPurchases
-      .filter((row) => row.benchmarkPriceDate <= valuation.date)
-      .reduce((sum, row) => sum + row.grossAmount / row.benchmarkAdjustedClose.SPY, 0);
-    assert.ok(Math.abs(spyUnits - valuation.spySimulatedUnits) < 0.000001, valuation.date);
-    assert.ok(Math.abs(spyUnits * valuation.spyAdjustedClose - valuation.spySimulatedValue) < 0.011, valuation.date);
   }
+});
+
+test("monthly simulated SPY holdings and XIRRs reconcile", () => {
+  for (const [index, valuation] of portfolioMonthlyValuations.entries()) {
+    const observed = portfolioSpyMonthlyReturns[index];
+    assert.equal(observed.date, valuation.date);
+    assert.equal(observed.priceDate, valuation.spyPriceDate);
+    assert.ok(observed.priceDate <= observed.date);
+    assert.equal(observed.priceDate.slice(0, 7), observed.date.slice(0, 7));
+    const units = portfolioPurchases
+      .filter((purchase) => purchase.spyPriceDate <= valuation.date)
+      .reduce((sum, purchase) => sum + purchase.grossAmount / spyAdjustedClosesByDate[purchase.spyPriceDate], 0);
+    assert.ok(Math.abs(observed.simulatedUnits - units) < 0.000001, `${valuation.date} SPY units`);
+    assert.equal(observed.adjustedClose, valuation.spyAdjustedClose);
+    assert.ok(Math.abs(observed.simulatedValue - units * observed.adjustedClose) < 0.011);
+    assert.equal(observed.xirr, valuation.benchmarkXirr);
+    if (index === 0) assert.equal(observed.xirr, null);
+    else assert.ok(Math.abs(observed.xirr - calculateXirr(valuation.date, observed.simulatedValue)) < 0.0001);
+  }
+  assert.ok(Math.abs(portfolioSpySnapshot.simulatedUnits - 158.5991478936601) < 0.000001);
+  assert.ok(Math.abs(portfolioSpySnapshot.simulatedValue - 121637.61647704263) < 0.01);
+  assert.equal(portfolioSpySnapshot.adjustedClose, 766.95);
 });
