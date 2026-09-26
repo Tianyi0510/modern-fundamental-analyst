@@ -34,6 +34,43 @@ test("memory limiter uses bounded fixed-window counters", () => {
   }
 });
 
+test("Redis failover keeps the visitor's already used allowance", async (context) => {
+  const previousUrl = process.env.UPSTASH_REDIS_URL;
+  const state = globalThis.__mfaRedisStateV5;
+  const previousState = { ...state };
+  let count = 0;
+  let available = true;
+  const redis = {
+    isReady: true,
+    isOpen: true,
+    async eval() {
+      if (!available) throw new Error("Redis unavailable");
+      return ++count;
+    },
+    destroy() {
+      this.isOpen = false;
+      this.isReady = false;
+    },
+  };
+  process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
+  Object.assign(state, { client: redis, connection: null, unavailableUntil: 0, lastErrorLogAt: {} });
+  context.mock.method(console, "error", () => {});
+  try {
+    const limit = createRateLimiter({ namespace: "failover", windowMs: 60_000, maxRequests: 2 });
+    const request = new Request("https://example.com/api", { headers: { "x-forwarded-for": "192.0.2.10" } });
+    assert.equal(await limit(request), false);
+    assert.equal(await limit(request), false);
+    available = false;
+    assert.equal(await limit(request), true);
+    assert.equal(await limit(request), true);
+    assert.equal(count, 2);
+  } finally {
+    if (previousUrl === undefined) delete process.env.UPSTASH_REDIS_URL;
+    else process.env.UPSTASH_REDIS_URL = previousUrl;
+    Object.assign(state, previousState);
+  }
+});
+
 test("rate limiter rejects invalid resource bounds and namespaces", () => {
   assert.throws(() => createMemoryRateLimiter({ windowMs: 0, maxRequests: 1 }), RangeError);
   assert.throws(() => createMemoryRateLimiter({ windowMs: 1000, maxRequests: 0 }), RangeError);

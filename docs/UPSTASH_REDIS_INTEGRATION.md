@@ -16,7 +16,7 @@ Initial connection readiness, including authentication, has a separate 10-second
 
 All application commands use `executeRedisCommand`. A failed command discards its connection and opens a 30-second cooldown. A delayed failure or connection completion from a discarded client cannot disable a newer client or clear its pending connection. Error listeners remain attached to discarded sockets to handle late events safely. Logs use bounded categories and omit command arguments, Redis URLs and credentials.
 
-Rate limiting falls back to a bounded in-process counter when Redis is unavailable. Subscriber mutations and preference-email persistence instead fail closed because their correctness requires shared coordination. Redis command timeouts do not prove a write was rejected: timed-out writes are not automatically replayed. Subscriber leases expire naturally when their release cannot be confirmed.
+Rate limiting falls back to a bounded in-process counter when Redis is unavailable. The counter also tracks requests while Redis is healthy, so a visitor does not regain a fresh local allowance when Redis fails; Redis remains authoritative while available. The fallback cannot enforce a global limit across application instances. Subscriber mutations and preference-email persistence instead fail closed because their correctness requires shared coordination. Redis command timeouts do not prove a write was rejected: timed-out writes are not automatically replayed. Subscriber leases expire naturally when their release cannot be confirmed.
 
 `npm run test:unit` includes isolated connection lifecycle and concurrency tests. These tests use simulated clients and do not connect to the production database.
 
@@ -24,7 +24,7 @@ Rate limiting falls back to a bounded in-process counter when Redis is unavailab
 
 The subscription journal has no plaintext email or preference token and retains unresolved records without expiry; see [subscription reconciliation](#subscription-reconciliation) for its fields and recovery procedure.
 
-Preference-email retry records are separate: they contain the sender, recipient, subject, original encrypted link, email text and HTML for up to 25 hours. The request key is reused as the provider idempotency key; it is not stored in the payload. This enables safe retries across Resend's deduplication window. Treat these records as sensitive, restrict Redis access, and follow [Resend request reliability](RESEND_INTEGRATION.md#request-reliability) for retry behavior.
+Preference-email retry records are separate: they contain the sender, recipient, subject, original encrypted link, email text and HTML for up to 25 hours. The same request ID can retrieve its original payload for 25 minutes; the record remains afterward so that reusing an old ID cannot create a fresh payload during the provider's deduplication window. The request key is reused as the provider idempotency key; it is not stored in the payload. Treat these records as sensitive, restrict Redis access, and follow [Resend request reliability](RESEND_INTEGRATION.md#request-reliability) for retry behavior.
 
 ## Subscription reconciliation
 

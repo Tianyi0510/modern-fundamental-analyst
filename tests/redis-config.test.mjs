@@ -48,7 +48,8 @@ test("API rate limiting uses Redis with a privacy-preserving memory fallback", a
   assert.match(rateLimiter, /redis\.eval\(rateLimitScript/);
   assert.match(rateLimiter, /mfa:rl:v2/);
   assert.match(rateLimiter, /executeRedisCommand\(redis/);
-  assert.match(rateLimiter, /return memoryFallback\(identifier\)/);
+  assert.match(rateLimiter, /const memoryLimited = memoryFallback\(identifier\)/);
+  assert.match(rateLimiter, /return memoryLimited/);
   assert.match(rateLimiter, /count: current\.count \+ 1/);
   assert.doesNotMatch(rateLimiter, /number\[\]/);
 });

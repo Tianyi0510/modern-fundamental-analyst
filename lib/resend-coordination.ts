@@ -19,6 +19,8 @@ function privateKey(scope: string, value: string) {
 
 const releaseScript =
   "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end";
+const PREFERENCE_RETRY_WINDOW_MS = 25 * 60 * 1000;
+const PREFERENCE_RECORD_TTL_SECONDS = 25 * 60 * 60;
 
 export async function withSubscriberLock<T>(email: string, operation: () => Promise<T>): Promise<T> {
   const redis = await getRedisClient();
@@ -67,9 +69,11 @@ export async function getStablePreferenceEmail(
   let stored = await executeRedisCommand(redis, () => redis.get(key));
   if (!stored) {
     const candidate = JSON.stringify({ fingerprint, createdAt: Date.now(), payload: create() });
-    // Cover Resend's 24-hour deduplication window even if the initial send
-    // happens shortly after this record is created.
-    const inserted = await executeRedisCommand(redis, () => redis.set(key, candidate, { NX: true, EX: 90_000 }));
+    // Retain the request ID beyond the provider's deduplication window so an
+    // old request cannot create a new payload after its short retry period.
+    const inserted = await executeRedisCommand(redis, () =>
+      redis.set(key, candidate, { NX: true, EX: PREFERENCE_RECORD_TTL_SECONDS }),
+    );
     stored = inserted ? candidate : await executeRedisCommand(redis, () => redis.get(key));
   }
   if (!stored) throw new ResendCoordinationError();
@@ -86,7 +90,7 @@ export async function getStablePreferenceEmail(
   }
   const age = Date.now() - createdAt;
   if (age < -60_000) throw new ResendCoordinationError();
-  if (storedFingerprint !== fingerprint || age >= 25 * 60 * 1000) {
+  if (storedFingerprint !== fingerprint || age >= PREFERENCE_RETRY_WINDOW_MS) {
     throw new ResendCoordinationError("Please submit a new preferences request.", 409);
   }
   if (!isPreferenceEmail(payload) || payload.to !== recipient) throw new ResendCoordinationError();

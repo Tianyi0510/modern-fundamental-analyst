@@ -194,9 +194,14 @@ test("reusing a request ID with different input is rejected", async () => {
   });
 });
 
-test("expired preference links require a new submission ID", async () => {
-  await getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail);
+test("preference retries use the original payload for 25 minutes, then require a new submission ID", async () => {
+  const payload = await getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail);
   const [key, value] = [...values][0];
+  values.set(key, JSON.stringify({ ...JSON.parse(value), createdAt: Date.now() - 24 * 60_000 }));
+  assert.deepEqual(
+    await getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail),
+    payload,
+  );
   values.set(key, JSON.stringify({ ...JSON.parse(value), createdAt: Date.now() - 26 * 60_000 }));
   await assert.rejects(getStablePreferenceEmail("request", "reader/en", "reader@example.com", preferenceEmail), {
     status: 409,

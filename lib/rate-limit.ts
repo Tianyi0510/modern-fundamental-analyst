@@ -86,10 +86,13 @@ export function createRateLimiter(options: RedisRateLimiterOptions) {
   return async (request: Request) => {
     const identifier = getRequestIdentifier(request);
     if (!identifier) return false;
+    // Track requests while Redis is healthy so an outage cannot restart the
+    // per-process fallback allowance for a visitor.
+    const memoryLimited = memoryFallback(identifier);
 
     try {
       const redis = await getRedisClient();
-      if (!redis) return memoryFallback(identifier);
+      if (!redis) return memoryLimited;
 
       const count = await executeRedisCommand(redis, () =>
         redis.eval(rateLimitScript, {
@@ -101,7 +104,7 @@ export function createRateLimiter(options: RedisRateLimiterOptions) {
       return count > maxRequests;
     } catch (error) {
       logRedisError("Redis rate limiter unavailable", error);
-      return memoryFallback(identifier);
+      return memoryLimited;
     }
   };
 }
