@@ -49,7 +49,10 @@ const copy = {
 
 export function PerformanceChart({ locale }: { locale: Locale }) {
   const text = copy[locale];
-  const points = portfolioMonthlyReturns.filter((row) => row.portfolioXirr !== null && row.benchmarkXirr !== null);
+  const points = portfolioMonthlyReturns.filter(
+    (row): row is typeof row & { portfolioXirr: number; benchmarkXirr: number } =>
+      row.portfolioXirr !== null && row.benchmarkXirr !== null,
+  );
   const values = points.flatMap((row) => [row.portfolioXirr, row.benchmarkXirr]);
   const lower = Math.floor(Math.min(...values) / 20) * 20;
   const upper = Math.ceil(Math.max(...values) / 20) * 20;

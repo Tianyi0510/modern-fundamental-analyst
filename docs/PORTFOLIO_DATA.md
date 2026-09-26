@@ -1,13 +1,19 @@
 # Portfolio Data
 
-This guide owns the versioned portfolio snapshot, calculation scope, source reconciliation, and update procedure.
+This guide owns the portfolio data model, calculation scope, reconciliation, and update procedure.
 
-`data/portfolio.ts` is the site's portfolio data store; Redis only supports service coordination and rate limiting. Home, Portfolio and Performance share this snapshot. The Performance chart uses since-inception annualized XIRR at each month-end, not single-month returns; horizons below 30 days remain unavailable.
+## Workspace data
 
-The 2026-08-31 update uses `portfolio-return-analysis-monthly-xirr.xlsx` (statement-backed revision): `August Statement!A16:D33` for 18 holdings and `Monthly XIRR!A5:H25` for the history. The original `portfolio-return-analysis-2026-07-31.xlsx` supplies unchanged cost bases, net dividends and financing interest; the August revision reports no added cash flows. Stocks total USD 121,301.99. Idle cash is excluded. Original July tabs remain historical snapshots; do not use the provisional August estimates.
+`data/portfolio-detail.ts` contains 91 purchase lots with fees and benchmark adjusted prices, 108 dated dividend, withholding-tax, and financing-interest cash events, three corporate actions, and 21 month-end position, price, and published XIRR snapshots. Amounts and prices are in USD; dates use `YYYY-MM-DD`. Cash-event amounts are signed: dividends are positive, taxes and interest are negative. Purchase costs are `grossAmount + fees`. Benchmark units use `grossAmount / adjustedClose`, while the full purchase cost is the simulated cash outflow; they are hypothetical holdings.
 
-Keep source precision until display formatting. Portfolio cumulative return includes net dividends and deducts financing interest; individual holding returns remain market-value-versus-cost calculations. On each update, reconcile quantities and price × shares, totals, the latest XIRR observation and snapshot date; run focused portfolio regression and browser checks. Run the full verification gate before deployment. Do not commit source statements, account identifiers or local source paths.
+`data/portfolio.ts` derives the website's current holdings, cost basis, income, market value, and return history from those records. Home, Portfolio, and Performance import this shared module. The application reads workspace data directly and does not need a database or a separate data-processing service.
 
-The latest history row supplies the shared snapshot date and both XIRRs; do not maintain duplicate headline values. Holdings remain the source of aggregate cost and market value. Retain the independently reported monthly market value for reconciliation rather than replacing it with a calculated total. CI checks unique holdings, finite nonnegative inputs, consecutive calendar month-ends, paired XIRR availability and agreement between the latest history and holdings.
+The published 2026-08-31 snapshot contains 18 holdings and 21 month-end observations. Stocks total USD 121,301.99. Idle cash, deposits, withdrawals, and currency exchanges are outside this stock-investment return model. The Performance chart shows since-inception annualized XIRR at each month-end, not each month's standalone return; horizons below 30 days remain unavailable.
 
-The application and CI require only Node.js. Python is optional for offline Excel extraction or independent XIRR reconciliation; it is not a website runtime or deployment dependency. Review extracted values before updating the versioned data, and never publish private workbook contents automatically.
+## Calculation and updates
+
+Keep source precision until display formatting. Portfolio cumulative return includes net dividends and deducts financing interest; individual holding returns compare market value with cost basis and do not allocate portfolio-level interest. The dated events support other cash-flow calculations, while the month-end prices and quantities support position-level valuation. The XIRR observations are published results, not recomputed by the website at request time.
+
+On each update, add or amend detailed records first. Reconcile transaction costs, dated cash-flow sums, corporate-action-adjusted shares, price × shares, reported stock value, benchmark units, and XIRR against the source evidence. Update `data/portfolio.ts` only when derivation or presentation rules change. Run focused portfolio tests and relevant browser checks; run the full verification gate before deployment. Do not commit source statements, account identifiers, or local source paths.
+
+The application and CI use Node.js, TypeScript, and the existing test tools. Reading, updating, and calculating from the workspace data do not require Python or SQL.

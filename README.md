@@ -46,7 +46,7 @@ Under `app/`, route groups such as `(en)` organize pages without adding a URL se
 
 ## Content and Integrations
 
-Portfolio holdings and month-end XIRR history are maintained in `data/portfolio.ts` as monthly snapshots, not live quotes. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for sources and calculation scope. Memo entries live in `data/memos.ts`, with articles under `data/memos/` registered in `data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
+Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `data/portfolio-detail.ts`; `data/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `data/memos.ts`, with articles under `data/memos/` registered in `data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
 
 Integration details:
 
