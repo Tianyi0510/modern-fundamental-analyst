@@ -155,29 +155,33 @@ export function HomePageContent({ locale }: { locale: Locale }) {
   return (
     <main className="home-page" id="main-content">
       <div className="home-opening">
-        <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-        <section className="hero shell">
-          <p className="eyebrow">
-            <span /> {text.researchLabel}
-          </p>
-          <h1>
-            {text.hero[0]}
-            <br />
-            <em>{text.hero[1]}</em>
-          </h1>
-          <div className="hero-bottom">
-            <p>{text.heroIntro}</p>
-            <div className="hero-actions">
-              <Link className="button button-dark" href={getLocalizedPath("/portfolio", locale)}>
-                {text.viewPortfolio}
-              </Link>
-              <Link className="text-link" href={getLocalizedPath("/memos", locale)}>
-                {text.readLatest}
-                <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
-              </Link>
+        <div className="home-header">
+          <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+        </div>
+        <div className="hero-band">
+          <section className="hero shell">
+            <p className="eyebrow">
+              <span /> {text.researchLabel}
+            </p>
+            <h1>
+              {text.hero[0]}
+              <br />
+              <em>{text.hero[1]}</em>
+            </h1>
+            <div className="hero-bottom">
+              <p>{text.heroIntro}</p>
+              <div className="hero-actions">
+                <Link className="button button-dark" href={getLocalizedPath("/portfolio", locale)}>
+                  {text.viewPortfolio}
+                </Link>
+                <Link className="text-link" href={getLocalizedPath("/memos", locale)}>
+                  {text.readLatest}
+                  <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
         <section className="metric-band" aria-label={text.portfolioSnapshot}>
           <div className="metric" data-tone="highlight">
             <span>{text.totalReturn}</span>
@@ -322,35 +326,39 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="memos-home shell">
-        <div className="section-heading">
-          <p className="section-number">{text.memosLabel}</p>
-          <h2>
-            {text.memosTitle[0]}
-            <br />
-            {text.memosTitle[1]}
-          </h2>
-        </div>
-        <MemoCards memos={memos} locale={locale} />
-        <Link className="text-link memos-all" href={getLocalizedPath("/memos", locale)}>
-          {text.viewAllMemos}
-          <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
-        </Link>
-      </section>
+      <div className="memos-home-band">
+        <section className="memos-home shell">
+          <div className="section-heading">
+            <p className="section-number">{text.memosLabel}</p>
+            <h2>
+              {text.memosTitle[0]}
+              <br />
+              {text.memosTitle[1]}
+            </h2>
+          </div>
+          <MemoCards memos={memos} locale={locale} />
+          <Link className="text-link memos-all" href={getLocalizedPath("/memos", locale)}>
+            {text.viewAllMemos}
+            <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+          </Link>
+        </section>
+      </div>
 
-      <section className="cta shell">
-        <p className="eyebrow">
-          <span /> {text.contactLabel}
-        </p>
-        <h2>
-          {text.contactTitle[0]}
-          <br />
-          {text.contactTitle[1]}
-        </h2>
-        <Link className="button button-dark" href={getLocalizedPath("/contact", locale)}>
-          {text.contactLink}
-        </Link>
-      </section>
+      <div className="cta-band">
+        <section className="cta shell">
+          <p className="eyebrow">
+            <span /> {text.contactLabel}
+          </p>
+          <h2>
+            {text.contactTitle[0]}
+            <br />
+            {text.contactTitle[1]}
+          </h2>
+          <Link className="button button-dark" href={getLocalizedPath("/contact", locale)}>
+            {text.contactLink}
+          </Link>
+        </section>
+      </div>
       <SiteFooter locale={locale} />
     </main>
   );

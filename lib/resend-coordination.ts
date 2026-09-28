@@ -12,7 +12,7 @@ export class ResendCoordinationError extends Error {
 }
 
 function privateKey(scope: string, value: string) {
-  const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET || process.env.RESEND_API_KEY;
+  const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET;
   if (!secret) throw new ResendCoordinationError();
   return `mfa:resend:${scope}:${createHmac("sha256", secret).update(value).digest("hex")}`;
 }
@@ -23,9 +23,9 @@ const PREFERENCE_RETRY_WINDOW_MS = 25 * 60 * 1000;
 const PREFERENCE_RECORD_TTL_SECONDS = 25 * 60 * 60;
 
 export async function withSubscriberLock<T>(email: string, operation: () => Promise<T>): Promise<T> {
+  const key = privateKey("subscriber", email.trim().toLowerCase());
   const redis = await getRedisClient();
   if (!redis) throw new ResendCoordinationError();
-  const key = privateKey("subscriber", email.trim().toLowerCase());
   const owner = randomUUID();
   // Fail fast on contention: never run an uncoordinated mutation as fallback.
   if (!(await executeRedisCommand(redis, () => redis.set(key, owner, { NX: true, PX: 120_000 }))))
@@ -62,10 +62,10 @@ export async function getStablePreferenceEmail(
   recipient: string,
   create: () => PreferenceEmail,
 ): Promise<PreferenceEmail> {
-  const redis = await getRedisClient();
-  if (!redis) throw new ResendCoordinationError();
   const key = privateKey("preference-request", requestId);
   const fingerprint = privateKey("preference-input", identity);
+  const redis = await getRedisClient();
+  if (!redis) throw new ResendCoordinationError();
   let stored = await executeRedisCommand(redis, () => redis.get(key));
   if (!stored) {
     const candidate = JSON.stringify({ fingerprint, createdAt: Date.now(), payload: create() });

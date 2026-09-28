@@ -803,6 +803,7 @@ test.describe("mobile content and navigation QA", () => {
 
   test("site header stays in document flow while the menu brand remains pinned", async ({ page }) => {
     await page.goto("/");
+    const background = page.locator(".home-header");
     const header = page.locator(".site-header").first();
     await expect(header).toHaveCSS("position", "relative");
     await expect(header).toHaveCSS("height", "70px");
@@ -812,15 +813,22 @@ test.describe("mobile content and navigation QA", () => {
     expect(wordmarkBox!.height).toBeLessThanOrEqual(25);
     expect(await page.locator("body").evaluate((element) => getComputedStyle(element).paddingTop)).toBe("0px");
     const topBeforeScroll = await header.boundingBox();
+    const backgroundBeforeScroll = await background.boundingBox();
     await page.evaluate(() => window.scrollTo({ top: 700, behavior: "instant" }));
     const topAfterScroll = await header.boundingBox();
+    const backgroundAfterScroll = await background.boundingBox();
     expect(topBeforeScroll).not.toBeNull();
     expect(topAfterScroll).not.toBeNull();
+    expect(backgroundBeforeScroll).not.toBeNull();
+    expect(backgroundAfterScroll).not.toBeNull();
     expect(topBeforeScroll!.y).toBe(0);
     expect(topAfterScroll!.y).toBeLessThan(-100);
-    expect(topBeforeScroll!.x).toBe(0);
-    expect(topBeforeScroll!.width).toBe(390);
-    expect(topAfterScroll!.width).toBe(390);
+    expect(topBeforeScroll!.x).toBe(16);
+    expect(topBeforeScroll!.width).toBe(358);
+    expect(topAfterScroll!.width).toBe(358);
+    expect(backgroundBeforeScroll!.x).toBe(0);
+    expect(backgroundBeforeScroll!.width).toBe(390);
+    expect(backgroundAfterScroll!.width).toBe(390);
   });
 
   test("home metrics form a compact full-width mobile data band", async ({ page }) => {
@@ -1122,5 +1130,40 @@ test.describe("mobile content and navigation QA", () => {
     const contact = page.locator(".footer-links a").first();
     await contact.hover();
     await expect(contact).toHaveCSS("color", "rgb(255, 255, 255)");
+  });
+});
+
+test.describe("touch holding feedback", () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test("number spacing stays stable during press and release", async ({ page }) => {
+    for (const path of ["/", "/zh-tw", "/zh-cn"]) {
+      await page.goto(path);
+      await page.evaluate(() => document.fonts.ready);
+      const row = page.locator(".holding-row").first();
+      await row.scrollIntoViewIfNeeded();
+      const positions = () =>
+        row.evaluate((element) => {
+          const number = element.children[0]!.getBoundingClientRect();
+          const name = element.children[1]!.getBoundingClientRect();
+          return { numberX: number.x, nameX: name.x, gap: name.left - number.right };
+        });
+      const before = await positions();
+      expect(before.gap).toBeGreaterThanOrEqual(16);
+      await row.hover();
+      await expect(row).toHaveCSS("padding-left", "0px");
+      await page.mouse.down();
+      try {
+        await expect(row).toHaveCSS("padding-left", "14px");
+        const pressed = await positions();
+        expect(pressed.numberX - before.numberX).toBeCloseTo(14, 1);
+        expect(pressed.nameX - before.nameX).toBeCloseTo(14, 1);
+        expect(pressed.gap).toBeCloseTo(before.gap, 1);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      } finally {
+        await page.mouse.up();
+      }
+      await expect(row).toHaveCSS("padding-left", "0px");
+    }
   });
 });

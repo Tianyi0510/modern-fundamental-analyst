@@ -1,5 +1,9 @@
 import { pathToFileURL } from "node:url";
 
+// The longest CI job allows 20 minutes; leave room for queueing and the
+// remaining Vercel build steps within its 45-minute build limit.
+const CI_WAIT_MS = 30 * 60_000;
+
 export async function requireSuccessfulCI({
   env = process.env,
   fetcher = fetch,
@@ -9,7 +13,7 @@ export async function requireSuccessfulCI({
   if (env.VERCEL_ENV !== "production") return;
   const sha = env.VERCEL_GIT_COMMIT_SHA;
   if (!/^[a-f0-9]{40}$/.test(sha ?? "")) throw new Error("Production requires an exact Git commit SHA.");
-  const deadline = now() + 10 * 60_000;
+  const deadline = now() + CI_WAIT_MS;
   const endpoint = `https://api.github.com/repos/Tianyi0510/modern-fundamental-analyst/actions/workflows/ci.yml/runs?head_sha=${sha}&event=push&per_page=20`;
   while (now() < deadline) {
     const response = await fetcher(endpoint, {
@@ -28,7 +32,7 @@ export async function requireSuccessfulCI({
     }
     await sleep(15_000);
   }
-  throw new Error("Production blocked: CI did not succeed within 10 minutes.");
+  throw new Error("Production blocked: CI did not succeed within 30 minutes.");
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

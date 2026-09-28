@@ -11,8 +11,8 @@ type JournalRecord = {
   operation?: "subscribe" | "preferences";
 };
 function keyFor(email: string) {
-  const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET || process.env.RESEND_API_KEY;
-  if (!secret) throw new Error("Subscription journal secret is unavailable");
+  const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+  if (!secret) throw new Error("SUBSCRIPTION_PREFERENCES_SECRET is required for subscription journals");
   return `mfa:subscription-journal:v1:${createHmac("sha256", secret).update(email.trim().toLowerCase()).digest("hex")}`;
 }
 async function client() {
@@ -29,8 +29,8 @@ export async function withSubscriptionJournal<T>(
   operation: () => Promise<T>,
   operationType: "subscribe" | "preferences" = "subscribe",
 ) {
-  const redis = await client();
   const key = keyFor(email);
+  const redis = await client();
   const context = resendOperationContext.getStore();
   if (!context) throw new Error("Subscription journal requires a subscriber lock");
   const record: JournalRecord = {
@@ -78,16 +78,17 @@ export async function withSubscriptionJournal<T>(
 }
 
 export async function readSubscriptionJournal(email: string): Promise<JournalRecord | null> {
+  const key = keyFor(email);
   const redis = await client();
-  const value = await executeRedisCommand(redis, () => redis.get(keyFor(email)));
+  const value = await executeRedisCommand(redis, () => redis.get(key));
   return value ? (JSON.parse(value) as JournalRecord) : null;
 }
 
 // Call under the subscriber lock only after the operator has reconciled the
 // provider state. Compare the exact record to avoid clearing a newer attempt.
 export async function resolveSubscriptionJournal(email: string, expectedId: string) {
-  const redis = await client();
   const key = keyFor(email);
+  const redis = await client();
   const value = await executeRedisCommand(redis, () => redis.get(key));
   if (!value || (JSON.parse(value) as JournalRecord).id !== expectedId) throw new Error("Journal ID does not match");
   const cleared = await executeRedisCommand(redis, () =>

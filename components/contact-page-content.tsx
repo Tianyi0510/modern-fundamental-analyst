@@ -47,19 +47,21 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
   return (
     <main className="contact-page" id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero contact-hero shell">
-        <p className="eyebrow">
-          <span /> {text.label}
-        </p>
-        <h1>
-          {text.title[0]}
-          <br />
-          <em>{text.title[1]}</em>
-        </h1>
-        <div className="page-intro">
-          <p className="contact-note">{text.intro}</p>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero contact-hero shell">
+          <p className="eyebrow">
+            <span /> {text.label}
+          </p>
+          <h1>
+            {text.title[0]}
+            <br />
+            <em>{text.title[1]}</em>
+          </h1>
+          <div className="page-intro">
+            <p className="contact-note">{text.intro}</p>
+          </div>
+        </section>
+      </div>
       <section className="contact-grid">
         {text.cards.map(([title, description]) => (
           <article key={title}>

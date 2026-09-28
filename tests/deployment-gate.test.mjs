@@ -21,6 +21,21 @@ test("production gate requires successful CI for the exact commit", async () => 
   });
   assert.equal(calls, 2);
 });
+test("production gate accepts CI that succeeds after a 20-minute job", async () => {
+  let clock = 0;
+  await requireSuccessfulCI({
+    env,
+    now: () => clock,
+    sleep: async (ms) => {
+      clock += ms;
+    },
+    fetcher: async () =>
+      Response.json({
+        workflow_runs: [clock < 21 * 60_000 ? { ...run, status: "in_progress", conclusion: null } : run],
+      }),
+  });
+  assert.equal(clock, 21 * 60_000);
+});
 test("production gate fails closed on failed CI, missing SHA, API errors and timeout", async () => {
   await assert.rejects(requireSuccessfulCI({ env: { VERCEL_ENV: "production" } }), /exact Git commit/);
   await assert.rejects(
@@ -41,8 +56,9 @@ test("production gate fails closed on failed CI, missing SHA, API errors and tim
       },
       fetcher: async () => Response.json({ workflow_runs: [] }),
     }),
-    /10 minutes/,
+    /30 minutes/,
   );
+  assert.equal(clock, 30 * 60_000);
 });
 test("preview and local builds do not require production CI", async () => {
   await requireSuccessfulCI({ env: {}, fetcher: () => assert.fail("must not fetch") });

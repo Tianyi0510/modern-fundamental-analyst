@@ -161,7 +161,7 @@ body {
 }
 
 /* A light-blue contact band closes the homepage before the inverse footer. */
-.home-page .cta {
+.home-page .cta-band {
   background: var(--surface-highlight);
   color: var(--text-primary);
 }

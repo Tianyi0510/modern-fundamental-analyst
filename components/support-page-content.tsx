@@ -66,19 +66,21 @@ export function SupportPageContent({ locale, status }: { locale: Locale; status?
   return (
     <main className="support-page" id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero support-hero shell">
-        <p className="eyebrow">
-          <span /> {text.label}
-        </p>
-        <h1>
-          {text.title[0]}
-          <br />
-          <em>{text.title[1]}</em>
-        </h1>
-        <div className="page-intro">
-          <p>{text.intro}</p>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero support-hero shell">
+          <p className="eyebrow">
+            <span /> {text.label}
+          </p>
+          <h1>
+            {text.title[0]}
+            <br />
+            <em>{text.title[1]}</em>
+          </h1>
+          <div className="page-intro">
+            <p>{text.intro}</p>
+          </div>
+        </section>
+      </div>
       <section className="support-section">
         <div className="support-layout shell">
           <div className="support-copy">

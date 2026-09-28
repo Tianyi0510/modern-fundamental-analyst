@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 const {
   portfolioSnapshot,
+  portfolioIncome,
   portfolioHoldings,
   portfolioMonthlyReturns,
   portfolioSpyMonthlyReturns,
@@ -44,6 +45,31 @@ test("published August snapshot retains verified values and income", () => {
   const expectedReturn = ((121301.99 - 96425.3742 + 526.69 - 85.75) / 96425.3742) * 100;
   assert.ok(Math.abs(portfolioSnapshot.totalReturn - expectedReturn) < 1e-9);
   assert.equal(portfolioHoldings.find((row) => row.symbol === "PYPL").price, 52.665);
+});
+
+test("future transactions and cash events do not change the published snapshot", async () => {
+  portfolioPurchases.push({
+    date: "2026-09-01",
+    symbol: "PYPL",
+    shares: 1,
+    unitPrice: 100,
+    grossAmount: 100,
+    fees: 1.99,
+    spyPriceDate: "2026-08-31",
+  });
+  portfolioCashEvents.push({ date: "2026-09-01", symbol: "PYPL", kind: "dividend", amount: 100 });
+  portfolioCashEvents.push({ date: "2026-09-01", kind: "financingInterest", amount: -10 });
+  try {
+    const withFutureInputs = await import("../data/portfolio.ts?future-inputs");
+    assert.deepEqual(withFutureInputs.portfolioSnapshot, portfolioSnapshot);
+    assert.deepEqual(withFutureInputs.portfolioIncome, portfolioIncome);
+    assert.deepEqual(withFutureInputs.portfolioHoldings, portfolioHoldings);
+    assert.deepEqual(withFutureInputs.portfolioSpyMonthlyReturns, portfolioSpyMonthlyReturns);
+  } finally {
+    portfolioPurchases.pop();
+    portfolioCashEvents.pop();
+    portfolioCashEvents.pop();
+  }
 });
 
 test("monthly XIRR history preserves unavailable periods and matches the latest snapshot", () => {
@@ -97,19 +123,21 @@ test("history contains consecutive calendar month-ends and paired XIRRs", () => 
 });
 
 test("dated purchases and cash events reconcile to the published totals", () => {
-  assert.equal(portfolioPurchases.length, 91);
-  assert.equal(portfolioCashEvents.length, 108);
-  const purchaseCost = portfolioPurchases.reduce((sum, row) => sum + row.grossAmount + row.fees, 0);
-  const netDividends = portfolioCashEvents
+  const purchases = portfolioPurchases.filter((row) => row.date <= portfolioSnapshot.asOf);
+  const cashEvents = portfolioCashEvents.filter((row) => row.date <= portfolioSnapshot.asOf);
+  assert.equal(purchases.length, 91);
+  assert.equal(cashEvents.length, 108);
+  const purchaseCost = purchases.reduce((sum, row) => sum + row.grossAmount + row.fees, 0);
+  const netDividends = cashEvents
     .filter((event) => event.kind !== "financingInterest")
     .reduce((sum, event) => sum + event.amount, 0);
-  const financingInterest = -portfolioCashEvents
+  const financingInterest = -cashEvents
     .filter((event) => event.kind === "financingInterest")
     .reduce((sum, event) => sum + event.amount, 0);
   assert.ok(Math.abs(purchaseCost - portfolioSnapshot.costBasis) < 0.001);
   assert.ok(Math.abs(netDividends - portfolioSnapshot.netDividends) < 0.001);
   assert.ok(Math.abs(financingInterest - portfolioSnapshot.financingInterest) < 0.001);
-  for (const purchase of portfolioPurchases) {
+  for (const purchase of purchases) {
     assert.ok(Math.abs(purchase.shares * purchase.unitPrice - purchase.grossAmount) < 0.0001);
     const spyPrice = spyAdjustedClosesByDate[purchase.spyPriceDate];
     assert.ok(spyPrice > 0, `Missing SPY price for ${purchase.spyPriceDate}`);
@@ -117,7 +145,7 @@ test("dated purchases and cash events reconcile to the published totals", () => 
 });
 
 test("monthly positions and values reconcile with detailed events", () => {
-  assert.equal(portfolioCorporateActions.length, 3);
+  assert.equal(portfolioCorporateActions.filter((action) => action.date <= portfolioSnapshot.asOf).length, 3);
   assert.equal(portfolioMonthlyValuations.length, portfolioMonthlyReturns.length);
   const events = [
     ...portfolioPurchases.map((row) => ({ ...row, kind: "purchase" })),
@@ -153,7 +181,7 @@ test("monthly simulated SPY holdings and XIRRs reconcile", () => {
     assert.ok(observed.priceDate <= observed.date);
     assert.equal(observed.priceDate.slice(0, 7), observed.date.slice(0, 7));
     const units = portfolioPurchases
-      .filter((purchase) => purchase.spyPriceDate <= valuation.date)
+      .filter((purchase) => purchase.date <= valuation.date && purchase.spyPriceDate <= valuation.date)
       .reduce((sum, purchase) => sum + purchase.grossAmount / spyAdjustedClosesByDate[purchase.spyPriceDate], 0);
     assert.ok(Math.abs(observed.simulatedUnits - units) < 0.000001, `${valuation.date} SPY units`);
     assert.equal(observed.adjustedClose, valuation.spyAdjustedClose);

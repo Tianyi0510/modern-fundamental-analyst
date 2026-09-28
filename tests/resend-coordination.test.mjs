@@ -28,6 +28,7 @@ const redis = {
 };
 process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
 process.env.RESEND_API_KEY = "re_test_coordination";
+process.env.SUBSCRIPTION_PREFERENCES_SECRET = "stable-test-coordination-secret";
 globalThis.__mfaRedisStateV5 = { client: redis, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 };
 const { withSubscriberLock, getStablePreferenceEmail } = await import("../lib/resend-coordination.ts");
 const { getResendClient, resendOperationContext, reportResendRollbackFailure } = await import("../lib/resend.ts");
@@ -112,6 +113,53 @@ test("subscription journal persists uncertain phases and blocks blind retries af
   );
   await withSubscriberLock("reader@example.com", () => resolveSubscriptionJournal("reader@example.com", record.id));
   assert.equal(await readSubscriptionJournal("reader@example.com"), null);
+});
+
+test("missing dedicated secret blocks coordination and journal access", async () => {
+  const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+  delete process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+  try {
+    await assert.rejects(
+      withSubscriberLock("reader@example.com", () => assert.fail("must not run")),
+      { status: 503 },
+    );
+    await assert.rejects(
+      getStablePreferenceEmail("request", "reader/en", "reader@example.com", () => assert.fail("must not create")),
+      { status: 503 },
+    );
+    await assert.rejects(readSubscriptionJournal("reader@example.com"), /SUBSCRIPTION_PREFERENCES_SECRET is required/);
+    assert.equal(values.size, 0);
+  } finally {
+    process.env.SUBSCRIPTION_PREFERENCES_SECRET = secret;
+  }
+});
+
+test("rotating the Resend API key cannot hide an unresolved journal", async () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  await withSubscriberLock("reader@example.com", () =>
+    withSubscriptionJournal("reader@example.com", "en", async () => {
+      resendOperationContext.getStore().uncertain = true;
+    }),
+  );
+  const record = await readSubscriptionJournal("reader@example.com");
+  const journalKeys = [...values.keys()].filter((key) => key.startsWith("mfa:subscription-journal:"));
+  for (const key of values.keys()) if (key.startsWith("mfa:resend:subscriber:")) values.delete(key);
+  process.env.RESEND_API_KEY = "re_rotated_coordination";
+  try {
+    assert.deepEqual(await readSubscriptionJournal("reader@example.com"), record);
+    await assert.rejects(
+      withSubscriberLock("reader@example.com", () =>
+        withSubscriptionJournal("reader@example.com", "en", () => assert.fail("must not retry")),
+      ),
+      /reconciliation/,
+    );
+    assert.deepEqual(
+      [...values.keys()].filter((key) => key.startsWith("mfa:subscription-journal:")),
+      journalKeys,
+    );
+  } finally {
+    process.env.RESEND_API_KEY = apiKey;
+  }
 });
 
 test("subscription journal clears confirmed operations and retains interrupted ones", async () => {

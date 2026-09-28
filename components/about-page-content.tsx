@@ -299,38 +299,42 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
   return (
     <main className="about-page" id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero shell">
-        <p className="eyebrow">
-          <span /> {text.eyebrow}
-        </p>
-        <h1>
-          {text.headline[0]}
-          <br />
-          <em>{text.headline[1]}</em>
-        </h1>
-        <div className="page-intro">
-          <p>{text.introduction}</p>
-          <small>{text.disciplines}</small>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero shell">
+          <p className="eyebrow">
+            <span /> {text.eyebrow}
+          </p>
+          <h1>
+            {text.headline[0]}
+            <br />
+            <em>{text.headline[1]}</em>
+          </h1>
+          <div className="page-intro">
+            <p>{text.introduction}</p>
+            <small>{text.disciplines}</small>
+          </div>
+        </section>
+      </div>
       {text.sections.map((section, index) => {
         const [number, sectionName] = section.label.split(" · ");
         return (
-          <section className={`about-section shell${index % 2 === 1 ? " section-gray" : ""}`} key={section.label}>
-            <div className="about-section-heading">
-              <p className="section-number about-section-label">
-                <span>{number}</span>
-                <span aria-hidden="true">·</span>
-                <span>{sectionName}</span>
-              </p>
-              <h2>{section.title}</h2>
-            </div>
-            <div className="about-copy">
-              {section.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </div>
-          </section>
+          <div className={index % 2 === 1 ? "section-gray" : undefined} key={section.label}>
+            <section className="about-section shell">
+              <div className="about-section-heading">
+                <p className="section-number about-section-label">
+                  <span>{number}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{sectionName}</span>
+                </p>
+                <h2>{section.title}</h2>
+              </div>
+              <div className="about-copy">
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            </section>
+          </div>
         );
       })}
       <section className="about-boundaries">

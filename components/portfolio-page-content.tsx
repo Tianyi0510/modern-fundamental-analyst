@@ -133,18 +133,20 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
   return (
     <main className="portfolio-page" id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero shell">
-        <p className="eyebrow">
-          <span /> {text.eyebrow}
-        </p>
-        <h1>{text.title}</h1>
-        <div className="page-intro">
-          <p>{text.intro}</p>
-          <small className="date-text">
-            {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
-          </small>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero shell">
+          <p className="eyebrow">
+            <span /> {text.eyebrow}
+          </p>
+          <h1>{text.title}</h1>
+          <div className="page-intro">
+            <p>{text.intro}</p>
+            <small className="date-text">
+              {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
+            </small>
+          </div>
+        </section>
+      </div>
       <section className="portfolio-kpis" aria-label={text.summaryLabel}>
         <div data-tone="plain">
           <span>{text.marketValue}</span>

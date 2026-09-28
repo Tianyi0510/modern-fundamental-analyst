@@ -24,22 +24,26 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
     <>
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main className="memo-detail-page" id="main-content">
-        <article className="memo-article shell">
-          <header className="memo-article-header">
-            <p className="eyebrow">
-              <span /> {memo.category.label}
-            </p>
-            <h1>{memo.title}</h1>
-            <div className="article-meta">
-              <span>{formatDate(memo.publishedAt, locale, locale === "en")}</span>
-              <span>{memo.readTime}</span>
-              <span>
-                {text.memoLabel} {memo.number}
-              </span>
-            </div>
-          </header>
-          <p className="article-lead">{memo.summary}</p>
-          <MemoArticleContent content={content} />
+        <article className="memo-article">
+          <div className="memo-article-header-band">
+            <header className="memo-article-header shell">
+              <p className="eyebrow">
+                <span /> {memo.category.label}
+              </p>
+              <h1>{memo.title}</h1>
+              <div className="article-meta">
+                <span>{formatDate(memo.publishedAt, locale, locale === "en")}</span>
+                <span>{memo.readTime}</span>
+                <span>
+                  {text.memoLabel} {memo.number}
+                </span>
+              </div>
+            </header>
+          </div>
+          <div className="shell">
+            <p className="article-lead">{memo.summary}</p>
+            <MemoArticleContent content={content} />
+          </div>
         </article>
       </main>
       <SiteFooter locale={locale} />

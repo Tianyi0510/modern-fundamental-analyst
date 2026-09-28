@@ -58,8 +58,6 @@ Integration details:
 
 Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
 
-The [Upstash Redis Integration](docs/UPSTASH_REDIS_INTEGRATION.md) guide covers Redis access, coordination, and subscription reconciliation.
-
 ## Deployment
 
 Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.

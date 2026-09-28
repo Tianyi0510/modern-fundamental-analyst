@@ -142,18 +142,20 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
   return (
     <main className="performance-page" id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero shell">
-        <p className="eyebrow">
-          <span /> {text.eyebrow}
-        </p>
-        <h1>{text.title}</h1>
-        <div className="page-intro">
-          <p>{text.intro}</p>
-          <small className="date-text">
-            {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
-          </small>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero shell">
+          <p className="eyebrow">
+            <span /> {text.eyebrow}
+          </p>
+          <h1>{text.title}</h1>
+          <div className="page-intro">
+            <p>{text.intro}</p>
+            <small className="date-text">
+              {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
+            </small>
+          </div>
+        </section>
+      </div>
       <section className="performance-summary">
         <div data-tone="highlight">
           <span>{text.cumulativeReturn}</span>
@@ -178,13 +180,15 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
         </div>
         <PerformanceChart locale={locale} />
       </section>
-      <section className="methodology shell section-gray">
-        <h2>{text.methodology}</h2>
-        <div className="methodology-content">
-          <div className="methodology-explanation">{text.methodologyCopy}</div>
-          <aside className="methodology-source">{text.snapshotCopy(asOf)}</aside>
-        </div>
-      </section>
+      <div className="section-gray">
+        <section className="methodology shell">
+          <h2>{text.methodology}</h2>
+          <div className="methodology-content">
+            <div className="methodology-explanation">{text.methodologyCopy}</div>
+            <aside className="methodology-source">{text.snapshotCopy(asOf)}</aside>
+          </div>
+        </section>
+      </div>
       <SiteFooter locale={locale} />
     </main>
   );

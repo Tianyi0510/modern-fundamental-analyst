@@ -92,15 +92,17 @@ export async function SubscriptionPreferencesPage({
   return (
     <main id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero shell">
-        <p className="eyebrow">
-          <span /> {text.label}
-        </p>
-        <h1>{text.title}</h1>
-        <div className="page-intro">
-          <p>{text.intro}</p>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero shell">
+          <p className="eyebrow">
+            <span /> {text.label}
+          </p>
+          <h1>{text.title}</h1>
+          <div className="page-intro">
+            <p>{text.intro}</p>
+          </div>
+        </section>
+      </div>
       <section className={`${styles.panel} shell`}>
         {payload ? (
           <SubscriptionPreferencesForm

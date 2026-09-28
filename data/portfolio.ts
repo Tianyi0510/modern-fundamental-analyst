@@ -15,8 +15,10 @@ export type { PortfolioHolding } from "@/lib/portfolio-calculations";
 
 const latestValuation = portfolioMonthlyValuations.at(-1);
 if (!latestValuation) throw new Error("The portfolio needs at least one monthly valuation");
+const asOf = latestValuation.date;
 const costBasisBySymbol = new Map<string, number>();
 for (const purchase of portfolioPurchases) {
+  if (purchase.date > asOf) continue;
   costBasisBySymbol.set(
     purchase.symbol,
     (costBasisBySymbol.get(purchase.symbol) ?? 0) + purchase.grossAmount + purchase.fees,
@@ -33,6 +35,7 @@ export const portfolioHoldings: ReadonlyArray<PortfolioHolding> = Object.entries
 const roundCents = (amount: number) => Math.round(amount * 100) / 100;
 const cashTotals = portfolioCashEvents.reduce(
   (totals, event) => {
+    if (event.date > asOf) return totals;
     if (event.kind === "financingInterest") totals.financingInterest -= event.amount;
     else totals.netDividends += event.amount;
     return totals;
@@ -47,7 +50,7 @@ export const portfolioIncome = {
 function getSpyObservation(date: string, priceDate: string, adjustedClose: number, xirr: number | null) {
   const simulatedUnits = portfolioPurchases.reduce(
     (units, purchase) =>
-      purchase.spyPriceDate <= date
+      purchase.date <= date && purchase.spyPriceDate <= date
         ? units + purchase.grossAmount / spyAdjustedClosesByDate[purchase.spyPriceDate]
         : units,
     0,
@@ -81,7 +84,7 @@ if (latestMonth.portfolioXirr === null || latestMonth.benchmarkXirr === null) {
 const totals = getPortfolioTotals(portfolioHoldings, portfolioIncome);
 
 export const portfolioSnapshot = {
-  asOf: latestMonth.date,
+  asOf,
   ...totals,
   ...portfolioIncome,
   xirr: latestMonth.portfolioXirr,

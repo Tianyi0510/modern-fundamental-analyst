@@ -43,22 +43,24 @@ export function MemoListPage({ locale }: { locale: Locale }) {
   return (
     <main className="memos-page" id="main-content">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <section className="page-hero shell">
-        <p className="eyebrow">
-          <span /> {text.eyebrow}
-        </p>
-        <h1>
-          {text.title}
-          <br />
-          <em>{text.emphasis}</em>
-        </h1>
-        <div className="page-intro">
-          <p>{text.subtitle}</p>
-          <small className="date-text">
-            {text.updated} {lastUpdated}
-          </small>
-        </div>
-      </section>
+      <div className="page-hero-band">
+        <section className="page-hero shell">
+          <p className="eyebrow">
+            <span /> {text.eyebrow}
+          </p>
+          <h1>
+            {text.title}
+            <br />
+            <em>{text.emphasis}</em>
+          </h1>
+          <div className="page-intro">
+            <p>{text.subtitle}</p>
+            <small className="date-text">
+              {text.updated} {lastUpdated}
+            </small>
+          </div>
+        </section>
+      </div>
       <MemoIndex memos={memos} locale={locale} label={text.indexLabel} />
       <SiteFooter locale={locale} />
     </main>
