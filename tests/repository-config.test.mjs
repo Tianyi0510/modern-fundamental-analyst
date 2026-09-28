@@ -5,9 +5,9 @@ import { read } from "./repository-helpers.mjs";
 
 test("SEO routes use the production site URL instead of localhost", async () => {
   const [config, sitemap, robots] = await Promise.all([
-    read("lib/site-config.ts"),
-    read("app/sitemap.ts"),
-    read("app/robots.ts"),
+    read("src/lib/site-config.ts"),
+    read("src/app/sitemap.ts"),
+    read("src/app/robots.ts"),
   ]);
 
   assert.match(config, /https:\/\/www\.modernfundamentalanalyst\.com/);
@@ -18,8 +18,8 @@ test("SEO routes use the production site URL instead of localhost", async () => 
 });
 
 test("page metadata provides canonical and bilingual alternate URLs", async () => {
-  const { createPageMetadata, createRootMetadata, SITE_NAME } = await import("../lib/site-config.ts");
-  const { locales, localeConfig, getLocalizedPath } = await import("../lib/i18n.ts");
+  const { createPageMetadata, createRootMetadata, SITE_NAME } = await import("../src/lib/site-config.ts");
+  const { locales, localeConfig, getLocalizedPath } = await import("../src/lib/i18n.ts");
   for (const locale of locales) {
     const root = createRootMetadata(locale);
     const rootTitle = locale === "en" ? SITE_NAME : `${SITE_NAME}｜${localeConfig[locale].label}`;

@@ -35,18 +35,18 @@ The goal is to make style ownership clear and use visual design to express infor
 
 ### Style ownership
 
-| Primary location                                                                                                       | Responsibility                                                 |
-| ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| [`app/reset.css`](../app/reset.css)                                                                                    | Browser normalization and the box model.                       |
-| [`app/styles/base.css`](../app/styles/base.css)                                                                        | Palette primitives, type, spacing, control, and motion tokens. |
-| [`app/styles/colors.css`](../app/styles/colors.css)                                                                    | Semantic color aliases.                                        |
-| [`app/styles/chrome.css`](../app/styles/chrome.css), [`pages.css`](../app/styles/pages.css)                            | Shared chrome, controls, and page layouts.                     |
-| [`typography.css`](../app/styles/typography.css), [`component-typography.css`](../app/styles/component-typography.css) | Shared text roles.                                             |
-| [`responsive.css`](../app/styles/responsive.css)                                                                       | Responsive layout, touch, and motion preferences.              |
-| [`themes.css`](../app/styles/themes.css)                                                                               | Component surfaces and interaction color overrides.            |
-| `components/*.module.css`                                                                                              | Component-local layout and states.                             |
+| Primary location                                                                                                               | Responsibility                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| [`src/app/reset.css`](../src/app/reset.css)                                                                                    | Browser normalization and the box model.                       |
+| [`src/app/styles/base.css`](../src/app/styles/base.css)                                                                        | Palette primitives, type, spacing, control, and motion tokens. |
+| [`src/app/styles/colors.css`](../src/app/styles/colors.css)                                                                    | Semantic color aliases.                                        |
+| [`src/app/styles/chrome.css`](../src/app/styles/chrome.css), [`pages.css`](../src/app/styles/pages.css)                        | Shared chrome, controls, and page layouts.                     |
+| [`typography.css`](../src/app/styles/typography.css), [`component-typography.css`](../src/app/styles/component-typography.css) | Shared text roles.                                             |
+| [`responsive.css`](../src/app/styles/responsive.css)                                                                           | Responsive layout, touch, and motion preferences.              |
+| [`themes.css`](../src/app/styles/themes.css)                                                                                   | Component surfaces and interaction color overrides.            |
+| `src/components/*.module.css`                                                                                                  | Component-local layout and states.                             |
 
-[`app/globals.css`](../app/globals.css) defines the import order; semantic colors and theme rules come later. Add new color aliases to `colors.css` and component selectors to the file that owns them. Theme rules may set backgrounds, borders, and interaction colors; other files own typography and page geometry.
+[`src/app/globals.css`](../src/app/globals.css) defines the import order; semantic colors and theme rules come later. Add new color aliases to `colors.css` and component selectors to the file that owns them. Theme rules may set backgrounds, borders, and interaction colors; other files own typography and page geometry.
 
 Keep box sizing, dimensions, spacing, and overflow predictable. Select shared tokens by purpose; CSS is the source of truth for values and breakpoints. Choose type sizes by semantic role, such as page title, section title, body, control, or data, rather than by what happens to fit one screenshot. Use `rem` for text and bounded `clamp()` values for display roles. Avoid arbitrary component font sizes or changing a text role solely at a breakpoint. Heading levels express document structure; financial numbers use tabular figures for comparison.
 
@@ -61,7 +61,7 @@ A KPI's `data-tone` explicitly determines its colors, even if cards are reordere
 
 Preserve established text colors and opacity, including hover, active, disabled, and inverse states, unless the task explicitly requests a color change. Pair positive and negative colors with numbers or symbols that convey the same meaning. Existing contrast concerns remain open: Medium Blue on white is about 3.39:1, Price Up 3.06:1, and Price Down 4.00:1. Do not claim full text-contrast compliance until the text colors have been addressed.
 
-Use Jost for Latin text and numbers. Use Noto Sans TC and Noto Sans SC for Traditional and Simplified Chinese glyphs, respectively. The brand vector masters are [`public/brand/icon.svg`](../public/brand/icon.svg) and [`logo.svg`](../public/brand/logo.svg). Preserve the square icon, single-line wordmark, and colored period; generate site icons and social images from the masters.
+Use Jost for Latin text and numbers. Use Noto Sans TC and Noto Sans SC for Traditional and Simplified Chinese glyphs, respectively. The brand vector masters are [`public/images/icon.svg`](../public/images/icon.svg) and [`logo.svg`](../public/images/logo.svg); PNG copies are available in the same directory. Preserve the square icon, single-line wordmark, and colored period; generate site icons and social images from the masters. Keep the file-based icon and Apple icon in [`src/app/`](../src/app) aligned with the icon master; sharing-image metadata references [`public/images/og-logo.png`](../public/images/og-logo.png).
 
 Responsive layouts keep information and actions in priority order. Check all three languages, root font sizes up to 200%, long translations, and content changes for wrapping and container width. The footer wordmark may wrap. Contact and preference forms use square fields, while the compact footer form uses pill-shaped fields; these are intentional variants. Local chart geometry and optical adjustments may use local values instead of forced spacing-token substitutions.
 
@@ -90,7 +90,7 @@ The goal is to keep information equivalent while respecting language differences
 
 ## Markdown documentation
 
-Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep independently maintained memo articles and portfolio snapshots in `data/`. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
+Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep independently maintained memo articles and portfolio snapshots in `src/data/`. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
 
 Each document should solve a clear problem and have a primary place to maintain its information:
 

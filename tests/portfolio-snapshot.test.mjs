@@ -7,14 +7,14 @@ const {
   portfolioMonthlyReturns,
   portfolioSpyMonthlyReturns,
   portfolioSpySnapshot,
-} = await import("../data/portfolio.ts");
+} = await import("../src/data/portfolio.ts");
 const {
   spyAdjustedClosesByDate,
   portfolioPurchases,
   portfolioCashEvents,
   portfolioCorporateActions,
   portfolioMonthlyValuations,
-} = await import("../data/portfolio-detail.ts");
+} = await import("../src/data/portfolio-detail.ts");
 
 function calculateXirr(date, terminalValue) {
   const day = (value) => Date.parse(`${value}T00:00:00Z`) / 86400000;
@@ -60,7 +60,7 @@ test("future transactions and cash events do not change the published snapshot",
   portfolioCashEvents.push({ date: "2026-09-01", symbol: "PYPL", kind: "dividend", amount: 100 });
   portfolioCashEvents.push({ date: "2026-09-01", kind: "financingInterest", amount: -10 });
   try {
-    const withFutureInputs = await import("../data/portfolio.ts?future-inputs");
+    const withFutureInputs = await import("../src/data/portfolio.ts?future-inputs");
     assert.deepEqual(withFutureInputs.portfolioSnapshot, portfolioSnapshot);
     assert.deepEqual(withFutureInputs.portfolioIncome, portfolioIncome);
     assert.deepEqual(withFutureInputs.portfolioHoldings, portfolioHoldings);

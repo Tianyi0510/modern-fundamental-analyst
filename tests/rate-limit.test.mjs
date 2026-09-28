@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { read } from "./repository-helpers.mjs";
 
-const { createMemoryRateLimiter, createRateLimiter } = await import("../lib/rate-limit.ts");
+const { createMemoryRateLimiter, createRateLimiter } = await import("../src/lib/rate-limit.ts");
 
 test("memory limiter isolates client keys and does not group missing IPs", () => {
   const limit = createMemoryRateLimiter({ windowMs: 60_000, maxRequests: 1, maxKeys: 2 });
@@ -82,7 +82,7 @@ test("rate limiter rejects invalid resource bounds and namespaces", () => {
 });
 
 test("Redis rate-limit keys use a compact versioned HMAC identifier", async () => {
-  const source = await read("lib/rate-limit.ts");
+  const source = await read("src/lib/rate-limit.ts");
 
   assert.match(source, /RATE_LIMIT_KEY_PREFIX = "mfa:rl:v2"/);
   assert.match(source, /createHmac\("sha256", rateLimitHashSecret\)/);

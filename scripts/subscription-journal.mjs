@@ -1,6 +1,6 @@
-import { readSubscriptionJournal, resolveSubscriptionJournal } from "../lib/subscription-journal.ts";
-import { withSubscriberLock } from "../lib/resend-coordination.ts";
-import { getRedisClient } from "../lib/redis.ts";
+import { readSubscriptionJournal, resolveSubscriptionJournal } from "../src/lib/subscription-journal.ts";
+import { withSubscriberLock } from "../src/lib/resend-coordination.ts";
+import { getRedisClient } from "../src/lib/redis.ts";
 
 const [command, email, expectedId] = process.argv.slice(2);
 try {

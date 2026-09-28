@@ -18,7 +18,7 @@ For each target environment, inspect the current Stripe Prices in that account a
 
 ## Checkout behavior
 
-[lib/stripe-checkout.ts](../lib/stripe-checkout.ts) defines the one-time hosted Checkout Session, Price mapping, pinned API version and integration identifier. Success and cancellation return to the localized Support page; the success URL includes the Session ID for server-side verification.
+[src/lib/stripe-checkout.ts](../src/lib/stripe-checkout.ts) defines the one-time hosted Checkout Session, Price mapping, pinned API version and integration identifier. Success and cancellation return to the localized Support page; the success URL includes the Session ID for server-side verification.
 
 Stripe Custom domains is disabled, as confirmed by the project owner on 2026-09-22. The Checkout route redirects to the `session.url` returned by Stripe; do not construct or rewrite it to `pay.modernfundamentalanalyst.com`. The Content Security Policy in [next.config.ts](../next.config.ts) permits `https://checkout.stripe.com` for form navigation and no longer allows the old custom payment domain. Website success and cancellation URLs remain unchanged. No custom-domain environment variable is required.
 
@@ -42,12 +42,12 @@ No webhook is required for this voluntary support flow because payment completio
 
 ## Project Structure
 
-- `app/api/stripe/checkout/route.ts` — same-origin, rate-limited Checkout endpoint.
-- `lib/stripe-checkout.ts` — Stripe client, Price mapping, Session configuration and payment-status verification.
-- `lib/support-config.ts` — shared amounts, validation and status types.
-- `components/support-page-content.tsx` — localized support interface.
-- `app/(en)/support/page.tsx` — English route.
-- `app/zh-tw/support/page.tsx` — Traditional Chinese route.
-- `app/zh-cn/support/page.tsx` — Simplified Chinese route.
+- `src/app/api/stripe/checkout/route.ts` — same-origin, rate-limited Checkout endpoint.
+- `src/lib/stripe-checkout.ts` — Stripe client, Price mapping, Session configuration and payment-status verification.
+- `src/lib/support-config.ts` — shared amounts, validation and status types.
+- `src/components/support-page-content.tsx` — localized support interface.
+- `src/app/(en)/support/page.tsx` — English route.
+- `src/app/zh-tw/support/page.tsx` — Traditional Chinese route.
+- `src/app/zh-cn/support/page.tsx` — Simplified Chinese route.
 
 Resources: [Stripe Support](https://support.stripe.com) · [Stripe MCP documentation](https://docs.stripe.com/mcp) · [Hosted Checkout](https://docs.stripe.com/payments/accept-a-payment?payment-ui=checkout&ui=stripe-hosted)

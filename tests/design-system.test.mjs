@@ -6,14 +6,16 @@ import { read } from "./repository-helpers.mjs";
 
 test("CSS defines typography roles only in base.css and uses them for component sizes", async () => {
   const [base, globals, componentFiles] = await Promise.all([
-    read("app/styles/base.css"),
-    read("app/globals.css"),
-    readdir(new URL("../components/", import.meta.url)),
+    read("src/app/styles/base.css"),
+    read("src/app/globals.css"),
+    readdir(new URL("../src/components/", import.meta.url)),
   ]);
-  const imports = [...globals.matchAll(/@import "\.\/(.+\.css)";/g)].map((match) => "app/" + match[1]);
-  const moduleFiles = componentFiles.filter((file) => file.endsWith(".module.css")).map((file) => "components/" + file);
+  const imports = [...globals.matchAll(/@import "\.\/(.+\.css)";/g)].map((match) => "src/app/" + match[1]);
+  const moduleFiles = componentFiles
+    .filter((file) => file.endsWith(".module.css"))
+    .map((file) => "src/components/" + file);
   const sources = await Promise.all(
-    [...imports.filter((path) => path !== "app/styles/base.css"), ...moduleFiles].map(async (path) => ({
+    [...imports.filter((path) => path !== "src/app/styles/base.css"), ...moduleFiles].map(async (path) => ({
       path,
       css: (await read(path)).replace(/\/\*[\s\S]*?\*\//g, ""),
     })),
@@ -27,7 +29,7 @@ test("CSS defines typography roles only in base.css and uses them for component 
       const role = /^var\(--font-size-([a-z-]+)\)$/.exec(value.trim())?.[1];
       assert.ok(role && roleNames.has(role), path + " uses a non-role font size: " + value.trim());
     }
-    if (path === "app/styles/responsive.css") {
+    if (path === "src/app/styles/responsive.css") {
       assert.doesNotMatch(css, /(?:^|[;{])\s*font-size\s*:/gm, "Responsive rules must not switch typography roles");
     }
   }

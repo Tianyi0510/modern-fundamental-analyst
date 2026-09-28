@@ -11,7 +11,7 @@ const PRICE_ENV_BY_AMOUNT: Record<SupportAmount, string> = {
 };
 
 const CHECKOUT_INTEGRATION_IDENTIFIER = "hosted_web_0001_mfaqxkpt";
-const STRIPE_API_VERSION = "2026-07-29.dahlia" as const;
+const STRIPE_API_VERSION = "2026-08-26.dahlia" as const;
 
 let stripeClient: Stripe | undefined;
 

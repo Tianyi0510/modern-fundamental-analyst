@@ -42,7 +42,7 @@ globalThis.__redisTestCreate = (options) => {
   return client;
 };
 process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
-const { getRedisClient, executeRedisCommand, markRedisUnavailable } = await import("../lib/redis.ts");
+const { getRedisClient, executeRedisCommand, markRedisUnavailable } = await import("../src/lib/redis.ts");
 
 test.beforeEach((context) => {
   Object.assign(state, { client: null, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 });

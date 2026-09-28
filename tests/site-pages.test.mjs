@@ -5,11 +5,11 @@ import { read } from "./repository-helpers.mjs";
 
 test("shared client navigation receives only the active locale copy from server components", async () => {
   const [header, navigationCopy, home, about, portfolio] = await Promise.all([
-    read("components/site-header.tsx"),
-    read("lib/navigation-copy.ts"),
-    read("components/home-page-content.tsx"),
-    read("components/about-page-content.tsx"),
-    read("components/portfolio-page-content.tsx"),
+    read("src/components/site-header.tsx"),
+    read("src/lib/navigation-copy.ts"),
+    read("src/components/home-page-content.tsx"),
+    read("src/components/about-page-content.tsx"),
+    read("src/components/portfolio-page-content.tsx"),
   ]);
 
   assert.match(header, /"use client"/);
@@ -23,23 +23,23 @@ test("shared client navigation receives only the active locale copy from server 
 
 test("language-specific root layouts preserve html lang without request-time proxying", async () => {
   const [englishLayout, traditionalChineseLayout, simplifiedChineseLayout] = await Promise.all([
-    read("app/(en)/layout.tsx"),
-    read("app/zh-tw/layout.tsx"),
-    read("app/zh-cn/layout.tsx"),
+    read("src/app/(en)/layout.tsx"),
+    read("src/app/zh-tw/layout.tsx"),
+    read("src/app/zh-cn/layout.tsx"),
   ]);
 
   assert.match(englishLayout, /language="en"/);
   assert.match(traditionalChineseLayout, /language="zh-Hant-TW"/);
   assert.match(simplifiedChineseLayout, /language="zh-CN"/);
   await assert.rejects(read("proxy.ts"));
-  await assert.rejects(read("app/layout.tsx"));
+  await assert.rejects(read("src/app/layout.tsx"));
 });
 
 test("all locales provide equivalent navigation paths and SEO alternates", async () => {
   const [{ getLocalizedPath }, { default: sitemap }, { createPageMetadata }] = await Promise.all([
-    import("../lib/i18n.ts"),
-    import("../app/sitemap.ts"),
-    import("../lib/site-config.ts"),
+    import("../src/lib/i18n.ts"),
+    import("../src/app/sitemap.ts"),
+    import("../src/lib/site-config.ts"),
   ]);
 
   assert.equal(getLocalizedPath("/portfolio", "zh-cn"), "/zh-cn/portfolio");

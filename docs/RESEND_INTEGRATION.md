@@ -4,7 +4,7 @@
 
 This guide describes the repository implementation. Provider resources must be configured in the Resend account used by each environment; their current Dashboard state is not verified by this document.
 
-1. Verify the sending domain `mail.modernfundamentalanalyst.com` in Resend. The sender constants in [lib/resend.ts](../lib/resend.ts) use `contact@` for contact messages and `updates@` for preference links. If using another domain, update those constants as well as the provider configuration.
+1. Verify the sending domain `mail.modernfundamentalanalyst.com` in Resend. The sender constants in [src/lib/resend.ts](../src/lib/resend.ts) use `contact@` for contact messages and `updates@` for preference links. If using another domain, update those constants as well as the provider configuration.
 2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_URL`, and `RATE_LIMIT_HASH_SECRET`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [credential and secret rotation](UPSTASH_REDIS_INTEGRATION.md#credential-and-secret-rotation).
 3. Create a text contact property named `preferred_language` and three language segments. Set the matching `RESEND_SEGMENT_*` variables below. The default IDs in the code and environment template refer to this project's existing resources; override all three when using another account or isolated test resources.
 
@@ -14,11 +14,11 @@ This guide describes the repository implementation. Provider resources must be c
 | `zh-tw` | `繁體中文`                       | `RESEND_SEGMENT_ZH_TW` |
 | `zh-cn` | `简体中文`                       | `RESEND_SEGMENT_ZH_CN` |
 
-These are the exact values written to Resend contacts, not translations of the documentation. [`localeConfig` in `lib/i18n.ts`](../lib/i18n.ts) is authoritative; update this table if those labels change. Use the literal values when configuring or inspecting contacts.
+These are the exact values written to Resend contacts, not translations of the documentation. [`localeConfig` in `src/lib/i18n.ts`](../src/lib/i18n.ts) is authoritative; update this table if those labels change. Use the literal values when configuring or inspecting contacts.
 
 4. Configure and enable a welcome automation triggered by `subscriber.created`. The application sends `locale`, `memo_title`, `memo_summary`, `memo_url`, and `preferences_url` in its payload; use these in the localized welcome content. The code sends an event rather than the welcome email itself, so a successful event response does not verify automation delivery. New or previously unsubscribed contacts trigger it; active contacts do not. At least one memo must exist for the selected locale.
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.
-6. Use isolated resources and an owned test recipient to verify contact delivery, welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Preference URLs use `SITE_URL` from [lib/site-config.ts](../lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
+6. Use isolated resources and an owned test recipient to verify contact delivery, welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Preference URLs use `SITE_URL` from [src/lib/site-config.ts](../src/lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
 
 ## Receiving
 

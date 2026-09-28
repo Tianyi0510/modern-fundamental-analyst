@@ -12,7 +12,7 @@ test("portfolio calculations remain internally consistent", async () => {
     portfolioHoldings,
     portfolioSnapshot,
     portfolioIncome,
-  } = await import("../data/portfolio.ts");
+  } = await import("../src/data/portfolio.ts");
   const totals = getPortfolioTotals(portfolioHoldings, portfolioIncome);
 
   assert.equal(totals.holdingsCount, portfolioHoldings.length);
@@ -43,10 +43,10 @@ test("portfolio calculations remain internally consistent", async () => {
 
 test("portfolio dates are formatted from the snapshot date", async () => {
   const [format, home, portfolioPage, performancePage] = await Promise.all([
-    read("lib/format.ts"),
-    read("components/home-page-content.tsx"),
-    read("components/portfolio-page-content.tsx"),
-    read("components/performance-page-content.tsx"),
+    read("src/lib/format.ts"),
+    read("src/components/home-page-content.tsx"),
+    read("src/components/portfolio-page-content.tsx"),
+    read("src/components/performance-page-content.tsx"),
   ]);
 
   assert.match(format, /formatDate/);
@@ -59,7 +59,7 @@ test("portfolio dates are formatted from the snapshot date", async () => {
 });
 
 test("date formatting rejects impossible and noncanonical dates", async () => {
-  const { formatDate } = await import("../lib/format.ts");
+  const { formatDate } = await import("../src/lib/format.ts");
 
   assert.equal(formatDate("2024-02-29", "en"), "29 February 2024");
   assert.throws(() => formatDate("2026-02-30", "en"), RangeError);
@@ -68,7 +68,7 @@ test("date formatting rejects impossible and noncanonical dates", async () => {
 });
 
 test("percent formatting handles positive, zero, and negative values", async () => {
-  const { formatPercent } = await import("../lib/format.ts");
+  const { formatPercent } = await import("../src/lib/format.ts");
 
   assert.equal(formatPercent(3.2), "+3.20%");
   assert.equal(formatPercent(0), "0.00%");
@@ -87,15 +87,15 @@ test("all portfolio and performance locales share page structures", async () => 
     performanceShared,
     portfolioTable,
   ] = await Promise.all([
-    read("app/(en)/portfolio/page.tsx"),
-    read("app/zh-tw/portfolio/page.tsx"),
-    read("app/zh-cn/portfolio/page.tsx"),
-    read("app/(en)/performance/page.tsx"),
-    read("app/zh-tw/performance/page.tsx"),
-    read("app/zh-cn/performance/page.tsx"),
-    read("components/portfolio-page-content.tsx"),
-    read("components/performance-page-content.tsx"),
-    read("components/portfolio-table.tsx"),
+    read("src/app/(en)/portfolio/page.tsx"),
+    read("src/app/zh-tw/portfolio/page.tsx"),
+    read("src/app/zh-cn/portfolio/page.tsx"),
+    read("src/app/(en)/performance/page.tsx"),
+    read("src/app/zh-tw/performance/page.tsx"),
+    read("src/app/zh-cn/performance/page.tsx"),
+    read("src/components/portfolio-page-content.tsx"),
+    read("src/components/performance-page-content.tsx"),
+    read("src/components/portfolio-table.tsx"),
   ]);
 
   for (const page of [portfolioEn, portfolioZhTw, portfolioZhCn]) assert.match(page, /PortfolioPageContent/);
@@ -114,8 +114,8 @@ test("all portfolio and performance locales share page structures", async () => 
 
 test("portfolio table receives only the active locale labels from its server parent", async () => {
   const [table, page] = await Promise.all([
-    read("components/portfolio-table.tsx"),
-    read("components/portfolio-page-content.tsx"),
+    read("src/components/portfolio-table.tsx"),
+    read("src/components/portfolio-page-content.tsx"),
   ]);
 
   assert.match(table, /"use client"/);

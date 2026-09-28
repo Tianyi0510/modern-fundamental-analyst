@@ -16,8 +16,8 @@ registerHooks({
 process.env.STRIPE_RESTRICTED_KEY = "rk_test_mock";
 process.env.STRIPE_PRICE_USD_12 = "price_mock_12";
 delete process.env.UPSTASH_REDIS_URL;
-const { POST } = await import("../app/api/stripe/checkout/route.ts");
-const { resolveSupportStatus } = await import("../lib/stripe-checkout.ts");
+const { POST } = await import("../src/app/api/stripe/checkout/route.ts");
+const { resolveSupportStatus } = await import("../src/lib/stripe-checkout.ts");
 let count = 0;
 function request(body = "locale=en&amount=12", overrides = {}) {
   return new Request("https://www.modernfundamentalanalyst.com/api/stripe/checkout", {

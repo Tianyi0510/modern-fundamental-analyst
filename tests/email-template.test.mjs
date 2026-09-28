@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { renderPreferenceEmail } from "../lib/email-template.ts";
+import { renderPreferenceEmail } from "../src/lib/email-template.ts";
 
 test("preference email preserves the brand and escapes interpolated content", () => {
   const html = renderPreferenceEmail(

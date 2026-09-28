@@ -11,7 +11,7 @@ const {
   readObjectJson,
   readProtectedObjectJson,
   RequestBodyError,
-} = await import("../lib/api-request.ts");
+} = await import("../src/lib/api-request.ts");
 
 test("request helpers normalize text and validate forwarded origins", () => {
   assert.equal(cleanSingleLine("  Hello\n\tworld  ", 100), "Hello world");

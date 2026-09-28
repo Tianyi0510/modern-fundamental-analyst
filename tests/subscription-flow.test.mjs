@@ -5,11 +5,11 @@ import { read } from "./repository-helpers.mjs";
 
 test("contact form keeps localized copy on the server and sends through a client boundary", async () => {
   const [page, form, client, route, resend] = await Promise.all([
-    read("components/contact-page-content.tsx"),
-    read("components/contact-form.tsx"),
-    read("components/contact-form-client.tsx"),
-    read("app/api/contact/route.ts"),
-    read("lib/resend.ts"),
+    read("src/components/contact-page-content.tsx"),
+    read("src/components/contact-form.tsx"),
+    read("src/components/contact-form-client.tsx"),
+    read("src/app/api/contact/route.ts"),
+    read("src/lib/resend.ts"),
   ]);
 
   assert.match(page, /ContactForm locale=\{locale\}/);
@@ -37,12 +37,12 @@ test("contact form keeps localized copy on the server and sends through a client
 
 test("subscribe form stores contacts and triggers a localized welcome automation", async () => {
   const [page, form, client, route, service, footer] = await Promise.all([
-    read("components/contact-page-content.tsx"),
-    read("components/subscribe-form.tsx"),
-    read("components/subscribe-form-client.tsx"),
-    read("app/api/subscribe/route.ts"),
-    read("lib/subscription-service.ts"),
-    read("components/site-footer.tsx"),
+    read("src/components/contact-page-content.tsx"),
+    read("src/components/subscribe-form.tsx"),
+    read("src/components/subscribe-form-client.tsx"),
+    read("src/app/api/subscribe/route.ts"),
+    read("src/lib/subscription-service.ts"),
+    read("src/components/site-footer.tsx"),
   ]);
 
   assert.doesNotMatch(page, /SubscribeForm/);
@@ -84,15 +84,15 @@ test("subscribe form stores contacts and triggers a localized welcome automation
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
   const [tokens, route, requestRoute, page, form, requestForm, segments, subscriptionService, emailTemplate] =
     await Promise.all([
-      read("lib/subscription-preferences.ts"),
-      read("app/api/subscription-preferences/route.ts"),
-      read("app/api/subscription-preferences/request/route.ts"),
-      read("components/subscription-preferences-page.tsx"),
-      read("components/subscription-preferences-form.tsx"),
-      read("components/subscription-preferences-request-form.tsx"),
-      read("lib/resend-segments.ts"),
-      read("lib/subscription-service.ts"),
-      read("lib/email-template.ts"),
+      read("src/lib/subscription-preferences.ts"),
+      read("src/app/api/subscription-preferences/route.ts"),
+      read("src/app/api/subscription-preferences/request/route.ts"),
+      read("src/components/subscription-preferences-page.tsx"),
+      read("src/components/subscription-preferences-form.tsx"),
+      read("src/components/subscription-preferences-request-form.tsx"),
+      read("src/lib/resend-segments.ts"),
+      read("src/lib/subscription-service.ts"),
+      read("src/lib/email-template.ts"),
     ]);
 
   assert.match(tokens, /createCipheriv\("aes-256-gcm"/);

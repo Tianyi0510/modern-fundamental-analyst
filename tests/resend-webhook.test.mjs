@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { getResendWebhookHeaders, getUnsubscribeRecipients } = await import("../lib/resend-webhook.ts");
+const { getResendWebhookHeaders, getUnsubscribeRecipients } = await import("../src/lib/resend-webhook.ts");
 
 test("webhook headers require the complete Svix signature set", () => {
   assert.equal(getResendWebhookHeaders(new Headers({ "svix-id": "msg_1" })), null);

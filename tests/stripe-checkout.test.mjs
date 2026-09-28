@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { read } from "./repository-helpers.mjs";
 
-const { parseSupportAmount } = await import("../lib/support-config.ts");
+const { parseSupportAmount } = await import("../src/lib/support-config.ts");
 
 test("Stripe support amount parsing accepts only canonical configured values", () => {
   assert.equal(parseSupportAmount("6"), 6);
@@ -16,7 +16,7 @@ test("Stripe support amount parsing accepts only canonical configured values", (
 });
 
 test("Stripe Checkout accepts only the three configured one-time support amounts", async () => {
-  const stripe = await read("lib/stripe-checkout.ts");
+  const stripe = await read("src/lib/stripe-checkout.ts");
 
   assert.doesNotMatch(stripe, /Number\(value\)/);
   assert.match(stripe, /mode: "payment"/);
@@ -28,8 +28,8 @@ test("Stripe Checkout accepts only the three configured one-time support amounts
 
 test("Stripe Checkout keeps secrets server-side and applies safety controls", async () => {
   const [stripe, route, environment] = await Promise.all([
-    read("lib/stripe-checkout.ts"),
-    read("app/api/stripe/checkout/route.ts"),
+    read("src/lib/stripe-checkout.ts"),
+    read("src/app/api/stripe/checkout/route.ts"),
     read(".env.example"),
   ]);
 
@@ -37,7 +37,7 @@ test("Stripe Checkout keeps secrets server-side and applies safety controls", as
   assert.match(stripe, /process\.env\.STRIPE_SECRET_KEY/);
   assert.match(stripe, /automatic_tax: \{ enabled: true \}/);
   assert.match(stripe, /apiVersion: STRIPE_API_VERSION/);
-  assert.match(stripe, /STRIPE_API_VERSION = "2026-07-29\.dahlia"/);
+  assert.match(stripe, /STRIPE_API_VERSION = "2026-08-26\.dahlia"/);
   assert.doesNotMatch(stripe, /managed_payments:/);
   assert.match(stripe, /integration_identifier: CHECKOUT_INTEGRATION_IDENTIFIER/);
   assert.match(stripe, /locale: locale === "en" \? "en" : "zh"/);
@@ -54,10 +54,10 @@ test("Stripe Checkout keeps secrets server-side and applies safety controls", as
 
 test("Support is localized and linked without changing the primary navigation", async () => {
   const [support, footer, sitemap, navigation] = await Promise.all([
-    read("components/support-page-content.tsx"),
-    read("components/site-footer.tsx"),
-    read("app/sitemap.ts"),
-    read("lib/navigation-copy.ts"),
+    read("src/components/support-page-content.tsx"),
+    read("src/components/site-footer.tsx"),
+    read("src/app/sitemap.ts"),
+    read("src/lib/navigation-copy.ts"),
   ]);
 
   assert.match(support, /en:/);

@@ -30,23 +30,24 @@ npm run verify
 
 ## Project Layout
 
-| Directory     | Purpose                                                              |
-| ------------- | -------------------------------------------------------------------- |
-| `app/`        | Pages, API routes, and global styles                                 |
-| `components/` | Shared UI, page copy, and interactions                               |
-| `data/`       | Portfolio snapshot, memo catalog, and memo articles                  |
-| `lib/`        | Services, calculations, and utilities                                |
-| `tests/`      | Unit and browser tests                                               |
-| `scripts/`    | CI deployment gate, Node module loader, and subscription journal CLI |
-| `docs/`       | Style guide, operations, data, and service integration guides        |
+| Directory         | Purpose                                                              |
+| ----------------- | -------------------------------------------------------------------- |
+| `src/app/`        | Pages, API routes, and global styles                                 |
+| `src/components/` | Shared UI, page copy, and interactions                               |
+| `src/data/`       | Portfolio snapshot, memo catalog, and memo articles                  |
+| `src/lib/`        | Services, calculations, and utilities                                |
+| `public/images/`  | Public icons, logos, and the social sharing image                    |
+| `tests/`          | Unit and browser tests                                               |
+| `scripts/`        | CI deployment gate, Node module loader, and subscription journal CLI |
+| `docs/`           | Style guide, operations, data, and service integration guides        |
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
-Under `app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, and `route.ts`).
+Under `src/app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, and `route.ts`).
 
 ## Content and Integrations
 
-Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `data/portfolio-detail.ts`; `data/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `data/memos.ts`, with articles under `data/memos/` registered in `data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
+Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/data/portfolio-detail.ts`; `src/data/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/data/memos.ts`, with articles under `src/data/memos/` registered in `src/data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
 
 Integration details:
 

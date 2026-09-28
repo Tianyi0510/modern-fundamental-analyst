@@ -6,7 +6,7 @@ export const SITE_NAME = "Modern Fundamental Analyst";
 const SITE_DESCRIPTION = "An independent public-equity portfolio, performance record, and investment memo archive.";
 
 const sharingImage = {
-  url: `${SITE_URL}/brand/og-logo.png`,
+  url: `${SITE_URL}/images/og-logo.png`,
   width: 1200,
   height: 630,
   alt: "Modern Fundamental Analyst logo",
@@ -41,13 +41,6 @@ export function createRootMetadata(locale: Locale): Metadata {
     title: locale === "en" ? { default: title, template: `%s | ${SITE_NAME}` } : { absolute: title },
     description,
     alternates: { canonical: getLocalizedPath("/", locale), languages: getLanguageAlternates("/") },
-    icons: {
-      icon: [
-        { url: "/brand/icon.svg", type: "image/svg+xml", sizes: "any" },
-        { url: "/brand/icon.png", type: "image/png", sizes: "1600x1600" },
-      ],
-      apple: { url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    },
     ...createSharingMetadata(title, description),
   };
 }

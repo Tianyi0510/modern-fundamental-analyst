@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { postJson } = await import("../lib/client-post-json.ts");
+const { postJson } = await import("../src/lib/client-post-json.ts");
 
 test("client JSON requests share bounded POST behavior", async (context) => {
   const originalFetch = globalThis.fetch;

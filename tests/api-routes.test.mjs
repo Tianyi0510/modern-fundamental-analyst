@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { POST: contact } = await import("../app/api/contact/route.ts");
-const { POST: subscribe } = await import("../app/api/subscribe/route.ts");
-const { POST: preferences } = await import("../app/api/subscription-preferences/route.ts");
-const { POST: preferenceRequest } = await import("../app/api/subscription-preferences/request/route.ts");
+const { POST: contact } = await import("../src/app/api/contact/route.ts");
+const { POST: subscribe } = await import("../src/app/api/subscribe/route.ts");
+const { POST: preferences } = await import("../src/app/api/subscription-preferences/route.ts");
+const { POST: preferenceRequest } = await import("../src/app/api/subscription-preferences/request/route.ts");
 
 const encoder = new TextEncoder();
 let requestNumber = 0;

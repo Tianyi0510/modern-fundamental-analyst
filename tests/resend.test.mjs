@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { getResendClient, getResendIdempotencyKey, runResendOperation } = await import("../lib/resend.ts");
+const { getResendClient, getResendIdempotencyKey, runResendOperation } = await import("../src/lib/resend.ts");
 
 test("Resend email idempotency keys are scoped and accept only UUID request IDs", () => {
   const request = new Request("https://example.com", {

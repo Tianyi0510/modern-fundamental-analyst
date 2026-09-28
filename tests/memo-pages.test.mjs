@@ -4,7 +4,7 @@ import test from "node:test";
 import { read } from "./repository-helpers.mjs";
 
 test("memo metadata uses one localized catalog", async () => {
-  const { memos, memosZhTw, memosZhCn } = await import("../data/memos.ts");
+  const { memos, memosZhTw, memosZhCn } = await import("../src/data/memos.ts");
 
   assert.equal(memos[0].publishedAt, "2025-10-10");
   assert.equal(memos[0].publishedAt, memosZhTw[0].publishedAt);
@@ -14,14 +14,14 @@ test("memo metadata uses one localized catalog", async () => {
 });
 
 test("memo catalog contains only the Microsoft source memo", async () => {
-  const { memos } = await import("../data/memos.ts");
+  const { memos } = await import("../src/data/memos.ts");
 
   assert.equal(memos.length, 1);
   assert.equal(memos[0].slug, "microsoft-stock-analysis-fiscal-year-2024");
 });
 
 test("memo content is selected by slug and locale", async () => {
-  const { getMemoContent } = await import("../data/memo-content.ts");
+  const { getMemoContent } = await import("../src/data/memo-content.ts");
 
   const english = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "en");
   const traditionalChinese = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "zh-tw");
@@ -38,8 +38,8 @@ test("memo content is selected by slug and locale", async () => {
 
 test("memo article preserves source document prose", async () => {
   const [content, detailPage] = await Promise.all([
-    read("data/memos/microsoft-stock-analysis-fiscal-year-2024.ts"),
-    read("components/memo-detail-page.tsx"),
+    read("src/data/memos/microsoft-stock-analysis-fiscal-year-2024.ts"),
+    read("src/components/memo-detail-page.tsx"),
   ]);
 
   assert.match(content, /const sourceContent: MemoContent/);
@@ -52,7 +52,7 @@ test("memo article preserves source document prose", async () => {
 
 test("the legacy Microsoft memo URL permanently redirects to the descriptive slug", async () => {
   const config = await read("next.config.ts");
-  const detailPage = await read("components/memo-detail-page.tsx");
+  const detailPage = await read("src/components/memo-detail-page.tsx");
 
   assert.match(config, /microsoft-stock-analysis-fy2024/);
   assert.match(config, /microsoft-stock-analysis-fiscal-year-2024/);

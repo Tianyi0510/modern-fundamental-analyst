@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createExclusiveRunner } from "../components/use-exclusive-submit.ts";
+import { createExclusiveRunner } from "../src/components/use-exclusive-submit.ts";
 
 test("exclusive form runner suppresses overlapping submissions and resets afterward", async () => {
   let release;

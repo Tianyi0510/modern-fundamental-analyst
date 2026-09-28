@@ -30,20 +30,20 @@ process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
 process.env.RESEND_API_KEY = "re_test_coordination";
 process.env.SUBSCRIPTION_PREFERENCES_SECRET = "stable-test-coordination-secret";
 globalThis.__mfaRedisStateV5 = { client: redis, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 };
-const { withSubscriberLock, getStablePreferenceEmail } = await import("../lib/resend-coordination.ts");
-const { getResendClient, resendOperationContext, reportResendRollbackFailure } = await import("../lib/resend.ts");
+const { withSubscriberLock, getStablePreferenceEmail } = await import("../src/lib/resend-coordination.ts");
+const { getResendClient, resendOperationContext, reportResendRollbackFailure } = await import("../src/lib/resend.ts");
 registerHooks({
   resolve(specifier, context, nextResolve) {
     return nextResolve(specifier === "next/server" ? "next/server.js" : specifier, context);
   },
 });
-const { POST: requestPreferences } = await import("../app/api/subscription-preferences/request/route.ts");
-const { subscribeContact } = await import("../lib/subscription-service.ts");
-const { getPreferredLanguageSegmentId } = await import("../lib/resend-segments.ts");
+const { POST: requestPreferences } = await import("../src/app/api/subscription-preferences/request/route.ts");
+const { subscribeContact } = await import("../src/lib/subscription-service.ts");
+const { getPreferredLanguageSegmentId } = await import("../src/lib/resend-segments.ts");
 const { withSubscriptionJournal, readSubscriptionJournal, resolveSubscriptionJournal } =
-  await import("../lib/subscription-journal.ts");
-const { POST: updatePreferences } = await import("../app/api/subscription-preferences/route.ts");
-const { createPreferenceToken } = await import("../lib/subscription-preferences.ts");
+  await import("../src/lib/subscription-journal.ts");
+const { POST: updatePreferences } = await import("../src/app/api/subscription-preferences/route.ts");
+const { createPreferenceToken } = await import("../src/lib/subscription-preferences.ts");
 
 function preferencesMutation(action) {
   return new Request("https://www.modernfundamentalanalyst.com/api/subscription-preferences", {
