@@ -213,6 +213,9 @@
   min-height: var(--size-field);
   color: var(--text-secondary);
 }
+.portfolio-column-label {
+  display: none;
+}
 .sort-button {
   width: 100%;
   padding: 10px 0;

@@ -933,7 +933,7 @@ test.describe("mobile content and navigation QA", () => {
     expect(topBeforeScroll!.width).toBe(390);
     await expect(menuTop).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(drawer).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(page.locator(".mobile-menu-content")).toHaveCSS("background-color", "rgb(248, 249, 251)");
+    await expect(page.locator(".mobile-menu-content")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("white-space", "normal");

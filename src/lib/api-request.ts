@@ -20,7 +20,7 @@ type ProtectedJsonOptions = {
   rateLimitWindowMs: number;
 };
 
-type ProtectedJsonResult<T extends object> = { ok: true; body: T } | { ok: false; response: Response };
+type ProtectedJsonResult = { ok: true; body: Record<string, unknown> } | { ok: false; response: Response };
 
 function jsonError(message: string, status: number, headers?: HeadersInit) {
   return Response.json({ error: message }, { status, headers });
@@ -113,18 +113,18 @@ export async function readLimitedJson(request: Request, maxBytes: number): Promi
   }
 }
 
-export async function readObjectJson<T extends object>(request: Request, maxBytes: number): Promise<T> {
+export async function readObjectJson(request: Request, maxBytes: number): Promise<Record<string, unknown>> {
   const payload = await readLimitedJson(request, maxBytes);
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new RequestBodyError("Invalid request.", 400);
   }
-  return payload as T;
+  return payload as Record<string, unknown>;
 }
 
-export async function readProtectedObjectJson<T extends object>(
+export async function readProtectedObjectJson(
   request: Request,
   { isRateLimited, maxBytes, rateLimitWindowMs }: ProtectedJsonOptions,
-): Promise<ProtectedJsonResult<T>> {
+): Promise<ProtectedJsonResult> {
   if (!isSameOrigin(request)) {
     return { ok: false, response: jsonError("Invalid request origin.", 403) };
   }
@@ -139,7 +139,7 @@ export async function readProtectedObjectJson<T extends object>(
   }
 
   try {
-    return { ok: true, body: await readObjectJson<T>(request, maxBytes) };
+    return { ok: true, body: await readObjectJson(request, maxBytes) };
   } catch (error) {
     const { message, status } = getRequestErrorDetails(error);
     return { ok: false, response: jsonError(message, status) };

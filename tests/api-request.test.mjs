@@ -92,6 +92,12 @@ test("object JSON reader rejects arrays and scalar payloads", async () => {
   }
 });
 
+test("object JSON reader preserves unvalidated field values for route validation", async () => {
+  const body = { email: 42, locale: ["en"], action: { nested: true } };
+  const request = new Request("https://example.com/api", { method: "POST", body: JSON.stringify(body) });
+  assert.deepEqual(await readObjectJson(request, 100), body);
+});
+
 test("request errors are normalized to stable API details", () => {
   assert.deepEqual(getRequestErrorDetails(new RequestBodyError("Request is too large.", 413)), {
     message: "Request is too large.",

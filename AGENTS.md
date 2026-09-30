@@ -14,6 +14,8 @@ Repository-wide defaults; follow the user's current request when it changes the 
 
 Next.js App Router, React, TypeScript, native CSS; Node.js 24 and npm (`npm ci`). English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. See [README.md](README.md#project-layout) for the directory map.
 
+Before changing Next.js APIs, routing conventions or configuration, read the relevant installed-version guide in `node_modules/next/dist/docs/`. If dependencies are unavailable, use the matching official Next.js documentation online.
+
 Read the guide relevant to the change, rather than loading every guide:
 
 - UI and interaction changes: [style guide](docs/STYLE_GUIDE.md), including CSS ownership, cascade, typography and motion tokens.

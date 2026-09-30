@@ -9,17 +9,8 @@ export const runtime = "nodejs";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const isRateLimited = createRateLimiter({ namespace: "contact", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 5 });
 
-type ContactRequest = {
-  name?: unknown;
-  email?: unknown;
-  subject?: unknown;
-  message?: unknown;
-  website?: unknown;
-  locale?: unknown;
-};
-
 export async function POST(request: Request) {
-  const parsed = await readProtectedObjectJson<ContactRequest>(request, {
+  const parsed = await readProtectedObjectJson(request, {
     isRateLimited,
     maxBytes: 20_000,
     rateLimitWindowMs: RATE_LIMIT_WINDOW_MS,

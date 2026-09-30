@@ -41,7 +41,7 @@ const mailCopy = {
 } satisfies Record<Locale, PreferenceEmailCopy & { subject: string }>;
 
 export async function POST(request: Request) {
-  const parsed = await readProtectedObjectJson<{ email?: unknown; locale?: unknown }>(request, {
+  const parsed = await readProtectedObjectJson(request, {
     isRateLimited,
     maxBytes: 5_000,
     rateLimitWindowMs: RATE_LIMIT_WINDOW_MS,

@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
+const shardSuffix = process.env.PLAYWRIGHT_SHARD ? `-shard-${process.env.PLAYWRIGHT_SHARD}` : "";
+
 const useProductionBuild = process.env.PLAYWRIGHT_USE_PRODUCTION_BUILD === "1";
 
 export default defineConfig({
@@ -12,11 +14,11 @@ export default defineConfig({
   reporter: "line",
   projects: [
     { name: "chromium", outputDir: "test-results/chromium", use: { browserName: "chromium" } },
-    { name: "webkit", outputDir: "test-results/webkit", use: { browserName: "webkit" } },
+    { name: "webkit", outputDir: `test-results/webkit${shardSuffix}`, use: { browserName: "webkit" } },
   ],
   use: {
     baseURL: "http://127.0.0.1:3210",
-    trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
+    trace: process.env.CI ? "retain-on-failure-and-retries" : "retain-on-failure",
     screenshot: "only-on-failure",
   },
   webServer: {

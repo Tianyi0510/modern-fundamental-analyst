@@ -9,11 +9,19 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
 
     const mobileSort = page.locator(".portfolio-mobile-sort");
     await expect(mobileSort).toBeVisible();
-    await expect(page.locator(".table-head")).toBeHidden();
+    const table = page.getByRole("table");
+    const headers = table.getByRole("columnheader");
+    await expect(headers).toHaveCount(7);
+    const labels = await mobileSort.locator("select option").allTextContents();
+    for (const [index, label] of labels.entries()) {
+      await expect(headers.nth(index)).toHaveAccessibleName(label);
+    }
+    await expect(headers.nth(4)).toHaveAttribute("aria-sort", "descending");
+    await expect(page.locator(".table-head button").first()).toBeHidden();
     expect(await page.locator(".portfolio-row:not(.portfolio-total-row)").count()).toBeGreaterThan(0);
     await mobileSort.locator("select").selectOption("shares");
     await expect(mobileSort.locator("select")).toHaveValue("shares");
-    const sharesHeader = page.locator('.table-head [role="columnheader"]').nth(1);
+    const sharesHeader = headers.nth(1);
     await expect(sharesHeader).toHaveAttribute("aria-sort", "descending");
 
     const shares = () =>

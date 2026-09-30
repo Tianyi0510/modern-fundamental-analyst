@@ -9,14 +9,8 @@ export const runtime = "nodejs";
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const isRateLimited = createRateLimiter({ namespace: "subscribe", windowMs: RATE_LIMIT_WINDOW_MS, maxRequests: 5 });
 
-type SubscribeRequest = {
-  email?: unknown;
-  locale?: unknown;
-  website?: unknown;
-};
-
 export async function POST(request: Request) {
-  const parsed = await readProtectedObjectJson<SubscribeRequest>(request, {
+  const parsed = await readProtectedObjectJson(request, {
     isRateLimited,
     maxBytes: 5_000,
     rateLimitWindowMs: RATE_LIMIT_WINDOW_MS,

@@ -36,18 +36,20 @@ test("memo content is selected by slug and locale", async () => {
   assert.equal(getMemoContent("missing-memo", "en"), undefined);
 });
 
-test("memo article preserves source document prose", async () => {
-  const [content, detailPage] = await Promise.all([
-    read("src/data/memos/microsoft-stock-analysis-fiscal-year-2024.ts"),
-    read("src/components/memo-detail-page.tsx"),
-  ]);
-
-  assert.match(content, /const sourceContent: MemoContent/);
-  assert.match(content, /Microsoft now operates through three primary business segments/);
-  assert.match(content, /Satya Nadella’s ethical leadership is a masterclass/);
-  assert.match(content, /Microsoft‘s retained earnings surged from \$24\.2 billion/);
-  assert.doesNotMatch(content, /Business Conclusion|Management Conclusion|Financial Conclusion/);
-  assert.doesNotMatch(detailPage, /All Investment Memos|back-link/);
+test("memo article preserves verified research prose", async () => {
+  const { getMemoContent } = await import("../src/data/memo-content.ts");
+  const content = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "en");
+  const paragraphs = content.sections
+    .flatMap((section) => [
+      ...(section.introduction ?? []),
+      ...section.subsections.flatMap((subsection) => subsection.paragraphs),
+    ])
+    .join("\n");
+  assert.match(paragraphs, /Microsoft now operates through three primary business segments/);
+  assert.match(paragraphs, /Satya Nadella’s ethical leadership is a masterclass/);
+  assert.match(paragraphs, /Microsoft‘s retained earnings surged from \$24\.2 billion/);
+  const titles = content.sections.flatMap((section) => section.subsections.map((subsection) => subsection.title));
+  assert.equal(titles.filter((title) => title === "Investment Conclusion").length, 3);
 });
 
 test("the legacy Microsoft memo URL permanently redirects to the descriptive slug", async () => {

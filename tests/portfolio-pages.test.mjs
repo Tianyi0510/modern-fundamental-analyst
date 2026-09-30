@@ -41,21 +41,12 @@ test("portfolio calculations remain internally consistent", async () => {
   assert.equal(getHoldingWeight(Number.NaN, 100), 0);
 });
 
-test("portfolio dates are formatted from the snapshot date", async () => {
-  const [format, home, portfolioPage, performancePage] = await Promise.all([
-    read("src/lib/format.ts"),
-    read("src/components/home-page-content.tsx"),
-    read("src/components/portfolio-page-content.tsx"),
-    read("src/components/performance-page-content.tsx"),
-  ]);
-
-  assert.match(format, /formatDate/);
-  assert.match(format, /const dateFormatters = new Map<string, Intl\.DateTimeFormat>\(\)/);
-  assert.match(format, /getDateFormatter\(locale, compact\)\.format\(date\)/);
-  for (const source of [home, portfolioPage, performancePage]) {
-    assert.match(source, /formatDate/);
-    assert.doesNotMatch(source, /31 July 2026|2026 年 7 月 31 日/);
-  }
+test("dates use localized month names and consistent day order", async () => {
+  const { formatDate } = await import("../src/lib/format.ts");
+  assert.equal(formatDate("2026-01-02", "en"), "2 January 2026");
+  assert.equal(formatDate("2026-01-02", "en", true), "2 Jan 2026");
+  assert.equal(formatDate("2026-01-02", "zh-tw", true), "2026年1月2日");
+  assert.equal(formatDate("2026-01-02", "zh-cn", true), "2026年1月2日");
 });
 
 test("date formatting rejects impossible and noncanonical dates", async () => {

@@ -58,11 +58,11 @@ jobs:
       - name: Verify application
         run: npm run verify
 
-      - name: Upload browser failure evidence
-        if: failure()
+      - name: Upload browser retry and failure evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-failure-evidence-chromium
+          name: browser-evidence-chromium
           path: test-results/chromium/
           if-no-files-found: ignore
           retention-days: 7
@@ -87,16 +87,27 @@ jobs:
         run: npx playwright install webkit
 
       - name: Build application
+        id: webkit-build
         run: npm run build
 
-      - name: Verify WebKit browser suite
-        run: npm run test:webkit
+      - name: Verify WebKit shard 1
+        env:
+          PLAYWRIGHT_USE_PRODUCTION_BUILD: "1"
+          PLAYWRIGHT_SHARD: "1"
+        run: npx playwright test --project=webkit --workers=1 --fully-parallel --shard=1/2
 
-      - name: Upload browser failure evidence
-        if: failure()
+      - name: Verify WebKit shard 2
+        if: ${{ !cancelled() && steps.webkit-build.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_USE_PRODUCTION_BUILD: "1"
+          PLAYWRIGHT_SHARD: "2"
+        run: npx playwright test --project=webkit --workers=1 --fully-parallel --shard=2/2
+
+      - name: Upload browser retry and failure evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-failure-evidence-webkit
-          path: test-results/webkit/
+          name: browser-evidence-webkit
+          path: test-results/webkit-shard-*/
           if-no-files-found: ignore
           retention-days: 7

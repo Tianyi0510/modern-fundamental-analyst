@@ -101,6 +101,7 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
 
           return (
             <span role="columnheader" aria-sort={ariaSort} key={column}>
+              <span className="portfolio-column-label">{copy[column]}</span>
               <button
                 className={`sort-button${isActive ? " is-active" : ""}`}
                 type="button"
