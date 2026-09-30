@@ -12,8 +12,16 @@ export const metadata = createPageMetadata({
 export default async function SupportPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; session_id?: string }>;
+  searchParams: Promise<{ status?: string; session_id?: string; checkout_attempt?: string; amount?: string }>;
 }) {
-  const normalizedStatus = await resolveSupportStatus(await searchParams);
-  return <SupportPageContent locale="zh-cn" status={normalizedStatus} />;
+  const params = await searchParams;
+  const normalizedStatus = await resolveSupportStatus(params);
+  return (
+    <SupportPageContent
+      locale="zh-cn"
+      status={normalizedStatus}
+      attemptId={params.checkout_attempt}
+      amount={params.amount}
+    />
+  );
 }

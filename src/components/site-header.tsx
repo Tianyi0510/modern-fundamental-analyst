@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Check, ChevronDown, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
-import { useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
+import { useLanguageMenu, useMenuTouchFeedback, useMobileMenu } from "@/components/use-site-header";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
 
@@ -37,6 +37,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
     toggle: toggleLanguageMenu,
     triggerRef: languageButtonRef,
   } = useLanguageMenu();
+  const menuTouchFeedback = useMenuTouchFeedback(menuButtonRef, menuCloseButtonRef);
   const menuLabel = copy.open;
   const closeLabel = copy.close;
   const homePath = getLocalizedPath("/", locale);
@@ -68,8 +69,10 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
         aria-expanded={isMenuOpen}
         aria-controls="mobile-site-menu"
         tabIndex={isMenuOpen ? -1 : undefined}
+        {...menuTouchFeedback}
         onClick={openMenu}
       >
+        <span className="mobile-menu-touch-ring" aria-hidden="true" />
         <Menu aria-hidden="true" strokeWidth={2} />
       </button>
       <div className="header-actions">
@@ -159,9 +162,11 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
               className="mobile-menu-close"
               type="button"
               aria-label={closeLabel}
+              {...menuTouchFeedback}
               onClick={closeMenu}
               tabIndex={isMenuOpen ? 0 : -1}
             >
+              <span className="mobile-menu-touch-ring" aria-hidden="true" />
               <X className="mobile-menu-close-icon" aria-hidden="true" strokeWidth={2} />
               <Menu className="mobile-menu-return-icon" aria-hidden="true" strokeWidth={2} />
             </button>
@@ -191,19 +196,20 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
                 }
               >
                 <div className="mobile-language-options">
-                  {locales.map((targetLocale) => (
-                    <Link
-                      className="mobile-menu-language"
-                      href={getLocalizedPath(pathname, targetLocale)}
-                      hrefLang={localeConfig[targetLocale].hrefLang}
-                      aria-current={locale === targetLocale ? "page" : undefined}
-                      onClick={closeMenuForNavigation}
-                      tabIndex={isMenuOpen ? 0 : -1}
-                      key={targetLocale}
-                    >
-                      {localeConfig[targetLocale].label}
-                    </Link>
-                  ))}
+                  {locales
+                    .filter((targetLocale) => targetLocale !== locale)
+                    .map((targetLocale) => (
+                      <Link
+                        className="mobile-menu-language"
+                        href={getLocalizedPath(pathname, targetLocale)}
+                        hrefLang={localeConfig[targetLocale].hrefLang}
+                        onClick={closeMenuForNavigation}
+                        tabIndex={isMenuOpen ? 0 : -1}
+                        key={targetLocale}
+                      >
+                        {localeConfig[targetLocale].label}
+                      </Link>
+                    ))}
                 </div>
               </AnimatedDisclosure>
             </div>

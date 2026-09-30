@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { SiteFooter } from "@/components/site-footer";
 import { SupportCheckoutForm } from "@/components/support-checkout-form";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
-import { SUPPORT_AMOUNTS, type SupportStatus } from "@/lib/support-config";
+import { SUPPORT_AMOUNTS, parseCheckoutAttempt, parseSupportAmount, type SupportStatus } from "@/lib/support-config";
 
 const copy = {
   en: {
@@ -18,6 +19,8 @@ const copy = {
     submit: "Continue to Stripe",
     submitting: "Redirecting to Stripe…",
     retry: "Try again",
+    resume: "Retry this checkout",
+    recovery: "If navigation stopped or failed, retry this checkout with the same amount.",
     note: "Securely processed by Stripe. This is voluntary support—not a charitable donation, investment product, or advisory service.",
     statuses: {
       pending: "Your payment is still processing. Check your Stripe confirmation before trying again.",
@@ -40,6 +43,8 @@ const copy = {
     submit: "前往 Stripe",
     submitting: "正在前往 Stripe…",
     retry: "重試",
+    resume: "重試此付款流程",
+    recovery: "若跳轉已停止或失敗，可用相同金額重試此付款流程。",
     note: "付款由 Stripe 安全處理。這是自願支持，並非慈善捐款、投資產品或投資顧問服務。",
     statuses: {
       pending: "付款仍在處理中，請先查閱 Stripe 付款確認，再決定是否重試。",
@@ -61,6 +66,8 @@ const copy = {
     submit: "前往 Stripe",
     submitting: "正在前往 Stripe…",
     retry: "重试",
+    resume: "重试此付款流程",
+    recovery: "若跳转已停止或失败，可用相同金额重试此付款流程。",
     note: "付款由 Stripe 安全处理。这是自愿支持，并非慈善捐款、投资产品或投资顾问服务。",
     statuses: {
       pending: "付款仍在处理中，请先查阅 Stripe 付款确认，再决定是否重试。",
@@ -74,8 +81,21 @@ const copy = {
   },
 } as const;
 
-export function SupportPageContent({ locale, status }: { locale: Locale; status?: SupportStatus }) {
+export function SupportPageContent({
+  locale,
+  status,
+  attemptId,
+  amount,
+}: {
+  locale: Locale;
+  status?: SupportStatus;
+  attemptId?: string;
+  amount?: string;
+}) {
   const text = copy[locale];
+  const recoveryAttempt =
+    status === "error" || status === "rate-limited" ? parseCheckoutAttempt(attemptId ?? null) : undefined;
+  const selectedAmount = parseSupportAmount(amount ?? null) ?? 12;
 
   return (
     <main className="support-page" id="main-content">
@@ -102,6 +122,11 @@ export function SupportPageContent({ locale, status }: { locale: Locale; status?
             <p>{text.sectionText}</p>
           </div>
           <SupportCheckoutForm
+            attemptId={recoveryAttempt ?? randomUUID()}
+            initialAmount={String(selectedAmount)}
+            recovering={Boolean(recoveryAttempt)}
+            resume={text.resume}
+            recovery={text.recovery}
             submit={
               status === "error" || status === "rate-limited" || status === "invalid-amount" ? text.retry : text.submit
             }
@@ -115,12 +140,12 @@ export function SupportPageContent({ locale, status }: { locale: Locale; status?
                 <input name="website" tabIndex={-1} autoComplete="off" />
               </label>
             </div>
-            <fieldset>
+            <fieldset disabled={Boolean(recoveryAttempt)}>
               <legend>{text.legend}</legend>
               <div className="support-amounts">
                 {SUPPORT_AMOUNTS.map((amount) => (
                   <label className="support-amount-option" key={amount}>
-                    <input type="radio" name="amount" value={amount} defaultChecked={amount === 12} />
+                    <input type="radio" name="amount" value={amount} defaultChecked={amount === selectedAmount} />
                     <span>USD</span>
                     <strong>${amount}</strong>
                   </label>

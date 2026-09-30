@@ -85,6 +85,26 @@ test("checkout provider timeout and missing URL return localized error redirects
     assert.ok(response.headers.get("location").endsWith("/zh-cn/support?status=error"));
   }
 });
+test("checkout retries an uncertain provider result with the same idempotency key and parameters", async (t) => {
+  t.mock.method(console, "error", () => {});
+  const calls = [];
+  globalThis.stripeCreate = async (params, options) => {
+    calls.push({ params, options });
+    if (calls.length === 1) throw new Error("response lost after session creation");
+    return { url: "https://checkout.stripe.com/same-session" };
+  };
+  const attempt = "69a3c170-1105-42f2-b492-15f74ef59a71";
+  const body = `locale=zh-tw&amount=12&checkout_attempt=${attempt}`;
+  const recovery = new URL((await POST(request(body))).headers.get("location"));
+  assert.equal(recovery.searchParams.get("status"), "error");
+  assert.equal(recovery.searchParams.get("checkout_attempt"), attempt);
+  assert.equal(recovery.searchParams.get("amount"), "12");
+  assert.equal((await POST(request(body))).headers.get("location"), "https://checkout.stripe.com/same-session");
+  assert.deepEqual(calls[0], calls[1]);
+  assert.equal(calls[0].options.idempotencyKey, `support-checkout:${attempt}`);
+  assert.equal((await POST(request("amount=12&checkout_attempt=invalid"))).status, 303);
+  assert.equal(calls.length, 2);
+});
 test("checkout rate limits repeated native forms with localized retry redirects before provider calls", async () => {
   for (const [locale, prefix, address] of [
     ["en", "", "198.51.100.1"],

@@ -42,10 +42,12 @@ export async function createSupportCheckoutSession({
   amount,
   locale,
   origin,
+  attemptId,
 }: {
   amount: SupportAmount;
   locale: Locale;
   origin: string;
+  attemptId?: string;
 }) {
   const successUrl = new URL(getLocalizedPath("/support", locale), origin);
   successUrl.searchParams.set("status", "success");
@@ -60,24 +62,27 @@ export async function createSupportCheckoutSession({
     site_locale: locale,
   };
 
-  return getStripeClient().checkout.sessions.create({
-    ui_mode: "hosted_page",
-    mode: "payment",
-    billing_address_collection: "auto",
-    phone_number_collection: { enabled: false },
-    // Live tax registrations are active; Managed Payments requires Automatic Tax.
-    automatic_tax: { enabled: true },
-    allow_promotion_codes: false,
-    submit_type: "auto",
-    integration_identifier: CHECKOUT_INTEGRATION_IDENTIFIER,
-    origin_context: "web",
-    locale: locale === "en" ? "en" : "zh",
-    success_url: successUrl.toString(),
-    cancel_url: cancelUrl.toString(),
-    line_items: [{ price: getPriceId(amount), quantity: 1 }],
-    metadata,
-    payment_intent_data: { metadata },
-  });
+  return getStripeClient().checkout.sessions.create(
+    {
+      ui_mode: "hosted_page",
+      mode: "payment",
+      billing_address_collection: "auto",
+      phone_number_collection: { enabled: false },
+      // Live tax registrations are active; Managed Payments requires Automatic Tax.
+      automatic_tax: { enabled: true },
+      allow_promotion_codes: false,
+      submit_type: "auto",
+      integration_identifier: CHECKOUT_INTEGRATION_IDENTIFIER,
+      origin_context: "web",
+      locale: locale === "en" ? "en" : "zh",
+      success_url: successUrl.toString(),
+      cancel_url: cancelUrl.toString(),
+      line_items: [{ price: getPriceId(amount), quantity: 1 }],
+      metadata,
+      payment_intent_data: { metadata },
+    },
+    attemptId ? { idempotencyKey: `support-checkout:${attemptId}` } : undefined,
+  );
 }
 
 export function getStripeErrorDetails(error: unknown) {

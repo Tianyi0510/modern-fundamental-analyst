@@ -28,6 +28,64 @@ const supportLocales = [
 ];
 
 for (const copy of supportLocales) {
+  test(`${copy.locale} stopped checkout navigation can resume the same amount and attempt`, async ({
+    page,
+    baseURL,
+  }) => {
+    const address = `198.51.100.${70 + supportLocales.indexOf(copy)}`;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await page.request.post("/api/stripe/checkout", {
+        headers: {
+          origin: new URL(baseURL!).origin,
+          "content-type": "application/x-www-form-urlencoded",
+          "x-forwarded-for": address,
+        },
+        data: "amount=invalid",
+        maxRedirects: 0,
+      });
+    }
+    const bodies: string[] = [];
+    let release!: () => void;
+    const stopped = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route("**/api/stripe/checkout", async (route) => {
+      bodies.push(route.request().postData()!);
+      if (bodies.length === 1) {
+        await stopped;
+        await route.abort("aborted");
+      } else {
+        await route.continue({ headers: { ...route.request().headers(), "x-forwarded-for": address } });
+      }
+    });
+    await page.goto(`${copy.prefix}/support`);
+    await page
+      .locator(".support-amount-option")
+      .filter({ has: page.locator('input[value="6"]') })
+      .click();
+    await page.locator(".support-submit").first().click({ noWaitAfter: true });
+    await expect.poll(() => bodies.length).toBe(1);
+    await page.keyboard.press("Escape");
+    release();
+    const resume = page.locator('button[name="checkout_resume"]');
+    await expect(resume).toBeVisible();
+    await expect(resume).toBeEnabled();
+    for (const radio of await page.locator('input[type="radio"]').all()) await expect(radio).toBeDisabled();
+    await resume.click({ noWaitAfter: true });
+    await expect(page).toHaveURL(new RegExp(`${copy.prefix}/support\\?status=rate-limited(?:&.*)?$`));
+    expect(bodies.length).toBe(2);
+    const first = new URLSearchParams(bodies[0]);
+    const second = new URLSearchParams(bodies[1]);
+    expect(first.get("checkout_attempt")).toMatch(/^[0-9a-f-]{36}$/);
+    expect(second.get("checkout_attempt")).toBe(first.get("checkout_attempt"));
+    expect(first.getAll("amount")).toEqual(["6"]);
+    expect(second.getAll("amount")).toEqual(["6"]);
+    await expect(page.locator(".support-submit")).toBeEnabled();
+    await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(first.get("checkout_attempt")!);
+    await expect(page.locator('input[type="hidden"][name="amount"]')).toHaveValue("6");
+    for (const radio of await page.locator('input[type="radio"]').all()) await expect(radio).toBeDisabled();
+  });
+
   test(`${copy.locale} Support locks native submissions and returns to localized retry feedback`, async ({
     page,
     baseURL,
@@ -65,24 +123,31 @@ for (const copy of supportLocales) {
       .filter({ has: page.locator('input[value="6"]') })
       .click();
     const submit = page.locator(".support-submit");
+    type SubmissionState = { text: string | null; disabled: boolean; busy: string | null };
+    let submissionState: SubmissionState | undefined;
+    await page.exposeFunction("recordSupportSubmission", (state: SubmissionState) => {
+      submissionState = state;
+    });
+    // Observe before starting native navigation: later evaluations can wait behind the pending POST.
+    await page.evaluate(() => {
+      const form = document.querySelector(".support-form")!;
+      new MutationObserver(() => {
+        const button = form.querySelector<HTMLButtonElement>(".support-submit")!;
+        void (
+          window as typeof window & { recordSupportSubmission: (state: SubmissionState) => Promise<void> }
+        ).recordSupportSubmission({
+          text: button.textContent,
+          disabled: button.disabled,
+          busy: form.getAttribute("aria-busy"),
+        });
+      }).observe(form, { attributes: true, childList: true, subtree: true });
+    });
     await submit.click({ noWaitAfter: true });
-    // Locator assertions wait for navigation; read the still-visible source document while POST is pending.
-    await expect
-      .poll(() =>
-        page.evaluate(() => {
-          const button = document.querySelector<HTMLButtonElement>(".support-submit")!;
-          return {
-            text: button.textContent,
-            disabled: button.disabled,
-            busy: document.querySelector(".support-form")!.getAttribute("aria-busy"),
-          };
-        }),
-      )
-      .toEqual({ text: copy.submitting, disabled: true, busy: "true" });
+    await expect.poll(() => submissionState).toEqual({ text: copy.submitting, disabled: true, busy: "true" });
     await expect.poll(() => requests).toBe(1);
     expect(requests).toBe(1);
     release();
-    await expect(page).toHaveURL(`${copy.prefix}/support?status=rate-limited`);
+    await expect(page).toHaveURL(new RegExp(`${copy.prefix}/support\\?status=rate-limited(?:&.*)?$`));
     await expect(page.locator(".support-status")).toContainText(copy.wait);
     await expect(submit).toHaveText(copy.retry);
     await expect(submit).toBeEnabled();

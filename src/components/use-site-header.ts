@@ -1,6 +1,47 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEventHandler } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEventHandler,
+  type RefObject,
+} from "react";
+
+// Touch feedback spans both buttons because opening replaces the trigger with the close control.
+export function useMenuTouchFeedback(
+  triggerRef: RefObject<HTMLButtonElement | null>,
+  closeRef: RefObject<HTMLButtonElement | null>,
+) {
+  const pointerRef = useRef<number | null>(null);
+  const onPointerDown: PointerEventHandler<HTMLButtonElement> = (event) => {
+    if (event.pointerType !== "touch" || !event.isPrimary || pointerRef.current !== null) return;
+    pointerRef.current = event.pointerId;
+    for (const button of [triggerRef.current, closeRef.current]) {
+      if (!button) continue;
+      const ring = button.querySelector(".mobile-menu-touch-ring");
+      ring?.getAnimations().forEach((animation) => animation.cancel());
+      button.dataset.touchPressed = "true";
+    }
+  };
+  const release: PointerEventHandler<HTMLButtonElement> = (event) => {
+    if (pointerRef.current !== event.pointerId) return;
+    pointerRef.current = null;
+    for (const button of [triggerRef.current, closeRef.current]) {
+      if (!button) continue;
+      delete button.dataset.touchPressed;
+      const ring = button.querySelector(".mobile-menu-touch-ring");
+      if (!ring || window.matchMedia("(prefers-reduced-motion: reduce)").matches) continue;
+      const token = getComputedStyle(button).getPropertyValue("--motion-duration-medium").trim();
+      const duration = Number.parseFloat(token) * (token.endsWith("ms") ? 1 : 1000);
+      // Explicit keyframes keep a quick tap visible even when down/up occur before a paint.
+      ring.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing: "linear" });
+    }
+  };
+  return { onPointerDown, onPointerUp: release, onPointerCancel: release, onLostPointerCapture: release };
+}
 
 // Keep in sync with the navigation-only breakpoint in responsive.css.
 const compactNavigationQuery = "(max-width: 1150px)";

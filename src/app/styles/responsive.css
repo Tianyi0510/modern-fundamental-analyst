@@ -551,6 +551,7 @@
   }
   .mobile-menu-button,
   .mobile-menu-close {
+    position: relative;
     width: 46px;
     height: 46px;
     padding: 0;
@@ -570,6 +571,17 @@
       background-color var(--motion-duration-base) var(--motion-ease-standard),
       border-color var(--motion-duration-base) var(--motion-ease-standard),
       color var(--motion-duration-base) var(--motion-ease-standard);
+  }
+  .mobile-menu-touch-ring {
+    position: absolute;
+    inset: -6px;
+    border: 2px solid var(--medium-blue);
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+  }
+  [data-touch-pressed="true"] > .mobile-menu-touch-ring {
+    opacity: 1;
   }
   .mobile-menu-button svg,
   .mobile-menu-close svg {
@@ -678,6 +690,11 @@
     color: var(--black);
     transform: scale(var(--motion-scale-press));
   }
+  .mobile-menu-button[data-touch-pressed="true"],
+  .mobile-menu-close[data-touch-pressed="true"] {
+    transform: scale(var(--motion-scale-press));
+    transition-duration: var(--motion-duration-press);
+  }
   .mobile-menu-close-icon,
   .mobile-menu-return-icon {
     grid-area: 1 / 1;
@@ -769,6 +786,13 @@
   .mobile-language-disclosure[open]:not([data-closing]) > summary {
     color: var(--interactive-accent);
   }
+  .site-header .mobile-menu-drawer nav a:focus-visible,
+  .mobile-language-disclosure > summary:focus-visible,
+  .mobile-language-links .mobile-menu-language:focus-visible {
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+  }
   .mobile-language-options {
     display: grid;
   }
@@ -791,12 +815,12 @@
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .mobile-menu-button:hover:not(:active):not(:focus-visible) {
+  .mobile-menu-button:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
     background: var(--white);
     color: var(--black);
     transform: none;
   }
-  .mobile-menu-close:hover:not(:active):not(:focus-visible) {
+  .mobile-menu-close:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
     border-color: var(--black);
     background: var(--bright-blue);
     color: var(--black);
@@ -812,13 +836,7 @@
     color: var(--black);
   }
 
-  .home-page .hero .button-dark:hover,
-  .performance-home .button-white:hover,
-  .home-page .cta .button-dark:hover {
-    background: var(--black);
-    color: var(--white);
-  }
-  .home-page .round-link:hover {
+  .home-page .round-link:hover:not(:active):not(:focus-visible) {
     background: var(--black);
     color: var(--white);
     transform: none;
@@ -953,6 +971,9 @@
 }
 
 @media (forced-colors: active) {
+  .mobile-menu-touch-ring {
+    border-color: Highlight;
+  }
   :focus-visible {
     outline: var(--focus-ring-width) solid Highlight !important;
     outline-offset: var(--focus-ring-offset);
