@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { postJson } from "@/lib/client-post-json";
+import { postJson, PostJsonError } from "@/lib/client-post-json";
 import type { Locale } from "@/lib/i18n";
 import styles from "./subscribe-form.module.css";
 import { HoneypotField } from "./honeypot-field";
@@ -15,11 +15,12 @@ export type SubscribeFormCopy = {
   submit: string;
   submitting: string;
   success: string;
+  alreadySubscribed: string;
   error: string;
   preferences: string;
 };
 
-type Status = "idle" | "submitting" | "success" | "error";
+type Status = "idle" | "submitting" | "success" | "alreadySubscribed" | "error";
 
 export function SubscribeFormClient({
   copy,
@@ -44,8 +45,8 @@ export function SubscribeFormClient({
         await postJson("/api/subscribe", { ...payload, locale });
         form.reset();
         setStatus("success");
-      } catch {
-        setStatus("error");
+      } catch (error) {
+        setStatus(error instanceof PostJsonError && error.status === 409 ? "alreadySubscribed" : "error");
       }
     });
   }
@@ -83,7 +84,13 @@ export function SubscribeFormClient({
           {copy.preferences}
         </a>
         <p className={styles.status} role="status" aria-live="polite">
-          {status === "success" ? copy.success : status === "error" ? copy.error : ""}
+          {status === "success"
+            ? copy.success
+            : status === "alreadySubscribed"
+              ? copy.alreadySubscribed
+              : status === "error"
+                ? copy.error
+                : ""}
         </p>
       </form>
     </section>

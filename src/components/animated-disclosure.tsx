@@ -18,7 +18,7 @@ export function AnimatedDisclosure({
   const settle = useCallback(() => {
     const details = ref.current;
     const animation = animationRef.current;
-    if (!details || !animation) return;
+    if (!details) return;
     const summary = details.querySelector("summary");
     if (
       !targetOpenRef.current &&
@@ -30,20 +30,23 @@ export function AnimatedDisclosure({
     details.open = targetOpenRef.current;
     details.removeAttribute("data-closing");
     animationRef.current = null;
-    animation.cancel();
+    animation?.cancel();
   }, []);
 
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const finish = () => {
-      if (motion.matches) settle();
+      if (motion.matches && animationRef.current) settle();
+    };
+    const finishOnResize = () => {
+      if (animationRef.current) settle();
     };
     motion.addEventListener("change", finish);
     // Let the new layout choose its natural height instead of keeping a stale pixel target.
-    window.addEventListener("resize", settle);
+    window.addEventListener("resize", finishOnResize);
     return () => {
       motion.removeEventListener("change", finish);
-      window.removeEventListener("resize", settle);
+      window.removeEventListener("resize", finishOnResize);
       animationRef.current?.cancel();
       animationRef.current = null;
     };
@@ -62,7 +65,7 @@ export function AnimatedDisclosure({
     details.removeAttribute("data-closing");
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      details.open = open;
+      settle();
       return;
     }
 

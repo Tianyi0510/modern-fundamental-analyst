@@ -7,7 +7,7 @@ import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/lib/subscription-preferences";
 import { withSubscriberLock } from "@/lib/resend-coordination";
 
-type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 502 | 503 };
+type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 409 | 502 | 503 };
 
 const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
   ok: false,
@@ -59,6 +59,10 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
   const existing = await runResendOperation("Resend contact lookup failed", () => resend.contacts.get({ email }));
   if (!existing) return unavailable();
 
+  if (existing.data && !existing.data.unsubscribed) {
+    return { ok: false, message: "You've already subscribed", status: 409 };
+  }
+
   const shouldSendWelcome = !existing.data || existing.data.unsubscribed;
   const latestMemo = shouldSendWelcome ? getLatestMemo(locale) : null;
   if (shouldSendWelcome && !latestMemo) {
@@ -78,7 +82,6 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
       console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
       return unavailable();
     }
-    if (!shouldSendWelcome && previousLanguage === properties.preferred_language) return { ok: true };
     await resendOperationContext.getStore()?.recordPhase?.("update-contact");
     result = await runResendOperation("Resend contact update failed", () =>
       resend.contacts.update({
@@ -106,8 +109,6 @@ async function subscribeContactLocked(email: string, locale: Locale): Promise<Su
     if (result?.error) console.error("Resend subscription failed", result.error.name);
     return unavailable();
   }
-
-  if (!shouldSendWelcome) return { ok: true };
 
   const contactId = result.data?.id ?? existing.data?.id;
   if (!latestMemo) return unavailable(503);

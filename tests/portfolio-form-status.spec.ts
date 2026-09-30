@@ -88,3 +88,23 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
     expect(new Set(preferencesKeys).size).toBe(2);
   });
 }
+
+for (const [prefix, message] of [
+  ["", "You've already subscribed"],
+  ["/zh-tw", "你已經訂閱了"],
+  ["/zh-cn", "你已经订阅了"],
+]) {
+  test(`${prefix || "English"} duplicate subscription keeps input and clears feedback on editing`, async ({ page }) => {
+    await page.route("**/api/subscribe", (route) =>
+      route.fulfill({ status: 409, json: { error: "You've already subscribed" } }),
+    );
+    await page.goto(`${prefix}/contact`);
+    const form = page.locator(".site-footer form");
+    await form.locator('[name="email"]').fill("reader@example.com");
+    await form.locator('button[type="submit"]').click();
+    await expect(form.getByRole("status")).toHaveText(message!);
+    await expect(form.locator('[name="email"]')).toHaveValue("reader@example.com");
+    await form.locator('[name="email"]').fill("another@example.com");
+    await expect(form.getByRole("status")).toBeEmpty();
+  });
+}

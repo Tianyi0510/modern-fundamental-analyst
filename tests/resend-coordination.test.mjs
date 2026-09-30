@@ -427,21 +427,24 @@ test("Resend timeout aborts the underlying fetch", async (context) => {
   await assert.rejects(getResendClient().contacts.get({ email: "reader@example.com" }), { name: "TimeoutError" });
 });
 
-test("an unchanged active subscription reads membership without writing or sending welcome", async (context) => {
-  context.mock.method(globalThis, "fetch", async (url, options) => {
+test("active subscriptions reject repeats in every locale without provider writes", async (context) => {
+  context.mock.method(globalThis, "fetch", async (_url, options) => {
     assert.equal(options.method, "GET");
-    return Response.json(
-      String(url).includes("/segments")
-        ? { data: [{ id: getPreferredLanguageSegmentId("en") }], has_more: false }
-        : {
-            id: "contact-id",
-            unsubscribed: false,
-            properties: { preferred_language: { type: "string", value: "English" } },
-          },
-    );
+    return Response.json({
+      id: "contact-id",
+      unsubscribed: false,
+      properties: { preferred_language: { type: "string", value: "English" } },
+    });
   });
-  assert.deepEqual(await subscribeContact("reader@example.com", "en"), { ok: true });
-  assert.equal(globalThis.fetch.mock.callCount(), 2);
+  for (const locale of ["en", "zh-tw", "zh-cn"]) {
+    assert.deepEqual(await subscribeContact("reader@example.com", locale), {
+      ok: false,
+      message: "You've already subscribed",
+      status: 409,
+    });
+    assert.equal(await readSubscriptionJournal("reader@example.com"), null);
+  }
+  assert.equal(globalThis.fetch.mock.callCount(), 3);
 });
 
 test("a rejected welcome restores the previous language property and memberships", async (context) => {

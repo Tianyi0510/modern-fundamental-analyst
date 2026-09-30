@@ -537,6 +537,7 @@
     background: var(--white);
   }
   .site-header .wordmark {
+    padding-inline-start: calc(var(--space-2) / 2);
     min-width: 0;
     max-width: 100%;
     white-space: normal;
@@ -650,11 +651,10 @@
   .mobile-menu-close {
     flex: 0 0 auto;
     border-color: var(--black);
+    outline: none;
     position: relative;
   }
   .mobile-menu-layer.is-open .mobile-menu-close {
-    outline: 2px solid var(--medium-blue);
-    outline-offset: 3px;
     border-color: var(--bright-blue);
     background: var(--bright-blue);
   }
@@ -712,47 +712,38 @@
   }
   .site-header .mobile-menu-drawer nav a {
     min-height: 56px;
-    padding: 0 14px;
+    padding: 0 var(--space-2);
+    border: 0;
     border-radius: 0;
-    border-bottom: 1px solid var(--gray);
+    background: transparent;
+    outline: none;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     align-items: center;
     white-space: nowrap;
-    transition:
-      color var(--motion-duration-fast) var(--motion-ease-standard),
-      background-color var(--motion-duration-base) var(--motion-ease-standard),
-      transform var(--motion-duration-base) var(--motion-ease-standard);
+    transition: none;
+    transform: none;
   }
   .site-header .mobile-menu-drawer nav a:hover,
-  .site-header .mobile-menu-drawer nav a:focus-visible {
-    background: color-mix(in srgb, var(--bright-blue) 22%, var(--white));
-    color: var(--deep-blue);
-    transform: scale(var(--motion-scale-hover));
-  }
+  .site-header .mobile-menu-drawer nav a:focus-visible,
   .site-header .mobile-menu-drawer nav a:active {
-    background: var(--bright-blue);
+    background: transparent;
     color: var(--deep-blue);
-    border-radius: var(--radius-menu);
-    transform: scale(var(--motion-scale-press));
-    transition-duration: var(--motion-duration-press);
+    transform: none;
   }
   .site-header .mobile-menu-drawer nav a[aria-current="page"] {
-    background: color-mix(in srgb, var(--bright-blue) 42%, var(--white));
+    background: transparent;
     color: var(--interactive-accent);
-    border-radius: var(--radius-menu);
   }
   .mobile-menu-language {
     min-height: 48px;
-    border-bottom: 1px solid var(--gray);
+    border: 0;
+    outline: none;
     color: var(--black);
     display: flex;
     align-items: center;
     font-weight: var(--weight-bold);
-    transition:
-      color var(--motion-duration-fast) var(--motion-ease-standard),
-      background-color var(--motion-duration-fast) var(--motion-ease-standard),
-      transform var(--motion-duration-base) var(--motion-ease-emphasized);
+    transition: none;
   }
   .mobile-language-links {
     position: relative;
@@ -762,27 +753,13 @@
   }
   .mobile-language-links .mobile-menu-language {
     margin-top: 0;
-    padding: 0 14px;
-  }
-  .mobile-language-links .mobile-menu-language:first-child {
-    border-top: 1px solid var(--gray);
+    padding: 0 var(--space-2);
   }
   .mobile-language-links .mobile-menu-language:hover,
-  .mobile-language-links .mobile-menu-language:focus-visible {
-    background: color-mix(in srgb, var(--bright-blue) 22%, var(--white));
-    color: var(--interactive-accent);
-    transform: scale(var(--motion-scale-hover));
-  }
-  .mobile-language-links .mobile-menu-language:active {
-    background: var(--bright-blue);
-    color: var(--interactive-accent);
-    border-radius: var(--radius-menu);
-    transform: scale(var(--motion-scale-press));
-    transition-duration: var(--motion-duration-press);
-  }
+  .mobile-language-links .mobile-menu-language:focus-visible,
+  .mobile-language-links .mobile-menu-language:active,
   .mobile-language-links .mobile-menu-language[aria-current="page"] {
     color: var(--interactive-accent);
-    border-radius: var(--radius-menu);
   }
 }
 
@@ -798,16 +775,8 @@
     color: var(--black);
     transform: none;
   }
-  .site-header .mobile-menu-drawer nav a:hover:not(:active):not(:focus-visible) {
-    transform: none;
-  }
   .site-header .mobile-menu-drawer nav a:hover:not([aria-current="page"]):not(:active):not(:focus-visible) {
-    background: transparent;
     color: var(--black);
-  }
-  .mobile-language-links .mobile-menu-language:hover:not(:active):not(:focus-visible) {
-    background: transparent;
-    transform: none;
   }
   .mobile-language-links .mobile-menu-language:hover:not([aria-current="page"]):not(:active):not(:focus-visible) {
     color: var(--black);
