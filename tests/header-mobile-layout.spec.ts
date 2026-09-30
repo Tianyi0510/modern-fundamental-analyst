@@ -375,7 +375,7 @@ test("menu icon replays after navigation and returning to a visited page", async
 test.describe("mobile menu touch ring", () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
 
-  test("blue inner ring persists without an outer ring on touch", async ({ page }) => {
+  test("blue fill and black border persist without an outer ring on touch", async ({ page }) => {
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.goto(prefix || "/");
       for (const route of ["/about", "/memos", "/"]) {
@@ -384,7 +384,7 @@ test.describe("mobile menu touch ring", () => {
         const close = page.locator(".mobile-menu-close");
         expect(await close.evaluate((e) => e.matches(":focus-visible"))).toBe(false);
         await expect(close).toHaveCSS("outline-style", "none");
-        await expect(close).toHaveCSS("border-color", "rgb(95, 205, 253)");
+        await expect(close).toHaveCSS("border-color", "rgb(0, 0, 0)");
         await expect(close).toHaveCSS("background-color", "rgb(95, 205, 253)");
         await expect(close).toHaveCSS("color", "rgb(0, 0, 0)");
         const path = route === "/" ? prefix || "/" : `${prefix}${route}`;
@@ -392,6 +392,20 @@ test.describe("mobile menu touch ring", () => {
         await expect(page).toHaveURL(path);
         await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
       }
+    }
+  });
+
+  test("mobile language drawer opens and closes on touch", async ({ page }) => {
+    for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+      await page.goto(`${prefix}/portfolio`);
+      await page.locator(".mobile-menu-button").tap();
+      const drawer = page.locator(".mobile-language-disclosure");
+      await drawer.locator("summary").tap();
+      await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+      await expect(drawer.locator("a").last()).toBeVisible();
+      await drawer.locator("summary").tap();
+      await expect(drawer).not.toHaveAttribute("open");
+      await expect(drawer.locator("a").last()).not.toBeVisible();
     }
   });
 });
@@ -906,7 +920,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("color", "rgb(0, 140, 255)");
     await expect(page.locator(".mobile-language-links a").nth(1)).toHaveCSS("color", "rgb(0, 0, 0)");
     await expect(page.locator(".mobile-language-links a").nth(2)).toHaveCSS("color", "rgb(0, 0, 0)");
-    await expect(page.locator(".mobile-language-links svg")).toHaveCount(0);
+    await expect(page.locator(".mobile-language-links summary svg")).toHaveCount(1);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "0px");
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(drawer).toHaveCSS("transform", "none");
@@ -1168,6 +1182,68 @@ test.describe("touch holding feedback", () => {
 });
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  for (const reducedMotion of ["no-preference", "reduce"] as const) {
+    test(`${prefix || "English"} mobile language drawer expands vertically and restores focus under ${reducedMotion}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion });
+      await page.goto(`${prefix}/portfolio`);
+      await page.locator(".mobile-menu-button").click();
+      const close = page.locator(".mobile-menu-close");
+      await expect(close).toHaveCSS("border-color", "rgb(0, 0, 0)");
+      await close.hover();
+      await expect(close).toHaveCSS("border-color", "rgb(0, 0, 0)");
+      const drawer = page.locator(".mobile-language-disclosure");
+      const summary = drawer.locator("summary");
+      const options = drawer.locator("a");
+      await expect(drawer).not.toHaveAttribute("open");
+      await expect(options.first()).not.toBeVisible();
+      await summary.focus();
+      await page.keyboard.press("Tab");
+      await expect(page.locator(".mobile-menu-wordmark")).toBeFocused();
+      await page.keyboard.press("Shift+Tab");
+      await expect(summary).toBeFocused();
+      const collapsedHeight = await drawer.evaluate((element) => element.getBoundingClientRect().height);
+      await summary.focus();
+      await page.keyboard.press("Enter");
+      await expect(drawer).toHaveAttribute("open", "");
+      await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+      await expect(options).toHaveCount(3);
+      await expect(options.first()).toBeVisible();
+      expect(await drawer.evaluate((element) => element.getBoundingClientRect().height)).toBeGreaterThan(
+        collapsedHeight,
+      );
+      await page.keyboard.press("Tab");
+      await expect(options.first()).toBeFocused();
+      await summary.evaluate((element: HTMLElement) => element.click());
+      await expect(drawer).not.toHaveAttribute("open");
+      await expect(summary).toBeFocused();
+      await expect(options.first()).not.toBeVisible();
+      await page.keyboard.press("Space");
+      await expect(drawer).toHaveAttribute("open", "");
+      await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+      if (reducedMotion === "no-preference") {
+        await summary.evaluate((element: HTMLElement) => {
+          element.click();
+          const animation = element.parentElement!.getAnimations()[0]!;
+          animation.pause();
+          animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+          element.click();
+        });
+        await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+        await expect(drawer).toHaveAttribute("open", "");
+      }
+      await page.evaluate(() => (document.documentElement.style.fontSize = "200%"));
+      await expect(options.last()).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+      const target = prefix === "/zh-tw" ? "/portfolio" : "/zh-tw/portfolio";
+      await drawer.locator(`a[href="${target}"]`).click();
+      await expect(page).toHaveURL(new RegExp(`${target}$`));
+      await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
+    });
+  }
+
   test(`${prefix || "English"} mobile menu choices use color-only feedback`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/portfolio`);
@@ -1178,26 +1254,49 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect
       .poll(() => page.locator(".mobile-menu-content").evaluate((element) => element.getAnimations().length))
       .toBe(0);
-    const links = page.locator(".mobile-menu-drawer nav a, .mobile-menu-language");
+    await page.locator(".mobile-language-disclosure > summary").click();
+    await expect
+      .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
+      .toBe(0);
+    const links = page.locator(
+      ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > summary",
+    );
     for (const link of await links.all()) {
       await expect(link).toHaveCSS("border-top-width", "0px");
       await expect(link).toHaveCSS("border-bottom-width", "0px");
       await expect(link).toHaveCSS("padding-left", "8px");
       await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(link).toHaveCSS("transition-duration", "0s");
+      await expect(link).toHaveCSS("transition-property", "color");
+      await expect(link).toHaveCSS("transition-duration", "0.14s");
+      await expect(link).toHaveCSS("transition-timing-function", "cubic-bezier(0.2, 0, 0, 1)");
       await expect(link).toHaveCSS("transform", "none");
       const originalBox = await link.boundingBox();
+      const initialColor = await link.evaluate((element) => getComputedStyle(element).color);
       await link.hover();
-      const usesAccent = await link.evaluate((element) =>
-        element.matches('.mobile-menu-language, [aria-current="page"]'),
-      );
-      await expect(link).toHaveCSS("color", usesAccent ? "rgb(0, 140, 255)" : "rgb(0, 41, 145)");
+      if (initialColor !== "rgb(0, 140, 255)") {
+        const midpointColor = await link.evaluate((element) => {
+          const transition = element
+            .getAnimations()
+            .find((animation) => animation instanceof CSSTransition && animation.transitionProperty === "color");
+          if (!transition) throw new Error("Menu color transition did not start");
+          transition.pause();
+          transition.currentTime = Number(transition.effect!.getTiming().duration) / 2;
+          const color = getComputedStyle(element).color;
+          transition.play();
+          return color;
+        });
+        expect(midpointColor).not.toBe(initialColor);
+        expect(midpointColor).not.toBe("rgb(0, 140, 255)");
+      }
+      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
       await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(link).toHaveCSS("transform", "none");
       await link.focus();
       await expect(link).toBeFocused();
+      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
       await expect(link).toHaveCSS("outline-style", "none");
       await page.mouse.down();
+      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
       await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(link).toHaveCSS("transform", "none");
       await expect(link).toHaveCSS("border-radius", "0px");

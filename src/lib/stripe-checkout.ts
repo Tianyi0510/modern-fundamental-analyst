@@ -96,7 +96,13 @@ export function getStripeErrorDetails(error: unknown) {
 }
 
 export async function resolveSupportStatus(params: { status?: string; session_id?: string }): Promise<SupportStatus> {
-  if (params.status === "cancelled" || params.status === "error") return params.status;
+  if (
+    params.status === "cancelled" ||
+    params.status === "error" ||
+    params.status === "rate-limited" ||
+    params.status === "invalid-amount"
+  )
+    return params.status;
   if (params.status !== "success") return undefined;
   if (!params.session_id || !/^cs_(test|live)_[A-Za-z0-9]{1,240}$/.test(params.session_id)) return "unverified";
   try {

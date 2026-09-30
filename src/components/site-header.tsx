@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Check, ChevronDown, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { AnimatedDisclosure } from "@/components/animated-disclosure";
 import { useLanguageMenu, useMobileMenu } from "@/components/use-site-header";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
@@ -180,19 +181,31 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
               ))}
             </nav>
             <div className="mobile-language-links">
-              {locales.map((targetLocale) => (
-                <Link
-                  className="mobile-menu-language"
-                  href={getLocalizedPath(pathname, targetLocale)}
-                  hrefLang={localeConfig[targetLocale].hrefLang}
-                  aria-current={locale === targetLocale ? "page" : undefined}
-                  onClick={closeMenuForNavigation}
-                  tabIndex={isMenuOpen ? 0 : -1}
-                  key={targetLocale}
-                >
-                  {localeConfig[targetLocale].label}
-                </Link>
-              ))}
+              <AnimatedDisclosure
+                className="mobile-language-disclosure"
+                summary={
+                  <>
+                    <span>{localeConfig[locale].label}</span>
+                    <ChevronDown aria-hidden="true" strokeWidth={2.75} />
+                  </>
+                }
+              >
+                <div className="mobile-language-options">
+                  {locales.map((targetLocale) => (
+                    <Link
+                      className="mobile-menu-language"
+                      href={getLocalizedPath(pathname, targetLocale)}
+                      hrefLang={localeConfig[targetLocale].hrefLang}
+                      aria-current={locale === targetLocale ? "page" : undefined}
+                      onClick={closeMenuForNavigation}
+                      tabIndex={isMenuOpen ? 0 : -1}
+                      key={targetLocale}
+                    >
+                      {localeConfig[targetLocale].label}
+                    </Link>
+                  ))}
+                </div>
+              </AnimatedDisclosure>
             </div>
           </div>
         </aside>

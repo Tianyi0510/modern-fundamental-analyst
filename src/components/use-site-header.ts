@@ -250,7 +250,16 @@ export function useMobileMenu() {
     };
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key !== "Tab") return;
-      const focusable = drawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
+      const focusable = Array.from(
+        drawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), summary") ?? [],
+      ).filter((element) => {
+        const closedDisclosure = element.closest("details:not([open])");
+        return (
+          element.tabIndex >= 0 &&
+          element.getClientRects().length > 0 &&
+          (!closedDisclosure || closedDisclosure.querySelector(":scope > summary")?.contains(element))
+        );
+      });
       if (!focusable?.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];

@@ -15,25 +15,23 @@ const isRateLimited = createRateLimiter({
   maxRequests: 8,
 });
 
-function supportUrl(request: Request, locale: ReturnType<typeof resolveLocale>, status: "cancelled" | "error") {
-  const url = new URL(getLocalizedPath("/support", locale), request.url);
+function supportUrl(
+  request: Request,
+  locale: ReturnType<typeof resolveLocale>,
+  status: "cancelled" | "error" | "rate-limited" | "invalid-amount",
+) {
+  // Next.js may normalize the internal request host; use the origin already checked by isSameOrigin.
+  const url = new URL(getLocalizedPath("/support", locale), request.headers.get("origin")!);
   url.searchParams.set("status", status);
   return url;
 }
 
 function checkoutOrigin(request: Request) {
-  return process.env.NODE_ENV === "production" ? SITE_URL : new URL(request.url).origin;
+  return process.env.NODE_ENV === "production" ? SITE_URL : request.headers.get("origin")!;
 }
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
-  if (await isRateLimited(request)) {
-    return NextResponse.json(
-      { error: "Too many checkout attempts. Please try again later." },
-      { status: 429, headers: { "Retry-After": String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)) } },
-    );
-  }
-
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (Number.isFinite(declaredLength) && declaredLength > MAX_FORM_BYTES) {
     return NextResponse.json({ error: "Request is too large." }, { status: 413 });
@@ -53,10 +51,15 @@ export async function POST(request: Request) {
   }
 
   const locale = resolveLocale(formData.get("locale"));
+  if (await isRateLimited(request)) {
+    const response = NextResponse.redirect(supportUrl(request, locale, "rate-limited"), 303);
+    response.headers.set("Retry-After", String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)));
+    return response;
+  }
   if (formData.get("website")) return NextResponse.redirect(supportUrl(request, locale, "cancelled"), 303);
 
   const amount = parseSupportAmount(formData.get("amount"));
-  if (!amount) return NextResponse.json({ error: "Choose a valid support amount." }, { status: 400 });
+  if (!amount) return NextResponse.redirect(supportUrl(request, locale, "invalid-amount"), 303);
 
   try {
     const session = await createSupportCheckoutSession({ amount, locale, origin: checkoutOrigin(request) });

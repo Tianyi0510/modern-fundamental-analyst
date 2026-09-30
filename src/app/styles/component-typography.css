@@ -23,7 +23,8 @@
 .language-dropdown a,
 .footer-links,
 .allocation-card > a,
-.mobile-menu-language {
+.mobile-menu-language,
+.mobile-language-disclosure > summary {
   font-family: var(--font-ui);
   font-size: var(--font-size-control);
   line-height: var(--leading-body);

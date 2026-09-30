@@ -39,7 +39,9 @@ test.beforeEach(() => {
 test("checkout rejects invalid origin, format, amount and oversized bodies before Stripe", async () => {
   assert.equal((await POST(request(undefined, { origin: "https://other.example" }))).status, 403);
   assert.equal((await POST(request("{}", { "content-type": "application/json" }))).status, 415);
-  assert.equal((await POST(request("amount=13"))).status, 400);
+  const invalid = await POST(request("locale=zh-cn&amount=13"));
+  assert.equal(invalid.status, 303);
+  assert.ok(invalid.headers.get("location").endsWith("/zh-cn/support?status=invalid-amount"));
   assert.equal((await POST(request("x".repeat(5001)))).status, 413);
 });
 test("checkout creates the configured session and returns a 303 redirect", async () => {
@@ -52,6 +54,22 @@ test("checkout creates the configured session and returns a 303 redirect", async
   const response = await POST(request("locale=zh-tw&amount=12"));
   assert.equal(response.status, 303);
   assert.equal(response.headers.get("location"), "https://checkout.stripe.com/mock");
+});
+test("checkout error redirects retain the validated browser origin when the internal host differs", async () => {
+  const response = await POST(
+    new Request("http://localhost:3210/api/stripe/checkout", {
+      method: "POST",
+      headers: {
+        host: "127.0.0.1:3210",
+        origin: "http://127.0.0.1:3210",
+        "content-type": "application/x-www-form-urlencoded",
+        "x-forwarded-for": "192.0.2.200",
+      },
+      body: "locale=zh-tw&amount=invalid",
+    }),
+  );
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("location"), "http://127.0.0.1:3210/zh-tw/support?status=invalid-amount");
 });
 test("checkout provider timeout and missing URL return localized error redirects", async (t) => {
   t.mock.method(console, "error", () => {});
@@ -67,12 +85,24 @@ test("checkout provider timeout and missing URL return localized error redirects
     assert.ok(response.headers.get("location").endsWith("/zh-cn/support?status=error"));
   }
 });
-test("checkout rate limits repeated requests before provider calls", async () => {
-  for (let i = 0; i < 8; i++)
-    assert.equal((await POST(request("amount=invalid", { "x-forwarded-for": "198.51.100.1" }))).status, 400);
-  const response = await POST(request("amount=12", { "x-forwarded-for": "198.51.100.1" }));
-  assert.equal(response.status, 429);
-  assert.equal(response.headers.get("retry-after"), "600");
+test("checkout rate limits repeated native forms with localized retry redirects before provider calls", async () => {
+  for (const [locale, prefix, address] of [
+    ["en", "", "198.51.100.1"],
+    ["zh-tw", "/zh-tw", "198.51.100.2"],
+    ["zh-cn", "/zh-cn", "198.51.100.3"],
+  ]) {
+    for (let i = 0; i < 8; i++)
+      assert.equal(
+        (await POST(request(`locale=${locale}&amount=invalid`, { "x-forwarded-for": address }))).status,
+        303,
+      );
+    const response = await POST(request(`locale=${locale}&amount=12`, { "x-forwarded-for": address }));
+    assert.equal(response.status, 303);
+    assert.ok(response.headers.get("location").endsWith(`${prefix}/support?status=rate-limited`));
+    assert.equal(response.headers.get("retry-after"), "600");
+    assert.equal(await resolveSupportStatus({ status: "rate-limited" }), "rate-limited");
+    assert.equal(await resolveSupportStatus({ status: "invalid-amount" }), "invalid-amount");
+  }
 });
 test("success URL alone never confirms payment", async () => {
   assert.equal(await resolveSupportStatus({ status: "success" }), "unverified");
