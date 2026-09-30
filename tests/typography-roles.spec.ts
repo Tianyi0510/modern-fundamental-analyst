@@ -382,8 +382,8 @@ test.describe("form accessibility and preserved text colors", () => {
 });
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-  test(`${prefix || "English"} content reflows at 200% text size`, async ({ context }) => {
-    for (const width of [320, 390]) {
+  for (const width of [320, 390]) {
+    test(`${prefix || "English"} content reflows at 200% text size at ${width}px`, async ({ context }) => {
       for (const route of [
         "/",
         "/about",
@@ -397,7 +397,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         const page = await context.newPage();
         await page.setViewportSize({ width, height: 800 });
         await page.goto(path);
-        await page.waitForLoadState("networkidle");
+        await page.evaluate(() => document.fonts.ready);
         await page.addStyleTag({ content: "html { font-size: 200%; }" });
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth),
@@ -419,6 +419,6 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         }
         await page.close();
       }
-    }
-  });
+    });
+  }
 }
