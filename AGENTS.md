@@ -8,7 +8,7 @@ Repository-wide defaults; follow the user's current request when it changes the 
 - Write project documentation prose in English. Include non-English text only when an exact runtime or provider value is needed for an operation, and identify its source in code.
 - For implementation or optimization, finish the requested change, verify its behavior, and fix related failures before handing off. Resolve routine choices within the authorized scope; ask when missing information materially changes the outcome.
 - Inspect `git status` before editing, preserve unrelated work, and stage only intended files. Keep ignored `audit/` evidence; it is historical context, not the current issue list.
-- Commit or deploy when requested. Deployment includes the necessary commit and push. Report changes, verification, remaining limitations, and commit/deployment status; distinguish local checks from production checks.
+- Commit, create a pull request or deploy when requested. Deployment includes the necessary commit, push and pull request merge. A request to create or update a pull request alone does not authorize merging or deployment. Report changes, verification, remaining limitations, and commit/pull request/deployment status; distinguish local checks from production checks.
 
 ## Project context and task references
 
@@ -58,7 +58,7 @@ Reviews should prioritize demonstrable violations of the constraints above, with
 
 ## Deployment completion
 
-Use the existing GitHub Actions and Vercel Git integration. Push authorized releases to `main`; new branches use `codex/` unless requested otherwise. Preserve `vercel.json`'s exact-commit CI gate, package integrity checks and browser suite. Keep the gate outside `npm run build` and runner-specific workarounds in the workflow; fix failed checks rather than bypassing them.
+Use the existing GitHub Actions and Vercel Git integration. By default, make changes on a `codex/` branch and submit a pull request targeting `main`; reuse an existing pull request for the same work. Review the diff and required CI results before merging. For an authorized deployment, merge the verified pull request into `main` and confirm CI for the resulting release commit before declaring deployment complete. Push directly to `main` only when the user explicitly requests that workflow. Preserve `vercel.json`'s exact-commit CI gate, package integrity checks and browser suite. Keep the gate outside `npm run build` and runner-specific workarounds in the workflow; fix failed checks rather than bypassing them.
 
 Deployment is complete after GitHub Actions succeeds for the release commit, Vercel is `READY`, and the deployed commit and production aliases match. Report success promptly once these conditions are met.
 
