@@ -80,7 +80,7 @@ Responsive layouts keep information and actions in priority order. Check all thr
 
 Email templates share the brand through [`email-layout.tsx`](../src/components/email-layout.tsx), rather than importing website CSS. Use React Email layout components, email-compatible inline styles and pixel-based dimensions. Preserve the existing email font stack (`Inter, Arial, Helvetica, sans-serif`), text colors and colored brand period; the website's Jost and responsive CSS rules do not apply automatically to inboxes.
 
-Keep one primary heading, a language attribute matching the content, descriptive action text and a usable plain-text alternative. Pass user content as React text, not raw HTML. Keep production copy with its owning feature and preview-only examples in `emails/`. Review all three languages and narrow layouts when changing the shared layout. See [Resend templates](RESEND_INTEGRATION.md#email-templates-and-local-preview) for source ownership, preview commands and delivery verification.
+Keep one primary heading, a language attribute matching the content, descriptive action text and a usable plain-text alternative. Pass user content as React text, not raw HTML. Keep production copy with its owning feature and preview-only examples in the owning feature’s `previews/` directory. Review all three languages and narrow layouts when changing the shared layout. See [Resend templates](RESEND_INTEGRATION.md#email-templates-and-local-preview) for source ownership, preview commands and delivery verification.
 
 ## Interaction, motion, and accessibility
 

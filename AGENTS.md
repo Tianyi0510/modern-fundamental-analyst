@@ -67,6 +67,8 @@ Deployment is complete after GitHub Actions succeeds for the release commit, Ver
 
 Production browser smoke checks and additional diagnostics are optional follow-up work unless the user requests them or evidence indicates a production failure. Do not delay the deployment success report for optional checks. Report deployment status separately from any incomplete or failed follow-up verification; never describe unverified checks as passed.
 
+After a pull request is merged and its production deployment succeeds, delete the remote and local feature branch when branch cleanup is authorized. Confirm that the branch has no unmerged commits, switch away from it, and use safe local deletion. Preserve branches with ongoing work. Start subsequent changes from the latest `main` on a new `codex/` branch; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) for cleanup details.
+
 ## Maintaining this file
 
 Keep only durable project constraints, task-specific references and executable completion criteria. Consolidate duplicated rules; put detailed procedures in the linked guides. Add nested instructions only for genuine subtree differences. After changing instruction files, verify the active instruction sources in a fresh Codex run from the intended directory.

@@ -32,17 +32,20 @@ Contact notifications and preference-link emails use React Email. The shared lay
 | Preference HTML                                         | [`preference-email.tsx`](../src/features/subscriptions/preference-email.tsx)         |
 | Preference subject and three-language copy              | [`preference-email-copy.ts`](../src/features/subscriptions/preference-email-copy.ts) |
 | Preference token, plain text and delivery orchestration | [`request/route.ts`](../src/app/api/subscription-preferences/request/route.ts)       |
-| Fictional preview examples                              | [`emails/`](../emails/)                                                              |
+| Fictional Contact previews                              | [`contact/previews/`](../src/features/contact/previews/)                             |
+| Fictional preference previews                           | [`subscriptions/previews/`](../src/features/subscriptions/previews/)                 |
 
 ### Preview workflow
 
 After `npm ci`, run:
 
 ```sh
-npm run email
+npm run email:contact
+# In a separate terminal, if needed:
+npm run email:preferences
 ```
 
-Open [localhost:3001](http://localhost:3001). Select `contact-en`, `contact-zh-tw`, `contact-zh-cn`, `preferences-en`, `preferences-zh-tw` or `preferences-zh-cn`. Edit the owning template or shared layout to update its preview. Stop the preview server with Ctrl+C. It can run alongside the website on port 3000.
+Open [localhost:3001](http://localhost:3001) for `contact-en`, `contact-zh-tw` and `contact-zh-cn`; open [localhost:3002](http://localhost:3002) for `preferences-en`, `preferences-zh-tw` and `preferences-zh-cn`. `npm run email` remains an alias for the Contact preview. Edit the owning template or shared layout to update its preview. Stop the preview server with Ctrl+C. It can run alongside the website on port 3000.
 
 All six examples use fictional content, `example.com` addresses and, for preferences, a nonfunctional token. No service credentials are needed. Rendering previews does not send mail; the preview UI's Send action is separate from this workflow. Welcome emails remain owned by the Resend automation.
 

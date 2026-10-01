@@ -1,4 +1,4 @@
-import { ContactEmail } from "../src/features/contact/contact-email";
+import { ContactEmail } from "../contact-email";
 export default function Preview() {
   return (
     <ContactEmail

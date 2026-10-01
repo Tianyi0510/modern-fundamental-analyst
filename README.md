@@ -17,7 +17,7 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000). For service integrations, use [.env.example](.env.example) as a template for an uncommitted `.env.local`. Never commit credentials.
 
-For email development, run `npm run email` and open [localhost:3001](http://localhost:3001). Six fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
+For email development, run `npm run email:contact` (or `npm run email`) and open [localhost:3001](http://localhost:3001); use `npm run email:preferences` and [localhost:3002](http://localhost:3002) for preference emails. Six fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
 
 ## Verification
 
@@ -40,7 +40,6 @@ npm run verify
 | `src/testing/`    | Shared test helpers and the explicit Node loader                                       |
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
 | `public/images/`  | Public icons, logos, and the social sharing image                                      |
-| `emails/`         | Local email preview examples; production templates stay in their features              |
 | `.github/`        | CI workflows, production deployment gate, and WebKit runner                            |
 | `docs/`           | Style guide, operations, data, and service integration guides                          |
 

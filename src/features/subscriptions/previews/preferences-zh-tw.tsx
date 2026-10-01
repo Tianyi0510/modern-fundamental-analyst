@@ -1,5 +1,5 @@
-import { PreferenceEmail } from "../src/features/subscriptions/preference-email";
-import { preferenceEmailCopy } from "../src/features/subscriptions/preference-email-copy";
+import { PreferenceEmail } from "../preference-email";
+import { preferenceEmailCopy } from "../preference-email-copy";
 export default function Preview() {
   return (
     <PreferenceEmail

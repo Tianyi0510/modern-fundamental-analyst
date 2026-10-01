@@ -25,7 +25,9 @@
     "test:webkit": "node .github/run-webkit.mjs",
     "verify": "npm run verify:static && npm run build && npm run test:computed-style:production",
     "test:computed-style:production": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --project=chromium",
-    "email": "email dev --dir emails --port 3001",
+    "email": "npm run email:contact",
+    "email:contact": "email dev --dir src/features/contact/previews --port 3001",
+    "email:preferences": "email dev --dir src/features/subscriptions/previews --port 3002",
     "verify:static": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit"
   },
   "dependencies": {
