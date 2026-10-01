@@ -60,7 +60,9 @@ Reviews should prioritize demonstrable violations of the constraints above, with
 
 Use the existing GitHub Actions and Vercel Git integration. Push authorized releases to `main`; new branches use `codex/` unless requested otherwise. Preserve `vercel.json`'s exact-commit CI gate, package integrity checks and browser suite. Keep the gate outside `npm run build` and runner-specific workarounds in the workflow; fix failed checks rather than bypassing them.
 
-Deployment is complete only after GitHub Actions succeeds, Vercel is `READY`, the deployed commit and production aliases match, and affected routes pass read-only production smoke checks.
+Deployment is complete after GitHub Actions succeeds for the release commit, Vercel is `READY`, and the deployed commit and production aliases match. Report success promptly once these conditions are met.
+
+Production browser smoke checks and additional diagnostics are optional follow-up work unless the user requests them or evidence indicates a production failure. Do not delay the deployment success report for optional checks. Report deployment status separately from any incomplete or failed follow-up verification; never describe unverified checks as passed.
 
 ## Maintaining this file
 
