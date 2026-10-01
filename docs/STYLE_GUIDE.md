@@ -29,6 +29,17 @@ The goal is for maintainers to understand behavior from names, types, and struct
 
 See [Technical Architecture](TECHNICAL_ARCHITECTURE.md#application-boundaries) for application boundaries and deployment constraints. Service procedures are in the [Resend Integration](RESEND_INTEGRATION.md), [Stripe Integration](STRIPE_INTEGRATION.md), and [Upstash Redis Integration](UPSTASH_REDIS_INTEGRATION.md) guides.
 
+### Project standards
+
+These conventions adapt [Bulletproof React's Project Standards](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-standards.md) to this Next.js application.
+
+- Use kebab-case for application files and folders; exported React components use PascalCase. Preserve Next.js routing and metadata conventions, including `(en)`, `[slug]`, `[...unmatched]`, `_components`, and `page.tsx`. Keep established tool configuration names and document titles.
+- Use the single `@/*` alias from [`tsconfig.json`](../tsconfig.json) for imports across source directories. Relative imports are appropriate for adjacent files and root tooling. Node tests use the same alias through the explicit [loader](../src/testing/register-server.mjs), retaining file extensions for `.mjs` helpers. Do not introduce barrel exports solely to shorten paths.
+- Use UTF-8, LF line endings, two-space indentation, and a final newline. [EditorConfig](../.editorconfig) applies editor defaults; [Git attributes](../.gitattributes) normalize text line endings without treating binary assets as text. Prettier remains the formatting authority; Markdown trailing spaces may express intentional line breaks.
+- Keep ESLint's flat configuration and type-aware rules. Lint commands reject warnings, and unused ESLint disable directives are errors. Scope necessary suppressions to the smallest affected code and explain their reason; remove them when the underlying exception disappears.
+- Validate external data at runtime even when its TypeScript type is declared. During refactoring, update types and callers together, then run affected checks. Tests stay beside their owning code; shared test utilities live in `src/testing/` and are never imported by application entry points.
+- CI is the required verification gate for releases. Local Git hooks are optional conveniences and cannot replace CI; do not install a hook that runs complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
+
 ## CSS, layout, and visual language
 
 The goal is to make style ownership clear and use visual design to express information structure. The site uses a financial editorial style: clear type hierarchy, generous section spacing, square data surfaces, pill-shaped primary controls, and restrained motion.
@@ -44,7 +55,7 @@ The goal is to make style ownership clear and use visual design to express infor
 | [`typography.css`](../src/app/styles/typography.css), [`component-typography.css`](../src/app/styles/component-typography.css) | Shared text roles.                                             |
 | [`responsive.css`](../src/app/styles/responsive.css)                                                                           | Responsive layout, touch, and motion preferences.              |
 | [`themes.css`](../src/app/styles/themes.css)                                                                                   | Component surfaces and interaction color overrides.            |
-| `src/components/*.module.css`                                                                                                  | Component-local layout and states.                             |
+| `src/components/*.module.css` and `src/features/**/*.module.css`                                                               | Component-local layout and states.                             |
 
 [`src/app/globals.css`](../src/app/globals.css) defines the import order; semantic colors and theme rules come later. Add new color aliases to `colors.css` and component selectors to the file that owns them. Theme rules may set backgrounds, borders, and interaction colors; other files own typography and page geometry.
 
@@ -64,6 +75,12 @@ Preserve established text colors and opacity, including hover, active, disabled,
 Use Jost for Latin text and numbers. Use Noto Sans TC and Noto Sans SC for Traditional and Simplified Chinese glyphs, respectively. The brand vector masters are [`public/images/icon.svg`](../public/images/icon.svg) and [`logo.svg`](../public/images/logo.svg); PNG copies are available in the same directory. Preserve the square icon, single-line wordmark, and colored period; generate site icons and social images from the masters. Keep the file-based icon and Apple icon in [`src/app/`](../src/app) aligned with the icon master; sharing-image metadata references [`public/images/og-logo.png`](../public/images/og-logo.png).
 
 Responsive layouts keep information and actions in priority order. Check all three languages, root font sizes up to 200%, long translations, and content changes for wrapping and container width. The footer wordmark may wrap. Contact and preference forms use square fields, while the compact footer form uses pill-shaped fields; these are intentional variants. Local chart geometry and optical adjustments may use local values instead of forced spacing-token substitutions.
+
+### Email presentation
+
+Email templates share the brand through [`email-layout.tsx`](../src/components/email-layout.tsx), rather than importing website CSS. Use React Email layout components, email-compatible inline styles and pixel-based dimensions. Preserve the existing email font stack (`Inter, Arial, Helvetica, sans-serif`), text colors and colored brand period; the website's Jost and responsive CSS rules do not apply automatically to inboxes.
+
+Keep one primary heading, a language attribute matching the content, descriptive action text and a usable plain-text alternative. Pass user content as React text, not raw HTML. Keep production copy with its owning feature and preview-only examples in `emails/`. Review all three languages and narrow layouts when changing the shared layout. See [Resend templates](RESEND_INTEGRATION.md#email-templates-and-local-preview) for source ownership, preview commands and delivery verification.
 
 ## Interaction, motion, and accessibility
 
@@ -90,7 +107,7 @@ The goal is to keep information equivalent while respecting language differences
 
 ## Markdown documentation
 
-Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep independently maintained memo articles and portfolio snapshots in `src/data/`. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
+Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep portfolio snapshots and their derivation modules directly in the owning feature; memo articles live in the memo feature’s `articles/` directory. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
 
 Each document should solve a clear problem and have a primary place to maintain its information:
 

@@ -1,4 +1,4 @@
-import { DisclaimerPageContent } from "@/components/disclaimer-page-content";
+import { DisclaimerPageContent } from "@/app/_components/disclaimer-page-content";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({

@@ -5,16 +5,21 @@ const shardSuffix = process.env.PLAYWRIGHT_SHARD ? `-shard-${process.env.PLAYWRI
 const useProductionBuild = process.env.PLAYWRIGHT_USE_PRODUCTION_BUILD === "1";
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./src",
   testMatch: "**/*.spec.ts",
+  outputDir: "node_modules/.cache/playwright",
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   workers: process.env.CI ? 1 : undefined,
   retries: process.env.CI ? 1 : 0,
   reporter: "line",
   projects: [
-    { name: "chromium", outputDir: "test-results/chromium", use: { browserName: "chromium" } },
-    { name: "webkit", outputDir: `test-results/webkit${shardSuffix}`, use: { browserName: "webkit" } },
+    { name: "chromium", outputDir: "node_modules/.cache/playwright/chromium", use: { browserName: "chromium" } },
+    {
+      name: "webkit",
+      outputDir: `node_modules/.cache/playwright/webkit${shardSuffix}`,
+      use: { browserName: "webkit" },
+    },
   ],
   use: {
     baseURL: "http://127.0.0.1:3210",

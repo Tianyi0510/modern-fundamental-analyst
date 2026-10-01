@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { readLimitedText, RequestBodyError } from "@/lib/api-request";
 import { getResendClient, runResendOperation } from "@/lib/resend";
-import { getResendWebhookHeaders, getUnsubscribeRecipients } from "@/lib/resend-webhook";
-import { withSubscriberLock } from "@/lib/resend-coordination";
+import { getResendWebhookHeaders, getUnsubscribeRecipients } from "@/features/subscriptions/server/resend-webhook";
+import { withSubscriberLock } from "@/features/subscriptions/server/resend-coordination";
 
 export const runtime = "nodejs";
 

@@ -5,6 +5,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 export const resendOperationContext = new AsyncLocalStorage<{
   signal: AbortSignal;
   uncertain: boolean;
+  writeStarted?: boolean;
   recordPhase?: (phase: string) => Promise<void>;
 }>();
 
@@ -23,16 +24,19 @@ class BoundedResend extends Resend {
     if (options.signal) signals.push(options.signal);
     const signal = AbortSignal.any(signals);
     signal.throwIfAborted();
-    const result = await super.fetchRequest<T>(path, { ...options, signal });
-    if (context && result.error && (result.error.statusCode == null || result.error.statusCode >= 500))
-      context.uncertain = true;
-    // An aborted write may already have reached Resend. Keep the subscriber
-    // lease until expiry rather than immediately allowing another mutation.
-    if (signal.aborted) {
-      if (context) context.uncertain = true;
+    const isWrite = !["GET", "HEAD"].includes((options.method ?? "GET").toUpperCase());
+    if (context && isWrite) context.writeStarted = true;
+    try {
+      const result = await super.fetchRequest<T>(path, { ...options, signal });
+      if (context?.writeStarted && result.error && (result.error.statusCode == null || result.error.statusCode >= 500))
+        context.uncertain = true;
       signal.throwIfAborted();
+      return result;
+    } catch (error) {
+      // Only a dispatched mutation can have an unknown provider outcome.
+      if (context?.writeStarted) context.uncertain = true;
+      throw error;
     }
-    return result;
   }
 }
 

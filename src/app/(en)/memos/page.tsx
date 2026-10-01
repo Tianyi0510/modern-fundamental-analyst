@@ -1,4 +1,4 @@
-import { MemoListPage } from "@/components/memo-list-page";
+import { MemoListPage } from "@/app/_components/memo-list-page";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({

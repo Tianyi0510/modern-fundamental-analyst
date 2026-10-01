@@ -1,8 +1,9 @@
+import { getLatestMemo } from "@/features/memos/memos";
 import { NextResponse } from "next/server";
 import { cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { subscribeContact } from "@/lib/subscription-service";
+import { subscribeContact } from "@/features/subscriptions/server/subscription-service";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
   if (website) return NextResponse.json({ ok: true });
   if (!isValidEmail(email)) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
 
-  const result = await subscribeContact(email, locale);
+  const result = await subscribeContact(email, locale, getLatestMemo);
   return result.ok
     ? NextResponse.json({ ok: true })
     : NextResponse.json({ error: result.message }, { status: result.status });

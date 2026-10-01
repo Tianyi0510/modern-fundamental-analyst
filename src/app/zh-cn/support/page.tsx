@@ -1,5 +1,5 @@
-import { resolveSupportStatus } from "@/lib/stripe-checkout";
-import { SupportPageContent } from "@/components/support-page-content";
+import type { SupportSearchParams } from "@/features/support/support-config";
+import { SupportPageContent } from "@/app/_components/support-page-content";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({
@@ -9,19 +9,6 @@ export const metadata = createPageMetadata({
   locale: "zh-cn",
 });
 
-export default async function SupportPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string; session_id?: string; checkout_attempt?: string; amount?: string }>;
-}) {
-  const params = await searchParams;
-  const normalizedStatus = await resolveSupportStatus(params);
-  return (
-    <SupportPageContent
-      locale="zh-cn"
-      status={normalizedStatus}
-      attemptId={params.checkout_attempt}
-      amount={params.amount}
-    />
-  );
+export default function SupportPage({ searchParams }: { searchParams: Promise<SupportSearchParams> }) {
+  return <SupportPageContent locale="zh-cn" searchParams={searchParams} />;
 }

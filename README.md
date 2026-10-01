@@ -17,6 +17,8 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000). For service integrations, use [.env.example](.env.example) as a template for an uncommitted `.env.local`. Never commit credentials.
 
+For email development, run `npm run email` and open [localhost:3001](http://localhost:3001). Six fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
+
 ## Verification
 
 For routine changes, run the focused checks in [AGENTS.md](AGENTS.md#verification-and-review). Before deployment, install the test browsers once and run the full gate:
@@ -26,28 +28,29 @@ npx playwright install chromium webkit
 npm run verify
 ```
 
-`npm run verify` checks types, lint, formatting, unit tests, the production build, and Chromium browser behavior. For shared UI releases, also run `npm run test:webkit`. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#review-evidence) for CI browser jobs and evidence retention. Use `npm run format` to apply Prettier formatting.
+`npm run verify:static` runs types, lint, formatting and unit tests without starting a browser. `npm run verify` adds a production build and Chromium browser tests. For shared UI releases, also run `npm run test:webkit` against that build. It runs both WebKit shards, even if the first has failing tests, and returns a failure if either shard fails. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#review-evidence) for CI browser jobs and evidence retention. Use `npm run format` to apply Prettier formatting.
 
 ## Project Layout
 
-| Directory         | Purpose                                                              |
-| ----------------- | -------------------------------------------------------------------- |
-| `src/app/`        | Pages, API routes, and global styles                                 |
-| `src/components/` | Shared UI, page copy, and interactions                               |
-| `src/data/`       | Portfolio snapshot, memo catalog, and memo articles                  |
-| `src/lib/`        | Services, calculations, and utilities                                |
-| `public/images/`  | Public icons, logos, and the social sharing image                    |
-| `tests/`          | Unit and browser tests                                               |
-| `scripts/`        | CI deployment gate, Node module loader, and subscription journal CLI |
-| `docs/`           | Style guide, operations, data, and service integration guides        |
+| Directory         | Purpose                                                                                |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `src/app/`        | Routes, localized page composition in `_components`, metadata, and global CSS          |
+| `src/features/`   | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls |
+| `src/components/` | Shared navigation, footer, disclosure, form primitives, and email layout               |
+| `src/testing/`    | Shared test helpers and the explicit Node loader                                       |
+| `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
+| `public/images/`  | Public icons, logos, and the social sharing image                                      |
+| `emails/`         | Local email preview examples; production templates stay in their features              |
+| `.github/`        | CI workflows, production deployment gate, and WebKit runner                            |
+| `docs/`           | Style guide, operations, data, and service integration guides                          |
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
-Under `src/app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, and `route.ts`).
+Under `src/app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, `error.tsx`, and `route.ts`).
 
 ## Content and Integrations
 
-Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/data/portfolio-detail.ts`; `src/data/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/data/memos.ts`, with articles under `src/data/memos/` registered in `src/data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
+Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/portfolio-detail.ts`; `src/features/portfolio/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/memos.ts`, with articles under `src/features/memos/articles/` registered in `src/features/memos/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
 
 Integration details:
 
@@ -61,4 +64,4 @@ Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, con
 
 ## Deployment
 
-Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.
+Submit changes through a pull request and review its CI and Vercel Preview results. Merge only when release is authorized. Pushes to `main` trigger fresh GitHub Actions and Vercel production builds. Production requires successful CI for the exact commit; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) and [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.

@@ -1,4 +1,4 @@
-import { PortfolioPageContent } from "@/components/portfolio-page-content";
+import { PortfolioPageContent } from "@/app/_components/portfolio-page-content";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({

@@ -8,7 +8,7 @@ Repository-wide defaults; follow the user's current request when it changes the 
 - Write project documentation prose in English. Include non-English text only when an exact runtime or provider value is needed for an operation, and identify its source in code.
 - For implementation or optimization, finish the requested change, verify its behavior, and fix related failures before handing off. Resolve routine choices within the authorized scope; ask when missing information materially changes the outcome.
 - Inspect `git status` before editing, preserve unrelated work, and stage only intended files. Keep ignored `audit/` evidence; it is historical context, not the current issue list.
-- Commit or deploy when requested. Deployment includes the necessary commit and push. Report changes, verification, remaining limitations, and commit/deployment status; distinguish local checks from production checks.
+- Commit, create a pull request or deploy when requested. Deployment includes the necessary commit, push and pull request merge. A request to create or update a pull request alone does not authorize merging or deployment. Report changes, verification, remaining limitations, and commit/pull request/deployment status; distinguish local checks from production checks.
 
 ## Project context and task references
 
@@ -29,6 +29,7 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 ## Implementation constraints
 
 - Use `getLocalizedPath` / `getLanguageAlternates` in `src/lib/i18n.ts` and `createRootMetadata` / `createPageMetadata` in `src/lib/site-config.ts`. Links and sharing metadata must resolve to the correct language and page.
+- Compose pages in `src/app/_components`; keep domain code, data, and CSS in the owning `src/features` folder. Features must not import other features or `app`; shared `components` and `lib` must not import either layer.
 - Keep interface copy with its owning page or shared component, use server components for static copy, and keep client boundaries small. Reuse `src/lib/escape-html.ts`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
 - Preserve deliberate language, layout and form variants. Preserve verified research and monthly portfolio snapshots unless a content update is requested; these are not live prices.
 - Preserve existing text colors in every state, including opacity, unless a color change is requested. Reuse semantic tokens and preserve the CSS import order in `src/app/globals.css`.
@@ -42,6 +43,8 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 - Routine tests mock provider writes. Real email, production subscriber changes and live payments require authorization for those actions; deployment does not authorize test transactions.
 
 ## Verification and review
+
+Keep module and component tests beside the code they verify in `src`, using the matching module name and `.test.mjs` for the current Node runner. Keep browser and integration tests with their owning feature, component or application layer. Keep configuration checks beside their configuration; shared test utilities belong in `src/testing/`. Update test discovery and documented commands when moving tests; preserve assertions and provider isolation. Use TypeScript test files when their types add value and the runner and lint configuration support them.
 
 For non-deployment work, run only checks relevant to the changed behavior; do not run the full `npm run verify` or complete browser suites unless the user explicitly requests them. Local unit tests mock service operations; Playwright starts an isolated server without Resend/Redis credentials. Fix failures related to the change without repeatedly seeking permission. Tool and sandbox permissions still apply.
 
@@ -58,9 +61,11 @@ Reviews should prioritize demonstrable violations of the constraints above, with
 
 ## Deployment completion
 
-Use the existing GitHub Actions and Vercel Git integration. Push authorized releases to `main`; new branches use `codex/` unless requested otherwise. Preserve `vercel.json`'s exact-commit CI gate, package integrity checks and browser suite. Keep the gate outside `npm run build` and runner-specific workarounds in the workflow; fix failed checks rather than bypassing them.
+Use the existing GitHub Actions and Vercel Git integration. By default, make changes on a `codex/` branch and submit a pull request targeting `main`; reuse an existing pull request for the same work. Review the diff and required CI results before merging. For an authorized deployment, merge the verified pull request into `main` and confirm CI for the resulting release commit before declaring deployment complete. Push directly to `main` only when the user explicitly requests that workflow. Preserve `vercel.json`'s exact-commit CI gate, package integrity checks and browser suite. Keep the gate outside `npm run build` and runner-specific workarounds in the workflow; fix failed checks rather than bypassing them.
 
-Deployment is complete only after GitHub Actions succeeds, Vercel is `READY`, the deployed commit and production aliases match, and affected routes pass read-only production smoke checks.
+Deployment is complete after GitHub Actions succeeds for the release commit, Vercel is `READY`, and the deployed commit and production aliases match. Report success promptly once these conditions are met.
+
+Production browser smoke checks and additional diagnostics are optional follow-up work unless the user requests them or evidence indicates a production failure. Do not delay the deployment success report for optional checks. Report deployment status separately from any incomplete or failed follow-up verification; never describe unverified checks as passed.
 
 ## Maintaining this file
 
