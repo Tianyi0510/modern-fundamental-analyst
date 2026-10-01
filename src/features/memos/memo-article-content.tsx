@@ -1,4 +1,4 @@
-import type { MemoContent } from "@/features/memos/data/memo-content";
+import type { MemoContent } from "@/features/memos/memo-content";
 
 export function MemoArticleContent({ content }: { content: MemoContent }) {
   return (

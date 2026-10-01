@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MemoDetailPage } from "@/app/_components/memo-detail-page";
-import { getMemoStaticParams } from "@/features/memos/data/memos";
+import { getMemoStaticParams } from "@/features/memos/memos";
 import { createMemoPageMetadata } from "@/features/memos/memo-pages";
 
 type Props = { params: Promise<{ slug: string }> };

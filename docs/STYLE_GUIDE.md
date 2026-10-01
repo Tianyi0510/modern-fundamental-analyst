@@ -29,6 +29,17 @@ The goal is for maintainers to understand behavior from names, types, and struct
 
 See [Technical Architecture](TECHNICAL_ARCHITECTURE.md#application-boundaries) for application boundaries and deployment constraints. Service procedures are in the [Resend Integration](RESEND_INTEGRATION.md), [Stripe Integration](STRIPE_INTEGRATION.md), and [Upstash Redis Integration](UPSTASH_REDIS_INTEGRATION.md) guides.
 
+### Project standards
+
+These conventions adapt [Bulletproof React's Project Standards](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-standards.md) to this Next.js application.
+
+- Use kebab-case for application files and folders; exported React components use PascalCase. Preserve Next.js routing and metadata conventions, including `(en)`, `[slug]`, `[...unmatched]`, `_components`, and `page.tsx`. Keep established tool configuration names and document titles.
+- Use the single `@/*` alias from [`tsconfig.json`](../tsconfig.json) for imports across source directories. Relative imports are appropriate for adjacent files and root tooling. Node tests use the same alias through the explicit [loader](../src/testing/register-server.mjs), retaining file extensions for `.mjs` helpers. Do not introduce barrel exports solely to shorten paths.
+- Use UTF-8, LF line endings, two-space indentation, and a final newline. [EditorConfig](../.editorconfig) applies editor defaults; [Git attributes](../.gitattributes) normalize text line endings without treating binary assets as text. Prettier remains the formatting authority; Markdown trailing spaces may express intentional line breaks.
+- Keep ESLint's flat configuration and type-aware rules. Lint commands reject warnings, and unused ESLint disable directives are errors. Scope necessary suppressions to the smallest affected code and explain their reason; remove them when the underlying exception disappears.
+- Validate external data at runtime even when its TypeScript type is declared. During refactoring, update types and callers together, then run affected checks. Tests stay beside their owning code; shared test utilities live in `src/testing/` and are never imported by application entry points.
+- CI is the required verification gate for releases. Local Git hooks are optional conveniences and cannot replace CI; do not install a hook that runs complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
+
 ## CSS, layout, and visual language
 
 The goal is to make style ownership clear and use visual design to express information structure. The site uses a financial editorial style: clear type hierarchy, generous section spacing, square data surfaces, pill-shaped primary controls, and restrained motion.
@@ -96,7 +107,7 @@ The goal is to keep information equivalent while respecting language differences
 
 ## Markdown documentation
 
-Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep independently maintained memo articles and portfolio snapshots in the owning feature’s `data/` directory. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
+Write all project documentation prose in English. Keep interface copy with the page or shared component that owns it. Keep portfolio snapshots and their derivation modules directly in the owning feature; memo articles live in the memo feature’s `articles/` directory. When an operation requires an exact non-English runtime or provider value, show it as a literal and link to its authoritative definition in code; do not translate that value.
 
 Each document should solve a clear problem and have a primary place to maintain its information:
 

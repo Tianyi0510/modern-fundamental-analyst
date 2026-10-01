@@ -1,7 +1,7 @@
 import { MemoIndex } from "@/features/memos/memo-index";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getMemos } from "@/features/memos/data/memos";
+import { getMemos } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
 import { type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";

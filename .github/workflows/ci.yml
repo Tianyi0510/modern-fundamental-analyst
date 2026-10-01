@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -31,6 +31,12 @@ jobs:
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
+
+      - name: Verify types, lint, formatting and unit tests
+        run: npm run verify:static
+
+      - name: Build application
+        run: npm run build
 
       # Playwright downloads its own Chromium; the runner's Chrome apt feed is unused.
       # Exclude it so a feed sync error cannot block Ubuntu dependency installation.
@@ -55,15 +61,16 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Verify application
-        run: npm run verify
+      - name: Verify Chromium
+        run: npm run test:computed-style:production
 
       - name: Upload browser retry and failure evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: browser-evidence-chromium
-          path: test-results/chromium/
+          path: node_modules/.cache/playwright/chromium/
+          include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 7
 
@@ -77,37 +84,33 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Install WebKit
-        run: npx playwright install webkit
-
       - name: Build application
         id: webkit-build
         run: npm run build
 
+      - name: Install WebKit
+        id: webkit-install
+        run: npx playwright install webkit
+
       - name: Verify WebKit shard 1
-        env:
-          PLAYWRIGHT_USE_PRODUCTION_BUILD: "1"
-          PLAYWRIGHT_SHARD: "1"
-        run: npx playwright test --project=webkit --workers=1 --fully-parallel --shard=1/2
+        run: npm run test:webkit -- --shard=1
 
       - name: Verify WebKit shard 2
-        if: ${{ !cancelled() && steps.webkit-build.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_USE_PRODUCTION_BUILD: "1"
-          PLAYWRIGHT_SHARD: "2"
-        run: npx playwright test --project=webkit --workers=1 --fully-parallel --shard=2/2
+        if: ${{ !cancelled() && steps.webkit-build.outcome == 'success' && steps.webkit-install.outcome == 'success' }}
+        run: npm run test:webkit -- --shard=2
 
       - name: Upload browser retry and failure evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: browser-evidence-webkit
-          path: test-results/webkit-shard-*/
+          path: node_modules/.cache/playwright/webkit-shard-*/
+          include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 7

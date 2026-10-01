@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm ci",
-  "buildCommand": "node scripts/require-ci.mjs && npm run build"
+  "buildCommand": "node .github/require-ci.mjs && npm run build"
 }

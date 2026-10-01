@@ -44,6 +44,8 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 
 ## Verification and review
 
+Keep module and component tests beside the code they verify in `src`, using the matching module name and `.test.mjs` for the current Node runner. Keep browser and integration tests with their owning feature, component or application layer. Keep configuration checks beside their configuration; shared test utilities belong in `src/testing/`. Update test discovery and documented commands when moving tests; preserve assertions and provider isolation. Use TypeScript test files when their types add value and the runner and lint configuration support them.
+
 For non-deployment work, run only checks relevant to the changed behavior; do not run the full `npm run verify` or complete browser suites unless the user explicitly requests them. Local unit tests mock service operations; Playwright starts an isolated server without Resend/Redis credentials. Fix failures related to the change without repeatedly seeking permission. Tool and sandbox permissions still apply.
 
 | Change | Completion checks |

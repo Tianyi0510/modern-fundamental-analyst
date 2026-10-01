@@ -1,7 +1,7 @@
 import { PerformanceChart } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
-import { portfolioSnapshot } from "@/features/portfolio/data/portfolio";
+import { portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";

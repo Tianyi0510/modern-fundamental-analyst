@@ -28,7 +28,7 @@ npx playwright install chromium webkit
 npm run verify
 ```
 
-`npm run verify` checks types, lint, formatting, unit tests, the production build, and Chromium browser behavior. For shared UI releases, also run `npm run test:webkit`. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#review-evidence) for CI browser jobs and evidence retention. Use `npm run format` to apply Prettier formatting.
+`npm run verify:static` runs types, lint, formatting and unit tests without starting a browser. `npm run verify` adds a production build and Chromium browser tests. For shared UI releases, also run `npm run test:webkit` against that build. It runs both WebKit shards, even if the first has failing tests, and returns a failure if either shard fails. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#review-evidence) for CI browser jobs and evidence retention. Use `npm run format` to apply Prettier formatting.
 
 ## Project Layout
 
@@ -37,11 +37,11 @@ npm run verify
 | `src/app/`        | Routes, localized page composition in `_components`, metadata, and global CSS          |
 | `src/features/`   | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls |
 | `src/components/` | Shared navigation, footer, disclosure, form primitives, and email layout               |
+| `src/testing/`    | Shared test helpers and the explicit Node loader                                       |
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
 | `public/images/`  | Public icons, logos, and the social sharing image                                      |
 | `emails/`         | Local email preview examples; production templates stay in their features              |
-| `tests/`          | Unit and browser tests                                                                 |
-| `scripts/`        | CI deployment gate, Node module loader, and subscription journal CLI                   |
+| `.github/`        | CI workflows, production deployment gate, and WebKit runner                            |
 | `docs/`           | Style guide, operations, data, and service integration guides                          |
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
@@ -50,7 +50,7 @@ Under `src/app/`, route groups such as `(en)` organize pages without adding a UR
 
 ## Content and Integrations
 
-Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/data/portfolio-detail.ts`; `src/features/portfolio/data/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/data/memos.ts`, with articles under `src/features/memos/data/memos/` registered in `src/features/memos/data/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
+Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/portfolio-detail.ts`; `src/features/portfolio/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/memos.ts`, with articles under `src/features/memos/articles/` registered in `src/features/memos/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
 
 Integration details:
 
@@ -64,4 +64,4 @@ Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, con
 
 ## Deployment
 
-Pushes to `main` trigger GitHub Actions and Vercel Git builds. Production requires successful CI for the exact commit; see the [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.
+Submit changes through a pull request and review its CI and Vercel Preview results. Merge only when release is authorized. Pushes to `main` trigger fresh GitHub Actions and Vercel production builds. Production requires successful CI for the exact commit; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) and [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.

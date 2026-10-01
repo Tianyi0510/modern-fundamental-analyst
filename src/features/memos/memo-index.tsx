@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
-import type { MemoSummary } from "@/features/memos/data/memos";
+import type { MemoSummary } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 

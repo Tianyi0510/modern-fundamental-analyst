@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { portfolioMonthlyReturns } from "@/features/portfolio/data/portfolio";
+import { portfolioMonthlyReturns } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";

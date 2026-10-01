@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { MemoSummary } from "@/features/memos/data/memos";
+import type { MemoSummary } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 

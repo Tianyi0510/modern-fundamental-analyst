@@ -59,7 +59,7 @@ The preference route awaits HTML rendering inside the initial payload factory, b
 Run the focused rendered-content and mocked-delivery checks:
 
 ```sh
-node --import ./scripts/register-server.mjs --test tests/email-template.test.mjs tests/contact-service.test.mjs tests/resend-coordination.test.mjs tests/subscription-flow.test.mjs
+node --import ./src/testing/register-server.mjs --test src/features/subscriptions/preference-email.test.mjs src/features/contact/server/send-contact-message.test.mjs src/features/subscriptions/server/resend-coordination.test.mjs src/app/api/subscription-flow.test.mjs
 ```
 
 Review both templates in all three languages at desktop and narrow widths. Check headings, action destinations, long content, line breaks and HTML escaping. Tests also cover plain text, Reply-To, idempotency, asynchronous rendering failure and concurrent retries. Local rendering does not establish Gmail, Outlook or Apple Mail inbox compatibility; real test sends require separate authorization.

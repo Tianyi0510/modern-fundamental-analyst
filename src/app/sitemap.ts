@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { memos } from "@/features/memos/data/memos";
+import { memos } from "@/features/memos/memos";
 import { getLanguageAlternates, getLocalizedPath, locales } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site-config";
 

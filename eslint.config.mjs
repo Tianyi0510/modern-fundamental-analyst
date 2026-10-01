@@ -16,8 +16,10 @@ export default tseslint.config(
       "**/dist/**",
       "coverage/**",
       "playwright-report/**",
-      "test-results/**",
     ],
+  },
+  {
+    linterOptions: { reportUnusedDisableDirectives: "error" },
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

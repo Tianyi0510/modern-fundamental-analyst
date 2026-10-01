@@ -1,7 +1,7 @@
 import { PortfolioTable, type PortfolioTableCopy } from "@/features/portfolio/portfolio-table";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
-import { portfolioHoldings, portfolioIncome, portfolioSnapshot } from "@/features/portfolio/data/portfolio";
+import { portfolioHoldings, portfolioIncome, portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";

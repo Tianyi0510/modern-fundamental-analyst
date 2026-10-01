@@ -1,4 +1,4 @@
-import { getLatestMemo } from "@/features/memos/data/memos";
+import { getLatestMemo } from "@/features/memos/memos";
 import { NextResponse } from "next/server";
 import { cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
 import { resolveLocale } from "@/lib/i18n";

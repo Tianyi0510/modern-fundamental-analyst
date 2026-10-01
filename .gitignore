@@ -21,7 +21,6 @@ coverage/
 dist/
 .wrangler/
 playwright-report/
-test-results/
 .playwright-cli/
 output/
 
