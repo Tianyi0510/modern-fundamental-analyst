@@ -1,4 +1,4 @@
-import { SubscriptionPreferencesPage } from "@/components/subscription-preferences-page";
+import { SubscriptionPreferencesPage } from "@/app/_components/subscription-preferences-page";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = {

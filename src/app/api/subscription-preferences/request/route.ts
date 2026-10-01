@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
-import { renderPreferenceEmail, type PreferenceEmailCopy } from "@/lib/email-template";
-import { resolveLocale, type Locale } from "@/lib/i18n";
+import { renderPreferenceEmail } from "@/features/subscriptions/preference-email";
+import { preferenceEmailCopy } from "@/features/subscriptions/preference-email-copy";
+import { resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, getResendIdempotencyKey, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
-import { createPreferenceUrl } from "@/lib/subscription-preferences";
-import { getStablePreferenceEmail, ResendCoordinationError } from "@/lib/resend-coordination";
+import { createPreferenceUrl } from "@/features/subscriptions/server/subscription-preferences";
+import { getStablePreferenceEmail, ResendCoordinationError } from "@/features/subscriptions/server/resend-coordination";
 import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
@@ -15,30 +16,6 @@ const isRateLimited = createRateLimiter({
   windowMs: RATE_LIMIT_WINDOW_MS,
   maxRequests: 5,
 });
-
-const mailCopy = {
-  en: {
-    subject: "Manage your email preferences",
-    heading: "Manage Your Email Preferences",
-    body: "Use the secure link below to update your preferred language or unsubscribe.",
-    action: "Manage Email Preferences",
-    note: "If you did not request this email, you can ignore it.",
-  },
-  "zh-tw": {
-    subject: "管理你的郵件偏好",
-    heading: "管理你的郵件偏好",
-    body: "使用以下安全連結更新偏好語言或取消訂閱。",
-    action: "管理郵件偏好",
-    note: "如果你沒有提出此要求，可以忽略這封郵件。",
-  },
-  "zh-cn": {
-    subject: "管理你的邮件偏好",
-    heading: "管理你的邮件偏好",
-    body: "使用以下安全链接更新偏好语言或取消订阅。",
-    action: "管理邮件偏好",
-    note: "如果你没有提出此请求，可以忽略这封邮件。",
-  },
-} satisfies Record<Locale, PreferenceEmailCopy & { subject: string }>;
 
 export async function POST(request: Request) {
   const parsed = await readProtectedObjectJson(request, {
@@ -62,15 +39,15 @@ export async function POST(request: Request) {
       idempotencyKey,
       JSON.stringify({ email, locale }),
       email,
-      () => {
-        const text = mailCopy[locale];
+      async () => {
+        const text = preferenceEmailCopy[locale];
         const preferencesUrl = createPreferenceUrl(email, locale, 30 * 60 * 1000);
         return {
           from: UPDATES_FROM_EMAIL,
           to: email,
           subject: text.subject,
           text: `${text.heading}\n\n${text.body}\n\n${preferencesUrl}\n\n${text.note}`,
-          html: renderPreferenceEmail(text, preferencesUrl),
+          html: await renderPreferenceEmail(text, preferencesUrl, locale),
         };
       },
     );

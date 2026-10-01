@@ -3,10 +3,10 @@ import { cleanText, readProtectedObjectJson } from "@/lib/api-request";
 import { localeConfig, locales, resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
-import { syncPreferredLanguageSegment } from "@/lib/resend-segments";
-import { readPreferenceToken } from "@/lib/subscription-preferences";
-import { withSubscriberLock } from "@/lib/resend-coordination";
-import { withSubscriptionJournal } from "@/lib/subscription-journal";
+import { syncPreferredLanguageSegment } from "@/features/subscriptions/server/resend-segments";
+import { readPreferenceToken } from "@/features/subscriptions/server/subscription-preferences";
+import { withSubscriberLock } from "@/features/subscriptions/server/resend-coordination";
+import { withSubscriptionJournal } from "@/features/subscriptions/server/subscription-journal";
 
 export const runtime = "nodejs";
 

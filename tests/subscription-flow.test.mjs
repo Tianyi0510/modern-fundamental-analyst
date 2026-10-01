@@ -5,10 +5,13 @@ import { read } from "./repository-helpers.mjs";
 
 test("contact form keeps localized copy on the server and sends through a client boundary", async () => {
   const [page, form, client, route, resend] = await Promise.all([
-    read("src/components/contact-page-content.tsx"),
-    read("src/components/contact-form.tsx"),
-    read("src/components/contact-form-client.tsx"),
-    read("src/app/api/contact/route.ts"),
+    read("src/app/_components/contact-page-content.tsx"),
+    read("src/features/contact/contact-form.tsx"),
+    read("src/features/contact/contact-form-client.tsx"),
+    Promise.all([
+      read("src/app/api/contact/route.ts"),
+      read("src/features/contact/server/send-contact-message.ts"),
+    ]).then((parts) => parts.join("\n")),
     read("src/lib/resend.ts"),
   ]);
 
@@ -37,11 +40,11 @@ test("contact form keeps localized copy on the server and sends through a client
 
 test("subscribe form stores contacts and triggers a localized welcome automation", async () => {
   const [page, form, client, route, service, footer] = await Promise.all([
-    read("src/components/contact-page-content.tsx"),
-    read("src/components/subscribe-form.tsx"),
-    read("src/components/subscribe-form-client.tsx"),
+    read("src/app/_components/contact-page-content.tsx"),
+    read("src/features/subscriptions/subscribe-form.tsx"),
+    read("src/features/subscriptions/subscribe-form-client.tsx"),
     read("src/app/api/subscribe/route.ts"),
-    read("src/lib/subscription-service.ts"),
+    read("src/features/subscriptions/server/subscription-service.ts"),
     read("src/components/site-footer.tsx"),
   ]);
 
@@ -58,7 +61,7 @@ test("subscribe form stores contacts and triggers a localized welcome automation
     /className="footer-social-link footer-x"\s+href="https:\/\/x\.com\/DavidLi0510"\s+target="_blank"\s+rel="noreferrer"/,
   );
   assert.match(footer, /footer-x[\s\S]*?<svg aria-hidden="true"[\s\S]*?<span>X \(formerly Twitter\)<\/span>/);
-  assert.match(route, /subscribeContact\(email, locale\)/);
+  assert.match(route, /subscribeContact\(email, locale, getLatestMemo\)/);
   assert.match(service, /resend\.contacts\.create/);
   assert.match(service, /resend\.contacts\.update/);
   assert.match(service, /resend\.contacts\.get/);
@@ -78,21 +81,23 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(form, /安全偏好设置链接/);
   assert.match(route, /readProtectedObjectJson/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
-  assert.match(footer, /SubscribeForm locale=\{locale\}/);
+  assert.match(footer, /\{subscription\}/);
+  assert.doesNotMatch(footer, /features\/subscriptions/);
+  assert.match(await read("src/app/_components/page-footer.tsx"), /SubscribeForm locale=\{locale\}/);
 });
 
 test("subscription preferences use encrypted expiring links and update Resend contacts", async () => {
   const [tokens, route, requestRoute, page, form, requestForm, segments, subscriptionService, emailTemplate] =
     await Promise.all([
-      read("src/lib/subscription-preferences.ts"),
+      read("src/features/subscriptions/server/subscription-preferences.ts"),
       read("src/app/api/subscription-preferences/route.ts"),
       read("src/app/api/subscription-preferences/request/route.ts"),
-      read("src/components/subscription-preferences-page.tsx"),
-      read("src/components/subscription-preferences-form.tsx"),
-      read("src/components/subscription-preferences-request-form.tsx"),
-      read("src/lib/resend-segments.ts"),
-      read("src/lib/subscription-service.ts"),
-      read("src/lib/email-template.ts"),
+      read("src/app/_components/subscription-preferences-page.tsx"),
+      read("src/features/subscriptions/subscription-preferences-form.tsx"),
+      read("src/features/subscriptions/subscription-preferences-request-form.tsx"),
+      read("src/features/subscriptions/server/resend-segments.ts"),
+      read("src/features/subscriptions/server/subscription-service.ts"),
+      read("src/features/subscriptions/preference-email.tsx"),
     ]);
 
   assert.match(tokens, /createCipheriv\("aes-256-gcm"/);
@@ -110,7 +115,7 @@ test("subscription preferences use encrypted expiring links and update Resend co
   );
   assert.match(route, /unsubscribed: true/);
   assert.match(route, /readProtectedObjectJson/);
-  assert.match(page, /maskEmail\(payload\.email\)/);
+  assert.match(await read("src/features/subscriptions/saved-preferences.tsx"), /maskEmail\(email\)/);
   assert.match(page, /Save Preferences/);
   assert.doesNotMatch(form, /RESEND_API_KEY/);
   assert.match(requestRoute, /createPreferenceUrl\(email, locale, 30 \* 60 \* 1000\)/);
@@ -118,7 +123,7 @@ test("subscription preferences use encrypted expiring links and update Resend co
   assert.match(requestRoute, /getResendIdempotencyKey\(request, "preferences"\)/);
   assert.match(requestForm, /idempotencyKey: getSubmissionId\(\)/);
   assert.match(requestRoute, /renderPreferenceEmail/);
-  assert.match(emailTemplate, /Modern Fundamental Analyst<span style="color:#008cff">\.<\/span>/);
+  assert.match(emailTemplate, /EmailLayout/);
   assert.doesNotMatch(emailTemplate, />MODERN FUNDAMENTAL ANALYST</);
   assert.match(requestRoute, /existing\.error\?\.statusCode !== 404/);
   assert.match(requestRoute, /return NextResponse\.json\(\{ ok: true \}\)/);

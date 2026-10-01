@@ -12,7 +12,7 @@ test("portfolio calculations remain internally consistent", async () => {
     portfolioHoldings,
     portfolioSnapshot,
     portfolioIncome,
-  } = await import("../src/data/portfolio.ts");
+  } = await import("../src/features/portfolio/data/portfolio.ts");
   const totals = getPortfolioTotals(portfolioHoldings, portfolioIncome);
 
   assert.equal(totals.holdingsCount, portfolioHoldings.length);
@@ -84,9 +84,9 @@ test("all portfolio and performance locales share page structures", async () => 
     read("src/app/(en)/performance/page.tsx"),
     read("src/app/zh-tw/performance/page.tsx"),
     read("src/app/zh-cn/performance/page.tsx"),
-    read("src/components/portfolio-page-content.tsx"),
-    read("src/components/performance-page-content.tsx"),
-    read("src/components/portfolio-table.tsx"),
+    read("src/app/_components/portfolio-page-content.tsx"),
+    read("src/app/_components/performance-page-content.tsx"),
+    read("src/features/portfolio/portfolio-table.tsx"),
   ]);
 
   for (const page of [portfolioEn, portfolioZhTw, portfolioZhCn]) assert.match(page, /PortfolioPageContent/);
@@ -105,8 +105,8 @@ test("all portfolio and performance locales share page structures", async () => 
 
 test("portfolio table receives only the active locale labels from its server parent", async () => {
   const [table, page] = await Promise.all([
-    read("src/components/portfolio-table.tsx"),
-    read("src/components/portfolio-page-content.tsx"),
+    read("src/features/portfolio/portfolio-table.tsx"),
+    read("src/app/_components/portfolio-page-content.tsx"),
   ]);
 
   assert.match(table, /"use client"/);

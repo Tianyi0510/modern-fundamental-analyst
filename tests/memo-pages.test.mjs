@@ -4,7 +4,7 @@ import test from "node:test";
 import { read } from "./repository-helpers.mjs";
 
 test("memo metadata uses one localized catalog", async () => {
-  const { memos, memosZhTw, memosZhCn } = await import("../src/data/memos.ts");
+  const { memos, memosZhTw, memosZhCn } = await import("../src/features/memos/data/memos.ts");
 
   assert.equal(memos[0].publishedAt, "2025-10-10");
   assert.equal(memos[0].publishedAt, memosZhTw[0].publishedAt);
@@ -14,14 +14,14 @@ test("memo metadata uses one localized catalog", async () => {
 });
 
 test("memo catalog contains only the Microsoft source memo", async () => {
-  const { memos } = await import("../src/data/memos.ts");
+  const { memos } = await import("../src/features/memos/data/memos.ts");
 
   assert.equal(memos.length, 1);
   assert.equal(memos[0].slug, "microsoft-stock-analysis-fiscal-year-2024");
 });
 
 test("memo content is selected by slug and locale", async () => {
-  const { getMemoContent } = await import("../src/data/memo-content.ts");
+  const { getMemoContent } = await import("../src/features/memos/data/memo-content.ts");
 
   const english = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "en");
   const traditionalChinese = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "zh-tw");
@@ -37,7 +37,7 @@ test("memo content is selected by slug and locale", async () => {
 });
 
 test("memo article preserves verified research prose", async () => {
-  const { getMemoContent } = await import("../src/data/memo-content.ts");
+  const { getMemoContent } = await import("../src/features/memos/data/memo-content.ts");
   const content = getMemoContent("microsoft-stock-analysis-fiscal-year-2024", "en");
   const paragraphs = content.sections
     .flatMap((section) => [
@@ -54,12 +54,54 @@ test("memo article preserves verified research prose", async () => {
 
 test("the legacy Microsoft memo URL permanently redirects to the descriptive slug", async () => {
   const config = await read("next.config.ts");
-  const detailPage = await read("src/components/memo-detail-page.tsx");
+  const detailPage = await read("src/app/_components/memo-detail-page.tsx");
 
   assert.match(config, /microsoft-stock-analysis-fy2024/);
   assert.match(config, /microsoft-stock-analysis-fiscal-year-2024/);
   assert.match(config, /permanent:\s*true/);
   assert.match(config, /\["", "\/zh-tw", "\/zh-cn"\]/);
   assert.match(detailPage, /<SiteHeader[^>]+\/>\s*<main className="memo-detail-page"/s);
-  assert.match(detailPage, /<\/main>\s*<SiteFooter/s);
+  assert.match(detailPage, /<\/main>\s*<PageFooter/s);
+});
+
+test("article metadata and structured data agree with the localized catalog", async () => {
+  const { createMemoPageMetadata, createMemoStructuredData } = await import("../src/features/memos/memo-pages.ts");
+  const { getMemo } = await import("../src/features/memos/data/memos.ts");
+  const { localeConfig, getLocalizedPath } = await import("../src/lib/i18n.ts");
+  const slug = "microsoft-stock-analysis-fiscal-year-2024";
+  for (const locale of ["en", "zh-tw", "zh-cn"]) {
+    const memo = getMemo(slug, locale);
+    const metadata = createMemoPageMetadata(slug, locale);
+    const serialized = createMemoStructuredData(slug, locale);
+    const article = JSON.parse(serialized);
+    assert.equal(metadata.openGraph.type, "article");
+    assert.equal(metadata.openGraph.publishedTime, memo.publishedAt);
+    assert.equal(metadata.alternates.canonical, getLocalizedPath(`/memos/${slug}`, locale));
+    assert.equal(article.headline, memo.title);
+    assert.equal(article.description, memo.summary);
+    assert.equal(article.datePublished, memo.publishedAt);
+    assert.equal(article.inLanguage, localeConfig[locale].hrefLang);
+    assert.ok(article.url.endsWith(metadata.alternates.canonical));
+    assert.ok(article.image.endsWith("/images/og-logo.png"));
+    assert.equal(article.dateModified, undefined);
+    assert.equal(serialized.includes("<"), false);
+  }
+  assert.deepEqual(createMemoPageMetadata("missing", "en"), {});
+  assert.equal(createMemoStructuredData("missing", "en"), null);
+});
+
+test("structured data escapes script terminators without changing article text", async () => {
+  const { getMemo } = await import("../src/features/memos/data/memos.ts");
+  const { createMemoStructuredData } = await import("../src/features/memos/memo-pages.ts");
+  const slug = "microsoft-stock-analysis-fiscal-year-2024";
+  const memo = getMemo(slug, "en");
+  const previous = memo.title;
+  try {
+    memo.title = "</script><script>unexpected()</script>";
+    const serialized = createMemoStructuredData(slug, "en");
+    assert.equal(serialized.includes("<"), false);
+    assert.equal(JSON.parse(serialized).headline, memo.title);
+  } finally {
+    memo.title = previous;
+  }
 });

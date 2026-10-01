@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } = await import("../src/lib/resend-segments.ts");
+const { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } =
+  await import("../src/features/subscriptions/server/resend-segments.ts");
 
 function createResendSegmentMock(initialIds, failRemoveId) {
   const segmentIds = new Set(initialIds);

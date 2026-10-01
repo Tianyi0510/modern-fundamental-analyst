@@ -11,9 +11,10 @@ import type { NavigationCopy } from "@/lib/navigation-copy";
 type SiteHeaderProps = {
   copy: NavigationCopy;
   locale: Locale;
+  languageQuery?: string;
 };
 
-export function SiteHeader({ copy, locale }: SiteHeaderProps) {
+export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
   const pathname = usePathname();
   const {
     close: closeMenu,
@@ -113,7 +114,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
           >
             {locales.map((targetLocale) => (
               <Link
-                href={getLocalizedPath(pathname, targetLocale)}
+                href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
                 hrefLang={localeConfig[targetLocale].hrefLang}
                 role="menuitem"
                 aria-current={locale === targetLocale ? "page" : undefined}
@@ -201,7 +202,7 @@ export function SiteHeader({ copy, locale }: SiteHeaderProps) {
                     .map((targetLocale) => (
                       <Link
                         className="mobile-menu-language"
-                        href={getLocalizedPath(pathname, targetLocale)}
+                        href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
                         hrefLang={localeConfig[targetLocale].hrefLang}
                         onClick={closeMenuForNavigation}
                         tabIndex={isMenuOpen ? 0 : -1}

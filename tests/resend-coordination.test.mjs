@@ -1,3 +1,4 @@
+import { getLatestMemo } from "../src/features/memos/data/memos.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { registerHooks } from "node:module";
@@ -30,7 +31,8 @@ process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
 process.env.RESEND_API_KEY = "re_test_coordination";
 process.env.SUBSCRIPTION_PREFERENCES_SECRET = "stable-test-coordination-secret";
 globalThis.__mfaRedisStateV5 = { client: redis, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 };
-const { withSubscriberLock, getStablePreferenceEmail } = await import("../src/lib/resend-coordination.ts");
+const { withSubscriberLock, getStablePreferenceEmail } =
+  await import("../src/features/subscriptions/server/resend-coordination.ts");
 const { getResendClient, resendOperationContext, reportResendRollbackFailure } = await import("../src/lib/resend.ts");
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -38,12 +40,12 @@ registerHooks({
   },
 });
 const { POST: requestPreferences } = await import("../src/app/api/subscription-preferences/request/route.ts");
-const { subscribeContact } = await import("../src/lib/subscription-service.ts");
-const { getPreferredLanguageSegmentId } = await import("../src/lib/resend-segments.ts");
+const { subscribeContact } = await import("../src/features/subscriptions/server/subscription-service.ts");
+const { getPreferredLanguageSegmentId } = await import("../src/features/subscriptions/server/resend-segments.ts");
 const { withSubscriptionJournal, readSubscriptionJournal, resolveSubscriptionJournal } =
-  await import("../src/lib/subscription-journal.ts");
+  await import("../src/features/subscriptions/server/subscription-journal.ts");
 const { POST: updatePreferences } = await import("../src/app/api/subscription-preferences/route.ts");
-const { createPreferenceToken } = await import("../src/lib/subscription-preferences.ts");
+const { createPreferenceToken } = await import("../src/features/subscriptions/server/subscription-preferences.ts");
 
 function preferencesMutation(action) {
   return new Request("https://www.modernfundamentalanalyst.com/api/subscription-preferences", {
@@ -173,6 +175,7 @@ test("subscription journal clears confirmed operations and retains interrupted o
   await assert.rejects(
     withSubscriberLock("reader@example.com", () =>
       withSubscriptionJournal("reader@example.com", "en", async () => {
+        resendOperationContext.getStore().writeStarted = true;
         throw new Error("process interrupted");
       }),
     ),
@@ -225,7 +228,10 @@ function preferenceEmail(html = "secure-link") {
 
 test("concurrent preference retries return identical randomized payloads", async () => {
   let generated = 0;
-  const create = () => preferenceEmail(`random-token-${++generated}`);
+  const create = async () => {
+    await Promise.resolve();
+    return preferenceEmail(`random-token-${++generated}`);
+  };
   const [first, second] = await Promise.all([
     getStablePreferenceEmail("request", "reader/en", "reader@example.com", create),
     getStablePreferenceEmail("request", "reader/en", "reader@example.com", create),
@@ -437,11 +443,16 @@ test("active subscriptions reject repeats in every locale without provider write
     });
   });
   for (const locale of ["en", "zh-tw", "zh-cn"]) {
-    assert.deepEqual(await subscribeContact("reader@example.com", locale), {
-      ok: false,
-      message: "You've already subscribed",
-      status: 409,
-    });
+    assert.deepEqual(
+      await subscribeContact("reader@example.com", locale, () =>
+        assert.fail("duplicate subscription must not look up a memo"),
+      ),
+      {
+        ok: false,
+        message: "You've already subscribed",
+        status: 409,
+      },
+    );
     assert.equal(await readSubscriptionJournal("reader@example.com"), null);
   }
   assert.equal(globalThis.fetch.mock.callCount(), 3);
@@ -474,11 +485,90 @@ test("a rejected welcome restores the previous language property and memberships
       properties: { preferred_language: { type: "string", value: "English" } },
     });
   });
-  assert.equal((await subscribeContact("reader@example.com", "zh-tw")).ok, false);
+  assert.equal((await subscribeContact("reader@example.com", "zh-tw", getLatestMemo)).ok, false);
   assert.equal(updates.length, 2);
   assert.equal(updates[0].unsubscribed, false);
   assert.equal(updates[1].unsubscribed, true);
   assert.equal(updates[1].properties.preferred_language, "English");
   assert.equal(memberships.has(english), true);
   assert.equal(memberships.has(target), false);
+});
+
+for (const failure of ["server", "network", "deadline"]) {
+  test(`read-only ${failure} failure releases its journal and permits a retry`, async (t) => {
+    t.mock.method(console, "error", () => {});
+    t.mock.method(globalThis, "fetch", async () => {
+      if (failure === "server")
+        return Response.json({ name: "application_error", message: "unavailable" }, { status: 503 });
+      if (failure === "deadline") resendOperationContext.getStore().signal = AbortSignal.abort();
+      throw new TypeError("read unavailable");
+    });
+    for (let i = 0; i < 2; i++) {
+      await withSubscriberLock("read-failure@example.com", () =>
+        withSubscriptionJournal("read-failure@example.com", "en", () =>
+          getResendClient().contacts.get({ email: "read-failure@example.com" }),
+        ),
+      );
+      assert.equal(await readSubscriptionJournal("read-failure@example.com"), null);
+    }
+    assert.equal(globalThis.fetch.mock.callCount(), 2);
+  });
+}
+test("a thrown read-only operation clears only its owned journal", async () => {
+  await assert.rejects(
+    withSubscriberLock("read-throw@example.com", () =>
+      withSubscriptionJournal("read-throw@example.com", "en", async () => {
+        throw new Error("lookup failed");
+      }),
+    ),
+    /lookup failed/,
+  );
+  assert.equal(await readSubscriptionJournal("read-throw@example.com"), null);
+});
+
+test("failed initial subscription reads can retry without looking up or sending a welcome memo", async (t) => {
+  t.mock.method(console, "error", () => {});
+  const fetch = t.mock.method(globalThis, "fetch", async (_url, options) => {
+    assert.equal(options.method, "GET");
+    return Response.json({ name: "application_error", message: "unavailable" }, { status: 503 });
+  });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const result = await subscribeContact("initial-read@example.com", "en", () => assert.fail("must not request memo"));
+    assert.equal(result.ok, false);
+    assert.equal(result.status, 502);
+    assert.equal(await readSubscriptionJournal("initial-read@example.com"), null);
+  }
+  assert.equal(fetch.mock.callCount(), 2);
+});
+
+test("a failed read after a dispatched mutation retains the journal", async (t) => {
+  t.mock.method(console, "error", () => {});
+  t.mock.method(globalThis, "fetch", async (_url, options) =>
+    options.method === "PATCH"
+      ? Response.json({ id: "contact-id" })
+      : Response.json({ name: "application_error", message: "unavailable" }, { status: 503 }),
+  );
+  await withSubscriberLock("post-write-read@example.com", () =>
+    withSubscriptionJournal("post-write-read@example.com", "en", async () => {
+      const resend = getResendClient();
+      await resend.contacts.update({ email: "post-write-read@example.com", unsubscribed: false });
+      await resend.contacts.get({ email: "post-write-read@example.com" });
+    }),
+  );
+  assert.ok(await readSubscriptionJournal("post-write-read@example.com"));
+});
+
+test("failed asynchronous email rendering leaves no partial retry record", async () => {
+  await assert.rejects(
+    getStablePreferenceEmail("render-error", "reader/en", "reader@example.com", async () => {
+      await Promise.resolve();
+      throw new Error("render failed");
+    }),
+    /render failed/,
+  );
+  assert.equal(values.size, 0);
+  assert.deepEqual(
+    await getStablePreferenceEmail("render-error", "reader/en", "reader@example.com", preferenceEmail),
+    preferenceEmail(),
+  );
 });

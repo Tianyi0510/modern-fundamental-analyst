@@ -1,4 +1,4 @@
-import { PerformancePageContent } from "@/components/performance-page-content";
+import { PerformancePageContent } from "@/app/_components/performance-page-content";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
-import { SubscribeForm } from "@/components/subscribe-form";
+import type { ReactNode } from "react";
 
-type SiteFooterProps = { locale?: Locale };
+type SiteFooterProps = { locale?: Locale; subscription: ReactNode };
 const currentYear = new Date().getUTCFullYear();
 
-export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
+export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
   const copy =
     locale === "zh-tw"
       ? {
@@ -85,7 +85,7 @@ export function SiteFooter({ locale = "en" }: SiteFooterProps = {}) {
               </a>
             </div>
           </nav>
-          <SubscribeForm locale={locale} />
+          {subscription}
         </div>
         <div className="footer-bottom">
           <small>

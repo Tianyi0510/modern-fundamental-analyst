@@ -15,12 +15,44 @@ export async function requireSuccessfulCI({
   if (!/^[a-f0-9]{40}$/.test(sha ?? "")) throw new Error("Production requires an exact Git commit SHA.");
   const deadline = now() + CI_WAIT_MS;
   const endpoint = `https://api.github.com/repos/Tianyi0510/modern-fundamental-analyst/actions/workflows/ci.yml/runs?head_sha=${sha}&event=push&per_page=20`;
+  let failures = 0;
+  const wait = (ms) => sleep(Math.min(ms, Math.max(0, deadline - now())));
+  const backoff = () => Math.min(60_000 * 2 ** Math.min(failures++, 2), 240_000);
   while (now() < deadline) {
-    const response = await fetcher(endpoint, {
-      headers: { Accept: "application/vnd.github+json" },
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (!response.ok) throw new Error(`Cannot verify CI: GitHub returned ${response.status}.`);
+    let response;
+    try {
+      response = await fetcher(endpoint, {
+        headers: { Accept: "application/vnd.github+json" },
+        signal: AbortSignal.timeout(Math.min(10_000, deadline - now())),
+      });
+    } catch {
+      await wait(backoff());
+      continue;
+    }
+    if (!response.ok) {
+      const retryAfter = response.headers.get("retry-after");
+      const reset = response.headers.get("x-ratelimit-reset");
+      const limited =
+        response.status === 429 ||
+        (response.status === 403 && (retryAfter !== null || response.headers.get("x-ratelimit-remaining") === "0"));
+      if (limited) {
+        const retryMs =
+          retryAfter === null
+            ? 0
+            : /^\d+$/.test(retryAfter)
+              ? Number(retryAfter) * 1000
+              : Date.parse(retryAfter) - now();
+        const resetMs = reset === null ? 0 : Number(reset) * 1000 - now();
+        await wait(Math.max(backoff(), Number.isFinite(retryMs) ? retryMs : 0, Number.isFinite(resetMs) ? resetMs : 0));
+        continue;
+      }
+      if (response.status >= 500) {
+        await wait(backoff());
+        continue;
+      }
+      throw new Error(`Cannot verify CI: GitHub returned ${response.status}.`);
+    }
+    failures = 0;
     const { workflow_runs: runs } = await response.json();
     const run = runs
       ?.filter((run) => run.head_sha === sha && run.head_branch === "main" && run.event === "push")
@@ -30,7 +62,7 @@ export async function requireSuccessfulCI({
       console.log(`CI verified for ${sha}: ${run.html_url}`);
       return;
     }
-    await sleep(15_000);
+    await wait(60_000);
   }
   throw new Error("Production blocked: CI did not succeed within 30 minutes.");
 }

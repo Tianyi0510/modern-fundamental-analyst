@@ -29,6 +29,7 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 ## Implementation constraints
 
 - Use `getLocalizedPath` / `getLanguageAlternates` in `src/lib/i18n.ts` and `createRootMetadata` / `createPageMetadata` in `src/lib/site-config.ts`. Links and sharing metadata must resolve to the correct language and page.
+- Compose pages in `src/app/_components`; keep domain code, data, and CSS in the owning `src/features` folder. Features must not import other features or `app`; shared `components` and `lib` must not import either layer.
 - Keep interface copy with its owning page or shared component, use server components for static copy, and keep client boundaries small. Reuse `src/lib/escape-html.ts`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
 - Preserve deliberate language, layout and form variants. Preserve verified research and monthly portfolio snapshots unless a content update is requested; these are not live prices.
 - Preserve existing text colors in every state, including opacity, unless a color change is requested. Reuse semantic tokens and preserve the CSS import order in `src/app/globals.css`.

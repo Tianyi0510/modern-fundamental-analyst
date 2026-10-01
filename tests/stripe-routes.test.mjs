@@ -17,7 +17,7 @@ process.env.STRIPE_RESTRICTED_KEY = "rk_test_mock";
 process.env.STRIPE_PRICE_USD_12 = "price_mock_12";
 delete process.env.UPSTASH_REDIS_URL;
 const { POST } = await import("../src/app/api/stripe/checkout/route.ts");
-const { resolveSupportStatus } = await import("../src/lib/stripe-checkout.ts");
+const { resolveSupportStatus } = await import("../src/features/support/server/stripe-checkout.ts");
 let count = 0;
 function request(body = "locale=en&amount=12", overrides = {}) {
   return new Request("https://www.modernfundamentalanalyst.com/api/stripe/checkout", {
@@ -154,4 +154,24 @@ test("only a paid completed research-support session is confirmed", async (t) =>
     throw new Error("timeout");
   };
   assert.equal(await resolveSupportStatus({ status: "success", session_id: "cs_test_mock" }), "unverified");
+});
+
+test("language switching preserves the original Stripe parameters and rejects duplicate amounts", async (t) => {
+  t.mock.method(console, "error", () => {});
+  const calls = [];
+  globalThis.stripeCreate = async (...args) => {
+    calls.push(args);
+    throw new Error("uncertain result");
+  };
+  const attempt = "550e8400-e29b-41d4-a716-446655440000";
+  for (const locale of ["en", "zh-tw", "zh-cn"]) {
+    const response = await POST(request(`locale=${locale}&checkout_locale=en&checkout_attempt=${attempt}&amount=12`));
+    const recovery = new URL(response.headers.get("location"));
+    assert.equal(recovery.searchParams.get("checkout_locale"), "en");
+    assert.equal(recovery.pathname, locale === "en" ? "/support" : `/${locale}/support`);
+  }
+  assert.deepEqual(calls[0], calls[1]);
+  assert.deepEqual(calls[1], calls[2]);
+  await POST(request("amount=6&amount=18"));
+  assert.equal(calls.length, 3);
 });

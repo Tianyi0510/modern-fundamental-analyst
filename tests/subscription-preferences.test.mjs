@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { createPreferenceToken, readPreferenceToken } = await import("../src/lib/subscription-preferences.ts");
+const { createPreferenceToken, readPreferenceToken } =
+  await import("../src/features/subscriptions/server/subscription-preferences.ts");
 
 test("preference tokens survive migration from the Resend-derived key", () => {
   const previousResendKey = process.env.RESEND_API_KEY;
@@ -43,7 +44,7 @@ test("preference tokens reject tampering", () => {
 test("saved language comes from the contact and unavailable values remain unknown", async (context) => {
   const oldKey = process.env.RESEND_API_KEY;
   process.env.RESEND_API_KEY = "re_test_preferences";
-  const { getSavedPreferenceLocale } = await import("../src/lib/subscription-preferences.ts");
+  const { getSavedPreferenceLocale } = await import("../src/features/subscriptions/server/subscription-preferences.ts");
   try {
     let property;
     context.mock.method(globalThis, "fetch", async () =>

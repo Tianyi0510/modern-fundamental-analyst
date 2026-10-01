@@ -20,6 +20,50 @@ These are the exact values written to Resend contacts, not translations of the d
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.
 6. Use isolated resources and an owned test recipient to verify contact delivery, welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Preference URLs use `SITE_URL` from [src/lib/site-config.ts](../src/lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
 
+## Email templates and local preview
+
+Contact notifications and preference-link emails use React Email. The shared layout owns the brand header, content container and button; domain templates own their content. Templates contain no provider clients, credentials or token-generation logic.
+
+| Responsibility                                          | Source                                                                               |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Shared email layout and button                          | [`email-layout.tsx`](../src/components/email-layout.tsx)                             |
+| Contact HTML and localized labels                       | [`contact-email.tsx`](../src/features/contact/contact-email.tsx)                     |
+| Contact subject, plain text, recipient and Reply-To     | [`send-contact-message.ts`](../src/features/contact/server/send-contact-message.ts)  |
+| Preference HTML                                         | [`preference-email.tsx`](../src/features/subscriptions/preference-email.tsx)         |
+| Preference subject and three-language copy              | [`preference-email-copy.ts`](../src/features/subscriptions/preference-email-copy.ts) |
+| Preference token, plain text and delivery orchestration | [`request/route.ts`](../src/app/api/subscription-preferences/request/route.ts)       |
+| Fictional preview examples                              | [`emails/`](../emails/)                                                              |
+
+### Preview workflow
+
+After `npm ci`, run:
+
+```sh
+npm run email
+```
+
+Open [localhost:3001](http://localhost:3001). Select `contact-en`, `contact-zh-tw`, `contact-zh-cn`, `preferences-en`, `preferences-zh-tw` or `preferences-zh-cn`. Edit the owning template or shared layout to update its preview. Stop the preview server with Ctrl+C. It can run alongside the website on port 3000.
+
+All six examples use fictional content, `example.com` addresses and, for preferences, a nonfunctional token. No service credentials are needed. Rendering previews does not send mail; the preview UI's Send action is separate from this workflow. Welcome emails remain owned by the Resend automation.
+
+The preview's generated plain-text view is a rendering aid, not the exact production text payload. Sending paths retain explicit plain text: Contact's operational labels remain English, while preference text uses the requested locale. Contact's HTML labels follow the submission locale. When changing copy, review HTML and the production text source together.
+
+### Rendering and retries
+
+The preference route awaits HTML rendering inside the initial payload factory, before storing a complete candidate in Redis. A rendering failure creates no partial retry record. Concurrent requests use atomic insertion and reuse the winning stored payload. Existing records, including those created before a template change, retain their original HTML, text and idempotency key; see [request reliability](#request-reliability).
+
+`react-email` provides the runtime components and renderer. The development-only `@react-email/ui` package provides the preview application; its scoped npm override uses the website's patched Next.js version. Recheck the preview and dependency audit when upgrading either package.
+
+### Template verification
+
+Run the focused rendered-content and mocked-delivery checks:
+
+```sh
+node --import ./scripts/register-server.mjs --test tests/email-template.test.mjs tests/contact-service.test.mjs tests/resend-coordination.test.mjs tests/subscription-flow.test.mjs
+```
+
+Review both templates in all three languages at desktop and narrow widths. Check headings, action destinations, long content, line breaks and HTML escaping. Tests also cover plain text, Reply-To, idempotency, asynchronous rendering failure and concurrent retries. Local rendering does not establish Gmail, Outlook or Apple Mail inbox compatibility; real test sends require separate authorization.
+
 ## Receiving
 
 The project owner confirmed on 2026-09-22 that Receiving is enabled for `mail.modernfundamentalanalyst.com`. The domain has transferred to Vercel; maintain Resend's required receiving MX and sending/verification records in the authoritative DNS zone. Retrieve exact records from Resend rather than hard-coding provider DNS values here. See [domain ownership](TECHNICAL_ARCHITECTURE.md#domain-and-service-ownership).
@@ -30,7 +74,7 @@ Keep `CONTACT_TO_EMAIL` set to the intended recipient of website contact-form me
 
 ## Preference display
 
-A valid preference token allows a server-side contact lookup. The form displays the saved `preferred_language`, independently of the page language. Missing, unknown or unavailable values require an explicit language selection before saving; unsubscribe remains available. Editing the selection clears the previous success message. Email identity inputs are trimmed and lowercased without truncation; overlong addresses are rejected before provider operations.
+A valid preference token allows a server-side contact lookup. The form displays the saved `preferred_language`, independently of the page language. The provider lookup runs beneath a localized loading boundary. Language navigation retains the validated preference token and does not copy unrelated query parameters. Missing, unknown or unavailable values require an explicit language selection before saving; unsubscribe remains available. Editing the selection clears the previous success message. Email identity inputs are trimmed and lowercased without truncation; overlong addresses are rejected before provider operations.
 
 ## Request reliability
 
@@ -42,7 +86,9 @@ Before a retry, the application validates the stored record's age, email fields 
 
 Subscribe, preference updates and unsubscribe webhooks share a per-email Redis lease. Contention returns a retryable failure instead of performing overlapping writes. Each Resend HTTP call has an 8-second abort deadline; a subscriber operation has a shared 20-second deadline. The browser allows 45 seconds for service work and Redis overhead.
 
-Network errors, server errors and timeouts can leave the provider outcome unknown. Further provider calls in that operation are stopped, including rollback, and the 120-second lease is retained until expiry. An abort cannot undo a write already accepted by Resend. Subscription and preference-language saves also use a durable journal; follow [subscription reconciliation](UPSTASH_REDIS_INTEGRATION.md#subscription-reconciliation) for blocking behavior, unsubscribe availability and recovery. Webhook failures return 500 for provider retry.
+Once a provider mutation has started, network errors, server errors and timeouts can leave the outcome unknown. Further provider calls in that operation are stopped, including rollback, and the 120-second lease is retained until expiry. An abort cannot undo a write already accepted by Resend. Subscription and preference-language saves also use a durable journal; follow [subscription reconciliation](UPSTASH_REDIS_INTEGRATION.md#subscription-reconciliation) for blocking behavior, unsubscribe availability and recovery. Webhook failures return 500 for provider retry.
+
+A failed read before any mutation starts does not create an unknown write outcome. Its owned journal and lease can be released, including on a thrown read failure or expired read-only deadline. Cleanup compares the exact Redis record and fails closed if ownership cannot be confirmed. Reads that fail after writes have begun remain conservative; existing unresolved journals are never automatically cleared.
 
 Segment reconciliation reads all pages before changing membership, preserves unrelated segments, and rejects non-progressing cursors. Active subscriptions are rejected with HTTP 409 and the message "You've already subscribed" before any contact, language-segment, or welcome-event writes. The form displays localized duplicate feedback and retains the email for editing. Language changes belong in Email Preferences; previously unsubscribed contacts may subscribe again. Welcome prerequisites are checked before mutation; a definitively rejected welcome restores the previous language property and memberships. Failed rollback is logged and retains the subscriber lease and journal for reconciliation.
 
