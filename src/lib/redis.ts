@@ -39,8 +39,8 @@ export async function executeRedisCommand<T>(client: Redis, operation: () => Pro
 }
 
 export function getRedisClient() {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_KV_REST_API_URL;
+  const token = process.env.UPSTASH_KV_REST_API_TOKEN;
   if (!url || !token) return null;
   try {
     const parsed = new URL(url);

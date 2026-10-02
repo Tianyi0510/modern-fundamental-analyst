@@ -36,7 +36,7 @@ test("memory limiter uses bounded fixed-window counters", () => {
 });
 
 test("Redis failover keeps the visitor's already used allowance", async (context) => {
-  const previousUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const previousUrl = process.env.UPSTASH_KV_REST_API_URL;
   const state = globalThis.__mfaRedisStateV6;
   const previousState = { ...state };
   let count = 0;
@@ -47,8 +47,8 @@ test("Redis failover keeps the visitor's already used allowance", async (context
       return ++count;
     },
   };
-  process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
-  process.env.UPSTASH_REDIS_REST_TOKEN = "test-only-token";
+  process.env.UPSTASH_KV_REST_API_URL = "https://redis.example.com";
+  process.env.UPSTASH_KV_REST_API_TOKEN = "test-only-token";
   Object.assign(state, { client: redis, unavailableUntil: 0, lastErrorLogAt: {} });
   context.mock.method(console, "error", () => {});
   try {
@@ -61,8 +61,8 @@ test("Redis failover keeps the visitor's already used allowance", async (context
     assert.equal(await limit(request), true);
     assert.equal(count, 2);
   } finally {
-    if (previousUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
-    else process.env.UPSTASH_REDIS_REST_URL = previousUrl;
+    if (previousUrl === undefined) delete process.env.UPSTASH_KV_REST_API_URL;
+    else process.env.UPSTASH_KV_REST_API_URL = previousUrl;
     Object.assign(state, previousState);
   }
 });
@@ -80,14 +80,14 @@ test("rate limiter rejects invalid resource bounds and namespaces", () => {
 test("derived identities keep an existing allowance without a separate hash secret", async () => {
   const state = globalThis.__mfaRedisStateV6;
   const previous = { ...state };
-  const oldUrl = process.env.UPSTASH_REDIS_REST_URL;
-  const oldToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const oldUrl = process.env.UPSTASH_KV_REST_API_URL;
+  const oldToken = process.env.UPSTASH_KV_REST_API_TOKEN;
   const secret = createHmac("sha256", "test-stable-secret").update("mfa:rate-limit:hash:v1").digest();
   const hash = createHmac("sha256", secret).update("rate-limit:192.0.2.99").digest("base64url");
   const key = `mfa:rl:v2:stable:${hash}`;
   const counters = new Map([[key, 1]]);
-  process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
-  process.env.UPSTASH_REDIS_REST_TOKEN = "test-only-token";
+  process.env.UPSTASH_KV_REST_API_URL = "https://redis.example.com";
+  process.env.UPSTASH_KV_REST_API_TOKEN = "test-only-token";
   Object.assign(state, {
     unavailableUntil: 0,
     client: {
@@ -105,10 +105,10 @@ test("derived identities keep an existing allowance without a separate hash secr
     assert.equal(await limit(new Request("https://example.com", { headers: { "x-real-ip": "192.0.2.99" } })), true);
     assert.equal(counters.get(key), 2);
   } finally {
-    if (oldUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
-    else process.env.UPSTASH_REDIS_REST_URL = oldUrl;
-    if (oldToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
-    else process.env.UPSTASH_REDIS_REST_TOKEN = oldToken;
+    if (oldUrl === undefined) delete process.env.UPSTASH_KV_REST_API_URL;
+    else process.env.UPSTASH_KV_REST_API_URL = oldUrl;
+    if (oldToken === undefined) delete process.env.UPSTASH_KV_REST_API_TOKEN;
+    else process.env.UPSTASH_KV_REST_API_TOKEN = oldToken;
     Object.assign(state, previous);
   }
 });

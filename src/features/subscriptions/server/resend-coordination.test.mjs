@@ -25,8 +25,8 @@ const redis = {
     return Number(values.delete(keys[0]));
   },
 };
-process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
-process.env.UPSTASH_REDIS_REST_TOKEN = "test-only-token";
+process.env.UPSTASH_KV_REST_API_URL = "https://redis.example.com";
+process.env.UPSTASH_KV_REST_API_TOKEN = "test-only-token";
 process.env.RESEND_API_KEY = "re_test_coordination";
 process.env.SUBSCRIPTION_PREFERENCES_SECRET = "stable-test-coordination-secret";
 globalThis.__mfaRedisStateV6 = { client: redis, lastErrorLogAt: {}, unavailableUntil: 0 };
@@ -411,8 +411,8 @@ test("provider fetch receives an abort signal and an expired deadline prevents I
 });
 
 test("Redis unavailability never falls back to an unprotected mutation", async () => {
-  const original = process.env.UPSTASH_REDIS_REST_URL;
-  delete process.env.UPSTASH_REDIS_REST_URL;
+  const original = process.env.UPSTASH_KV_REST_API_URL;
+  delete process.env.UPSTASH_KV_REST_API_URL;
   try {
     await assert.rejects(
       withSubscriberLock("reader@example.com", async () => assert.fail("must not run")),
@@ -423,7 +423,7 @@ test("Redis unavailability never falls back to an unprotected mutation", async (
       { status: 503 },
     );
   } finally {
-    process.env.UPSTASH_REDIS_REST_URL = original;
+    process.env.UPSTASH_KV_REST_API_URL = original;
   }
 });
 

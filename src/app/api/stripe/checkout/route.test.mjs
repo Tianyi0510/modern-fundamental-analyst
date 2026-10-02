@@ -15,8 +15,8 @@ registerHooks({
   },
 });
 process.env.STRIPE_RESTRICTED_KEY = "rk_test_mock";
-delete process.env.UPSTASH_REDIS_REST_URL;
-delete process.env.UPSTASH_REDIS_REST_TOKEN;
+delete process.env.UPSTASH_KV_REST_API_URL;
+delete process.env.UPSTASH_KV_REST_API_TOKEN;
 const { POST } = await import("./route.ts");
 const { resolveSupportStatus } = await import("@/features/support/server/stripe-checkout.ts");
 let count = 0;

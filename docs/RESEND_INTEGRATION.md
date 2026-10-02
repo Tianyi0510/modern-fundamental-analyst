@@ -5,7 +5,7 @@
 This guide describes the repository implementation. Provider resources must be configured in the Resend account used by each environment; their current Dashboard state is not verified by this document.
 
 1. Verify the sending domain `mail.modernfundamentalanalyst.com` in Resend. The sender constants in [src/lib/resend.ts](../src/lib/resend.ts) use `contact@` for contact messages and `updates@` for preference links. If using another domain, update those constants as well as the provider configuration.
-2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [credential and secret rotation](UPSTASH_REDIS_INTEGRATION.md#credential-and-secret-rotation).
+2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_KV_REST_API_URL`, and `UPSTASH_KV_REST_API_TOKEN`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [credential and secret rotation](UPSTASH_REDIS_INTEGRATION.md#credential-and-secret-rotation).
 3. Create a text contact property named `preferred_language` and three language segments. Set the matching `RESEND_SEGMENT_*` variables below. The default IDs in the code and environment template refer to this project's existing resources; override all three when using another account or isolated test resources.
 
 | Locale  | Exact `preferred_language` value | Segment variable       |
@@ -84,7 +84,7 @@ A valid preference token allows a server-side contact lookup. The form displays 
 
 ## Request reliability
 
-`UPSTASH_REDIS_REST_URL` and the read/write `UPSTASH_REDIS_REST_TOKEN` are required for subscriber mutations and preference-link requests. Unlike rate limiting, these operations fail with a retryable error if Redis is unavailable. No live email is sent by the unit tests.
+`UPSTASH_KV_REST_API_URL` and the read/write `UPSTASH_KV_REST_API_TOKEN` are required for subscriber mutations and preference-link requests. Unlike rate limiting, these operations fail with a retryable error if Redis is unavailable. No live email is sent by the unit tests.
 
 Preference requests store the complete email payload for 25 hours using atomic `SET NX`, covering Resend's 24-hour deduplication window plus a delay before the initial send. Retries reuse the original encrypted link, text, HTML and provider idempotency key. Changing the input under the same key returns 409. After 25 minutes, a fresh submission ID is required so users do not receive a nearly expired 30-minute link. The form resets its ID on that response. Redis records contain the recipient and email content; use the existing authenticated TLS connection and restrict database access.
 

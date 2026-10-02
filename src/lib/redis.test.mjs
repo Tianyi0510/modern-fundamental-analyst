@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const state = (globalThis.__mfaRedisStateV6 = { client: null, lastErrorLogAt: {}, unavailableUntil: 0 });
-process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
-process.env.UPSTASH_REDIS_REST_TOKEN = "test-only-token";
+process.env.UPSTASH_KV_REST_API_URL = "https://redis.example.com";
+process.env.UPSTASH_KV_REST_API_TOKEN = "test-only-token";
 const { getRedisClient, executeRedisCommand, markRedisUnavailable } = await import("./redis.ts");
 
 test.beforeEach((context) => {
@@ -103,22 +103,22 @@ test("an old failure cannot disable a recovered client", async () => {
 });
 
 test("missing credentials and insecure URLs fail closed", async () => {
-  const original = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const original = process.env.UPSTASH_KV_REST_API_URL;
+  const token = process.env.UPSTASH_KV_REST_API_TOKEN;
   try {
-    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    delete process.env.UPSTASH_KV_REST_API_TOKEN;
     assert.equal(await getRedisClient(), null);
-    process.env.UPSTASH_REDIS_REST_TOKEN = token;
+    process.env.UPSTASH_KV_REST_API_TOKEN = token;
     for (const url of [
       "http://redis.example.com",
       "rediss://user:password@redis.example.com",
       "https://user:password@redis.example.com",
     ]) {
-      process.env.UPSTASH_REDIS_REST_URL = url;
+      process.env.UPSTASH_KV_REST_API_URL = url;
       assert.equal(await getRedisClient(), null);
     }
   } finally {
-    process.env.UPSTASH_REDIS_REST_URL = original;
-    process.env.UPSTASH_REDIS_REST_TOKEN = token;
+    process.env.UPSTASH_KV_REST_API_URL = original;
+    process.env.UPSTASH_KV_REST_API_TOKEN = token;
   }
 });
