@@ -11,8 +11,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute("content", description!);
     await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", /\/icon\.svg/);
     await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", /\/apple-icon\.png/);
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /\/images\/og-logo\.png/);
-    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", /\/images\/og-logo\.png/);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /\/og-logo\.png$/);
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", /\/og-logo\.png$/);
   });
 }
 

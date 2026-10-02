@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { read } from "@/testing/repository-helpers.mjs";
+import { read } from "../../../scripts/repository-helpers.mjs";
 
 test("contact form keeps localized copy on the server and sends through a client boundary", async () => {
   const [page, form, client, route, resend] = await Promise.all([

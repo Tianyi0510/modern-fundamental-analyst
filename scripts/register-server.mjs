@@ -17,7 +17,7 @@ registerHooks({
   resolve(specifier, context, nextResolve) {
     if (specifier === "server-only") return { url: "data:text/javascript,export {};", shortCircuit: true };
     if (specifier.startsWith("@/")) {
-      const base = new URL(`../${specifier.slice(2)}`, import.meta.url).href;
+      const base = new URL(`../src/${specifier.slice(2)}`, import.meta.url).href;
       if (existsSync(new URL(base))) return nextResolve(base, context);
       for (const extension of [".ts", ".tsx"]) {
         if (existsSync(new URL(base + extension))) return nextResolve(base + extension, context);

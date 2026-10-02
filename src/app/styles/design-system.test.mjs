@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdir } from "node:fs/promises";
 import test from "node:test";
 
-import { read } from "@/testing/repository-helpers.mjs";
+import { read } from "../../../scripts/repository-helpers.mjs";
 
 test("CSS defines typography roles only in tokens.css and uses them for component sizes", async () => {
   const [tokens, globals, componentFiles] = await Promise.all([
