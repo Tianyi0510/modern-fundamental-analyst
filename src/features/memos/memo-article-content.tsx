@@ -1,16 +1,17 @@
+import { appearance } from "./memo-article-content.styles";
 import type { MemoContent } from "@/features/memos/memo-content";
 
 export function MemoArticleContent({ content }: { content: MemoContent }) {
   return (
-    <div className="article-body">
+    <div className={appearance["article-body"]}>
       {content.sections.map((section) => (
-        <section className="memo-section" key={section.title}>
+        <section className={appearance["memo-section"]} key={section.title}>
           <h2>{section.title}</h2>
           {section.introduction?.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
           {section.subsections.map((subsection) => (
-            <section className="memo-subsection" key={subsection.title}>
+            <section className={appearance["memo-subsection"]} key={subsection.title}>
               <h3>{subsection.title}</h3>
               {subsection.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
@@ -19,7 +20,7 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
           ))}
         </section>
       ))}
-      <section className="memo-references">
+      <section className={appearance["memo-references"]}>
         <h2>{content.referencesTitle}</h2>
         <ol>
           {content.references.map((reference) => (

@@ -1,5 +1,8 @@
 "use client";
 
+import { appearance } from "./page-error.styles";
+import { Button } from "./ui/button";
+
 import Link from "next/link";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 
@@ -12,12 +15,12 @@ const copy = {
 export function PageError({ locale, retry }: { locale: Locale; retry: () => void }) {
   const text = copy[locale];
   return (
-    <main className="not-found" id="main-content" tabIndex={-1}>
+    <main className={appearance["not-found"]} id="main-content" tabIndex={-1}>
       <h1>{text.title}</h1>
-      <button className="button button-dark" type="button" onClick={retry}>
+      <Button type="button" onClick={retry}>
         {text.retry}
-      </button>
-      <Link className="text-link" href={getLocalizedPath("/", locale)}>
+      </Button>
+      <Link className={appearance["text-link"]} href={getLocalizedPath("/", locale)}>
         {text.home}
       </Link>
     </main>

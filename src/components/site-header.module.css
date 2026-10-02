@@ -1,0 +1,159 @@
+.desktopLink,
+.languageTrigger {
+  transform-origin: center;
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-emphasized);
+}
+.dropdownItem {
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-emphasized);
+}
+.dropdownItem:active {
+  transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
+}
+.desktopLink:hover,
+.desktopLink:focus-visible,
+.languageTrigger:hover,
+.languageTrigger:focus-visible {
+  transform: scale(var(--motion-scale-hover));
+}
+.desktopLink:active,
+.languageTrigger:active {
+  transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
+}
+.languageTrigger > svg {
+  transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized);
+}
+.languageTrigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.languageDropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top right;
+  transition:
+    opacity var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-medium) var(--motion-ease-emphasized),
+    visibility 0s linear var(--motion-duration-medium);
+}
+.languageDropdown[data-state="open"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+.layer {
+  pointer-events: none;
+  visibility: hidden;
+}
+.layer[data-state="open"] {
+  pointer-events: auto;
+  visibility: visible;
+}
+.iconButton {
+  transform-origin: center;
+  backface-visibility: hidden;
+  transition:
+    transform var(--motion-duration-base) var(--motion-ease-standard),
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    color var(--motion-duration-base) var(--motion-ease-standard);
+}
+.openButton:hover {
+  background: var(--bright-blue);
+  transform: rotate(4deg) scale(var(--motion-scale-hover));
+}
+.closeButton:hover {
+  transform: rotate(-4deg) scale(var(--motion-scale-hover));
+}
+.iconButton:focus-visible {
+  outline: 2px solid var(--medium-blue);
+  outline-offset: 3px;
+  background: var(--bright-blue);
+  transform: scale(var(--motion-scale-hover));
+}
+.iconButton:active,
+.iconButton[data-touch-pressed="true"] {
+  background: var(--bright-blue);
+  transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
+}
+.iconButton[data-touch-pressed="true"] > .touchRing {
+  opacity: 1;
+}
+.closeIcon {
+  transform: none;
+}
+.iconButton[data-animation-phase="closing"] {
+  transition: none;
+}
+.returnIcon {
+  transform: scale(0.85);
+}
+.mobileLink,
+.languageDisclosure > summary {
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.languageDisclosure > summary {
+  min-height: 48px;
+  padding: 0 var(--space-2);
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+}
+.languageDisclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.languageDisclosure > summary > svg {
+  width: 18px;
+  height: 18px;
+  transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized);
+}
+.languageDisclosure[open]:not([data-closing]) > summary > svg {
+  transform: rotate(180deg);
+}
+.languageDisclosure > summary:hover,
+.languageDisclosure > summary:focus-visible,
+.languageDisclosure > summary:active,
+.languageDisclosure[open]:not([data-closing]) > summary {
+  color: var(--medium-blue);
+}
+.languageDisclosure > summary:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+@media (hover: none) and (pointer: coarse) {
+  .openButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
+    background: var(--white);
+    transform: none;
+  }
+  .closeButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
+    transform: none;
+  }
+  .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
+  .languageDisclosure:not([open]) > summary:hover:not(:active):not(:focus-visible) {
+    color: var(--black);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iconButton,
+  .iconButton > svg,
+  .languageDropdown {
+    transform: none !important;
+  }
+}
+@media (forced-colors: active) {
+  .touchRing {
+    border-color: Highlight;
+  }
+}

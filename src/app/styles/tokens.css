@@ -1,0 +1,131 @@
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --deep-blue: #002991;
+  --medium-blue: #008cff;
+  --bright-blue: #5fcdfd;
+  --gray: #ededed;
+  --background-gray: #f8f9fb;
+  --price-up: #34a853;
+  --price-down: #ff0000;
+  --font-size-page-title: clamp(3.25rem, 1.75rem + 5vw, 7rem);
+  --font-size-section-title: clamp(2.75rem, 2.125rem + 2.5vw, 4.5rem);
+  --font-size-card-title: clamp(2rem, 1.75rem + 1vw, 2.625rem);
+  --font-size-compact-title: clamp(1.25rem, 1.125rem + 0.5vw, 1.5rem);
+  --font-size-lead: 1.375rem;
+  --font-size-body-large: 1.125rem;
+  --font-size-body: 1rem;
+  --font-size-label: 1rem;
+  --font-size-control: 0.9375rem;
+  --font-size-caption: 0.9375rem;
+  --font-size-data-display: clamp(3.25rem, 2rem + 4vw, 6rem);
+  --font-size-data-kpi: clamp(3rem, 2.5rem + 1.5vw, 4rem);
+  --font-size-data-ring: 2.5rem;
+  --font-size-data-row: 1.25rem;
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --tracking-heading: -0.05em;
+  --tracking-body: 0;
+  --tracking-label: 0.05em;
+  --leading-page-title: 1.05;
+  --leading-section-title: 1.1;
+  --leading-card-title: 1.1;
+  --leading-compact-title: 1.2;
+  --leading-data: 1;
+  --leading-body: 1.5;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+  --space-9: 56px;
+  --space-10: 72px;
+  --space-11: 96px;
+  --space-page-gutter: var(--space-6);
+  --space-section: var(--space-11);
+  --space-section-compact: var(--space-10);
+  --space-heading-content: var(--space-9);
+  --space-related-content: var(--space-7);
+  --space-footer-main: var(--space-10);
+  --space-footer-bottom: var(--space-5);
+  --size-control: 52px;
+  --size-control-small: 42px;
+  --size-field: 56px;
+  --size-touch-target: 48px;
+  --radius-menu: 8px;
+  --radius-pill: 999px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 4px;
+  --focus-ring-on-light: var(--deep-blue);
+  --focus-ring-on-dark: var(--bright-blue);
+  --space-field-label: var(--space-3);
+  --space-form-row: var(--space-5);
+  --space-form-column: var(--space-5);
+  --space-field-block: var(--space-3);
+  --space-field-inline: var(--space-4);
+  --size-status-reserve: 1.65em;
+  --opacity-disabled: 0.64;
+  --opacity-disabled-preferences: 0.55;
+  --motion-duration-press: 90ms;
+  --motion-duration-fast: 180ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-medium: 280ms;
+  --motion-duration-slow: 360ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --motion-scale-hover: 1.04;
+  --motion-offset-summary: 8px;
+  --motion-offset-sort: -1px;
+  --motion-scale-press: 0.98;
+  --surface-primary: var(--white);
+  --surface-inverse: var(--black);
+  --surface-brand: var(--deep-blue);
+  --surface-highlight: var(--bright-blue);
+  --text-primary: var(--black);
+  --text-secondary: rgba(0, 0, 0, 0.62);
+  --text-tertiary: rgba(0, 0, 0, 0.56);
+  --text-brand: var(--deep-blue);
+  --text-inverse: var(--white);
+  --text-inverse-secondary: rgba(255, 255, 255, 0.68);
+  --text-inverse-tertiary: rgba(255, 255, 255, 0.62);
+  --text-highlight: var(--bright-blue);
+  --interactive-accent: var(--medium-blue);
+}
+@media (max-width: 800px) {
+  :root {
+    --space-page-gutter: var(--space-4);
+    --space-section: var(--space-10);
+    --space-section-compact: var(--space-9);
+    --space-heading-content: var(--space-7);
+    --space-related-content: var(--space-6);
+    --motion-duration-fast: 140ms;
+    --motion-duration-base: 180ms;
+    --motion-duration-medium: 220ms;
+    --motion-duration-slow: 300ms;
+    --motion-duration-press: 90ms;
+    --space-footer-main: var(--space-8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-scale-hover: 1;
+    --motion-scale-press: 1;
+    --motion-offset-summary: 0px;
+    --motion-offset-sort: 0px;
+  }
+}
+@theme inline {
+  --color-brand: var(--deep-blue);
+  --color-accent: var(--medium-blue);
+  --color-highlight: var(--bright-blue);
+  --color-surface: var(--surface-primary);
+  --color-ink: var(--text-primary);
+  --font-sans: var(--font-ui);
+  --font-weight-bold: var(--weight-bold);
+  --font-weight-normal: var(--weight-regular);
+  --spacing-page: var(--space-page-gutter);
+  --radius-pill: var(--radius-pill);
+}

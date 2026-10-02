@@ -4,7 +4,7 @@ A public-equity research website in English, Traditional Chinese, and Simplified
 
 [Visit the website](https://www.modernfundamentalanalyst.com)
 
-Built with Next.js, React, TypeScript, and native CSS. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
+Built with Next.js, React, TypeScript, Tailwind CSS, customized shadcn/ui primitives, and CSS Modules. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
 
 ## Local Development
 
@@ -44,6 +44,10 @@ npm run verify
 | `public/images/`  | Public icons, logos, and the social sharing image                                      |
 | `.github/`        | CI workflows, production deployment gate, and WebKit runner                            |
 | `docs/`           | Style guide, operations, data, and service integration guides                          |
+
+Layout and ordinary states use static Tailwind classes; complex component motion and charts use adjacent CSS Modules. Tokens and the single reset live in `src/app/styles/`; see [style ownership](docs/STYLE_GUIDE.md#style-ownership). React Email maintains separate inbox-compatible styling.
+
+shadcn/ui configuration lives in `components.json`; owned Button, Input, and Textarea sources live in `src/components/ui/`. These primitives use the existing brand tokens and native HTML semantics. Follow the [component installation procedure](docs/STYLE_GUIDE.md#shadcnui-components) when adding or updating a primitive.
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 

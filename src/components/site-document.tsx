@@ -1,3 +1,4 @@
+import { appearance } from "./site-document.styles";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { jost, notoSansSc, notoSansTc } from "@/lib/fonts";
@@ -12,7 +13,7 @@ export function SiteDocument({
   return (
     <html lang={language} data-scroll-behavior="smooth">
       <body className={`${jost.variable} ${notoSansTc.variable} ${notoSansSc.variable}`}>
-        <a className="skip-link" href="#main-content">
+        <a className={appearance["skip-link"]} href="#main-content">
           {skipLabel}
         </a>
         {children}

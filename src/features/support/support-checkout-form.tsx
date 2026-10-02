@@ -1,5 +1,8 @@
 "use client";
 
+import { appearance } from "./support-checkout-form.styles";
+import { Button } from "@/components/ui/button";
+
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export function SupportCheckoutForm({
@@ -53,7 +56,7 @@ export function SupportCheckoutForm({
 
   return (
     <form
-      className="support-form"
+      className={appearance["support-form"]}
       action="/api/stripe/checkout"
       method="post"
       aria-busy={isSubmitting}
@@ -86,15 +89,15 @@ export function SupportCheckoutForm({
         value={submittedAmount ?? ""}
       />
       {children}
-      <button className="button button-dark support-submit" type="submit" disabled={isSubmitting} aria-live="polite">
+      <Button className={appearance["support-submit"]} type="submit" disabled={isSubmitting} aria-live="polite">
         {isSubmitting ? submitting : submit}
-      </button>
+      </Button>
       {isSubmitting ? (
-        <div className="support-status" role="status">
+        <div className={appearance["support-status"]} role="status">
           <p>{recovery}</p>
-          <button className="button button-dark support-submit" type="submit" name="checkout_resume" value="1">
+          <Button className={appearance["support-submit"]} type="submit" name="checkout_resume" value="1">
             {resume}
-          </button>
+          </Button>
         </div>
       ) : null}
       {note}

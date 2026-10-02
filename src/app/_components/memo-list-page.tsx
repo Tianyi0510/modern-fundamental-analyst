@@ -1,3 +1,5 @@
+import { PageHero } from "@/components/page-hero";
+import { appearance } from "./memo-list-page.styles";
 import { MemoIndex } from "@/features/memos/memo-index";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -44,25 +46,26 @@ export function MemoListPage({ locale }: { locale: Locale }) {
     <div className="memos-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero shell">
-            <p className="eyebrow">
-              <span /> {text.eyebrow}
-            </p>
-            <h1>
+        <PageHero
+          variant="standard"
+          label={<>{text.eyebrow}</>}
+          title={
+            <>
               {text.title}
               <br />
               <em>{text.emphasis}</em>
-            </h1>
-            <div className="page-intro">
+            </>
+          }
+          intro={
+            <>
               <p>{text.subtitle}</p>
-              <small className="date-text">
+              <small className={appearance["date-text"]}>
                 {text.updated}{" "}
                 {latestPublishedAt ? <time dateTime={latestPublishedAt}>{lastUpdated}</time> : lastUpdated}
               </small>
-            </div>
-          </section>
-        </div>
+            </>
+          }
+        />
         <MemoIndex memos={memos} locale={locale} label={text.indexLabel} />
       </main>
       <PageFooter locale={locale} />

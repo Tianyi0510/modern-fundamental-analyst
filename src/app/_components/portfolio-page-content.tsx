@@ -1,3 +1,6 @@
+import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
+import { PageHero } from "@/components/page-hero";
+import { appearance } from "./portfolio-page-content.styles";
 import { PortfolioTable, type PortfolioTableCopy } from "@/features/portfolio/portfolio-table";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -134,68 +137,59 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
     <div className="portfolio-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero shell">
-            <p className="eyebrow">
-              <span /> {text.eyebrow}
-            </p>
-            <h1>{text.title}</h1>
-            <div className="page-intro">
+        <PageHero
+          variant="portfolio"
+          label={<>{text.eyebrow}</>}
+          title={<>{text.title}</>}
+          intro={
+            <>
               <p>{text.intro}</p>
-              <small className="date-text">
+              <small className={appearance["date-text"]}>
                 {isChinese ? "截至 " : "As of "}
                 <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
                 {isChinese ? " · 每月更新" : " · Updated monthly"}
               </small>
-            </div>
-          </section>
-        </div>
-        <dl className="portfolio-kpis" aria-label={text.summaryLabel}>
-          <div data-tone="plain">
-            <dt>{text.marketValue}</dt>
-            <dd className="kpi-value">
-              <strong>{formatUsd(portfolioSnapshot.marketValue)}</strong>
-            </dd>
-            <dd className="kpi-note">
-              <small>{text.currency}</small>
-            </dd>
-          </div>
-          <div data-tone="highlight">
-            <dt>{text.costBasis}</dt>
-            <dd className="kpi-value">
-              <strong>{formatUsd(portfolioSnapshot.costBasis)}</strong>
-            </dd>
-            <dd className="kpi-note">
-              <small>{text.costBasisNote}</small>
-            </dd>
-          </div>
-          <div data-tone="brand">
-            <dt>{text.totalReturn}</dt>
-            <dd className="kpi-value">
-              <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
-            </dd>
-            <dd className="kpi-note">
-              <small>{text.totalReturnNote}</small>
-            </dd>
-          </div>
-          <div data-tone="paper">
-            <dt>{text.holdings}</dt>
-            <dd className="kpi-value">
-              <strong>{portfolioSnapshot.holdingsCount}</strong>
-            </dd>
-            <dd className="kpi-note">
-              <small>{text.holdingsNote}</small>
-            </dd>
-          </div>
+            </>
+          }
+        />
+        <dl className={appearance["portfolio-kpis"]} aria-label={text.summaryLabel}>
+          <PortfolioMetric
+            tone="plain"
+            className="col-start-1 row-start-1 compact:col-auto compact:row-auto"
+            label={<>{text.marketValue}</>}
+            value={<>{formatUsd(portfolioSnapshot.marketValue)}</>}
+            note={<>{text.currency}</>}
+          />
+          <PortfolioMetric
+            tone="highlight"
+            className="col-start-1 row-start-2 compact:col-auto compact:row-auto"
+            label={<>{text.costBasis}</>}
+            value={<>{formatUsd(portfolioSnapshot.costBasis)}</>}
+            note={<>{text.costBasisNote}</>}
+          />
+          <PortfolioMetric
+            tone="brand"
+            className="col-start-2 row-start-1 compact:col-auto compact:row-auto"
+            label={<>{text.totalReturn}</>}
+            value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
+            note={<>{text.totalReturnNote}</>}
+          />
+          <PortfolioMetric
+            tone="paper"
+            className="col-start-2 row-start-2 compact:col-auto compact:row-auto"
+            label={<>{text.holdings}</>}
+            value={<>{portfolioSnapshot.holdingsCount}</>}
+            note={<>{text.holdingsNote}</>}
+          />
         </dl>
-        <section className="portfolio-holdings-section" aria-labelledby="portfolio-holdings-title">
-          <div className="portfolio-holdings-heading shell">
+        <section className={appearance["portfolio-holdings-section"]} aria-labelledby="portfolio-holdings-title">
+          <div className={appearance["portfolio-holdings-heading"] + " " + appearance["shell"]}>
             <div>
               <span>{text.currentHoldings}</span>
               <h2 id="portfolio-holdings-title">{text.positionCount}</h2>
             </div>
             <p>
-              <span className="portfolio-desktop-instruction">
+              <span className={appearance["portfolio-desktop-instruction"]}>
                 {locale === "en"
                   ? "Click any column heading to sort. "
                   : locale === "zh-tw"
@@ -209,10 +203,10 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
                   : `价格与市场价值均采用 ${asOf} 收盘价。`}
             </p>
           </div>
-          <div className="portfolio-table-wrap shell">
+          <div className={appearance["portfolio-table-wrap"] + " " + appearance["shell"]}>
             <PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} income={portfolioIncome} />
           </div>
-          <div className="portfolio-return-note shell">
+          <div className={appearance["portfolio-return-note"] + " " + appearance["shell"]}>
             <p>{text.returnNote}</p>
           </div>
         </section>

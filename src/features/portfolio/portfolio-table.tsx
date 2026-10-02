@@ -1,5 +1,7 @@
 "use client";
 
+import { appearance } from "./portfolio-table.styles";
+
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatPercent, formatShares, formatUsd } from "@/lib/format";
@@ -73,10 +75,14 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
 
   return (
     <>
-      <div className="portfolio-mobile-sort">
-        <label>
-          <span>{copy.sortBy}</span>
-          <select value={sortKey} onChange={(event) => changeSort(event.target.value as SortKey)}>
+      <div className={appearance["portfolio-mobile-sort"]}>
+        <label className={appearance.mobileLabel}>
+          <span className={appearance.mobileHeading}>{copy.sortBy}</span>
+          <select
+            className={appearance.mobileSelect}
+            value={sortKey}
+            onChange={(event) => changeSort(event.target.value as SortKey)}
+          >
             {columns.map((column) => (
               <option value={column} key={column}>
                 {copy[column]}
@@ -85,17 +91,22 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
           </select>
         </label>
         <button
+          className={appearance.mobileDirection}
           type="button"
           onClick={() => setSortDirection((current) => (current === "asc" ? "desc" : "asc"))}
           aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}
         >
           <span>{sortDirection === "asc" ? copy.ascending : copy.descending}</span>
-          {sortDirection === "asc" ? <ArrowUp aria-hidden="true" /> : <ArrowDown aria-hidden="true" />}
+          {sortDirection === "asc" ? (
+            <ArrowUp className={appearance.mobileArrow} aria-hidden="true" />
+          ) : (
+            <ArrowDown className={appearance.mobileArrow} aria-hidden="true" />
+          )}
         </button>
       </div>
-      <table className="portfolio-table portfolio-table-detailed" aria-label={copy.ariaLabel}>
+      <table className={appearance["portfolio-table"]} aria-label={copy.ariaLabel}>
         <thead>
-          <tr className="table-head">
+          <tr className={appearance["table-head"]}>
             {columns.map((column) => {
               const isActive = sortKey === column;
               const ariaSort = isActive ? (sortDirection === "asc" ? "ascending" : "descending") : "none";
@@ -103,9 +114,9 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
 
               return (
                 <th scope="col" aria-sort={ariaSort} key={column}>
-                  <span className="portfolio-column-label">{copy[column]}</span>
+                  <span className={appearance["portfolio-column-label"]}>{copy[column]}</span>
                   <button
-                    className={`sort-button${isActive ? " is-active" : ""}`}
+                    className={`${appearance["sort-button"]} ${column !== "symbol" ? appearance.sortAlignment : ""} ${isActive ? appearance["is-active"] : ""}`}
                     type="button"
                     onClick={() => changeSort(column)}
                     aria-label={`${copy.sortBy} ${copy[column]}`}
@@ -119,7 +130,7 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
         </thead>
         <tbody>
           {sortedRows.map(({ holding, costPerShare, returnPct, weight }) => (
-            <tr className="portfolio-row" key={holding.symbol}>
+            <tr className={appearance["portfolio-row"]} key={holding.symbol}>
               <th scope="row" data-label={copy.symbol}>
                 {holding.symbol}
               </th>
@@ -127,7 +138,10 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
               <td data-label={copy.price}>{formatUsd(holding.price)}</td>
               <td data-label={copy.costBasis}>{formatUsd(costPerShare)}</td>
               <td data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</td>
-              <td data-label={copy.returnPct} className={`data-value ${returnPct < 0 ? "negative" : "positive"}`}>
+              <td
+                data-label={copy.returnPct}
+                className={`data-value ${returnPct < 0 ? appearance["negative"] : appearance["positive"]}`}
+              >
                 {formatPercent(returnPct, 1)}
               </td>
               <td data-label={copy.weight}>{weight.toFixed(1)}%</td>
@@ -135,19 +149,19 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
           ))}
         </tbody>
         <tfoot>
-          <tr className="portfolio-row portfolio-total-row">
+          <tr className={appearance["portfolio-total-row"]}>
             <th scope="row" data-label={copy.symbol}>
               {copy.total}
             </th>
             <td />
             <td />
             <td />
-            <td className="portfolio-total-market" data-label={copy.marketValue}>
+            <td className={appearance["portfolio-total-market"]} data-label={copy.marketValue}>
               {formatUsd(totals.marketValue)}
             </td>
             <td
               data-label={copy.returnPct}
-              className={`portfolio-total-return data-value ${totals.totalReturn < 0 ? "negative" : "positive"}`}
+              className={`${appearance["portfolio-total-return"]} data-value ${totals.totalReturn < 0 ? appearance["negative"] : appearance["positive"]}`}
             >
               {formatPercent(totals.totalReturn)}
             </td>

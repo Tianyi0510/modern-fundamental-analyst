@@ -1,3 +1,4 @@
+import { appearance } from "./memo-detail-page.styles";
 import { createMemoStructuredData } from "@/features/memos/memo-pages";
 import { notFound } from "next/navigation";
 import { MemoArticleContent } from "@/features/memos/memo-article-content";
@@ -29,14 +30,14 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
         {structuredData ? (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData }} />
         ) : null}
-        <article className="memo-article">
-          <div className="memo-article-header-band">
-            <header className="memo-article-header shell">
-              <p className="eyebrow">
+        <article className={appearance["memo-article"]}>
+          <div className={appearance["memo-article-header-band"]}>
+            <header className={appearance["memo-article-header"] + " " + appearance["shell"]}>
+              <p className={appearance["eyebrow"]}>
                 <span /> {memo.category.label}
               </p>
               <h1>{memo.title}</h1>
-              <div className="article-meta">
+              <div className={appearance["article-meta"]}>
                 <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>
                 <span>{memo.readTime}</span>
                 <span>
@@ -45,8 +46,8 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
               </div>
             </header>
           </div>
-          <div className="shell">
-            <p className="article-lead">{memo.summary}</p>
+          <div className={appearance["shell"]}>
+            <p className={appearance["article-lead"]}>{memo.summary}</p>
             <MemoArticleContent content={content} />
           </div>
         </article>

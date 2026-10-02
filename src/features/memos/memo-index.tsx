@@ -1,3 +1,4 @@
+import { appearance } from "./memo-index.styles";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
@@ -14,30 +15,34 @@ type MemoIndexProps = {
 
 export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
   return (
-    <section className="memo-index shell">
-      <MemoCards memos={memos} locale={locale} className="memo-index-featured" />
+    <section className={appearance["memo-index"] + " " + appearance["shell"]}>
+      <MemoCards memos={memos} locale={locale} placement="featured" />
       <AnimatedDisclosure
-        className="memo-disclosure"
+        className={appearance["memo-disclosure"]}
         summary={
           <>
             <span>{label}</span>
-            <span className="memo-summary-meta">
-              <span className="memo-count">{String(memos.length).padStart(2, "0")}</span>
+            <span className={appearance["memo-summary-meta"]}>
+              <span className={appearance["memo-count"]}>{String(memos.length).padStart(2, "0")}</span>
               <ChevronDown aria-hidden="true" size={24} strokeWidth={2} />
             </span>
           </>
         }
       >
-        <div className="memo-disclosure-content">
+        <div className={appearance["memo-disclosure-content"]}>
           {memos.map((memo) => (
-            <Link href={getLocalizedPath(`/memos/${memo.slug}`, locale)} className="memo-index-row" key={memo.slug}>
+            <Link
+              href={getLocalizedPath(`/memos/${memo.slug}`, locale)}
+              className={appearance["memo-index-row"]}
+              key={memo.slug}
+            >
               <span>{memo.number}</span>
               <div>
                 <small>{memo.category.label}</small>
                 <h2>{memo.title}</h2>
                 <p>{memo.summary}</p>
               </div>
-              <div className="memo-meta">
+              <div className={appearance["memo-meta"]}>
                 <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>
                 <span>{memo.readTime}</span>
               </div>

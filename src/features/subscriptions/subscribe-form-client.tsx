@@ -1,12 +1,17 @@
 "use client";
 
+import { appearance } from "./subscribe-form-client.styles";
+import { FormField } from "@/components/form-field";
+import { Input } from "@/components/ui/input";
+import { StatusMessage } from "@/components/status-message";
+import { Button } from "@/components/ui/button";
+
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { PostJsonError } from "@/lib/client-post-json";
 import { subscribeToUpdates } from "./subscription-api";
 import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
-import styles from "./subscribe-form.module.css";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 
@@ -58,21 +63,20 @@ export function SubscribeFormClient({
   }
 
   return (
-    <section className={styles.section} id="subscribe" aria-labelledby="subscribe-title">
+    <section className={appearance["subscribe-section"]} id="subscribe" aria-labelledby="subscribe-title">
       <h2 id="subscribe-title">{copy.title}</h2>
       <form
-        className={styles.form}
+        className={appearance["subscribe-form"]}
         onSubmit={(event) => {
           void submit(event);
         }}
         onChange={() => setStatus("idle")}
         aria-busy={status === "submitting"}
       >
-        <label className={styles.field}>
-          <span>{copy.email}</span>
-          <input
+        <FormField label={copy.email} visibility="hidden">
+          <Input
             disabled={status === "submitting"}
-            className={styles.control}
+            variant="inverse"
             name="email"
             type="email"
             autoComplete="email"
@@ -81,15 +85,20 @@ export function SubscribeFormClient({
             maxLength={254}
             required
           />
-        </label>
+        </FormField>
         <HoneypotField />
-        <button className={styles.submit} type="submit" disabled={status === "submitting"}>
+        <Button
+          variant="inverse"
+          className="subscribe-submit min-w-[7.733em] compact:w-full"
+          type="submit"
+          disabled={status === "submitting"}
+        >
           {status === "submitting" ? copy.submitting : copy.submit}
-        </button>
-        <a className={styles.preferences} href={preferencesHref}>
+        </Button>
+        <a className={appearance["subscribe-preferences"]} href={preferencesHref}>
           {copy.preferences}
         </a>
-        <p className={styles.status} role="status" aria-live="polite">
+        <StatusMessage tone="inverse" className="col-span-full compact:col-auto max-w-[390px]">
           {status === "success"
             ? copy.success
             : status === "alreadySubscribed"
@@ -97,7 +106,7 @@ export function SubscribeFormClient({
               : status === "error"
                 ? copy.error
                 : ""}
-        </p>
+        </StatusMessage>
       </form>
     </section>
   );

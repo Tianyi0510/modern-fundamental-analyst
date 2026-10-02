@@ -1,3 +1,4 @@
+import { PageHero } from "@/components/page-hero";
 import { Suspense } from "react";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -17,28 +18,41 @@ export async function SupportPageContent({
 }) {
   const text = supportCopy[locale];
   const params = parseSupportSearchParams(await searchParams, locale);
+  // Ordinary visits and retry errors must expose the native form without a streamed JS swap.
+  // Only payment verification can wait on a provider behind the local loading boundary.
+  const panel =
+    params.status === "success" ? (
+      <SupportPanel locale={locale} params={params} />
+    ) : (
+      await SupportPanel({ locale, params })
+    );
   return (
     <div className="support-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} languageQuery={params.languageQuery} />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero support-hero shell">
-            <p className="eyebrow">
-              <span /> {text.label}
-            </p>
-            <h1>
+        <PageHero
+          variant="support"
+          label={<>{text.label}</>}
+          title={
+            <>
               {text.title[0]}
               <br />
               <em>{text.title[1]}</em>
-            </h1>
-            <div className="page-intro">
+            </>
+          }
+          intro={
+            <>
               <p>{text.intro}</p>
-            </div>
-          </section>
-        </div>
-        <Suspense key={params.languageQuery} fallback={<ServiceLoading locale={locale} />}>
-          <SupportPanel locale={locale} params={params} />
-        </Suspense>
+            </>
+          }
+        />
+        {params.status === "success" ? (
+          <Suspense key={params.languageQuery} fallback={<ServiceLoading locale={locale} />}>
+            {panel}
+          </Suspense>
+        ) : (
+          panel
+        )}
       </main>
       <PageFooter locale={locale} />
     </div>

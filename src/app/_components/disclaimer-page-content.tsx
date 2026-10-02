@@ -1,3 +1,4 @@
+import { appearance } from "./disclaimer-page-content.styles";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
@@ -95,15 +96,15 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
 
   return (
-    <div className="legal">
+    <div className={appearance["legal"]}>
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main id="main-content" tabIndex={-1}>
-        <section className="legal-hero">
-          <header className="legal-header shell">
-            <p className="eyebrow">
+        <section className={appearance["legal-hero"]}>
+          <header className={"legal-header" + " " + appearance["shell"]}>
+            <p className={appearance["eyebrow"]}>
               <span /> {text.label}
             </p>
-            <h1>
+            <h1 className={appearance.legalTitle}>
               {text.title}
               {text.titleAccent ? (
                 <>
@@ -112,22 +113,22 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
                 </>
               ) : null}
             </h1>
-            {text.subtitle ? <p className="legal-subtitle">{text.subtitle}</p> : null}
+            {text.subtitle ? <p className={appearance["legal-subtitle"]}>{text.subtitle}</p> : null}
           </header>
         </section>
-        <section className="legal-body">
-          <div className="legal-content shell">
+        <section className={appearance["legal-body"]}>
+          <div className={appearance["legal-content"] + " " + appearance["shell"]}>
             {text.sections.map(([title, lead, paragraphs], index) => (
-              <section className="legal-section" key={title}>
-                <div className="legal-section-heading">
-                  <p className="section-number legal-section-label">
+              <section className={appearance["legal-section"]} key={title}>
+                <div className={appearance["legal-section-heading"]}>
+                  <p className={appearance["section-number"] + " " + appearance["legal-section-label"]}>
                     <span>{String(index + 1).padStart(2, "0")}</span>
                     <span aria-hidden="true">·</span>
                     <span>{title}</span>
                   </p>
                   {lead ? <h2>{lead}</h2> : null}
                 </div>
-                <div className="legal-section-copy">
+                <div className={appearance["legal-section-copy"]}>
                   {paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}

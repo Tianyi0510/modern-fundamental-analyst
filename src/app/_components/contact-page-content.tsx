@@ -1,3 +1,5 @@
+import { PageHero } from "@/components/page-hero";
+import { appearance } from "./contact-page-content.styles";
 import { ContactForm } from "@/features/contact/contact-form";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -48,22 +50,23 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
     <div className="contact-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero contact-hero shell">
-            <p className="eyebrow">
-              <span /> {text.label}
-            </p>
-            <h1>
+        <PageHero
+          variant="standard"
+          label={<>{text.label}</>}
+          title={
+            <>
               {text.title[0]}
               <br />
               <em>{text.title[1]}</em>
-            </h1>
-            <div className="page-intro">
-              <p className="contact-note">{text.intro}</p>
-            </div>
-          </section>
-        </div>
-        <section className="contact-grid">
+            </>
+          }
+          intro={
+            <>
+              <p className={appearance["contact-note"]}>{text.intro}</p>
+            </>
+          }
+        />
+        <section className={appearance["contact-grid"]}>
           {text.cards.map(([title, description]) => (
             <article key={title}>
               <header>

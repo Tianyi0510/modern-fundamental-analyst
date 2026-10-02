@@ -12,22 +12,24 @@ export function AnimatedDisclosure({
   className?: string;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<Animation | null>(null);
-  const targetOpenRef = useRef(false);
+  const phaseRef = useRef<"closed" | "opening" | "open" | "closing">("closed");
 
   const settle = useCallback(() => {
     const details = ref.current;
     const animation = animationRef.current;
     if (!details) return;
     const summary = details.querySelector("summary");
-    if (
-      !targetOpenRef.current &&
-      details.contains(document.activeElement) &&
-      !summary?.contains(document.activeElement)
-    ) {
+    const open = phaseRef.current === "opening" || phaseRef.current === "open";
+    if (!open && details.contains(document.activeElement) && !summary?.contains(document.activeElement)) {
       summary?.focus({ preventScroll: true });
     }
-    details.open = targetOpenRef.current;
+    details.open = open;
+    phaseRef.current = open ? "open" : "closed";
+    details.dataset.state = phaseRef.current;
+    summary?.setAttribute("aria-expanded", String(open));
+    if (contentRef.current) contentRef.current.inert = !open;
     details.removeAttribute("data-closing");
     animationRef.current = null;
     animation?.cancel();
@@ -58,8 +60,12 @@ export function AnimatedDisclosure({
     const summary = event.currentTarget;
     event.preventDefault();
     const startHeight = details.getBoundingClientRect().height;
-    const open = animationRef.current ? !targetOpenRef.current : !details.open;
-    targetOpenRef.current = open;
+    const open = animationRef.current ? phaseRef.current === "closing" : !details.open;
+    phaseRef.current = open ? "opening" : "closing";
+    details.dataset.state = phaseRef.current;
+    summary.setAttribute("aria-expanded", String(open));
+    if (!open && contentRef.current?.contains(document.activeElement)) summary.focus({ preventScroll: true });
+    if (contentRef.current) contentRef.current.inert = !open;
     animationRef.current?.cancel();
     animationRef.current = null;
     details.removeAttribute("data-closing");
@@ -93,7 +99,7 @@ export function AnimatedDisclosure({
   return (
     <details ref={ref} className={className}>
       <summary onClick={toggle}>{summary}</summary>
-      {children}
+      <div ref={contentRef}>{children}</div>
     </details>
   );
 }

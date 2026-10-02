@@ -348,7 +348,12 @@ test.describe("form accessibility and preserved text colors", () => {
       .filter({ has: page.locator("textarea") })
       .locator('button[type="submit"]');
     await button.focus();
-    await expect(button).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
+    expect(
+      await button.evaluate((element) => {
+        const transform = getComputedStyle(element).transform;
+        return transform === "none" || new DOMMatrix(transform).isIdentity;
+      }),
+    ).toBe(true);
     const durations = await button.evaluate((element) =>
       getComputedStyle(element)
         .transitionDuration.split(",")

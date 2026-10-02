@@ -1,11 +1,18 @@
 "use client";
 
+import { appearance } from "./contact-form-client.styles";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/container";
+import { FormField } from "@/components/form-field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { StatusMessage } from "@/components/status-message";
+
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { sendContactMessage } from "./contact-api";
 import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
-import styles from "./contact-form.module.css";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 import { useSubmissionId } from "@/components/use-submission-id";
@@ -56,14 +63,14 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
   }
 
   return (
-    <div className={styles.band}>
-      <section className={`${styles.section} shell`} aria-labelledby="contact-form-title">
-        <div className={styles.heading}>
+    <div className={appearance["contact-band"]}>
+      <Container as="section" className={appearance["contact-section"]} aria-labelledby="contact-form-title">
+        <div className={appearance["contact-heading"]}>
           <h2 id="contact-form-title">{copy.title}</h2>
-          <p className={styles.headingIntro}>{copy.intro}</p>
+          <p className={appearance["contact-headingIntro"]}>{copy.intro}</p>
         </div>
         <form
-          className={styles.form}
+          className={appearance["contact-form"]}
           onSubmit={(event) => {
             void submit(event);
           }}
@@ -73,64 +80,54 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
           }}
           aria-busy={status === "sending"}
         >
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>{copy.name}</span>
-            <input
+          <FormField label={copy.name}>
+            <Input
               disabled={status === "sending"}
-              className={styles.control}
               name="name"
               type="text"
               autoComplete="name"
               maxLength={100}
               required
             />
-          </label>
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>{copy.email}</span>
-            <input
+          </FormField>
+          <FormField label={copy.email}>
+            <Input
               disabled={status === "sending"}
-              className={styles.control}
               name="email"
               type="email"
               autoComplete="email"
               maxLength={254}
               required
             />
-          </label>
-          <label className={`${styles.field} ${styles.fieldWide}`}>
-            <span className={styles.fieldLabel}>{copy.subject}</span>
-            <input
+          </FormField>
+          <FormField label={copy.subject} className="col-span-full compact:col-auto">
+            <Input disabled={status === "sending"} name="subject" type="text" maxLength={160} required />
+          </FormField>
+          <FormField label={copy.message} className="col-span-full compact:col-auto">
+            <Textarea
               disabled={status === "sending"}
-              className={styles.control}
-              name="subject"
-              type="text"
-              maxLength={160}
-              required
-            />
-          </label>
-          <label className={`${styles.field} ${styles.fieldWide}`}>
-            <span className={styles.fieldLabel}>{copy.message}</span>
-            <textarea
-              disabled={status === "sending"}
-              className={styles.control}
               name="message"
               rows={7}
               minLength={10}
               maxLength={5000}
               required
             />
-          </label>
+          </FormField>
           <HoneypotField />
-          <div className={styles.actions}>
-            <button className={`${styles.submit} button button-dark`} type="submit" disabled={status === "sending"}>
+          <div className={appearance["contact-actions"]}>
+            <Button
+              className="contact-submit shrink-0 max-[801px]:w-full"
+              type="submit"
+              disabled={status === "sending"}
+            >
               {status === "sending" ? copy.sending : copy.send}
-            </button>
-            <p className={styles.status} role="status" aria-live="polite">
+            </Button>
+            <StatusMessage className="max-w-[420px]">
               {status === "success" ? copy.success : status === "error" ? copy.error : ""}
-            </p>
+            </StatusMessage>
           </div>
         </form>
-      </section>
+      </Container>
     </div>
   );
 }

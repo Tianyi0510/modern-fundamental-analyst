@@ -1,3 +1,4 @@
+import { appearance } from "./site-footer.styles";
 import Link from "next/link";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import type { ReactNode } from "react";
@@ -35,18 +36,21 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
           };
 
   return (
-    <footer className="site-footer">
-      <div className="shell">
-        <div className="footer-main">
-          <div className="footer-brand">
-            <Link className="wordmark footer-mark" href={getLocalizedPath("/", locale)}>
+    <footer className={appearance["site-footer"]}>
+      <div className={appearance["shell"]}>
+        <div className={appearance["footer-main"]}>
+          <div className={appearance["footer-brand"]}>
+            <Link
+              className={appearance["wordmark"] + " " + appearance["footer-mark"]}
+              href={getLocalizedPath("/", locale)}
+            >
               Modern Fundamental Analyst<span>.</span>
             </Link>
-            <p>{copy.description}</p>
+            <p className={appearance["footer-description"]}>{copy.description}</p>
           </div>
-          <nav className="footer-navigation" aria-label={copy.quickLinks}>
-            <p className="footer-heading">{copy.quickLinks}</p>
-            <ul className="footer-links">
+          <nav className={appearance["footer-navigation"]} aria-label={copy.quickLinks}>
+            <p className={appearance["footer-heading"]}>{copy.quickLinks}</p>
+            <ul className={appearance["footer-links"]}>
               <li>
                 <Link href={getLocalizedPath("/contact", locale)}>{copy.contact}</Link>
               </li>
@@ -58,7 +62,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
               </li>
               <li>
                 <a
-                  className="footer-social-link footer-github"
+                  className={appearance["footer-social-link"] + " " + "footer-github"}
                   href="https://github.com/Tianyi0510/modern-fundamental-analyst"
                   target="_blank"
                   rel="noreferrer"
@@ -71,7 +75,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
               </li>
               <li>
                 <a
-                  className="footer-social-link footer-linkedin"
+                  className={appearance["footer-social-link"] + " " + "footer-linkedin"}
                   href="https://www.linkedin.com/in/tianyi-li-modern-fundamental-analyst/"
                   target="_blank"
                   rel="noreferrer"
@@ -84,7 +88,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
               </li>
               <li>
                 <a
-                  className="footer-social-link footer-x"
+                  className={appearance["footer-social-link"] + " " + "footer-x"}
                   href="https://x.com/DavidLi0510"
                   target="_blank"
                   rel="noreferrer"
@@ -99,7 +103,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
           </nav>
           {subscription}
         </div>
-        <div className="footer-bottom">
+        <div className={appearance["footer-bottom"]}>
           <small>
             © {currentYear} Modern Fundamental Analyst. {copy.rights}
           </small>

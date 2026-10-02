@@ -1,3 +1,5 @@
+import { PageHero } from "@/components/page-hero";
+import { appearance } from "./about-page-content.styles";
 import Link from "next/link";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -300,36 +302,37 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
     <div className="about-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero shell">
-            <p className="eyebrow">
-              <span /> {text.eyebrow}
-            </p>
-            <h1>
+        <PageHero
+          variant="standard"
+          label={<>{text.eyebrow}</>}
+          title={
+            <>
               {text.headline[0]}
               <br />
               <em>{text.headline[1]}</em>
-            </h1>
-            <div className="page-intro">
+            </>
+          }
+          intro={
+            <>
               <p>{text.introduction}</p>
               <small>{text.disciplines}</small>
-            </div>
-          </section>
-        </div>
+            </>
+          }
+        />
         {text.sections.map((section, index) => {
           const [number, sectionName] = section.label.split(" · ");
           return (
-            <div className={index % 2 === 1 ? "section-gray" : undefined} key={section.label}>
-              <section className="about-section shell">
-                <div className="about-section-heading">
-                  <p className="section-number about-section-label">
+            <div className={index % 2 === 1 ? appearance["section-gray"] : undefined} key={section.label}>
+              <section className={appearance["about-section"] + " " + appearance["shell"]}>
+                <div className={appearance["about-section-heading"]}>
+                  <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
                     <span>{number}</span>
                     <span aria-hidden="true">·</span>
                     <span>{sectionName}</span>
                   </p>
                   <h2>{section.title}</h2>
                 </div>
-                <div className="about-copy">
+                <div className={appearance["about-copy"]}>
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}
@@ -338,14 +341,14 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
             </div>
           );
         })}
-        <section className="about-boundaries">
+        <section className={appearance["about-boundaries"]}>
           {text.boundaries.map((boundary) => (
             <section key={boundary.title}>
               <h2>{boundary.title}</h2>
               <ol>
                 {boundary.items.map((item, index) => (
                   <li key={item}>
-                    <span className="about-boundary-number" aria-hidden="true">
+                    <span className={appearance["about-boundary-number"]} aria-hidden="true">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span>{item}</span>
@@ -355,8 +358,8 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
             </section>
           ))}
         </section>
-        <section className="about-closing shell">
-          <p className="eyebrow">
+        <section className={appearance["about-closing"] + " " + appearance["shell"]}>
+          <p className={appearance["eyebrow"]}>
             <span /> {text.closingLabel}
           </p>
           <h2>{text.closingTitle}</h2>
@@ -364,13 +367,13 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
             {text.closingParagraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
-            <p className="reference-note">
+            <p className={appearance["reference-note"]}>
               {text.legalPrefix}
-              <Link className="source-link" href={getLocalizedPath("/disclaimer", locale)}>
+              <Link className={appearance["source-link"]} href={getLocalizedPath("/disclaimer", locale)}>
                 {text.disclaimer}
               </Link>
               {text.conjunction}
-              <Link className="source-link" href={getLocalizedPath("/performance", locale)}>
+              <Link className={appearance["source-link"]} href={getLocalizedPath("/performance", locale)}>
                 {text.performance}
               </Link>
               {text.legalSuffix}
