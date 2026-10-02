@@ -4,7 +4,7 @@ import { appearance } from "./subscription-preferences-request-form.styles";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
-import { StatusMessage } from "@/components/status-message";
+import { Alert } from "@/components/ui/alert";
 
 import { useState, type FormEvent } from "react";
 import { PostJsonError } from "@/lib/client-post-json";
@@ -79,7 +79,7 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
           {status === "requesting" ? copy.requesting : copy.request}
         </Button>
       </div>
-      <StatusMessage className="[overflow-wrap:anywhere]">{message}</StatusMessage>
+      <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
     </form>
   );
 }

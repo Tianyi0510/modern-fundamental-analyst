@@ -1,4 +1,5 @@
 import { appearance } from "./support-panel.styles";
+import { Alert } from "@/components/ui/alert";
 import { randomUUID } from "node:crypto";
 import { SupportCheckoutForm } from "./support-checkout-form";
 import { supportCopy } from "./support-copy";
@@ -60,13 +61,13 @@ export async function SupportPanel({
             </div>
           </fieldset>
           {status ? (
-            <p
+            <Alert
               className={`${appearance["support-status"]} ${status === "error" ? "support-status-error border-l-[var(--price-down)]" : "border-l-accent"}`}
               role="status"
               aria-live="polite"
             >
               {text.statuses[status]}
-            </p>
+            </Alert>
           ) : null}
         </SupportCheckoutForm>
       </div>

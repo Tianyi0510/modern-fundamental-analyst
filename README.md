@@ -47,7 +47,7 @@ npm run verify
 
 Layout and ordinary states use static Tailwind classes; complex component motion and charts use adjacent CSS Modules. Tokens and the single reset live in `src/app/styles/`; see [style ownership](docs/STYLE_GUIDE.md#style-ownership). React Email maintains separate inbox-compatible styling.
 
-shadcn/ui configuration lives in `components.json`; owned Button, Input, and Textarea sources live in `src/components/ui/`. These primitives use the existing brand tokens and native HTML semantics. Follow the [component installation procedure](docs/STYLE_GUIDE.md#shadcnui-components) when adding or updating a primitive.
+shadcn/ui configuration lives in `components.json`; owned primitives live in `src/components/ui/`. Native form, result and loading primitives preserve server rendering; interactive DropdownMenu and Sheet use Radix. All share the existing brand tokens and semantic HTML contracts. Follow the [component installation procedure](docs/STYLE_GUIDE.md#shadcnui-components) when adding or updating a primitive.
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 

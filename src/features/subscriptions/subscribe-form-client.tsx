@@ -3,7 +3,7 @@
 import { appearance } from "./subscribe-form-client.styles";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
-import { StatusMessage } from "@/components/status-message";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
 import { useState } from "react";
@@ -98,7 +98,7 @@ export function SubscribeFormClient({
         <a className={appearance["subscribe-preferences"]} href={preferencesHref}>
           {copy.preferences}
         </a>
-        <StatusMessage tone="inverse" className="col-span-full compact:col-auto max-w-[390px]">
+        <Alert tone="inverse" className="col-span-full compact:col-auto max-w-[390px]">
           {status === "success"
             ? copy.success
             : status === "alreadySubscribed"
@@ -106,7 +106,7 @@ export function SubscribeFormClient({
               : status === "error"
                 ? copy.error
                 : ""}
-        </StatusMessage>
+        </Alert>
       </form>
     </section>
   );

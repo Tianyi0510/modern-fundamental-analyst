@@ -33,30 +33,6 @@
 .languageTrigger[aria-expanded="true"] > svg {
   transform: rotate(180deg);
 }
-.languageDropdown {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px) scale(0.98);
-  transform-origin: top right;
-  transition:
-    opacity var(--motion-duration-base) var(--motion-ease-standard),
-    transform var(--motion-duration-medium) var(--motion-ease-emphasized),
-    visibility 0s linear var(--motion-duration-medium);
-}
-.languageDropdown[data-state="open"] {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  transition-delay: 0s;
-}
-.layer {
-  pointer-events: none;
-  visibility: hidden;
-}
-.layer[data-state="open"] {
-  pointer-events: auto;
-  visibility: visible;
-}
 .iconButton {
   transform-origin: center;
   backface-visibility: hidden;
@@ -147,8 +123,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .iconButton,
-  .iconButton > svg,
-  .languageDropdown {
+  .iconButton > svg {
     transform: none !important;
   }
 }

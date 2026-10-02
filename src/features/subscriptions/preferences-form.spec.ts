@@ -31,6 +31,7 @@ for (const { prefix, saved, unsubscribed } of [
     const select = page.locator('select[name="locale"]');
     const form = page.locator("form").filter({ has: select });
     const status = form.locator('[role="status"]');
+    await expect(select).toHaveAccessibleName(/\S/);
     await expect(select).toHaveValue("");
     await form.locator('button[type="submit"]').click();
     expect(actions).toEqual([]);
