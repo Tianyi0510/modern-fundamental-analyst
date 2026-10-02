@@ -46,14 +46,16 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 
 Keep module and component tests beside the code they verify in `src`, using the matching module name and `.test.mjs` for the current Node runner. Keep browser and integration tests with their owning feature, component or application layer. Keep configuration checks beside their configuration; shared test utilities belong in `scripts/`. Update test discovery and documented commands when moving tests; preserve assertions and provider isolation. Use TypeScript test files when their types add value and the runner and lint configuration support them.
 
-For non-deployment work, run only checks relevant to the changed behavior; do not run the full `npm run verify` or complete browser suites unless the user explicitly requests them. Local unit tests mock service operations; Playwright starts an isolated server without Resend/Redis credentials. Fix failures related to the change without repeatedly seeking permission. Tool and sandbox permissions still apply.
+Local work owns fast, affected-scope verification; CI owns complete verification; deployment owns version identity and live status. Do not repeat full local suites before deployment unless explicitly requested or needed to investigate a failure. Local unit tests mock provider operations, and Playwright uses isolated credentials. Fix related failures within the authorized scope.
 
-| Change | Completion checks |
+| Change | Local completion checks |
 | --- | --- |
-| Documentation only, without deployment | Links, anchors, references and `git diff --check`; no application suite |
-| Application code or configuration, without deployment | Focused type, lint, format, unit or browser checks for the affected files and behavior, then `git diff --check` |
-| Shared UI, without deployment | Targeted browser checks for affected languages, layouts and interactions; include enlarged text, keyboard, touch or reduced motion when relevant. Style-loading changes also require a production build with direct, client-navigation and return checks |
-| Deployment | `npm run verify` (types, lint, unit tests, Chromium and production build), plus `npm run test:webkit` for shared UI changes; then `git diff --check` |
+| Documentation | Links, anchors, references and `git diff --check` |
+| Application or configuration | Affected type, lint, format and behavioral tests, then `git diff --check` |
+| Shared UI | Targeted browser checks for affected interactions, keyboard, touch and reduced motion; verify production styles when style loading changes |
+| Deployment | Review successful CI evidence for the release SHA, Vercel `READY`, matching deployed SHA and production aliases; no routine repeat of full local suites |
+
+PR CI runs all checks. Main CI may reuse a recent successful full PR run only when `scripts/ci-plan.mjs` verifies the identical Git tree and all required test jobs. Missing or uncertain evidence requires full CI. Preserve the stable `verify` and `webkit` result jobs and the exact-commit production gate.
 
 Install missing browser binaries with `npx playwright install chromium webkit`. Once checks pass, repeat only when subsequent changes or unresolved failures justify it. Add behavioral regression coverage for changed risks; update source-structure assertions during refactors without weakening user-visible coverage. For animation fixes, check intermediate visual states and repeated/interrupted input, not merely whether an animation was created. WebKit automation does not establish physical iPhone behavior.
 
@@ -67,7 +69,7 @@ Deployment is complete after GitHub Actions succeeds for the release commit, Ver
 
 Production browser smoke checks and additional diagnostics are optional follow-up work unless the user requests them or evidence indicates a production failure. Do not delay the deployment success report for optional checks. Report deployment status separately from any incomplete or failed follow-up verification; never describe unverified checks as passed.
 
-After a pull request is merged and its production deployment succeeds, delete the remote and local feature branch when branch cleanup is authorized. Confirm that the branch has no unmerged commits, switch away from it, and use safe local deletion. Preserve branches with ongoing work. Start subsequent changes from the latest `main` on a new `codex/` branch; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) for cleanup details.
+GitHub automatically deletes the remote feature branch when its PR merges. After successful production deployment, clean up the local merged feature branch as part of the authorized release. Confirm that the branch has no unmerged commits, switch away from it, and use safe local deletion. Preserve branches with ongoing work. Start subsequent changes from the latest `main` on a new `codex/` branch; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) for cleanup details.
 
 ## Maintaining this file
 

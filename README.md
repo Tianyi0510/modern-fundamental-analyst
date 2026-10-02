@@ -23,14 +23,11 @@ For email development, run `npm run email:contact` (or `npm run email`) and open
 
 `npm ci` installs the local Husky pre-commit hook. It runs `npm run lint:staged`: Prettier checks all staged files it supports and skips unknown formats, ESLint checks staged JavaScript/TypeScript with the shared local cache, and Stylelint checks staged CSS. Concurrent tasks only read files, so overlapping format and lint checks do not race to rewrite them. These checks do not rewrite files. Run `npm run format` or fix reported lint errors, review and stage the changes, then commit again. Partially staged files are checked with their unstaged changes temporarily hidden and restored by lint-staged. CI, Vercel and production installs skip hook setup; local hooks do not replace CI or release verification. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node setup.
 
-For routine changes, run the focused checks in [AGENTS.md](AGENTS.md#verification-and-review). Before deployment, install the test browsers once and run the full gate:
+Local development uses fast, affected-scope checks from [AGENTS.md](AGENTS.md#verification-and-review). GitHub Actions owns full verification; deployment verifies the release commit and live status. A release does not require repeating the complete suite locally.
 
-```bash
-npx playwright install chromium webkit
-npm run verify
-```
+`npm run verify:static` runs types, lint, formatting and unit tests. `npm run verify` adds a production build and Chromium tests when full local diagnosis is needed. `npm run test:webkit` runs both shards against an existing production build; CI runs those shards concurrently on separate macOS runners. Install browsers with `npx playwright install chromium webkit` when needed.
 
-`npm run verify:static` runs types, lint, formatting and unit tests without starting a browser. `npm run verify` adds a production build and Chromium browser tests. For shared UI releases, also run `npm run test:webkit` against that build. It runs both WebKit shards, even if the first has failing tests, and returns a failure if either shard fails. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#review-evidence) for CI browser jobs and evidence retention. Use `npm run format` to apply Prettier formatting.
+PRs run full CI. A main-branch merge can reuse a recent successful full PR run with an identical Git tree; otherwise it runs full CI. The release workflow records the evidence and retains the exact-commit Vercel gate. GitHub deletes merged remote branches automatically; local merged branches are cleaned up after successful deployment. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#release-workflow).
 
 ## Project Layout
 
