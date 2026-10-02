@@ -2,8 +2,9 @@
 
 import { appearance } from "./subscription-preferences-form.styles";
 import { Button } from "@/components/ui/button";
-import { FormField, SelectControl } from "@/components/form-field";
-import { StatusMessage } from "@/components/status-message";
+import { FormField } from "@/components/form-field";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Alert } from "@/components/ui/alert";
 
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -86,7 +87,7 @@ export function SubscriptionPreferencesForm({
         <strong>{email}</strong>
       </div>
       <FormField label={copy.language}>
-        <SelectControl
+        <NativeSelect
           name="locale"
           required
           defaultValue={initialLocale ?? ""}
@@ -101,7 +102,7 @@ export function SubscriptionPreferencesForm({
               {localeConfig[locale].label}
             </option>
           ))}
-        </SelectControl>
+        </NativeSelect>
       </FormField>
       <div className={appearance["preferences-actions"]}>
         <Button
@@ -112,8 +113,11 @@ export function SubscriptionPreferencesForm({
         >
           {status === "saving" ? copy.saving : copy.save}
         </Button>
-        <button
-          className={`${appearance["preferences-unsubscribe"]} min-w-0 max-w-full wrap-anywhere disabled:opacity-[var(--opacity-disabled-preferences)] ${busy ? "disabled:cursor-wait" : "disabled:cursor-default"}`}
+        <Button
+          variant="quiet"
+          size="text"
+          disabledFeedback={busy ? "muted-busy" : "muted"}
+          className={`${appearance["preferences-unsubscribe"]} min-w-0 max-w-full wrap-anywhere`}
           type="button"
           disabled={busy || status === "unsubscribed"}
           onClick={(event) => {
@@ -121,9 +125,9 @@ export function SubscriptionPreferencesForm({
           }}
         >
           {status === "unsubscribing" ? copy.unsubscribing : copy.unsubscribe}
-        </button>
+        </Button>
       </div>
-      <StatusMessage className="[overflow-wrap:anywhere]">{message}</StatusMessage>
+      <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
     </form>
   );
 }

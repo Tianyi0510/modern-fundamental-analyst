@@ -16,11 +16,41 @@ export function useMenuTouchFeedback(
   closeRef: RefObject<HTMLButtonElement | null>,
 ) {
   const pointerRef = useRef<number | null>(null);
+  const buttonsRef = useRef(new Set<HTMLButtonElement>());
+  const attachClose = useCallback(
+    (button: HTMLButtonElement | null) => {
+      const previous = closeRef.current;
+      if (previous && previous !== button) {
+        previous
+          .querySelector(".mobile-menu-touch-ring")
+          ?.getAnimations()
+          .forEach((animation) => animation.cancel());
+        buttonsRef.current.delete(previous);
+        delete previous.dataset.touchPressed;
+      }
+      closeRef.current = button;
+      if (!button) return;
+      buttonsRef.current.add(button);
+      if (pointerRef.current !== null) button.dataset.touchPressed = "true";
+      const source = triggerRef.current?.querySelector(".mobile-menu-touch-ring");
+      const ring = button.querySelector(".mobile-menu-touch-ring");
+      const animation = source?.getAnimations()[0];
+      if (!source || !ring || !animation || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const remaining = Number(animation.effect?.getComputedTiming().duration) - Number(animation.currentTime);
+      if (remaining > 0)
+        ring.animate([{ opacity: getComputedStyle(source).opacity }, { opacity: 0 }], {
+          duration: remaining,
+          easing: "linear",
+        });
+    },
+    [closeRef, triggerRef],
+  );
   const onPointerDown: PointerEventHandler<HTMLButtonElement> = (event) => {
     if (event.pointerType !== "touch" || !event.isPrimary || pointerRef.current !== null) return;
     pointerRef.current = event.pointerId;
     for (const button of [triggerRef.current, closeRef.current]) {
       if (!button) continue;
+      buttonsRef.current.add(button);
       const ring = button.querySelector(".mobile-menu-touch-ring");
       ring?.getAnimations().forEach((animation) => animation.cancel());
       button.dataset.touchPressed = "true";
@@ -41,7 +71,8 @@ export function useMenuTouchFeedback(
     }
   };
   useEffect(() => {
-    const buttons = [triggerRef.current, closeRef.current];
+    const buttons = buttonsRef.current;
+    if (triggerRef.current) buttons.add(triggerRef.current);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const cancelRings = () => {
       for (const button of buttons) {
@@ -62,7 +93,7 @@ export function useMenuTouchFeedback(
       pointerRef.current = null;
     };
   }, [triggerRef, closeRef]);
-  return { onPointerDown, onPointerUp: release, onPointerCancel: release, onLostPointerCapture: release };
+  return { attachClose, onPointerDown, onPointerUp: release, onPointerCancel: release, onLostPointerCapture: release };
 }
 
 // Keep in sync with the nav-compact variant in globals.css.
@@ -194,11 +225,15 @@ export function useMobileMenu() {
   }, []);
   const isOpen = phase !== "closed";
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const drawerRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
-  const scrollPositionRef = useRef(0);
+  const [contentNode, setContentNode] = useState<HTMLDivElement | null>(null);
+  const attachContent = useCallback((node: HTMLDivElement | null) => {
+    contentRef.current = node;
+    setContentNode(node);
+  }, []);
   const openingAnimationRef = useRef<Animation | null>(null);
   const openingIconAnimationRef = useRef<Animation | null>(null);
   const closingAnimationRef = useRef<Animation | null>(null);
@@ -266,17 +301,17 @@ export function useMobileMenu() {
       openingIconAnimationRef.current?.cancel();
       openingIconAnimationRef.current = null;
     };
-  }, [phase, changePhase]);
+  }, [phase, changePhase, contentNode]);
 
-  // Keep the final frame until React has hidden the layer; cancelling first can flash it open.
+  // Keep the final frame until the portal content unmounts; cancelling first can flash it open.
   useLayoutEffect(() => {
-    if (isOpen) return;
+    if (isOpen || contentNode) return;
     closingAnimationRef.current?.cancel();
     closingAnimationRef.current = null;
     for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
     closingSupportingAnimationsRef.current = [];
     closeButtonRef.current?.removeAttribute("data-animation-phase");
-  }, [isOpen]);
+  }, [isOpen, contentNode]);
 
   const close = useCallback(() => {
     if (phaseRef.current === "closed" || phaseRef.current === "closing") return;
@@ -318,16 +353,8 @@ export function useMobileMenu() {
         if (phaseRef.current === "opening") changePhase("open");
       }
     };
-    // Keep dismissal independent of render timing and repeated input.
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        if (phaseRef.current === "closing") closeImmediately();
-        else close();
-      }
-    };
     compactNavigation.addEventListener("change", handleBreakpoint);
     reducedMotion.addEventListener("change", handleMotion);
-    window.addEventListener("keydown", handleEscape);
     return () => {
       compactNavigation.removeEventListener("change", handleBreakpoint);
       reducedMotion.removeEventListener("change", handleMotion);
@@ -335,86 +362,8 @@ export function useMobileMenu() {
       openingIconAnimationRef.current?.cancel();
       closingAnimationRef.current?.cancel();
       for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
-      window.removeEventListener("keydown", handleEscape);
     };
   }, [close, closeImmediately, changePhase]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const previousOverflow = document.documentElement.style.overflow;
-    const previousBodyPosition = document.body.style.position;
-    const previousBodyTop = document.body.style.top;
-    const previousBodyWidth = document.body.style.width;
-    const previousBodyOverflow = document.body.style.overflow;
-    const scrollPosition = scrollPositionRef.current;
-    const trigger = triggerRef.current;
-    const layer = drawerRef.current?.parentElement;
-    const wordmark = trigger?.parentElement?.querySelector(":scope > .wordmark");
-    // Isolate siblings at every level without making the drawer's ancestors inert.
-    const background = new Map<HTMLElement, boolean>();
-    let branch: HTMLElement | null = drawerRef.current;
-    while (branch && branch !== document.body) {
-      for (const sibling of branch.parentElement?.children ?? []) {
-        if (sibling instanceof HTMLElement && sibling !== branch) {
-          // Keep the underlying header painted while the fixed layer intercepts
-          // pointer input and React removes these controls from the tab order.
-          if (branch === layer && (sibling === trigger || sibling === wordmark)) continue;
-          background.set(sibling, sibling.inert);
-          sibling.setAttribute("inert", "");
-        }
-      }
-      branch = branch.parentElement;
-    }
-    const containFocus = () => {
-      if (!drawerRef.current?.contains(document.activeElement)) {
-        closeButtonRef.current?.focus({ preventScroll: true });
-      }
-    };
-    const handleKeyboard = (event: KeyboardEvent) => {
-      if (event.key !== "Tab") return;
-      const focusable = Array.from(
-        drawerRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), summary") ?? [],
-      ).filter((element) => {
-        const closedDisclosure = element.closest("details:not([open])");
-        return (
-          element.tabIndex >= 0 &&
-          element.getClientRects().length > 0 &&
-          (!closedDisclosure || closedDisclosure.querySelector(":scope > summary")?.contains(element))
-        );
-      });
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last?.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first?.focus();
-      }
-    };
-
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollPosition}px`;
-    document.body.style.width = "100%";
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus({ preventScroll: true });
-    window.addEventListener("keydown", handleKeyboard);
-    document.addEventListener("focusin", containFocus);
-    return () => {
-      document.removeEventListener("focusin", containFocus);
-      for (const [element, previousInert] of background) element.inert = previousInert;
-      document.documentElement.style.overflow = previousOverflow;
-      document.body.style.position = previousBodyPosition;
-      document.body.style.top = previousBodyTop;
-      document.body.style.width = previousBodyWidth;
-      document.body.style.overflow = previousBodyOverflow;
-      window.scrollTo({ top: scrollPosition, left: 0, behavior: "instant" });
-      window.removeEventListener("keydown", handleKeyboard);
-      if (trigger?.getClientRects().length) trigger.focus({ preventScroll: true });
-    };
-  }, [isOpen]);
 
   const handlePointerDown: PointerEventHandler<HTMLElement> = (event) => {
     if (event.pointerType !== "touch") return;
@@ -442,7 +391,7 @@ export function useMobileMenu() {
     close,
     closeImmediately,
     closeButtonRef,
-    contentRef,
+    attachContent,
     drawerRef,
     handlePointerCancel,
     handlePointerDown,
@@ -469,92 +418,9 @@ export function useMobileMenu() {
         for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
         closingSupportingAnimationsRef.current = [];
         closeButtonRef.current?.removeAttribute("data-animation-phase");
-      } else {
-        scrollPositionRef.current = window.scrollY;
       }
       changePhase(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "open" : "opening");
     },
-    triggerRef,
-  };
-}
-
-export function useLanguageMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  const focusItem = (position: "first" | "last") => {
-    requestAnimationFrame(() => {
-      if (triggerRef.current?.getAttribute("aria-expanded") !== "true") return;
-      const items = containerRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]');
-      const index = position === "first" ? 0 : (items?.length ?? 1) - 1;
-      items?.[index]?.focus({ preventScroll: true });
-    });
-  };
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const closeOnOutsideClick = (event: PointerEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false);
-    };
-    const closeOnOutsideFocus = (event: FocusEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false);
-    };
-    const compactNavigation = window.matchMedia(compactNavigationQuery);
-    const handleBreakpoint = () => {
-      if (compactNavigation.matches) setIsOpen(false);
-    };
-    const handleKeyboard = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-        triggerRef.current?.focus({ preventScroll: true });
-        return;
-      }
-      if (!containerRef.current?.contains(document.activeElement)) return;
-      if (event.key === "Tab") {
-        // Resume native tab order from the trigger before hiding the focused item.
-        triggerRef.current?.focus({ preventScroll: true });
-        setIsOpen(false);
-        if (event.shiftKey) {
-          event.preventDefault();
-        }
-        return;
-      }
-      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
-      const items = Array.from(containerRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
-      if (!items.length) return;
-      event.preventDefault();
-      const currentIndex = items.indexOf(document.activeElement as HTMLElement);
-      const nextIndex =
-        event.key === "Home"
-          ? 0
-          : event.key === "End"
-            ? items.length - 1
-            : event.key === "ArrowDown"
-              ? (currentIndex + 1) % items.length
-              : (currentIndex - 1 + items.length) % items.length;
-      items[nextIndex]?.focus({ preventScroll: true });
-    };
-
-    document.addEventListener("pointerdown", closeOnOutsideClick);
-    document.addEventListener("focusin", closeOnOutsideFocus);
-    compactNavigation.addEventListener("change", handleBreakpoint);
-    window.addEventListener("keydown", handleKeyboard);
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsideClick);
-      document.removeEventListener("focusin", closeOnOutsideFocus);
-      compactNavigation.removeEventListener("change", handleBreakpoint);
-      window.removeEventListener("keydown", handleKeyboard);
-    };
-  }, [isOpen]);
-
-  return {
-    close: () => setIsOpen(false),
-    containerRef,
-    focusItem,
-    isOpen,
-    open: () => setIsOpen(true),
-    toggle: () => setIsOpen((current) => !current),
     triggerRef,
   };
 }

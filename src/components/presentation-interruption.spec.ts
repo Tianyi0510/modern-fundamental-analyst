@@ -21,12 +21,18 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     });
     await expect(layer).toHaveAttribute("data-menu-phase", "open");
     await expect(close).toBeFocused();
-    await expect(page.locator("main")).toHaveAttribute("inert", "");
+    await expect
+      .poll(() => page.locator("main").evaluate((element) => Boolean(element.closest('[aria-hidden="true"]'))))
+      .toBe(true);
     await page.keyboard.press("Escape");
-    await expect(layer).toHaveAttribute("data-menu-phase", "closed");
+    await expect(layer).toBeHidden();
     await expect(trigger).toBeFocused();
-    await expect(page.locator("main")).not.toHaveAttribute("inert");
-    await expect.poll(() => page.locator(".mobile-menu-content").evaluate((e) => e.getAnimations().length)).toBe(0);
+    await expect
+      .poll(() => page.locator("main").evaluate((element) => Boolean(element.closest('[aria-hidden="true"]'))))
+      .toBe(false);
+    await expect
+      .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0))
+      .toBe(0);
 
     const details = page.locator("figure details");
     const summary = details.locator("summary");

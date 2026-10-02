@@ -50,6 +50,12 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
 
     await page.goto(`${prefix}/contact`);
     const contact = page.locator("form").filter({ has: page.locator('textarea[name="message"]') });
+    for (const control of await contact.locator('input:not([type="hidden"]):not([name="website"]), textarea').all()) {
+      await expect(control).toHaveAccessibleName(/\S/);
+      const id = await control.getAttribute("id");
+      await contact.locator(`label[for="${id}"]`).click();
+      await expect(control).toBeFocused();
+    }
     await contact.locator('[name="name"]').fill("Reader");
     await contact.locator('[name="email"]').fill("reader@example.com");
     await contact.locator('[name="subject"]').fill("First question");

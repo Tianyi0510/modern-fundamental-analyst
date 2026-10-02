@@ -6,7 +6,7 @@ import { Container } from "@/components/container";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { StatusMessage } from "@/components/status-message";
+import { Alert } from "@/components/ui/alert";
 
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -122,9 +122,9 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
             >
               {status === "sending" ? copy.sending : copy.send}
             </Button>
-            <StatusMessage className="max-w-[420px]">
+            <Alert className="max-w-[420px]">
               {status === "success" ? copy.success : status === "error" ? copy.error : ""}
-            </StatusMessage>
+            </Alert>
           </div>
         </form>
       </Container>
