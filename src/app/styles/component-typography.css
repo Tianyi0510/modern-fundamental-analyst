@@ -128,7 +128,7 @@
 /* Higher-specificity legacy selectors must retain the new Label treatment. */
 .home-page .eyebrow,
 .home-page .section-number,
-.home-page .metric span,
+.home-page .metric dt,
 .about-page .page-hero .eyebrow,
 .contact-page .page-hero .eyebrow,
 .legal .legal-hero .eyebrow,
@@ -139,10 +139,10 @@
 .performance-page .page-hero .eyebrow,
 .about-page .about-section-heading > span,
 .about-page .about-closing > .eyebrow,
-.portfolio-page .portfolio-kpis span,
+.portfolio-page .portfolio-kpis dt,
 .portfolio-page .portfolio-holdings-heading span,
 .portfolio-page .portfolio-table-detailed .table-head,
-.performance-page .performance-summary span,
+.performance-page .performance-summary dt,
 .performance-page .returns .section-number,
 .contact-grid span,
 .memo-card > div {
@@ -173,7 +173,7 @@
   letter-spacing: var(--tracking-body);
 }
 
-.portfolio-table-detailed .portfolio-row > [role="cell"]::before {
+.portfolio-table-detailed .portfolio-row > :is(th, td)::before {
   font-size: var(--font-size-caption);
   line-height: var(--leading-body);
   letter-spacing: var(--tracking-label);

@@ -1073,7 +1073,7 @@ test.describe("mobile content and navigation QA", () => {
 
   test("mobile page content converges on shared gutters and stack spacing", async ({ page }) => {
     await page.goto("/about");
-    const aboutBoundary = page.locator(".about-boundaries > article").first();
+    const aboutBoundary = page.locator(".about-boundaries > section").first();
     const aboutBoundaryBox = await aboutBoundary.boundingBox();
     const aboutHeadingBox = await aboutBoundary.locator("h2").boundingBox();
     expect(aboutBoundaryBox).not.toBeNull();

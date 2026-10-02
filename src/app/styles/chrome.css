@@ -373,15 +373,23 @@
   display: flex;
   flex-direction: column;
 }
-.metric strong,
-.portfolio-kpis strong,
-.performance-summary strong {
+.kpi-value > strong,
+.kpi-note > small {
+  display: block;
+}
+.metric .kpi-value,
+.portfolio-kpis .kpi-value,
+.performance-summary .kpi-value {
   margin-top: auto;
+}
+.metric .kpi-note,
+.portfolio-kpis .kpi-note,
+.performance-summary .kpi-note {
+  margin-top: 14px;
 }
 .metric small,
 .portfolio-kpis small,
 .performance-summary small {
-  margin-top: 14px;
   color: currentColor;
   opacity: 0.62;
 }

@@ -340,7 +340,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
         })}
         <section className="about-boundaries">
           {text.boundaries.map((boundary) => (
-            <article key={boundary.title}>
+            <section key={boundary.title}>
               <h2>{boundary.title}</h2>
               <ol>
                 {boundary.items.map((item, index) => (
@@ -352,7 +352,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
                   </li>
                 ))}
               </ol>
-            </article>
+            </section>
           ))}
         </section>
         <section className="about-closing shell">

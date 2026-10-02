@@ -42,12 +42,12 @@ body {
 
 /* Black / white */
 .performance-summary > div[data-tone="highlight"],
-.about-boundaries > article:first-child,
+.about-boundaries > section:first-child,
 .contact-grid > article:first-child {
   background: var(--surface-inverse);
   color: var(--text-inverse);
 }
-.about-boundaries > article:first-child .about-boundary-number {
+.about-boundaries > section:first-child .about-boundary-number {
   color: var(--text-highlight);
 }
 .contact-grid > article:first-child p {
@@ -60,7 +60,7 @@ body {
   color: var(--text-primary);
 }
 .performance-summary > div[data-tone="paper"],
-.about-boundaries > article:last-child {
+.about-boundaries > section:last-child {
   background: var(--surface-highlight);
   color: var(--text-primary);
 }

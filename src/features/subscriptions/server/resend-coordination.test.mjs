@@ -44,6 +44,7 @@ const { getPreferredLanguageSegmentId } = await import("./resend-segments.ts");
 const { withSubscriptionJournal, readSubscriptionJournal, resolveSubscriptionJournal } =
   await import("./subscription-journal.ts");
 const { POST: updatePreferences } = await import("@/app/api/subscription-preferences/route.ts");
+const { updateSubscriptionPreferences } = await import("./update-subscription-preferences.ts");
 const { createPreferenceToken } = await import("./subscription-preferences.ts");
 
 function preferencesMutation(action) {
@@ -65,8 +66,45 @@ test("confirmed preference saves clear their journal", async (t) => {
     if (options.method === "PATCH") assert.equal(JSON.parse(options.body).properties.preferred_language, "繁體中文");
     return Response.json({ id: "contact-id", unsubscribed: false });
   });
-  assert.equal((await updatePreferences(preferencesMutation("save"))).status, 200);
+  const response = await updatePreferences(preferencesMutation("save"));
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true, action: "save" });
   assert.equal(await readSubscriptionJournal("reader@example.com"), null);
+});
+
+test("confirmed preference update failures restore previous language segments and clear the journal", async (t) => {
+  t.mock.method(console, "error", () => {});
+  const writes = [];
+  const previousId = getPreferredLanguageSegmentId("en");
+  const targetId = getPreferredLanguageSegmentId("zh-tw");
+  t.mock.method(globalThis, "fetch", async (url, options) => {
+    if (options.method === "GET" && String(url).includes("/segments")) {
+      return Response.json({ data: [{ id: previousId }], has_more: false });
+    }
+    if (options.method !== "GET") writes.push({ method: options.method, url: String(url) });
+    if (options.method === "PATCH") {
+      return Response.json(
+        { name: "validation_error", message: "Mock provider rejection", statusCode: 422 },
+        { status: 422 },
+      );
+    }
+    return Response.json({ id: "contact-id", unsubscribed: false });
+  });
+  const email = "rollback-preferences@example.com";
+  assert.deepEqual(await updateSubscriptionPreferences({ email }, "zh-tw", "save"), {
+    ok: false,
+    error: "Subscription preferences could not be updated.",
+    status: 502,
+  });
+  assert.deepEqual(
+    writes.map(({ method }) => method),
+    ["POST", "DELETE", "PATCH", "POST", "DELETE"],
+  );
+  assert.ok(writes[0].url.endsWith(`/segments/${targetId}`));
+  assert.ok(writes[1].url.endsWith(`/segments/${previousId}`));
+  assert.ok(writes[3].url.endsWith(`/segments/${previousId}`));
+  assert.ok(writes[4].url.endsWith(`/segments/${targetId}`));
+  assert.equal(await readSubscriptionJournal(email), null);
 });
 
 test("ambiguous preference saves retain a journal and do not prevent later unsubscribe", async (t) => {

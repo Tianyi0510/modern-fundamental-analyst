@@ -97,7 +97,7 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
   assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
   assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
-  assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/span>/);
+  assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/td>/);
   assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
   assert.match(performanceShared, /className="methodology-source"/);
   assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);

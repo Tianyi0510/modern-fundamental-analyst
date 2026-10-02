@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { postJson, PostJsonError } from "@/lib/client-post-json";
+import { PostJsonError } from "@/lib/client-post-json";
+import { subscribeToUpdates } from "./subscription-api";
+import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
 import styles from "./subscribe-form.module.css";
 import { HoneypotField } from "@/components/honeypot-field";
@@ -37,12 +39,16 @@ export function SubscribeFormClient({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const payload = Object.fromEntries(new FormData(form).entries());
+    const formData = new FormData(form);
 
     await runExclusive(async () => {
       setStatus("submitting");
       try {
-        await postJson("/api/subscribe", { ...payload, locale });
+        await subscribeToUpdates({
+          email: getFormText(formData, "email"),
+          website: getFormText(formData, "website"),
+          locale,
+        });
         form.reset();
         setStatus("success");
       } catch (error) {

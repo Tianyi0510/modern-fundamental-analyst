@@ -183,27 +183,39 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               </div>
             </section>
           </div>
-          <section className="metric-band" aria-label={text.portfolioSnapshot}>
+          <dl className="metric-band" aria-label={text.portfolioSnapshot}>
             <div className="metric" data-tone="highlight">
-              <span>{text.totalReturn}</span>
-              <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
-              <small>{text.cumulativeReturn}</small>
+              <dt>{text.totalReturn}</dt>
+              <dd className="kpi-value">
+                <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
+              </dd>
+              <dd className="kpi-note">
+                <small>{text.cumulativeReturn}</small>
+              </dd>
             </div>
             <div className="metric" data-tone="brand">
-              <span>{text.marketValue}</span>
-              <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
-              <small>
-                {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
-              </small>
+              <dt>{text.marketValue}</dt>
+              <dd className="kpi-value">
+                <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
+              </dd>
+              <dd className="kpi-note">
+                <small>
+                  {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
+                </small>
+              </dd>
             </div>
             <div className="metric" data-tone="paper">
-              <span>{text.portfolioXirr}</span>
-              <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
-              <small className="date-text">
-                {text.asOf} {portfolioDate} · {text.updatedMonthly}
-              </small>
+              <dt>{text.portfolioXirr}</dt>
+              <dd className="kpi-value">
+                <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
+              </dd>
+              <dd className="kpi-note">
+                <small className="date-text">
+                  {text.asOf} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time> · {text.updatedMonthly}
+                </small>
+              </dd>
             </div>
-          </section>
+          </dl>
         </div>
 
         <section className="home-about shell">
@@ -237,9 +249,11 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             </Link>
           </section>
           <section className="holdings-preview shell">
-            <div className="holdings-list">
+            {/* Safari needs an explicit list role when markers are removed outside navigation. */}
+            {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
+            <ol className="holdings-list" role="list">
               {featuredHoldings.map((holding, index) => (
-                <div className="holding-row" key={holding.symbol}>
+                <li className="holding-row" key={holding.symbol}>
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <div>
                     <strong>{holding.symbol}</strong>
@@ -248,9 +262,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                     </small>
                   </div>
                   <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
             <aside className="allocation-card">
               <span>{text.holdingsAllocation}</span>
               <div className="allocation-visual">
@@ -315,7 +329,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
                 <p>{text.performanceCopy(benchmarkReturn)}</p>
                 <small className="date-text">
-                  {text.verified} {portfolioDate}
+                  {text.verified} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time>
                   {locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} ·{" "}
                   {text.updatedMonthly}
                   {locale === "en" ? "." : "。"}

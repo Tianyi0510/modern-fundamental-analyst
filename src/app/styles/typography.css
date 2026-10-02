@@ -125,12 +125,12 @@
 
 .eyebrow,
 .section-number,
-.metric span,
+.metric dt,
 .allocation-card > span,
 .about-section-heading > span,
-.portfolio-kpis span,
+.portfolio-kpis dt,
 .portfolio-holdings-heading span,
-.performance-summary span,
+.performance-summary dt,
 .table-head {
   font-family: var(--font-ui);
   font-size: var(--font-size-label);

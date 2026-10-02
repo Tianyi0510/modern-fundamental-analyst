@@ -21,6 +21,8 @@ For email development, run `npm run email:contact` (or `npm run email`) and open
 
 ## Verification
 
+`npm ci` installs the local Husky pre-commit hook. It runs `npm run lint:staged`: Prettier checks all staged files it supports and skips unknown formats, ESLint checks staged JavaScript/TypeScript with the shared local cache, and Stylelint checks staged CSS. Concurrent tasks only read files, so overlapping format and lint checks do not race to rewrite them. These checks do not rewrite files. Run `npm run format` or fix reported lint errors, review and stage the changes, then commit again. Partially staged files are checked with their unstaged changes temporarily hidden and restored by lint-staged. CI, Vercel and production installs skip hook setup; local hooks do not replace CI or release verification. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node setup.
+
 For routine changes, run the focused checks in [AGENTS.md](AGENTS.md#verification-and-review). Before deployment, install the test browsers once and run the full gate:
 
 ```bash

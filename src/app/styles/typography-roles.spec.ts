@@ -27,7 +27,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     compactTitle: [".site-header .wordmark", ".footer-heading", ".holding-row strong"],
     lead: [".hero-bottom > p", ".home-about > div:last-child p", ".performance-copy p"],
     body: [".memo-card p", ".holding-row small"],
-    label: [".eyebrow", ".section-number", ".metric > span", ".memo-card > div"],
+    label: [".eyebrow", ".section-number", ".metric > dt", ".memo-card > div"],
     control: [".header-actions nav a", ".button", ".text-link"],
     caption: [".metric small", ".memo-card > small", ".footer-bottom small"],
     dataDisplay: [".performance-copy > strong"],
@@ -50,7 +50,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     lead: [".page-intro p"],
     label: [
       ".eyebrow",
-      ".portfolio-kpis span",
+      ".portfolio-kpis dt",
       ".portfolio-holdings-heading > div > span",
       ".portfolio-mobile-sort label > span",
     ],
@@ -64,7 +64,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     sectionTitle: [".returns .section-heading h2", ".methodology h2"],
     lead: [".page-intro p"],
     bodyLarge: [".methodology-content"],
-    label: [".eyebrow", ".performance-summary span", ".returns .section-number"],
+    label: [".eyebrow", ".performance-summary dt", ".returns .section-number"],
     caption: [".page-intro small", ".performance-summary small"],
     dataKpi: [".performance-summary strong"],
   },
@@ -153,10 +153,10 @@ for (const viewport of [viewports[0], viewports[2]]) {
     await expect(page.locator(".performance-home")).toHaveCSS("color", "rgb(0, 0, 0)");
 
     await page.goto("/about");
-    await expect(page.locator(".about-boundaries > article").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    await expect(page.locator(".about-boundaries > article").first()).toHaveCSS("color", "rgb(255, 255, 255)");
-    await expect(page.locator(".about-boundaries > article").last()).toHaveCSS("background-color", "rgb(95, 205, 253)");
-    await expect(page.locator(".about-boundaries > article").last()).toHaveCSS("color", "rgb(0, 0, 0)");
+    await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("background-color", "rgb(95, 205, 253)");
+    await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("color", "rgb(0, 0, 0)");
 
     await page.goto("/contact");
     await expect(page.locator(".contact-grid > article").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");

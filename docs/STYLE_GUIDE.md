@@ -38,7 +38,7 @@ These conventions adapt [Bulletproof React's Project Standards](https://github.c
 - Use UTF-8, LF line endings, two-space indentation, and a final newline. [EditorConfig](../.editorconfig) applies editor defaults; [Git attributes](../.gitattributes) normalize text line endings without treating binary assets as text. Prettier remains the formatting authority; Markdown trailing spaces may express intentional line breaks.
 - Keep ESLint's flat configuration and type-aware rules. Lint commands reject warnings, and unused ESLint disable directives are errors. Scope necessary suppressions to the smallest affected code and explain their reason; remove them when the underlying exception disappears.
 - Validate external data at runtime even when its TypeScript type is declared. During refactoring, update types and callers together, then run affected checks. Tests stay beside their owning code; shared test utilities live in `src/testing/` and are never imported by application entry points.
-- CI is the required verification gate for releases. Local Git hooks are optional conveniences and cannot replace CI; do not install a hook that runs complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
+- CI is the required verification gate for releases. Husky provides local pre-commit checks of staged files; see [README verification](../README.md#verification) for their scope and recovery steps. Hooks cannot replace CI and must not run complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
 
 ## CSS, layout, and visual language
 

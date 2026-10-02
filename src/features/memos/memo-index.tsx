@@ -38,7 +38,7 @@ export function MemoIndex({ memos, locale, label }: MemoIndexProps) {
                 <p>{memo.summary}</p>
               </div>
               <div className="memo-meta">
-                <span>{formatDate(memo.publishedAt, locale, locale === "en")}</span>
+                <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>
                 <span>{memo.readTime}</span>
               </div>
             </Link>

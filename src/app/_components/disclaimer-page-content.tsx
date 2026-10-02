@@ -118,7 +118,7 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
         <section className="legal-body">
           <div className="legal-content shell">
             {text.sections.map(([title, lead, paragraphs], index) => (
-              <article className="legal-section" key={title}>
+              <section className="legal-section" key={title}>
                 <div className="legal-section-heading">
                   <p className="section-number legal-section-label">
                     <span>{String(index + 1).padStart(2, "0")}</span>
@@ -132,7 +132,7 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
                     <p key={paragraph}>{paragraph}</p>
                   ))}
                 </div>
-              </article>
+              </section>
             ))}
           </div>
         </section>

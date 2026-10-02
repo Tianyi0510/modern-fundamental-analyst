@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { postJson } from "@/lib/client-post-json";
+import { sendContactMessage } from "./contact-api";
+import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
 import styles from "./contact-form.module.css";
 import { HoneypotField } from "@/components/honeypot-field";
@@ -34,17 +35,16 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
     await runExclusive(async () => {
       setStatus("sending");
       try {
-        await postJson(
-          "/api/contact",
+        await sendContactMessage(
           {
-            name: formData.get("name"),
-            email: formData.get("email"),
-            subject: formData.get("subject"),
-            message: formData.get("message"),
-            website: formData.get("website"),
+            name: getFormText(formData, "name"),
+            email: getFormText(formData, "email"),
+            subject: getFormText(formData, "subject"),
+            message: getFormText(formData, "message"),
+            website: getFormText(formData, "website"),
             locale,
           },
-          { idempotencyKey: getSubmissionId() },
+          getSubmissionId(),
         );
         form.reset();
         resetSubmissionId();

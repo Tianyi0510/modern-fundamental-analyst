@@ -63,7 +63,8 @@ export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
             <h3>{memo.title}</h3>
             <p>{memo.summary}</p>
             <small className="date-text">
-              {formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}
+              <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time> ·{" "}
+              {memo.readTime}
             </small>
           </Link>
         );

@@ -57,7 +57,8 @@ export function MemoListPage({ locale }: { locale: Locale }) {
             <div className="page-intro">
               <p>{text.subtitle}</p>
               <small className="date-text">
-                {text.updated} {lastUpdated}
+                {text.updated}{" "}
+                {latestPublishedAt ? <time dateTime={latestPublishedAt}>{lastUpdated}</time> : lastUpdated}
               </small>
             </div>
           </section>

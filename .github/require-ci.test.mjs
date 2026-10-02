@@ -127,3 +127,73 @@ test("a rate-limit reset beyond the deadline fails closed without another reques
   );
   assert.equal(calls, 1);
 });
+
+test("body read and JSON parsing failures share backoff, reset only after a complete valid response", async () => {
+  let clock = 0;
+  const times = [];
+  const responses = [
+    () => {
+      throw new TypeError("network unavailable");
+    },
+    () => ({
+      ok: true,
+      json: async () => {
+        throw new TypeError("body stream interrupted");
+      },
+    }),
+    () => new Response('{"workflow_runs":['),
+    () => Response.json({ workflow_runs: [] }),
+    () => ({
+      ok: true,
+      json: async () => {
+        throw new DOMException("body timeout", "TimeoutError");
+      },
+    }),
+    () => Response.json({ workflow_runs: [run] }),
+  ];
+  await requireSuccessfulCI({
+    env,
+    now: () => clock,
+    sleep: async (ms) => {
+      clock += ms;
+    },
+    fetcher: async () => {
+      times.push(clock);
+      return responses.shift()();
+    },
+  });
+  assert.deepEqual(times, [0, 60_000, 180_000, 420_000, 480_000, 540_000]);
+});
+
+test("unreadable or malformed CI evidence cannot authorize deployment", async () => {
+  for (const response of [
+    () => ({
+      ok: true,
+      json: async () => {
+        throw new TypeError("body interrupted");
+      },
+    }),
+    () => new Response("not JSON"),
+    () => Response.json(null),
+    () => Response.json({ workflow_runs: {} }),
+    () => Response.json({ workflow_runs: [null] }),
+    () => Response.json({ workflow_runs: [{ ...run, id: "invalid" }] }),
+  ]) {
+    let clock = 0;
+    const delays = [];
+    await assert.rejects(
+      requireSuccessfulCI({
+        env,
+        now: () => clock,
+        sleep: async (ms) => {
+          delays.push(ms);
+          clock += ms;
+        },
+        fetcher: async () => response(),
+      }),
+      /30 minutes/,
+    );
+    assert.deepEqual(delays.slice(0, 4), [60_000, 120_000, 240_000, 240_000]);
+    assert.equal(clock, 30 * 60_000);
+  }
+});

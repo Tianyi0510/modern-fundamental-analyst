@@ -143,33 +143,51 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
             <div className="page-intro">
               <p>{text.intro}</p>
               <small className="date-text">
-                {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
+                {isChinese ? "截至 " : "As of "}
+                <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
+                {isChinese ? " · 每月更新" : " · Updated monthly"}
               </small>
             </div>
           </section>
         </div>
-        <section className="portfolio-kpis" aria-label={text.summaryLabel}>
+        <dl className="portfolio-kpis" aria-label={text.summaryLabel}>
           <div data-tone="plain">
-            <span>{text.marketValue}</span>
-            <strong>{formatUsd(portfolioSnapshot.marketValue)}</strong>
-            <small>{text.currency}</small>
+            <dt>{text.marketValue}</dt>
+            <dd className="kpi-value">
+              <strong>{formatUsd(portfolioSnapshot.marketValue)}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.currency}</small>
+            </dd>
           </div>
           <div data-tone="highlight">
-            <span>{text.costBasis}</span>
-            <strong>{formatUsd(portfolioSnapshot.costBasis)}</strong>
-            <small>{text.costBasisNote}</small>
+            <dt>{text.costBasis}</dt>
+            <dd className="kpi-value">
+              <strong>{formatUsd(portfolioSnapshot.costBasis)}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.costBasisNote}</small>
+            </dd>
           </div>
           <div data-tone="brand">
-            <span>{text.totalReturn}</span>
-            <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
-            <small>{text.totalReturnNote}</small>
+            <dt>{text.totalReturn}</dt>
+            <dd className="kpi-value">
+              <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.totalReturnNote}</small>
+            </dd>
           </div>
           <div data-tone="paper">
-            <span>{text.holdings}</span>
-            <strong>{portfolioSnapshot.holdingsCount}</strong>
-            <small>{text.holdingsNote}</small>
+            <dt>{text.holdings}</dt>
+            <dd className="kpi-value">
+              <strong>{portfolioSnapshot.holdingsCount}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.holdingsNote}</small>
+            </dd>
           </div>
-        </section>
+        </dl>
         <section className="portfolio-holdings-section" aria-labelledby="portfolio-holdings-title">
           <div className="portfolio-holdings-heading shell">
             <div>

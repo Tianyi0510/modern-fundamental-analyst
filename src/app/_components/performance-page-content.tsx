@@ -152,28 +152,42 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <div className="page-intro">
               <p>{text.intro}</p>
               <small className="date-text">
-                {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
+                {isChinese ? "截至 " : "As of "}
+                <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
+                {isChinese ? " · 每月更新" : " · Updated monthly"}
               </small>
             </div>
           </section>
         </div>
-        <section className="performance-summary">
+        <dl className="performance-summary">
           <div data-tone="highlight">
-            <span>{text.cumulativeReturn}</span>
-            <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
-            <small>{text.cumulativeNote}</small>
+            <dt>{text.cumulativeReturn}</dt>
+            <dd className="kpi-value">
+              <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.cumulativeNote}</small>
+            </dd>
           </div>
           <div data-tone="brand">
-            <span>{text.portfolioXirr}</span>
-            <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
-            <small>{text.portfolioNote}</small>
+            <dt>{text.portfolioXirr}</dt>
+            <dd className="kpi-value">
+              <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.portfolioNote}</small>
+            </dd>
           </div>
           <div data-tone="paper">
-            <span>{portfolioSnapshot.benchmark} XIRR</span>
-            <strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong>
-            <small>{text.benchmarkNote}</small>
+            <dt>{portfolioSnapshot.benchmark} XIRR</dt>
+            <dd className="kpi-value">
+              <strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong>
+            </dd>
+            <dd className="kpi-note">
+              <small>{text.benchmarkNote}</small>
+            </dd>
           </div>
-        </section>
+        </dl>
         <section className="returns shell">
           <div className="section-heading">
             <p className="section-number">{text.chart}</p>

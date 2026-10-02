@@ -37,7 +37,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
               </p>
               <h1>{memo.title}</h1>
               <div className="article-meta">
-                <span>{formatDate(memo.publishedAt, locale, locale === "en")}</span>
+                <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>
                 <span>{memo.readTime}</span>
                 <span>
                   {text.memoLabel} {memo.number}

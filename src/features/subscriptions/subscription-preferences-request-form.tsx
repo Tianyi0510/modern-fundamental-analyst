@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { postJson, PostJsonError } from "@/lib/client-post-json";
+import { PostJsonError } from "@/lib/client-post-json";
+import { requestPreferencesLink } from "./subscription-api";
+import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
 import styles from "./subscription-preferences.module.css";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
@@ -23,16 +25,11 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const submittedEmail = new FormData(form).get("email");
-    const email = typeof submittedEmail === "string" ? submittedEmail : "";
+    const email = getFormText(new FormData(form), "email");
     await runExclusive(async () => {
       setStatus("requesting");
       try {
-        await postJson(
-          "/api/subscription-preferences/request",
-          { email, locale },
-          { idempotencyKey: getSubmissionId() },
-        );
+        await requestPreferencesLink({ email, locale }, getSubmissionId());
         form.reset();
         resetSubmissionId();
         setStatus("sent");
