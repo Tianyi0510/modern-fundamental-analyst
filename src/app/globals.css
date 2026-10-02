@@ -1,9 +1,9 @@
-@import "./reset.css";
-@import "./styles/base.css";
-@import "./styles/chrome.css";
-@import "./styles/pages.css";
-@import "./styles/typography.css";
-@import "./styles/component-typography.css";
-@import "./styles/responsive.css";
-@import "./styles/colors.css";
-@import "./styles/themes.css";
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "./styles/tokens.css";
+@import "./styles/base.css" layer(base);
+
+@custom-variant nav-compact (@media (max-width: 1150px));
+@custom-variant compact (@media (max-width: 800px));
+@custom-variant touch (@media (hover: none) and (pointer: coarse));

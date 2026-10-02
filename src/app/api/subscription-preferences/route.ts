@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { cleanText, readProtectedObjectJson } from "@/lib/api-request";
-import { localeConfig, locales, resolveLocale } from "@/lib/i18n";
+import { locales, resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
-import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
-import { syncPreferredLanguageSegment } from "@/features/subscriptions/server/resend-segments";
 import { readPreferenceToken } from "@/features/subscriptions/server/subscription-preferences";
-import { withSubscriberLock } from "@/features/subscriptions/server/resend-coordination";
-import { withSubscriptionJournal } from "@/features/subscriptions/server/subscription-journal";
+import { updateSubscriptionPreferences } from "@/features/subscriptions/server/update-subscription-preferences";
 
 export const runtime = "nodejs";
 
@@ -38,74 +35,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Choose a valid language." }, { status: 400 });
   }
   const locale = resolveLocale(requestedLocale);
-  const resend = getResendClient();
-  if (!resend) return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
-
-  try {
-    return await withSubscriberLock(payload.email, () =>
-      action === "save"
-        ? withSubscriptionJournal(
-            payload.email,
-            locale,
-            () => updatePreferences(resend, payload, locale, action),
-            "preferences",
-          )
-        : updatePreferences(resend, payload, locale, action),
-    );
-  } catch {
-    return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
-  }
-}
-
-async function updatePreferences(
-  resend: NonNullable<ReturnType<typeof getResendClient>>,
-  payload: { email: string },
-  locale: ReturnType<typeof resolveLocale>,
-  action: "save" | "unsubscribe",
-) {
-  const existing = await runResendOperation("Resend preferences contact lookup failed", () =>
-    resend.contacts.get({ email: payload.email }),
-  );
-  if (!existing)
-    return NextResponse.json({ error: "Subscription service is temporarily unavailable." }, { status: 503 });
-  if (!existing.data)
-    return NextResponse.json(
-      { error: "Subscription preferences could not be found." },
-      { status: existing.error?.statusCode === 404 ? 404 : 502 },
-    );
-
-  if (action === "save") {
-    await resendOperationContext.getStore()?.recordPhase?.("sync-language-segments");
-    let rollbackLanguageSegments: (() => Promise<void>) | null = null;
-    try {
-      rollbackLanguageSegments = await syncPreferredLanguageSegment(resend, payload.email, locale);
-    } catch (error) {
-      console.error("Resend language segment sync failed", error instanceof Error ? error.message : "UnknownError");
-      return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
-    }
-
-    await resendOperationContext.getStore()?.recordPhase?.("update-preferred-language");
-    const result = await runResendOperation("Resend preferences update request failed", () =>
-      resend.contacts.update({
-        email: payload.email,
-        properties: { preferred_language: localeConfig[locale].label },
-      }),
-    );
-    if (!result || result.error) {
-      await resendOperationContext.getStore()?.recordPhase?.("rollback-language-segments");
-      if (rollbackLanguageSegments) await rollbackLanguageSegments().catch(() => undefined);
-      if (result?.error) console.error("Resend preferences update failed", result.error.name);
-      return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
-    }
-  } else {
-    const result = await runResendOperation("Resend unsubscribe request failed", () =>
-      resend.contacts.update({ email: payload.email, unsubscribed: true }),
-    );
-    if (!result || result.error) {
-      if (result?.error) console.error("Resend preferences update failed", result.error.name);
-      return NextResponse.json({ error: "Subscription preferences could not be updated." }, { status: 502 });
-    }
-  }
-
-  return NextResponse.json({ ok: true, action });
+  const result = await updateSubscriptionPreferences(payload, locale, action);
+  return result.ok
+    ? NextResponse.json({ ok: true, action: result.action })
+    : NextResponse.json({ error: result.error }, { status: result.status });
 }

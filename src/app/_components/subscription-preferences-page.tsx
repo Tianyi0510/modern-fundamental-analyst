@@ -1,3 +1,6 @@
+import { PageHero } from "@/components/page-hero";
+import { appearance } from "./subscription-preferences-page.styles";
+import { Container } from "@/components/container";
 import { Suspense } from "react";
 import { ServiceLoading } from "@/components/service-loading";
 import { SavedPreferences } from "@/features/subscriptions/saved-preferences";
@@ -11,7 +14,6 @@ import {
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 import { readPreferenceToken } from "@/features/subscriptions/server/subscription-preferences";
-import styles from "@/features/subscriptions/subscription-preferences.module.css";
 
 const copy = {
   en: {
@@ -99,29 +101,28 @@ export async function SubscriptionPreferencesPage({
         languageQuery={payload ? new URLSearchParams({ token }).toString() : undefined}
       />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero shell">
-            <p className="eyebrow">
-              <span /> {text.label}
-            </p>
-            <h1>{text.title}</h1>
-            <div className="page-intro">
+        <PageHero
+          variant="standard"
+          label={<>{text.label}</>}
+          title={<>{text.title}</>}
+          intro={
+            <>
               <p>{text.intro}</p>
-            </div>
-          </section>
-        </div>
-        <section className={`${styles.panel} shell`}>
+            </>
+          }
+        />
+        <Container as="section" className={appearance["preferences-panel"]}>
           {payload ? (
             <Suspense key={token} fallback={<ServiceLoading locale={locale} />}>
               <SavedPreferences copy={text} email={payload.email} token={token} />
             </Suspense>
           ) : (
-            <div className={styles.request}>
-              <p className={styles.invalid}>{text.invalid}</p>
+            <div className={appearance["preferences-request"]}>
+              <p className={appearance["preferences-invalid"]}>{text.invalid}</p>
               <SubscriptionPreferencesRequestForm copy={text} locale={locale} />
             </div>
           )}
-        </section>
+        </Container>
       </main>
       <PageFooter locale={locale} />
     </div>

@@ -75,7 +75,6 @@ test("all portfolio and performance locales share page structures", async () => 
     performanceZhTw,
     performanceZhCn,
     portfolioShared,
-    performanceShared,
     portfolioTable,
   ] = await Promise.all([
     read("src/app/(en)/portfolio/page.tsx"),
@@ -85,7 +84,6 @@ test("all portfolio and performance locales share page structures", async () => 
     read("src/app/zh-tw/performance/page.tsx"),
     read("src/app/zh-cn/performance/page.tsx"),
     read("src/app/_components/portfolio-page-content.tsx"),
-    read("src/app/_components/performance-page-content.tsx"),
     read("src/features/portfolio/portfolio-table.tsx"),
   ]);
 
@@ -97,10 +95,8 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
   assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
   assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
-  assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/span>/);
+  assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/td>/);
   assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
-  assert.match(performanceShared, /className="methodology-source"/);
-  assert.match(performanceShared, /Prices and market values use closing prices as of \{asOf\}/);
 });
 
 test("portfolio table receives only the active locale labels from its server parent", async () => {

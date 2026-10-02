@@ -40,10 +40,32 @@ export function useMenuTouchFeedback(
       ring.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing: "linear" });
     }
   };
+  useEffect(() => {
+    const buttons = [triggerRef.current, closeRef.current];
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const cancelRings = () => {
+      for (const button of buttons) {
+        button
+          ?.querySelector(".mobile-menu-touch-ring")
+          ?.getAnimations()
+          .forEach((animation) => animation.cancel());
+      }
+    };
+    const onMotionChange = () => {
+      if (motion.matches) cancelRings();
+    };
+    motion.addEventListener("change", onMotionChange);
+    return () => {
+      motion.removeEventListener("change", onMotionChange);
+      cancelRings();
+      for (const button of buttons) if (button) delete button.dataset.touchPressed;
+      pointerRef.current = null;
+    };
+  }, [triggerRef, closeRef]);
   return { onPointerDown, onPointerUp: release, onPointerCancel: release, onLostPointerCapture: release };
 }
 
-// Keep in sync with the navigation-only breakpoint in responsive.css.
+// Keep in sync with the nav-compact variant in globals.css.
 const compactNavigationQuery = "(max-width: 1150px)";
 
 function animateMenuDismissal(
@@ -91,8 +113,17 @@ function animateMenuDismissal(
     );
   }
   if (closeButton && trigger) {
-    const source = getComputedStyle(closeButton);
+    const sourceStyle = getComputedStyle(closeButton);
+    const source = {
+      backgroundColor: sourceStyle.backgroundColor,
+      borderColor: sourceStyle.borderColor,
+      color: sourceStyle.color,
+      outlineColor: sourceStyle.outlineColor,
+      transform: sourceStyle.transform,
+    };
     const target = getComputedStyle(trigger);
+    // WAAPI owns these properties during dismissal; stop the press transitions first.
+    closeButton.dataset.animationPhase = "closing";
     supportingAnimations.push(
       closeButton.animate(
         [
@@ -154,8 +185,14 @@ function animateMenuDismissal(
 }
 
 export function useMobileMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-  const isOpenRef = useRef(false);
+  type MenuPhase = "closed" | "opening" | "open" | "closing";
+  const [phase, setPhase] = useState<MenuPhase>("closed");
+  const phaseRef = useRef<MenuPhase>("closed");
+  const changePhase = useCallback((next: MenuPhase) => {
+    phaseRef.current = next;
+    setPhase(next);
+  }, []);
+  const isOpen = phase !== "closed";
   const triggerRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -163,40 +200,73 @@ export function useMobileMenu() {
   const pointerStartRef = useRef<{ id: number; x: number; y: number } | null>(null);
   const scrollPositionRef = useRef(0);
   const openingAnimationRef = useRef<Animation | null>(null);
+  const openingIconAnimationRef = useRef<Animation | null>(null);
   const closingAnimationRef = useRef<Animation | null>(null);
   const closingSupportingAnimationsRef = useRef<Animation[]>([]);
+  const openingStartRef = useRef<{ panel: string; icon: string; opacity: string } | null>(null);
 
   const closeImmediately = useCallback(() => {
     openingAnimationRef.current?.cancel();
     openingAnimationRef.current = null;
-    isOpenRef.current = false;
+    openingIconAnimationRef.current?.cancel();
+    openingIconAnimationRef.current = null;
+    openingStartRef.current = null;
     pointerStartRef.current = null;
-    setIsOpen(false);
-  }, []);
+    changePhase("closed");
+  }, [changePhase]);
 
   useLayoutEffect(() => {
-    if (!isOpen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (phase !== "opening") return;
     const content = contentRef.current;
     if (!content) return;
     const style = getComputedStyle(content);
     const token = style.getPropertyValue("--motion-duration-slow").trim();
     const duration = Number.parseFloat(token) * (token.endsWith("ms") ? 1 : 1000);
+    const start = openingStartRef.current;
+    openingStartRef.current = null;
     const animation = content.animate(
-      [{ transform: "translate3d(100%, 0, 0)" }, { transform: "translate3d(0, 0, 0)" }],
+      [{ transform: start?.panel ?? "translate3d(100%, 0, 0)" }, { transform: "translate3d(0, 0, 0)" }],
       { duration, easing: style.getPropertyValue("--motion-ease-emphasized").trim(), fill: "backwards" },
     );
     openingAnimationRef.current = animation;
+    const icon = closeButtonRef.current?.querySelector(".mobile-menu-close-icon");
+    if (icon) {
+      const iconToken = style.getPropertyValue("--motion-duration-medium").trim();
+      const iconDuration = Number.parseFloat(iconToken) * (iconToken.endsWith("ms") ? 1 : 1000);
+      const iconAnimation = icon.animate(
+        [
+          { transform: start?.icon ?? "rotate(-90deg)", opacity: start?.opacity ?? "1" },
+          { transform: "rotate(0)", opacity: 1 },
+        ],
+        {
+          duration: iconDuration,
+          easing: style.getPropertyValue("--motion-ease-emphasized").trim(),
+          fill: "backwards",
+        },
+      );
+      openingIconAnimationRef.current = iconAnimation;
+      iconAnimation.onfinish = () => {
+        if (openingIconAnimationRef.current !== iconAnimation) return;
+        openingIconAnimationRef.current = null;
+        iconAnimation.cancel();
+      };
+    }
     animation.onfinish = () => {
       if (openingAnimationRef.current !== animation) return;
       openingAnimationRef.current = null;
       animation.cancel();
+      openingIconAnimationRef.current?.cancel();
+      openingIconAnimationRef.current = null;
+      changePhase("open");
     };
     return () => {
       if (openingAnimationRef.current !== animation) return;
       openingAnimationRef.current = null;
       animation.cancel();
+      openingIconAnimationRef.current?.cancel();
+      openingIconAnimationRef.current = null;
     };
-  }, [isOpen]);
+  }, [phase, changePhase]);
 
   // Keep the final frame until React has hidden the layer; cancelling first can flash it open.
   useLayoutEffect(() => {
@@ -205,16 +275,18 @@ export function useMobileMenu() {
     closingAnimationRef.current = null;
     for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
     closingSupportingAnimationsRef.current = [];
+    closeButtonRef.current?.removeAttribute("data-animation-phase");
   }, [isOpen]);
 
   const close = useCallback(() => {
-    if (!isOpenRef.current || closingAnimationRef.current) return;
+    if (phaseRef.current === "closed" || phaseRef.current === "closing") return;
     const content = contentRef.current;
     if (!content || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       closeImmediately();
       return;
     }
     const startingTransform = getComputedStyle(content).transform;
+    changePhase("closing");
     openingAnimationRef.current?.cancel();
     openingAnimationRef.current = null;
     const { panelAnimation, supportingAnimations } = animateMenuDismissal(
@@ -225,8 +297,10 @@ export function useMobileMenu() {
     );
     closingAnimationRef.current = panelAnimation;
     closingSupportingAnimationsRef.current = supportingAnimations;
+    openingIconAnimationRef.current?.cancel();
+    openingIconAnimationRef.current = null;
     panelAnimation.onfinish = closeImmediately;
-  }, [closeImmediately]);
+  }, [closeImmediately, changePhase]);
 
   useEffect(() => {
     const compactNavigation = window.matchMedia(compactNavigationQuery);
@@ -235,15 +309,21 @@ export function useMobileMenu() {
       if (!compactNavigation.matches) closeImmediately();
     };
     const handleMotion = () => {
-      if (reducedMotion.matches && closingAnimationRef.current) closeImmediately();
+      if (reducedMotion.matches && phaseRef.current === "closing") closeImmediately();
       if (reducedMotion.matches) {
         openingAnimationRef.current?.cancel();
         openingAnimationRef.current = null;
+        openingIconAnimationRef.current?.cancel();
+        openingIconAnimationRef.current = null;
+        if (phaseRef.current === "opening") changePhase("open");
       }
     };
     // Keep dismissal independent of render timing and repeated input.
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape") {
+        if (phaseRef.current === "closing") closeImmediately();
+        else close();
+      }
     };
     compactNavigation.addEventListener("change", handleBreakpoint);
     reducedMotion.addEventListener("change", handleMotion);
@@ -252,11 +332,12 @@ export function useMobileMenu() {
       compactNavigation.removeEventListener("change", handleBreakpoint);
       reducedMotion.removeEventListener("change", handleMotion);
       openingAnimationRef.current?.cancel();
+      openingIconAnimationRef.current?.cancel();
       closingAnimationRef.current?.cancel();
       for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [close, closeImmediately]);
+  }, [close, closeImmediately, changePhase]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -367,11 +448,31 @@ export function useMobileMenu() {
     handlePointerDown,
     handlePointerUp,
     isOpen,
+    phase,
     open: () => {
-      if (isOpenRef.current || !window.matchMedia(compactNavigationQuery).matches) return;
-      isOpenRef.current = true;
-      scrollPositionRef.current = window.scrollY;
-      setIsOpen(true);
+      if (
+        !window.matchMedia(compactNavigationQuery).matches ||
+        phaseRef.current === "open" ||
+        phaseRef.current === "opening"
+      )
+        return;
+      if (phaseRef.current === "closing" && contentRef.current) {
+        const icon = closeButtonRef.current?.querySelector(".mobile-menu-close-icon");
+        const iconStyle = icon ? getComputedStyle(icon) : null;
+        openingStartRef.current = {
+          panel: getComputedStyle(contentRef.current).transform,
+          icon: iconStyle?.transform ?? "none",
+          opacity: iconStyle?.opacity ?? "1",
+        };
+        closingAnimationRef.current?.cancel();
+        closingAnimationRef.current = null;
+        for (const animation of closingSupportingAnimationsRef.current) animation.cancel();
+        closingSupportingAnimationsRef.current = [];
+        closeButtonRef.current?.removeAttribute("data-animation-phase");
+      } else {
+        scrollPositionRef.current = window.scrollY;
+      }
+      changePhase(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "open" : "opening");
     },
     triggerRef,
   };

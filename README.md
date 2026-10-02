@@ -4,7 +4,7 @@ A public-equity research website in English, Traditional Chinese, and Simplified
 
 [Visit the website](https://www.modernfundamentalanalyst.com)
 
-Built with Next.js, React, TypeScript, and native CSS. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
+Built with Next.js, React, TypeScript, Tailwind CSS, customized shadcn/ui primitives, and CSS Modules. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
 
 ## Local Development
 
@@ -17,9 +17,11 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000). For service integrations, use [.env.example](.env.example) as a template for an uncommitted `.env.local`. Never commit credentials.
 
-For email development, run `npm run email` and open [localhost:3001](http://localhost:3001). Six fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
+For email development, run `npm run email:contact` (or `npm run email`) and open [localhost:3001](http://localhost:3001); use `npm run email:preferences` and [localhost:3002](http://localhost:3002) for preference emails. Six fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
 
 ## Verification
+
+`npm ci` installs the local Husky pre-commit hook. It runs `npm run lint:staged`: Prettier checks all staged files it supports and skips unknown formats, ESLint checks staged JavaScript/TypeScript with the shared local cache, and Stylelint checks staged CSS. Concurrent tasks only read files, so overlapping format and lint checks do not race to rewrite them. These checks do not rewrite files. Run `npm run format` or fix reported lint errors, review and stage the changes, then commit again. Partially staged files are checked with their unstaged changes temporarily hidden and restored by lint-staged. CI, Vercel and production installs skip hook setup; local hooks do not replace CI or release verification. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node setup.
 
 For routine changes, run the focused checks in [AGENTS.md](AGENTS.md#verification-and-review). Before deployment, install the test browsers once and run the full gate:
 
@@ -40,9 +42,12 @@ npm run verify
 | `src/testing/`    | Shared test helpers and the explicit Node loader                                       |
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
 | `public/images/`  | Public icons, logos, and the social sharing image                                      |
-| `emails/`         | Local email preview examples; production templates stay in their features              |
 | `.github/`        | CI workflows, production deployment gate, and WebKit runner                            |
 | `docs/`           | Style guide, operations, data, and service integration guides                          |
+
+Layout and ordinary states use static Tailwind classes; complex component motion and charts use adjacent CSS Modules. Tokens and the single reset live in `src/app/styles/`; see [style ownership](docs/STYLE_GUIDE.md#style-ownership). React Email maintains separate inbox-compatible styling.
+
+shadcn/ui configuration lives in `components.json`; owned Button, Input, and Textarea sources live in `src/components/ui/`. These primitives use the existing brand tokens and native HTML semantics. Follow the [component installation procedure](docs/STYLE_GUIDE.md#shadcnui-components) when adding or updating a primitive.
 
 Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 

@@ -1,3 +1,4 @@
+import { appearance } from "./memo-cards.styles";
 import Link from "next/link";
 import type { MemoSummary } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
@@ -29,21 +30,23 @@ const placeholderCopy = {
 type MemoCardsProps = {
   memos: readonly MemoSummary[];
   locale: Locale;
-  className?: string;
+  placement?: "section" | "featured";
 };
 
-export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
+export function MemoCards({ memos, locale, placement = "section" }: MemoCardsProps) {
   const placeholder = placeholderCopy[locale];
 
   return (
-    <div className={`memo-grid${className ? ` ${className}` : ""}`}>
+    <div
+      className={`${appearance["memo-grid"]} ${placement === "featured" ? "memo-index-featured mt-0 mb-[var(--space-section)]" : "mt-[var(--space-heading-content)]"}`}
+    >
       {slotIndexes.map((index) => {
         const memo = memos[index];
         const cardNumber = String(index + 1).padStart(3, "0");
 
         if (!memo)
           return (
-            <article className="memo-card memo-card-placeholder" key={cardNumber}>
+            <article className={appearance["memo-card"] + " " + appearance["memo-card-placeholder"]} key={cardNumber}>
               <div>
                 <span>{cardNumber}</span>
                 <span>{placeholder.status}</span>
@@ -55,15 +58,20 @@ export function MemoCards({ memos, locale, className = "" }: MemoCardsProps) {
           );
 
         return (
-          <Link className="memo-card" href={getLocalizedPath(`/memos/${memo.slug}`, locale)} key={memo.slug}>
+          <Link
+            className={appearance["memo-card"]}
+            href={getLocalizedPath(`/memos/${memo.slug}`, locale)}
+            key={memo.slug}
+          >
             <div>
               <span>{memo.number}</span>
               <span>{memo.category.label}</span>
             </div>
             <h3>{memo.title}</h3>
             <p>{memo.summary}</p>
-            <small className="date-text">
-              {formatDate(memo.publishedAt, locale, locale === "en")} · {memo.readTime}
+            <small className={appearance["date-text"]}>
+              <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time> ·{" "}
+              {memo.readTime}
             </small>
           </Link>
         );

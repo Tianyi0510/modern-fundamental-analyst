@@ -52,8 +52,31 @@ export async function requireSuccessfulCI({
       }
       throw new Error(`Cannot verify CI: GitHub returned ${response.status}.`);
     }
+    let runs;
+    try {
+      const body = await response.json();
+      if (
+        !Array.isArray(body?.workflow_runs) ||
+        body.workflow_runs.some(
+          (run) =>
+            !run ||
+            !Number.isSafeInteger(run.id) ||
+            typeof run.head_sha !== "string" ||
+            (typeof run.head_branch !== "string" && run.head_branch !== null) ||
+            typeof run.event !== "string" ||
+            typeof run.status !== "string" ||
+            (typeof run.conclusion !== "string" && run.conclusion !== null),
+        )
+      ) {
+        throw new Error("Invalid CI response.");
+      }
+      runs = body.workflow_runs;
+    } catch {
+      await wait(backoff());
+      continue;
+    }
+    // Receiving headers alone does not confirm a usable GitHub response.
     failures = 0;
-    const { workflow_runs: runs } = await response.json();
     const run = runs
       ?.filter((run) => run.head_sha === sha && run.head_branch === "main" && run.event === "push")
       .sort((a, b) => b.id - a.id)[0];

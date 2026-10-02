@@ -1,3 +1,6 @@
+import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
+import { appearance } from "./home-page-content.styles";
+import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
 import { MoveRight, MoveUpRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
@@ -154,14 +157,14 @@ export function HomePageContent({ locale }: { locale: Locale }) {
 
   return (
     <div className="home-page">
-      <div className="home-header">
+      <div className={appearance["home-header"]}>
         <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       </div>
       <main id="main-content" tabIndex={-1}>
-        <div className="home-opening">
-          <div className="hero-band">
-            <section className="hero shell">
-              <p className="eyebrow">
+        <div className={appearance["home-opening"]}>
+          <div className={appearance["hero-band"]}>
+            <section className={appearance["hero"] + " " + appearance["shell"]}>
+              <p className={appearance["eyebrow"]}>
                 <span /> {text.researchLabel}
               </p>
               <h1>
@@ -169,46 +172,57 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 <br />
                 <em>{text.hero[1]}</em>
               </h1>
-              <div className="hero-bottom">
+              <div className={appearance["hero-bottom"]}>
                 <p>{text.heroIntro}</p>
-                <div className="hero-actions">
-                  <Link className="button button-dark" href={getLocalizedPath("/portfolio", locale)}>
+                <div className={appearance["hero-actions"]}>
+                  <ButtonLink variant="contrast" href={getLocalizedPath("/portfolio", locale)}>
                     {text.viewPortfolio}
-                  </Link>
-                  <Link className="text-link" href={getLocalizedPath("/memos", locale)}>
+                  </ButtonLink>
+                  <Link className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
                     {text.readLatest}
-                    <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+                    <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
                   </Link>
                 </div>
               </div>
             </section>
           </div>
-          <section className="metric-band" aria-label={text.portfolioSnapshot}>
-            <div className="metric" data-tone="highlight">
-              <span>{text.totalReturn}</span>
-              <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
-              <small>{text.cumulativeReturn}</small>
-            </div>
-            <div className="metric" data-tone="brand">
-              <span>{text.marketValue}</span>
-              <strong>{formatUsd(portfolioSnapshot.marketValue, 0)}</strong>
-              <small>
-                {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
-              </small>
-            </div>
-            <div className="metric" data-tone="paper">
-              <span>{text.portfolioXirr}</span>
-              <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
-              <small className="date-text">
-                {text.asOf} {portfolioDate} · {text.updatedMonthly}
-              </small>
-            </div>
-          </section>
+          <dl className={appearance["metric-band"]} aria-label={text.portfolioSnapshot}>
+            <PortfolioMetric
+              tone="highlight"
+              className="metric compact:overflow-hidden"
+              label={<>{text.totalReturn}</>}
+              value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
+              note={<>{text.cumulativeReturn}</>}
+            />
+            <PortfolioMetric
+              tone="brand"
+              className="metric compact:overflow-hidden"
+              label={<>{text.marketValue}</>}
+              value={<>{formatUsd(portfolioSnapshot.marketValue, 0)}</>}
+              note={
+                <>
+                  {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
+                </>
+              }
+            />
+            <PortfolioMetric
+              tone="paper"
+              className="metric compact:overflow-hidden"
+              label={<>{text.portfolioXirr}</>}
+              value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
+              note={
+                <>
+                  {text.asOf} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time> · {text.updatedMonthly}
+                </>
+              }
+              noteClassName="date-text tabular-nums"
+            />
+          </dl>
         </div>
 
-        <section className="home-about shell">
+        <section className={appearance["home-about"] + " " + appearance["shell"]}>
           <div>
-            <p className="section-number">{text.aboutLabel}</p>
+            <p className={appearance["section-number"]}>{text.aboutLabel}</p>
             <h2>
               {text.aboutTitle[0]}
               <br />
@@ -217,29 +231,39 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           </div>
           <div>
             <p>{text.aboutCopy}</p>
-            <Link className="text-link" href={getLocalizedPath("/about", locale)}>
+            <Link className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
               {text.aboutLink}
-              <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+              <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
             </Link>
           </div>
         </section>
 
-        <div className="home-portfolio-section">
-          <section className="intro shell">
-            <p className="section-number">{text.portfolioLabel}</p>
+        <div className={appearance["home-portfolio-section"]}>
+          <section className={appearance["intro"] + " " + appearance["shell"]}>
+            <p className={appearance["section-number"]}>{text.portfolioLabel}</p>
             <h2>
               {text.portfolioTitle[0]}
               <br />
               {text.portfolioTitle[1]}
             </h2>
-            <Link className="round-link" href={getLocalizedPath("/portfolio", locale)} aria-label={text.viewPortfolio}>
-              <MoveUpRight className="arrow-icon round-link-arrow" aria-hidden="true" strokeWidth={3} />
+            <Link
+              className={appearance["round-link"]}
+              href={getLocalizedPath("/portfolio", locale)}
+              aria-label={text.viewPortfolio}
+            >
+              <MoveUpRight
+                className={appearance["arrow-icon"] + " " + appearance["round-link-arrow"]}
+                aria-hidden="true"
+                strokeWidth={3}
+              />
             </Link>
           </section>
-          <section className="holdings-preview shell">
-            <div className="holdings-list">
+          <section className={appearance["holdings-preview"] + " " + appearance["shell"]}>
+            {/* Safari needs an explicit list role when markers are removed outside navigation. */}
+            {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
+            <ol className={appearance["holdings-list"]} role="list">
               {featuredHoldings.map((holding, index) => (
-                <div className="holding-row" key={holding.symbol}>
+                <li className={appearance["holding-row"]} key={holding.symbol}>
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <div>
                     <strong>{holding.symbol}</strong>
@@ -248,14 +272,14 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                     </small>
                   </div>
                   <b>{getHoldingWeight(holding.marketValue).toFixed(1)}%</b>
-                </div>
+                </li>
               ))}
-            </div>
-            <aside className="allocation-card">
+            </ol>
+            <aside className={appearance["allocation-card"]}>
               <span>{text.holdingsAllocation}</span>
-              <div className="allocation-visual">
+              <div className={appearance["allocation-visual"]}>
                 <div
-                  className="allocation-ring"
+                  className={appearance["allocation-ring"]}
                   style={{ background: allocationGradient }}
                   role="img"
                   aria-label={text.topHoldings}
@@ -263,7 +287,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   <span>{portfolioSnapshot.holdingsCount}</span>
                   <small>{text.holdingsAllocation}</small>
                 </div>
-                <ul className="allocation-legend">
+                <ul className={appearance["allocation-legend"]}>
                   {featuredHoldings.map((holding) => (
                     <li key={holding.symbol}>
                       <i aria-hidden="true" />
@@ -280,58 +304,65 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               </div>
               <Link href={getLocalizedPath("/portfolio", locale)}>
                 <span className="link-label">{text.fullPortfolio}</span>
-                <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+                <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
               </Link>
             </aside>
           </section>
         </div>
 
-        <section className="performance-home">
-          <div className="shell">
-            <div className="section-heading inverse">
-              <p className="section-number">{text.performanceLabel}</p>
+        <section className={appearance["performance-home"]}>
+          <div className={appearance["shell"]}>
+            <div className={appearance["section-heading"] + " " + "inverse"}>
+              <p className={appearance["section-number"]}>{text.performanceLabel}</p>
               <h2>
                 {text.performanceTitle[0]}
                 <br />
                 {text.performanceTitle[1]}
               </h2>
             </div>
-            <div className="performance-grid">
-              <div className="performance-bars" aria-label={text.chartLabel}>
-                <div className="year-bar">
-                  <div className="bar-value" style={{ height: `${portfolioSnapshot.xirr * 8}px` }}>
+            <div className={appearance["performance-grid"]}>
+              <div className={appearance["performance-bars"]} aria-label={text.chartLabel}>
+                <div className={appearance["year-bar"]}>
+                  <div className={appearance["bar-value"]} style={{ height: `${portfolioSnapshot.xirr * 8}px` }}>
                     <span>{formatPercent(portfolioSnapshot.xirr)}</span>
                   </div>
                   <small>{text.portfolioName}</small>
                 </div>
-                <div className="year-bar">
-                  <div className="bar-value" style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}>
+                <div className={appearance["year-bar"]}>
+                  <div
+                    className={appearance["bar-value"]}
+                    style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}
+                  >
                     <span>{benchmarkReturn}</span>
                   </div>
                   <small>{portfolioSnapshot.benchmark}</small>
                 </div>
               </div>
-              <div className="performance-copy">
+              <div className={appearance["performance-copy"]}>
                 <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
                 <p>{text.performanceCopy(benchmarkReturn)}</p>
-                <small className="date-text">
-                  {text.verified} {portfolioDate}
+                <small className={appearance["date-text"]}>
+                  {text.verified} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time>
                   {locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} ·{" "}
                   {text.updatedMonthly}
                   {locale === "en" ? "." : "。"}
                 </small>
-                <Link className="button button-white" href={getLocalizedPath("/performance", locale)}>
+                <ButtonLink
+                  variant="contrast"
+                  className="button-white mt-[48px]"
+                  href={getLocalizedPath("/performance", locale)}
+                >
                   {text.viewPerformance}
-                </Link>
+                </ButtonLink>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="memos-home-band">
-          <section className="memos-home shell">
-            <div className="section-heading">
-              <p className="section-number">{text.memosLabel}</p>
+        <div className={appearance["memos-home-band"]}>
+          <section className={appearance["memos-home"] + " " + appearance["shell"]}>
+            <div className={appearance["section-heading"]}>
+              <p className={appearance["section-number"]}>{text.memosLabel}</p>
               <h2>
                 {text.memosTitle[0]}
                 <br />
@@ -339,16 +370,19 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               </h2>
             </div>
             <MemoCards memos={memos} locale={locale} />
-            <Link className="text-link memos-all" href={getLocalizedPath("/memos", locale)}>
+            <Link
+              className={appearance["text-link"] + " " + appearance["memos-all"]}
+              href={getLocalizedPath("/memos", locale)}
+            >
               {text.viewAllMemos}
-              <MoveRight className="arrow-icon" aria-hidden="true" strokeWidth={3} />
+              <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
             </Link>
           </section>
         </div>
 
-        <div className="cta-band">
-          <section className="cta shell">
-            <p className="eyebrow">
+        <div className={appearance["cta-band"]}>
+          <section className={appearance["cta"] + " " + appearance["shell"]}>
+            <p className={appearance["eyebrow"]}>
               <span /> {text.contactLabel}
             </p>
             <h2>
@@ -356,9 +390,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <br />
               {text.contactTitle[1]}
             </h2>
-            <Link className="button button-dark" href={getLocalizedPath("/contact", locale)}>
-              {text.contactLink}
-            </Link>
+            <ButtonLink href={getLocalizedPath("/contact", locale)}>{text.contactLink}</ButtonLink>
           </section>
         </div>
       </main>

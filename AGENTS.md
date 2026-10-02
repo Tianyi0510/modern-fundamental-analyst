@@ -12,7 +12,7 @@ Repository-wide defaults; follow the user's current request when it changes the 
 
 ## Project context and task references
 
-Next.js App Router, React, TypeScript, native CSS; Node.js 24 and npm (`npm ci`). English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. See [README.md](README.md#project-layout) for the directory map.
+Next.js App Router, React, TypeScript, Tailwind CSS and CSS Modules; Node.js 24 and npm (`npm ci`). English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. See [README.md](README.md#project-layout) for the directory map.
 
 Before changing Next.js APIs, routing conventions or configuration, read the relevant installed-version guide in `node_modules/next/dist/docs/`. If dependencies are unavailable, use the matching official Next.js documentation online.
 
@@ -32,8 +32,8 @@ Keep README concise and detailed procedures in `docs/`. Update the relevant guid
 - Compose pages in `src/app/_components`; keep domain code, data, and CSS in the owning `src/features` folder. Features must not import other features or `app`; shared `components` and `lib` must not import either layer.
 - Keep interface copy with its owning page or shared component, use server components for static copy, and keep client boundaries small. Reuse `src/lib/escape-html.ts`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
 - Preserve deliberate language, layout and form variants. Preserve verified research and monthly portfolio snapshots unless a content update is requested; these are not live prices.
-- Preserve existing text colors in every state, including opacity, unless a color change is requested. Reuse semantic tokens and preserve the CSS import order in `src/app/globals.css`.
-- Keep menu visibility, focus and scroll restoration synchronized. Touch hover resets must retain active and keyboard-focus feedback.
+- Preserve existing text colors in every state, including opacity, unless a color change is requested. Maintain values only in `src/app/styles/tokens.css`; Tailwind and CSS Modules reference the same tokens. Keep `globals.css` limited to layers/imports/variants and `base.css` to the single reset and document defaults. Use complete static utility classes for normal layout and states, adjacent CSS Modules for owned complex motion, and inline styles only for data or measurements. Share repeated appearance through finite component variants; never override another component’s internals.
+- Keep menu visibility, focus, content interactivity and scroll restoration synchronized. Use one state source and one animation owner per property; handle interruption, reversal, cancellation, reduced motion and unmount. Touch hover resets must retain active and keyboard-focus feedback.
 
 ## Service boundaries
 
@@ -52,7 +52,7 @@ For non-deployment work, run only checks relevant to the changed behavior; do no
 | --- | --- |
 | Documentation only, without deployment | Links, anchors, references and `git diff --check`; no application suite |
 | Application code or configuration, without deployment | Focused type, lint, format, unit or browser checks for the affected files and behavior, then `git diff --check` |
-| Shared UI, without deployment | Targeted browser checks for affected languages, layouts and interactions; include enlarged text, keyboard, touch or reduced motion when relevant |
+| Shared UI, without deployment | Targeted browser checks for affected languages, layouts and interactions; include enlarged text, keyboard, touch or reduced motion when relevant. Style-loading changes also require a production build with direct, client-navigation and return checks |
 | Deployment | `npm run verify` (types, lint, unit tests, Chromium and production build), plus `npm run test:webkit` for shared UI changes; then `git diff --check` |
 
 Install missing browser binaries with `npx playwright install chromium webkit`. Once checks pass, repeat only when subsequent changes or unresolved failures justify it. Add behavioral regression coverage for changed risks; update source-structure assertions during refactors without weakening user-visible coverage. For animation fixes, check intermediate visual states and repeated/interrupted input, not merely whether an animation was created. WebKit automation does not establish physical iPhone behavior.
@@ -66,6 +66,8 @@ Use the existing GitHub Actions and Vercel Git integration. By default, make cha
 Deployment is complete after GitHub Actions succeeds for the release commit, Vercel is `READY`, and the deployed commit and production aliases match. Report success promptly once these conditions are met.
 
 Production browser smoke checks and additional diagnostics are optional follow-up work unless the user requests them or evidence indicates a production failure. Do not delay the deployment success report for optional checks. Report deployment status separately from any incomplete or failed follow-up verification; never describe unverified checks as passed.
+
+After a pull request is merged and its production deployment succeeds, delete the remote and local feature branch when branch cleanup is authorized. Confirm that the branch has no unmerged commits, switch away from it, and use safe local deletion. Preserve branches with ongoing work. Start subsequent changes from the latest `main` on a new `codex/` branch; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) for cleanup details.
 
 ## Maintaining this file
 

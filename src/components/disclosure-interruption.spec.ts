@@ -21,6 +21,7 @@ for (const route of ["memos", "performance"]) {
       await expect(details).not.toHaveAttribute("data-closing");
       const contentFocus = details.locator('a, [tabindex="0"]').first();
       await expect(contentFocus).toBeVisible();
+      await contentFocus.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
       await details.locator("summary").evaluate((summary: HTMLElement) => {
         summary.click();
         const details = summary.parentElement!;
@@ -29,7 +30,8 @@ for (const route of ["memos", "performance"]) {
         animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
         details.querySelector<HTMLElement>('a, [tabindex="0"]')!.focus();
       });
-      await expect(contentFocus).toBeFocused();
+      await expect(details.locator("summary")).toBeFocused();
+      await expect(details.locator("summary")).toHaveAttribute("aria-expanded", "false");
       await page.setViewportSize({ width: 390, height: 844 });
       await expect(details).not.toHaveAttribute("open");
       await expect(details.locator("summary")).toBeFocused();

@@ -1,3 +1,4 @@
+import { appearance } from "./support-panel.styles";
 import { randomUUID } from "node:crypto";
 import { SupportCheckoutForm } from "./support-checkout-form";
 import { supportCopy } from "./support-copy";
@@ -19,9 +20,9 @@ export async function SupportPanel({
   const checkoutLocale = params.checkoutLocale;
   const formAttempt = recoveryAttempt ?? randomUUID();
   return (
-    <section className="support-section">
-      <div className="support-layout shell">
-        <div className="support-copy">
+    <section className={appearance["support-section"]}>
+      <div className={appearance["support-layout"] + " " + appearance["shell"]}>
+        <div className={appearance["support-copy"]}>
           <h2>{text.sectionTitle}</h2>
           <p>{text.sectionText}</p>
         </div>
@@ -36,11 +37,11 @@ export async function SupportPanel({
             status === "error" || status === "rate-limited" || status === "invalid-amount" ? text.retry : text.submit
           }
           submitting={text.submitting}
-          note={<p className="support-note">{text.note}</p>}
+          note={<p className={appearance["support-note"]}>{text.note}</p>}
         >
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="checkout_locale" value={checkoutLocale} />
-          <div className="support-honeypot" aria-hidden="true">
+          <div className={appearance["support-honeypot"]} aria-hidden="true">
             <label>
               Website
               <input name="website" tabIndex={-1} autoComplete="off" />
@@ -48,9 +49,9 @@ export async function SupportPanel({
           </div>
           <fieldset disabled={Boolean(recoveryAttempt)}>
             <legend>{text.legend}</legend>
-            <div className="support-amounts">
+            <div className={appearance["support-amounts"]}>
               {SUPPORT_AMOUNTS.map((amount) => (
-                <label className="support-amount-option" key={amount}>
+                <label className={appearance["support-amount-option"]} key={amount}>
                   <input type="radio" name="amount" value={amount} defaultChecked={amount === selectedAmount} />
                   <span>USD</span>
                   <strong>${amount}</strong>
@@ -59,7 +60,11 @@ export async function SupportPanel({
             </div>
           </fieldset>
           {status ? (
-            <p className={`support-status support-status-${status}`} role="status" aria-live="polite">
+            <p
+              className={`${appearance["support-status"]} ${status === "error" ? "support-status-error border-l-[var(--price-down)]" : "border-l-accent"}`}
+              role="status"
+              aria-live="polite"
+            >
               {text.statuses[status]}
             </p>
           ) : null}

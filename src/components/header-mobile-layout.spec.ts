@@ -335,20 +335,22 @@ test.describe("repeated touch menu animation", () => {
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.goto(prefix || "/");
       const icon = page.locator(".mobile-menu-close-icon");
-      await icon.evaluate((element) => {
-        element.setAttribute("data-starts", "0");
-        element.addEventListener("animationstart", (event) => {
-          if ((event as AnimationEvent).animationName === "mobile-menu-icon-enter") {
-            element.setAttribute("data-starts", String(Number(element.getAttribute("data-starts")) + 1));
-          }
-        });
-      });
       for (let opening = 1; opening <= 3; opening++) {
         await page.locator(".mobile-menu-button").tap();
-        await expect(icon).toHaveAttribute("data-starts", String(opening));
+        const midpoint = await icon.evaluate((element) => {
+          const animation = element.getAnimations()[0]!;
+          animation.pause();
+          animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+          const transform = getComputedStyle(element).transform;
+          animation.play();
+          return transform;
+        });
+        expect(midpoint).not.toBe("none");
+        expect(midpoint).not.toBe("matrix(1, 0, 0, 1, 0, 0)");
+        await expect.poll(() => icon.evaluate((element) => element.getAnimations().length)).toBe(0);
         await page.locator(".mobile-menu-close").tap();
         await expect(page.locator(".mobile-menu-layer")).not.toHaveClass(/is-open/);
-        expect(await icon.evaluate((element) => getComputedStyle(element).transform)).toBe("matrix(0, -1, 1, 0, 0, 0)");
+        expect(await icon.evaluate((element) => getComputedStyle(element).transform)).toBe("none");
       }
     }
   });
@@ -360,12 +362,17 @@ test("menu icon replays after navigation and returning to a visited page", async
   await page.goto("/");
   for (const path of ["/about", "/memos", "/", "/portfolio"]) {
     const icon = page.locator(".mobile-menu-close:visible .mobile-menu-close-icon");
-    await page.locator(".mobile-menu-close-icon").evaluate((element) => {
-      element.setAttribute("data-started", "false");
-      element.addEventListener("animationstart", () => element.setAttribute("data-started", "true"), { once: true });
-    });
     await page.locator(".mobile-menu-button").click();
-    await expect(icon).toHaveAttribute("data-started", "true");
+    const midpoint = await icon.evaluate((element) => {
+      const animation = element.getAnimations()[0]!;
+      animation.pause();
+      animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+      const transform = getComputedStyle(element).transform;
+      animation.play();
+      return transform;
+    });
+    expect(midpoint).not.toBe("none");
+    await expect.poll(() => icon.evaluate((element) => element.getAnimations().length)).toBe(0);
     await page.locator(`.mobile-menu-layer.is-open nav a[href="${path}"]`).click();
     await expect(page).toHaveURL(path);
     await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
@@ -1073,7 +1080,7 @@ test.describe("mobile content and navigation QA", () => {
 
   test("mobile page content converges on shared gutters and stack spacing", async ({ page }) => {
     await page.goto("/about");
-    const aboutBoundary = page.locator(".about-boundaries > article").first();
+    const aboutBoundary = page.locator(".about-boundaries > section").first();
     const aboutBoundaryBox = await aboutBoundary.boundingBox();
     const aboutHeadingBox = await aboutBoundary.locator("h2").boundingBox();
     expect(aboutBoundaryBox).not.toBeNull();

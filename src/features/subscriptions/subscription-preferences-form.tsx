@@ -1,10 +1,16 @@
 "use client";
 
+import { appearance } from "./subscription-preferences-form.styles";
+import { Button } from "@/components/ui/button";
+import { FormField, SelectControl } from "@/components/form-field";
+import { StatusMessage } from "@/components/status-message";
+
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { postJson } from "@/lib/client-post-json";
+import { updatePreferences } from "./subscription-api";
+import { getFormText } from "@/lib/form-data";
+import type { PreferencesAction } from "./subscription-contract";
 import { localeConfig, locales, type Locale } from "@/lib/i18n";
-import styles from "./subscription-preferences.module.css";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 
 export type PreferencesCopy = {
@@ -36,14 +42,19 @@ export function SubscriptionPreferencesForm({
   const [status, setStatus] = useState<Status>("idle");
   const runExclusive = useExclusiveSubmit();
 
-  async function submit(form: HTMLFormElement, action: "save" | "unsubscribe") {
+  async function submit(form: HTMLFormElement, action: PreferencesAction) {
     await runExclusive(async () => {
-      const selectedLocale = new FormData(form).get("locale");
-      const locale = typeof selectedLocale === "string" ? selectedLocale : "";
+      const selectedLocale = getFormText(new FormData(form), "locale");
+      const locale = locales.find((candidate) => candidate === selectedLocale);
       setStatus(action === "save" ? "saving" : "unsubscribing");
 
       try {
-        await postJson("/api/subscription-preferences", { action, locale, token });
+        if (action === "save") {
+          if (!locale) throw new Error("Choose a valid language.");
+          await updatePreferences({ action, locale, token });
+        } else {
+          await updatePreferences({ action, locale: locale ?? "", token });
+        }
         setStatus(action === "save" ? "saved" : "unsubscribed");
       } catch {
         setStatus("error");
@@ -63,20 +74,19 @@ export function SubscriptionPreferencesForm({
 
   return (
     <form
-      className={styles.form}
+      className={appearance["preferences-form"]}
       aria-busy={busy}
       onSubmit={(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         void submit(event.currentTarget, "save");
       }}
     >
-      <div className={styles.field}>
+      <div className={appearance["preferences-field"]}>
         <span>{copy.email}</span>
         <strong>{email}</strong>
       </div>
-      <label className={styles.field}>
-        <span>{copy.language}</span>
-        <select
+      <FormField label={copy.language}>
+        <SelectControl
           name="locale"
           required
           defaultValue={initialLocale ?? ""}
@@ -91,14 +101,19 @@ export function SubscriptionPreferencesForm({
               {localeConfig[locale].label}
             </option>
           ))}
-        </select>
-      </label>
-      <div className={styles.actions}>
-        <button className="button button-dark" type="submit" disabled={busy || status === "unsubscribed"}>
+        </SelectControl>
+      </FormField>
+      <div className={appearance["preferences-actions"]}>
+        <Button
+          type="submit"
+          className="min-w-0 max-w-full wrap-anywhere"
+          disabledFeedback={busy ? "muted-busy" : "muted"}
+          disabled={busy || status === "unsubscribed"}
+        >
           {status === "saving" ? copy.saving : copy.save}
-        </button>
+        </Button>
         <button
-          className={styles.unsubscribe}
+          className={`${appearance["preferences-unsubscribe"]} min-w-0 max-w-full wrap-anywhere disabled:opacity-[var(--opacity-disabled-preferences)] ${busy ? "disabled:cursor-wait" : "disabled:cursor-default"}`}
           type="button"
           disabled={busy || status === "unsubscribed"}
           onClick={(event) => {
@@ -108,9 +123,7 @@ export function SubscriptionPreferencesForm({
           {status === "unsubscribing" ? copy.unsubscribing : copy.unsubscribe}
         </button>
       </div>
-      <p className={styles.status} role="status" aria-live="polite">
-        {message}
-      </p>
+      <StatusMessage className="[overflow-wrap:anywhere]">{message}</StatusMessage>
     </form>
   );
 }

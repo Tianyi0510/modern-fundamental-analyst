@@ -1,3 +1,6 @@
+import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
+import { PageHero } from "@/components/page-hero";
+import { appearance } from "./performance-page-content.styles";
 import { PerformanceChart } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -143,50 +146,57 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
     <div className="performance-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       <main id="main-content" tabIndex={-1}>
-        <div className="page-hero-band">
-          <section className="page-hero shell">
-            <p className="eyebrow">
-              <span /> {text.eyebrow}
-            </p>
-            <h1>{text.title}</h1>
-            <div className="page-intro">
+        <PageHero
+          variant="performance"
+          label={<>{text.eyebrow}</>}
+          title={<>{text.title}</>}
+          intro={
+            <>
               <p>{text.intro}</p>
-              <small className="date-text">
-                {isChinese ? `截至 ${asOf} · 每月更新` : `As of ${asOf} · Updated monthly`}
+              <small className={appearance["date-text"]}>
+                {isChinese ? "截至 " : "As of "}
+                <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
+                {isChinese ? " · 每月更新" : " · Updated monthly"}
               </small>
-            </div>
-          </section>
-        </div>
-        <section className="performance-summary">
-          <div data-tone="highlight">
-            <span>{text.cumulativeReturn}</span>
-            <strong>{formatPercent(portfolioSnapshot.totalReturn)}</strong>
-            <small>{text.cumulativeNote}</small>
-          </div>
-          <div data-tone="brand">
-            <span>{text.portfolioXirr}</span>
-            <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
-            <small>{text.portfolioNote}</small>
-          </div>
-          <div data-tone="paper">
-            <span>{portfolioSnapshot.benchmark} XIRR</span>
-            <strong>{formatPercent(portfolioSnapshot.benchmarkXirr)}</strong>
-            <small>{text.benchmarkNote}</small>
-          </div>
-        </section>
-        <section className="returns shell">
-          <div className="section-heading">
-            <p className="section-number">{text.chart}</p>
+            </>
+          }
+        />
+        <dl className={appearance["performance-summary"]}>
+          <PortfolioMetric
+            tone="highlight"
+            className=""
+            label={<>{text.cumulativeReturn}</>}
+            value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
+            note={<>{text.cumulativeNote}</>}
+          />
+          <PortfolioMetric
+            tone="brand"
+            className=""
+            label={<>{text.portfolioXirr}</>}
+            value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
+            note={<>{text.portfolioNote}</>}
+          />
+          <PortfolioMetric
+            tone="paper"
+            className=""
+            label={<>{portfolioSnapshot.benchmark} XIRR</>}
+            value={<>{formatPercent(portfolioSnapshot.benchmarkXirr)}</>}
+            note={<>{text.benchmarkNote}</>}
+          />
+        </dl>
+        <section className={appearance["returns"] + " " + appearance["shell"]}>
+          <div className={appearance["section-heading"]}>
+            <p className={appearance["section-number"]}>{text.chart}</p>
             <h2>{text.measured}</h2>
           </div>
           <PerformanceChart locale={locale} />
         </section>
-        <div className="section-gray">
-          <section className="methodology shell">
+        <div className={appearance["section-gray"]}>
+          <section className={appearance["methodology"] + " " + appearance["shell"]}>
             <h2>{text.methodology}</h2>
-            <div className="methodology-content">
-              <div className="methodology-explanation">{text.methodologyCopy}</div>
-              <aside className="methodology-source">{text.snapshotCopy(asOf)}</aside>
+            <div className={appearance["methodology-content"]}>
+              <div className={appearance["methodology-explanation"]}>{text.methodologyCopy}</div>
+              <aside className={appearance["methodology-source"]}>{text.snapshotCopy(asOf)}</aside>
             </div>
           </section>
         </div>

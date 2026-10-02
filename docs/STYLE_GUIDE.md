@@ -38,7 +38,7 @@ These conventions adapt [Bulletproof React's Project Standards](https://github.c
 - Use UTF-8, LF line endings, two-space indentation, and a final newline. [EditorConfig](../.editorconfig) applies editor defaults; [Git attributes](../.gitattributes) normalize text line endings without treating binary assets as text. Prettier remains the formatting authority; Markdown trailing spaces may express intentional line breaks.
 - Keep ESLint's flat configuration and type-aware rules. Lint commands reject warnings, and unused ESLint disable directives are errors. Scope necessary suppressions to the smallest affected code and explain their reason; remove them when the underlying exception disappears.
 - Validate external data at runtime even when its TypeScript type is declared. During refactoring, update types and callers together, then run affected checks. Tests stay beside their owning code; shared test utilities live in `src/testing/` and are never imported by application entry points.
-- CI is the required verification gate for releases. Local Git hooks are optional conveniences and cannot replace CI; do not install a hook that runs complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
+- CI is the required verification gate for releases. Husky provides local pre-commit checks of staged files; see [README verification](../README.md#verification) for their scope and recovery steps. Hooks cannot replace CI and must not run complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
 
 ## CSS, layout, and visual language
 
@@ -46,22 +46,33 @@ The goal is to make style ownership clear and use visual design to express infor
 
 ### Style ownership
 
-| Primary location                                                                                                               | Responsibility                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| [`src/app/reset.css`](../src/app/reset.css)                                                                                    | Browser normalization and the box model.                       |
-| [`src/app/styles/base.css`](../src/app/styles/base.css)                                                                        | Palette primitives, type, spacing, control, and motion tokens. |
-| [`src/app/styles/colors.css`](../src/app/styles/colors.css)                                                                    | Semantic color aliases.                                        |
-| [`src/app/styles/chrome.css`](../src/app/styles/chrome.css), [`pages.css`](../src/app/styles/pages.css)                        | Shared chrome, controls, and page layouts.                     |
-| [`typography.css`](../src/app/styles/typography.css), [`component-typography.css`](../src/app/styles/component-typography.css) | Shared text roles.                                             |
-| [`responsive.css`](../src/app/styles/responsive.css)                                                                           | Responsive layout, touch, and motion preferences.              |
-| [`themes.css`](../src/app/styles/themes.css)                                                                                   | Component surfaces and interaction color overrides.            |
-| `src/components/*.module.css` and `src/features/**/*.module.css`                                                               | Component-local layout and states.                             |
+| Primary location                             | Responsibility                                                                                                                                        |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`tokens.css`](../src/app/styles/tokens.css) | Brand primitives, semantic colors, typography, spacing, control and motion values; Tailwind theme aliases reference these values.                     |
+| [`base.css`](../src/app/styles/base.css)     | The single browser normalization, document fonts, baseline focus and motion preferences. No page or component selectors.                              |
+| [`globals.css`](../src/app/globals.css)      | Tailwind layers, theme/utilities imports, tokens, base and shared responsive variants.                                                                |
+| Component JSX and adjacent `*.styles.ts`     | Statically identifiable Tailwind classes for layout, responsive geometry, surfaces and ordinary states. Private style maps belong to their component. |
+| Adjacent `*.module.css`                      | Complex owned motion, chart structure and special controls. Never override another component's internals.                                             |
+| Inline styles                                | Values derived from data or measurements, such as chart coordinates; standalone global-error and email rendering have independent constraints.        |
 
-[`src/app/globals.css`](../src/app/globals.css) defines the import order; semantic colors and theme rules come later. Add new color aliases to `colors.css` and component selectors to the file that owns them. Theme rules may set backgrounds, borders, and interaction colors; other files own typography and page geometry.
+Tailwind utilities are processed by [`postcss.config.mjs`](../postcss.config.mjs). The custom normalization in `base.css` remains the only reset: Tailwind Preflight is deliberately not imported, preserving established heading, control and media defaults. Do not stack another reset on it. Use complete literal classes rather than interpolating utility fragments. Keep the same property under one styling mechanism; cancel and settle measured animations before releasing their state.
+
+Shared appearance is maintained through components, with finite variants:
+
+| Component                                             | Contract                                                                                                                                                                                                                               |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Container`                                           | Shared maximum width and responsive gutters; backgrounds belong to its outer section.                                                                                                                                                  |
+| `PageHero`                                            | Standard, portfolio, performance or support geometry; localized content remains with the page.                                                                                                                                         |
+| `Button` / `ButtonLink`                               | Primary, contrast or inverse surface; regular or small size. Native button and link semantics remain distinct. Disabled feedback uses standard, muted or muted-busy variants, preserving preferences opacity without parent overrides. |
+| `FormField`, `TextInput`, `TextArea`, `SelectControl` | Label association, visible or hidden label, standard square or inverse compact fields. Business validation and submission stay with the feature.                                                                                       |
+| `StatusMessage`                                       | Standard or inverse typography, reserved space and polite live feedback.                                                                                                                                                               |
+| `PortfolioMetric`                                     | Plain, highlight, brand or paper financial surfaces, shared typography and note opacity.                                                                                                                                               |
+
+Use Tailwind for normal layout and states, CSS Modules for owned complex structures and motion. Both reference the same tokens. This split follows [Next.js CSS recommendations](https://nextjs.org/docs/app/getting-started/css#recommendations), [Tailwind theme variables](https://tailwindcss.com/docs/theme) and the documented [Preflight effects](https://tailwindcss.com/docs/preflight).
 
 Keep box sizing, dimensions, spacing, and overflow predictable. Select shared tokens by purpose; CSS is the source of truth for values and breakpoints. Choose type sizes by semantic role, such as page title, section title, body, control, or data, rather than by what happens to fit one screenshot. Use `rem` for text and bounded `clamp()` values for display roles. Avoid arbitrary component font sizes or changing a text role solely at a breakpoint. Heading levels express document structure; financial numbers use tabular figures for comparison.
 
-A KPI's `data-tone` explicitly determines its colors, even if cards are reordered:
+A KPI's `tone` prop explicitly determines its colors, even if cards are reordered:
 
 | Tone        | Surface     | Text        |
 | ----------- | ----------- | ----------- |
@@ -80,13 +91,23 @@ Responsive layouts keep information and actions in priority order. Check all thr
 
 Email templates share the brand through [`email-layout.tsx`](../src/components/email-layout.tsx), rather than importing website CSS. Use React Email layout components, email-compatible inline styles and pixel-based dimensions. Preserve the existing email font stack (`Inter, Arial, Helvetica, sans-serif`), text colors and colored brand period; the website's Jost and responsive CSS rules do not apply automatically to inboxes.
 
-Keep one primary heading, a language attribute matching the content, descriptive action text and a usable plain-text alternative. Pass user content as React text, not raw HTML. Keep production copy with its owning feature and preview-only examples in `emails/`. Review all three languages and narrow layouts when changing the shared layout. See [Resend templates](RESEND_INTEGRATION.md#email-templates-and-local-preview) for source ownership, preview commands and delivery verification.
+Keep one primary heading, a language attribute matching the content, descriptive action text and a usable plain-text alternative. Pass user content as React text, not raw HTML. Keep production copy with its owning feature and preview-only examples in the owning feature’s `previews/` directory. Review all three languages and narrow layouts when changing the shared layout. See [Resend templates](RESEND_INTEGRATION.md#email-templates-and-local-preview) for source ownership, preview commands and delivery verification.
+
+### shadcn/ui components
+
+[shadcn/ui](https://ui.shadcn.com/docs) supplies component source that this project owns and customizes. `components.json` targets Tailwind v4, the existing `@/*` alias and `src/components/ui/`; `src/lib/utils.ts` provides `cn` for conditional classes and utility conflict resolution. Button variants use `class-variance-authority`. Import primitives directly from their source files; `ButtonLink` shares Button appearance while retaining link semantics.
+
+Button uses the site's `primary`, `contrast`, and `inverse` variants, `regular` and `small` sizes, and explicit disabled feedback. Input retains `standard` and `inverse` treatments; Textarea and the native select share the field appearance. These native elements retain refs, labels, validation and form submission without a client boundary. The separate `ButtonLink` contract deliberately replaces upstream Button's optional `asChild` composition.
+
+Before adding a component, inspect its official source and dependencies with `npx shadcn@latest view <component>`. Add only the needed component with `npx shadcn@latest add <component>`, then review the entire generated diff. Adapt new semantic aliases in `tokens.css`, including any focus, disabled and motion states; the existing `accent` alias means medium blue. Do not copy a default palette, add a second reset, replace Jost, or overwrite customized primitives blindly. Keep simple primitives server-compatible; add a client boundary only where an interactive primitive requires one. Install animation or primitive dependencies only when the selected component uses them.
+
+Verify affected rendered states, native form behavior and navigation after integration. Upstream defaults are examples, not a second visual standard for this site.
 
 ## Interaction, motion, and accessibility
 
 The goal is clear, reliable feedback for every action. Accessibility applies during layout, content, and component design, not only at final review.
 
-- Make controls recognizable and keyboard focus clearly visible. Touch hover resets must preserve active and `:focus-visible` feedback. Shared CTA hover recovery is maintained in the final theme layer; reset only idle hover, including transforms, without duplicating those rules in responsive styles.
+- Make controls recognizable and keyboard focus clearly visible. Touch hover resets must preserve active and `:focus-visible` feedback. Shared CTA hover recovery belongs to the button component; reset only idle hover, including transforms, without overriding active or keyboard focus.
 - Give loading, success, failure, disabled, and retry states clear meanings. Forms should prevent duplicate submissions, announce outcomes with text and live regions, and clear stale outcomes when the user edits again.
 - Use motion to explain state and spatial changes. Expanding and closing should support repeated input, interruption, and reversal while keeping visuals, focus, interactivity, and scroll state synchronized.
 - Preserve full function and necessary feedback under `prefers-reduced-motion`. Focus outlines should remain visible in standard and forced-colors modes; disabled states should not move.
@@ -95,7 +116,7 @@ Choose focus tokens according to light or inverse form surfaces. Preferences ret
 
 Current interaction conventions: the mobile menu slides left to open and right to close, and navigation fades early on close. Mobile language choices use a vertically expanding disclosure, initially collapsed and labelled with the current language. Its options contain only the other languages, avoiding a duplicate current-language control. Menu navigation, the language disclosure label, and language choices share a fast color transition and Medium Blue feedback for hover, keyboard focus, pressed, current-page, and expanded states. They retain stable geometry without separators or background fills. Keyboard focus adds an underline to navigation links, the language disclosure label, and language choices so focus remains distinguishable from current-page and expanded colors. The close icon returns from X to Menu. Background isolation and scroll locking remain until dismissal finishes, then focus returns. The open menu's close button retains a blue fill and black border; keyboard focus keeps its outer ring visible under `:focus-visible`. Touch presses show a separate blue ring and slight scale reduction; release fades the ring, including short taps and pointer cancellation. This feedback transfers from the trigger to the close control when opening. Reduced-motion mode shows the held ring without scale or release animation. The desktop language menu supports Enter, Space, arrow keys, Escape, and Tab; the mobile disclosure supports Enter, Space, and Tab. Reduced-motion mode may complete state changes immediately.
 
-Memos and monthly data retain native `details`/`summary` semantics. Height animation can reverse mid-flight; a viewport resize settles the intended height, and closing returns focus from the content to its summary. Without JavaScript, the native disclosure remains usable.
+Memos and monthly data retain native `details`/`summary` semantics. The requested state, `aria-expanded` and content interactivity remain synchronized, including during closing. Height animation can reverse mid-flight; a viewport resize settles the intended height, and closing returns focus from the content to its summary. Without JavaScript, the native disclosure remains usable. The modal mobile navigation uses `closed → opening → open → closing` phases, background isolation, a focus trap and Escape dismissal; ordinary navigation links retain link semantics. Opening and dismissal transforms are owned by Web Animations API; CSS Modules own unrelated color and touch feedback. Cancel, finish, resize, reduced-motion changes and unmount must leave no stale effects.
 
 ## Content and localization
 

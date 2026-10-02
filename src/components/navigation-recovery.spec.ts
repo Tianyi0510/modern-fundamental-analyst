@@ -66,17 +66,20 @@ for (const { prefix, language, locale, retry, error } of variants) {
     await expect(page.locator('.support-form input[type="hidden"][name="amount"]')).toHaveValue("6");
     await page.locator(`.footer-links a[href="${prefix}/support"]`).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/support$`));
-    await page
+    // Next.js may retain an inactive route tree; operate on the ready, visible form.
+    const form = page.locator(".support-form:visible");
+    await expect(form.locator("fieldset")).toBeEnabled();
+    await form
       .locator(".support-amount-option")
       .filter({ has: page.locator('input[value="18"]') })
       .click();
-    const data = await page.locator(".support-form").evaluate((form) => {
-      const data = new FormData(form as HTMLFormElement);
+    const data = await form.evaluate((element) => {
+      const data = new FormData(element as HTMLFormElement);
       return { amounts: data.getAll("amount"), attempt: data.get("checkout_attempt") };
     });
     expect(data.amounts).toEqual(["18"]);
     expect(data.attempt).not.toBe(attempt);
-    await expect(page.locator(".support-form fieldset")).toBeEnabled();
+    await expect(form.locator("fieldset")).toBeEnabled();
   });
 
   test(`${locale} a restored checkout page unlocks a new attempt without a stale amount`, async ({ page }) => {

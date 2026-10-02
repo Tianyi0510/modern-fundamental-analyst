@@ -10,6 +10,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     const mobileSort = page.locator(".portfolio-mobile-sort");
     await expect(mobileSort).toBeVisible();
     const table = page.getByRole("table");
+    await expect(table).toHaveJSProperty("tagName", "TABLE");
+    const holdingRows = table.locator("tbody").getByRole("row");
+    await expect(table.getByRole("rowheader")).toHaveCount((await holdingRows.count()) + 1);
+    await expect(table.locator("tfoot").getByRole("row")).toHaveCount(1);
     const headers = table.getByRole("columnheader");
     await expect(headers).toHaveCount(7);
     const labels = await mobileSort.locator("select option").allTextContents();
@@ -27,9 +31,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     const shares = () =>
       page
         .locator(".portfolio-row:not(.portfolio-total-row)")
-        .evaluateAll((rows) =>
-          rows.map((row) => Number(row.querySelectorAll('[role="cell"]')[1]?.textContent?.replaceAll(",", ""))),
-        );
+        .evaluateAll((rows) => rows.map((row) => Number(row.children[1]?.textContent?.replaceAll(",", ""))));
     await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => b - a));
 
     await mobileSort.locator("button").click();
@@ -41,5 +43,16 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.setViewportSize({ width: 1440, height: 900 });
     await expect(mobileSort).toBeHidden();
     await expect(page.locator(".table-head")).toBeVisible();
+    const sharesButton = sharesHeader.getByRole("button");
+    await sharesButton.focus();
+    await sharesButton.press("Enter");
+    await expect(sharesHeader).toHaveAttribute("aria-sort", "descending");
+    await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => b - a));
+    await expect(holdingRows.first().getByRole("rowheader")).toHaveCSS("text-align", "left");
+    await expect(holdingRows.first().getByRole("cell").first()).toHaveCSS("text-align", "right");
+    await expect(table.locator(".portfolio-total-market")).toHaveCSS("font-weight", "700");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 }

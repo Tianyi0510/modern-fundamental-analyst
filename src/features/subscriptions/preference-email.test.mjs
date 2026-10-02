@@ -31,7 +31,9 @@ for (const [locale, lang] of [
     const { createElement } = await import("react");
     const { render } = await import("react-email");
     for (const kind of ["contact", "preferences"]) {
-      const { default: Preview } = await import(`../../../emails/${kind}-${locale}.tsx`);
+      const previewPath =
+        kind === "contact" ? `../contact/previews/contact-${locale}.tsx` : `./previews/preferences-${locale}.tsx`;
+      const { default: Preview } = await import(previewPath);
       const element = createElement(Preview);
       const html = await render(element);
       const text = await render(element, { plainText: true });

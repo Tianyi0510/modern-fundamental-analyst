@@ -25,26 +25,34 @@
     "test:webkit": "node .github/run-webkit.mjs",
     "verify": "npm run verify:static && npm run build && npm run test:computed-style:production",
     "test:computed-style:production": "PLAYWRIGHT_USE_PRODUCTION_BUILD=1 playwright test --project=chromium",
-    "email": "email dev --dir emails --port 3001",
-    "verify:static": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit"
+    "email": "npm run email:contact",
+    "email:contact": "email dev --dir src/features/contact/previews --port 3001",
+    "email:preferences": "email dev --dir src/features/subscriptions/previews --port 3002",
+    "verify:static": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit",
+    "prepare": "node .husky/install.mjs",
+    "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@redis/client": "^6.2.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "lucide-react": "^1.48.0",
     "next": "16.3.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-email": "^6.11.0",
     "resend": "^6.30.0",
-    "stripe": "^22.6.2"
+    "stripe": "^22.6.2",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.4",
     "@next/eslint-plugin-next": "16.3.6",
     "@playwright/test": "1.63.0",
     "@react-email/ui": "^6.11.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "24.19.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
@@ -53,9 +61,12 @@
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "prettier": "^3.9.9",
     "stylelint": "^17.15.0",
     "stylelint-config-recommended": "^18.0.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.1"
   },
@@ -64,5 +75,10 @@
     "@react-email/ui": {
       "next": "$next"
     }
+  },
+  "lint-staged": {
+    "*": "prettier --check --ignore-unknown",
+    "*.{js,cjs,mjs,jsx,ts,tsx}": "eslint --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
+    "*.css": "stylelint --max-warnings=0"
   }
 }

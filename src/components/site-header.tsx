@@ -1,5 +1,8 @@
 "use client";
 
+import { appearance, desktopNavigationLink, mobileNavigationLink, languageChoice } from "./site-header.styles";
+import { ButtonLink } from "./button-link";
+
 import Link from "next/link";
 import { Check, ChevronDown, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -26,6 +29,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
     handlePointerDown: handleMenuPointerDown,
     handlePointerUp: handleMenuPointerUp,
     isOpen: isMenuOpen,
+    phase: menuPhase,
     open: openMenu,
     triggerRef: menuButtonRef,
   } = useMobileMenu();
@@ -53,9 +57,9 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
 
   return (
-    <header className="site-header shell">
+    <header className={appearance["site-header"] + " " + appearance["shell"]}>
       <Link
-        className="wordmark"
+        className={appearance["wordmark"]}
         href={getLocalizedPath("/", locale)}
         aria-label={`Modern Fundamental Analyst ${copy.home}`}
         tabIndex={isMenuOpen ? -1 : undefined}
@@ -64,7 +68,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
       </Link>
       <button
         ref={menuButtonRef}
-        className="mobile-menu-button"
+        className={appearance["mobile-menu-button"]}
         type="button"
         aria-label={menuLabel}
         aria-expanded={isMenuOpen}
@@ -73,21 +77,26 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
         {...menuTouchFeedback}
         onClick={openMenu}
       >
-        <span className="mobile-menu-touch-ring" aria-hidden="true" />
+        <span className={appearance["mobile-menu-touch-ring"]} aria-hidden="true" />
         <Menu aria-hidden="true" strokeWidth={2} />
       </button>
-      <div className="header-actions">
-        <nav aria-label={copy.primary}>
+      <div className={appearance["header-actions"]}>
+        <nav className="flex gap-[12px]" aria-label={copy.primary}>
           {navigation.map(({ href, label }) => (
-            <Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} key={href}>
+            <Link
+              className={desktopNavigationLink}
+              href={href}
+              aria-current={isCurrentPath(href) ? "page" : undefined}
+              key={href}
+            >
               {label}
             </Link>
           ))}
         </nav>
-        <div className="language-menu" ref={languageMenuRef}>
+        <div className={appearance["language-menu"]} ref={languageMenuRef}>
           <button
             ref={languageButtonRef}
-            className="language-trigger"
+            className={appearance["language-trigger"]}
             type="button"
             aria-label={copy.change}
             aria-haspopup="menu"
@@ -106,7 +115,8 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             <ChevronDown aria-hidden="true" strokeWidth={2.75} />
           </button>
           <div
-            className={`language-dropdown${isLanguageOpen ? " is-open" : ""}`}
+            className={`${appearance["language-dropdown"]}${isLanguageOpen ? " is-open" : ""}`}
+            data-state={isLanguageOpen ? "open" : "closed"}
             id="desktop-language-menu"
             role="menu"
             aria-hidden={!isLanguageOpen}
@@ -114,6 +124,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           >
             {locales.map((targetLocale) => (
               <Link
+                className={languageChoice}
                 href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
                 hrefLang={localeConfig[targetLocale].hrefLang}
                 role="menuitem"
@@ -128,19 +139,26 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             ))}
           </div>
         </div>
-        <Link
-          className="button button-dark button-small"
+        <ButtonLink
+          variant="contrast"
+          size="small"
           href={getLocalizedPath("/contact", locale)}
           aria-current={isCurrentPath(getLocalizedPath("/contact", locale)) ? "page" : undefined}
         >
           {copy.contact}
-        </Link>
+        </ButtonLink>
       </div>
 
-      <div className={`mobile-menu-layer${isMenuOpen ? " is-open" : ""}`} aria-hidden={!isMenuOpen}>
+      <div
+        className={`${appearance["mobile-menu-layer"]}${isMenuOpen ? " is-open" : ""}`}
+        data-state={isMenuOpen ? "open" : "closed"}
+        data-menu-phase={menuPhase}
+        aria-hidden={!isMenuOpen}
+        inert={!isMenuOpen}
+      >
         <aside
           ref={menuDrawerRef}
-          className="mobile-menu-drawer"
+          className={appearance["mobile-menu-drawer"]}
           id="mobile-site-menu"
           role="dialog"
           aria-modal="true"
@@ -149,9 +167,9 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           onPointerDown={handleMenuPointerDown}
           onPointerUp={handleMenuPointerUp}
         >
-          <div className="mobile-menu-top">
+          <div className={appearance["mobile-menu-top"]}>
             <Link
-              className="wordmark mobile-menu-wordmark"
+              className={appearance["wordmark"] + " " + appearance["mobile-menu-wordmark"]}
               href={homePath}
               onClick={closeMenuForNavigation}
               tabIndex={isMenuOpen ? 0 : -1}
@@ -160,22 +178,26 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             </Link>
             <button
               ref={menuCloseButtonRef}
-              className="mobile-menu-close"
+              className={appearance["mobile-menu-close"]}
               type="button"
               aria-label={closeLabel}
               {...menuTouchFeedback}
               onClick={closeMenu}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              <span className="mobile-menu-touch-ring" aria-hidden="true" />
-              <X className="mobile-menu-close-icon" aria-hidden="true" strokeWidth={2} />
-              <Menu className="mobile-menu-return-icon" aria-hidden="true" strokeWidth={2} />
+              <span className={appearance["mobile-menu-touch-ring"]} aria-hidden="true" />
+              <X className={appearance["mobile-menu-close-icon"]} aria-hidden="true" strokeWidth={2} />
+              <Menu className={appearance["mobile-menu-return-icon"]} aria-hidden="true" strokeWidth={2} />
             </button>
           </div>
-          <div className="mobile-menu-content" ref={menuContentRef}>
-            <nav aria-label={copy.mobilePrimary}>
+          <div className={appearance["mobile-menu-content"]} ref={menuContentRef}>
+            <nav
+              className="relative z-[1] flex flex-col text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] tracking-[var(--tracking-heading)] font-bold"
+              aria-label={copy.mobilePrimary}
+            >
               {mobileNavigation.map(({ href, label }) => (
                 <Link
+                  className={mobileNavigationLink}
                   href={href}
                   aria-current={isCurrentPath(href) ? "page" : undefined}
                   onClick={closeMenuForNavigation}
@@ -186,9 +208,9 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                 </Link>
               ))}
             </nav>
-            <div className="mobile-language-links">
+            <div className={appearance["mobile-language-links"]}>
               <AnimatedDisclosure
-                className="mobile-language-disclosure"
+                className={appearance["mobile-language-disclosure"]}
                 summary={
                   <>
                     <span>{localeConfig[locale].label}</span>
@@ -196,12 +218,12 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                   </>
                 }
               >
-                <div className="mobile-language-options">
+                <div className={appearance["mobile-language-options"]}>
                   {locales
                     .filter((targetLocale) => targetLocale !== locale)
                     .map((targetLocale) => (
                       <Link
-                        className="mobile-menu-language"
+                        className={appearance["mobile-menu-language"]}
                         href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
                         hrefLang={localeConfig[targetLocale].hrefLang}
                         onClick={closeMenuForNavigation}

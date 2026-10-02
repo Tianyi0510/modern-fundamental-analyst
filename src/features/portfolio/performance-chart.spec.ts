@@ -10,6 +10,12 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator('a[href*="docs.google.com/spreadsheets"]')).toHaveCount(0);
     await expect(page.locator(".returns-table")).toHaveCount(0);
     await expect(page.locator(".methodology-explanation > p")).toHaveCount(3);
+    const methodologyNote = page.getByRole("complementary");
+    await expect(methodologyNote).toBeVisible();
+    await expect(methodologyNote).toContainText(prefix ? "2026年8月31日" : "31 Aug 2026");
+    await expect(methodologyNote).toContainText(
+      prefix === "/zh-tw" ? "並非即時報價" : prefix === "/zh-cn" ? "并非实时报价" : "not live quotes",
+    );
     const chart = page.locator('figure[aria-labelledby="performance-chart-title"]');
     await expect(chart.getByRole("img")).toBeVisible();
     await expect(chart.getByRole("img")).toHaveAccessibleName(/21\.14%.*21\.00%/);
