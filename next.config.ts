@@ -21,11 +21,18 @@ const nextConfig: NextConfig = {
     const oldSlug = "microsoft-stock-analysis-fy2024";
     const newSlug = "microsoft-stock-analysis-fiscal-year-2024";
 
-    return ["", "/zh-tw", "/zh-cn"].map((prefix) => ({
-      source: `${prefix}/memos/${oldSlug}`,
-      destination: `${prefix}/memos/${newSlug}`,
-      permanent: true,
-    }));
+    return [
+      ...["", "/zh-tw", "/zh-cn"].map((prefix) => ({
+        source: `${prefix}/memos/${oldSlug}`,
+        destination: `${prefix}/memos/${newSlug}`,
+        permanent: true,
+      })),
+      ...["icon.svg", "icon.png", "logo.svg", "logo.png", "og-logo.png"].map((filename) => ({
+        source: `/images/${filename}`,
+        destination: `/${filename}`,
+        permanent: true,
+      })),
+    ];
   },
   // eslint-disable-next-line @typescript-eslint/require-await
   async headers() {

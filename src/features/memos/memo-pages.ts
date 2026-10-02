@@ -23,6 +23,6 @@ export function createMemoStructuredData(slug: string, locale: Locale) {
     inLanguage: localeConfig[locale].hrefLang,
     url,
     mainEntityOfPage: url,
-    image: `${SITE_URL}/images/og-logo.png`,
+    image: `${SITE_URL}/og-logo.png`,
   }).replace(/</g, "\\u003c");
 }

@@ -39,10 +39,10 @@ npm run verify
 | `src/app/`        | Routes, localized page composition in `_components`, metadata, and global CSS          |
 | `src/features/`   | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls |
 | `src/components/` | Shared navigation, footer, disclosure, form primitives, and email layout               |
-| `src/testing/`    | Shared test helpers and the explicit Node loader                                       |
+| `scripts/`        | Node loader, test helpers, WebKit runner, and production deployment gate               |
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
-| `public/images/`  | Public icons, logos, and the social sharing image                                      |
-| `.github/`        | CI workflows, production deployment gate, and WebKit runner                            |
+| `public/`         | Public icons, logos, and the social sharing image                                      |
+| `.github/`        | GitHub Actions workflows                                                               |
 | `docs/`           | Style guide, operations, data, and service integration guides                          |
 
 Layout and ordinary states use static Tailwind classes; complex component motion and charts use adjacent CSS Modules. Tokens and the single reset live in `src/app/styles/`; see [style ownership](docs/STYLE_GUIDE.md#style-ownership). React Email maintains separate inbox-compatible styling.

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { read } from "@/testing/repository-helpers.mjs";
+import { read } from "../../../scripts/repository-helpers.mjs";
 
 test("memo metadata uses one localized catalog", async () => {
   const { memos, memosZhTw, memosZhCn } = await import("./memos.ts");
@@ -82,7 +82,7 @@ test("article metadata and structured data agree with the localized catalog", as
     assert.equal(article.datePublished, memo.publishedAt);
     assert.equal(article.inLanguage, localeConfig[locale].hrefLang);
     assert.ok(article.url.endsWith(metadata.alternates.canonical));
-    assert.ok(article.image.endsWith("/images/og-logo.png"));
+    assert.ok(article.image.endsWith("/og-logo.png"));
     assert.equal(article.dateModified, undefined);
     assert.equal(serialized.includes("<"), false);
   }
