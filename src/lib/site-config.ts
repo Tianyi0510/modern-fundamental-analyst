@@ -6,7 +6,7 @@ export const SITE_NAME = "Modern Fundamental Analyst";
 const SITE_DESCRIPTION = "An independent public-equity portfolio, performance record, and investment memo archive.";
 
 const sharingImage = {
-  url: `${SITE_URL}/images/og-logo.png`,
+  url: `${SITE_URL}/og-logo.png`,
   width: 1200,
   height: 630,
   alt: "Modern Fundamental Analyst logo",

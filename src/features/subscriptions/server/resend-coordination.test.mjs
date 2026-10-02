@@ -2,7 +2,6 @@ import { getLatestMemo } from "@/features/memos/memos.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { registerHooks } from "node:module";
-import "@/testing/repository-helpers.mjs";
 
 const values = new Map();
 const redis = {

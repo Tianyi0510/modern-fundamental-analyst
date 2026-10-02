@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { read } from "@/testing/repository-helpers.mjs";
+import { read } from "../../scripts/repository-helpers.mjs";
 
 const { createMemoryRateLimiter, createRateLimiter } = await import("./rate-limit.ts");
 

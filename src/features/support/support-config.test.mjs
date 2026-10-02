@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { read } from "@/testing/repository-helpers.mjs";
+import { read } from "../../../scripts/repository-helpers.mjs";
 
 const { parseSupportAmount } = await import("./support-config.ts");
 

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { read } from "@/testing/repository-helpers.mjs";
+import { read } from "../../scripts/repository-helpers.mjs";
 
 test("shared client navigation receives only the active locale copy from server components", async () => {
   const [header, navigationCopy, home, about, portfolio] = await Promise.all([
