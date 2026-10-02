@@ -1,16 +1,16 @@
 "use client";
 
-import { appearance, desktopNavigationLink, mobileNavigationLink, languageChoice } from "./site-header.styles";
-import { ButtonLink } from "./button-link";
+import { appearance, mobileNavigationLink } from "./site-header.styles";
+import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
-import { Check, ChevronDown, Menu, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { useRef } from "react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { usePathname } from "next/navigation";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
-import { useMenuTouchFeedback, useMobileMenu } from "@/components/use-site-header";
+import { useMobileMenu } from "./use-site-header";
+import { useMenuTouchFeedback } from "./use-menu-touch-feedback";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
 
@@ -36,21 +36,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
     open: openMenu,
     triggerRef: menuButtonRef,
   } = useMobileMenu();
-  const [isLanguageOpen, setLanguageOpen] = useState(false);
-  const languageTriggerRef = useRef<HTMLButtonElement>(null);
-  const languageContentRef = useRef<HTMLDivElement>(null);
-  const contactLinkRef = useRef<HTMLAnchorElement>(null);
-  const enterLastLanguageRef = useRef(false);
-  const languageTabExitRef = useRef(false);
   const navigationClosingRef = useRef(false);
-  useEffect(() => {
-    const compact = window.matchMedia("(max-width: 1150px)");
-    const closeDesktopMenu = () => {
-      if (compact.matches) setLanguageOpen(false);
-    };
-    compact.addEventListener("change", closeDesktopMenu);
-    return () => compact.removeEventListener("change", closeDesktopMenu);
-  }, []);
   const closeForNavigation = () => {
     navigationClosingRef.current = true;
     closeMenuForNavigation();
@@ -100,86 +86,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             <Menu aria-hidden="true" strokeWidth={2} />
           </button>
         </SheetTrigger>
-        <div className={appearance["header-actions"]}>
-          <nav className="flex gap-[12px]" aria-label={copy.primary}>
-            {navigation.map(({ href, label }) => (
-              <Link
-                className={desktopNavigationLink}
-                href={href}
-                aria-current={isCurrentPath(href) ? "page" : undefined}
-                key={href}
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
-          <div className={appearance["language-menu"]}>
-            <DropdownMenu modal={false} open={isLanguageOpen} onOpenChange={setLanguageOpen}>
-              <DropdownMenuTrigger
-                ref={languageTriggerRef}
-                onKeyDown={(event) => {
-                  if (event.key !== "ArrowUp" || isLanguageOpen) return;
-                  event.preventDefault();
-                  enterLastLanguageRef.current = true;
-                  setLanguageOpen(true);
-                }}
-                className={appearance["language-trigger"]}
-                aria-label={copy.change}
-                aria-controls="desktop-language-menu"
-              >
-                {localeConfig[locale].label}
-                <ChevronDown aria-hidden="true" strokeWidth={2.75} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                ref={languageContentRef}
-                className="language-dropdown"
-                align="end"
-                id="desktop-language-menu"
-                onFocusCapture={() => {
-                  if (!enterLastLanguageRef.current) return;
-                  enterLastLanguageRef.current = false;
-                  requestAnimationFrame(() =>
-                    languageContentRef.current?.querySelector<HTMLElement>("[role=menuitem]:last-child")?.focus(),
-                  );
-                }}
-                onKeyDown={(event) => {
-                  if (event.key !== "Tab") return;
-                  event.preventDefault();
-                  languageTabExitRef.current = true;
-                  setLanguageOpen(false);
-                  (event.shiftKey ? languageTriggerRef.current : contactLinkRef.current)?.focus();
-                }}
-                onCloseAutoFocus={(event) => {
-                  if (languageTabExitRef.current) event.preventDefault();
-                  languageTabExitRef.current = false;
-                }}
-              >
-                {locales.map((targetLocale) => (
-                  <DropdownMenuItem asChild key={targetLocale}>
-                    <Link
-                      className={languageChoice}
-                      href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
-                      hrefLang={localeConfig[targetLocale].hrefLang}
-                      aria-current={locale === targetLocale ? "page" : undefined}
-                    >
-                      <span>{localeConfig[targetLocale].label}</span>
-                      {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <ButtonLink
-            ref={contactLinkRef}
-            variant="contrast"
-            size="small"
-            href={getLocalizedPath("/contact", locale)}
-            aria-current={isCurrentPath(getLocalizedPath("/contact", locale)) ? "page" : undefined}
-          >
-            {copy.contact}
-          </ButtonLink>
-        </div>
+        <DesktopNavigation copy={copy} locale={locale} languageQuery={languageQuery} navigation={navigation} />
 
         <SheetContent
           ref={menuDrawerRef}
@@ -212,6 +119,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
               className={appearance["wordmark"] + " " + appearance["mobile-menu-wordmark"]}
               href={homePath}
               onClick={closeForNavigation}
+              inert={menuPhase === "closing"}
               tabIndex={isMenuOpen ? 0 : -1}
             >
               Modern Fundamental Analyst<span>.</span>
@@ -230,7 +138,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
               <Menu className={appearance["mobile-menu-return-icon"]} aria-hidden="true" strokeWidth={2} />
             </button>
           </div>
-          <div className={appearance["mobile-menu-content"]} ref={menuContentRef}>
+          <div className={appearance["mobile-menu-content"]} ref={menuContentRef} inert={menuPhase === "closing"}>
             <nav
               className="relative z-[1] flex flex-col text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] tracking-[var(--tracking-heading)] font-bold"
               aria-label={copy.mobilePrimary}
