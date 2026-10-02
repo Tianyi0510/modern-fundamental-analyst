@@ -15,6 +15,8 @@ export const supportCopy = {
     recovery: "If navigation stopped or failed, retry this checkout with the same amount.",
     note: "Securely processed by Stripe. This is voluntary support—not a charitable donation, investment product, or advisory service.",
     statuses: {
+      "retired-checkout":
+        "This checkout attempt can no longer be resumed. Check your original Stripe confirmation before starting another payment.",
       pending: "Your payment is still processing. Check your Stripe confirmation before trying again.",
       unverified: "We could not confirm this payment. Check your Stripe confirmation before trying again.",
       success: "Thank you for supporting independent research. Stripe will send your payment confirmation by email.",
@@ -39,6 +41,7 @@ export const supportCopy = {
     recovery: "若跳轉已停止或失敗，可用相同金額重試此付款流程。",
     note: "付款由 Stripe 安全處理。這是自願支持，並非慈善捐款、投資產品或投資顧問服務。",
     statuses: {
+      "retired-checkout": "此付款嘗試已無法恢復。請先查閱原本的 Stripe 付款確認，再決定是否開始另一筆付款。",
       pending: "付款仍在處理中，請先查閱 Stripe 付款確認，再決定是否重試。",
       unverified: "目前無法確認這筆付款，請先查閱 Stripe 付款確認，再決定是否重試。",
       success: "感謝你支持獨立研究。Stripe 將透過電子郵件寄送付款確認。",
@@ -62,6 +65,7 @@ export const supportCopy = {
     recovery: "若跳转已停止或失败，可用相同金额重试此付款流程。",
     note: "付款由 Stripe 安全处理。这是自愿支持，并非慈善捐款、投资产品或投资顾问服务。",
     statuses: {
+      "retired-checkout": "此付款尝试已无法恢复。请先查阅原本的 Stripe 付款确认，再决定是否开始另一笔付款。",
       pending: "付款仍在处理中，请先查阅 Stripe 付款确认，再决定是否重试。",
       unverified: "目前无法确认这笔付款，请先查阅 Stripe 付款确认，再决定是否重试。",
       success: "感谢你支持独立研究。Stripe 将通过电子邮件发送付款确认。",

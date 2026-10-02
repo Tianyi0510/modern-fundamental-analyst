@@ -15,12 +15,15 @@ registerHooks({
   },
 });
 process.env.STRIPE_RESTRICTED_KEY = "rk_test_mock";
-for (const amount of [6, 12, 18]) process.env[`STRIPE_PRICE_USD_${amount}`] = `price_mock_${amount}`;
-delete process.env.UPSTASH_REDIS_URL;
+delete process.env.UPSTASH_REDIS_REST_URL;
+delete process.env.UPSTASH_REDIS_REST_TOKEN;
 const { POST } = await import("./route.ts");
 const { resolveSupportStatus } = await import("@/features/support/server/stripe-checkout.ts");
 let count = 0;
-function request(body = "locale=en&amount=12", overrides = {}) {
+function request(
+  body = "locale=en&product_id=support-12-v1&checkout_attempt=550e8400-e29b-41d4-a716-446655440000",
+  overrides = {},
+) {
   return new Request("https://www.modernfundamentalanalyst.com/api/stripe/checkout", {
     method: "POST",
     headers: {
@@ -40,54 +43,11 @@ test.beforeEach(() => {
 test("checkout rejects invalid origin, format, amount and oversized bodies before Stripe", async () => {
   assert.equal((await POST(request(undefined, { origin: "https://other.example" }))).status, 403);
   assert.equal((await POST(request("{}", { "content-type": "application/json" }))).status, 415);
-  const invalid = await POST(request("locale=zh-cn&amount=13"));
+  const invalid = await POST(request("locale=zh-cn&product_id=unknown"));
   assert.equal(invalid.status, 303);
   assert.ok(invalid.headers.get("location").endsWith("/zh-cn/support?status=invalid-amount"));
   assert.equal((await POST(request("x".repeat(5001)))).status, 413);
 });
-test("checkout creates hosted one-time sessions for every configured amount and language", async () => {
-  for (const [locale, prefix, stripeLocale] of [
-    ["en", "", "en"],
-    ["zh-tw", "/zh-tw", "zh"],
-    ["zh-cn", "/zh-cn", "zh"],
-  ]) {
-    for (const amount of [6, 12, 18]) {
-      globalThis.stripeCreate = async (options) => {
-        assert.deepEqual(options.line_items, [{ price: `price_mock_${amount}`, quantity: 1 }]);
-        assert.equal(options.mode, "payment");
-        assert.equal(options.ui_mode, "hosted_page");
-        assert.deepEqual(options.automatic_tax, { enabled: true });
-        assert.equal(options.locale, stripeLocale);
-        assert.deepEqual(options.metadata, {
-          purpose: "research_support",
-          support_amount_usd: String(amount),
-          site_locale: locale,
-        });
-        assert.deepEqual(options.payment_intent_data, { metadata: options.metadata });
-        assert.equal(typeof options.integration_identifier, "string");
-        assert.ok(options.integration_identifier.length > 0);
-        for (const key of ["managed_payments", "payment_method_types", "payment_method_collection"])
-          assert.equal(Object.hasOwn(options, key), false);
-        const success = new URL(options.success_url);
-        const cancel = new URL(options.cancel_url);
-        assert.equal(success.pathname, `${prefix}/support`);
-        assert.equal(success.searchParams.get("status"), "success");
-        assert.equal(success.searchParams.get("session_id"), "{CHECKOUT_SESSION_ID}");
-        assert.equal(cancel.pathname, success.pathname);
-        assert.equal(cancel.searchParams.get("status"), "cancelled");
-        return { url: "https://checkout.stripe.com/mock" };
-      };
-      const response = await POST(request(`locale=${locale}&amount=${amount}`));
-      assert.equal(response.status, 303);
-      assert.equal(response.headers.get("location"), "https://checkout.stripe.com/mock");
-    }
-  }
-  assert.deepEqual(globalThis.stripeInitialization, {
-    key: "rk_test_mock",
-    options: { apiVersion: "2026-08-26.dahlia", maxNetworkRetries: 2, timeout: 10_000 },
-  });
-});
-
 test("checkout error redirects retain the validated browser origin when the internal host differs", async () => {
   const response = await POST(
     new Request("http://localhost:3210/api/stripe/checkout", {
@@ -98,7 +58,7 @@ test("checkout error redirects retain the validated browser origin when the inte
         "content-type": "application/x-www-form-urlencoded",
         "x-forwarded-for": "192.0.2.200",
       },
-      body: "locale=zh-tw&amount=invalid",
+      body: "locale=zh-tw&product_id=invalid",
     }),
   );
   assert.equal(response.status, 303);
@@ -113,9 +73,11 @@ test("checkout provider failures return localized redirects without logging priv
     async () => ({}),
   ]) {
     globalThis.stripeCreate = create;
-    const response = await POST(request("locale=zh-cn&amount=12"));
+    const response = await POST(
+      request("locale=zh-cn&product_id=support-12-v1&checkout_attempt=550e8400-e29b-41d4-a716-446655440000"),
+    );
     assert.equal(response.status, 303);
-    assert.ok(response.headers.get("location").endsWith("/zh-cn/support?status=error"));
+    assert.equal(new URL(response.headers.get("location")).searchParams.get("status"), "error");
   }
   assert.ok(logs.mock.callCount() > 0);
   assert.doesNotMatch(
@@ -132,14 +94,14 @@ test("checkout retries an uncertain provider result with the same idempotency ke
     return { url: "https://checkout.stripe.com/same-session" };
   };
   const attempt = "69a3c170-1105-42f2-b492-15f74ef59a71";
-  const body = `locale=zh-tw&amount=12&checkout_attempt=${attempt}`;
+  const body = `locale=zh-tw&product_id=support-12-v1&checkout_attempt=${attempt}`;
   const recovery = new URL((await POST(request(body))).headers.get("location"));
   assert.equal(recovery.searchParams.get("status"), "error");
   assert.equal(recovery.searchParams.get("checkout_attempt"), attempt);
-  assert.equal(recovery.searchParams.get("amount"), "12");
+  assert.equal(recovery.searchParams.get("product_id"), "support-12-v1");
   assert.equal((await POST(request(body))).headers.get("location"), "https://checkout.stripe.com/same-session");
   assert.deepEqual(calls[0], calls[1]);
-  assert.equal(calls[0].options.idempotencyKey, `support-checkout:${attempt}`);
+  assert.equal(calls[0].options.idempotencyKey, `support-checkout:v2:${attempt}`);
   assert.equal((await POST(request("amount=12&checkout_attempt=invalid"))).status, 303);
   assert.equal(calls.length, 2);
 });
@@ -194,22 +156,123 @@ test("only a paid completed research-support session is confirmed", async (t) =>
   assert.equal(await resolveSupportStatus({ status: "success", session_id: "cs_test_mock" }), "unverified");
 });
 
-test("language switching preserves the original Stripe parameters and rejects duplicate amounts", async (t) => {
-  t.mock.method(console, "error", () => {});
+test("catalog checkouts own pricing for every product and language", async () => {
+  const attempt = "69a3c170-1105-42f2-b492-15f74ef59a71";
+  {
+    for (const locale of ["en", "zh-tw", "zh-cn"])
+      for (const amount of [6, 12, 18]) {
+        globalThis.stripeCreate = async (params, options) => {
+          assert.deepEqual(params.line_items, [
+            {
+              quantity: 1,
+              price_data: {
+                currency: "usd",
+                unit_amount: amount * 100,
+                product_data: { name: "Support", tax_code: "txcd_10000000" },
+              },
+            },
+          ]);
+          assert.equal(params.mode, "payment");
+          assert.equal(params.ui_mode, "hosted_page");
+          assert.equal(params.locale, locale === "en" ? "en" : "zh");
+          assert.equal(new URL(params.success_url).pathname, locale === "en" ? "/support" : `/${locale}/support`);
+          assert.equal(params.metadata.support_product_id, `support-${amount}-v1`);
+          assert.equal(params.metadata.support_amount_usd, String(amount));
+          assert.equal(params.metadata.site_locale, locale);
+          assert.deepEqual(params.automatic_tax, { enabled: true });
+          assert.equal(options.idempotencyKey, `support-checkout:v2:${attempt}`);
+          return { url: "https://checkout.stripe.com/catalog" };
+        };
+        // User-supplied amounts never become the price for a catalog product.
+        const response = await POST(
+          request(`locale=${locale}&product_id=support-${amount}-v1&amount=1&checkout_attempt=${attempt}`),
+        );
+        assert.equal(response.headers.get("location"), "https://checkout.stripe.com/catalog");
+      }
+  }
+});
+
+test("unknown and repeated products cannot fall back to legacy amount pricing", async () => {
+  for (const body of [
+    "product_id=unknown&amount=12",
+    "product_id=support-6-v1&product_id=support-18-v1&amount=12",
+    "product_id=&amount=12",
+  ]) {
+    const response = await POST(request(body));
+    assert.equal(new URL(response.headers.get("location")).searchParams.get("status"), "invalid-amount");
+  }
+});
+
+test("catalog retries freeze the product version and original language after an unknown outcome", async (context) => {
+  context.mock.method(console, "error", () => {});
   const calls = [];
+  const attempt = "550e8400-e29b-41d4-a716-446655440000";
   globalThis.stripeCreate = async (...args) => {
     calls.push(args);
-    throw new Error("uncertain result");
+    throw new Error("response lost");
   };
-  const attempt = "550e8400-e29b-41d4-a716-446655440000";
   for (const locale of ["en", "zh-tw", "zh-cn"]) {
-    const response = await POST(request(`locale=${locale}&checkout_locale=en&checkout_attempt=${attempt}&amount=12`));
-    const recovery = new URL(response.headers.get("location"));
-    assert.equal(recovery.searchParams.get("checkout_locale"), "en");
-    assert.equal(recovery.pathname, locale === "en" ? "/support" : `/${locale}/support`);
+    const response = await POST(
+      request(`locale=${locale}&checkout_locale=zh-tw&product_id=support-6-v1&checkout_attempt=${attempt}`),
+    );
+    const query = new URL(response.headers.get("location")).searchParams;
+    assert.equal(query.get("product_id"), "support-6-v1");
+    assert.equal(query.get("checkout_locale"), "zh-tw");
+    assert.equal(query.has("amount"), false);
   }
   assert.deepEqual(calls[0], calls[1]);
   assert.deepEqual(calls[1], calls[2]);
-  await POST(request("amount=6&amount=18"));
-  assert.equal(calls.length, 3);
+  assert.equal(calls[0][1].idempotencyKey, `support-checkout:v2:${attempt}`);
+  globalThis.stripeCreate = async (...args) => {
+    calls.push(args);
+    return { url: "https://checkout.stripe.com/mock" };
+  };
+  await POST(request(`product_id=support-18-v1&checkout_attempt=${attempt}`));
+  // A changed selection must hit the SAME key, allowing Stripe to reject changed parameters.
+  assert.equal(calls[3][1].idempotencyKey, calls[0][1].idempotencyKey);
+});
+
+test("catalog sessions require matching version, subtotal and amount metadata for confirmation", async () => {
+  const session = {
+    mode: "payment",
+    status: "complete",
+    payment_status: "paid",
+    currency: "usd",
+    amount_subtotal: 1200,
+    metadata: { purpose: "research_support", support_amount_usd: "12", support_product_id: "support-12-v1" },
+  };
+  for (const [patch, expected] of [
+    [{}, "success"],
+    [{ amount_subtotal: 600 }, "unverified"],
+    [{ metadata: { ...session.metadata, support_product_id: "unknown" } }, "unverified"],
+    [{ metadata: { ...session.metadata, support_amount_usd: "6" } }, "unverified"],
+    [{ payment_status: "unpaid" }, "pending"],
+  ]) {
+    globalThis.stripeRetrieve = async () => ({ ...session, ...patch });
+    assert.equal(await resolveSupportStatus({ status: "success", session_id: "cs_test_catalog" }), expected);
+  }
+});
+
+test("catalog requests require one valid attempt identifier", async () => {
+  for (const choice of [
+    "",
+    "&checkout_attempt=invalid",
+    "&checkout_attempt=550e8400-e29b-41d4-a716-446655440000&checkout_attempt=69a3c170-1105-42f2-b492-15f74ef59a71",
+  ]) {
+    const response = await POST(request(`product_id=support-12-v1${choice}`));
+    assert.equal(new URL(response.headers.get("location")).searchParams.get("status"), "error");
+  }
+});
+
+test("retired amount-only attempts never create a new Session or suggest an idempotent retry", async () => {
+  for (const locale of ["en", "zh-tw", "zh-cn"]) {
+    const response = await POST(
+      request(`locale=${locale}&amount=12&checkout_attempt=550e8400-e29b-41d4-a716-446655440000`),
+    );
+    const url = new URL(response.headers.get("location"));
+    assert.equal(response.status, 303);
+    assert.equal(url.searchParams.get("status"), "retired-checkout");
+    assert.equal(url.searchParams.has("checkout_attempt"), false);
+    assert.equal(await resolveSupportStatus({ status: "retired-checkout" }), "retired-checkout");
+  }
 });

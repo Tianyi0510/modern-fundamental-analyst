@@ -3,12 +3,8 @@ import { isSameOrigin, readLimitedText, RequestBodyError } from "@/lib/api-reque
 import { getLocalizedPath, resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site-config";
-import { parseCheckoutAttempt, type SupportAmount } from "@/features/support/support-config";
-import {
-  createSupportCheckoutSession,
-  getStripeErrorDetails,
-  parseSupportAmount,
-} from "@/features/support/server/stripe-checkout";
+import { parseCheckoutAttempt, parseSupportProductId, type SupportProductId } from "@/features/support/support-config";
+import { createSupportCheckoutSession, getStripeErrorDetails } from "@/features/support/server/stripe-checkout";
 
 export const runtime = "nodejs";
 
@@ -23,15 +19,19 @@ const isRateLimited = createRateLimiter({
 function supportUrl(
   request: Request,
   locale: ReturnType<typeof resolveLocale>,
-  status: "cancelled" | "error" | "rate-limited" | "invalid-amount",
-  recovery?: { attemptId?: string; amount: SupportAmount | null; checkoutLocale: ReturnType<typeof resolveLocale> },
+  status: "cancelled" | "error" | "rate-limited" | "invalid-amount" | "retired-checkout",
+  recovery?: {
+    attemptId?: string;
+    productId: SupportProductId | null;
+    checkoutLocale: ReturnType<typeof resolveLocale>;
+  },
 ) {
   // Next.js may normalize the internal request host; use the origin already checked by isSameOrigin.
   const url = new URL(getLocalizedPath("/support", locale), request.headers.get("origin")!);
   url.searchParams.set("status", status);
-  if (recovery?.attemptId && recovery.amount) {
+  if (recovery?.attemptId && recovery.productId) {
     url.searchParams.set("checkout_attempt", recovery.attemptId);
-    url.searchParams.set("amount", String(recovery.amount));
+    url.searchParams.set("product_id", recovery.productId);
     url.searchParams.set("checkout_locale", recovery.checkoutLocale);
   }
   return url;
@@ -63,11 +63,20 @@ export async function POST(request: Request) {
 
   const locale = resolveLocale(formData.get("locale"));
   const checkoutLocale = resolveLocale(formData.get("checkout_locale"), locale);
-  const amount = formData.getAll("amount").length === 1 ? parseSupportAmount(formData.get("amount")) : null;
-  const attemptId = parseCheckoutAttempt(formData.get("checkout_attempt"));
+  const hasProduct = formData.has("product_id");
+  const productId =
+    formData.getAll("product_id").length === 1 ? parseSupportProductId(formData.get("product_id")) : null;
+  const attemptId =
+    formData.getAll("checkout_attempt").length === 1
+      ? parseCheckoutAttempt(formData.get("checkout_attempt"))
+      : undefined;
   if (await isRateLimited(request)) {
     const response = NextResponse.redirect(
-      supportUrl(request, locale, "rate-limited", { attemptId, amount, checkoutLocale }),
+      supportUrl(request, locale, "rate-limited", {
+        attemptId,
+        productId,
+        checkoutLocale,
+      }),
       303,
     );
     response.headers.set("Retry-After", String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)));
@@ -75,22 +84,38 @@ export async function POST(request: Request) {
   }
   if (formData.get("website")) return NextResponse.redirect(supportUrl(request, locale, "cancelled"), 303);
 
-  if (!amount) return NextResponse.redirect(supportUrl(request, locale, "invalid-amount"), 303);
-  if (formData.get("checkout_attempt") && !attemptId) {
-    return NextResponse.redirect(supportUrl(request, locale, "error", { attemptId, amount, checkoutLocale }), 303);
+  if (!hasProduct && formData.has("amount"))
+    return NextResponse.redirect(supportUrl(request, locale, "retired-checkout"), 303);
+  if (!productId) return NextResponse.redirect(supportUrl(request, locale, "invalid-amount"), 303);
+  if (!attemptId) {
+    return NextResponse.redirect(
+      supportUrl(request, locale, "error", {
+        attemptId,
+        productId,
+        checkoutLocale,
+      }),
+      303,
+    );
   }
 
   try {
     const session = await createSupportCheckoutSession({
-      amount,
+      productId,
+      attemptId,
       locale: checkoutLocale,
       origin: checkoutOrigin(request),
-      attemptId,
     });
     if (!session.url) throw new Error("Stripe did not return a Checkout URL.");
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
     console.error("Stripe Checkout session creation failed.", getStripeErrorDetails(error));
-    return NextResponse.redirect(supportUrl(request, locale, "error", { attemptId, amount, checkoutLocale }), 303);
+    return NextResponse.redirect(
+      supportUrl(request, locale, "error", {
+        attemptId,
+        productId,
+        checkoutLocale,
+      }),
+      303,
+    );
   }
 }

@@ -28,7 +28,7 @@ const supportLocales = [
 ];
 
 for (const copy of supportLocales) {
-  test(`${copy.locale} stopped checkout navigation can resume the same amount and attempt`, async ({
+  test(`${copy.locale} stopped checkout navigation can resume the same product and attempt`, async ({
     page,
     baseURL,
   }) => {
@@ -61,7 +61,7 @@ for (const copy of supportLocales) {
     await page.goto(`${copy.prefix}/support`);
     await page
       .locator(".support-amount-option")
-      .filter({ has: page.locator('input[value="6"]') })
+      .filter({ has: page.locator('input[value="support-6-v1"]') })
       .click();
     await page.locator(".support-submit").first().click({ noWaitAfter: true });
     await expect.poll(() => bodies.length).toBe(1);
@@ -78,11 +78,11 @@ for (const copy of supportLocales) {
     const second = new URLSearchParams(bodies[1]);
     expect(first.get("checkout_attempt")).toMatch(/^[0-9a-f-]{36}$/);
     expect(second.get("checkout_attempt")).toBe(first.get("checkout_attempt"));
-    expect(first.getAll("amount")).toEqual(["6"]);
-    expect(second.getAll("amount")).toEqual(["6"]);
+    expect(first.getAll("product_id")).toEqual(["support-6-v1"]);
+    expect(second.getAll("product_id")).toEqual(["support-6-v1"]);
     await expect(page.locator(".support-submit")).toBeEnabled();
     await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(first.get("checkout_attempt")!);
-    await expect(page.locator('input[type="hidden"][name="amount"]')).toHaveValue("6");
+    await expect(page.locator('input[type="hidden"][name="product_id"]')).toHaveValue("support-6-v1");
     for (const radio of await page.locator('input[type="radio"]').all()) await expect(radio).toBeDisabled();
   });
 
@@ -113,14 +113,14 @@ for (const copy of supportLocales) {
       expect(route.request().method()).toBe("POST");
       const body = new URLSearchParams(route.request().postData()!);
       expect(body.get("locale")).toBe(copy.locale);
-      expect(body.get("amount")).toBe("6");
+      expect(body.get("product_id")).toBe("support-6-v1");
       await waiting;
       await route.continue({ headers: { ...route.request().headers(), "x-forwarded-for": address } });
     });
     await page.goto(`${copy.prefix}/support`);
     await page
       .locator(".support-amount-option")
-      .filter({ has: page.locator('input[value="6"]') })
+      .filter({ has: page.locator('input[value="support-6-v1"]') })
       .click();
     const submit = page.locator(".support-submit");
     type SubmissionState = { text: string | null; disabled: boolean; busy: string | null };
@@ -168,9 +168,9 @@ for (const copy of supportLocales) {
         expect(route.request().method()).toBe("POST");
         const body = new URLSearchParams(route.request().postData()!);
         expect(body.get("locale")).toBe(copy.locale);
-        expect(body.get("amount")).toBe("18");
+        expect(body.get("product_id")).toBe("support-18-v1");
         // Exercise the real local validation redirect; no provider request is needed.
-        body.set("amount", "invalid");
+        body.set("product_id", "invalid");
         await route.continue({
           postData: body.toString(),
           headers: { ...route.request().headers(), "x-forwarded-for": `192.0.2.${40 + supportLocales.indexOf(copy)}` },
@@ -179,7 +179,7 @@ for (const copy of supportLocales) {
       await page.goto(`${copy.prefix}/support`);
       await page
         .locator(".support-amount-option")
-        .filter({ has: page.locator('input[value="18"]') })
+        .filter({ has: page.locator('input[value="support-18-v1"]') })
         .click();
       await page.locator(".support-submit").click();
       await expect(page).toHaveURL(`${copy.prefix}/support?status=invalid-amount`);

@@ -5,7 +5,7 @@
 This guide describes the repository implementation. Provider resources must be configured in the Resend account used by each environment; their current Dashboard state is not verified by this document.
 
 1. Verify the sending domain `mail.modernfundamentalanalyst.com` in Resend. The sender constants in [src/lib/resend.ts](../src/lib/resend.ts) use `contact@` for contact messages and `updates@` for preference links. If using another domain, update those constants as well as the provider configuration.
-2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_URL`, and `RATE_LIMIT_HASH_SECRET`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [credential and secret rotation](UPSTASH_REDIS_INTEGRATION.md#credential-and-secret-rotation).
+2. Configure server variables from [.env.example](../.env.example): `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `SUBSCRIPTION_PREFERENCES_SECRET`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN`. Use an API key that permits the email, contact, segment and event operations in this application. Keep the preference secret stable; see [credential and secret rotation](UPSTASH_REDIS_INTEGRATION.md#credential-and-secret-rotation).
 3. Create a text contact property named `preferred_language` and three language segments. Set the matching `RESEND_SEGMENT_*` variables below. The default IDs in the code and environment template refer to this project's existing resources; override all three when using another account or isolated test resources.
 
 | Locale  | Exact `preferred_language` value | Segment variable       |
@@ -28,7 +28,8 @@ Contact notifications and preference-link emails use React Email. The shared lay
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Shared email layout and button                          | [`email-layout.tsx`](../src/components/email-layout.tsx)                             |
 | Contact HTML and localized labels                       | [`contact-email.tsx`](../src/features/contact/contact-email.tsx)                     |
-| Contact subject, plain text, recipient and Reply-To     | [`send-contact-message.ts`](../src/features/contact/server/send-contact-message.ts)  |
+| Contact subject, plain text and Reply-To                | [`send-contact-message.ts`](../src/features/contact/server/send-contact-message.ts)  |
+| Contact recipient                                       | [`contact-config.ts`](../src/features/contact/server/contact-config.ts)              |
 | Preference HTML                                         | [`preference-email.tsx`](../src/features/subscriptions/preference-email.tsx)         |
 | Preference subject and three-language copy              | [`preference-email-copy.ts`](../src/features/subscriptions/preference-email-copy.ts) |
 | Preference token, plain text and delivery orchestration | [`request/route.ts`](../src/app/api/subscription-preferences/request/route.ts)       |
@@ -69,6 +70,8 @@ Review both templates in all three languages at desktop and narrow widths. Check
 
 ## Receiving
 
+Contact-form delivery uses the server-only [contact configuration](../src/features/contact/server/contact-config.ts). On 2026-10-02, the owner confirmed `contact@mail.modernfundamentalanalyst.com` can receive mail and approved committing it publicly. `CONTACT_TO_EMAIL` is no longer read; recipient changes now require code review and deployment. This owner confirmation is not a delivery test performed by the workspace checks. Resend Receiving alone does not establish a mailbox or forwarding destination.
+
 The project owner confirmed on 2026-09-22 that Receiving is enabled for `mail.modernfundamentalanalyst.com`. The domain has transferred to Vercel; maintain Resend's required receiving MX and sending/verification records in the authoritative DNS zone. Retrieve exact records from Resend rather than hard-coding provider DNS values here. See [domain ownership](TECHNICAL_ARCHITECTURE.md#domain-and-service-ownership).
 
 Receiving is a provider capability, not an application inbox or automatic forwarding rule. The existing `/api/webhooks/resend` handler processes only `email.bounced`, `email.complained`, and `email.suppressed`; other signed events, including `email.received`, are acknowledged without processing their contents. Do not use this endpoint as an inbound-mail processor. An inbound workflow requires a separately designed handler and event subscription before it can retrieve, store or forward messages.
@@ -81,7 +84,7 @@ A valid preference token allows a server-side contact lookup. The form displays 
 
 ## Request reliability
 
-`UPSTASH_REDIS_URL` is required for subscriber mutations and preference-link requests. Unlike rate limiting, these operations fail with a retryable error if Redis is unavailable. No live email is sent by the unit tests.
+`UPSTASH_REDIS_REST_URL` and the read/write `UPSTASH_REDIS_REST_TOKEN` are required for subscriber mutations and preference-link requests. Unlike rate limiting, these operations fail with a retryable error if Redis is unavailable. No live email is sent by the unit tests.
 
 Preference requests store the complete email payload for 25 hours using atomic `SET NX`, covering Resend's 24-hour deduplication window plus a delay before the initial send. Retries reuse the original encrypted link, text, HTML and provider idempotency key. Changing the input under the same key returns 409. After 25 minutes, a fresh submission ID is required so users do not receive a nearly expired 30-minute link. The form resets its ID on that response. Redis records contain the recipient and email content; use the existing authenticated TLS connection and restrict database access.
 

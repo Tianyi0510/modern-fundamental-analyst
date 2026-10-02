@@ -52,10 +52,10 @@ test("support language links keep only validated recovery parameters", async () 
     { status: "error", checkout_attempt: attempt, amount: "6", extra: "discard" },
     "zh-tw",
   );
-  assert.equal(params.checkoutLocale, "zh-tw");
+  assert.equal(params.status, "retired-checkout");
   const next = parseSupportSearchParams(Object.fromEntries(new URLSearchParams(params.languageQuery)), "en");
-  assert.equal(next.checkoutLocale, "zh-tw");
-  assert.equal(next.attemptId, attempt);
+  assert.equal(next.status, "retired-checkout");
+  assert.equal(next.attemptId, undefined);
   assert.equal(new URLSearchParams(next.languageQuery).has("extra"), false);
   assert.equal(parseSupportSearchParams({ status: ["error"], amount: "6" }, "en").languageQuery, "");
   assert.equal(
@@ -70,4 +70,24 @@ test("support language links keep only validated recovery parameters", async () 
     parseSupportSearchParams({ status: "success", session_id: "bad" }, "en").languageQuery,
     "status=success",
   );
+});
+
+test("catalog recovery preserves product version and original language without trusting an amount", async () => {
+  const { parseSupportSearchParams } = await import("./support-config.ts");
+  const checkout_attempt = "550e8400-e29b-41d4-a716-446655440000";
+  const params = parseSupportSearchParams(
+    { status: "error", checkout_attempt, product_id: "support-6-v1", amount: "18", checkout_locale: "zh-cn" },
+    "en",
+  );
+  assert.equal(params.productId, "support-6-v1");
+  const next = parseSupportSearchParams(Object.fromEntries(new URLSearchParams(params.languageQuery)), "zh-tw");
+  assert.equal(next.productId, "support-6-v1");
+  assert.equal(next.checkoutLocale, "zh-cn");
+  assert.equal(next.attemptId, checkout_attempt);
+  for (const product_id of ["unknown", ["support-6-v1", "support-18-v1"], ""]) {
+    assert.equal(
+      parseSupportSearchParams({ status: "error", checkout_attempt, product_id, amount: "12" }, "en").attemptId,
+      undefined,
+    );
+  }
 });

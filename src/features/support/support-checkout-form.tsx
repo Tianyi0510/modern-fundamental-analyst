@@ -13,7 +13,7 @@ export function SupportCheckoutForm({
   attemptId,
   resume,
   recovery,
-  initialAmount,
+  initialChoice,
   recovering,
 }: {
   children: ReactNode;
@@ -23,15 +23,15 @@ export function SupportCheckoutForm({
   attemptId: string;
   resume: string;
   recovery: string;
-  initialAmount: string;
+  initialChoice: string;
   recovering: boolean;
 }) {
   const locked = useRef(false);
-  const amountRef = useRef<HTMLInputElement>(null);
+  const choiceRef = useRef<HTMLInputElement>(null);
   const attemptRef = useRef<HTMLInputElement>(null);
   const [currentAttempt, setCurrentAttempt] = useState(attemptId);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittedAmount, setSubmittedAmount] = useState<string | null>(recovering ? initialAmount : null);
+  const [submittedChoice, setSubmittedChoice] = useState<string | null>(recovering ? initialChoice : null);
 
   useEffect(() => {
     // A browser Back navigation may restore this form from the page cache.
@@ -43,11 +43,11 @@ export function SupportCheckoutForm({
         setCurrentAttempt(nextAttempt);
       }
       locked.current = false;
-      const form = amountRef.current?.form;
+      const form = choiceRef.current?.form;
       const fieldset = form?.querySelector("fieldset");
       if (fieldset) fieldset.disabled = false;
-      if (amountRef.current) amountRef.current.disabled = true;
-      setSubmittedAmount(null);
+      if (choiceRef.current) choiceRef.current.disabled = true;
+      setSubmittedChoice(null);
       setIsSubmitting(false);
     };
     window.addEventListener("pageshow", reset);
@@ -68,12 +68,12 @@ export function SupportCheckoutForm({
         }
         const form = event.currentTarget;
         const fieldset = form.querySelector("fieldset");
-        if (!locked.current && amountRef.current) {
-          // Freeze the submitted amount for an idempotent retry, without disabling the native payload.
-          const amount = new FormData(form).get("amount");
-          amountRef.current.value = typeof amount === "string" ? amount : "";
-          setSubmittedAmount(amountRef.current.value);
-          amountRef.current.disabled = false;
+        if (!locked.current && choiceRef.current) {
+          // Freeze the submitted product/version for an idempotent retry, without disabling the native payload.
+          const choice = new FormData(form).get("product_id");
+          choiceRef.current.value = typeof choice === "string" ? choice : "";
+          setSubmittedChoice(choiceRef.current.value);
+          choiceRef.current.disabled = false;
           if (fieldset) fieldset.disabled = true;
         }
         locked.current = true;
@@ -83,10 +83,10 @@ export function SupportCheckoutForm({
       <input type="hidden" name="checkout_attempt" ref={attemptRef} value={currentAttempt} />
       <input
         type="hidden"
-        name="amount"
-        ref={amountRef}
-        disabled={submittedAmount === null}
-        value={submittedAmount ?? ""}
+        name="product_id"
+        ref={choiceRef}
+        disabled={submittedChoice === null}
+        value={submittedChoice ?? ""}
       />
       {children}
       <Button className={appearance["support-submit"]} type="submit" disabled={isSubmitting} aria-live="polite">

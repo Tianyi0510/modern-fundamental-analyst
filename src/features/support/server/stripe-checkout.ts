@@ -1,14 +1,13 @@
 import "server-only";
 import Stripe from "stripe";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
-import { parseSupportAmount, type SupportAmount, type SupportStatus } from "@/features/support/support-config";
-export { parseSupportAmount } from "@/features/support/support-config";
-
-const PRICE_ENV_BY_AMOUNT: Record<SupportAmount, string> = {
-  6: "STRIPE_PRICE_USD_6",
-  12: "STRIPE_PRICE_USD_12",
-  18: "STRIPE_PRICE_USD_18",
-};
+import {
+  parseSupportAmount,
+  type SupportStatus,
+  type SupportProductId,
+  parseSupportProductId,
+} from "@/features/support/support-config";
+import { getSupportProduct } from "./support-catalog";
 
 const CHECKOUT_INTEGRATION_IDENTIFIER = "hosted_web_0001_mfaqxkpt";
 const STRIPE_API_VERSION = "2026-08-26.dahlia" as const;
@@ -29,26 +28,18 @@ function getStripeClient() {
   return stripeClient;
 }
 
-function getPriceId(amount: SupportAmount) {
-  const environmentVariable = PRICE_ENV_BY_AMOUNT[amount];
-  const priceId = process.env[environmentVariable]?.trim();
-  if (!priceId?.startsWith("price_")) {
-    throw new Error(`${environmentVariable} is not configured with a Stripe Price ID.`);
-  }
-  return priceId;
-}
+type CheckoutRequest = { locale: Locale; origin: string; productId: SupportProductId; attemptId: string };
 
-export async function createSupportCheckoutSession({
-  amount,
-  locale,
-  origin,
-  attemptId,
-}: {
-  amount: SupportAmount;
-  locale: Locale;
-  origin: string;
-  attemptId?: string;
-}) {
+export async function createSupportCheckoutSession({ locale, origin, attemptId, productId }: CheckoutRequest) {
+  const product = getSupportProduct(productId);
+  const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
+    quantity: 1,
+    price_data: {
+      currency: product.currency,
+      unit_amount: product.unitAmount,
+      product_data: { name: product.name, tax_code: product.taxCode },
+    },
+  };
   const successUrl = new URL(getLocalizedPath("/support", locale), origin);
   successUrl.searchParams.set("status", "success");
   successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
@@ -58,7 +49,8 @@ export async function createSupportCheckoutSession({
 
   const metadata = {
     purpose: "research_support",
-    support_amount_usd: String(amount),
+    support_amount_usd: String(product.unitAmount / 100),
+    support_product_id: product.id,
     site_locale: locale,
   };
 
@@ -77,11 +69,11 @@ export async function createSupportCheckoutSession({
       locale: locale === "en" ? "en" : "zh",
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
-      line_items: [{ price: getPriceId(amount), quantity: 1 }],
+      line_items: [lineItem],
       metadata,
       payment_intent_data: { metadata },
     },
-    attemptId ? { idempotencyKey: `support-checkout:${attemptId}` } : undefined,
+    { idempotencyKey: `support-checkout:v2:${attemptId}` },
   );
 }
 
@@ -105,7 +97,8 @@ export async function resolveSupportStatus(params: { status?: string; session_id
     params.status === "cancelled" ||
     params.status === "error" ||
     params.status === "rate-limited" ||
-    params.status === "invalid-amount"
+    params.status === "invalid-amount" ||
+    params.status === "retired-checkout"
   )
     return params.status;
   if (params.status !== "success") return undefined;
@@ -116,13 +109,20 @@ export async function resolveSupportStatus(params: { status?: string; session_id
       {},
       { timeout: 5_000, maxNetworkRetries: 0 },
     );
-    if (
-      session.mode !== "payment" ||
-      session.metadata?.purpose !== "research_support" ||
-      !parseSupportAmount(session.metadata.support_amount_usd ?? null) ||
-      session.currency !== "usd"
-    )
+    if (session.mode !== "payment" || session.metadata?.purpose !== "research_support" || session.currency !== "usd")
       return "unverified";
+    if (session.metadata.support_product_id !== undefined) {
+      const id = parseSupportProductId(session.metadata.support_product_id);
+      if (!id) return "unverified";
+      const product = getSupportProduct(id);
+      if (
+        session.amount_subtotal !== product.unitAmount ||
+        session.metadata.support_amount_usd !== String(product.unitAmount / 100)
+      )
+        return "unverified";
+    } else if (!parseSupportAmount(session.metadata.support_amount_usd ?? null)) {
+      return "unverified";
+    }
     if (session.status === "complete" && session.payment_status === "paid") return "success";
     return session.status === "complete" ? "pending" : "unverified";
   } catch (error) {

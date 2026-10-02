@@ -12,11 +12,10 @@ type RedisRateLimiterOptions = RateLimiterOptions & {
 };
 
 const RATE_LIMIT_KEY_PREFIX = "mfa:rl:v2";
-const rateLimitHashSecret =
-  process.env.RATE_LIMIT_HASH_SECRET ||
-  process.env.SUBSCRIPTION_PREFERENCES_SECRET ||
-  process.env.RESEND_API_KEY ||
-  randomBytes(32);
+const localSecret = randomBytes(32);
+const rateLimitHashSecret = createHmac("sha256", process.env.SUBSCRIPTION_PREFERENCES_SECRET || localSecret)
+  .update("mfa:rate-limit:hash:v1")
+  .digest();
 
 function validateRateLimiterOptions({ windowMs, maxRequests, maxKeys = 1000 }: RateLimiterOptions) {
   if (!Number.isSafeInteger(windowMs) || windowMs <= 0)
@@ -72,9 +71,7 @@ export function createMemoryRateLimiter(options: RateLimiterOptions) {
 
 const rateLimitScript = `
 local count = redis.call("INCR", KEYS[1])
-if count == 1 then
-  redis.call("PEXPIRE", KEYS[1], ARGV[1])
-end
+if count == 1 then redis.call("PEXPIRE", KEYS[1], ARGV[1]) end
 return count
 `;
 
@@ -91,15 +88,11 @@ export function createRateLimiter(options: RedisRateLimiterOptions) {
     const memoryLimited = memoryFallback(identifier);
 
     try {
-      const redis = await getRedisClient();
+      const redis = getRedisClient();
       if (!redis) return memoryLimited;
 
-      const count = await executeRedisCommand(redis, () =>
-        redis.eval(rateLimitScript, {
-          keys: [`${RATE_LIMIT_KEY_PREFIX}:${namespace}:${identifier}`],
-          arguments: [String(windowMs)],
-        }),
-      );
+      const key = `${RATE_LIMIT_KEY_PREFIX}:${namespace}:${identifier}`;
+      const count = await executeRedisCommand(redis, () => redis.eval(rateLimitScript, [key], [String(windowMs)]));
       if (typeof count !== "number") throw new TypeError("Unexpected Redis rate-limit response");
       return count > maxRequests;
     } catch (error) {

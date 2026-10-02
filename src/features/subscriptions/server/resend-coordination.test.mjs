@@ -5,9 +5,8 @@ import { registerHooks } from "node:module";
 
 const values = new Map();
 const redis = {
-  isReady: true,
   async set(key, value, options) {
-    if (options?.NX && values.has(key)) return null;
+    if (options?.nx && values.has(key)) return null;
     values.set(key, value);
     return "OK";
   },
@@ -17,7 +16,7 @@ const redis = {
   async del(key) {
     return Number(values.delete(key));
   },
-  async eval(_script, { keys, arguments: args }) {
+  async eval(_script, keys, args) {
     if (values.get(keys[0]) !== args[0]) return 0;
     if (args.length === 2) {
       values.set(keys[0], args[1]);
@@ -26,10 +25,11 @@ const redis = {
     return Number(values.delete(keys[0]));
   },
 };
-process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
+process.env.UPSTASH_REDIS_REST_URL = "https://redis.example.com";
+process.env.UPSTASH_REDIS_REST_TOKEN = "test-only-token";
 process.env.RESEND_API_KEY = "re_test_coordination";
 process.env.SUBSCRIPTION_PREFERENCES_SECRET = "stable-test-coordination-secret";
-globalThis.__mfaRedisStateV5 = { client: redis, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 };
+globalThis.__mfaRedisStateV6 = { client: redis, lastErrorLogAt: {}, unavailableUntil: 0 };
 const { withSubscriberLock, getStablePreferenceEmail } = await import("./resend-coordination.ts");
 const { getResendClient, resendOperationContext, reportResendRollbackFailure } = await import("@/lib/resend.ts");
 registerHooks({
@@ -411,8 +411,8 @@ test("provider fetch receives an abort signal and an expired deadline prevents I
 });
 
 test("Redis unavailability never falls back to an unprotected mutation", async () => {
-  const original = process.env.UPSTASH_REDIS_URL;
-  delete process.env.UPSTASH_REDIS_URL;
+  const original = process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_URL;
   try {
     await assert.rejects(
       withSubscriberLock("reader@example.com", async () => assert.fail("must not run")),
@@ -423,7 +423,7 @@ test("Redis unavailability never falls back to an unprotected mutation", async (
       { status: 503 },
     );
   } finally {
-    process.env.UPSTASH_REDIS_URL = original;
+    process.env.UPSTASH_REDIS_REST_URL = original;
   }
 });
 
