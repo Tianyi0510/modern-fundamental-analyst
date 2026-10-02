@@ -187,6 +187,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           phase={menuPhase}
           className={appearance["mobile-menu-drawer"]}
           id="mobile-site-menu"
+          aria-modal="true"
           aria-describedby={undefined}
           onOpenAutoFocus={(event) => {
             event.preventDefault();

@@ -347,7 +347,7 @@ test.describe("repeated touch menu animation", () => {
         await expect.poll(() => icon.evaluate((element) => element.getAnimations().length)).toBe(0);
         await page.locator(".mobile-menu-close").tap();
         await expect(page.locator(".mobile-menu-layer")).toBeHidden();
-        expect(await icon.evaluate((element) => getComputedStyle(element).transform)).toBe("none");
+        await expect(icon).toHaveCount(0);
       }
     }
   });
