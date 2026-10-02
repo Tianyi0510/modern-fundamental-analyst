@@ -1,150 +1,124 @@
 import assert from "node:assert/strict";
-import { EventEmitter } from "node:events";
-import { registerHooks } from "node:module";
 import test from "node:test";
 
-const factoryUrl = `data:text/javascript,${encodeURIComponent("export const createClient = options => globalThis.__redisTestCreate(options);")}`;
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    return nextResolve(specifier === "@redis/client" ? factoryUrl : specifier, context);
-  },
-});
-
-const state = (globalThis.__mfaRedisStateV5 = {
-  client: null,
-  connection: null,
-  lastErrorLogAt: {},
-  unavailableUntil: 0,
-});
-const clients = [];
-globalThis.__redisTestCreate = (options) => {
-  const client = new EventEmitter();
-  client.options = options;
-  client.isOpen = false;
-  client.isReady = false;
-  client.destroyCount = 0;
-  client.connect = () => {
-    client.isOpen = true;
-    return new Promise((resolve, reject) => {
-      client.succeed = () => {
-        client.isReady = true;
-        resolve(client);
-      };
-      client.fail = reject;
-    });
-  };
-  client.destroy = () => {
-    client.destroyCount += 1;
-    client.isOpen = false;
-    client.isReady = false;
-  };
-  clients.push(client);
-  return client;
-};
-process.env.UPSTASH_REDIS_URL = "rediss://default:test@localhost:6379";
+const state = (globalThis.__mfaRedisStateV6 = { client: null, lastErrorLogAt: {}, unavailableUntil: 0 });
+process.env.UPSTASH_KV_REST_API_URL = "https://redis.example.com";
+process.env.UPSTASH_KV_REST_API_TOKEN = "test-only-token";
 const { getRedisClient, executeRedisCommand, markRedisUnavailable } = await import("./redis.ts");
 
 test.beforeEach((context) => {
-  Object.assign(state, { client: null, connection: null, lastErrorLogAt: {}, unavailableUntil: 0 });
-  clients.length = 0;
+  Object.assign(state, { client: null, lastErrorLogAt: {}, unavailableUntil: 0 });
   context.mock.method(console, "error", () => {});
 });
 
-async function connect() {
-  const pending = getRedisClient();
-  const client = clients.at(-1);
-  client.succeed();
-  assert.equal(await pending, client);
-  return client;
-}
+test("concurrent requests share a REST client without a readiness handshake", async () => {
+  const [first, second] = await Promise.all([getRedisClient(), getRedisClient()]);
+  assert.equal(first, second);
+  assert.equal(await getRedisClient(), first);
+});
 
-test("concurrent cold requests wait for one ready connection", async () => {
-  const first = getRedisClient();
-  const second = getRedisClient();
-  assert.equal(clients.length, 1);
-  assert.equal(clients[0].options.commandOptions.timeout, 5_000);
-  assert.equal(clients[0].options.socket.socketTimeout, undefined);
-  let settled = false;
-  second.then(() => {
-    settled = true;
+test("REST preserves raw JSON, NX, TTL and Lua arguments with a fresh deadline per request", async (context) => {
+  const calls = [];
+  context.mock.method(globalThis, "fetch", async (_url, options) => {
+    const command = JSON.parse(options.body);
+    calls.push({ command, signal: options.signal });
+    const result = command[0] === "get" ? '{"phase":"starting"}' : command[0] === "eval" ? 1 : "OK";
+    return Response.json({ result });
   });
-  await Promise.resolve();
-  assert.equal(settled, false);
-  clients[0].succeed();
-  assert.deepEqual(await Promise.all([first, second]), [clients[0], clients[0]]);
-  assert.equal(await getRedisClient(), clients[0]);
+  const redis = await getRedisClient();
+  const raw = await executeRedisCommand(redis, () => redis.get("mfa:journal"));
+  assert.equal(raw, '{"phase":"starting"}');
+  await executeRedisCommand(redis, () => redis.set("mfa:lease", "owner", { nx: true, px: 120000 }));
+  await executeRedisCommand(redis, () => redis.eval("return ARGV[1]", ["mfa:journal"], [raw]));
+  assert.deepEqual(calls[1].command, ["set", "mfa:lease", "owner", "nx", "px", 120000]);
+  assert.deepEqual(calls[2].command, ["eval", "return ARGV[1]", 1, "mfa:journal", raw]);
+  assert.notEqual(calls[0].signal, calls[1].signal);
+  assert.equal(calls[1].signal.aborted, false);
 });
 
-test("command failure destroys only its client and enforces a recovery cooldown", async (context) => {
-  let now = 100_000;
-  context.mock.method(Date, "now", () => now);
-  const client = await connect();
+test("a lost write response is propagated once and starts cooldown without replay", async (context) => {
+  let calls = 0;
+  context.mock.method(globalThis, "fetch", async () => {
+    calls++;
+    throw new TypeError("response lost");
+  });
+  const redis = await getRedisClient();
   await assert.rejects(
-    executeRedisCommand(client, async () => {
-      throw new Error("socket closed");
-    }),
+    executeRedisCommand(redis, () => redis.set("mfa:lease", "owner", { nx: true })),
+    /response lost/,
   );
-  assert.equal(client.destroyCount, 1);
+  assert.equal(calls, 1);
   assert.equal(await getRedisClient(), null);
-  assert.equal(clients.length, 1);
-  now += 30_001;
-  const recovered = await connect();
-  assert.notEqual(recovered, client);
-  assert.equal(state.unavailableUntil, 0);
+  assert.equal(calls, 1);
+  state.unavailableUntil = 0;
+  assert.notEqual(await getRedisClient(), redis);
 });
 
-test("an old command failure cannot disable a recovered connection", async () => {
-  const old = await connect();
+test("a stalled REST response is aborted without a write retry", async (context) => {
+  let calls = 0;
+  const timeout = AbortSignal.timeout;
+  context.mock.method(AbortSignal, "timeout", (duration) => {
+    assert.equal(duration, 5000);
+    return timeout(10);
+  });
+  context.mock.method(globalThis, "fetch", async (_url, options) => {
+    calls++;
+    return new Promise((_resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error("deadline did not abort request")), 500);
+      options.signal.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(timer);
+          reject(options.signal.reason);
+        },
+        { once: true },
+      );
+    });
+  });
+  const redis = await getRedisClient();
+  await assert.rejects(
+    executeRedisCommand(redis, () => redis.eval("return redis.call('INCR', KEYS[1])", ["mfa:counter"], [])),
+    { name: "TimeoutError" },
+  );
+  assert.equal(calls, 1);
+});
+
+test("an old failure cannot disable a recovered client", async () => {
+  const old = await getRedisClient();
   let reject;
   const pending = executeRedisCommand(
     old,
     () =>
-      new Promise((_resolve, rejectPromise) => {
-        reject = rejectPromise;
+      new Promise((_resolve, fail) => {
+        reject = fail;
       }),
   );
   markRedisUnavailable(old);
   state.unavailableUntil = 0;
-  const recovered = await connect();
-  reject(new Error("delayed old failure"));
+  const current = await getRedisClient();
+  reject(new Error("late failure"));
   await assert.rejects(pending);
-  assert.equal(state.client, recovered);
+  assert.equal(state.client, current);
   assert.equal(state.unavailableUntil, 0);
-  assert.equal(recovered.destroyCount, 0);
 });
 
-test("superseded connection completion cannot clear a newer connection promise", async () => {
-  const first = getRedisClient();
-  const old = clients[0];
-  markRedisUnavailable(old);
-  state.unavailableUntil = 0;
-  const second = getRedisClient();
-  const activeConnection = state.connection;
-  old.succeed();
-  await assert.rejects(first, /superseded/);
-  assert.equal(state.connection, activeConnection);
-  assert.equal(state.unavailableUntil, 0);
-  clients[1].succeed();
-  assert.equal(await second, clients[1]);
-});
-
-test("discarded sockets retain an error listener for late events", async () => {
-  const client = await connect();
-  markRedisUnavailable(client);
-  assert.doesNotThrow(() => client.emit("error", new Error("late socket event")));
-});
-
-test("a stalled authentication handshake is destroyed after the readiness deadline", async (context) => {
-  let expire;
-  context.mock.method(globalThis, "setTimeout", (callback, delay) => {
-    assert.equal(delay, 10_000);
-    expire = callback;
-    return 1;
-  });
-  const pending = getRedisClient();
-  expire();
-  await assert.rejects(pending, /readiness timeout/);
-  assert.equal(clients[0].destroyCount, 1);
-  assert.equal(await getRedisClient(), null);
-  clients[0].fail(new Error("socket destroyed"));
+test("missing credentials and insecure URLs fail closed", async () => {
+  const original = process.env.UPSTASH_KV_REST_API_URL;
+  const token = process.env.UPSTASH_KV_REST_API_TOKEN;
+  try {
+    delete process.env.UPSTASH_KV_REST_API_TOKEN;
+    assert.equal(await getRedisClient(), null);
+    process.env.UPSTASH_KV_REST_API_TOKEN = token;
+    for (const url of [
+      "http://redis.example.com",
+      "rediss://user:password@redis.example.com",
+      "https://user:password@redis.example.com",
+    ]) {
+      process.env.UPSTASH_KV_REST_API_URL = url;
+      assert.equal(await getRedisClient(), null);
+    }
+  } finally {
+    process.env.UPSTASH_KV_REST_API_URL = original;
+    process.env.UPSTASH_KV_REST_API_TOKEN = token;
+  }
 });

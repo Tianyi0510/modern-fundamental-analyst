@@ -1,4 +1,18 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function pauseNextMenuEntrance(page: Page) {
+  await page.evaluate(() => {
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- The wrapper supplies the original element via apply.
+    const animate = Element.prototype.animate;
+    // Capture the short entrance before a busy runner can finish the click/tap round trip.
+    Element.prototype.animate = function (...args) {
+      const animation = animate.apply(this, args);
+      if (this.matches(".mobile-menu-content, .mobile-menu-close-icon")) animation.pause();
+      if (this.matches(".mobile-menu-close-icon")) Element.prototype.animate = animate;
+      return animation;
+    };
+  });
+}
 
 test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -333,6 +347,7 @@ test.describe("repeated touch menu animation", () => {
       await page.goto(prefix || "/");
       const icon = page.locator(".mobile-menu-close-icon");
       for (let opening = 1; opening <= 3; opening++) {
+        await pauseNextMenuEntrance(page);
         await page.locator(".mobile-menu-button").tap();
         const midpoint = await icon.evaluate((element) => {
           const animation = element.getAnimations()[0]!;
@@ -340,6 +355,10 @@ test.describe("repeated touch menu animation", () => {
           animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
           const transform = getComputedStyle(element).transform;
           animation.play();
+          document
+            .querySelector(".mobile-menu-content")!
+            .getAnimations()
+            .forEach((entrance) => entrance.play());
           return transform;
         });
         expect(midpoint).not.toBe("none");
@@ -359,6 +378,7 @@ test("menu icon replays after navigation and returning to a visited page", async
   await page.goto("/");
   for (const path of ["/about", "/memos", "/", "/portfolio"]) {
     const icon = page.locator(".mobile-menu-close:visible .mobile-menu-close-icon");
+    await pauseNextMenuEntrance(page);
     await page.locator(".mobile-menu-button").click();
     const midpoint = await icon.evaluate((element) => {
       const animation = element.getAnimations()[0]!;
@@ -366,6 +386,10 @@ test("menu icon replays after navigation and returning to a visited page", async
       animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
       const transform = getComputedStyle(element).transform;
       animation.play();
+      document
+        .querySelector(".mobile-menu-content")!
+        .getAnimations()
+        .forEach((entrance) => entrance.play());
       return transform;
     });
     expect(midpoint).not.toBe("none");

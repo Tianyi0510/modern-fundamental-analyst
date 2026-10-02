@@ -24,22 +24,20 @@ const PREFERENCE_RECORD_TTL_SECONDS = 25 * 60 * 60;
 
 export async function withSubscriberLock<T>(email: string, operation: () => Promise<T>): Promise<T> {
   const key = privateKey("subscriber", email.trim().toLowerCase());
-  const redis = await getRedisClient();
+  const redis = getRedisClient();
   if (!redis) throw new ResendCoordinationError();
   const owner = randomUUID();
   // Fail fast on contention: never run an uncoordinated mutation as fallback.
-  if (!(await executeRedisCommand(redis, () => redis.set(key, owner, { NX: true, PX: 120_000 }))))
+  if (!(await executeRedisCommand(redis, () => redis.set(key, owner, { nx: true, px: 120_000 }))))
     throw new ResendCoordinationError();
   const context = { signal: AbortSignal.timeout(20_000), uncertain: false, writeStarted: false };
   try {
     return await resendOperationContext.run(context, operation);
   } finally {
     if (!context.uncertain && (!context.writeStarted || !context.signal.aborted)) {
-      await executeRedisCommand(redis, () => redis.eval(releaseScript, { keys: [key], arguments: [owner] })).catch(
-        () => {
-          console.error("Resend subscriber lease release failed");
-        },
-      );
+      await executeRedisCommand(redis, () => redis.eval(releaseScript, [key], [owner])).catch(() => {
+        console.error("Resend subscriber lease release failed");
+      });
     }
   }
 }
@@ -64,17 +62,17 @@ export async function getStablePreferenceEmail(
 ): Promise<PreferenceEmail> {
   const key = privateKey("preference-request", requestId);
   const fingerprint = privateKey("preference-input", identity);
-  const redis = await getRedisClient();
+  const redis = getRedisClient();
   if (!redis) throw new ResendCoordinationError();
-  let stored = await executeRedisCommand(redis, () => redis.get(key));
+  let stored = await executeRedisCommand(redis, () => redis.get<string>(key));
   if (!stored) {
     const candidate = JSON.stringify({ fingerprint, createdAt: Date.now(), payload: await create() });
     // Retain the request ID beyond the provider's deduplication window so an
     // old request cannot create a new payload after its short retry period.
     const inserted = await executeRedisCommand(redis, () =>
-      redis.set(key, candidate, { NX: true, EX: PREFERENCE_RECORD_TTL_SECONDS }),
+      redis.set(key, candidate, { nx: true, ex: PREFERENCE_RECORD_TTL_SECONDS }),
     );
-    stored = inserted ? candidate : await executeRedisCommand(redis, () => redis.get(key));
+    stored = inserted ? candidate : await executeRedisCommand(redis, () => redis.get<string>(key));
   }
   if (!stored) throw new ResendCoordinationError();
   let record: unknown;

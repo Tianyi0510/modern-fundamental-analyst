@@ -10,7 +10,7 @@ const input = {
   locale: "en",
 };
 
-test("contact delivery escapes HTML and retains reply-to and idempotency", async (t) => {
+test("contact delivery uses the verified mailbox, escapes HTML and retains reply-to and idempotency", async (t) => {
   const previousKey = process.env.RESEND_API_KEY;
   const previousRecipient = process.env.CONTACT_TO_EMAIL;
   process.env.RESEND_API_KEY = "re_test_contact_only";
@@ -35,7 +35,7 @@ test("contact delivery escapes HTML and retains reply-to and idempotency", async
     `Name: ${input.name}\nEmail: ${input.email}\nLanguage: ${input.locale}\nSubject: ${input.subject}\n\n${input.message}`,
   );
   assert.equal(payload.reply_to, input.email);
-  assert.equal(payload.to, "recipient@example.com");
+  assert.equal(payload.to, "contact@mail.modernfundamentalanalyst.com");
   assert.match(payload.html, /Reader &lt;name&gt;/);
   assert.match(payload.html, /Message &lt;tag&gt;<br\s*\/>Next line/);
   assert.equal(new Headers(requests[0].headers).get("idempotency-key"), "contact/test-id");
