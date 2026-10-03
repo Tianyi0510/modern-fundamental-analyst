@@ -16,7 +16,7 @@ export const appearance = {
   "legal-content":
     "legal-content grid [gap:var(--space-section)] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)]",
   "legal-section":
-    "legal-section grid [grid-template-columns:0.9fr_1.1fr] [gap:var(--space-11)] [align-items:start] [padding:0] [&_h2]:[margin:0] [&_h2]:[font-size:var(--font-size-section-title)] [&_h2]:[line-height:var(--leading-section-title)] [&_h2]:[letter-spacing:var(--tracking-heading)] [&_h2]:font-bold [&_h2]:[text-transform:none] [&_h2]:[text-wrap:balance] [@media((max-width:_800px))]:[&_h2]:[overflow-wrap:anywhere] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[gap:var(--space-related-content)]",
+    "legal-section grid [grid-template-columns:0.9fr_1.1fr] [gap:var(--space-11)] [align-items:start] [padding:0] [&_.legal-section-lead]:[margin:0] [&_.legal-section-lead]:[font-size:var(--font-size-section-title)] [&_.legal-section-lead]:[line-height:var(--leading-section-title)] [&_.legal-section-lead]:[letter-spacing:var(--tracking-heading)] [&_.legal-section-lead]:font-bold [&_.legal-section-lead]:[text-transform:none] [&_.legal-section-lead]:[text-wrap:balance] [@media((max-width:_800px))]:[&_.legal-section-lead]:[overflow-wrap:anywhere] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[gap:var(--space-related-content)]",
   "legal-section-heading":
     "legal-section-heading [align-self:start] grid [gap:34px] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)]",
   "section-number":

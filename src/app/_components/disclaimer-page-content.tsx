@@ -118,23 +118,26 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
         </section>
         <section className={appearance["legal-body"]}>
           <div className={appearance["legal-content"] + " " + appearance["shell"]}>
-            {text.sections.map(([title, lead, paragraphs], index) => (
-              <section className={appearance["legal-section"]} key={title}>
-                <div className={appearance["legal-section-heading"]}>
-                  <p className={appearance["section-number"] + " " + appearance["legal-section-label"]}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{title}</span>
-                  </p>
-                  {lead ? <h2>{lead}</h2> : null}
-                </div>
-                <div className={appearance["legal-section-copy"]}>
-                  {paragraphs.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
-                </div>
-              </section>
-            ))}
+            {text.sections.map(([title, lead, paragraphs], index) => {
+              const SectionLabel = lead ? "p" : "h2";
+              return (
+                <section className={appearance["legal-section"]} key={title}>
+                  <div className={appearance["legal-section-heading"]}>
+                    <SectionLabel className={appearance["section-number"] + " " + appearance["legal-section-label"]}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{title}</span>
+                    </SectionLabel>
+                    {lead ? <h2 className="legal-section-lead">{lead}</h2> : null}
+                  </div>
+                  <div className={appearance["legal-section-copy"]}>
+                    {paragraphs.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         </section>
       </main>
