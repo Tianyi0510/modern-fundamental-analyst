@@ -1,6 +1,9 @@
 "use client";
 
-export default function GlobalError({ retry }: { error: Error & { digest?: string }; retry: () => void }) {
+import { useReportError } from "@/components/use-report-error";
+
+export default function GlobalError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
+  useReportError(error);
   return (
     <html lang="en">
       <body>

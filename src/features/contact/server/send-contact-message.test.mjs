@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
 import { sendContactMessage } from "./send-contact-message.ts";
 
 const input = {
@@ -39,4 +40,24 @@ test("contact delivery uses the verified mailbox, escapes HTML and retains reply
   assert.match(payload.html, /Reader &lt;name&gt;/);
   assert.match(payload.html, /Message &lt;tag&gt;<br\s*\/>Next line/);
   assert.equal(new Headers(requests[0].headers).get("idempotency-key"), "contact/test-id");
+});
+
+test("provider rejection reports one safe error and retains the Contact failure response", async (t) => {
+  const previousKey = process.env.RESEND_API_KEY;
+  process.env.RESEND_API_KEY = "re_test_contact_only";
+  t.after(() => {
+    if (previousKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = previousKey;
+  });
+  const { events, flush } = monitoringCapture(t);
+  t.mock.method(console, "error", () => {});
+  t.mock.method(globalThis, "fetch", async () =>
+    Response.json({ name: "application_error", message: "private message reader@example.com" }, { status: 500 }),
+  );
+  assert.deepEqual(await sendContactMessage(input), { ok: false, error: "Message could not be sent.", status: 502 });
+  await flush();
+  assert.equal(events.length, 1);
+  assert.equal(events[0].tags.operation, "contact.delivery");
+  assert.equal(events[0].tags.failure_kind, "provider-error");
+  assert.doesNotMatch(JSON.stringify(events), /private message|reader@example.com|re_test_contact_only/);
 });

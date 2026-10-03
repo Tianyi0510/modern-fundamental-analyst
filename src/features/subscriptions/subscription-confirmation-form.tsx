@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
-import { postJson } from "@/lib/client-post-json";
+import { confirmSubscription } from "./subscription-api";
 import type { Locale } from "@/lib/i18n";
 import { confirmationCopy } from "./confirmation-copy";
 
@@ -19,7 +19,7 @@ export function SubscriptionConfirmationForm({ token, locale }: { token: string;
         void runExclusive(async () => {
           setStatus("busy");
           try {
-            await postJson("/api/subscription-confirmation", { token });
+            await confirmSubscription({ token });
             setStatus("success");
           } catch {
             setStatus("error");

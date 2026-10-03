@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { registerHooks } from "node:module";
 import test from "node:test";
+import { monitoringCapture } from "../../../../../scripts/sentry-test-client.mjs";
 
 const mockModule = `export default class Stripe {
   static errors = { StripeError: Error };
@@ -65,6 +66,7 @@ test("checkout error redirects retain the validated browser origin when the inte
   assert.equal(response.headers.get("location"), "http://127.0.0.1:3210/zh-tw/support?status=invalid-amount");
 });
 test("checkout provider failures return localized redirects without logging private messages", async (t) => {
+  const { events, flush } = monitoringCapture(t);
   const logs = t.mock.method(console, "error", () => {});
   for (const create of [
     async () => {
@@ -80,6 +82,10 @@ test("checkout provider failures return localized redirects without logging priv
     assert.equal(new URL(response.headers.get("location")).searchParams.get("status"), "error");
   }
   assert.ok(logs.mock.callCount() > 0);
+  await flush();
+  assert.equal(events.length, 2);
+  assert.ok(events.every((event) => event.tags.operation === "stripe.checkout.create"));
+  assert.doesNotMatch(JSON.stringify(events), /private-provider-message|rk_test_mock/);
   assert.doesNotMatch(
     JSON.stringify(logs.mock.calls.map(({ arguments: args }) => args)),
     /private-provider-message|rk_test_mock/,

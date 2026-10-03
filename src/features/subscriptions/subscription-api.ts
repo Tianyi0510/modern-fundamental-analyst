@@ -1,5 +1,14 @@
 import { postJson } from "@/lib/client-post-json";
-import type { PreferencesLinkRequest, PreferencesUpdateRequest, SubscribeRequest } from "./subscription-contract";
+import type {
+  PreferencesLinkRequest,
+  PreferencesUpdateRequest,
+  SubscribeRequest,
+  SubscriptionConfirmationRequest,
+} from "./subscription-contract";
+
+export async function confirmSubscription(input: SubscriptionConfirmationRequest): Promise<void> {
+  await postJson("/api/subscription-confirmation", input);
+}
 
 export async function subscribeToUpdates(input: SubscribeRequest, idempotencyKey?: string): Promise<void> {
   await postJson("/api/subscribe", input, { idempotencyKey });

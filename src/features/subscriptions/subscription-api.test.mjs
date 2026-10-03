@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { requestPreferencesLink, subscribeToUpdates, updatePreferences } from "./subscription-api.ts";
+import {
+  confirmSubscription,
+  requestPreferencesLink,
+  subscribeToUpdates,
+  updatePreferences,
+} from "./subscription-api.ts";
 import { PostJsonError } from "@/lib/client-post-json.ts";
 
 test("subscription requests retain locale, bot detection, preference actions and retry identity", async (t) => {
@@ -13,6 +18,7 @@ test("subscription requests retain locale, bot detection, preference actions and
   await requestPreferencesLink({ email: "reader@example.com", locale: "en" }, "same-attempt");
   await updatePreferences({ action: "save", locale: "zh-tw", token: "test-token" });
   await updatePreferences({ action: "unsubscribe", locale: "", token: "test-token" });
+  await confirmSubscription({ token: "confirmation-token" });
   assert.deepEqual(calls, [
     { url: "/api/subscribe", body: { email: "reader@example.com", website: "", locale: "zh-cn" }, key: null },
     {
@@ -26,6 +32,7 @@ test("subscription requests retain locale, bot detection, preference actions and
       body: { action: "unsubscribe", locale: "", token: "test-token" },
       key: null,
     },
+    { url: "/api/subscription-confirmation", body: { token: "confirmation-token" }, key: null },
   ]);
 });
 
@@ -41,6 +48,10 @@ test("subscription requests preserve conflict and provider failure statuses for 
     (error) => error instanceof PostJsonError && error.status === 409,
   );
   status = 503;
+  await assert.rejects(
+    confirmSubscription({ token: "confirmation-token" }),
+    (error) => error instanceof PostJsonError && error.status === 503,
+  );
   await assert.rejects(
     updatePreferences({ action: "unsubscribe", locale: "", token: "test-token" }),
     (error) => error instanceof PostJsonError && error.status === 503,

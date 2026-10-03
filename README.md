@@ -61,6 +61,7 @@ Integration details:
 - [Resend Integration](docs/RESEND_INTEGRATION.md)
 - [Upstash Redis Integration](docs/UPSTASH_REDIS_INTEGRATION.md)
 - [Stripe Integration](docs/STRIPE_INTEGRATION.md)
+- [Sentry error monitoring](docs/TECHNICAL_ARCHITECTURE.md#error-monitoring)
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
 - [Portfolio Data](docs/PORTFOLIO_DATA.md)
 
