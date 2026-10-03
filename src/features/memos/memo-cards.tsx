@@ -35,6 +35,7 @@ type MemoCardsProps = {
 
 export function MemoCards({ memos, locale, placement = "section" }: MemoCardsProps) {
   const placeholder = placeholderCopy[locale];
+  const Heading = placement === "featured" ? "h2" : "h3";
 
   return (
     <div
@@ -51,7 +52,7 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
                 <span>{cardNumber}</span>
                 <span>{placeholder.status}</span>
               </div>
-              <h3>{placeholder.title(cardNumber)}</h3>
+              <Heading>{placeholder.title(cardNumber)}</Heading>
               <p>{placeholder.summary}</p>
               <small>{placeholder.availability}</small>
             </article>
@@ -67,7 +68,7 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
               <span>{memo.number}</span>
               <span>{memo.category.label}</span>
             </div>
-            <h3>{memo.title}</h3>
+            <Heading>{memo.title}</Heading>
             <p>{memo.summary}</p>
             <small className={appearance["date-text"]}>
               <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time> ·{" "}

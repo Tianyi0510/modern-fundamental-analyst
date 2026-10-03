@@ -60,3 +60,29 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".article-meta time")).toHaveText(displayed);
   });
 }
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  for (const width of [1440, 390]) {
+    test(`${prefix || "English"} headings reflect their page context at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`${prefix}/disclaimer`);
+      const sections = page.locator(".legal-section");
+      await expect(sections).toHaveCount(3);
+      for (const section of await sections.all()) {
+        await expect(section.getByRole("heading", { level: 2 })).toHaveCount(1);
+        await expect(section.getByRole("heading", { level: 2 })).toBeVisible();
+      }
+      await page.goto(`${prefix}/memos`);
+      const headings = page.locator(".memo-card").getByRole("heading", { level: 2, includeHidden: true });
+      await expect(headings).toHaveCount(3);
+      await expect(page.locator(".memo-card").getByRole("heading", { level: 3, includeHidden: true })).toHaveCount(0);
+      await page.locator(".memo-disclosure > summary").click();
+      await expect(page.locator(".memo-index-row").first().getByRole("heading", { level: 2 })).toHaveText(
+        await headings.first().innerText(),
+      );
+      await page.goto(prefix || "/");
+      await expect(page.locator(".memos-home").getByRole("heading", { level: 2 })).toHaveCount(1);
+      await expect(page.locator(".memo-card").getByRole("heading", { level: 3, includeHidden: true })).toHaveCount(3);
+    });
+  }
+}
