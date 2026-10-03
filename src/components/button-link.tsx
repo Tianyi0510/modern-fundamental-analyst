@@ -8,5 +8,5 @@ export function ButtonLink({
   className,
   ...props
 }: ComponentProps<typeof Link> & { variant?: ButtonVariant; size?: ButtonSize }) {
-  return <Link className={buttonAppearance(variant, size, className)} {...props} />;
+  return <Link data-touch-feedback="" className={buttonAppearance(variant, size, className)} {...props} />;
 }

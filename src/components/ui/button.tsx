@@ -8,13 +8,13 @@ export type ButtonSize = "regular" | "small" | "text";
 
 const variants: Record<ButtonVariant, string> = {
   quiet:
-    "rounded-[6px] bg-transparent text-black [transition:color_var(--motion-duration-fast)_var(--motion-ease-standard),_background-color_var(--motion-duration-fast)_var(--motion-ease-standard),_transform_var(--motion-duration-base)_var(--motion-ease-emphasized)] [&:hover:not(:disabled)]:bg-[color-mix(in_srgb,var(--bright-blue)_18%,transparent)] [&:hover:not(:disabled)]:text-brand [&:focus-visible:not(:disabled)]:bg-[color-mix(in_srgb,var(--bright-blue)_18%,transparent)] [&:focus-visible:not(:disabled)]:text-brand [&:active:not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:active:not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:active):not(:focus-visible)]:bg-transparent touch:[&:hover:not(:active):not(:focus-visible)]:text-black motion-reduce:transform-none!",
+    "rounded-[6px] bg-transparent text-black [transition:color_var(--motion-duration-fast)_var(--motion-ease-standard),_background-color_var(--motion-duration-fast)_var(--motion-ease-standard),_transform_var(--motion-duration-base)_var(--motion-ease-emphasized)] [&:hover:not(:disabled)]:bg-[color-mix(in_srgb,var(--bright-blue)_18%,transparent)] [&:hover:not(:disabled)]:text-brand [&:focus-visible:not(:disabled)]:bg-[color-mix(in_srgb,var(--bright-blue)_18%,transparent)] [&:focus-visible:not(:disabled)]:text-brand [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:bg-transparent touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:text-black motion-reduce:transform-none!",
   primary:
-    "button-dark bg-black text-white [&:hover:not(:disabled)]:bg-brand [&:focus-visible:not(:disabled)]:bg-brand touch:[&:hover:not(:active):not(:focus-visible)]:bg-black touch:[&:hover:not(:active):not(:focus-visible)]:text-white touch:[&:active:not(:disabled)]:bg-brand touch:[&:active:not(:disabled)]:text-white",
+    "button-dark bg-black text-white [&:hover:not(:disabled)]:bg-brand [&:focus-visible:not(:disabled)]:bg-brand touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:bg-black touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:text-white touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:bg-brand touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:text-white",
   contrast:
-    "button-dark bg-black text-white [&:hover:not(:disabled)]:bg-highlight [&:hover:not(:disabled)]:text-black [&:focus-visible:not(:disabled)]:bg-highlight [&:focus-visible:not(:disabled)]:text-black touch:[&:hover:not(:active):not(:focus-visible)]:bg-black touch:[&:hover:not(:active):not(:focus-visible)]:text-white touch:[&:active:not(:disabled)]:bg-highlight touch:[&:active:not(:disabled)]:text-black",
+    "button-dark bg-black text-white [&:hover:not(:disabled)]:bg-highlight [&:hover:not(:disabled)]:text-black [&:focus-visible:not(:disabled)]:bg-highlight [&:focus-visible:not(:disabled)]:text-black touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:bg-black touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:text-white touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:bg-highlight touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:text-black",
   inverse:
-    "bg-white text-black border border-white [&:hover:not(:disabled)]:bg-highlight [&:hover:not(:disabled)]:border-highlight [&:focus-visible:not(:disabled)]:bg-highlight [&:focus-visible:not(:disabled)]:border-highlight touch:[&:hover:not(:active):not(:focus-visible)]:bg-white touch:[&:hover:not(:active):not(:focus-visible)]:border-white touch:[&:active:not(:disabled)]:bg-highlight touch:[&:active:not(:disabled)]:border-highlight",
+    "bg-white text-black border border-white [&:hover:not(:disabled)]:bg-highlight [&:hover:not(:disabled)]:border-highlight [&:focus-visible:not(:disabled)]:bg-highlight [&:focus-visible:not(:disabled)]:border-highlight touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:bg-white touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:border-white touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:bg-highlight touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:border-highlight",
 };
 const sizes: Record<ButtonSize, string> = {
   text: "min-h-[var(--size-touch-target)] px-[6px]",
@@ -29,7 +29,7 @@ const disabledFeedback: Record<ButtonDisabledFeedback, string> = {
 };
 
 const interaction =
-  "origin-center transition-[transform,background-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] [&:hover:not(:active):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:focus-visible:not(:active):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:active:not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:active:not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:active):not(:focus-visible)]:transform-none motion-reduce:transform-none!";
+  "origin-center transition-[transform,background-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] [&:hover:not(:is(:active,[data-touch-pressed=true])):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:focus-visible:not(:is(:active,[data-touch-pressed=true])):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:transform-none motion-reduce:transform-none!";
 
 export const buttonVariants = cva(
   `button inline-flex items-center justify-center text-[length:var(--font-size-control)] leading-[var(--leading-body)] font-bold tracking-[var(--tracking-body)]`,
@@ -64,6 +64,7 @@ export function Button({
   return (
     <button
       data-slot="button"
+      data-touch-feedback=""
       type={type}
       className={buttonAppearance(variant, size, className, disabledFeedback)}
       {...props}

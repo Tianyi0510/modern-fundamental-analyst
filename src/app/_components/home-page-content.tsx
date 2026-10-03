@@ -247,6 +247,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               {text.portfolioTitle[1]}
             </h2>
             <Link
+              data-touch-feedback=""
               className={appearance["round-link"]}
               href={getLocalizedPath("/portfolio", locale)}
               aria-label={text.viewPortfolio}

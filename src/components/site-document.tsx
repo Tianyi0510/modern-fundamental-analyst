@@ -1,3 +1,4 @@
+import { TouchPressFeedback } from "./touch-press-feedback";
 import { appearance } from "./site-document.styles";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -17,6 +18,7 @@ export function SiteDocument({
           {skipLabel}
         </a>
         {children}
+        <TouchPressFeedback />
         <Analytics />
         <SpeedInsights />
       </body>
