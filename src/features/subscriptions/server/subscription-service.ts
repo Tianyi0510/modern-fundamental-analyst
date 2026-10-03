@@ -1,6 +1,6 @@
 import "server-only";
 import { getLocalizedPath, localeConfig, type Locale } from "@/lib/i18n";
-import { getResendClient, reportResendRollbackFailure, runResendOperation, resendOperationContext } from "@/lib/resend";
+import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
 import { withSubscriptionJournal } from "@/features/subscriptions/server/subscription-journal";
 import {
   getPreferredLanguageSegmentId,
@@ -18,30 +18,6 @@ const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
   status,
 });
 
-type ResendClient = NonNullable<ReturnType<typeof getResendClient>>;
-
-async function rollbackSubscription(
-  resend: ResendClient,
-  contactId: string | undefined,
-  rollbackLanguageSegments: (() => Promise<void>) | null,
-  previousLanguage: string | number | null,
-) {
-  await Promise.all([
-    contactId
-      ? runResendOperation("Resend subscription rollback failed", () =>
-          resend.contacts.update({
-            id: contactId,
-            unsubscribed: true,
-            properties: { preferred_language: previousLanguage },
-          }),
-        ).then((result) => {
-          if (!result || result.error) reportResendRollbackFailure();
-        })
-      : Promise.resolve(null),
-    rollbackLanguageSegments ? rollbackLanguageSegments().catch(() => undefined) : Promise.resolve(),
-  ]);
-}
-
 export type WelcomeMemoProvider = (
   locale: Locale,
 ) => { title: string; summary: string; slug: string } | null | undefined;
@@ -53,18 +29,21 @@ export async function subscribeContact(
 ): Promise<SubscriptionResult> {
   try {
     return await withSubscriberLock(email, () =>
-      withSubscriptionJournal(email, locale, () => subscribeContactLocked(email, locale, getWelcomeMemo)),
+      withSubscriptionJournal(email, locale, () => activateConfirmedContactLocked(email, locale, getWelcomeMemo)),
     );
   } catch {
     return unavailable(503);
   }
 }
 
-async function subscribeContactLocked(
+export async function activateConfirmedContactLocked(
   email: string,
   locale: Locale,
   getWelcomeMemo: WelcomeMemoProvider,
 ): Promise<SubscriptionResult> {
+  if (!resendOperationContext.getStore()?.recordPhase) {
+    throw new Error("Subscription activation requires a subscriber lock and journal");
+  }
   const resend = getResendClient();
   if (!resend) {
     console.error("Subscribe is missing RESEND_API_KEY.");
@@ -84,7 +63,6 @@ async function subscribeContactLocked(
     console.error("Welcome automation requires at least one investment memo.");
     return unavailable(503);
   }
-  const previousLanguage = existing.data?.properties?.preferred_language?.value ?? null;
   const properties = { preferred_language: localeConfig[locale].label };
   let result;
   let rollbackLanguageSegments: (() => Promise<void>) | null = null;
@@ -125,7 +103,6 @@ async function subscribeContactLocked(
     return unavailable();
   }
 
-  const contactId = result.data?.id ?? existing.data?.id;
   if (!latestMemo) return unavailable(503);
 
   await resendOperationContext.getStore()?.recordPhase?.("send-welcome-event");
@@ -144,10 +121,11 @@ async function subscribeContactLocked(
   );
 
   if (!welcome || welcome.error) {
-    await resendOperationContext.getStore()?.recordPhase?.("rollback-after-welcome-failure");
-    await rollbackSubscription(resend, contactId, rollbackLanguageSegments, previousLanguage);
-    if (welcome?.error) console.error("Resend welcome automation failed", welcome.error.name);
-    return unavailable();
+    // Subscription consent survives delivery failure. Keep the durable journal
+    // for operator reconciliation; never blindly replay an ambiguous event.
+    const context = resendOperationContext.getStore();
+    if (context) context.uncertain = true;
+    if (welcome?.error) console.error("Resend welcome automation pending", welcome.error.name);
   }
 
   return { ok: true };

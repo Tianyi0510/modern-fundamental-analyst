@@ -20,7 +20,7 @@ export function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-[110] w-40 max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto border border-[var(--gray)] rounded-[var(--radius-menu)] bg-white text-black shadow-[0_16px_40px_rgba(0,0,0,0.12)] outline-none",
+          "z-[110] max-h-[var(--radix-dropdown-menu-content-available-height)] w-40 overflow-y-auto rounded-[var(--radius-menu)] border border-[var(--gray)] bg-white text-black shadow-[0_16px_40px_rgba(0,0,0,0.12)] outline-none",
           className,
         )}
         {...props}

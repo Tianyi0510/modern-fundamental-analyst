@@ -6,7 +6,7 @@ export function Field({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="field"
       role="group"
-      className={cn("min-w-0 grid gap-[var(--space-field-label)]", className)}
+      className={cn("grid min-w-0 gap-[var(--space-field-label)]", className)}
       {...props}
     />
   );
@@ -17,7 +17,7 @@ export function FieldLabel({ className, htmlFor, ...props }: ComponentProps<"lab
       data-slot="field-label"
       htmlFor={htmlFor}
       className={cn(
-        "text-[length:var(--font-size-label)] leading-[var(--leading-body)] tracking-[var(--tracking-label)] font-bold",
+        "text-[length:var(--font-size-label)] leading-[var(--leading-body)] font-bold tracking-[var(--tracking-label)]",
         className,
       )}
       {...props}

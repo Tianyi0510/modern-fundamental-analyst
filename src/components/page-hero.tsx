@@ -36,7 +36,7 @@ export function PageHero({
           <span className="size-[9px] rounded-full bg-accent" /> {label}
         </p>
         <h1
-          className={`mt-[66px] text-[length:var(--font-size-page-title)] leading-[var(--leading-page-title)] font-bold tracking-[var(--tracking-heading)] text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:not-italic [&_em]:text-brand ${titleWidths[variant]}`}
+          className={`mt-[66px] text-[length:var(--font-size-page-title)] leading-[var(--leading-page-title)] font-bold tracking-[var(--tracking-heading)] text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
         >
           {title}
         </h1>

@@ -72,7 +72,7 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
       <div className={appearance["preferences-actions"]}>
         <Button
           type="submit"
-          className="min-w-0 max-w-full wrap-anywhere"
+          className="max-w-full min-w-0 wrap-anywhere"
           disabledFeedback="muted-busy"
           disabled={status === "requesting"}
         >

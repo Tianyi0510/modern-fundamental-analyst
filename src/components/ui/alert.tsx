@@ -8,7 +8,7 @@ const alertVariants = cva(
     variants: {
       tone: {
         standard: "text-[length:var(--font-size-body)]",
-        inverse: "text-white text-[length:var(--font-size-caption)] font-bold",
+        inverse: "text-[length:var(--font-size-caption)] font-bold text-white",
       },
     },
     defaultVariants: { tone: "standard" },

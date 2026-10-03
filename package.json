@@ -6,16 +6,23 @@
     "node": "24.x"
   },
   "prettier": {
-    "printWidth": 120
+    "printWidth": 120,
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ],
+    "tailwindStylesheet": "./src/app/globals.css",
+    "tailwindFunctions": [
+      "cn",
+      "clsx",
+      "cva"
+    ]
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "lint": "npm run lint:js && npm run lint:css",
-    "lint:js": "eslint . --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
-    "lint:css": "stylelint 'src/**/*.css' --max-warnings=0",
+    "lint": "eslint . --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test:unit && npm run test:computed-style",
@@ -65,8 +72,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.9",
-    "stylelint": "^17.15.0",
-    "stylelint-config-recommended": "^18.0.0",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.1"
@@ -79,7 +85,6 @@
   },
   "lint-staged": {
     "*": "prettier --check --ignore-unknown",
-    "*.{js,cjs,mjs,jsx,ts,tsx}": "eslint --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
-    "*.css": "stylelint --max-warnings=0"
+    "*.{js,cjs,mjs,jsx,ts,tsx}": "eslint --max-warnings=0 --cache --cache-location node_modules/.cache/eslint"
   }
 }

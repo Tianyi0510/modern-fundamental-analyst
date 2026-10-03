@@ -45,7 +45,7 @@ export const UPDATES_FROM_EMAIL = "Modern Fundamental Analyst <updates@mail.mode
 
 const REQUEST_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export function getResendIdempotencyKey(request: Request, scope: "contact" | "preferences") {
+export function getResendIdempotencyKey(request: Request, scope: "contact" | "preferences" | "subscribe") {
   const requestId = request.headers.get("idempotency-key")?.trim();
   return requestId && REQUEST_ID_PATTERN.test(requestId) ? `${scope}/${requestId.toLowerCase()}` : undefined;
 }

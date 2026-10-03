@@ -26,7 +26,7 @@ export function PortfolioMetric({
   return (
     <div
       data-tone={tone}
-      className={`min-w-0 min-h-[240px] p-[var(--space-5)] flex flex-col [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] ${tones[tone]} ${className}`}
+      className={`flex min-h-[240px] min-w-0 flex-col p-[var(--space-5)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] ${tones[tone]} ${className}`}
     >
       <dt className="text-[length:var(--font-size-label)] leading-[var(--leading-body)] font-bold tracking-[var(--tracking-label)]">
         {label}
@@ -38,7 +38,7 @@ export function PortfolioMetric({
       </dd>
       <dd className="kpi-note mt-[14px] compact:mt-[var(--space-2)]">
         <small
-          className={`block text-current opacity-[0.62] text-[length:var(--font-size-caption)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] font-normal compact:max-w-[32ch] ${noteClassName}`}
+          className={`block text-[length:var(--font-size-caption)] leading-[var(--leading-body)] font-normal tracking-[var(--tracking-body)] text-current opacity-[0.62] compact:max-w-[32ch] ${noteClassName}`}
         >
           {note}
         </small>

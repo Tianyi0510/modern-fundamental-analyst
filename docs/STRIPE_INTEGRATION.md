@@ -44,6 +44,8 @@ Old paid Sessions remain verifiable through their original amount metadata. The 
 
 ## Payment confirmation
 
+Payment status does not grant email-subscription consent. Checkout remains independent of the [email confirmation flow](RESEND_INTEGRATION.md#subscription-confirmation-and-delivery-feedback); the application does not activate a newsletter subscription from a successful payment or a Checkout email address.
+
 The return page retrieves the Session server-side. Only a completed, paid USD research-support Session confirms success. New catalog Sessions must also match the known product ID, subtotal and amount metadata; tax may increase the total without changing the subtotal. Missing or unavailable evidence is unverified, and completed unpaid Sessions are pending. URL parameters alone never confirm payment. No customer details are returned to the page.
 
 No webhook is required for voluntary support because payment does not unlock content or fulfill an order. Future entitlements or durable recovery require a payment ledger and verified Stripe webhooks.

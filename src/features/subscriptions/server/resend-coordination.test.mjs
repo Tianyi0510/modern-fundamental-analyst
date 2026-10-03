@@ -17,6 +17,14 @@ const redis = {
     return Number(values.delete(key));
   },
   async eval(_script, keys, args) {
+    if (keys.length === 3) {
+      if (values.has(keys[2])) return 1;
+      if (values.has(keys[0]) || Number(values.get(keys[1]) ?? 0) >= 3) return 0;
+      values.set(keys[0], "1");
+      values.set(keys[1], Number(values.get(keys[1]) ?? 0) + 1);
+      values.set(keys[2], "1");
+      return 1;
+    }
     if (values.get(keys[0]) !== args[0]) return 0;
     if (args.length === 2) {
       values.set(keys[0], args[1]);
@@ -494,7 +502,7 @@ test("active subscriptions reject repeats in every locale without provider write
   assert.equal(globalThis.fetch.mock.callCount(), 3);
 });
 
-test("a rejected welcome restores the previous language property and memberships", async (context) => {
+test("a rejected welcome retains consent and a durable pending journal", async (context) => {
   const english = getPreferredLanguageSegmentId("en");
   const target = getPreferredLanguageSegmentId("zh-tw");
   const memberships = new Set([english]);
@@ -521,13 +529,12 @@ test("a rejected welcome restores the previous language property and memberships
       properties: { preferred_language: { type: "string", value: "English" } },
     });
   });
-  assert.equal((await subscribeContact("reader@example.com", "zh-tw", getLatestMemo)).ok, false);
-  assert.equal(updates.length, 2);
+  assert.equal((await subscribeContact("reader@example.com", "zh-tw", getLatestMemo)).ok, true);
+  assert.equal(updates.length, 1);
   assert.equal(updates[0].unsubscribed, false);
-  assert.equal(updates[1].unsubscribed, true);
-  assert.equal(updates[1].properties.preferred_language, "English");
-  assert.equal(memberships.has(english), true);
-  assert.equal(memberships.has(target), false);
+  assert.equal(memberships.has(english), false);
+  assert.equal(memberships.has(target), true);
+  assert.equal((await readSubscriptionJournal("reader@example.com")).phase, "send-welcome-event");
 });
 
 for (const failure of ["server", "network", "deadline"]) {

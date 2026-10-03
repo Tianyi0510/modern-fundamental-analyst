@@ -140,7 +140,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           </div>
           <div className={appearance["mobile-menu-content"]} ref={menuContentRef} inert={menuPhase === "closing"}>
             <nav
-              className="relative z-[1] flex flex-col text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] tracking-[var(--tracking-heading)] font-bold"
+              className="relative z-[1] flex flex-col text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] font-bold tracking-[var(--tracking-heading)]"
               aria-label={copy.mobilePrimary}
             >
               {mobileNavigation.map(({ href, label }) => (
