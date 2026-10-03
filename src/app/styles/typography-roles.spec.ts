@@ -70,7 +70,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/memos": {
     pageTitle: [".page-hero h1"],
-    cardTitle: [".memo-card h3", ".memo-index-row h2"],
+    cardTitle: [".memo-card h2", ".memo-index-row h2"],
     compactTitle: [".memo-disclosure > summary"],
     lead: [".page-intro p"],
     body: [".memo-card p", ".memo-index-row p"],
