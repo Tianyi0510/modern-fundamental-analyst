@@ -35,7 +35,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.doesNotMatch(client, /RESEND_API_KEY/);
 });
 
-test("subscribe form stores contacts and triggers a localized welcome automation", async () => {
+test("subscribe form requests confirmation before activation and welcome automation", async () => {
   const [page, form, client, route, service, footer] = await Promise.all([
     read("src/app/_components/contact-page-content.tsx"),
     read("src/features/subscriptions/subscribe-form.tsx"),
@@ -55,7 +55,8 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(client, /<HoneypotField \/>/);
   assert.match(footer, /href="https:\/\/x\.com\/DavidLi0510"\s+target="_blank"\s+rel="noreferrer"/);
   assert.match(footer, /footer-x[\s\S]*?<svg aria-hidden="true"[\s\S]*?<span>X \(formerly Twitter\)<\/span>/);
-  assert.match(route, /subscribeContact\(email, locale, getLatestMemo\)/);
+  assert.match(route, /requestSubscriptionConfirmation\(/);
+  assert.doesNotMatch(route, /subscribeContact\(/);
   assert.match(service, /resend\.contacts\.create/);
   assert.match(service, /resend\.contacts\.update/);
   assert.match(service, /resend\.contacts\.get/);
@@ -69,10 +70,9 @@ test("subscribe form stores contacts and triggers a localized welcome automation
   assert.match(service, /memo_url:.*getLocalizedPath/);
   assert.match(service, /preferences_url: createPreferenceUrl\(email, locale\)/);
   assert.doesNotMatch(route, /ok: true, preferencesUrl/);
-  assert.match(service, /unsubscribed:\s*true/);
-  assert.match(form, /secure preferences link/);
-  assert.match(form, /安全偏好設定連結/);
-  assert.match(form, /安全偏好设置链接/);
+  assert.match(form, /confirm your subscription/);
+  assert.match(form, /確認你的訂閱/);
+  assert.match(form, /确认你的订阅/);
   assert.match(route, /readProtectedObjectJson/);
   assert.doesNotMatch(client, /RESEND_API_KEY/);
   assert.match(footer, /\{subscription\}/);

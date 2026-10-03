@@ -7,6 +7,7 @@ import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendClient, getResendIdempotencyKey, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
 import { createPreferenceUrl } from "@/features/subscriptions/server/subscription-preferences";
 import { getStablePreferenceEmail, ResendCoordinationError } from "@/features/subscriptions/server/resend-coordination";
+import { requireRecipientAllowance } from "@/features/subscriptions/server/recipient-delivery";
 import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
 
   try {
     const idempotencyKey = getResendIdempotencyKey(request, "preferences") ?? `preferences/${randomUUID()}`;
+    await requireRecipientAllowance(email, idempotencyKey);
     const emailPayload = await getStablePreferenceEmail(
       idempotencyKey,
       JSON.stringify({ email, locale }),

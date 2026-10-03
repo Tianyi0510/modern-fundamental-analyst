@@ -32,7 +32,7 @@ const interaction =
   "origin-center transition-[transform,background-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] [&:hover:not(:active):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:focus-visible:not(:active):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:active:not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:active:not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:active):not(:focus-visible)]:transform-none motion-reduce:transform-none!";
 
 export const buttonVariants = cva(
-  `button inline-flex items-center justify-center text-[length:var(--font-size-control)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] font-bold`,
+  `button inline-flex items-center justify-center text-[length:var(--font-size-control)] leading-[var(--leading-body)] font-bold tracking-[var(--tracking-body)]`,
   {
     variants: { variant: variants, size: sizes, disabledFeedback },
     compoundVariants: [{ variant: ["primary", "contrast", "inverse"], className: `rounded-pill ${interaction}` }],

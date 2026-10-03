@@ -16,25 +16,39 @@ This guide describes the repository implementation. Provider resources must be c
 
 These are the exact values written to Resend contacts, not translations of the documentation. [`localeConfig` in `src/lib/i18n.ts`](../src/lib/i18n.ts) is authoritative; update this table if those labels change. Use the literal values when configuring or inspecting contacts.
 
-4. Configure and enable a welcome automation triggered by `subscriber.created`. The application sends `locale`, `memo_title`, `memo_summary`, `memo_url`, and `preferences_url` in its payload; use these in the localized welcome content. The code sends an event rather than the welcome email itself, so a successful event response does not verify automation delivery. New or previously unsubscribed contacts trigger it; active contacts do not. At least one memo must exist for the selected locale.
+4. Configure and enable a welcome automation triggered by `subscriber.created`. The application sends `locale`, `memo_title`, `memo_summary`, `memo_url`, and `preferences_url` in its payload; use these in the localized welcome content. The code sends an event rather than the welcome email itself, so a successful event response does not verify automation delivery. Only confirmed new or previously unsubscribed contacts trigger it; active contacts do not. Public signup sends a confirmation email first. At least one memo must exist for the selected locale.
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.
-6. Use isolated resources and an owned test recipient to verify contact delivery, welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Preference URLs use `SITE_URL` from [src/lib/site-config.ts](../src/lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
+6. Use isolated resources and an owned test recipient to verify contact delivery, confirmation and welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Confirmation and preference URLs use `SITE_URL` from [src/lib/site-config.ts](../src/lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
+
+## Server secrets
+
+These credentials are independent and must not be merged or reused:
+
+| Variable                          | Owner and purpose                                                                                    | Rotation considerations                                                                                                                                                   |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RESEND_API_KEY`                  | Resend API Keys; permits the application's email, contact, segment and event operations.             | Keep provider authentication separate from application cryptography. It remains a legacy decryption fallback for old preference links; check those links before rotation. |
+| `RESEND_WEBHOOK_SECRET`           | Signing secret of the configured Resend webhook endpoint.                                            | Must match that endpoint. The handler reads one signing secret; coordinate changes with deployment and verify delivery retries.                                           |
+| `SUBSCRIPTION_PREFERENCES_SECRET` | Application-generated secret for existing encrypted preference links and stable Redis identity keys. | Preserve the current value. Journal, consent, suppression and retry records require an explicit migration before rotation.                                                |
+
+Use environment-scoped sensitive variables in Vercel and an uncommitted `.env.local` locally. Never prefix these names with `NEXT_PUBLIC_`. Confirmation emails need no additional secret: their opaque random tokens are looked up by digest, while their coordination still depends on the stable application secret. See [credential and secret rotation](UPSTASH_REDIS_INTEGRATION.md#credential-and-secret-rotation) before changing deployed values. This guide does not verify the current Vercel values or provider settings.
 
 ## Email templates and local preview
 
-Contact notifications and preference-link emails use React Email. The shared layout owns the brand header, content container and button; domain templates own their content. Templates contain no provider clients, credentials or token-generation logic.
+Contact notifications, preference-link emails and subscription confirmations use React Email. The shared layout owns the brand header, content container and button; domain templates own their content. Templates contain no provider clients, credentials or token-generation logic.
 
-| Responsibility                                          | Source                                                                               |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Shared email layout and button                          | [`email-layout.tsx`](../src/components/email-layout.tsx)                             |
-| Contact HTML and localized labels                       | [`contact-email.tsx`](../src/features/contact/contact-email.tsx)                     |
-| Contact subject, plain text and Reply-To                | [`send-contact-message.ts`](../src/features/contact/server/send-contact-message.ts)  |
-| Contact recipient                                       | [`contact-config.ts`](../src/features/contact/server/contact-config.ts)              |
-| Preference HTML                                         | [`preference-email.tsx`](../src/features/subscriptions/preference-email.tsx)         |
-| Preference subject and three-language copy              | [`preference-email-copy.ts`](../src/features/subscriptions/preference-email-copy.ts) |
-| Preference token, plain text and delivery orchestration | [`request/route.ts`](../src/app/api/subscription-preferences/request/route.ts)       |
-| Fictional Contact previews                              | [`contact/previews/`](../src/features/contact/previews/)                             |
-| Fictional preference previews                           | [`subscriptions/previews/`](../src/features/subscriptions/previews/)                 |
+| Responsibility                                          | Source                                                                                              |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Shared email layout and button                          | [`email-layout.tsx`](../src/components/email-layout.tsx)                                            |
+| Contact HTML and localized labels                       | [`contact-email.tsx`](../src/features/contact/contact-email.tsx)                                    |
+| Contact subject, plain text and Reply-To                | [`send-contact-message.ts`](../src/features/contact/server/send-contact-message.ts)                 |
+| Contact recipient                                       | [`contact-config.ts`](../src/features/contact/server/contact-config.ts)                             |
+| Preference HTML                                         | [`preference-email.tsx`](../src/features/subscriptions/preference-email.tsx)                        |
+| Preference subject and three-language copy              | [`preference-email-copy.ts`](../src/features/subscriptions/preference-email-copy.ts)                |
+| Preference token, plain text and delivery orchestration | [`request/route.ts`](../src/app/api/subscription-preferences/request/route.ts)                      |
+| Fictional Contact previews                              | [`contact/previews/`](../src/features/contact/previews/)                                            |
+| Confirmation copy                                       | [`confirmation-copy.ts`](../src/features/subscriptions/confirmation-copy.ts)                        |
+| Confirmation token, consent and delivery                | [`subscription-confirmation.ts`](../src/features/subscriptions/server/subscription-confirmation.ts) |
+| Fictional preference and confirmation previews          | [`subscriptions/previews/`](../src/features/subscriptions/previews/)                                |
 
 ### Preview workflow
 
@@ -46,11 +60,11 @@ npm run email:contact
 npm run email:preferences
 ```
 
-Open [localhost:3001](http://localhost:3001) for `contact-en`, `contact-zh-tw` and `contact-zh-cn`; open [localhost:3002](http://localhost:3002) for `preferences-en`, `preferences-zh-tw` and `preferences-zh-cn`. `npm run email` remains an alias for the Contact preview. Edit the owning template or shared layout to update its preview. Stop the preview server with Ctrl+C. It can run alongside the website on port 3000.
+Open [localhost:3001](http://localhost:3001) for the three `contact-*` previews; open [localhost:3002](http://localhost:3002) for the three `preferences-*` and three `confirmation-*` previews. `npm run email` remains an alias for the Contact preview. Edit the owning template or shared layout to update its preview. Stop the preview server with Ctrl+C. It can run alongside the website on port 3000.
 
-All six examples use fictional content, `example.com` addresses and, for preferences, a nonfunctional token. No service credentials are needed. Rendering previews does not send mail; the preview UI's Send action is separate from this workflow. Welcome emails remain owned by the Resend automation.
+All nine examples use fictional content, `example.com` addresses and, for link emails, a nonfunctional token. No service credentials are needed. Rendering previews does not send mail; the preview UI's Send action is separate from this workflow. Welcome emails remain owned by the Resend automation.
 
-The preview's generated plain-text view is a rendering aid, not the exact production text payload. Sending paths retain explicit plain text: Contact's operational labels remain English, while preference text uses the requested locale. Contact's HTML labels follow the submission locale. When changing copy, review HTML and the production text source together.
+The preview's generated plain-text view is a rendering aid, not the exact production text payload. Sending paths retain explicit plain text: Contact's operational labels remain English, while preference and confirmation text use the requested locale. Contact's HTML labels follow the submission locale. When changing copy, review HTML and the production text source together.
 
 ### Rendering and retries
 
@@ -63,10 +77,10 @@ The preference route awaits HTML rendering inside the initial payload factory, b
 Run the focused rendered-content and mocked-delivery checks:
 
 ```sh
-node --import ./scripts/register-server.mjs --test src/features/subscriptions/preference-email.test.mjs src/features/contact/server/send-contact-message.test.mjs src/features/subscriptions/server/resend-coordination.test.mjs src/app/api/subscription-flow.test.mjs
+node --import ./scripts/register-server.mjs --test src/features/subscriptions/preference-email.test.mjs src/features/contact/server/send-contact-message.test.mjs src/features/subscriptions/server/resend-coordination.test.mjs src/app/api/subscription-flow.test.mjs src/features/subscriptions/server/subscription-confirmation.test.mjs
 ```
 
-Review both templates in all three languages at desktop and narrow widths. Check headings, action destinations, long content, line breaks and HTML escaping. Tests also cover plain text, Reply-To, idempotency, asynchronous rendering failure and concurrent retries. Local rendering does not establish Gmail, Outlook or Apple Mail inbox compatibility; real test sends require separate authorization.
+Review all three email variants in all three languages at desktop and narrow widths. Check headings, action destinations, long content, line breaks and HTML escaping. Tests also cover plain text, Reply-To, idempotency, asynchronous rendering failure and concurrent retries. Local rendering does not establish Gmail, Outlook or Apple Mail inbox compatibility; real test sends require separate authorization.
 
 ## Receiving
 
@@ -76,7 +90,23 @@ The project owner confirmed on 2026-09-22 that Receiving is enabled for `mail.mo
 
 Receiving is a provider capability, not an application inbox or automatic forwarding rule. The existing `/api/webhooks/resend` handler processes only `email.bounced`, `email.complained`, and `email.suppressed`; other signed events, including `email.received`, are acknowledged without processing their contents. Do not use this endpoint as an inbound-mail processor. An inbound workflow requires a separately designed handler and event subscription before it can retrieve, store or forward messages.
 
-Keep `CONTACT_TO_EMAIL` set to the intended recipient of website contact-form messages. Enabling Receiving does not change that destination, sender addresses, or the existing webhook signing secret. No new environment variable is required for provider-only receiving. Actual inbound delivery has not been verified by this repository update.
+Maintain the website contact-form recipient in the server-only contact configuration linked above. Enabling Receiving does not change that destination, sender addresses, or the existing webhook signing secret. No new environment variable is required for provider-only receiving. Actual inbound delivery has not been verified by this repository update.
+
+## Subscription confirmation and delivery feedback
+
+Public signup validates input and requests a confirmation email; it does not activate a contact. The email uses the shared React Email layout, three-language copy and explicit plain text. Its random 256-bit token expires after 24 hours. Opening the localized `/subscription-confirmation` page has no provider side effects; an explicit same-origin POST confirms consent. The original requested email language is stored with the token, independently of the page language.
+
+Redis stores the confirmation under the token's SHA-256 digest, with a bounded lifetime. The record contains the email and locale; the immutable email retry payload also contains the complete link. Restrict database access accordingly. Confirmation runs under the existing subscriber lock and journal. It records the consent time, locale and policy version, consumes the token after success, and cannot reactivate a later-unsubscribed contact on replay. Interrupted `processing` records fail closed; reconcile the journal and provider state before requesting a new confirmation. Never manually reset a processing token to pending after an uncertain write.
+
+Confirmation and preference requests share a recipient-level limit: a 60-second cooldown and three distinct requests per hour, in addition to IP limits. Retries of the same request retain their allowance for the 25-minute retry window. Redis failure blocks delivery. These allowances include failed attempts. An expired confirmation request ID returns 422 so the form can create a new request without displaying the duplicate-subscription message.
+
+Signed bounce, complaint and suppression events persist a separate delivery-suppression marker before updating the contact. Successfully handled event IDs are retained per recipient, so replay cannot repeatedly apply the mutation. Provider failures remain retryable. Public signup and confirmation cannot clear suppression; recovery requires provider reconciliation and an explicit operator decision, not another form submission. Unrelated signed events are acknowledged without Redis access.
+
+Consent, suppression and completed webhook records are durable and have no automatic expiry. Include them in backup, access-control and subscriber-erasure procedures. Suppression takes precedence over consent, including when an old delivery event arrives for the first time. The application does not automatically override provider suppression based on event timestamps.
+
+Welcome delivery is separate from confirmed consent: a rejected or uncertain welcome event retains the `send-welcome-event` journal for reconciliation but does not roll back the subscription. There is no automatic welcome retry worker. A successful event API response still does not prove that the Automation delivered an email. Resolve pending journals through the existing operator workflow; never blindly replay an unknown event.
+
+Confirmation previews (`confirmation-en`, `confirmation-zh-tw`, `confirmation-zh-cn`) are included in `npm run email:preferences`. Existing preference links and the current secret remain unchanged. This release does not migrate keys or add seamless secret rotation.
 
 ## Preference display
 
@@ -84,7 +114,7 @@ A valid preference token allows a server-side contact lookup. The form displays 
 
 ## Request reliability
 
-`UPSTASH_KV_REST_API_URL` and the read/write `UPSTASH_KV_REST_API_TOKEN` are required for subscriber mutations and preference-link requests. Unlike rate limiting, these operations fail with a retryable error if Redis is unavailable. No live email is sent by the unit tests.
+`UPSTASH_KV_REST_API_URL` and the read/write `UPSTASH_KV_REST_API_TOKEN` are required for subscriber mutations and preference-link requests. Only IP rate limiting has an in-process fallback. Recipient delivery allowances, confirmation and subscriber mutations fail closed if Redis is unavailable. No live email is sent by the unit tests.
 
 Preference requests store the complete email payload for 25 hours using atomic `SET NX`, covering Resend's 24-hour deduplication window plus a delay before the initial send. Retries reuse the original encrypted link, text, HTML and provider idempotency key. Changing the input under the same key returns 409. After 25 minutes, a fresh submission ID is required so users do not receive a nearly expired 30-minute link. The form resets its ID on that response. Redis records contain the recipient and email content; use the existing authenticated TLS connection and restrict database access.
 
@@ -96,8 +126,12 @@ Once a provider mutation has started, network errors, server errors and timeouts
 
 A failed read before any mutation starts does not create an unknown write outcome. Its owned journal and lease can be released, including on a thrown read failure or expired read-only deadline. Cleanup compares the exact Redis record and fails closed if ownership cannot be confirmed. Reads that fail after writes have begun remain conservative; existing unresolved journals are never automatically cleared.
 
-Segment reconciliation reads all pages before changing membership, preserves unrelated segments, and rejects non-progressing cursors. Active subscriptions are rejected with HTTP 409 and the message "You've already subscribed" before any contact, language-segment, or welcome-event writes. The form displays localized duplicate feedback and retains the email for editing. Language changes belong in Email Preferences; previously unsubscribed contacts may subscribe again. Welcome prerequisites are checked before mutation; a definitively rejected welcome restores the previous language property and memberships. Failed rollback is logged and retains the subscriber lease and journal for reconciliation.
+Segment reconciliation reads all pages before changing membership, preserves unrelated segments, and rejects non-progressing cursors. Active subscriptions are rejected with HTTP 409 and the message "You've already subscribed" before any contact, language-segment, or welcome-event writes. The form displays localized duplicate feedback and retains the email for editing. Language changes belong in Email Preferences; previously unsubscribed contacts must confirm again, and delivery-suppressed contacts require operator review. Welcome prerequisites are checked before mutation. Language-segment failures retain the existing rollback protection; welcome delivery failures preserve confirmed consent and retain the journal for reconciliation.
 
 ## Verification
+
+For affected UI workflows, run `npx playwright test src/features/subscriptions/subscription-confirmation.spec.ts src/app/_components/portfolio-form-status.spec.ts --project=chromium --project=webkit --workers=2`. The configured server uses isolated provider settings; browser requests are mocked. Service tests cover confirmation, replay, expiry, consent, suppressed delivery, recipient allowances and journal recovery. Redis command behavior is mocked in these tests; this does not establish live Redis durability or provider delivery.
+
+Before releasing, check the target sender/domain, Automation event and content, unsubscribe controls, webhook URL/signing secret/event subscriptions, and Redis persistence. Keep current secrets and records. Obtain separate authorization for real recipient tests; do not treat local passing tests as proof of Dashboard configuration or production delivery.
 
 Follow the [verification commands](../README.md#verification). Coordination tests simulate Redis, provider failures, duplicate requests and aborted fetches without accessing production services. See [review evidence](TECHNICAL_ARCHITECTURE.md#review-evidence) for CI artifact retention.

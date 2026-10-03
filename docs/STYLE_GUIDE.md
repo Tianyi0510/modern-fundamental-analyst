@@ -124,6 +124,8 @@ Memos and monthly data retain native `details`/`summary` semantics. The requeste
 
 ## Content and localization
 
+Subscription feedback distinguishes confirmation requested, subscription confirmed, duplicate subscription, and delivery failure. Never call a request “subscribed” before confirmation. Confirmation pages require an explicit action; opening a link must not mutate consent. Keep invalid, pending, failed and completed states accessible, and preserve request identity on retries. Translate confirmation purpose, expiry and unrequested-email guidance in all three languages. Service behavior belongs in the [Resend guide](RESEND_INTEGRATION.md#subscription-confirmation-and-delivery-feedback).
+
 The goal is to keep information equivalent while respecting language differences.
 
 - Use consistent terminology for the same concepts. State the outcome first, then give the next step when needed.
@@ -156,16 +158,19 @@ For example, shared components reduce behavior drift: share when responsibilitie
 
 ## Verification and maintenance
 
-| Layer                                            | Responsibility and configuration source                                                           |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Prettier                                         | Consistent formatting; see the `prettier` field in [`package.json`](../package.json).             |
-| ESLint, typescript-eslint, and framework plugins | Code, type usage, and framework rules; see [`eslint.config.mjs`](../eslint.config.mjs).           |
-| Stylelint                                        | CSS static checks; see [`stylelint.config.mjs`](../stylelint.config.mjs).                         |
-| TypeScript                                       | Type checking; see [`tsconfig.json`](../tsconfig.json).                                           |
-| Unit tests                                       | Logic, state, and failure handling.                                                               |
-| Playwright                                       | Layout, interaction, and browser behavior; see [`playwright.config.ts`](../playwright.config.ts). |
-| Human review and device checks                   | Understandability, visual quality, and real-device experience.                                    |
+| Layer                                            | Responsibility and configuration source                                                                           |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Prettier and Tailwind plugin                     | Formatting and recognized Tailwind class ordering; see the `prettier` field in [`package.json`](../package.json). |
+| ESLint, typescript-eslint, and framework plugins | Code, type usage, and framework rules; see [`eslint.config.mjs`](../eslint.config.mjs).                           |
+| TypeScript                                       | Type checking; see [`tsconfig.json`](../tsconfig.json).                                                           |
+| Unit tests                                       | Logic, state, and failure handling.                                                                               |
+| Playwright                                       | Layout, interaction, and browser behavior; see [`playwright.config.ts`](../playwright.config.ts).                 |
+| Human review and device checks                   | Understandability, visual quality, and real-device experience.                                                    |
 
 See [README verification](../README.md#verification) and [`package.json`](../package.json) for commands; configuration files and [`ci.yml`](../.github/workflows/ci.yml) define versions and CI behavior. Choose checks according to change risk. Shared UI changes should cover three languages, narrow layouts, enlarged text, keyboard, touch, reduced motion, and forced colors when relevant. Browser tests should verify rendered behavior rather than repeat CSS source-code assertions.
 
 Add a rule only to address a real problem. When revising a rule, check the related tools, documentation, and tests for conflicting standards.
+
+Prettier uses `prettier-plugin-tailwindcss` with `src/app/globals.css` as the Tailwind v4 stylesheet entry point, including custom tokens and variants. It sorts recognized `className` attributes and class lists passed to `cn`, `clsx` and `cva`. Plain strings in private style maps are not automatically recognized; do not claim that every string in a `*.styles.ts` file is sorted. Preserve CSS cascade, variant semantics and meaningful interpolation boundaries when editing those maps.
+
+`npm run lint` runs ESLint; `npm run format:check` runs Prettier including CSS parsing and Tailwind ordering. `eslint-config-prettier` disables conflicting formatting rules. There is no dedicated CSS semantic linter: formatting does not detect invalid property names or all selector errors. Use the production CSS build, affected browser checks and review for those concerns. Commit hooks remain check-only; use `npm run format`, inspect the diff and stage the intended files before committing.

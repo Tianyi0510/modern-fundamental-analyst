@@ -13,6 +13,7 @@ import { subscribeToUpdates } from "./subscription-api";
 import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
 import { HoneypotField } from "@/components/honeypot-field";
+import { useSubmissionId } from "@/components/use-submission-id";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 
 export type SubscribeFormCopy = {
@@ -39,6 +40,7 @@ export function SubscribeFormClient({
   preferencesHref: string;
 }) {
   const [status, setStatus] = useState<Status>("idle");
+  const { getSubmissionId, resetSubmissionId } = useSubmissionId();
   const runExclusive = useExclusiveSubmit();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -49,14 +51,19 @@ export function SubscribeFormClient({
     await runExclusive(async () => {
       setStatus("submitting");
       try {
-        await subscribeToUpdates({
-          email: getFormText(formData, "email"),
-          website: getFormText(formData, "website"),
-          locale,
-        });
+        await subscribeToUpdates(
+          {
+            email: getFormText(formData, "email"),
+            website: getFormText(formData, "website"),
+            locale,
+          },
+          getSubmissionId(),
+        );
         form.reset();
+        resetSubmissionId();
         setStatus("success");
       } catch (error) {
+        if (error instanceof PostJsonError && (error.status === 409 || error.status === 422)) resetSubmissionId();
         setStatus(error instanceof PostJsonError && error.status === 409 ? "alreadySubscribed" : "error");
       }
     });
@@ -70,7 +77,10 @@ export function SubscribeFormClient({
         onSubmit={(event) => {
           void submit(event);
         }}
-        onChange={() => setStatus("idle")}
+        onChange={() => {
+          resetSubmissionId();
+          setStatus("idle");
+        }}
         aria-busy={status === "submitting"}
       >
         <FormField label={copy.email} visibility="hidden">
@@ -98,7 +108,7 @@ export function SubscribeFormClient({
         <a className={appearance["subscribe-preferences"]} href={preferencesHref}>
           {copy.preferences}
         </a>
-        <Alert tone="inverse" className="col-span-full compact:col-auto max-w-[390px]">
+        <Alert tone="inverse" className="col-span-full max-w-[390px] compact:col-auto">
           {status === "success"
             ? copy.success
             : status === "alreadySubscribed"

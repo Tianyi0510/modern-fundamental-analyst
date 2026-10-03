@@ -4,7 +4,7 @@ A public-equity research website in English, Traditional Chinese, and Simplified
 
 [Visit the website](https://www.modernfundamentalanalyst.com)
 
-Built with Next.js, React, TypeScript, Tailwind CSS, customized shadcn/ui primitives, and CSS Modules. Resend handles email, Upstash Redis coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
+Built with Next.js, React, TypeScript, Tailwind CSS, customized shadcn/ui primitives, and CSS Modules. Resend handles email, Upstash Redis stores confirmation and consent records and coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
 
 ## Local Development
 
@@ -17,11 +17,11 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000). For service integrations, use [.env.example](.env.example) as a template for an uncommitted `.env.local`. Never commit credentials.
 
-For email development, run `npm run email:contact` (or `npm run email`) and open [localhost:3001](http://localhost:3001); use `npm run email:preferences` and [localhost:3002](http://localhost:3002) for preference emails. Six fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
+For email development, run `npm run email:contact` (or `npm run email`) and open [localhost:3001](http://localhost:3001); use `npm run email:preferences` and [localhost:3002](http://localhost:3002) for preference and subscription-confirmation emails. Nine fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
 
 ## Verification
 
-`npm ci` installs the local Husky pre-commit hook. It runs `npm run lint:staged`: Prettier checks all staged files it supports and skips unknown formats, ESLint checks staged JavaScript/TypeScript with the shared local cache, and Stylelint checks staged CSS. Concurrent tasks only read files, so overlapping format and lint checks do not race to rewrite them. These checks do not rewrite files. Run `npm run format` or fix reported lint errors, review and stage the changes, then commit again. Partially staged files are checked with their unstaged changes temporarily hidden and restored by lint-staged. CI, Vercel and production installs skip hook setup; local hooks do not replace CI or release verification. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node setup.
+`npm ci` installs the local Husky pre-commit hook. It runs `npm run lint:staged`: Prettier checks supported staged files, including CSS, and sorts recognized Tailwind class lists through `prettier-plugin-tailwindcss`; ESLint checks staged JavaScript/TypeScript with the shared local cache. Unknown formats are skipped. Concurrent tasks only read files, so overlapping format and lint checks do not race to rewrite them. These checks do not rewrite files. Run `npm run format` or fix reported lint errors, review and stage the changes, then commit again. Partially staged files are checked with their unstaged changes temporarily hidden and restored by lint-staged. CI, Vercel and production installs skip hook setup; local hooks do not replace CI or release verification. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node setup.
 
 Local development uses fast, affected-scope checks from [AGENTS.md](AGENTS.md#verification-and-review). GitHub Actions owns full verification; deployment verifies the release commit and live status. A release does not require repeating the complete suite locally.
 
@@ -53,6 +53,8 @@ Under `src/app/`, route groups such as `(en)` organize pages without adding a UR
 ## Content and Integrations
 
 Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/portfolio-detail.ts`; `src/features/portfolio/portfolio.ts` derives the website snapshot and return history. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/memos.ts`, with articles under `src/features/memos/articles/` registered in `src/features/memos/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
+
+Subscriptions require email confirmation before activation. Existing subscribers can manage language or unsubscribe through secure preference links. Keep the three distinct server secrets (`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, and `SUBSCRIPTION_PREFERENCES_SECRET`); see [email secrets](docs/RESEND_INTEGRATION.md#server-secrets) for their roles and rotation constraints. Public signup cannot override delivery suppression.
 
 Integration details:
 

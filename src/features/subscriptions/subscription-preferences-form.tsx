@@ -107,7 +107,7 @@ export function SubscriptionPreferencesForm({
       <div className={appearance["preferences-actions"]}>
         <Button
           type="submit"
-          className="min-w-0 max-w-full wrap-anywhere"
+          className="max-w-full min-w-0 wrap-anywhere"
           disabledFeedback={busy ? "muted-busy" : "muted"}
           disabled={busy || status === "unsubscribed"}
         >
@@ -117,7 +117,7 @@ export function SubscriptionPreferencesForm({
           variant="quiet"
           size="text"
           disabledFeedback={busy ? "muted-busy" : "muted"}
-          className={`${appearance["preferences-unsubscribe"]} min-w-0 max-w-full wrap-anywhere`}
+          className={`${appearance["preferences-unsubscribe"]} max-w-full min-w-0 wrap-anywhere`}
           type="button"
           disabled={busy || status === "unsubscribed"}
           onClick={(event) => {

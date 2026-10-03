@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { readLimitedText, RequestBodyError } from "@/lib/api-request";
-import { getResendClient, runResendOperation } from "@/lib/resend";
-import { getResendWebhookHeaders, getUnsubscribeRecipients } from "@/features/subscriptions/server/resend-webhook";
-import { withSubscriberLock } from "@/features/subscriptions/server/resend-coordination";
+import { getResendClient } from "@/lib/resend";
+import { getResendWebhookHeaders, processDeliveryFeedback } from "@/features/subscriptions/server/resend-webhook";
 
 export const runtime = "nodejs";
 
@@ -34,17 +33,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid webhook." }, { status: 400 });
   }
 
-  const recipients = getUnsubscribeRecipients(event);
-  const updates = await Promise.all(
-    recipients.map((email) =>
-      runResendOperation("Resend webhook contact update failed", () =>
-        withSubscriberLock(email, () => resend.contacts.update({ email, unsubscribed: true })),
-      ),
-    ),
-  );
-
-  const retryableFailure = updates.some((result) => !result || (result.error && result.error.statusCode !== 404));
-  if (retryableFailure) return NextResponse.json({ error: "Webhook processing failed." }, { status: 500 });
+  try {
+    await processDeliveryFeedback(event, headers.id);
+  } catch {
+    return NextResponse.json({ error: "Webhook processing failed." }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }
