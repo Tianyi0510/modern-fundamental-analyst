@@ -2,57 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { read } from "../../scripts/repository-helpers.mjs";
 
-test("Redis connections are bounded and reused", async () => {
-  const [redis, packageSource] = await Promise.all([read("src/lib/redis.ts"), read("package.json")]);
-  const dependencies = JSON.parse(packageSource).dependencies;
-
-  assert.match(redis, /from "@redis\/client"/);
-  assert.equal(dependencies["@redis/client"], "^6.2.1");
-  assert.equal(dependencies.redis, undefined);
-  assert.match(redis, /connectTimeout: CONNECT_TIMEOUT_MS/);
-  assert.match(redis, /commandOptions: \{ timeout: COMMAND_TIMEOUT_MS \}/);
-  assert.doesNotMatch(redis, /socketTimeout:/);
-  assert.match(redis, /disableOfflineQueue: true/);
-  assert.match(redis, /commandsQueueMaxLength: MAX_COMMAND_QUEUE_LENGTH/);
-  assert.match(redis, /MAX_COMMAND_QUEUE_LENGTH = 100/);
-  assert.match(redis, /retries >= MAX_RECONNECT_ATTEMPTS/);
-  assert.match(redis, /process\.env\.UPSTASH_REDIS_URL/);
-  assert.doesNotMatch(redis, /process\.env\.REDIS_URL\b/);
-  assert.match(redis, /__mfaRedisStateV5/);
-  assert.match(redis, /url\.protocol !== "rediss:"/);
-  assert.match(redis, /Upstash Redis requires TLS/);
-  assert.doesNotMatch(redis, /REDIS_ALLOW_INSECURE/);
-  assert.match(redis, /Redis authentication is required/);
-  assert.match(redis, /unavailableUntil = Date\.now\(\) \+ CONNECTION_COOLDOWN_MS/);
-  assert.match(redis, /export function markRedisUnavailable\(client = state.client\)/);
-  assert.match(redis, /suspendRedis\(pendingClient\)/);
-  assert.doesNotMatch(redis, /client\.removeAllListeners\(\)/);
-});
-
-test("Redis errors use bounded categories and are throttled independently", async () => {
-  const redis = await read("src/lib/redis.ts");
-
-  assert.match(redis, /type RedisErrorCategory =/);
-  assert.match(redis, /lastErrorLogAt: Partial<Record<RedisErrorCategory, number>>/);
-  assert.match(redis, /lastErrorLogAt\[message\]/);
-  assert.doesNotMatch(redis, /lastErrorLogAt: Map/);
-});
-
-test("API rate limiting uses Redis with a privacy-preserving memory fallback", async () => {
-  const [requestHelpers, rateLimiter] = await Promise.all([
-    read("src/lib/api-request.ts"),
-    read("src/lib/rate-limit.ts"),
-  ]);
-
-  assert.doesNotMatch(requestHelpers, /Redis|RateLimiter|createHmac/);
-  assert.match(rateLimiter, /randomBytes\(32\)/);
-  assert.match(rateLimiter, /createHmac\("sha256", rateLimitHashSecret\)/);
-  assert.doesNotMatch(rateLimiter, /createHash/);
-  assert.match(rateLimiter, /redis\.eval\(rateLimitScript/);
-  assert.match(rateLimiter, /mfa:rl:v2/);
-  assert.match(rateLimiter, /executeRedisCommand\(redis/);
-  assert.match(rateLimiter, /const memoryLimited = memoryFallback\(identifier\)/);
-  assert.match(rateLimiter, /return memoryLimited/);
-  assert.match(rateLimiter, /count: current\.count \+ 1/);
-  assert.doesNotMatch(rateLimiter, /number\[\]/);
+test("Redis uses the REST SDK without the socket dependency", async () => {
+  const dependencies = JSON.parse(await read("package.json")).dependencies;
+  assert.ok(dependencies["@upstash/redis"]);
+  assert.equal(dependencies["@redis/client"], undefined);
 });

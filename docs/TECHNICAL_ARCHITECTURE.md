@@ -4,7 +4,7 @@ This guide owns cross-service boundaries, domain ownership, deployment gating, a
 
 ## Application boundaries
 
-Pages render localized server components; interactive controls use small client boundaries. Pure support amounts and types live in `src/features/support/support-config.ts`. Stripe, Redis, Resend and preference-token modules declare `server-only`. Node tests and the operator CLI load `scripts/register-server.mjs` to resolve TypeScript imports and transpile TSX for email rendering. This loader bypasses the `server-only` marker for Node entry points and does not type-check; TypeScript checks and Next.js build-time boundary enforcement remain separate.
+Pages render localized server components; interactive controls use small client boundaries. Shared support choice identifiers, legacy amounts and types live in `src/features/support/support-config.ts`. Stripe, Redis, Resend and preference-token modules declare `server-only`. Node tests and the operator CLI load `scripts/register-server.mjs` to resolve TypeScript imports and transpile TSX for email rendering. This loader bypasses the `server-only` marker for Node entry points and does not type-check; TypeScript checks and Next.js build-time boundary enforcement remain separate.
 
 `src/app/_components` composes page chrome and feature content, including the Home page's portfolio and memo sections. `src/features` groups `portfolio`, `memos`, `subscriptions`, `contact`, and `support`. Feature data, CSS Modules, domain types, and controls stay with their owner; provider operations and coordination live in feature `server` directories. Shared utilities and clients remain in `src/lib`, and shared UI in `src/components`.
 
@@ -30,7 +30,7 @@ flowchart LR
     Webhook --> Redis
 ```
 
-Portfolio and memo pages read versioned workspace data at build or request time; Redis is not their source of truth. Contact and subscription routes call Resend. Redis supplies rate limiting, subscriber locks, retry payloads and a durable journal around uncertain subscriber writes. Rate limiting has a local fallback, while subscription and preference mutations fail closed if coordination is unavailable. The Support route creates a hosted Stripe Session; the return page verifies payment status server-side. The Resend webhook accepts signed delivery feedback and shares the subscriber lock. See the service guides for failure recovery and operator actions.
+Portfolio and memo pages read versioned workspace data at build or request time; Redis is not their source of truth. Contact and subscription routes call Resend. Redis REST supplies rate limiting, subscriber locks, retry payloads and a durable journal around uncertain subscriber writes; raw records and atomic ownership checks remain shared with earlier TCP deployments. Transport retries are disabled for uncertain writes. Rate limiting has a local fallback, while subscription and preference mutations fail closed if coordination is unavailable. The Support route prices versioned products from its server-only catalog and creates a hosted Stripe Session; legacy amount-only attempts display a retirement notice without creating another payment. The return page verifies payment status server-side. The Resend webhook accepts signed delivery feedback and shares the subscriber lock. See the service guides for failure recovery and operator actions.
 
 ## Presentation and style loading
 

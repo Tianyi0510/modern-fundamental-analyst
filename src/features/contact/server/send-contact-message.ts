@@ -1,4 +1,5 @@
 import "server-only";
+import { CONTACT_RECIPIENT } from "./contact-config";
 import { renderContactEmail, type ContactMessage } from "../contact-email";
 import { CONTACT_FROM_EMAIL, getResendClient, runResendOperation } from "@/lib/resend";
 
@@ -9,9 +10,8 @@ export async function sendContactMessage(
   idempotencyKey?: string,
 ): Promise<ContactResult> {
   const resend = getResendClient();
-  const recipient = process.env.CONTACT_TO_EMAIL;
-  if (!resend || !recipient) {
-    console.error("Contact email is missing RESEND_API_KEY or CONTACT_TO_EMAIL.");
+  if (!resend) {
+    console.error("Contact email is missing RESEND_API_KEY.");
     return { ok: false, error: "Email service is temporarily unavailable.", status: 503 };
   }
 
@@ -20,7 +20,7 @@ export async function sendContactMessage(
     resend.emails.send(
       {
         from: CONTACT_FROM_EMAIL,
-        to: recipient,
+        to: CONTACT_RECIPIENT,
         replyTo: email,
         subject: `[MFA Contact] ${subject}`,
         text: `Name: ${name}\nEmail: ${email}\nLanguage: ${locale || "unknown"}\nSubject: ${subject}\n\n${message}`,

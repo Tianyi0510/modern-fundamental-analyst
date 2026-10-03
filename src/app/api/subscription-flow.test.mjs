@@ -26,7 +26,7 @@ test("contact form keeps localized copy on the server and sends through a client
   assert.match(client, /sendContactMessage\(/);
   assert.doesNotMatch(client, /headingLabel/);
   assert.match(client, /<HoneypotField \/>/);
-  assert.match(route, /CONTACT_TO_EMAIL/);
+  assert.match(route, /CONTACT_RECIPIENT/);
   assert.match(route, /CONTACT_FROM_EMAIL/);
   assert.match(resend, /contact@mail\.modernfundamentalanalyst\.com/);
   assert.match(route, /replyTo:\s*email/);

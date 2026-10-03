@@ -34,16 +34,12 @@ export default defineConfig({
     // Always start an isolated server: browser tests must not use local provider credentials.
     env: {
       SUBSCRIPTION_PREFERENCES_SECRET: "playwright-preferences-only",
-      RATE_LIMIT_HASH_SECRET: "playwright-rate-limit-only",
       RESEND_API_KEY: "",
       RESEND_WEBHOOK_SECRET: "",
-      CONTACT_TO_EMAIL: "",
-      UPSTASH_REDIS_URL: "",
+      UPSTASH_KV_REST_API_URL: "",
+      UPSTASH_KV_REST_API_TOKEN: "",
       STRIPE_RESTRICTED_KEY: "",
       STRIPE_SECRET_KEY: "",
-      STRIPE_PRICE_USD_6: "",
-      STRIPE_PRICE_USD_12: "",
-      STRIPE_PRICE_USD_18: "",
     },
     reuseExistingServer: false,
     timeout: 120_000,

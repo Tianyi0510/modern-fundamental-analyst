@@ -63,7 +63,10 @@ for (const { prefix, language, locale, retry, error } of variants) {
   test(`${locale} a fresh Support visit drops the previous recovery amount`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/support?status=error&checkout_attempt=${attempt}&amount=6`);
-    await expect(page.locator('.support-form input[type="hidden"][name="amount"]')).toHaveValue("6");
+    await expect(page.locator(".support-status")).toContainText(
+      locale === "en" ? "can no longer be resumed" : locale === "zh-tw" ? "已無法恢復" : "已无法恢复",
+    );
+    await expect(page.locator(".support-form")).toHaveCount(0);
     await page.locator(`.footer-links a[href="${prefix}/support"]`).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/support$`));
     // Next.js may retain an inactive route tree; operate on the ready, visible form.
@@ -71,13 +74,13 @@ for (const { prefix, language, locale, retry, error } of variants) {
     await expect(form.locator("fieldset")).toBeEnabled();
     await form
       .locator(".support-amount-option")
-      .filter({ has: page.locator('input[value="18"]') })
+      .filter({ has: page.locator('input[value="support-18-v1"]') })
       .click();
     const data = await form.evaluate((element) => {
       const data = new FormData(element as HTMLFormElement);
-      return { amounts: data.getAll("amount"), attempt: data.get("checkout_attempt") };
+      return { products: data.getAll("product_id"), attempt: data.get("checkout_attempt") };
     });
-    expect(data.amounts).toEqual(["18"]);
+    expect(data.products).toEqual(["support-18-v1"]);
     expect(data.attempt).not.toBe(attempt);
     await expect(form.locator("fieldset")).toBeEnabled();
   });
@@ -86,7 +89,7 @@ for (const { prefix, language, locale, retry, error } of variants) {
     await page.goto(`${prefix}/support`);
     await page
       .locator(".support-amount-option")
-      .filter({ has: page.locator('input[value="6"]') })
+      .filter({ has: page.locator('input[value="support-6-v1"]') })
       .click();
     const originalAttempt = await page.locator('input[name="checkout_attempt"]').inputValue();
     await page.locator(".support-form").evaluate((form) => {
@@ -102,11 +105,13 @@ for (const { prefix, language, locale, retry, error } of variants) {
     await expect(page.locator('input[name="checkout_attempt"]')).not.toHaveValue(originalAttempt);
     await page
       .locator(".support-amount-option")
-      .filter({ has: page.locator('input[value="18"]') })
+      .filter({ has: page.locator('input[value="support-18-v1"]') })
       .click();
     expect(
-      await page.locator(".support-form").evaluate((form) => new FormData(form as HTMLFormElement).getAll("amount")),
-    ).toEqual(["18"]);
+      await page
+        .locator(".support-form")
+        .evaluate((form) => new FormData(form as HTMLFormElement).getAll("product_id")),
+    ).toEqual(["support-18-v1"]);
   });
 
   test(`${locale} article metadata uses the canonical localized article`, async ({ page }) => {
@@ -153,7 +158,7 @@ for (const mobile of [false, true]) {
     for (const entry of [
       {
         path: "/support",
-        query: `status=error&checkout_attempt=${attempt}&amount=6&extra=discard`,
+        query: `status=error&checkout_attempt=${attempt}&product_id=support-6-v1&extra=discard`,
         name: "checkout_attempt",
         value: attempt,
       },
@@ -175,6 +180,7 @@ for (const mobile of [false, true]) {
       await expect(page).toHaveURL(new RegExp(`/zh-tw${entry.path}\\?`));
       if (entry.path === "/support") {
         await expect(page.locator('input[name="checkout_locale"]')).toHaveValue("en");
+        await expect(page.locator('input[type="hidden"][name="product_id"]')).toHaveValue("support-6-v1");
         await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(attempt);
       } else {
         expect(new URL(page.url()).searchParams.get("token")).toBe(token);

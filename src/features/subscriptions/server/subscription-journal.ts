@@ -15,8 +15,8 @@ function keyFor(email: string) {
   if (!secret) throw new Error("SUBSCRIPTION_PREFERENCES_SECRET is required for subscription journals");
   return `mfa:subscription-journal:v1:${createHmac("sha256", secret).update(email.trim().toLowerCase()).digest("hex")}`;
 }
-async function client() {
-  const redis = await getRedisClient();
+function client() {
+  const redis = getRedisClient();
   if (!redis) throw new Error("Subscription journal is unavailable");
   return redis;
 }
@@ -30,7 +30,7 @@ export async function withSubscriptionJournal<T>(
   operationType: "subscribe" | "preferences" = "subscribe",
 ) {
   const key = keyFor(email);
-  const redis = await client();
+  const redis = client();
   const context = resendOperationContext.getStore();
   if (!context) throw new Error("Subscription journal requires a subscriber lock");
   const record: JournalRecord = {
@@ -41,7 +41,7 @@ export async function withSubscriptionJournal<T>(
     operation: operationType,
   };
   let serialized = JSON.stringify(record);
-  if (!(await executeRedisCommand(redis, () => redis.set(key, serialized, { NX: true })))) {
+  if (!(await executeRedisCommand(redis, () => redis.set(key, serialized, { nx: true })))) {
     throw new Error("Subscription reconciliation required");
   }
   context.recordPhase = async (phase) => {
@@ -49,7 +49,8 @@ export async function withSubscriptionJournal<T>(
     const updated = await executeRedisCommand(redis, () =>
       redis.eval(
         "if redis.call('GET', KEYS[1]) == ARGV[1] then redis.call('SET', KEYS[1], ARGV[2]); return 1 else return 0 end",
-        { keys: [key], arguments: [serialized, next] },
+        [key],
+        [serialized, next],
       ),
     );
     if (!updated) throw new Error("Subscription journal ownership changed");
@@ -69,10 +70,11 @@ export async function withSubscriptionJournal<T>(
   }
   if (!context.uncertain && (!context.writeStarted || (completed && !context.signal.aborted))) {
     const removed = await executeRedisCommand(redis, () =>
-      redis.eval("if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end", {
-        keys: [key],
-        arguments: [serialized],
-      }),
+      redis.eval(
+        "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end",
+        [key],
+        [serialized],
+      ),
     );
     if (!removed) throw new Error("Subscription journal ownership changed");
   } else {
@@ -84,8 +86,8 @@ export async function withSubscriptionJournal<T>(
 
 export async function readSubscriptionJournal(email: string): Promise<JournalRecord | null> {
   const key = keyFor(email);
-  const redis = await client();
-  const value = await executeRedisCommand(redis, () => redis.get(key));
+  const redis = client();
+  const value = await executeRedisCommand(redis, () => redis.get<string>(key));
   return value ? (JSON.parse(value) as JournalRecord) : null;
 }
 
@@ -93,14 +95,15 @@ export async function readSubscriptionJournal(email: string): Promise<JournalRec
 // provider state. Compare the exact record to avoid clearing a newer attempt.
 export async function resolveSubscriptionJournal(email: string, expectedId: string) {
   const key = keyFor(email);
-  const redis = await client();
-  const value = await executeRedisCommand(redis, () => redis.get(key));
+  const redis = client();
+  const value = await executeRedisCommand(redis, () => redis.get<string>(key));
   if (!value || (JSON.parse(value) as JournalRecord).id !== expectedId) throw new Error("Journal ID does not match");
   const cleared = await executeRedisCommand(redis, () =>
-    redis.eval("if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end", {
-      keys: [key],
-      arguments: [value],
-    }),
+    redis.eval(
+      "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end",
+      [key],
+      [value],
+    ),
   );
   if (!cleared) throw new Error("Journal changed during reconciliation");
 }
