@@ -1,4 +1,5 @@
 import "server-only";
+import { reportServiceFailure } from "./sentry-server";
 import { Resend } from "resend";
 import { AsyncLocalStorage } from "node:async_hooks";
 
@@ -69,6 +70,7 @@ export async function runResendOperation<T>(label: string, operation: () => Prom
   try {
     return await operation();
   } catch (error) {
+    reportServiceFailure("resend.request", "exception");
     console.error(label, error instanceof Error ? error.name : "UnknownError");
     return null;
   }

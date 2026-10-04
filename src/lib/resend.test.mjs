@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { monitoringCapture } from "../../scripts/sentry-test-client.mjs";
 
 const { getResendClient, getResendIdempotencyKey, runResendOperation } = await import("./resend.ts");
 
@@ -41,7 +42,8 @@ test("Resend operation boundary returns successful provider responses", async ()
   assert.deepEqual(result, { data: { id: "contact-id" } });
 });
 
-test("Resend operation boundary converts thrown provider failures to null", async () => {
+test("Resend operation boundary converts thrown provider failures to null", async (t) => {
+  const { events, flush } = monitoringCapture(t);
   const originalError = console.error;
   const logs = [];
   console.error = (...values) => logs.push(values);
@@ -52,6 +54,10 @@ test("Resend operation boundary converts thrown provider failures to null", asyn
     });
     assert.equal(result, null);
     assert.deepEqual(logs, [["Resend test failed", "TypeError"]]);
+    await flush();
+    assert.equal(events.length, 1);
+    assert.equal(events[0].tags.operation, "resend.request");
+    assert.doesNotMatch(JSON.stringify(events), /private provider details/);
   } finally {
     console.error = originalError;
   }

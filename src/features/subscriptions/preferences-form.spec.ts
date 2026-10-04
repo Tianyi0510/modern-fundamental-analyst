@@ -45,6 +45,8 @@ for (const { prefix, saved, unsubscribed } of [
     await form.locator('button[type="button"]').click();
     await expect(status).toHaveText(unsubscribed);
     await expect(select).toBeDisabled();
+    await expect(select).toHaveCSS("cursor", "not-allowed");
+    await expect(select).toHaveCSS("border-top-style", "dashed");
     expect(actions).toEqual(["save", "unsubscribe"]);
   });
 }

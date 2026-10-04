@@ -52,6 +52,9 @@ jobs:
     needs: static
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      PLAYWRIGHT_SENTRY_TEST: "1"
+      NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
     steps:
       - uses: actions/checkout@v5
         with:
@@ -103,6 +106,9 @@ jobs:
     needs: static
     runs-on: macos-latest
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_SENTRY_TEST: "1"
+      NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
     strategy:
       fail-fast: false
       matrix:

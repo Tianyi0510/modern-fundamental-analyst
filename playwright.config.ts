@@ -40,6 +40,10 @@ export default defineConfig({
       UPSTASH_KV_REST_API_TOKEN: "",
       STRIPE_RESTRICTED_KEY: "",
       STRIPE_SECRET_KEY: "",
+      // A fake DSN can be supplied explicitly for intercepted monitoring tests.
+      NEXT_PUBLIC_SENTRY_DSN: process.env.PLAYWRIGHT_SENTRY_TEST === "1" ? "https://public@sentry.invalid/1" : "",
+      SENTRY_DSN: "",
+      SENTRY_AUTH_TOKEN: "",
     },
     reuseExistingServer: false,
     timeout: 120_000,

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { reportServiceFailure } from "@/lib/sentry-server";
 import { isSameOrigin, readLimitedText, RequestBodyError } from "@/lib/api-request";
 import { getLocalizedPath, resolveLocale } from "@/lib/i18n";
 import { createRateLimiter } from "@/lib/rate-limit";
@@ -108,6 +109,7 @@ export async function POST(request: Request) {
     if (!session.url) throw new Error("Stripe did not return a Checkout URL.");
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
+    reportServiceFailure("stripe.checkout.create", "exception");
     console.error("Stripe Checkout session creation failed.", getStripeErrorDetails(error));
     return NextResponse.redirect(
       supportUrl(request, locale, "error", {
