@@ -155,12 +155,14 @@ for (const mobile of [false, true]) {
   }) => {
     await page.setViewportSize({ width: mobile ? 390 : 1440, height: 900 });
     const token = preferenceToken();
+    await page.goto("/support");
+    const signedAttempt = await page.locator('input[name="checkout_attempt"]').inputValue();
     for (const entry of [
       {
         path: "/support",
-        query: `status=error&checkout_attempt=${attempt}&product_id=support-6-v1&extra=discard`,
+        query: `status=error&checkout_attempt=${signedAttempt}&product_id=support-6-v1&extra=discard`,
         name: "checkout_attempt",
-        value: attempt,
+        value: signedAttempt,
       },
       { path: "/subscription-preferences", query: `token=${token}&extra=discard`, name: "token", value: token },
     ]) {
@@ -181,7 +183,7 @@ for (const mobile of [false, true]) {
       if (entry.path === "/support") {
         await expect(page.locator('input[name="checkout_locale"]')).toHaveValue("en");
         await expect(page.locator('input[type="hidden"][name="product_id"]')).toHaveValue("support-6-v1");
-        await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(attempt);
+        await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(signedAttempt);
       } else {
         expect(new URL(page.url()).searchParams.get("token")).toBe(token);
         await expect(page.locator('select[name="locale"]')).toBeVisible();

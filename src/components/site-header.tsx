@@ -5,7 +5,7 @@ import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useRef } from "react";
+import { useRef, type MouseEvent } from "react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { usePathname } from "next/navigation";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
@@ -37,8 +37,11 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
     triggerRef: menuButtonRef,
   } = useMobileMenu();
   const navigationClosingRef = useRef(false);
-  const closeForNavigation = () => {
-    navigationClosingRef.current = true;
+  const closeForNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+    const destination = new URL(event.currentTarget.href);
+    const changesPage = destination.pathname !== pathname || destination.search !== window.location.search;
+    const opensElsewhere = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+    navigationClosingRef.current = changesPage && !opensElsewhere;
     closeMenuForNavigation();
   };
   const { attachClose, ...menuTouchFeedback } = useMenuTouchFeedback(menuButtonRef, menuCloseButtonRef);

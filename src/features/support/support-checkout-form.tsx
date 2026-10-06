@@ -28,8 +28,6 @@ export function SupportCheckoutForm({
 }) {
   const locked = useRef(false);
   const choiceRef = useRef<HTMLInputElement>(null);
-  const attemptRef = useRef<HTMLInputElement>(null);
-  const [currentAttempt, setCurrentAttempt] = useState(attemptId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedChoice, setSubmittedChoice] = useState<string | null>(recovering ? initialChoice : null);
 
@@ -37,10 +35,10 @@ export function SupportCheckoutForm({
     // A browser Back navigation may restore this form from the page cache.
     const reset = (event: PageTransitionEvent) => {
       if (!locked.current) return;
-      if (event.persisted && attemptRef.current) {
-        const nextAttempt = crypto.randomUUID();
-        attemptRef.current.value = nextAttempt;
-        setCurrentAttempt(nextAttempt);
+      if (event.persisted) {
+        // A fresh attempt must be issued by the server, never minted in the browser.
+        window.location.reload();
+        return;
       }
       locked.current = false;
       const form = choiceRef.current?.form;
@@ -80,7 +78,7 @@ export function SupportCheckoutForm({
         setIsSubmitting(true);
       }}
     >
-      <input type="hidden" name="checkout_attempt" ref={attemptRef} value={currentAttempt} />
+      <input type="hidden" name="checkout_attempt" value={attemptId} />
       <input
         type="hidden"
         name="product_id"

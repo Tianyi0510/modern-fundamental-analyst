@@ -38,6 +38,7 @@ export default defineConfig({
       RESEND_WEBHOOK_SECRET: "",
       UPSTASH_KV_REST_API_URL: "",
       UPSTASH_KV_REST_API_TOKEN: "",
+      SUPPORT_CHECKOUT_SECRET: "playwright-checkout-only",
       STRIPE_RESTRICTED_KEY: "",
       STRIPE_SECRET_KEY: "",
       // A fake DSN can be supplied explicitly for intercepted monitoring tests.

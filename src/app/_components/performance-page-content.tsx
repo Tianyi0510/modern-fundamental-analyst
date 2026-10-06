@@ -3,7 +3,7 @@ import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./performance-page-content.styles";
 import { TimeWeightedPerformance } from "@/features/portfolio/time-weighted-performance";
-import { PerformanceChart } from "@/features/portfolio/performance-chart";
+import { XirrHistory } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/features/portfolio/portfolio";
@@ -216,8 +216,8 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <p className={appearance["section-number"]}>{text.chart}</p>
             <h2>{text.measured}</h2>
           </div>
-          <PerformanceChart locale={locale} />
           <TimeWeightedPerformance locale={locale} />
+          <XirrHistory locale={locale} />
         </section>
         <div className={appearance["section-gray"]}>
           <section className={appearance["methodology"] + " " + appearance["shell"]}>

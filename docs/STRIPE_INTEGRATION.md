@@ -22,7 +22,9 @@ On 2026-10-02, the live account's three active one-time Prices were inspected re
 
 The [server module](../src/features/support/server/stripe-checkout.ts) creates one-time hosted Sessions with `price_data`, a pinned API version and the existing integration identifier. Automatic Tax remains enabled; no Managed Payments override is added. Embedded Checkout is not part of this migration. Stripe owns all payment fields; the website does not collect card details.
 
-The Support form works as a native POST without JavaScript. With JavaScript it announces navigation, locks ordinary repeated submissions, and freezes the product/version and attempt ID. If navigation stops, an explicit resume control resubmits those same values; no timer unlocks the form. A page-cache restore starts a new attempt. New requests require one valid UUID attempt and use `support-checkout:v2:<attempt>` as the idempotency key. The key does not include the product ID: changing a selection under the same attempt must cause a parameter mismatch, not a second Session. Stripe retains keys for at least 24 hours; this is short-term recovery, not a durable payment ledger.
+The Support form works as a native POST without JavaScript. With JavaScript it announces navigation, locks ordinary repeated submissions, and freezes the product/version and attempt ID. If navigation stops, an explicit resume control resubmits those same values; no timer unlocks the form. A page-cache restore after submission reloads the server page rather than minting a browser attempt. New requests require a server-issued `v3` token containing a random UUID, expiry and HMAC-SHA256 signature; the API and Session-creation service validate it before a provider write. Attempts expire 23 hours after issuance, leaving a margin before Stripe's minimum 24-hour idempotency retention. Retries keep the complete token and use `support-checkout:v3:<token>` as their idempotency key. Changing a product under the same attempt hits the same key and must cause a parameter mismatch, not another Session.
+
+`SUPPORT_CHECKOUT_SECRET` can supply a stable signing key; otherwise signing uses the active Stripe server API key. Keep the effective key consistent across serving instances. Rotating it invalidates existing attempts, which then display the retirement notice. Unconfigured local previews use a process-local random key and cannot create Stripe Sessions. The expiry cannot be extended by editing the URL or form. This bounds retries; it is not a durable payment ledger.
 
 Expected errors redirect to the selected language with `status=error`, `status=rate-limited` or `status=invalid-amount`. Rate-limit redirects include `Retry-After` and the ten-minute message. Recovery keeps `product_id`, `checkout_attempt` and the original `checkout_locale`; interface language switches do not change Stripe metadata or return URLs. New attempts remount the form to discard a previous frozen choice. Origin, format and body-size rejections remain API errors.
 
@@ -30,7 +32,7 @@ Stripe Custom domains was disabled according to the owner on 2026-09-22. Redirec
 
 ## Retired attempts
 
-Amount-only forms and recovery links are retired. The endpoint redirects old amount-only requests to `status=retired-checkout` without creating a Session. Legacy error/rate-limit links show the same localized message and no checkout form; readers must check their original Stripe confirmation before intentionally opening a fresh Support page. Language switches preserve this notice, not an old attempt payload. Never convert an old UUID to the new pricing contract or silently create a replacement payment.
+Amount-only forms, unsigned UUID attempts, expired tokens and invalid signatures are retired. The endpoint redirects retired requests to `status=retired-checkout` without creating a Session. Legacy error/rate-limit links show the same localized message and no checkout form; readers must check their original Stripe confirmation before intentionally opening a fresh Support page. Language switches preserve this notice, not an old attempt payload. Never convert an old UUID to the new pricing contract or silently create a replacement payment.
 
 Old paid Sessions remain verifiable through their original amount metadata. The application no longer reads any legacy Price configuration. This workspace change does not delete cloud variables; removing settings from an older serving deployment still requires coordinating its release or rollback.
 
@@ -45,6 +47,8 @@ Old paid Sessions remain verifiable through their original amount metadata. The 
 ## Payment confirmation
 
 Payment status does not grant email-subscription consent. Checkout remains independent of the [email confirmation flow](RESEND_INTEGRATION.md#subscription-confirmation-and-delivery-feedback); the application does not activate a newsletter subscription from a successful payment or a Checkout email address.
+
+The asynchronous `VerifiedSupportPanel` retrieves payment status server-side and renders the synchronous `SupportPanel` through JSX. Payment verification uses a Suspense loading boundary; ordinary visits and retry states render the native form directly through JSX without awaiting a provider. Do not invoke either component as an ordinary function.
 
 The return page retrieves the Session server-side. Only a completed, paid USD research-support Session confirms success. New catalog Sessions must also match the known product ID, subtotal and amount metadata; tax may increase the total without changing the subtotal. Missing or unavailable evidence is unverified, and completed unpaid Sessions are pending. URL parameters alone never confirm payment. No customer details are returned to the page.
 

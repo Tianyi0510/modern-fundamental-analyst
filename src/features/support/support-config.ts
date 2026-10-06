@@ -24,7 +24,10 @@ export function parseSupportAmount(value: string | null): SupportAmount | null {
 }
 
 export function parseCheckoutAttempt(value: string | null): string | undefined {
-  return value && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+  return value &&
+    /^(?:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|v3\.[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.[0-9]{13}\.[A-Za-z0-9_-]{43})$/.test(
+      value,
+    )
     ? value
     : undefined;
 }
@@ -41,8 +44,12 @@ export function parseSupportSearchParams(params: SupportSearchParams, locale: Lo
       : undefined;
   const attemptId = parseCheckoutAttempt(typeof params.checkout_attempt === "string" ? params.checkout_attempt : null);
   const productId = parseSupportProductId(typeof params.product_id === "string" ? params.product_id : null);
-  // Legacy attempts cannot be converted to a new pricing contract under an old key.
-  if ((status === "error" || status === "rate-limited") && attemptId && params.product_id === undefined)
+  // Unverifiable recovery must not silently become a fresh payment attempt.
+  if (
+    (status === "error" || status === "rate-limited") &&
+    params.checkout_attempt !== undefined &&
+    (!attemptId?.startsWith("v3.") || !productId)
+  )
     status = "retired-checkout";
   const checkoutLocale = resolveLocale(params.checkout_locale, locale);
   const query = new URLSearchParams();

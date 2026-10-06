@@ -11,7 +11,7 @@ import styles from "./performance-chart.module.css";
 
 const copy = {
   en: {
-    title: "Portfolio vs SPY",
+    title: "Annualized XIRR history",
     note: "Since-inception annualized XIRR at each month-end. These are not individual monthly returns.",
     portfolio: "Portfolio",
     data: "View monthly data",
@@ -23,7 +23,7 @@ const copy = {
     scroll: "Swipe horizontally to compare columns; scroll vertically for earlier months.",
   },
   "zh-tw": {
-    title: "投資組合與 SPY",
+    title: "年化 XIRR 歷史數據",
     note: "每個月底自成立以來的年化 XIRR，並非各月份的單月報酬。",
     portfolio: "投資組合",
     data: "查看每月數據",
@@ -35,7 +35,7 @@ const copy = {
     scroll: "左右滑動比較欄位，上下捲動查看較早月份。",
   },
   "zh-cn": {
-    title: "投资组合与 SPY",
+    title: "年化 XIRR 历史数据",
     note: "每个月底自成立以来的年化 XIRR，并非各月份的单月回报。",
     portfolio: "投资组合",
     data: "查看每月数据",
@@ -66,7 +66,17 @@ const twrCopy = {
   },
 } as const;
 
-export function PerformanceChart({ locale, measure = "xirr" }: { locale: Locale; measure?: "xirr" | "twr" }) {
+export function PerformanceChart({ locale }: { locale: Locale }) {
+  return <PerformanceHistory locale={locale} measure="twr" />;
+}
+
+export function XirrHistory({ locale }: { locale: Locale }) {
+  return <PerformanceHistory locale={locale} measure="xirr" />;
+}
+
+function PerformanceHistory({ locale, measure }: { locale: Locale; measure: "xirr" | "twr" }) {
+  const Root = measure === "twr" ? "figure" : "section";
+  const Heading = measure === "twr" ? "figcaption" : "header";
   const text = measure === "twr" ? { ...copy[locale], ...twrCopy[locale] } : copy[locale];
   const titleId = measure === "twr" ? "performance-twr-chart-title" : "performance-chart-title";
   const observations =
@@ -96,55 +106,59 @@ export function PerformanceChart({ locale, measure = "xirr" }: { locale: Locale;
     points.map((row, index) => `${(index * 800) / (points.length - 1)},${y(row[key])}`).join(" ");
   const ticks = Array.from({ length: (upper - lower) / 20 + 1 }, (_, index) => upper - index * 20);
   return (
-    <figure className={styles.figure} aria-labelledby={titleId}>
-      <figcaption>
+    <Root className={styles.figure} aria-labelledby={titleId}>
+      <Heading>
         <h3 id={titleId}>{text.title}</h3>
         <p>{text.note}</p>
-      </figcaption>
-      <ul className={styles.legend} aria-label={text.title}>
-        <li>
-          <span className={styles.portfolioKey} />
-          {text.portfolio}
-        </li>
-        <li>
-          <span className={styles.benchmarkKey} />
-          SPY
-        </li>
-      </ul>
-      <p>{text.axis}</p>
-      <div className={styles.plot}>
-        <div className={styles.ticks} aria-hidden="true">
-          {ticks.map((tick) => (
-            <span key={tick}>{tick}%</span>
-          ))}
-        </div>
-        <svg
-          viewBox="0 0 800 300"
-          preserveAspectRatio="none"
-          role="img"
-          aria-label={`${text.title}. ${text.note} ${formatDate(latest.date, locale, true)}: ${text.portfolio} ${formatPercent(latest.portfolioReturn)}, SPY ${formatPercent(latest.benchmarkReturn)}.`}
-        >
-          {ticks.map((tick) => (
-            <line
-              key={tick}
-              x1="0"
-              x2="800"
-              y1={y(tick)}
-              y2={y(tick)}
-              className={tick === 0 ? styles.zeroLine : styles.grid}
-            />
-          ))}
-          <polyline points={line("benchmarkReturn")} className={styles.benchmarkLine} />
-          <polyline points={line("portfolioReturn")} className={styles.portfolioLine} />
-        </svg>
-      </div>
-      <div className={styles.dates}>
-        <span>{formatDate(points[0]!.date, locale, true)}</span>
-        <span className={styles.midpoint}>
-          {formatDate(points[Math.floor((points.length - 1) / 2)]!.date, locale, true)}
-        </span>
-        <span>{formatDate(latest.date, locale, true)}</span>
-      </div>
+      </Heading>
+      {measure === "twr" ? (
+        <>
+          <ul className={styles.legend} aria-label={text.title}>
+            <li>
+              <span className={styles.portfolioKey} />
+              {text.portfolio}
+            </li>
+            <li>
+              <span className={styles.benchmarkKey} />
+              SPY
+            </li>
+          </ul>
+          <p>{text.axis}</p>
+          <div className={styles.plot}>
+            <div className={styles.ticks} aria-hidden="true">
+              {ticks.map((tick) => (
+                <span key={tick}>{tick}%</span>
+              ))}
+            </div>
+            <svg
+              viewBox="0 0 800 300"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={`${text.title}. ${text.note} ${formatDate(latest.date, locale, true)}: ${text.portfolio} ${formatPercent(latest.portfolioReturn)}, SPY ${formatPercent(latest.benchmarkReturn)}.`}
+            >
+              {ticks.map((tick) => (
+                <line
+                  key={tick}
+                  x1="0"
+                  x2="800"
+                  y1={y(tick)}
+                  y2={y(tick)}
+                  className={tick === 0 ? styles.zeroLine : styles.grid}
+                />
+              ))}
+              <polyline points={line("benchmarkReturn")} className={styles.benchmarkLine} />
+              <polyline points={line("portfolioReturn")} className={styles.portfolioLine} />
+            </svg>
+          </div>
+          <div className={styles.dates}>
+            <span>{formatDate(points[0]!.date, locale, true)}</span>
+            <span className={styles.midpoint}>
+              {formatDate(points[Math.floor((points.length - 1) / 2)]!.date, locale, true)}
+            </span>
+            <span>{formatDate(latest.date, locale, true)}</span>
+          </div>
+        </>
+      ) : null}
       <AnimatedDisclosure
         className={styles.details}
         summary={
@@ -194,6 +208,6 @@ export function PerformanceChart({ locale, measure = "xirr" }: { locale: Locale;
           </table>
         </div>
       </AnimatedDisclosure>
-    </figure>
+    </Root>
   );
 }

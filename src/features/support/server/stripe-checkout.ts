@@ -9,6 +9,8 @@ import {
 } from "@/features/support/support-config";
 import { getSupportProduct } from "./support-catalog";
 
+import { isValidCheckoutAttempt, RetiredCheckoutAttemptError } from "./checkout-attempt";
+
 const CHECKOUT_INTEGRATION_IDENTIFIER = "hosted_web_0001_mfaqxkpt";
 const STRIPE_API_VERSION = "2026-08-26.dahlia" as const;
 
@@ -31,6 +33,7 @@ function getStripeClient() {
 type CheckoutRequest = { locale: Locale; origin: string; productId: SupportProductId; attemptId: string };
 
 export async function createSupportCheckoutSession({ locale, origin, attemptId, productId }: CheckoutRequest) {
+  if (!isValidCheckoutAttempt(attemptId)) throw new RetiredCheckoutAttemptError();
   const product = getSupportProduct(productId);
   const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
     quantity: 1,
@@ -73,7 +76,7 @@ export async function createSupportCheckoutSession({ locale, origin, attemptId, 
       metadata,
       payment_intent_data: { metadata },
     },
-    { idempotencyKey: `support-checkout:v2:${attemptId}` },
+    { idempotencyKey: `support-checkout:v3:${attemptId}` },
   );
 }
 

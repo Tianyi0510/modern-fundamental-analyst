@@ -7,6 +7,8 @@ import { SITE_URL } from "@/lib/site-config";
 import { parseCheckoutAttempt, parseSupportProductId, type SupportProductId } from "@/features/support/support-config";
 import { createSupportCheckoutSession, getStripeErrorDetails } from "@/features/support/server/stripe-checkout";
 
+import { isValidCheckoutAttempt, RetiredCheckoutAttemptError } from "@/features/support/server/checkout-attempt";
+
 export const runtime = "nodejs";
 
 const MAX_FORM_BYTES = 5_000;
@@ -71,6 +73,8 @@ export async function POST(request: Request) {
     formData.getAll("checkout_attempt").length === 1
       ? parseCheckoutAttempt(formData.get("checkout_attempt"))
       : undefined;
+  if (formData.has("checkout_attempt") && (!attemptId || !isValidCheckoutAttempt(attemptId)))
+    return NextResponse.redirect(supportUrl(request, locale, "retired-checkout"), 303);
   if (await isRateLimited(request)) {
     const response = NextResponse.redirect(
       supportUrl(request, locale, "rate-limited", {
@@ -109,6 +113,8 @@ export async function POST(request: Request) {
     if (!session.url) throw new Error("Stripe did not return a Checkout URL.");
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
+    if (error instanceof RetiredCheckoutAttemptError)
+      return NextResponse.redirect(supportUrl(request, locale, "retired-checkout"), 303);
     reportServiceFailure("stripe.checkout.create", "exception");
     console.error("Stripe Checkout session creation failed.", getStripeErrorDetails(error));
     return NextResponse.redirect(

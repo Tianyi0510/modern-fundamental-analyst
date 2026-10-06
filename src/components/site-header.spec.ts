@@ -1014,3 +1014,41 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page).toHaveURL(new RegExp(`${prefix}/about$`));
   });
 }
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  for (const reducedMotion of ["reduce", "no-preference"] as const) {
+    test(`${prefix || "English"} same-route menu dismissal restores keyboard focus under ${reducedMotion}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion });
+      await page.goto(`${prefix}/portfolio`);
+      const trigger = page.locator(".mobile-menu-button");
+      await trigger.click();
+      const current = page.locator(`.mobile-menu-content nav a[href="${prefix}/portfolio"]`);
+      await current.focus();
+      await page.keyboard.press("Enter");
+      await expect(page.locator(".mobile-menu-layer")).toBeHidden();
+      await expect(trigger).toBeFocused();
+      await expect(page).toHaveURL(`${prefix}/portfolio`);
+    });
+  }
+  test(`${prefix || "English"} enlarged mobile labels fit inside the drawer`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto(`${prefix}/portfolio`);
+    await page.locator(".mobile-menu-button").click();
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    await page.evaluate(() => document.fonts.ready);
+    const content = page.locator(".mobile-menu-content");
+    await expect.poll(() => content.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(1);
+    for (const link of await content.locator("nav a").all()) {
+      await link.scrollIntoViewIfNeeded();
+      await expect(link).toBeVisible();
+      expect(await link.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(1);
+    }
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".mobile-menu-button")).toBeFocused();
+  });
+}

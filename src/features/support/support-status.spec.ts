@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { expect, test } from "@playwright/test";
 
 const supportLocales = [
@@ -76,7 +77,7 @@ for (const copy of supportLocales) {
     expect(bodies.length).toBe(2);
     const first = new URLSearchParams(bodies[0]);
     const second = new URLSearchParams(bodies[1]);
-    expect(first.get("checkout_attempt")).toMatch(/^[0-9a-f-]{36}$/);
+    expect(first.get("checkout_attempt")).toMatch(/^v3\.[0-9a-f-]{36}\.[0-9]{13}\.[A-Za-z0-9_-]{43}$/);
     expect(second.get("checkout_attempt")).toBe(first.get("checkout_attempt"));
     expect(first.getAll("product_id")).toEqual(["support-6-v1"]);
     expect(second.getAll("product_id")).toEqual(["support-6-v1"]);
@@ -205,3 +206,35 @@ test("a success query without a Stripe session never displays payment confirmati
     await expect(page.locator(".support-submit")).toBeEnabled();
   }
 });
+
+for (const copy of supportLocales) {
+  test(`${copy.locale} unsigned recovery is retired without offering a replacement form`, async ({ page }) => {
+    await page.goto(
+      `${copy.prefix}/support?status=error&checkout_attempt=550e8400-e29b-41d4-a716-446655440000&product_id=support-12-v1`,
+    );
+    await expect(page.locator(".support-form")).toHaveCount(0);
+    await expect(page.locator(".support-status")).toContainText(
+      copy.locale === "en" ? "can no longer be resumed" : copy.locale === "zh-tw" ? "已無法恢復" : "已无法恢复",
+    );
+  });
+}
+
+for (const copy of supportLocales) {
+  test(`${copy.locale} expired and malformed signed recovery never renders a fresh checkout form`, async ({ page }) => {
+    const payload = `v3.550e8400-e29b-41d4-a716-446655440000.${Date.now() - 1000}`;
+    const signature = createHmac("sha256", "playwright-checkout-only")
+      .update(`support-checkout:v3:${payload}`)
+      .digest("base64url");
+    for (const attempt of [`${payload}.${signature}`, "v3.invalid"]) {
+      await page.goto(`${copy.prefix}/support?status=error&checkout_attempt=${attempt}&product_id=support-12-v1`);
+      await expect(page.locator(".support-form")).toHaveCount(0);
+      await expect(page.locator(".support-status")).toContainText(
+        copy.locale === "en" ? "can no longer be resumed" : copy.locale === "zh-tw" ? "已無法恢復" : "已无法恢复",
+      );
+      await page.locator(".language-trigger").click();
+      const target = await page.locator("#desktop-language-menu a").first().getAttribute("href");
+      expect(target).toContain("status=retired-checkout");
+      expect(target).not.toContain("checkout_attempt");
+    }
+  });
+}

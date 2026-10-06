@@ -74,7 +74,8 @@ test("support language links keep only validated recovery parameters", async () 
 
 test("catalog recovery preserves product version and original language without trusting an amount", async () => {
   const { parseSupportSearchParams } = await import("./support-config.ts");
-  const checkout_attempt = "550e8400-e29b-41d4-a716-446655440000";
+  const { createCheckoutAttempt } = await import("./server/checkout-attempt.ts");
+  const checkout_attempt = createCheckoutAttempt();
   const params = parseSupportSearchParams(
     { status: "error", checkout_attempt, product_id: "support-6-v1", amount: "18", checkout_locale: "zh-cn" },
     "en",
