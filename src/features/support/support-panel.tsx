@@ -3,19 +3,22 @@ import { Alert } from "@/components/ui/alert";
 import { randomUUID } from "node:crypto";
 import { SupportCheckoutForm } from "./support-checkout-form";
 import { supportCopy } from "./support-copy";
-import { type parseSupportSearchParams } from "./support-config";
+import { type parseSupportSearchParams, type SupportStatus } from "./support-config";
 import { SUPPORT_CATALOG } from "./server/support-catalog";
 import { resolveSupportStatus } from "./server/stripe-checkout";
 import type { Locale } from "@/lib/i18n";
 
-export async function SupportPanel({
-  locale,
-  params,
-}: {
+type SupportPanelProps = {
   locale: Locale;
   params: ReturnType<typeof parseSupportSearchParams>;
-}) {
+};
+
+export async function VerifiedSupportPanel({ locale, params }: SupportPanelProps) {
   const status = await resolveSupportStatus(params);
+  return <SupportPanel locale={locale} params={params} status={status} />;
+}
+
+export function SupportPanel({ locale, params, status }: SupportPanelProps & { status: SupportStatus }) {
   const text = supportCopy[locale];
   const recoveryAttempt = params.attemptId;
   const selectedChoice = params.productId ?? "support-12-v1";

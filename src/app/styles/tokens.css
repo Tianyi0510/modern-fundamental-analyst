@@ -8,6 +8,8 @@
   --background-gray: #f8f9fb;
   --price-up: #34a853;
   --price-down: #ff0000;
+  --text-return-positive: #037b66;
+  --text-return-negative: #d60a22;
   --font-size-page-title: clamp(3.25rem, 1.75rem + 5vw, 7rem);
   --font-size-section-title: clamp(2.75rem, 2.125rem + 2.5vw, 4.5rem);
   --font-size-card-title: clamp(2rem, 1.75rem + 1vw, 2.625rem);

@@ -3,34 +3,34 @@ import { expect, test } from "@playwright/test";
 test.use({ hasTouch: true });
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-  test(`${prefix || "English"} August performance chart and monthly data remain accessible`, async ({ page }) => {
+  test(`${prefix || "English"} September performance chart and monthly data remain accessible`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`${prefix}/performance`);
     await expect(page.locator('a[href*="docs.google.com/spreadsheets"]')).toHaveCount(0);
     await expect(page.locator(".returns-table")).toHaveCount(0);
-    await expect(page.locator(".methodology-explanation > p")).toHaveCount(3);
+    await expect(page.locator(".methodology-explanation > p")).toHaveCount(4);
     const methodologyNote = page.getByRole("complementary");
     await expect(methodologyNote).toBeVisible();
-    await expect(methodologyNote).toContainText(prefix ? "2026年8月31日" : "31 Aug 2026");
+    await expect(methodologyNote).toContainText(prefix ? "2026年9月30日" : /30 Sept? 2026/);
     await expect(methodologyNote).toContainText(
       prefix === "/zh-tw" ? "並非即時報價" : prefix === "/zh-cn" ? "并非实时报价" : "not live quotes",
     );
     const chart = page.locator('figure[aria-labelledby="performance-chart-title"]');
     await expect(chart.getByRole("img")).toBeVisible();
-    await expect(chart.getByRole("img")).toHaveAccessibleName(/21\.14%.*21\.00%/);
+    await expect(chart.getByRole("img")).toHaveAccessibleName(/24\.43%.*19\.26%/);
     await expect(chart.locator("polyline")).toHaveCount(2);
     for (const line of await chart.locator("polyline").all()) {
-      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(20);
+      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(21);
       for (const point of (await line.getAttribute("points"))!.split(" ")) {
         const y = Number(point.split(",")[1]);
         expect(y).toBeGreaterThanOrEqual(12);
         expect(y).toBeLessThanOrEqual(288);
       }
     }
-    await expect(page.locator(".performance-summary")).toContainText("+21.14%");
-    await expect(page.locator(".performance-summary")).toContainText("+21.00%");
-    if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText("As of 31 Aug 2026");
+    await expect(page.locator(".performance-summary")).toContainText("+24.43%");
+    await expect(page.locator(".performance-summary")).toContainText("+19.26%");
+    if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText(/As of 30 Sept? 2026/);
     const summary = chart.locator("summary");
     await expect(summary.locator("svg.lucide-chevron-down")).toBeVisible();
     expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -38,9 +38,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(summary).toHaveCSS("outline-style", "solid");
     await page.keyboard.press("Enter");
     await expect(chart.getByRole("table")).toBeVisible();
-    await expect(chart.locator("tbody tr")).toHaveCount(21);
-    await expect(chart.locator("tbody tr").first()).toContainText("121,301.99");
-    await expect(chart.locator("tbody tr").first()).toContainText("+21.14%");
+    await expect(chart.locator("tbody tr")).toHaveCount(22);
+    await expect(chart.locator("tbody tr").first()).toContainText("127,533.11");
+    await expect(chart.locator("tbody tr").first()).toContainText("+24.43%");
     const region = chart.getByRole("region");
     expect(await region.evaluate((e) => e.scrollWidth > e.clientWidth && e.scrollHeight > e.clientHeight)).toBe(true);
     await region.evaluate((e) => {

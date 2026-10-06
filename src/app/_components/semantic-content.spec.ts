@@ -19,7 +19,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(group.locator("dd.kpi-value")).not.toBeEmpty();
         await expect(group.locator("dd.kpi-note")).not.toBeEmpty();
       }
-      const date = page.locator('main time[datetime="2026-08-31"]').first();
+      const date = page.locator('main time[datetime="2026-09-30"]').first();
       await expect(date).toBeVisible();
       await expect(date).not.toBeEmpty();
       for (const width of [1440, 390]) {

@@ -37,28 +37,54 @@ function calculateXirr(date, terminalValue) {
   return ((lower + upper) / 2) * 100;
 }
 
-test("published August snapshot retains verified values and income", () => {
-  assert.equal(portfolioSnapshot.asOf, "2026-08-31");
+test("September portfolio XIRR reconciles with dated cash flows without revising August", () => {
+  const latest = portfolioMonthlyValuations.at(-1);
+  const day = (date) => Date.parse(`${date}T00:00:00Z`) / 86400000;
+  const origin = day(portfolioPurchases[0].date);
+  const flows = [
+    ...portfolioPurchases
+      .filter((row) => row.date <= latest.date)
+      .map((row) => ({
+        date: row.date,
+        amount: -(row.grossAmount + row.fees),
+      })),
+    ...portfolioCashEvents.filter((row) => row.date <= latest.date),
+    { date: latest.date, amount: latest.stockValue },
+  ];
+  const residual = flows.reduce(
+    (sum, flow) => sum + flow.amount / (1 + latest.portfolioXirr / 100) ** ((day(flow.date) - origin) / 365),
+    0,
+  );
+  assert.ok(Math.abs(residual) < 0.0001, "Stored XIRR must zero the dated cash-flow NPV");
+  const august = portfolioMonthlyValuations.at(-2);
+  assert.equal(august.date, "2026-08-31");
+  assert.equal(august.stockValue, 121301.99);
+  assert.equal(august.portfolioXirr, 21.13767139882297);
+  assert.equal(august.benchmarkXirr, 21.002190100241442);
+});
+
+test("published September snapshot retains verified values and income", () => {
+  assert.equal(portfolioSnapshot.asOf, "2026-09-30");
   assert.equal(portfolioHoldings.length, 18);
-  assert.ok(Math.abs(portfolioSnapshot.marketValue - 121301.99) < 0.001);
+  assert.ok(Math.abs(portfolioSnapshot.marketValue - 127533.11) < 0.001);
   assert.ok(Math.abs(portfolioSnapshot.costBasis - 96425.3742) < 0.001);
-  const expectedReturn = ((121301.99 - 96425.3742 + 526.69 - 85.75) / 96425.3742) * 100;
+  const expectedReturn = ((127533.11 - 96425.3742 + 644.48 - 85.75) / 96425.3742) * 100;
   assert.ok(Math.abs(portfolioSnapshot.totalReturn - expectedReturn) < 1e-9);
-  assert.equal(portfolioHoldings.find((row) => row.symbol === "PYPL").price, 52.665);
+  assert.equal(portfolioHoldings.find((row) => row.symbol === "PYPL").price, 52.53);
 });
 
 test("future transactions and cash events do not change the published snapshot", async () => {
   portfolioPurchases.push({
-    date: "2026-09-01",
+    date: "2026-10-01",
     symbol: "PYPL",
     shares: 1,
     unitPrice: 100,
     grossAmount: 100,
     fees: 1.99,
-    spyPriceDate: "2026-08-31",
+    spyPriceDate: "2026-09-30",
   });
-  portfolioCashEvents.push({ date: "2026-09-01", symbol: "PYPL", kind: "dividend", amount: 100 });
-  portfolioCashEvents.push({ date: "2026-09-01", kind: "financingInterest", amount: -10 });
+  portfolioCashEvents.push({ date: "2026-10-01", symbol: "PYPL", kind: "dividend", amount: 100 });
+  portfolioCashEvents.push({ date: "2026-10-01", kind: "financingInterest", amount: -10 });
   try {
     const withFutureInputs = await import("./portfolio.ts?future-inputs");
     assert.deepEqual(withFutureInputs.portfolioSnapshot, portfolioSnapshot);
@@ -73,8 +99,8 @@ test("future transactions and cash events do not change the published snapshot",
 });
 
 test("monthly XIRR history preserves unavailable periods and matches the latest snapshot", () => {
-  assert.equal(portfolioMonthlyReturns.length, 21);
-  assert.equal(portfolioSpyMonthlyReturns.length, 21);
+  assert.equal(portfolioMonthlyReturns.length, 22);
+  assert.equal(portfolioSpyMonthlyReturns.length, 22);
   assert.equal(portfolioMonthlyReturns[0].date, "2024-12-31");
   assert.equal(portfolioMonthlyReturns[0].portfolioXirr, null);
   assert.equal(portfolioMonthlyReturns[0].benchmarkXirr, null);
@@ -126,7 +152,7 @@ test("dated purchases and cash events reconcile to the published totals", () => 
   const purchases = portfolioPurchases.filter((row) => row.date <= portfolioSnapshot.asOf);
   const cashEvents = portfolioCashEvents.filter((row) => row.date <= portfolioSnapshot.asOf);
   assert.equal(purchases.length, 91);
-  assert.equal(cashEvents.length, 108);
+  assert.equal(cashEvents.length, 124);
   const purchaseCost = purchases.reduce((sum, row) => sum + row.grossAmount + row.fees, 0);
   const netDividends = cashEvents
     .filter((event) => event.kind !== "financingInterest")
@@ -191,6 +217,6 @@ test("monthly simulated SPY holdings and XIRRs reconcile", () => {
     else assert.ok(Math.abs(observed.xirr - calculateXirr(valuation.date, observed.simulatedValue)) < 0.0001);
   }
   assert.ok(Math.abs(portfolioSpySnapshot.simulatedUnits - 158.5991478936601) < 0.000001);
-  assert.ok(Math.abs(portfolioSpySnapshot.simulatedValue - 121637.61647704263) < 0.01);
-  assert.equal(portfolioSpySnapshot.adjustedClose, 766.95);
+  assert.ok(Math.abs(portfolioSpySnapshot.simulatedValue - 121237.00640905317) < 0.01);
+  assert.equal(portfolioSpySnapshot.adjustedClose, (766.95 * 762.63) / 765.15);
 });

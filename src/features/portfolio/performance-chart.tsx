@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { portfolioTwrMonthlyReturns } from "./portfolio-twr";
 import { portfolioMonthlyReturns } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
@@ -47,24 +48,57 @@ const copy = {
   },
 } as const;
 
-export function PerformanceChart({ locale }: { locale: Locale }) {
-  const text = copy[locale];
-  const points = portfolioMonthlyReturns.filter(
-    (row): row is typeof row & { portfolioXirr: number; benchmarkXirr: number } =>
-      row.portfolioXirr !== null && row.benchmarkXirr !== null,
+const twrCopy = {
+  en: {
+    title: "Reconstructed TWR vs SPY",
+    note: "Cumulative, non-annualized closing-price TWR. Contributions are modeled at period start; net income and costs at period end. Not observed intraday TWR.",
+    axis: "Cumulative reconstructed TWR",
+  },
+  "zh-tw": {
+    title: "重建 TWR 與 SPY",
+    note: "以收盤估值重建的累積 TWR，未年化；假設資金於期初流入，淨股息與費用於期末結算，並非實際日內 TWR。",
+    axis: "累積重建 TWR",
+  },
+  "zh-cn": {
+    title: "重建 TWR 与 SPY",
+    note: "以收盘估值重建的累计 TWR，未年化；假设资金于期初流入，净股息与费用于期末结算，并非实际日内 TWR。",
+    axis: "累计重建 TWR",
+  },
+} as const;
+
+export function PerformanceChart({ locale, measure = "xirr" }: { locale: Locale; measure?: "xirr" | "twr" }) {
+  const text = measure === "twr" ? { ...copy[locale], ...twrCopy[locale] } : copy[locale];
+  const titleId = measure === "twr" ? "performance-twr-chart-title" : "performance-chart-title";
+  const observations =
+    measure === "twr"
+      ? portfolioTwrMonthlyReturns.map((row) => ({
+          date: row.date,
+          marketValue: row.endingValue,
+          portfolioReturn: row.portfolioTwr,
+          benchmarkReturn: row.benchmarkTwr,
+        }))
+      : portfolioMonthlyReturns.map((row) => ({
+          date: row.date,
+          marketValue: row.marketValue,
+          portfolioReturn: row.portfolioXirr,
+          benchmarkReturn: row.benchmarkXirr,
+        }));
+  const points = observations.filter(
+    (row): row is typeof row & { portfolioReturn: number; benchmarkReturn: number } =>
+      row.portfolioReturn !== null && row.benchmarkReturn !== null,
   );
-  const values = points.flatMap((row) => [row.portfolioXirr, row.benchmarkXirr]);
+  const values = points.flatMap((row) => [row.portfolioReturn, row.benchmarkReturn]);
   const lower = Math.floor(Math.min(...values) / 20) * 20;
-  const upper = Math.ceil(Math.max(...values) / 20) * 20;
+  const upper = Math.max(lower + 20, Math.ceil(Math.max(...values) / 20) * 20);
   const y = (value: number) => 12 + (276 * (upper - value)) / (upper - lower);
   const latest = points[points.length - 1]!;
-  const line = (key: "portfolioXirr" | "benchmarkXirr") =>
+  const line = (key: "portfolioReturn" | "benchmarkReturn") =>
     points.map((row, index) => `${(index * 800) / (points.length - 1)},${y(row[key])}`).join(" ");
   const ticks = Array.from({ length: (upper - lower) / 20 + 1 }, (_, index) => upper - index * 20);
   return (
-    <figure className={styles.figure} aria-labelledby="performance-chart-title">
+    <figure className={styles.figure} aria-labelledby={titleId}>
       <figcaption>
-        <h3 id="performance-chart-title">{text.title}</h3>
+        <h3 id={titleId}>{text.title}</h3>
         <p>{text.note}</p>
       </figcaption>
       <ul className={styles.legend} aria-label={text.title}>
@@ -88,7 +122,7 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
           viewBox="0 0 800 300"
           preserveAspectRatio="none"
           role="img"
-          aria-label={`${text.title}. ${text.note} ${formatDate(latest.date, locale, true)}: ${text.portfolio} ${formatPercent(latest.portfolioXirr)}, SPY ${formatPercent(latest.benchmarkXirr)}.`}
+          aria-label={`${text.title}. ${text.note} ${formatDate(latest.date, locale, true)}: ${text.portfolio} ${formatPercent(latest.portfolioReturn)}, SPY ${formatPercent(latest.benchmarkReturn)}.`}
         >
           {ticks.map((tick) => (
             <line
@@ -100,8 +134,8 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
               className={tick === 0 ? styles.zeroLine : styles.grid}
             />
           ))}
-          <polyline points={line("benchmarkXirr")} className={styles.benchmarkLine} />
-          <polyline points={line("portfolioXirr")} className={styles.portfolioLine} />
+          <polyline points={line("benchmarkReturn")} className={styles.benchmarkLine} />
+          <polyline points={line("portfolioReturn")} className={styles.portfolioLine} />
         </svg>
       </div>
       <div className={styles.dates}>
@@ -120,7 +154,7 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
           </>
         }
       >
-        <p className={styles.scrollHint} id="performance-table-hint">
+        <p className={styles.scrollHint} id={`${titleId}-hint`}>
           {text.scroll}
         </p>
         {/* Keyboard focus allows horizontal scrolling of the monthly table. */}
@@ -129,7 +163,7 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
           tabIndex={0}
           role="region"
           aria-label={text.data}
-          aria-describedby="performance-table-hint"
+          aria-describedby={`${titleId}-hint`}
         >
           <table>
             <caption>{text.caption}</caption>
@@ -137,20 +171,22 @@ export function PerformanceChart({ locale }: { locale: Locale }) {
               <tr>
                 <th scope="col">{text.month}</th>
                 <th scope="col">{text.value}</th>
-                <th scope="col">{text.portfolio} XIRR</th>
-                <th scope="col">SPY XIRR</th>
+                <th scope="col">
+                  {text.portfolio} {measure === "twr" ? "TWR" : "XIRR"}
+                </th>
+                <th scope="col">SPY {measure === "twr" ? "TWR" : "XIRR"}</th>
               </tr>
             </thead>
             <tbody>
-              {portfolioMonthlyReturns.toReversed().map((row) => (
+              {observations.toReversed().map((row) => (
                 <tr key={row.date}>
                   <th scope="row">{formatDate(row.date, locale, true)}</th>
                   <td>{formatUsd(row.marketValue)}</td>
-                  <td className={row.portfolioXirr === null ? styles.unavailable : undefined}>
-                    {row.portfolioXirr === null ? text.unavailable : formatPercent(row.portfolioXirr)}
+                  <td className={row.portfolioReturn === null ? styles.unavailable : undefined}>
+                    {row.portfolioReturn === null ? text.unavailable : formatPercent(row.portfolioReturn)}
                   </td>
-                  <td className={row.benchmarkXirr === null ? styles.unavailable : undefined}>
-                    {row.benchmarkXirr === null ? text.unavailable : formatPercent(row.benchmarkXirr)}
+                  <td className={row.benchmarkReturn === null ? styles.unavailable : undefined}>
+                    {row.benchmarkReturn === null ? text.unavailable : formatPercent(row.benchmarkReturn)}
                   </td>
                 </tr>
               ))}
