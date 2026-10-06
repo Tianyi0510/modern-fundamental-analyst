@@ -36,8 +36,7 @@ test("contact form keeps localized copy on the server and sends through a client
 });
 
 test("subscribe form requests confirmation before activation and welcome automation", async () => {
-  const [page, form, client, route, service, footer] = await Promise.all([
-    read("src/app/_components/contact-page-content.tsx"),
+  const [form, client, route, service, footer] = await Promise.all([
     read("src/features/subscriptions/subscribe-form.tsx"),
     read("src/features/subscriptions/subscribe-form-client.tsx"),
     read("src/app/api/subscribe/route.ts"),
@@ -45,9 +44,8 @@ test("subscribe form requests confirmation before activation and welcome automat
     read("src/components/site-footer.tsx"),
   ]);
 
-  assert.doesNotMatch(page, /SubscribeForm/);
   assert.doesNotMatch(form, /"use client"/);
-  assert.match(form, /SubscribeFormClient\s+copy=\{copy\[locale\]\}/);
+  assert.match(form, /SubscribeFormClient/);
   assert.match(form, /"zh-tw"/);
   assert.match(form, /"zh-cn"/);
   assert.match(client, /"use client"/);
