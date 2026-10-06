@@ -313,7 +313,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".about-section").first()).toHaveCSS("gap", "40px");
 
     await page.goto("/contact");
-    const contactHeadingBox = await page.locator(".contact-grid > article h2").first().boundingBox();
+    const contactHeadingBox = await page.locator("#contact-form-title").boundingBox();
     const firstControlBox = await page.locator('input[name="name"]').boundingBox();
     expect(contactHeadingBox).not.toBeNull();
     expect(firstControlBox).not.toBeNull();
