@@ -28,12 +28,12 @@ const locales = [
 ] as const;
 
 for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess, returnNote } of locales) {
-  test(`${name} portfolio total matches its summary`, async ({ page }) => {
+  test(`${name} portfolio table retains cost-basis return beside the TWR summary`, async ({ page }) => {
     await page.goto(`${prefix}/portfolio`);
     const summaryReturn = page.locator('.portfolio-kpis [data-tone="brand"] strong');
     const tableReturn = page.locator(".portfolio-total-return");
-    await expect(summaryReturn).toBeVisible();
-    await expect(tableReturn).toHaveText((await summaryReturn.textContent()) ?? "");
+    await expect(summaryReturn).toHaveText("+38.27%");
+    await expect(tableReturn).toHaveText("+32.84%");
     await expect(page.locator(".portfolio-table-wrap + .portfolio-return-note p")).toContainText(returnNote);
   });
 

@@ -1,3 +1,4 @@
+import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./performance-page-content.styles";
@@ -22,8 +23,8 @@ const copy = {
     ),
     intro:
       "A complete monthly record of portfolio results, methodology, benchmarks, dividends, fees, and periods of underperformance.",
-    cumulativeReturn: "Cumulative return",
-    cumulativeNote: "Cost-basis return",
+    timeWeightedReturn: "Time-Weighted Return",
+    twrNote: "Reconstructed · cumulative · not annualized",
     portfolioXirr: "Portfolio XIRR",
     portfolioNote: "Cash-flow weighted",
     benchmarkNote: "Same investment dates",
@@ -75,8 +76,8 @@ const copy = {
       </>
     ),
     intro: "完整記錄每月投資組合結果、計算方法、基準、股息、費用與績效落後的時期。",
-    cumulativeReturn: "累積報酬",
-    cumulativeNote: "成本基礎報酬",
+    timeWeightedReturn: "時間加權報酬",
+    twrNote: "重建值・累積・未年化",
     portfolioXirr: "投資組合 XIRR",
     portfolioNote: "現金流加權",
     benchmarkNote: "相同投資日期",
@@ -123,8 +124,8 @@ const copy = {
       </>
     ),
     intro: "完整记录每月投资组合结果、计算方法、基准、股息、费用与业绩落后的时期。",
-    cumulativeReturn: "累计回报",
-    cumulativeNote: "成本基础回报",
+    timeWeightedReturn: "时间加权回报",
+    twrNote: "重建值・累计・未年化",
     portfolioXirr: "投资组合 XIRR",
     portfolioNote: "现金流加权",
     benchmarkNote: "相同投资日期",
@@ -191,9 +192,9 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
           <PortfolioMetric
             tone="highlight"
             className=""
-            label={<>{text.cumulativeReturn}</>}
-            value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
-            note={<>{text.cumulativeNote}</>}
+            label={<>{text.timeWeightedReturn}</>}
+            value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
+            note={<>{text.twrNote}</>}
           />
           <PortfolioMetric
             tone="brand"

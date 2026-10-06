@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
+import { cn } from "@/lib/utils";
+
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { PostJsonError } from "@/lib/client-post-json";
@@ -34,11 +36,18 @@ export function SubscribeFormClient({
   copy,
   locale,
   preferencesHref,
+  variant = "inverse",
+  id = "subscribe",
+  intro,
 }: {
   copy: SubscribeFormCopy;
   locale: Locale;
   preferencesHref: string;
+  variant?: "standard" | "inverse";
+  id?: string;
+  intro?: string;
 }) {
+  const titleId = `${id}-title`;
   const [status, setStatus] = useState<Status>("idle");
   const { getSubmissionId, resetSubmissionId } = useSubmissionId();
   const runExclusive = useExclusiveSubmit();
@@ -70,10 +79,13 @@ export function SubscribeFormClient({
   }
 
   return (
-    <section className={appearance["subscribe-section"]} id="subscribe" aria-labelledby="subscribe-title">
-      <h2 id="subscribe-title">{copy.title}</h2>
+    <section className={appearance.section[variant]} id={id} aria-labelledby={titleId}>
+      <header>
+        <h2 id={titleId}>{copy.title}</h2>
+        {intro ? <p className={appearance.intro}>{intro}</p> : null}
+      </header>
       <form
-        className={appearance["subscribe-form"]}
+        className={cn(appearance["subscribe-form"], variant === "inverse" && "mt-[var(--space-5)]")}
         onSubmit={(event) => {
           void submit(event);
         }}
@@ -83,10 +95,10 @@ export function SubscribeFormClient({
         }}
         aria-busy={status === "submitting"}
       >
-        <FormField label={copy.email} visibility="hidden">
+        <FormField label={copy.email} visibility={variant === "inverse" ? "hidden" : "visible"}>
           <Input
             disabled={status === "submitting"}
-            variant="inverse"
+            variant={variant}
             name="email"
             type="email"
             autoComplete="email"
@@ -98,17 +110,17 @@ export function SubscribeFormClient({
         </FormField>
         <HoneypotField />
         <Button
-          variant="inverse"
-          className="subscribe-submit min-w-[7.733em] compact:w-full"
+          variant={variant === "inverse" ? "inverse" : "primary"}
+          className={cn("subscribe-submit min-w-[7.733em] compact:w-full", variant === "standard" && "self-end")}
           type="submit"
           disabled={status === "submitting"}
         >
           {status === "submitting" ? copy.submitting : copy.submit}
         </Button>
-        <a className={appearance["subscribe-preferences"]} href={preferencesHref}>
+        <a className={appearance.preferences[variant]} href={preferencesHref}>
           {copy.preferences}
         </a>
-        <Alert tone="inverse" className="col-span-full max-w-[390px] compact:col-auto">
+        <Alert tone={variant} className="col-span-full max-w-[390px] compact:col-auto">
           {status === "success"
             ? copy.success
             : status === "alreadySubscribed"

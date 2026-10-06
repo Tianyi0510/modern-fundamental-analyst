@@ -1,3 +1,4 @@
+import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
@@ -21,8 +22,8 @@ const copy = {
     viewPortfolio: "View portfolio",
     readLatest: "Read latest Investment Memo",
     portfolioSnapshot: "Portfolio snapshot",
-    totalReturn: "Total return",
-    cumulativeReturn: "Cumulative cost-basis return",
+    timeWeightedReturn: "Time-Weighted Return",
+    twrNote: "Reconstructed · cumulative · not annualized",
     marketValue: "Market value",
     holdingsUnit: "stocks and ETFs",
     portfolioXirr: "Portfolio XIRR",
@@ -62,8 +63,8 @@ const copy = {
     viewPortfolio: "查看投資組合",
     readLatest: "閱讀最新投資備忘錄",
     portfolioSnapshot: "投資組合摘要",
-    totalReturn: "累積報酬",
-    cumulativeReturn: "成本基礎累積報酬",
+    timeWeightedReturn: "時間加權報酬",
+    twrNote: "重建值・累積・未年化",
     marketValue: "市場價值",
     holdingsUnit: "檔股票與 ETF",
     portfolioXirr: "投資組合 XIRR",
@@ -103,8 +104,8 @@ const copy = {
     viewPortfolio: "查看投资组合",
     readLatest: "阅读最新投资备忘录",
     portfolioSnapshot: "投资组合摘要",
-    totalReturn: "累计回报",
-    cumulativeReturn: "成本基础累计回报",
+    timeWeightedReturn: "时间加权回报",
+    twrNote: "重建值・累计・未年化",
     marketValue: "市场价值",
     holdingsUnit: "只股票与 ETF",
     portfolioXirr: "投资组合 XIRR",
@@ -190,9 +191,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <PortfolioMetric
               tone="highlight"
               className="metric compact:overflow-hidden"
-              label={<>{text.totalReturn}</>}
-              value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
-              note={<>{text.cumulativeReturn}</>}
+              label={<>{text.timeWeightedReturn}</>}
+              value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
+              note={<>{text.twrNote}</>}
             />
             <PortfolioMetric
               tone="brand"

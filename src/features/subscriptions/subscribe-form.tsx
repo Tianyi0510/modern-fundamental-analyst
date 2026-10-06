@@ -37,10 +37,25 @@ const copy = {
   },
 } satisfies Record<Locale, SubscribeFormCopy>;
 
-export function SubscribeForm({ locale }: { locale: Locale }) {
+export function SubscribeForm({
+  locale,
+  variant = "inverse",
+  id = "subscribe",
+  title,
+  intro,
+}: {
+  locale: Locale;
+  variant?: "standard" | "inverse";
+  id?: string;
+  title?: string;
+  intro?: string;
+}) {
   return (
     <SubscribeFormClient
-      copy={copy[locale]}
+      copy={title ? { ...copy[locale], title } : copy[locale]}
+      variant={variant}
+      id={id}
+      intro={intro}
       locale={locale}
       preferencesHref={getLocalizedPath("/subscription-preferences", locale)}
     />
