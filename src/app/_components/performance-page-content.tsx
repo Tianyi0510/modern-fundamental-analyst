@@ -29,12 +29,12 @@ const copy = {
     portfolioNote: "Cash-flow weighted",
     benchmarkNote: "Same investment dates",
     chart: "Performance Chart",
-    measured: "Measured consistently.",
+    measured: "Measured Consistently.",
     methodology: "Methodology",
     methodologyCopy: (
       <>
         <p>
-          <strong>Cumulative return.</strong> (Stock market value + net dividends − financing interest − net cost basis)
+          <strong>Cumulative Return.</strong> (Stock market value + net dividends − financing interest − net cost basis)
           ÷ net cost basis. This is a cumulative, non-annualized return.
         </p>
         <p>
@@ -43,7 +43,7 @@ const copy = {
           month. Periods shorter than 30 days are not annualized.
         </p>
         <p>
-          <strong>{portfolioSnapshot.benchmark} comparison.</strong> Uses the same investment dates and purchase costs
+          <strong>{portfolioSnapshot.benchmark} Comparison.</strong> Uses the same investment dates and purchase costs
           with adjusted benchmark prices. It is a hypothetical comparison, not an actual benchmark holding.
         </p>
         <p>

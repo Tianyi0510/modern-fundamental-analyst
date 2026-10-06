@@ -11,15 +11,15 @@ import styles from "./performance-chart.module.css";
 
 const copy = {
   en: {
-    title: "Annualized XIRR history",
+    title: "Annualized XIRR History",
     note: "Since-inception annualized XIRR at each month-end. These are not individual monthly returns.",
     portfolio: "Portfolio",
-    data: "View monthly data",
-    month: "Month end",
-    value: "Stock market value",
+    data: "View Monthly Data",
+    month: "Month End",
+    value: "Stock Market Value",
     unavailable: "Not annualized: less than 30 days",
     axis: "Annualized XIRR",
-    caption: "Month-end data · newest first",
+    caption: "Month-End Data · Newest First",
     scroll: "Swipe horizontally to compare columns; scroll vertically for earlier months.",
   },
   "zh-tw": {
@@ -52,7 +52,7 @@ const twrCopy = {
   en: {
     title: "Reconstructed TWR vs SPY",
     note: "Cumulative, non-annualized closing-price TWR. Contributions are modeled at period start; net income and costs at period end. Not observed intraday TWR.",
-    axis: "Cumulative reconstructed TWR",
+    axis: "Cumulative Reconstructed TWR",
   },
   "zh-tw": {
     title: "重建 TWR 與 SPY",

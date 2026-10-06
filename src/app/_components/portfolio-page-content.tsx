@@ -22,17 +22,17 @@ const copy = {
     ),
     intro:
       "A monthly view of my holdings, position sizes, investment theses, and long-term approach to portfolio management.",
-    summaryLabel: "Portfolio summary",
-    marketValue: "Stock market value",
+    summaryLabel: "Portfolio Summary",
+    marketValue: "Stock Market Value",
     currency: "USD",
-    costBasis: "Net cost basis",
+    costBasis: "Net Cost Basis",
     costBasisNote: "Purchases and transaction fees",
     timeWeightedReturn: "Time-Weighted Return",
     twrNote: "Reconstructed · cumulative · not annualized",
     holdings: "Holdings",
     holdingsNote: "Stocks and ETFs",
-    currentHoldings: "Current holdings",
-    positionCount: `${portfolioSnapshot.holdingsCount} disclosed positions.`,
+    currentHoldings: "Current Holdings",
+    positionCount: `${portfolioSnapshot.holdingsCount} Disclosed Positions.`,
     returnNote:
       "Each position's return compares market value with cost basis. Net dividends and financing interest are not allocated to positions; they are added and deducted, respectively, only in the table’s total cost-basis return. The summary shows a separate reconstructed time-weighted return.",
   },
@@ -88,7 +88,7 @@ const copy = {
 
 const tableCopy = {
   en: {
-    ariaLabel: "Portfolio holdings",
+    ariaLabel: "Portfolio Holdings",
     symbol: "Position",
     shares: "Shares",
     costBasis: "Cost Basis",

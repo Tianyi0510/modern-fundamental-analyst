@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 
 const copy = {
-  en: { title: "This page could not be loaded.", retry: "Try again", home: "Return home" },
+  en: { title: "This Page Could Not Be Loaded.", retry: "Try again", home: "Return home" },
   "zh-tw": { title: "目前無法載入此頁面。", retry: "重試", home: "返回首頁" },
   "zh-cn": { title: "目前无法加载此页面。", retry: "重试", home: "返回首页" },
 };

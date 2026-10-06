@@ -6,8 +6,8 @@ import type { Locale } from "@/lib/i18n";
 
 const copy = {
   en: {
-    portfolio: "Reconstructed portfolio TWR",
-    benchmark: "SPY total return",
+    portfolio: "Reconstructed Portfolio TWR",
+    benchmark: "SPY Total Return",
     note: "Cumulative · not annualized",
     since: "Since",
   },

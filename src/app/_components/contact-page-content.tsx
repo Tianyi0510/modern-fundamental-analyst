@@ -14,7 +14,7 @@ const copy = {
     subscribe: "Subscribe",
     subscribeIntro:
       "Receive new investment research and website updates by email. Confirm your subscription in your inbox.",
-    title: ["Connect Through Research,", "Ideas, and Opportunities."],
+    title: ["Connect through Research,", "Ideas, and Opportunities."],
     intro:
       "Reach out to discuss investment research, financial modeling, business opportunities, or ideas that empower retail investors.",
   },

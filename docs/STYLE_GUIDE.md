@@ -132,6 +132,7 @@ Subscription feedback distinguishes confirmation requested, subscription confirm
 The goal is to keep information equivalent while respecting language differences.
 
 - Use consistent terminology for the same concepts. State the outcome first, then give the next step when needed.
+- Use title case for English page and section headings, form titles, data labels, chart and table headings, and disclosure titles. Capitalize the first and last words, nouns, pronouns, verbs, adjectives, and adverbs; keep articles, coordinating conjunctions, and prepositions lowercase unless they start or end the title. Treat wrapped lines as one title, capitalize meaningful parts of hyphenated words, and preserve brand names and acronyms. Use sentence case for prose, status messages, and ordinary actions.
 - Present dates, currency, percentages, and data timestamps clearly and consistently. Portfolio and performance data are timestamped snapshots and must not imply live quotes; see [Portfolio Data](PORTFOLIO_DATA.md) for definitions.
 - Preserve meaning, tone, and action intent in translation rather than matching words or line counts literally. Language differences may justify layout and content variants.
 

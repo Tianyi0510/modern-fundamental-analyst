@@ -42,7 +42,7 @@ const copy: Record<Locale, Copy> = {
         ],
       },
       {
-        label: "02 · What is a Modern Fundamental Analyst?",
+        label: "02 · What Is a Modern Fundamental Analyst?",
         title: "Traditional Fundamentals for the Coming Technological Waves",
         paragraphs: [
           "A modern fundamental analyst begins with the business: its operations, competitive position, financial statements, capital allocation, long-term opportunities, and risks.",
@@ -79,7 +79,7 @@ const copy: Record<Locale, Copy> = {
       },
       {
         label: "06 · Background",
-        title: "Growing Through Curiosity, Empathy, and Continuous Learning",
+        title: "Growing through Curiosity, Empathy, and Continuous Learning",
         paragraphs: [
           "I am an incoming Rutgers University–New Brunswick Honors College student intending to double major in Finance and Business Analytics and Information Technology. I also intend to pursue a minor in either Philosophy or Music.",
           "I promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning. I do not expect to begin with every answer. Instead, I aim to ask better questions, listen to different perspectives, accept feedback, and continuously improve my knowledge and skills.",
