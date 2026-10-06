@@ -81,7 +81,7 @@ A KPI's `tone` prop explicitly determines its colors, even if cards are reordere
 | `brand`     | Deep Blue   | Bright Blue |
 | `paper`     | White       | Deep Blue   |
 
-Preserve established text colors and opacity, including hover, active, disabled, and inverse states, unless the task explicitly requests a color change. Pair positive and negative colors with numbers or symbols that convey the same meaning. Existing contrast concerns remain open: Medium Blue on white is about 3.39:1, Price Up 3.06:1, and Price Down 4.00:1. Do not claim full text-contrast compliance until the text colors have been addressed.
+Preserve established text colors and opacity, including hover, active, disabled, and inverse states, unless the task explicitly requests a color change. Pair positive and negative colors with numbers or symbols that convey the same meaning. Portfolio return values use dedicated `--text-return-positive` and `--text-return-negative` tokens on light surfaces, including the table's pale blue hover background. The return text tokens use the positive `#037B66` and negative `#D60A22` text colors observed in [Yahoo Finance's quote table](https://finance.yahoo.com/markets/stocks/most-active/) on October 5, 2026, as selected for this site. Both colors meet the 4.5:1 contrast threshold for normal text on white and the table's pale blue hover background. Keep `--price-up` and `--price-down` separate for non-text uses. Medium Blue on white remains about 3.39:1; do not claim full text-contrast compliance for the site.
 
 Use Jost for Latin text and numbers. Use Noto Sans TC and Noto Sans SC for Traditional and Simplified Chinese glyphs, respectively. The brand vector masters are [`public/icon.svg`](../public/icon.svg) and [`logo.svg`](../public/logo.svg); PNG copies are available in the same directory. Preserve the square icon, single-line wordmark, and colored period; generate site icons and social images from the masters. Keep the file-based icon and Apple icon in [`src/app/`](../src/app) aligned with the icon master; sharing-image metadata references [`public/og-logo.png`](../public/og-logo.png). Previous `/images/` asset URLs permanently redirect to their root-level equivalents.
 
@@ -116,6 +116,8 @@ The goal is clear, reliable feedback for every action. Accessibility applies dur
 - Give loading, success, failure, disabled, and retry states clear meanings. Forms should prevent duplicate submissions, announce outcomes with text and live regions, and clear stale outcomes when the user edits again.
 - Use motion to explain state and spatial changes. Expanding and closing should support repeated input, interruption, and reversal while keeping visuals, focus, interactivity, and scroll state synchronized.
 - Preserve full function and necessary feedback under `prefers-reduced-motion`. Focus outlines should remain visible in standard and forced-colors modes; disabled states should not move.
+
+The shared subscription form uses a standard light treatment on Contact and an inverse treatment in the Footer. Each instance has a unique section/heading ID and independent submission state; both retain the same confirmation and retry contract.
 
 Choose focus tokens according to light or inverse form surfaces. Preferences retain their own disabled opacity. Reserve space for status messages and allow long errors to wrap. After a programmatic field reset, keep the success message visible until the user edits again.
 

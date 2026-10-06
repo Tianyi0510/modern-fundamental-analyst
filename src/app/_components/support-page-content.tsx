@@ -3,7 +3,8 @@ import { Suspense } from "react";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ServiceLoading } from "@/components/service-loading";
-import { SupportPanel } from "@/features/support/support-panel";
+import { SupportPanel, VerifiedSupportPanel } from "@/features/support/support-panel";
+import { resolveSupportStatus } from "@/features/support/server/stripe-checkout";
 import { supportCopy } from "@/features/support/support-copy";
 import { parseSupportSearchParams, type SupportSearchParams } from "@/features/support/support-config";
 import type { Locale } from "@/lib/i18n";
@@ -20,12 +21,7 @@ export async function SupportPageContent({
   const params = parseSupportSearchParams(await searchParams, locale);
   // Ordinary visits and retry errors must expose the native form without a streamed JS swap.
   // Only payment verification can wait on a provider behind the local loading boundary.
-  const panel =
-    params.status === "success" ? (
-      <SupportPanel locale={locale} params={params} />
-    ) : (
-      await SupportPanel({ locale, params })
-    );
+  const status = params.status === "success" ? undefined : await resolveSupportStatus(params);
   return (
     <div className="support-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} languageQuery={params.languageQuery} />
@@ -48,10 +44,10 @@ export async function SupportPageContent({
         />
         {params.status === "success" ? (
           <Suspense key={params.languageQuery} fallback={<ServiceLoading locale={locale} />}>
-            {panel}
+            <VerifiedSupportPanel locale={locale} params={params} />
           </Suspense>
         ) : (
-          panel
+          <SupportPanel locale={locale} params={params} status={status} />
         )}
       </main>
       <PageFooter locale={locale} />
