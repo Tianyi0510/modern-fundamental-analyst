@@ -326,17 +326,17 @@ test.describe("form accessibility and preserved text colors", () => {
         paper: ["rgb(0, 41, 145)", "rgb(255, 255, 255)"],
       };
       for (const sample of before) expect([sample.color, sample.background]).toEqual(expected[sample.tone!]);
-      await cards.evaluateAll((elements) =>
-        elements.reverse().forEach((element) => element.parentElement!.appendChild(element)),
-      );
-      const after = await cards.evaluateAll((elements) =>
-        elements.map((element) => ({
+      const after = await cards.evaluateAll((elements) => {
+        // Preserve identity across multiple KPI groups; each parent reorders its own cards.
+        const originalOrder = [...elements];
+        elements.reverse().forEach((element) => element.parentElement!.appendChild(element));
+        return originalOrder.map((element) => ({
           tone: element.getAttribute("data-tone"),
           color: getComputedStyle(element).color,
           background: getComputedStyle(element).backgroundColor,
-        })),
-      );
-      expect(after.reverse()).toEqual(before);
+        }));
+      });
+      expect(after).toEqual(before);
     }
   });
 

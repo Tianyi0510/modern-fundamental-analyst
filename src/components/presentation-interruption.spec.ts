@@ -34,23 +34,24 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0))
       .toBe(0);
 
-    const details = page.locator("figure details");
-    const summary = details.locator("summary");
-    await summary.click();
-    await expect(details).toHaveAttribute("data-state", "open");
-    await summary.evaluate((element: HTMLElement) => {
-      element.click();
-      const animation = element.parentElement!.getAnimations()[0]!;
-      animation.pause();
-      animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-    });
-    await expect(summary).toHaveAttribute("aria-expanded", "false");
-    await expect(details.locator(":scope > div")).toHaveAttribute("inert", "");
-    await summary.evaluate((element: HTMLElement) => element.click());
-    await expect(details).toHaveAttribute("data-state", "open");
-    await expect(summary).toHaveAttribute("aria-expanded", "true");
-    await expect(details.locator(":scope > div")).not.toHaveAttribute("inert");
-    await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+    for (const details of await page.locator("figure details").all()) {
+      const summary = details.locator("summary");
+      await summary.click();
+      await expect(details).toHaveAttribute("data-state", "open");
+      await summary.evaluate((element: HTMLElement) => {
+        element.click();
+        const animation = element.parentElement!.getAnimations()[0]!;
+        animation.pause();
+        animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+      });
+      await expect(summary).toHaveAttribute("aria-expanded", "false");
+      await expect(details.locator(":scope > div")).toHaveAttribute("inert", "");
+      await summary.evaluate((element: HTMLElement) => element.click());
+      await expect(details).toHaveAttribute("data-state", "open");
+      await expect(summary).toHaveAttribute("aria-expanded", "true");
+      await expect(details.locator(":scope > div")).not.toHaveAttribute("inert");
+      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+    }
   });
 }
 

@@ -43,7 +43,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   }) => {
     await page.goto(`${prefix}/contact`);
     const traps = page.locator('input[name="website"]');
-    await expect(traps).toHaveCount(2);
+    await expect(traps).toHaveCount(3);
     for (const trap of await traps.all()) {
       await expect(trap).toHaveAttribute("tabindex", "-1");
       await expect(trap.locator("..")).toHaveAttribute("aria-hidden", "true");
