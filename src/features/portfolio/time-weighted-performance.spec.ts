@@ -8,6 +8,14 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.getByRole("main")).toContainText(
       prefix === "/zh-tw" ? "負債餘額" : prefix === "/zh-cn" ? "负债余额" : "liability balances",
     );
+    await expect(page.locator("main figure")).toHaveCount(1);
+    await expect(page.locator('main svg[role="img"]')).toHaveCount(1);
+    const history = page.locator('section[aria-labelledby="performance-chart-title"]');
+    await history.locator("summary").click();
+    await expect(history.locator("tbody tr")).toHaveCount(22);
+    await expect(history.locator("tbody tr").first()).toContainText("+24.43%");
+    await expect(history.locator("tbody tr").first()).toContainText("+19.26%");
+    await expect(history.locator("tbody tr").last()).toContainText(prefix ? "30" : "less than 30 days");
     const summary = page.locator(".performance-twr-summary");
     await expect(summary.getByRole("term")).toHaveCount(2);
     await expect(summary).toContainText("+38.27%");

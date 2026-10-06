@@ -6,8 +6,8 @@ import type { Locale } from "@/lib/i18n";
 
 const copy = {
   en: {
-    portfolio: "Reconstructed portfolio TWR",
-    benchmark: "SPY total return",
+    portfolio: "Reconstructed Portfolio TWR",
+    benchmark: "SPY Total Return",
     note: "Cumulative · not annualized",
     since: "Since",
   },
@@ -25,7 +25,7 @@ export function TimeWeightedPerformance({ locale }: { locale: Locale }) {
     </>
   );
   return (
-    <div className="mt-[var(--space-section)] space-y-[var(--space-heading-content)]">
+    <div className="space-y-[var(--space-heading-content)]">
       <dl className="performance-twr-summary grid grid-cols-2 gap-px bg-black compact:grid-cols-1">
         <PortfolioMetric
           tone="highlight"
@@ -40,7 +40,7 @@ export function TimeWeightedPerformance({ locale }: { locale: Locale }) {
           note={note}
         />
       </dl>
-      <PerformanceChart locale={locale} measure="twr" />
+      <PerformanceChart locale={locale} />
     </div>
   );
 }

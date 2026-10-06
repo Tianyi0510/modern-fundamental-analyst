@@ -92,6 +92,12 @@ Receiving is a provider capability, not an application inbox or automatic forwar
 
 Maintain the website contact-form recipient in the server-only contact configuration linked above. Enabling Receiving does not change that destination, sender addresses, or the existing webhook signing secret. No new environment variable is required for provider-only receiving. Actual inbound delivery has not been verified by this repository update.
 
+## Subscription entry points
+
+All three Contact pages place a standard subscription form with the `contact-subscribe` ID before Send a Message; the footer renders the inverse form with the `subscribe` ID. Both compose the same `SubscribeForm` and `SubscribeFormClient`, with distinct field and heading IDs. Each instance owns its input, submission lock, status feedback and retry ID. Submitting one form must not disable, clear or replace feedback in the other. Successful requests ask the reader to check their inbox; they do not claim activation.
+
+Both forms call the same subscription API and share recipient cooldowns, delivery allowances, confirmation records, suppression rules and subscriber coordination. Independent browser state does not bypass those protections. This separation and the specific cooldown values are project decisions, not Resend requirements. The contact-message form remains a separate workflow and does not grant subscription consent.
+
 ## Subscription confirmation and delivery feedback
 
 Public signup validates input and requests a confirmation email; it does not activate a contact. The email uses the shared React Email layout, three-language copy and explicit plain text. Its random 256-bit token expires after 24 hours. Opening the localized `/subscription-confirmation` page has no provider side effects; an explicit same-origin POST confirms consent. The original requested email language is stored with the token, independently of the page language.
@@ -130,7 +136,7 @@ Segment reconciliation reads all pages before changing membership, preserves unr
 
 ## Verification
 
-For affected UI workflows, run `npx playwright test src/features/subscriptions/subscription-confirmation.spec.ts src/app/_components/portfolio-form-status.spec.ts --project=chromium --project=webkit --workers=2`. The configured server uses isolated provider settings; browser requests are mocked. Service tests cover confirmation, replay, expiry, consent, suppressed delivery, recipient allowances and journal recovery. Redis command behavior is mocked in these tests; this does not establish live Redis durability or provider delivery.
+For affected UI workflows, run `npx playwright test src/features/subscriptions/subscription-confirmation.spec.ts src/app/_components/contact-subscription.spec.ts src/app/_components/portfolio-form-status.spec.ts --project=chromium --project=webkit --workers=2`. The configured server uses isolated provider settings; browser requests are mocked. Service tests cover confirmation, replay, expiry, consent, suppressed delivery, recipient allowances and journal recovery. Redis command behavior is mocked in these tests; this does not establish live Redis durability or provider delivery.
 
 Before releasing, check the target sender/domain, Automation event and content, unsubscribe controls, webhook URL/signing secret/event subscriptions, and Redis persistence. Keep current secrets and records. Obtain separate authorization for real recipient tests; do not treat local passing tests as proof of Dashboard configuration or production delivery.
 

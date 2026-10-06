@@ -44,6 +44,9 @@ for (const { prefix, locale, title, success, error } of [
     await page.goto(`${prefix}/contact`);
     const section = page.getByRole("main").getByRole("region", { name: title, exact: true });
     await expect(section.getByRole("heading", { level: 2 })).toHaveText(title);
+    await expect(page.locator(".contact-grid")).toHaveCount(0);
+    const messageForm = page.locator(".contact-form");
+    expect((await section.boundingBox())!.y).toBeLessThan((await messageForm.boundingBox())!.y);
     const email = section.getByRole("textbox");
     await expect(email).toHaveAccessibleName(/Email Address|電子郵件地址|电子邮件地址/);
     await expect(section.getByRole("link")).toHaveAttribute("href", `${prefix}/subscription-preferences`);

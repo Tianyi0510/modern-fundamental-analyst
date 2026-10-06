@@ -14,19 +14,9 @@ const copy = {
     subscribe: "Subscribe",
     subscribeIntro:
       "Receive new investment research and website updates by email. Confirm your subscription in your inbox.",
-    title: ["Connect Through Research,", "Ideas, and Opportunities."],
+    title: ["Connect through Research,", "Ideas, and Opportunities."],
     intro:
       "Reach out to discuss investment research, financial modeling, business opportunities, or ideas that empower retail investors.",
-    cards: [
-      [
-        "Research",
-        "Share feedback, challenge my assumptions, or discuss detailed investment theses, valuation methods, and portfolio decisions.",
-      ],
-      [
-        "Business",
-        "Contact me about internships, collaborations, tutoring, financial modeling projects, or other professional opportunities across finance.",
-      ],
-    ],
   },
   "zh-tw": {
     label: "聯絡",
@@ -34,10 +24,6 @@ const copy = {
     subscribeIntro: "透過電子郵件接收最新投資研究與網站更新。請在收到郵件後確認訂閱。",
     title: ["透過研究、觀點與機會", "建立連結。"],
     intro: "歡迎聯絡我，交流投資研究、財務建模、商業機會，或能幫助個人投資者的想法。",
-    cards: [
-      ["研究", "分享回饋、挑戰我的假設，或討論詳細的投資論點、估值方法與投資組合決策。"],
-      ["商業", "歡迎就實習、合作、家教、財務建模專案，或其他金融領域的專業機會與我聯絡。"],
-    ],
   },
   "zh-cn": {
     label: "联系",
@@ -45,10 +31,6 @@ const copy = {
     subscribeIntro: "通过电子邮件接收最新投资研究与网站更新。请在收到邮件后确认订阅。",
     title: ["通过研究、观点与机会", "建立联系。"],
     intro: "欢迎联系我，交流投资研究、财务建模、商业机会，或能够帮助个人投资者的想法。",
-    cards: [
-      ["研究", "分享反馈、挑战我的假设，或讨论详细的投资论点、估值方法与投资组合决策。"],
-      ["商业", "欢迎就实习、合作、家教、财务建模项目，或其他金融领域的专业机会与我联系。"],
-    ],
   },
 } as const;
 
@@ -75,17 +57,6 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
             </>
           }
         />
-        <section className={appearance["contact-grid"]}>
-          {text.cards.map(([title, description]) => (
-            <article key={title}>
-              <header>
-                <h2>{title}</h2>
-              </header>
-              <p>{description}</p>
-            </article>
-          ))}
-        </section>
-        <ContactForm locale={locale} />
         <Container>
           <SubscribeForm
             locale={locale}
@@ -95,6 +66,7 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
             intro={text.subscribeIntro}
           />
         </Container>
+        <ContactForm locale={locale} />
       </main>
       <PageFooter locale={locale} />
     </div>

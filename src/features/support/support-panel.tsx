@@ -1,6 +1,6 @@
 import { appearance } from "./support-panel.styles";
 import { Alert } from "@/components/ui/alert";
-import { randomUUID } from "node:crypto";
+import { createCheckoutAttempt, isValidCheckoutAttempt } from "./server/checkout-attempt";
 import { SupportCheckoutForm } from "./support-checkout-form";
 import { supportCopy } from "./support-copy";
 import { type parseSupportSearchParams, type SupportStatus } from "./support-config";
@@ -24,7 +24,8 @@ export function SupportPanel({ locale, params, status }: SupportPanelProps & { s
   const selectedChoice = params.productId ?? "support-12-v1";
   const choices = SUPPORT_CATALOG.map((product) => ({ value: product.id, amount: product.unitAmount / 100 }));
   const checkoutLocale = params.checkoutLocale;
-  const formAttempt = recoveryAttempt ?? randomUUID();
+  const retired = status === "retired-checkout" || (recoveryAttempt && !isValidCheckoutAttempt(recoveryAttempt));
+  const formAttempt = retired ? "" : (recoveryAttempt ?? createCheckoutAttempt());
   return (
     <section className={appearance["support-section"]}>
       <div className={appearance["support-layout"] + " " + appearance["shell"]}>
@@ -32,9 +33,9 @@ export function SupportPanel({ locale, params, status }: SupportPanelProps & { s
           <h2>{text.sectionTitle}</h2>
           <p>{text.sectionText}</p>
         </div>
-        {status === "retired-checkout" ? (
+        {retired ? (
           <Alert role="status" className={appearance["support-status"]}>
-            {text.statuses[status]}
+            {text.statuses["retired-checkout"]}
           </Alert>
         ) : (
           <SupportCheckoutForm

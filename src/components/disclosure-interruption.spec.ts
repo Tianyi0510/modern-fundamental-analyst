@@ -11,7 +11,7 @@ for (const route of ["memos", "performance", "performance-twr"]) {
       const details = page.locator(
         route === "memos"
           ? ".memo-disclosure"
-          : `figure[aria-labelledby="${route === "performance" ? "performance-chart-title" : "performance-twr-chart-title"}"] details`,
+          : `[aria-labelledby="${route === "performance" ? "performance-chart-title" : "performance-twr-chart-title"}"] details`,
       );
       await details.locator("summary").evaluate((summary: HTMLElement) => {
         summary.click();
@@ -63,7 +63,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         const details = page.locator(
           route === "memos"
             ? ".memo-disclosure"
-            : `figure[aria-labelledby="${route === "performance" ? "performance-chart-title" : "performance-twr-chart-title"}"] details`,
+            : `[aria-labelledby="${route === "performance" ? "performance-chart-title" : "performance-twr-chart-title"}"] details`,
         );
         const summary = details.locator("summary");
         await summary.click();

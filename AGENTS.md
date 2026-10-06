@@ -5,6 +5,7 @@ Repository-wide defaults; follow the user's current request when it changes the 
 ## Working agreement
 
 - Communicate in Traditional Chinese unless requested otherwise. Read-only reviews produce findings with file locations and practical impact, without edits.
+- Write code comments, GitHub issue comments, pull request comments and review comments in English only, without emojis.
 - Write project documentation prose in English. Include non-English text only when an exact runtime or provider value is needed for an operation, and identify its source in code.
 - For implementation or optimization, finish the requested change, verify its behavior, and fix related failures before handing off. Resolve routine choices within the authorized scope; ask when missing information materially changes the outcome.
 - Inspect `git status` before editing, preserve unrelated work, and stage only intended files. Keep ignored `audit/` evidence; it is historical context, not the current issue list.

@@ -16,12 +16,12 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(methodologyNote).toContainText(
       prefix === "/zh-tw" ? "並非即時報價" : prefix === "/zh-cn" ? "并非实时报价" : "not live quotes",
     );
-    const chart = page.locator('figure[aria-labelledby="performance-chart-title"]');
+    const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
     await expect(chart.getByRole("img")).toBeVisible();
-    await expect(chart.getByRole("img")).toHaveAccessibleName(/24\.43%.*19\.26%/);
+    await expect(chart.getByRole("img")).toHaveAccessibleName(/38\.27%.*32\.20%/);
     await expect(chart.locator("polyline")).toHaveCount(2);
     for (const line of await chart.locator("polyline").all()) {
-      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(21);
+      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(22);
       for (const point of (await line.getAttribute("points"))!.split(" ")) {
         const y = Number(point.split(",")[1]);
         expect(y).toBeGreaterThanOrEqual(12);
@@ -40,7 +40,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.getByRole("table")).toBeVisible();
     await expect(chart.locator("tbody tr")).toHaveCount(22);
     await expect(chart.locator("tbody tr").first()).toContainText("127,533.11");
-    await expect(chart.locator("tbody tr").first()).toContainText("+24.43%");
+    await expect(chart.locator("tbody tr").first()).toContainText("+38.27%");
     const region = chart.getByRole("region");
     expect(await region.evaluate((e) => e.scrollWidth > e.clientWidth && e.scrollHeight > e.clientHeight)).toBe(true);
     await region.evaluate((e) => {
@@ -92,7 +92,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.setViewportSize({ width, height: 844 });
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto(`${prefix}/performance`);
-      const details = page.locator('figure[aria-labelledby="performance-chart-title"] details');
+      const details = page.locator('figure[aria-labelledby="performance-twr-chart-title"] details');
       const summary = details.locator("summary");
       const collapsed = (await details.boundingBox())!.height;
       await summary.click();

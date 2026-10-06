@@ -3,7 +3,7 @@ import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./performance-page-content.styles";
 import { TimeWeightedPerformance } from "@/features/portfolio/time-weighted-performance";
-import { PerformanceChart } from "@/features/portfolio/performance-chart";
+import { XirrHistory } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/features/portfolio/portfolio";
@@ -29,12 +29,12 @@ const copy = {
     portfolioNote: "Cash-flow weighted",
     benchmarkNote: "Same investment dates",
     chart: "Performance Chart",
-    measured: "Measured consistently.",
+    measured: "Measured Consistently.",
     methodology: "Methodology",
     methodologyCopy: (
       <>
         <p>
-          <strong>Cumulative return.</strong> (Stock market value + net dividends − financing interest − net cost basis)
+          <strong>Cumulative Return.</strong> (Stock market value + net dividends − financing interest − net cost basis)
           ÷ net cost basis. This is a cumulative, non-annualized return.
         </p>
         <p>
@@ -43,7 +43,7 @@ const copy = {
           month. Periods shorter than 30 days are not annualized.
         </p>
         <p>
-          <strong>{portfolioSnapshot.benchmark} comparison.</strong> Uses the same investment dates and purchase costs
+          <strong>{portfolioSnapshot.benchmark} Comparison.</strong> Uses the same investment dates and purchase costs
           with adjusted benchmark prices. It is a hypothetical comparison, not an actual benchmark holding.
         </p>
         <p>
@@ -216,8 +216,8 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <p className={appearance["section-number"]}>{text.chart}</p>
             <h2>{text.measured}</h2>
           </div>
-          <PerformanceChart locale={locale} />
           <TimeWeightedPerformance locale={locale} />
+          <XirrHistory locale={locale} />
         </section>
         <div className={appearance["section-gray"]}>
           <section className={appearance["methodology"] + " " + appearance["shell"]}>

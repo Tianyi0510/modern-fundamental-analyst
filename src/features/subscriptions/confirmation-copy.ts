@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n";
 
 export const confirmationCopy = {
   en: {
-    subject: "Confirm your subscription",
+    subject: "Confirm Your Subscription",
     heading: "Confirm Your Subscription",
     body: "Confirm that you want to receive Modern Fundamental Analyst research updates. This link expires in 24 hours.",
     action: "Confirm Subscription",

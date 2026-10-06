@@ -20,9 +20,11 @@ delete process.env.UPSTASH_KV_REST_API_URL;
 delete process.env.UPSTASH_KV_REST_API_TOKEN;
 const { POST } = await import("./route.ts");
 const { resolveSupportStatus } = await import("@/features/support/server/stripe-checkout.ts");
+const { createCheckoutAttempt, CHECKOUT_ATTEMPT_LIFETIME_MS } =
+  await import("@/features/support/server/checkout-attempt.ts");
 let count = 0;
 function request(
-  body = "locale=en&product_id=support-12-v1&checkout_attempt=550e8400-e29b-41d4-a716-446655440000",
+  body = `locale=en&product_id=support-12-v1&checkout_attempt=${createCheckoutAttempt()}`,
   overrides = {},
 ) {
   return new Request("https://www.modernfundamentalanalyst.com/api/stripe/checkout", {
@@ -76,7 +78,7 @@ test("checkout provider failures return localized redirects without logging priv
   ]) {
     globalThis.stripeCreate = create;
     const response = await POST(
-      request("locale=zh-cn&product_id=support-12-v1&checkout_attempt=550e8400-e29b-41d4-a716-446655440000"),
+      request(`locale=zh-cn&product_id=support-12-v1&checkout_attempt=${createCheckoutAttempt()}`),
     );
     assert.equal(response.status, 303);
     assert.equal(new URL(response.headers.get("location")).searchParams.get("status"), "error");
@@ -99,7 +101,7 @@ test("checkout retries an uncertain provider result with the same idempotency ke
     if (calls.length === 1) throw new Error("response lost after session creation");
     return { url: "https://checkout.stripe.com/same-session" };
   };
-  const attempt = "69a3c170-1105-42f2-b492-15f74ef59a71";
+  const attempt = createCheckoutAttempt();
   const body = `locale=zh-tw&product_id=support-12-v1&checkout_attempt=${attempt}`;
   const recovery = new URL((await POST(request(body))).headers.get("location"));
   assert.equal(recovery.searchParams.get("status"), "error");
@@ -107,7 +109,7 @@ test("checkout retries an uncertain provider result with the same idempotency ke
   assert.equal(recovery.searchParams.get("product_id"), "support-12-v1");
   assert.equal((await POST(request(body))).headers.get("location"), "https://checkout.stripe.com/same-session");
   assert.deepEqual(calls[0], calls[1]);
-  assert.equal(calls[0].options.idempotencyKey, `support-checkout:v2:${attempt}`);
+  assert.equal(calls[0].options.idempotencyKey, `support-checkout:v3:${attempt}`);
   assert.equal((await POST(request("amount=12&checkout_attempt=invalid"))).status, 303);
   assert.equal(calls.length, 2);
 });
@@ -163,7 +165,7 @@ test("only a paid completed research-support session is confirmed", async (t) =>
 });
 
 test("catalog checkouts own pricing for every product and language", async () => {
-  const attempt = "69a3c170-1105-42f2-b492-15f74ef59a71";
+  const attempt = createCheckoutAttempt();
   {
     for (const locale of ["en", "zh-tw", "zh-cn"])
       for (const amount of [6, 12, 18]) {
@@ -186,7 +188,7 @@ test("catalog checkouts own pricing for every product and language", async () =>
           assert.equal(params.metadata.support_amount_usd, String(amount));
           assert.equal(params.metadata.site_locale, locale);
           assert.deepEqual(params.automatic_tax, { enabled: true });
-          assert.equal(options.idempotencyKey, `support-checkout:v2:${attempt}`);
+          assert.equal(options.idempotencyKey, `support-checkout:v3:${attempt}`);
           return { url: "https://checkout.stripe.com/catalog" };
         };
         // User-supplied amounts never become the price for a catalog product.
@@ -212,7 +214,7 @@ test("unknown and repeated products cannot fall back to legacy amount pricing", 
 test("catalog retries freeze the product version and original language after an unknown outcome", async (context) => {
   context.mock.method(console, "error", () => {});
   const calls = [];
-  const attempt = "550e8400-e29b-41d4-a716-446655440000";
+  const attempt = createCheckoutAttempt();
   globalThis.stripeCreate = async (...args) => {
     calls.push(args);
     throw new Error("response lost");
@@ -228,7 +230,7 @@ test("catalog retries freeze the product version and original language after an 
   }
   assert.deepEqual(calls[0], calls[1]);
   assert.deepEqual(calls[1], calls[2]);
-  assert.equal(calls[0][1].idempotencyKey, `support-checkout:v2:${attempt}`);
+  assert.equal(calls[0][1].idempotencyKey, `support-checkout:v3:${attempt}`);
   globalThis.stripeCreate = async (...args) => {
     calls.push(args);
     return { url: "https://checkout.stripe.com/mock" };
@@ -266,7 +268,10 @@ test("catalog requests require one valid attempt identifier", async () => {
     "&checkout_attempt=550e8400-e29b-41d4-a716-446655440000&checkout_attempt=69a3c170-1105-42f2-b492-15f74ef59a71",
   ]) {
     const response = await POST(request(`product_id=support-12-v1${choice}`));
-    assert.equal(new URL(response.headers.get("location")).searchParams.get("status"), "error");
+    assert.equal(
+      new URL(response.headers.get("location")).searchParams.get("status"),
+      choice ? "retired-checkout" : "error",
+    );
   }
 });
 
@@ -280,5 +285,64 @@ test("retired amount-only attempts never create a new Session or suggest an idem
     assert.equal(url.searchParams.get("status"), "retired-checkout");
     assert.equal(url.searchParams.has("checkout_attempt"), false);
     assert.equal(await resolveSupportStatus({ status: "retired-checkout" }), "retired-checkout");
+  }
+});
+
+test("expired, tampered and unsigned attempts cannot create another Session", async (t) => {
+  const start = Date.now();
+  const now = t.mock.method(Date, "now", () => start);
+  const attempt = createCheckoutAttempt();
+  const body = (value) => `product_id=support-12-v1&checkout_attempt=${value}`;
+  let writes = 0;
+  globalThis.stripeCreate = async () => {
+    writes++;
+    return { url: "https://checkout.stripe.com/original" };
+  };
+  await POST(request(body(attempt)));
+  now.mock.mockImplementation(() => start + CHECKOUT_ATTEMPT_LIFETIME_MS - 1);
+  await POST(request(body(attempt)));
+  assert.equal(writes, 2);
+  for (const elapsed of [CHECKOUT_ATTEMPT_LIFETIME_MS, 25 * 60 * 60 * 1000]) {
+    now.mock.mockImplementation(() => start + elapsed);
+    const response = await POST(request(body(attempt)));
+    assert.equal(new URL(response.headers.get("location")).search, "?status=retired-checkout");
+  }
+  now.mock.mockImplementation(() => start);
+  const parts = attempt.split(".");
+  parts[2] = String(Number(parts[2]) - 1000);
+  for (const value of [
+    parts.join("."),
+    attempt.slice(0, -1) + (attempt.endsWith("A") ? "B" : "A"),
+    "550e8400-e29b-41d4-a716-446655440000",
+  ]) {
+    assert.equal(
+      new URL((await POST(request(body(value)))).headers.get("location")).search,
+      "?status=retired-checkout",
+    );
+  }
+  assert.equal(writes, 2);
+});
+
+test("Session service independently rejects expired attempts and signing-key rotation", async (t) => {
+  const { createSupportCheckoutSession } = await import("@/features/support/server/stripe-checkout.ts");
+  const { isValidCheckoutAttempt } = await import("@/features/support/server/checkout-attempt.ts");
+  const attemptId = createCheckoutAttempt();
+  const start = Date.now();
+  t.mock.method(Date, "now", () => start + 25 * 60 * 60 * 1000);
+  await assert.rejects(
+    createSupportCheckoutSession({
+      attemptId,
+      productId: "support-12-v1",
+      locale: "en",
+      origin: "https://example.com",
+    }),
+    { name: "RetiredCheckoutAttemptError" },
+  );
+  const previous = process.env.STRIPE_RESTRICTED_KEY;
+  try {
+    process.env.STRIPE_RESTRICTED_KEY = "rotated-test-key";
+    assert.equal(isValidCheckoutAttempt(attemptId, start), false);
+  } finally {
+    process.env.STRIPE_RESTRICTED_KEY = previous;
   }
 });

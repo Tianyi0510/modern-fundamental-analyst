@@ -4,10 +4,10 @@ export const supportCopy = {
     title: ["Support Independent", "Research."],
     intro:
       "Help sustain rigorous, transparent public-equity research and keep every investment memo freely accessible to all readers.",
-    sectionTitle: "Choose an amount.",
+    sectionTitle: "Choose an Amount.",
     sectionText:
       "Your one-time contribution supports research tools, data access, and the time required to publish accountable analysis.",
-    legend: "One-time support amount",
+    legend: "One-Time Support Amount",
     submit: "Continue to Stripe",
     submitting: "Redirecting to Stripe…",
     retry: "Try again",

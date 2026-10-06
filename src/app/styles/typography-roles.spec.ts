@@ -79,9 +79,9 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/contact": {
     pageTitle: [".page-hero h1"],
-    cardTitle: [".contact-grid h2", "#contact-form-title"],
+    cardTitle: ["#contact-subscribe-title", "#contact-form-title"],
     lead: [".contact-note"],
-    bodyLarge: [".contact-grid p"],
+    body: ["#contact-subscribe > header > p", ".contact-headingIntro"],
     label: [".eyebrow"],
     control: ["form .button"],
   },
@@ -159,10 +159,10 @@ for (const viewport of [viewports[0], viewports[2]]) {
     await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("color", "rgb(0, 0, 0)");
 
     await page.goto("/contact");
-    await expect(page.locator(".contact-grid > article").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    await expect(page.locator(".contact-grid > article").first()).toHaveCSS("color", "rgb(255, 255, 255)");
-    await expect(page.locator(".contact-grid > article").last()).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(page.locator(".contact-grid > article").last()).toHaveCSS("color", "rgb(0, 0, 0)");
+    await expect(page.locator(".contact-band")).toHaveCSS("background-color", "rgb(95, 205, 253)");
+    await expect(page.locator(".contact-section")).toHaveCSS("color", "rgb(0, 0, 0)");
+    await expect(page.locator("#contact-subscribe")).toHaveCSS("color", "rgb(0, 0, 0)");
+    await expect(page.locator("#contact-subscribe-title")).toBeVisible();
   });
 }
 
