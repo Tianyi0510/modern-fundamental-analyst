@@ -10,12 +10,12 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
         <main id="main-content" tabIndex={-1}>
           <h1>This Page Could Not Be Loaded.</h1>
           <button type="button" onClick={retry}>
-            Try again
+            Try Again
           </button>
           <p>
             {/* A document navigation must work even when the root router has failed. */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/">Return home</a>
+            <a href="/">Return Home</a>
           </p>
         </main>
       </body>

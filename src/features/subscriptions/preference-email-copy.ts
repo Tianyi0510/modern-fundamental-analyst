@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n";
 
 export const preferenceEmailCopy = {
   en: {
-    subject: "Manage your email preferences",
+    subject: "Manage Your Email Preferences",
     heading: "Manage Your Email Preferences",
     body: "Use the secure link below to update your preferred language or unsubscribe.",
     action: "Manage Email Preferences",

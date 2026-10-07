@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createSentryOptions, resolveSentryDsn, sanitizeSentryEvent } from "./sentry-options.ts";
+import { createSentryOptions, resolveSentryDsn, sanitizeSentryEvent, sanitizeSentrySpan } from "./sentry-options.ts";
 
 test("DSN resolution treats empty or whitespace-only overrides as absent", () => {
   const publicDsn = "https://public@sentry.invalid/1";
@@ -54,11 +54,12 @@ test("error events retain stack identity without request payloads or recovery se
   }
 });
 
-test("monitoring options disable sensitive collection and optional products", () => {
+test("monitoring samples traces while retaining sensitive collection restrictions", () => {
   const options = createSentryOptions("https://public@sentry.invalid/1", "preview");
   assert.equal(options.environment, "preview");
   assert.equal(options.sampleRate, 1);
-  assert.equal(options.tracesSampleRate, undefined);
+  assert.equal(options.tracesSampleRate, 1);
+  assert.equal(createSentryOptions("https://public@sentry.invalid/1", "production").tracesSampleRate, 0.1);
   assert.equal(options.beforeSendLog({}), null);
   assert.equal(options.beforeSendMetric({}), null);
   assert.equal(options.beforeSend, sanitizeSentryEvent);
@@ -74,4 +75,81 @@ test("monitoring options disable sensitive collection and optional products", ()
   }
   assert.deepEqual(options.dataCollection.httpBodies, []);
   assert.equal(options.dataCollection.frameContextLines, 0);
+  assert.deepEqual(options.dataCollection.genAI, { inputs: false, outputs: false });
+  for (const target of ["https://api.stripe.com/v1/checkout", "https://modernfundamentalanalyst.com.evil.test/"]) {
+    assert.ok(!options.tracePropagationTargets.some((pattern) => pattern.test(target)));
+  }
+  assert.ok(options.tracePropagationTargets.some((pattern) => pattern.test("/api/contact")));
+});
+
+test("streamed spans retain timing and measurements without recovery values or database keys", () => {
+  const base = {
+    trace_id: "trace",
+    span_id: "span",
+    start_timestamp: 1,
+    end_timestamp: 2,
+    status: "ok",
+    is_segment: true,
+    name: "/support?session_id=private-session#fragment",
+    attributes: {
+      "sentry.op": "pageload",
+      "http.request.method": "GET",
+      "measurements.lcp": 120,
+      "url.full": "https://example.com/support?session_id=private-session",
+      "user.email": "reader@example.com",
+      "db.statement": "GET private-key",
+    },
+    links: [{ attributes: { token: "private-token" } }],
+  };
+  const span = sanitizeSentrySpan(base);
+  assert.equal(span.name, "/support");
+  assert.equal(span.end_timestamp - span.start_timestamp, 1);
+  assert.equal(span.attributes["measurements.lcp"], 120);
+  assert.equal(span.attributes["sentry.segment.name"], "/support");
+  assert.ok(!JSON.stringify(span).includes("private"));
+  assert.ok(!JSON.stringify(span).includes("reader@example.com"));
+  const database = sanitizeSentrySpan({
+    ...base,
+    name: "GET private-redis-key",
+    attributes: { "sentry.op": "db.redis" },
+  });
+  assert.equal(database.name, "Database operation");
+  const provider = sanitizeSentrySpan({
+    ...base,
+    name: "GET https://api.stripe.com/v1/checkout/sessions/private-session",
+    attributes: { "sentry.op": "http.client" },
+  });
+  assert.equal(provider.name, "GET https://api.stripe.com");
+});
+
+test("child spans retain release and segment metadata without copying private attributes", () => {
+  const metadata = {
+    "sentry.op": "db.redis",
+    "sentry.environment": "production",
+    "sentry.release": "release-sha",
+    "sentry.segment.id": "root-span",
+    "sentry.sdk.name": "sentry.javascript.nextjs",
+    "sentry.sdk.version": "11.4.0",
+    "sentry.trace_lifecycle": "stream",
+  };
+  const span = sanitizeSentrySpan({
+    trace_id: "trace",
+    span_id: "child-span",
+    parent_span_id: "root-span",
+    start_timestamp: 1,
+    end_timestamp: 2,
+    status: "ok",
+    is_segment: false,
+    name: "GET private-redis-key",
+    attributes: {
+      ...metadata,
+      "sentry.segment.name": "GET /support?session_id=private-session#private-fragment",
+      "user.email": "reader@example.com",
+    },
+  });
+  assert.equal(span.name, "Database operation");
+  assert.equal(span.parent_span_id, "root-span");
+  assert.deepEqual(span.attributes, { ...metadata, "sentry.segment.name": "GET /support" });
+  assert.ok(!JSON.stringify(span).includes("private-"));
+  assert.ok(!JSON.stringify(span).includes("reader@example.com"));
 });

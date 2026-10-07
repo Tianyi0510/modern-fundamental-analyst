@@ -187,10 +187,6 @@
   background: var(--white);
   z-index: 1;
 }
-.tableScroll .unavailable {
-  white-space: normal;
-  min-width: 12rem;
-}
 @media (prefers-reduced-motion: reduce) {
   .chevron {
     transition: none;

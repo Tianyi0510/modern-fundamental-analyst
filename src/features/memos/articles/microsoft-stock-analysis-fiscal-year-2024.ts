@@ -1,4 +1,7 @@
+import type { Locale } from "@/lib/i18n";
+
 export type MemoContent = {
+  language: Locale;
   sections: Array<{
     title: string;
     introduction?: string[];
@@ -11,6 +14,7 @@ export type MemoContent = {
 // The article body below mirrors the source Google Doc verbatim. Do not edit its
 // prose independently; update it only from the source document.
 const sourceContent: MemoContent = {
+  language: "en",
   sections: [
     {
       title: "Section 1: Business Analysis",

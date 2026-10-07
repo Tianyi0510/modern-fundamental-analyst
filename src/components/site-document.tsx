@@ -9,7 +9,7 @@ export function SiteDocument({
   language,
 }: Readonly<{ children: React.ReactNode; language: "en" | "zh-Hant-TW" | "zh-CN" }>) {
   const skipLabel =
-    language === "en" ? "Skip to main content" : language === "zh-Hant-TW" ? "跳至主要內容" : "跳至主要内容";
+    language === "en" ? "Skip to Main Content" : language === "zh-Hant-TW" ? "跳至主要內容" : "跳至主要内容";
 
   return (
     <html lang={language} data-scroll-behavior="smooth">
