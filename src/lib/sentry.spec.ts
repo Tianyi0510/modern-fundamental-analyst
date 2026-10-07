@@ -42,5 +42,9 @@ test("sampled browser traces reach the isolated transport without recovery query
   });
   await page.goto("/contact?token=private-recovery-token");
   await expect.poll(() => spans.some((span) => span.name === "/contact"), { timeout: 20_000 }).toBe(true);
+  expect(spans.find((span) => span.name === "/contact")?.attributes["sentry.environment"]).toEqual({
+    type: "string",
+    value: "test",
+  });
   expect(JSON.stringify(spans)).not.toContain("private-recovery-token");
 });

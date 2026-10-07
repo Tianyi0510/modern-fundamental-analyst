@@ -55,6 +55,7 @@ jobs:
     env:
       PLAYWRIGHT_SENTRY_TEST: "1"
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
+      NEXT_PUBLIC_VERCEL_ENV: test
     steps:
       - uses: actions/checkout@v5
         with:
@@ -109,6 +110,7 @@ jobs:
     env:
       PLAYWRIGHT_SENTRY_TEST: "1"
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
+      NEXT_PUBLIC_VERCEL_ENV: test
     strategy:
       fail-fast: false
       matrix:
