@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { portfolioHoldings, portfolioIncome, getPortfolioTotals, getHoldingCostPerShare } from "./portfolio";
+import { formatUsd } from "@/lib/format";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} portfolio mobile sorting changes the rendered order without overflow`, async ({
@@ -37,6 +39,25 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await mobileSort.locator("button").click();
     await expect(sharesHeader).toHaveAttribute("aria-sort", "ascending");
     await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => a - b));
+
+    await mobileSort.locator("select").selectOption("costBasis");
+    await expect(headers.nth(3)).toHaveAttribute("aria-sort", "descending");
+    const expectedHoldings = portfolioHoldings.toSorted(
+      (a, b) => getHoldingCostPerShare(b) - getHoldingCostPerShare(a),
+    );
+    await expect(holdingRows.getByRole("rowheader")).toHaveText(expectedHoldings.map((holding) => holding.symbol));
+    for (const [index, holding] of expectedHoldings.entries()) {
+      await expect(holdingRows.nth(index).getByRole("cell").nth(2)).toHaveText(
+        formatUsd(getHoldingCostPerShare(holding)),
+      );
+    }
+    await expect(table.locator("tfoot .portfolio-total-market")).toHaveText(
+      formatUsd(getPortfolioTotals(portfolioHoldings, portfolioIncome).marketValue),
+    );
+
+    await mobileSort.locator("select").selectOption("shares");
+
+    await mobileSort.locator("button").click();
 
     await page.setViewportSize({ width: 320, height: 844 });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);

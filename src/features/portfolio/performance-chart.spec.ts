@@ -94,7 +94,14 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.goto(`${prefix}/performance`);
       const details = page.locator('figure[aria-labelledby="performance-twr-chart-title"] details');
       const summary = details.locator("summary");
-      const collapsed = (await details.boundingBox())!.height;
+      // Suspense may replace the SSR node during hydration; sample visibility and height together.
+      let collapsed = 0;
+      await expect
+        .poll(async () => {
+          collapsed = (await details.boundingBox())?.height ?? 0;
+          return collapsed;
+        })
+        .toBeGreaterThan(0);
       await summary.click();
       await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
       const expanded = (await details.boundingBox())!.height;

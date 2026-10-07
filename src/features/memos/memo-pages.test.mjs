@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { read } from "../../../scripts/repository-helpers.mjs";
+import nextConfig from "../../../next.config.ts";
 
 test("memo metadata uses one localized catalog", async () => {
   const { memos, memosZhTw, memosZhCn } = await import("./memos.ts");
@@ -53,15 +53,14 @@ test("memo article preserves verified research prose", async () => {
 });
 
 test("the legacy Microsoft memo URL permanently redirects to the descriptive slug", async () => {
-  const config = await read("next.config.ts");
-  const detailPage = await read("src/app/_components/memo-detail-page.tsx");
-
-  assert.match(config, /microsoft-stock-analysis-fy2024/);
-  assert.match(config, /microsoft-stock-analysis-fiscal-year-2024/);
-  assert.match(config, /permanent:\s*true/);
-  assert.match(config, /\["", "\/zh-tw", "\/zh-cn"\]/);
-  assert.match(detailPage, /<SiteHeader[^>]+\/>\s*<main className="memo-detail-page"/s);
-  assert.match(detailPage, /<\/main>\s*<PageFooter/s);
+  const redirects = await nextConfig.redirects();
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    const source = `${prefix}/memos/microsoft-stock-analysis-fy2024`;
+    const matches = redirects.filter((redirect) => redirect.source === source);
+    assert.equal(matches.length, 1);
+    assert.equal(matches[0].destination, `${prefix}/memos/microsoft-stock-analysis-fiscal-year-2024`);
+    assert.equal(matches[0].permanent, true);
+  }
 });
 
 test("article metadata and structured data agree with the localized catalog", async () => {

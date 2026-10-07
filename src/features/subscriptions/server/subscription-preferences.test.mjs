@@ -3,6 +3,22 @@ import test from "node:test";
 
 const { createPreferenceToken, readPreferenceToken } = await import("./subscription-preferences.ts");
 
+test("preference tokens expire at their deadline", (t) => {
+  const previous = process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+  process.env.SUBSCRIPTION_PREFERENCES_SECRET = "test-only-expiry-secret";
+  t.after(() => {
+    if (previous === undefined) delete process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+    else process.env.SUBSCRIPTION_PREFERENCES_SECRET = previous;
+  });
+  let now = 1_000;
+  t.mock.method(Date, "now", () => now);
+  const token = createPreferenceToken("reader@example.com", 100);
+  now = 1_099;
+  assert.equal(readPreferenceToken(token)?.email, "reader@example.com");
+  now = 1_100;
+  assert.equal(readPreferenceToken(token), null);
+});
+
 test("preference tokens survive migration from the Resend-derived key", () => {
   const previousResendKey = process.env.RESEND_API_KEY;
   const previousPreferenceSecret = process.env.SUBSCRIPTION_PREFERENCES_SECRET;

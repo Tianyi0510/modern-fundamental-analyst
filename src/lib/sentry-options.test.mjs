@@ -153,3 +153,51 @@ test("child spans retain release and segment metadata without copying private at
   assert.ok(!JSON.stringify(span).includes("private-"));
   assert.ok(!JSON.stringify(span).includes("reader@example.com"));
 });
+
+test("chart failures retain original stack locations and standard types without private error details", () => {
+  const original = {
+    tags: { feature: "performance-chart", measure: "twr" },
+    message: "private chart payload",
+    extra: { observations: [12345], token: "private-token" },
+    exception: {
+      values: [
+        {
+          type: "TypeError",
+          value: "private chart payload",
+          stacktrace: {
+            frames: [
+              {
+                filename: "https://example.com/_next/static/chart.js?token=private-token",
+                function: "PerformanceChartView",
+                lineno: 42,
+                colno: 17,
+                vars: { data: "private chart payload" },
+              },
+            ],
+          },
+        },
+        { type: "private custom name", value: "private nested cause" },
+      ],
+    },
+  };
+  const event = sanitizeSentryEvent(structuredClone(original));
+  assert.equal(event.exception.values[0].type, "TypeError");
+  assert.deepEqual(event.exception.values[0].stacktrace.frames, [
+    {
+      filename: "https://example.com/_next/static/chart.js",
+      function: "PerformanceChartView",
+      lineno: 42,
+      colno: 17,
+    },
+  ]);
+  assert.equal(event.message, "Performance chart rendering failed");
+  assert.equal(event.exception.values[0].value, "Performance chart rendering failed");
+  assert.deepEqual(event.exception.values[1], { type: "Error", value: "Performance chart rendering failed" });
+  assert.equal(event.tags.measure, "twr");
+  assert.doesNotMatch(JSON.stringify(event), /private|12345/);
+
+  const ordinary = sanitizeSentryEvent({
+    exception: { values: [{ type: "TypeError", value: "Ordinary render failure" }] },
+  });
+  assert.equal(ordinary.exception.values[0].value, "Ordinary render failure");
+});

@@ -11,7 +11,15 @@ for (const route of ["memos", "performance"]) {
       const details = page.locator(
         route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
       );
-      await details.locator("summary").evaluate((summary: HTMLElement) => {
+      const summary = details.locator("summary");
+      // A real click hydrates streamed content before synchronous animation inspection.
+      await summary.click();
+      await expect(summary).toHaveAttribute("aria-expanded", "true");
+      await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
+      await summary.click();
+      await expect(summary).toHaveAttribute("aria-expanded", "false");
+      await expect(details).not.toHaveAttribute("open");
+      await summary.evaluate((summary: HTMLElement) => {
         summary.click();
         const animation = summary.parentElement!.getAnimations()[0]!;
         animation.pause();

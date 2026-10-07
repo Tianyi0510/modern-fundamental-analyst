@@ -67,36 +67,22 @@ test("percent formatting handles positive, zero, and negative values", async () 
 });
 
 test("all portfolio and performance locales share page structures", async () => {
-  const [
-    portfolioEn,
-    portfolioZhTw,
-    portfolioZhCn,
-    performanceEn,
-    performanceZhTw,
-    performanceZhCn,
-    portfolioShared,
-    portfolioTable,
-  ] = await Promise.all([
-    read("src/app/(en)/portfolio/page.tsx"),
-    read("src/app/zh-tw/portfolio/page.tsx"),
-    read("src/app/zh-cn/portfolio/page.tsx"),
-    read("src/app/(en)/performance/page.tsx"),
-    read("src/app/zh-tw/performance/page.tsx"),
-    read("src/app/zh-cn/performance/page.tsx"),
-    read("src/app/_components/portfolio-page-content.tsx"),
-    read("src/features/portfolio/portfolio-table.tsx"),
-  ]);
+  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, portfolioShared] =
+    await Promise.all([
+      read("src/app/(en)/portfolio/page.tsx"),
+      read("src/app/zh-tw/portfolio/page.tsx"),
+      read("src/app/zh-cn/portfolio/page.tsx"),
+      read("src/app/(en)/performance/page.tsx"),
+      read("src/app/zh-tw/performance/page.tsx"),
+      read("src/app/zh-cn/performance/page.tsx"),
+      read("src/app/_components/portfolio-page-content.tsx"),
+    ]);
 
   for (const page of [portfolioEn, portfolioZhTw, portfolioZhCn]) assert.match(page, /PortfolioPageContent/);
   for (const page of [performanceEn, performanceZhTw, performanceZhCn]) assert.match(page, /PerformancePageContent/);
   assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
   assert.doesNotMatch(portfolioShared, /portfolio-allocation|Allocation by market value|getHoldingWeight/);
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
-  assert.match(portfolioTable, /costPerShare:\s*getHoldingCostPerShare\(holding\)/);
-  assert.match(portfolioTable, /sortKey === "costBasis"\) return row\.costPerShare/);
-  assert.match(portfolioTable, /formatUsd\(costPerShare\)/);
-  assert.match(portfolioTable, /portfolio-total-market[^>]*>\s*\{formatUsd\(totals\.marketValue\)\}\s*<\/td>/);
-  assert.match(portfolioTable, /portfolio-total-return[\s\S]*?\{formatPercent\(totals\.totalReturn\)\}/);
 });
 
 test("portfolio table receives only the active locale labels from its server parent", async () => {

@@ -108,9 +108,28 @@ export function sanitizeSentryEvent(event: ErrorEvent): ErrorEvent {
       url: event.request.url?.split(/[?#]/)[0],
     };
   }
-  if (event.message) event.message = redactMessage(event.message);
+  const isChartFailure = event.tags?.feature === "performance-chart";
+  const chartMessage = "Performance chart rendering failed";
+  if (event.message) event.message = isChartFailure ? chartMessage : redactMessage(event.message);
   for (const exception of event.exception?.values ?? []) {
-    if (exception.value) exception.value = redactMessage(exception.value);
+    if (isChartFailure) {
+      exception.value = chartMessage;
+      // Custom error names may contain user input; standard types retain useful grouping.
+      if (
+        ![
+          "Error",
+          "TypeError",
+          "RangeError",
+          "ReferenceError",
+          "SyntaxError",
+          "URIError",
+          "EvalError",
+          "AggregateError",
+        ].includes(exception.type ?? "")
+      ) {
+        exception.type = "Error";
+      }
+    } else if (exception.value) exception.value = redactMessage(exception.value);
     for (const frame of exception.stacktrace?.frames ?? []) {
       if (frame.filename) frame.filename = frame.filename.split(/[?#]/)[0];
       if (frame.abs_path) frame.abs_path = frame.abs_path.split(/[?#]/)[0];
