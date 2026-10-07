@@ -25,7 +25,9 @@ For email development, run `npm run email:contact` (or `npm run email`) and open
 
 Local development uses fast, affected-scope checks from [AGENTS.md](AGENTS.md#verification-and-review). GitHub Actions owns full verification; deployment verifies the release commit and live status. A release does not require repeating the complete suite locally.
 
-`npm run verify:static` runs types, lint, formatting and unit tests. `npm run verify` adds a production build and Chromium tests when full local diagnosis is needed. `npm run test:webkit` runs both shards against an existing production build; CI runs those shards concurrently on separate macOS runners. Install browsers with `npx playwright install chromium webkit` when needed.
+`npm test` runs the existing Node suite, Vitest unit tests and Testing Library/MSW integration tests. Use `npm run test:unit`, `npm run test:integration`, or `npm run test:watch` for focused development. `npm run test:e2e -- <spec-files> --project=chromium` runs selected Playwright journeys (use `webkit` for WebKit).
+
+`npm run verify:static` runs types, lint, formatting and all Node/Vitest tests. `npm run verify` adds a production build and Chromium tests when full local diagnosis is needed. `npm run test:webkit` runs both shards against an existing production build; CI runs those shards concurrently on separate macOS runners. Install browsers with `npx playwright install chromium webkit` when needed.
 
 PRs run full CI. A main-branch merge can reuse a recent successful full PR run with an identical Git tree; otherwise it runs full CI. The release workflow records the evidence and retains the exact-commit Vercel gate. GitHub deletes merged remote branches automatically; local merged branches are cleaned up after successful deployment. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#release-workflow).
 

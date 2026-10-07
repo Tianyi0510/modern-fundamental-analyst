@@ -126,6 +126,18 @@ for (const locale of ["en", "zh-tw", "zh-cn"])
     await confirmSubscription(value, memo);
     assert.equal(active, true);
     assert.equal(writes.filter((w) => w.path.includes("/events")).length, 1);
+    const welcome = writes.find((w) => w.path.includes("/events")).body;
+    assert.equal(welcome.event, "subscriber.created");
+    assert.equal(welcome.email, "reader@example.com");
+    assert.equal(welcome.payload.locale, locale);
+    assert.equal(welcome.payload.memo_title, memo().title);
+    assert.equal(welcome.payload.memo_summary, memo().summary);
+    const prefix = locale === "en" ? "" : `/${locale}`;
+    assert.equal(new URL(welcome.payload.memo_url).pathname, `${prefix}/memos/example`);
+    const preferences = new URL(welcome.payload.preferences_url);
+    assert.equal(preferences.pathname, `${prefix}/subscription-preferences`);
+    const { readPreferenceToken } = await import("./subscription-preferences.ts");
+    assert.equal(readPreferenceToken(preferences.searchParams.get("token"))?.email, "reader@example.com");
     const consent = JSON.parse(read(subscriptionKey("consent", "reader@example.com")));
     assert.equal(consent.locale, locale);
     assert.equal(consent.policy, "research-updates-v1");

@@ -1,3 +1,10 @@
+import vitest from "@vitest/eslint-plugin";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import checkFile from "eslint-plugin-check-file";
+import importX from "eslint-plugin-import-x";
+import jestDom from "eslint-plugin-jest-dom";
+import playwright from "eslint-plugin-playwright";
+import testingLibrary from "eslint-plugin-testing-library";
 import js from "@eslint/js";
 import nextPlugin from "@next/eslint-plugin-next";
 import prettier from "eslint-config-prettier";
@@ -6,6 +13,12 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import path from "node:path";
+
+const kebabCase = "+([a-z])*([a-z0-9])*(-+([a-z0-9]))";
+const camelCase = "+([a-z])*([a-z0-9])*([A-Z]*([a-z0-9]))";
+const routeSegment = `@(${kebabCase}|\\[${camelCase}\\]|\\[...${camelCase}\\]|\\[\\[...${camelCase}\\]\\])`;
+// App Router also permits groups, slots, private folders and interception prefixes.
+const appFolder = `@(${routeSegment}|\\(${kebabCase}\\)|@${camelCase}|_${kebabCase}|.well-known|+([a-z])?(.+([a-z]))|@(\\(.\\)|+(\\(..\\))|\\(...\\))${routeSegment})`;
 
 const sourceRoot = path.join(import.meta.dirname, "src");
 const architecture = {
@@ -131,5 +144,55 @@ export default tseslint.config(
       ],
     },
   })),
+  {
+    files: ["**/*.{js,mjs,ts,tsx}"],
+    plugins: { "import-x": importX },
+    settings: {
+      ...importX.flatConfigs.typescript.settings,
+      "import-x/resolver-next": [
+        createTypeScriptImportResolver({ project: path.join(import.meta.dirname, "tsconfig.json") }),
+      ],
+    },
+    rules: { "import-x/no-cycle": "error" },
+  },
+  {
+    files: ["src/**/*.{js,mjs,ts,tsx}"],
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/filename-naming-convention": [
+        "error",
+        { "**/*.{js,mjs,ts,tsx}": "KEBAB_CASE" },
+        { ignoreMiddleExtensions: true },
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "src/app/**/": appFolder,
+          "src/!(app)/**/": "KEBAB_CASE",
+        },
+      ],
+    },
+  },
+  {
+    ...vitest.configs.recommended,
+    files: ["src/**/*.test.{ts,tsx}"],
+  },
+  {
+    ...testingLibrary.configs["flat/react"],
+    settings: { "testing-library/custom-renders": "off" },
+    files: ["src/**/*.test.tsx"],
+  },
+  {
+    ...jestDom.configs["flat/recommended"],
+    files: ["src/**/*.test.tsx"],
+  },
+  {
+    ...playwright.configs["flat/recommended"],
+    files: ["src/**/*.spec.ts"],
+    // Keep correctness rules; advisory style rules conflict with viewport/platform matrices.
+    rules: Object.fromEntries(
+      Object.entries(playwright.configs["flat/recommended"].rules).filter(([, severity]) => severity === "error"),
+    ),
+  },
   prettier,
 );

@@ -74,22 +74,28 @@ test.describe("header interaction QA", () => {
       ["/contact", "form .button"],
     ] as const) {
       await page.goto(path);
-      await page.keyboard.press("Tab");
+      await page.keyboard.press("Shift");
       const control = page.locator(selector).first();
       await control.focus();
       await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
       await expect(control).toHaveCSS("box-shadow", "none");
       await control.hover();
+      // Release on the control without following links or submitting forms.
+      await control.evaluate((element) =>
+        element.addEventListener("click", (event) => event.preventDefault(), { once: true }),
+      );
       await page.mouse.down();
       try {
-        const durations = await control.evaluate((element) =>
-          getComputedStyle(element)
-            .transitionDuration.split(",")
-            .map((value) => Number.parseFloat(value)),
+        await expect
+          .poll(() => control.evaluate((element) => element.matches(":active")), {
+            message: `${path} ${selector} receives the pointer press`,
+          })
+          .toBe(true);
+        await expect(control, `${path} ${selector} uses the press duration`).toHaveCSS(
+          "transition-duration",
+          /^(?:0\.09s)(?:,\s*0\.09s)*$/,
         );
-        expect(durations.every((duration) => duration === 0.09)).toBe(true);
       } finally {
-        await page.mouse.move(1, 1);
         await page.mouse.up();
       }
     }
