@@ -8,19 +8,22 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.getByRole("main")).toContainText(
       prefix === "/zh-tw" ? "負債餘額" : prefix === "/zh-cn" ? "负债余额" : "liability balances",
     );
-    await expect(page.locator("main figure")).toHaveCount(1);
-    await expect(page.locator('main svg[role="img"]')).toHaveCount(1);
-    const history = page.locator('section[aria-labelledby="performance-chart-title"]');
-    await history.locator("summary").click();
-    await expect(history.locator("tbody tr")).toHaveCount(22);
-    await expect(history.locator("tbody tr").first()).toContainText("+24.43%");
-    await expect(history.locator("tbody tr").first()).toContainText("+19.26%");
-    await expect(history.locator("tbody tr").last()).toContainText(prefix ? "30" : "less than 30 days");
-    const summary = page.locator(".performance-twr-summary");
-    await expect(summary.getByRole("term")).toHaveCount(2);
-    await expect(summary).toContainText("+38.27%");
-    await expect(summary).toContainText("+32.20%");
-    await expect(summary).toContainText(prefix ? "未年化" : "not annualized");
+    await expect(page.locator("main figure")).toHaveCount(2);
+    await expect(page.locator('main svg[role="img"]')).toHaveCount(2);
+    const xirr = page.locator('figure[aria-labelledby="performance-chart-title"]');
+    await expect(xirr.getByRole("img")).toHaveAccessibleName(/24\.43%.*19\.26%/);
+    await expect(xirr.locator("polyline")).toHaveCount(2);
+    for (const line of await xirr.locator("polyline").all()) {
+      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(21);
+    }
+    await xirr.locator("summary").click();
+    await expect(xirr.getByRole("table")).toBeVisible();
+    await expect(xirr.locator("tbody tr")).toHaveCount(22);
+    await expect(xirr.locator("tbody tr").first()).toContainText("+24.43%");
+    await expect(xirr.locator("tbody tr").first()).toContainText("+19.26%");
+    await expect(xirr.locator("tbody tr").last()).toContainText(prefix ? "30" : "less than 30 days");
+    await expect(page.locator(".performance-twr-summary")).toHaveCount(0);
+    await expect(page.locator(".performance-summary").getByRole("term")).toHaveCount(3);
     await expect(page.locator(".performance-summary")).toContainText("+24.43%");
     const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
     await expect(chart.getByRole("img")).toHaveAccessibleName(/38\.27%.*32\.20%/);
@@ -42,6 +45,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.evaluate(() => document.fonts.ready);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       await expect(chart.getByRole("img")).toBeVisible();
+      await expect(xirr.getByRole("img")).toBeVisible();
     }
   });
 }

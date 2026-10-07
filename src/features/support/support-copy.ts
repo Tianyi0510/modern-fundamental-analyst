@@ -10,8 +10,8 @@ export const supportCopy = {
     legend: "One-Time Support Amount",
     submit: "Continue to Stripe",
     submitting: "Redirecting to Stripe…",
-    retry: "Try again",
-    resume: "Retry this checkout",
+    retry: "Try Again",
+    resume: "Retry This Checkout",
     recovery: "If navigation stopped or failed, retry this checkout with the same amount.",
     note: "Securely processed by Stripe. This is voluntary support—not a charitable donation, investment product, or advisory service.",
     statuses: {
@@ -20,7 +20,8 @@ export const supportCopy = {
       pending: "Your payment is still processing. Check your Stripe confirmation before trying again.",
       unverified: "We could not confirm this payment. Check your Stripe confirmation before trying again.",
       success: "Thank you for supporting independent research. Stripe will send your payment confirmation by email.",
-      cancelled: "Checkout was cancelled. No payment was made.",
+      cancelled:
+        "You returned from Checkout. Payment status has not been verified. Check your Stripe confirmation before trying again.",
       error: "Checkout is temporarily unavailable. Please try again later.",
       "rate-limited":
         "Too many checkout attempts. Wait 10 minutes before trying again. This attempt did not start a payment.",
@@ -45,7 +46,7 @@ export const supportCopy = {
       pending: "付款仍在處理中，請先查閱 Stripe 付款確認，再決定是否重試。",
       unverified: "目前無法確認這筆付款，請先查閱 Stripe 付款確認，再決定是否重試。",
       success: "感謝你支持獨立研究。Stripe 將透過電子郵件寄送付款確認。",
-      cancelled: "付款流程已取消，沒有產生任何款項。",
+      cancelled: "你已返回本頁，付款狀態尚未確認。請先查閱 Stripe 付款確認，再決定是否重試。",
       error: "目前暫時無法開啟付款頁面，請稍後再試。",
       "rate-limited": "付款嘗試次數過多，請等待 10 分鐘後再重試。本次未開啟付款流程。",
       "invalid-amount": "請選擇 6、12 或 18 美元後重試。",
@@ -69,7 +70,7 @@ export const supportCopy = {
       pending: "付款仍在处理中，请先查阅 Stripe 付款确认，再决定是否重试。",
       unverified: "目前无法确认这笔付款，请先查阅 Stripe 付款确认，再决定是否重试。",
       success: "感谢你支持独立研究。Stripe 将通过电子邮件发送付款确认。",
-      cancelled: "付款流程已取消，没有产生任何款项。",
+      cancelled: "你已返回本页，付款状态尚未确认。请先查阅 Stripe 付款确认，再决定是否重试。",
       error: "目前暂时无法打开付款页面，请稍后再试。",
       "rate-limited": "付款尝试次数过多，请等待 10 分钟后再重试。本次未开启付款流程。",
       "invalid-amount": "请选择 6、12 或 18 美元后重试。",

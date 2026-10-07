@@ -1,17 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-for (const route of ["memos", "performance", "performance-twr"]) {
+for (const route of ["memos", "performance"]) {
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     test(`${prefix || "English"} ${route} disclosure settles on resize and restores focus from closing content`, async ({
       page,
     }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.emulateMedia({ reducedMotion: "no-preference" });
-      await page.goto(`${prefix}/${route === "performance-twr" ? "performance" : route}`);
+      await page.goto(`${prefix}/${route}`);
       const details = page.locator(
-        route === "memos"
-          ? ".memo-disclosure"
-          : `[aria-labelledby="${route === "performance" ? "performance-chart-title" : "performance-twr-chart-title"}"] details`,
+        route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
       );
       await details.locator("summary").evaluate((summary: HTMLElement) => {
         summary.click();
@@ -52,18 +50,16 @@ for (const route of ["memos", "performance", "performance-twr"]) {
 }
 
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
-  for (const route of ["memos", "performance", "performance-twr"]) {
+  for (const route of ["memos", "performance"]) {
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       test(`${prefix || "English"} ${route} closing restores content focus without scrolling under ${reducedMotion}`, async ({
         page,
       }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         await page.emulateMedia({ reducedMotion });
-        await page.goto(`${prefix}/${route === "performance-twr" ? "performance" : route}`);
+        await page.goto(`${prefix}/${route}`);
         const details = page.locator(
-          route === "memos"
-            ? ".memo-disclosure"
-            : `[aria-labelledby="${route === "performance" ? "performance-chart-title" : "performance-twr-chart-title"}"] details`,
+          route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
         );
         const summary = details.locator("summary");
         await summary.click();

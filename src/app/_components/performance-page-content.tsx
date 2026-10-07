@@ -2,8 +2,7 @@ import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./performance-page-content.styles";
-import { TimeWeightedPerformance } from "@/features/portfolio/time-weighted-performance";
-import { XirrHistory } from "@/features/portfolio/performance-chart";
+import { PerformanceChart } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { portfolioSnapshot } from "@/features/portfolio/portfolio";
@@ -34,35 +33,35 @@ const copy = {
     methodologyCopy: (
       <>
         <p>
-          <strong>Cumulative Return.</strong> (Stock market value + net dividends − financing interest − net cost basis)
-          ÷ net cost basis. This is a cumulative, non-annualized return.
-        </p>
-        <p>
-          <strong>XIRR.</strong> Money-weighted annualized return using dated investment cash flows and the ending stock
-          market value. Each chart point shows the since-inception XIRR at that month-end, not the return for that
-          month. Periods shorter than 30 days are not annualized.
-        </p>
-        <p>
-          <strong>{portfolioSnapshot.benchmark} Comparison.</strong> Uses the same investment dates and purchase costs
-          with adjusted benchmark prices. It is a hypothetical comparison, not an actual benchmark holding.
-        </p>
-        <p>
-          <strong>Reconstructed TWR.</strong> Geometrically links closing-price sub-period returns for the stock sleeve,
-          with purchase costs and gifted securities modeled as beginning-of-period contributions. Net dividends and
-          financing costs are settled at period end. Gift values use the preceding close; splits change quantities
-          without a cash flow. Non-trading dates use the preceding trading close. The result is cumulative and not
-          annualized. Like XIRR, it excludes cash balances, fund holdings and liability balances, while retaining net
-          dividends, trading fees and financing interest. Account deposits and withdrawals are outside this stock-only
-          boundary. SPY uses same-vintage dividend-adjusted prices from the first purchase date. This model does not
+          <strong>Reconstructed TWR.</strong> Geometrically links closing-price returns to show cumulative performance,
+          not an annualized rate. Purchase costs, including fees, and gifted securities are contributions at period
+          start; net dividends and financing costs settle at period end. Gifts use the preceding close; splits change
+          quantities without a cash flow. Non-trading dates use the preceding trading close. These assumptions do not
           recover actual intraday valuations or establish GIPS compliance.
+        </p>
+        <p>
+          <strong>Annualized XIRR.</strong> Measures money-weighted return using dated purchase costs, net dividends,
+          financing interest and ending market value. Each chart point is the annualized return since inception at that
+          month-end, not that month's return. Periods shorter than 30 days are not annualized.
+        </p>
+        <p>
+          <strong>{portfolioSnapshot.benchmark} Comparison.</strong> The TWR chart uses dividend-adjusted prices from
+          one data vintage, starting on the first purchase date, without a synthetic trading-fee deduction. The XIRR
+          chart simulates purchases on the portfolio's purchase dates: gross purchase amounts determine units, while
+          cash outflows include fees. These are hypothetical comparisons, not actual SPY holdings.
+        </p>
+        <p>
+          <strong>Stocks and ETFs.</strong> Both measures exclude cash balances, separate brokerage fund-account
+          positions and liability balances. Listed ETFs in the stock ledger, including VGT and GRNY, remain included.
+          Dividends are net of withholding tax; returns deduct trading fees and financing interest. Account deposits and
+          withdrawals are outside this measurement boundary; the results do not represent the entire brokerage account.
         </p>
       </>
     ),
     snapshotCopy: (asOf: string) => (
       <p>
-        The verified data is synchronized to this site monthly. Prices and market values use closing prices as of {asOf}{" "}
-        and are not live quotes. TWR and XIRR cover stock holdings only, excluding cash balances, fund holdings and
-        liability balances.
+        Updated monthly. Prices and market values reflect closing prices as of {asOf}, using the preceding trading close
+        when markets are closed. They are not live quotes.
       </p>
     ),
   },
@@ -87,31 +86,30 @@ const copy = {
     methodologyCopy: (
       <>
         <p>
-          <strong>累積報酬。</strong>（股票市場價值＋淨股息－融資利息－淨成本）÷ 淨成本，為未經年化的累積報酬。
-        </p>
-        <p>
-          <strong>XIRR。</strong>{" "}
-          依投資現金流的實際日期與期末股票市場價值，計算資金加權年化報酬。圖表每個點代表該月底自成立以來的
-          XIRR，並非該月單月報酬；不足 30 天的期間不作年化。
-        </p>
-        <p>
-          <strong>{portfolioSnapshot.benchmark} 比較。</strong>{" "}
-          使用相同投資日期、買入成本與基準的調整後價格計算，屬於假設性比較，並非實際持有基準的績效。
-        </p>
-        <p>
           <strong>重建 TWR。</strong>{" "}
-          串接股票部位各估值期間的報酬，假設買入成本及獲贈股票於期初投入，淨股息與融資費用於期末結算。贈股按前一期收盤價估值，拆股只調整股數；非交易日沿用前一交易日收盤價。結果為未年化累積報酬；與
-          XIRR
-          相同，排除現金餘額、基金持倉及負債餘額，但保留淨股息、交易費用及融資利息。帳戶出入金不屬於股票部位計算範圍。SPY
-          採同一資料批次的股息調整價格，自首次買入日期比較。此模型無法還原實際日內估值，也不代表符合 GIPS 標準。
+          以幾何方式串接收盤估值期間的報酬，呈現未年化的累積績效。含交易費用的買入成本及獲贈股票視為期初投入，淨股息與融資費用於期末結算。贈股按前一期收盤價估值，拆股只調整股數；非交易日沿用前一交易日收盤價。這些假設無法還原實際日內估值，也不代表符合
+          GIPS 標準。
+        </p>
+        <p>
+          <strong>年化 XIRR。</strong>{" "}
+          依買入成本、淨股息、融資利息的實際日期與期末市場價值，計算資金加權報酬。圖表每個點代表該月底自成立以來的年化報酬，並非該月單月報酬；不足
+          30 天的期間不作年化。
+        </p>
+        <p>
+          <strong>{portfolioSnapshot.benchmark} 比較。</strong> TWR
+          圖表採用同一資料批次的股息調整價格，自首次買入日期起計算，不額外扣除模擬交易費用。XIRR
+          圖表按投資組合的買入日期模擬投資：買入金額決定單位數，現金流出則包含交易費用。兩者均為假設性比較，並非實際持有
+          SPY 的績效。
+        </p>
+        <p>
+          <strong>股票與 ETF。</strong> 兩項指標均排除現金餘額、獨立基金帳戶持倉及負債餘額。股票交易紀錄內的上市
+          ETF（包括 VGT 與
+          GRNY）仍納入計算。股息按扣繳稅後金額計入，報酬則扣除交易費用與融資利息。帳戶出入金不屬於此計算範圍，結果並不代表整個證券帳戶的績效。
         </p>
       </>
     ),
     snapshotCopy: (asOf: string) => (
-      <p>
-        已驗證快照每月同步至本網站。價格與市場價值均採用 {asOf} 收盤價，並非即時報價；TWR 與 XIRR
-        僅涵蓋股票持倉，不包含現金餘額、基金持倉及負債餘額。
-      </p>
+      <p>每月更新。價格與市場價值以 {asOf} 的收盤價為準；休市日採前一交易日收盤價，並非即時報價。</p>
     ),
   },
   "zh-cn": {
@@ -135,31 +133,30 @@ const copy = {
     methodologyCopy: (
       <>
         <p>
-          <strong>累计回报。</strong>（股票市场价值＋净股息－融资利息－净成本）÷ 净成本，为未经年化的累计回报。
-        </p>
-        <p>
-          <strong>XIRR。</strong>{" "}
-          根据投资现金流的实际日期与期末股票市场价值，计算资金加权年化回报。图表每个点代表该月底自成立以来的
-          XIRR，并非该月单月回报；不足 30 天的期间不作年化。
-        </p>
-        <p>
-          <strong>{portfolioSnapshot.benchmark} 比较。</strong>{" "}
-          使用相同投资日期、买入成本与基准的调整后价格计算，属于假设性比较，并非实际持有基准的业绩。
-        </p>
-        <p>
           <strong>重建 TWR。</strong>{" "}
-          串接股票部位各估值期间的回报，假设买入成本及获赠股票于期初投入，净股息与融资费用于期末结算。赠股按前一期收盘价估值，拆股只调整股数；非交易日沿用前一交易日收盘价。结果为未经年化的累计回报；与
-          XIRR
-          相同，排除现金余额、基金持仓及负债余额，但保留净股息、交易费用及融资利息。账户出入金不属于股票部位计算范围。SPY
-          采用同一数据批次的股息调整价格，自首次买入日期比较。此模型无法还原实际日内估值，也不代表符合 GIPS 标准。
+          以几何方式串接收盘估值期间的回报，呈现未经年化的累计业绩。含交易费用的买入成本及获赠股票视为期初投入，净股息与融资费用于期末结算。赠股按前一期收盘价估值，拆股只调整股数；非交易日沿用前一交易日收盘价。这些假设无法还原实际日内估值，也不代表符合
+          GIPS 标准。
+        </p>
+        <p>
+          <strong>年化 XIRR。</strong>{" "}
+          根据买入成本、净股息、融资利息的实际日期与期末市场价值，计算资金加权回报。图表每个点代表该月底自成立以来的年化回报，并非该月单月回报；不足
+          30 天的期间不作年化。
+        </p>
+        <p>
+          <strong>{portfolioSnapshot.benchmark} 比较。</strong> TWR
+          图表采用同一数据批次的股息调整价格，自首次买入日期起计算，不额外扣除模拟交易费用。XIRR
+          图表按投资组合的买入日期模拟投资：买入金额决定单位数，现金流出则包含交易费用。两者均为假设性比较，并非实际持有
+          SPY 的业绩。
+        </p>
+        <p>
+          <strong>股票与 ETF。</strong> 两项指标均排除现金余额、独立基金账户持仓及负债余额。股票交易记录内的上市
+          ETF（包括 VGT 与
+          GRNY）仍纳入计算。股息按扣缴税后金额计入，回报则扣除交易费用与融资利息。账户出入金不属于此计算范围，结果并不代表整个证券账户的业绩。
         </p>
       </>
     ),
     snapshotCopy: (asOf: string) => (
-      <p>
-        已验证快照每月同步至本网站。价格与市场价值均采用 {asOf} 收盘价，并非实时报价；TWR 与 XIRR
-        仅涵盖股票持仓，不包含现金余额、基金持仓及负债余额。
-      </p>
+      <p>每月更新。价格与市场价值以 {asOf} 的收盘价为准；休市日采用前一交易日收盘价，并非实时报价。</p>
     ),
   },
 } as const;
@@ -216,8 +213,8 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <p className={appearance["section-number"]}>{text.chart}</p>
             <h2>{text.measured}</h2>
           </div>
-          <TimeWeightedPerformance locale={locale} />
-          <XirrHistory locale={locale} />
+          <PerformanceChart locale={locale} />
+          <PerformanceChart locale={locale} measure="xirr" />
         </section>
         <div className={appearance["section-gray"]}>
           <section className={appearance["methodology"] + " " + appearance["shell"]}>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getMemoContent } from "./memo-content";
 import { getMemo } from "@/features/memos/memos";
 import { getLocalizedPath, localeConfig, type Locale } from "@/lib/i18n";
 import { createPageMetadata, SITE_URL } from "@/lib/site-config";
@@ -20,7 +21,7 @@ export function createMemoStructuredData(slug: string, locale: Locale) {
     headline: memo.title,
     description: memo.summary,
     datePublished: memo.publishedAt,
-    inLanguage: localeConfig[locale].hrefLang,
+    inLanguage: localeConfig[getMemoContent(slug, locale)?.language ?? locale].hrefLang,
     url,
     mainEntityOfPage: url,
     image: `${SITE_URL}/og-logo.png`,

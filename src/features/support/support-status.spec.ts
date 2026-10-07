@@ -6,7 +6,7 @@ const supportLocales = [
     prefix: "",
     locale: "en",
     submitting: "Redirecting to Stripe…",
-    retry: "Try again",
+    retry: "Try Again",
     wait: "Wait 10 minutes",
     invalid: "Choose USD 6, 12, or 18",
   },

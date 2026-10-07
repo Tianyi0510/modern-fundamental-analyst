@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 const attempt = "550e8400-e29b-41d4-a716-446655440000";
 const variants = [
-  { prefix: "", language: "en", locale: "en", retry: "Try again", error: "This Page Could Not Be Loaded." },
+  { prefix: "", language: "en", locale: "en", retry: "Try Again", error: "This Page Could Not Be Loaded." },
   { prefix: "/zh-tw", language: "zh-Hant-TW", locale: "zh-tw", retry: "重試", error: "目前無法載入此頁面。" },
   { prefix: "/zh-cn", language: "zh-CN", locale: "zh-cn", retry: "重试", error: "目前无法加载此页面。" },
 ];

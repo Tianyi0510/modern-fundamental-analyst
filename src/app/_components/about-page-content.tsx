@@ -27,7 +27,7 @@ type Copy = {
 const copy: Record<Locale, Copy> = {
   en: {
     eyebrow: "About",
-    headline: ["Learning Continuously.", "Investing with Accountability."],
+    headline: ["Learning Continuously.", "Investing With Accountability."],
     introduction:
       "I am Tianyi (David) Li, an incoming Rutgers Honors College student building a transparent, long-term investment process.",
     disciplines: "Finance · BAIT · Philosophy · Music",
@@ -70,7 +70,7 @@ const copy: Record<Locale, Copy> = {
       },
       {
         label: "05 · Research and Writing",
-        title: "Turning Investment Ideas into Testable Theses",
+        title: "Turning Investment Ideas Into Testable Theses",
         paragraphs: [
           "I use investment memos to turn opinions into structured and testable arguments. Each thesis aims to explain the business, investment opportunity, supporting evidence, valuation, major risks, and conditions that would cause my view to change.",
           "Where appropriate, I support my research with an integrated 3-statement model and DCF valuation. The model connects operating assumptions with financial performance and intrinsic value.",
@@ -79,7 +79,7 @@ const copy: Record<Locale, Copy> = {
       },
       {
         label: "06 · Background",
-        title: "Growing through Curiosity, Empathy, and Continuous Learning",
+        title: "Growing Through Curiosity, Empathy, and Continuous Learning",
         paragraphs: [
           "I am an incoming Rutgers University–New Brunswick Honors College student intending to double major in Finance and Business Analytics and Information Technology. I also intend to pursue a minor in either Philosophy or Music.",
           "I promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning. I do not expect to begin with every answer. Instead, I aim to ask better questions, listen to different perspectives, accept feedback, and continuously improve my knowledge and skills.",

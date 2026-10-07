@@ -4,6 +4,9 @@ import { createSentryOptions } from "../src/lib/sentry-options.ts";
 
 export function monitoringCapture(t) {
   const events = [];
+  const logs = [];
+  const metrics = [];
+  const spans = [];
   const previous = getClient();
   const client = new Sentry.NodeClient({
     ...createSentryOptions("https://public@sentry.invalid/1", "test"),
@@ -11,7 +14,12 @@ export function monitoringCapture(t) {
     stackParser: () => [],
     transport: () => ({
       send(envelope) {
-        for (const [header, payload] of envelope[1]) if (header.type === "event") events.push(payload);
+        for (const [header, payload] of envelope[1]) {
+          if (header.type === "event") events.push(payload);
+          if (header.type === "log") logs.push(...payload.items);
+          if (header.type === "trace_metric") metrics.push(...payload.items);
+          if (header.type === "span") spans.push(...payload.items);
+        }
         return Promise.resolve({ statusCode: 200 });
       },
       flush: () => Promise.resolve(true),
@@ -23,5 +31,5 @@ export function monitoringCapture(t) {
     await client.close(1000);
     setCurrentClient(previous);
   });
-  return { events, flush: () => client.flush(1000) };
+  return { events, logs, metrics, spans, flush: () => client.flush(1000) };
 }

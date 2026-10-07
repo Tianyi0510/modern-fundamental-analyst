@@ -3,7 +3,7 @@ import type { MemoContent } from "@/features/memos/memo-content";
 
 export function MemoArticleContent({ content }: { content: MemoContent }) {
   return (
-    <div className={appearance["article-body"]}>
+    <div className={appearance["article-body"]} lang={content.language}>
       {content.sections.map((section) => (
         <section className={appearance["memo-section"]} key={section.title}>
           <h2>{section.title}</h2>

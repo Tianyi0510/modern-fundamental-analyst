@@ -62,7 +62,11 @@ PR CI runs all checks. Main CI may reuse a recent successful full PR run only wh
 
 Install missing browser binaries with `npx playwright install chromium webkit`. Once checks pass, repeat only when subsequent changes or unresolved failures justify it. Add behavioral regression coverage for changed risks; update source-structure assertions during refactors without weakening user-visible coverage. For animation fixes, check intermediate visual states and repeated/interrupted input, not merely whether an animation was created. WebKit automation does not establish physical iPhone behavior.
 
-Reviews should prioritize demonstrable violations of the constraints above, with precise locations and consequences. Leave formatting to lint; intentional variants are not defects solely because they duplicate markup.
+## Code Review Rules
+
+- Write all authored review output in English only, without emojis or emoji shortcodes. This includes review titles, summaries, findings, inline comments and follow-up comments. Use plain-text severity labels such as `[P1]` rather than decorative badges.
+- Prioritize demonstrable violations of the constraints above, with precise locations and consequences. Leave formatting to lint; intentional variants are not defects solely because they duplicate markup.
+- These rules govern authored review text. Do not claim that repository instructions disable provider-generated status summaries, boilerplate or reactions; verify a supported integration setting before reporting that those outputs have changed.
 
 ## Deployment completion
 

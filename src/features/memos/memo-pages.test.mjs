@@ -67,7 +67,7 @@ test("the legacy Microsoft memo URL permanently redirects to the descriptive slu
 test("article metadata and structured data agree with the localized catalog", async () => {
   const { createMemoPageMetadata, createMemoStructuredData } = await import("./memo-pages.ts");
   const { getMemo } = await import("./memos.ts");
-  const { localeConfig, getLocalizedPath } = await import("@/lib/i18n.ts");
+  const { getLocalizedPath } = await import("@/lib/i18n.ts");
   const slug = "microsoft-stock-analysis-fiscal-year-2024";
   for (const locale of ["en", "zh-tw", "zh-cn"]) {
     const memo = getMemo(slug, locale);
@@ -80,7 +80,7 @@ test("article metadata and structured data agree with the localized catalog", as
     assert.equal(article.headline, memo.title);
     assert.equal(article.description, memo.summary);
     assert.equal(article.datePublished, memo.publishedAt);
-    assert.equal(article.inLanguage, localeConfig[locale].hrefLang);
+    assert.equal(article.inLanguage, "en");
     assert.ok(article.url.endsWith(metadata.alternates.canonical));
     assert.ok(article.image.endsWith("/og-logo.png"));
     assert.equal(article.dateModified, undefined);
