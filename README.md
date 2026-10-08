@@ -66,7 +66,6 @@ Integration details:
 - [Sentry monitoring](docs/TECHNICAL_ARCHITECTURE.md#monitoring)
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
 - [Portfolio Data](docs/PORTFOLIO_DATA.md)
-- [Website Copy](docs/WEBSITE_COPY.md)
 
 Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
 
