@@ -247,24 +247,38 @@ test.describe("mobile content and navigation QA", () => {
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
   });
 
-  test("home metrics form a compact full-width mobile data band", async ({ page }) => {
+  test("home metrics form a compact full-width mobile data band", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/");
     const metrics = page.locator(".home-page .metric");
     await expect(metrics).toHaveCount(3);
+    await page.evaluate(() => document.fonts.ready);
     const boxes = await metrics.evaluateAll((elements) =>
       elements.map((element) => {
         const box = element.getBoundingClientRect();
-        return { width: box.width, height: box.height, left: box.left };
+        const note = element.querySelector(".kpi-note small")!;
+        const noteBox = note.getBoundingClientRect();
+        const lineHeight = parseFloat(getComputedStyle(note).lineHeight);
+        return {
+          width: box.width,
+          height: box.height,
+          left: box.left,
+          extraNoteHeight: Math.max(0, noteBox.height - lineHeight),
+          noteFits: noteBox.bottom <= box.bottom && noteBox.left >= box.left && noteBox.right <= box.right,
+          contentFits: element.scrollHeight <= element.clientHeight && element.scrollWidth <= element.clientWidth,
+        };
       }),
     );
     for (const box of boxes) {
       expect(box.left).toBe(0);
       expect(box.width).toBe(390);
-      expect(box.height).toBeLessThanOrEqual(190);
+      // Preserve the compact single-line budget while allowing complete multiline explanations.
+      expect(box.height - box.extraNoteHeight).toBeLessThanOrEqual(190);
+      expect(box.noteFits).toBe(true);
+      expect(box.contentFits).toBe(true);
     }
   });
 
-  test("mobile footer and legal sections use balanced vertical spacing", async ({ page }) => {
+  test("mobile footer and legal sections use balanced vertical spacing", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/disclaimer");
     const footer = page.locator(".site-footer");
     const upperBlock = footer.locator(".footer-main");
@@ -287,7 +301,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(legalBody).toHaveCSS("padding-bottom", "72px");
   });
 
-  test("mobile page heroes share one vertical rhythm", async ({ page }) => {
+  test("mobile page heroes share one vertical rhythm", { tag: "@mobile" }, async ({ page }) => {
     for (const path of [
       "/",
       "/about",
@@ -306,7 +320,7 @@ test.describe("mobile content and navigation QA", () => {
     }
   });
 
-  test("mobile page content converges on shared gutters and stack spacing", async ({ page }) => {
+  test("mobile page content converges on shared gutters and stack spacing", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/about");
     const aboutBoundary = page.locator(".about-boundaries > section").first();
     const aboutBoundaryBox = await aboutBoundary.boundingBox();
@@ -328,7 +342,7 @@ test.describe("mobile content and navigation QA", () => {
     expect(firstControlBox!.width).toBe(358);
   });
 
-  test("touch buttons share press scale and footer links stay legible", async ({ page }) => {
+  test("touch buttons share press scale and footer links stay legible", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/");
     const menuButton = page.locator(".mobile-menu-button");
     await menuButton.hover();
@@ -379,49 +393,53 @@ test.describe("touch CTA recovery", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-    test(`${prefix || "English"} CTA idle hover resets while keyboard focus stays visible`, async ({ page }) => {
-      await page.goto(prefix || "/");
-      await page.evaluate(async () => {
-        await document.fonts.ready;
-        // This test checks control states; settle programmatic scrolling before pointer input.
-        document.documentElement.style.scrollBehavior = "auto";
-      });
-      for (const selector of [
-        ".hero .button-dark",
-        ".performance-home .button-white",
-        ".cta .button-dark",
-        ".round-link",
-      ]) {
-        const control = page.locator(selector).first();
-        // Keep the page available while exercising real press/release and touch gestures on links.
-        await control.evaluate((element) =>
-          element.addEventListener("click", (event) => event.preventDefault(), { capture: true }),
-        );
-        await control.hover();
-        await expect(control).toHaveCSS("transform", "none");
-        await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
-        await page.mouse.down();
-        await expect(control).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
-        await page.mouse.up();
-        await control.tap();
-        await control.hover();
-        await expect(control).toHaveCSS("transform", "none");
-        await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
-        await page.keyboard.press("Tab");
-        await control.focus();
-        // Keyboard focus may scroll the control away from the pointer in WebKit.
-        await control.hover();
-        expect(
-          await control.evaluate((element) => element.matches(":hover") && element.matches(":focus-visible")),
-        ).toBe(true);
-        await expect(control).toHaveCSS("outline-style", "solid");
-        await expect(control).toHaveCSS(
-          "background-color",
-          selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(95, 205, 253)",
-        );
-        await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
-        await control.evaluate((element: HTMLElement) => element.blur());
-      }
-    });
+    test(
+      `${prefix || "English"} CTA idle hover resets while keyboard focus stays visible`,
+      { tag: "@mobile" },
+      async ({ page }) => {
+        await page.goto(prefix || "/");
+        await page.evaluate(async () => {
+          await document.fonts.ready;
+          // This test checks control states; settle programmatic scrolling before pointer input.
+          document.documentElement.style.scrollBehavior = "auto";
+        });
+        for (const selector of [
+          ".hero .button-dark",
+          ".performance-home .button-white",
+          ".cta .button-dark",
+          ".round-link",
+        ]) {
+          const control = page.locator(selector).first();
+          // Keep the page available while exercising real press/release and touch gestures on links.
+          await control.evaluate((element) =>
+            element.addEventListener("click", (event) => event.preventDefault(), { capture: true }),
+          );
+          await control.hover();
+          await expect(control).toHaveCSS("transform", "none");
+          await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
+          await page.mouse.down();
+          await expect(control).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
+          await page.mouse.up();
+          await control.tap();
+          await control.hover();
+          await expect(control).toHaveCSS("transform", "none");
+          await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
+          await page.keyboard.press("Tab");
+          await control.focus();
+          // Keyboard focus may scroll the control away from the pointer in WebKit.
+          await control.hover();
+          expect(
+            await control.evaluate((element) => element.matches(":hover") && element.matches(":focus-visible")),
+          ).toBe(true);
+          await expect(control).toHaveCSS("outline-style", "solid");
+          await expect(control).toHaveCSS(
+            "background-color",
+            selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(95, 205, 253)",
+          );
+          await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+          await control.evaluate((element: HTMLElement) => element.blur());
+        }
+      },
+    );
   }
 });

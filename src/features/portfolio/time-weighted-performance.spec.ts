@@ -11,6 +11,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator("main figure")).toHaveCount(2);
     await expect(page.locator('main svg[role="img"]')).toHaveCount(2);
     const xirr = page.locator('figure[aria-labelledby="performance-chart-title"]');
+    await expect(xirr.getByRole("heading")).toHaveText(prefix ? "年化 XIRR" : "Annualized XIRR");
+    await expect(
+      page.getByRole("heading", {
+        name: prefix === "/zh-tw" ? "資料來源" : prefix === "/zh-cn" ? "数据来源" : "Data Sources",
+        exact: true,
+      }),
+    ).toBeVisible();
     await expect(xirr.getByRole("img")).toHaveAccessibleName(/24\.43%.*19\.26%/);
     await expect(xirr.locator("polyline")).toHaveCount(2);
     for (const line of await xirr.locator("polyline").all()) {
@@ -26,12 +33,16 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".performance-summary").getByRole("term")).toHaveCount(3);
     await expect(page.locator(".performance-summary")).toContainText("+24.43%");
     const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
+    await expect(chart.getByRole("heading")).toHaveText(
+      prefix === "/zh-tw" ? "累積重建 TWRR" : prefix === "/zh-cn" ? "累计重建 TWRR" : "Cumulative Reconstructed TWRR",
+    );
     await expect(chart.getByRole("img")).toHaveAccessibleName(/38\.27%.*32\.20%/);
     await expect(chart.locator("polyline")).toHaveCount(2);
     const summaryButton = chart.locator("summary");
     await summaryButton.focus();
     await page.keyboard.press("Enter");
     await expect(chart.getByRole("table")).toBeVisible();
+    await expect(chart.getByRole("columnheader").filter({ hasText: "TWRR" })).toHaveCount(2);
     await expect(chart.locator("tbody tr")).toHaveCount(22);
     await expect(chart.locator("tbody tr").first()).toContainText("127,533.11");
     await expect(chart.locator("tbody tr").first()).toContainText("+38.27%");

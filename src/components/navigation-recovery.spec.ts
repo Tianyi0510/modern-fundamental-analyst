@@ -60,7 +60,7 @@ for (const { prefix, language, locale, retry, error } of variants) {
     }
   });
 
-  test(`${locale} a fresh Support visit drops the previous recovery amount`, async ({ page }) => {
+  test(`${locale} a fresh Support visit drops the previous recovery amount`, { tag: "@mobile" }, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/support?status=error&checkout_attempt=${attempt}&amount=6`);
     await expect(page.locator(".support-status")).toContainText(
@@ -150,44 +150,46 @@ for (const { prefix, language, locale, retry, error } of variants) {
 }
 
 for (const mobile of [false, true]) {
-  test(`${mobile ? "mobile" : "desktop"} language navigation retains validated support and preference context`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: mobile ? 390 : 1440, height: 900 });
-    const token = preferenceToken();
-    await page.goto("/support");
-    const signedAttempt = await page.locator('input[name="checkout_attempt"]').inputValue();
-    for (const entry of [
-      {
-        path: "/support",
-        query: `status=error&checkout_attempt=${signedAttempt}&product_id=support-6-v1&extra=discard`,
-        name: "checkout_attempt",
-        value: signedAttempt,
-      },
-      { path: "/subscription-preferences", query: `token=${token}&extra=discard`, name: "token", value: token },
-    ]) {
-      await page.goto(`${entry.path}?${entry.query}`);
-      if (mobile) {
-        await page.locator(".mobile-menu-button").click();
-        await page.locator(".mobile-language-disclosure summary").click();
-      } else {
-        await page.locator(".language-trigger").click();
+  test(
+    `${mobile ? "mobile" : "desktop"} language navigation retains validated support and preference context`,
+    mobile ? { tag: "@mobile" } : {},
+    async ({ page }) => {
+      await page.setViewportSize({ width: mobile ? 390 : 1440, height: 900 });
+      const token = preferenceToken();
+      await page.goto("/support");
+      const signedAttempt = await page.locator('input[name="checkout_attempt"]').inputValue();
+      for (const entry of [
+        {
+          path: "/support",
+          query: `status=error&checkout_attempt=${signedAttempt}&product_id=support-6-v1&extra=discard`,
+          name: "checkout_attempt",
+          value: signedAttempt,
+        },
+        { path: "/subscription-preferences", query: `token=${token}&extra=discard`, name: "token", value: token },
+      ]) {
+        await page.goto(`${entry.path}?${entry.query}`);
+        if (mobile) {
+          await page.locator(".mobile-menu-button").click();
+          await page.locator(".mobile-language-disclosure summary").click();
+        } else {
+          await page.locator(".language-trigger").click();
+        }
+        const menu = page.locator(mobile ? "#mobile-site-menu" : "#desktop-language-menu");
+        const link = menu.locator('a[hreflang="zh-Hant-TW"]');
+        const target = new URL((await link.getAttribute("href"))!, "http://localhost");
+        expect(target.searchParams.get(entry.name)).toBe(entry.value);
+        expect(target.searchParams.has("extra")).toBe(false);
+        await link.click();
+        await expect(page).toHaveURL(new RegExp(`/zh-tw${entry.path}\\?`));
+        if (entry.path === "/support") {
+          await expect(page.locator('input[name="checkout_locale"]')).toHaveValue("en");
+          await expect(page.locator('input[type="hidden"][name="product_id"]')).toHaveValue("support-6-v1");
+          await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(signedAttempt);
+        } else {
+          expect(new URL(page.url()).searchParams.get("token")).toBe(token);
+          await expect(page.locator('select[name="locale"]')).toBeVisible();
+        }
       }
-      const menu = page.locator(mobile ? "#mobile-site-menu" : "#desktop-language-menu");
-      const link = menu.locator('a[hreflang="zh-Hant-TW"]');
-      const target = new URL((await link.getAttribute("href"))!, "http://localhost");
-      expect(target.searchParams.get(entry.name)).toBe(entry.value);
-      expect(target.searchParams.has("extra")).toBe(false);
-      await link.click();
-      await expect(page).toHaveURL(new RegExp(`/zh-tw${entry.path}\\?`));
-      if (entry.path === "/support") {
-        await expect(page.locator('input[name="checkout_locale"]')).toHaveValue("en");
-        await expect(page.locator('input[type="hidden"][name="product_id"]')).toHaveValue("support-6-v1");
-        await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(signedAttempt);
-      } else {
-        expect(new URL(page.url()).searchParams.get("token")).toBe(token);
-        await expect(page.locator('select[name="locale"]')).toBeVisible();
-      }
-    }
-  });
+    },
+  );
 }

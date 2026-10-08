@@ -17,36 +17,40 @@ for (const { prefix, saved, unsubscribed } of [
   { prefix: "/zh-tw", saved: "你的偏好語言已更新。", unsubscribed: "你已取消訂閱。" },
   { prefix: "/zh-cn", saved: "你的偏好语言已更新。", unsubscribed: "你已取消订阅。" },
 ]) {
-  test(`${prefix || "English"} preferences require a selection and clear stale success`, async ({ page }) => {
-    const actions: string[] = [];
-    await page.route("**/api/subscription-preferences", async (route) => {
-      const body: unknown = route.request().postDataJSON();
-      if (!body || typeof body !== "object" || !("action" in body) || typeof body.action !== "string") {
-        throw new Error("Expected a preference action");
-      }
-      actions.push(body.action);
-      await route.fulfill({ json: { ok: true } });
-    });
-    await page.goto(`${prefix}/subscription-preferences?token=${token()}`);
-    const select = page.locator('select[name="locale"]');
-    const form = page.locator("form").filter({ has: select });
-    const status = form.locator('[role="status"]');
-    await expect(select).toHaveAccessibleName(/\S/);
-    await expect(select).toHaveValue("");
-    await form.locator('button[type="submit"]').click();
-    expect(actions).toEqual([]);
-    await select.selectOption("zh-tw");
-    await form.locator('button[type="submit"]').click();
-    await expect(status).toHaveText(saved);
-    await select.selectOption("en");
-    await expect(status).toBeEmpty();
-    await page.reload();
-    await expect(select).toHaveValue("");
-    await form.locator('button[type="button"]').click();
-    await expect(status).toHaveText(unsubscribed);
-    await expect(select).toBeDisabled();
-    await expect(select).toHaveCSS("cursor", "not-allowed");
-    await expect(select).toHaveCSS("border-top-style", "dashed");
-    expect(actions).toEqual(["save", "unsubscribe"]);
-  });
+  test(
+    `${prefix || "English"} preferences require a selection and clear stale success`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      const actions: string[] = [];
+      await page.route("**/api/subscription-preferences", async (route) => {
+        const body: unknown = route.request().postDataJSON();
+        if (!body || typeof body !== "object" || !("action" in body) || typeof body.action !== "string") {
+          throw new Error("Expected a preference action");
+        }
+        actions.push(body.action);
+        await route.fulfill({ json: { ok: true } });
+      });
+      await page.goto(`${prefix}/subscription-preferences?token=${token()}`);
+      const select = page.locator('select[name="locale"]');
+      const form = page.locator("form").filter({ has: select });
+      const status = form.locator('[role="status"]');
+      await expect(select).toHaveAccessibleName(/\S/);
+      await expect(select).toHaveValue("");
+      await form.locator('button[type="submit"]').click();
+      expect(actions).toEqual([]);
+      await select.selectOption("zh-tw");
+      await form.locator('button[type="submit"]').click();
+      await expect(status).toHaveText(saved);
+      await select.selectOption("en");
+      await expect(status).toBeEmpty();
+      await page.reload();
+      await expect(select).toHaveValue("");
+      await form.locator('button[type="button"]').click();
+      await expect(status).toHaveText(unsubscribed);
+      await expect(select).toBeDisabled();
+      await expect(select).toHaveCSS("cursor", "not-allowed");
+      await expect(select).toHaveCSS("border-top-style", "dashed");
+      expect(actions).toEqual(["save", "unsubscribe"]);
+    },
+  );
 }

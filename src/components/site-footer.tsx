@@ -32,7 +32,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
             contact: "Contact",
             support: "Support",
             disclaimer: "Disclaimer",
-            rights: "All rights reserved.",
+            rights: "All Rights Reserved.",
           };
 
   return (

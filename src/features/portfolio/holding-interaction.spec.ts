@@ -25,7 +25,7 @@ test.describe("header interaction QA", () => {
 test.describe("touch holding feedback", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
-  test("number spacing stays stable during press and release", async ({ page }) => {
+  test("number spacing stays stable during press and release", { tag: "@mobile" }, async ({ page }) => {
     for (const path of ["/", "/zh-tw", "/zh-cn"]) {
       await page.goto(path);
       await page.evaluate(() => document.fonts.ready);

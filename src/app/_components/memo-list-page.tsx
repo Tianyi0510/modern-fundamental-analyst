@@ -15,7 +15,7 @@ const copy = {
     emphasis: "Independent Investor Evaluation.",
     subtitle:
       "Detailed investment theses supported by fundamental research, financial analysis, valuation, and clearly defined material risks.",
-    updated: "Last updated on",
+    updated: "Last Updated on",
     indexLabel: "View All Investment Memos",
   },
   "zh-tw": {

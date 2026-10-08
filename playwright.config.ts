@@ -1,4 +1,4 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 const shardSuffix = process.env.PLAYWRIGHT_SHARD ? `-shard-${process.env.PLAYWRIGHT_SHARD}` : "";
 
@@ -18,7 +18,8 @@ export default defineConfig({
     {
       name: "webkit",
       outputDir: `node_modules/.cache/playwright/webkit${shardSuffix}`,
-      use: { browserName: "webkit" },
+      grep: /@mobile/,
+      use: { ...devices["iPhone 13"], browserName: "webkit" },
     },
   ],
   use: {

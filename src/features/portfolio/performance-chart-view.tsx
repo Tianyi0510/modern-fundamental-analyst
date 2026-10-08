@@ -38,37 +38,37 @@ const copy = {
 
 const twrCopy = {
   en: {
-    title: "Reconstructed TWR vs SPY",
-    note: "Cumulative, non-annualized closing-price TWR. Contributions are modeled at period start; net income and costs at period end. Not observed intraday TWR.",
-    axis: "Cumulative Reconstructed TWR",
+    title: "Cumulative Reconstructed TWRR",
+    note: "Cumulative closing-price TWRR. Contributions are modeled at period start; net income and costs at period end. Not observed intraday TWRR.",
+    axis: "Cumulative Reconstructed TWRR",
   },
   "zh-tw": {
-    title: "重建 TWR 與 SPY",
-    note: "以收盤估值重建的累積 TWR，未年化；假設資金於期初流入，淨股息與費用於期末結算，並非實際日內 TWR。",
-    axis: "累積重建 TWR",
+    title: "累積重建 TWRR",
+    note: "以收盤估值重建的累積 TWRR；假設資金於期初流入，淨股息與費用於期末結算，並非實際日內 TWRR。",
+    axis: "累積重建 TWRR",
   },
   "zh-cn": {
-    title: "重建 TWR 与 SPY",
-    note: "以收盘估值重建的累计 TWR，未年化；假设资金于期初流入，净股息与费用于期末结算，并非实际日内 TWR。",
-    axis: "累计重建 TWR",
+    title: "累计重建 TWRR",
+    note: "以收盘估值重建的累计 TWRR；假设资金于期初流入，净股息与费用于期末结算，并非实际日内 TWRR。",
+    axis: "累计重建 TWRR",
   },
 } as const;
 
 const xirrCopy = {
   en: {
-    title: "Annualized XIRR vs SPY",
+    title: "Annualized XIRR",
     note: "Since-inception annualized XIRR at each month-end, not individual monthly returns. Periods shorter than 30 days are not annualized and are omitted from the lines.",
     axis: "Annualized XIRR",
     unavailable: "Not annualized: less than 30 days",
   },
   "zh-tw": {
-    title: "年化 XIRR 與 SPY",
+    title: "年化 XIRR",
     note: "每個月底自成立以來的年化 XIRR，並非各月份的單月報酬；不足 30 天的期間不作年化，也不繪入折線。",
     axis: "年化 XIRR",
     unavailable: "未年化：不足 30 天",
   },
   "zh-cn": {
-    title: "年化 XIRR 与 SPY",
+    title: "年化 XIRR",
     note: "每个月底自成立以来的年化 XIRR，并非各月份的单月回报；不足 30 天的期间不作年化，也不绘入折线。",
     axis: "年化 XIRR",
     unavailable: "未年化：不足 30 天",
@@ -97,7 +97,7 @@ export function PerformanceChartView({
     (row): row is typeof row & { portfolioReturn: number; benchmarkReturn: number } =>
       row.portfolioReturn !== null && row.benchmarkReturn !== null,
   );
-  const returnLabel = measure === "twr" ? "TWR" : "XIRR";
+  const returnLabel = measure === "twr" ? "TWRR" : "XIRR";
   const formatReturn = (value: number | null) => (value === null ? xirrCopy[locale].unavailable : formatPercent(value));
   const values = points.flatMap((row) => [row.portfolioReturn, row.benchmarkReturn]);
   const lower = Math.floor(Math.min(...values) / 20) * 20;

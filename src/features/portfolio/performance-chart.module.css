@@ -6,6 +6,7 @@
   margin: 0;
   font-size: var(--font-size-compact-title);
   line-height: var(--leading-compact-title);
+  letter-spacing: var(--tracking-heading);
 }
 .figure p {
   margin: var(--space-3) 0;

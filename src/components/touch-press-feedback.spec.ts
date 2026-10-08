@@ -56,56 +56,60 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     });
   }
 
-  test(`touch cancellation, disabled controls and native taps ${reducedMotion}`, async ({ page }) => {
-    await page.emulateMedia({ reducedMotion });
-    await page.goto("/");
-    await page.evaluate(() => {
-      document.documentElement.style.scrollBehavior = "auto";
-    });
-    const control = page.locator(".hero .button").first();
-    await prepare(control);
-    for (const cancellation of [
-      "pointercancel",
-      "lostpointercapture",
-      "pointermove",
-      "scroll",
-      "blur",
-      "pagehide",
-    ] as const) {
-      // Explicit event-contract checks; these are not a substitute for trusted device input.
-      await control.dispatchEvent("pointerdown", {
-        pointerType: "touch",
-        pointerId: 7,
-        isPrimary: true,
-        clientX: 0,
-        clientY: 0,
+  test(
+    `touch cancellation, disabled controls and native taps ${reducedMotion}`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.emulateMedia({ reducedMotion });
+      await page.goto("/");
+      await page.evaluate(() => {
+        document.documentElement.style.scrollBehavior = "auto";
       });
-      await expect(control).toHaveAttribute("data-touch-pressed", "true");
-      await expect.poll(() => scale(control)).toBeCloseTo(reducedMotion === "reduce" ? 1 : 0.98, 3);
-      if (cancellation === "blur" || cancellation === "pagehide") {
-        await page.evaluate((name) => window.dispatchEvent(new Event(name)), cancellation);
-      } else {
-        await control.dispatchEvent(cancellation, { pointerType: "touch", pointerId: 7, clientX: 30, clientY: 30 });
+      const control = page.locator(".hero .button").first();
+      await prepare(control);
+      for (const cancellation of [
+        "pointercancel",
+        "lostpointercapture",
+        "pointermove",
+        "scroll",
+        "blur",
+        "pagehide",
+      ] as const) {
+        // Explicit event-contract checks; these are not a substitute for trusted device input.
+        await control.dispatchEvent("pointerdown", {
+          pointerType: "touch",
+          pointerId: 7,
+          isPrimary: true,
+          clientX: 0,
+          clientY: 0,
+        });
+        await expect(control).toHaveAttribute("data-touch-pressed", "true");
+        await expect.poll(() => scale(control)).toBeCloseTo(reducedMotion === "reduce" ? 1 : 0.98, 3);
+        if (cancellation === "blur" || cancellation === "pagehide") {
+          await page.evaluate((name) => window.dispatchEvent(new Event(name)), cancellation);
+        } else {
+          await control.dispatchEvent(cancellation, { pointerType: "touch", pointerId: 7, clientX: 30, clientY: 30 });
+        }
+        await expect(control).not.toHaveAttribute("data-touch-pressed");
+        await expect.poll(() => scale(control)).toBeCloseTo(1, 3);
       }
-      await expect(control).not.toHaveAttribute("data-touch-pressed");
-      await expect.poll(() => scale(control)).toBeCloseTo(1, 3);
-    }
-    for (let i = 0; i < 3; i++) {
-      await control.tap();
-      await expect(control).not.toHaveAttribute("data-touch-pressed");
-      await expect.poll(() => scale(control)).toBeCloseTo(1, 3);
-    }
-    const button = page.locator("#subscribe button[type=submit]");
-    await button.evaluate((element: HTMLButtonElement) => {
-      element.disabled = true;
-    });
-    await button.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 8, isPrimary: true });
-    await expect(button).not.toHaveAttribute("data-touch-pressed");
-    expect(await scale(button)).toBe(1);
-  });
+      for (let i = 0; i < 3; i++) {
+        await control.tap();
+        await expect(control).not.toHaveAttribute("data-touch-pressed");
+        await expect.poll(() => scale(control)).toBeCloseTo(1, 3);
+      }
+      const button = page.locator("#subscribe button[type=submit]");
+      await button.evaluate((element: HTMLButtonElement) => {
+        element.disabled = true;
+      });
+      await button.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 8, isPrimary: true });
+      await expect(button).not.toHaveAttribute("data-touch-pressed");
+      expect(await scale(button)).toBe(1);
+    },
+  );
 }
 
-test("touch feedback preserves native navigation and one form submission", async ({ page }) => {
+test("touch feedback preserves native navigation and one form submission", { tag: "@mobile" }, async ({ page }) => {
   await page.goto("/");
   await page.locator(".hero .button").first().tap();
   await expect(page).toHaveURL(/\/portfolio$/);

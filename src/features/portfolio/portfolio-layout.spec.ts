@@ -30,23 +30,27 @@ test.describe("mobile content and navigation QA", () => {
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
   });
 
-  test("performance methodology has compact hierarchy and a top-rule source card", async ({ page }) => {
-    await page.goto("/performance");
-    const headingBox = await page.locator(".methodology h2").boundingBox();
-    const contentBox = await page.locator(".methodology-content").boundingBox();
-    expect(headingBox).not.toBeNull();
-    expect(contentBox).not.toBeNull();
-    expect(contentBox!.y - (headingBox!.y + headingBox!.height)).toBeLessThanOrEqual(40);
+  test(
+    "performance methodology has compact hierarchy and a top-rule source card",
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.goto("/performance");
+      const headingBox = await page.locator(".methodology h2").boundingBox();
+      const contentBox = await page.locator(".methodology-content").boundingBox();
+      expect(headingBox).not.toBeNull();
+      expect(contentBox).not.toBeNull();
+      expect(contentBox!.y - (headingBox!.y + headingBox!.height)).toBeLessThanOrEqual(40);
 
-    const sourceStyle = await page.locator(".methodology-source").evaluate((element) => {
-      const style = getComputedStyle(element);
-      return {
-        borderTopWidth: style.borderTopWidth,
-        borderLeftWidth: style.borderLeftWidth,
-        marginTop: style.marginTop,
-      };
-    });
-    expect(sourceStyle).toEqual({ borderTopWidth: "4px", borderLeftWidth: "0px", marginTop: "0px" });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  });
+      const sourceStyle = await page.locator(".methodology-source").evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          borderTopWidth: style.borderTopWidth,
+          borderLeftWidth: style.borderLeftWidth,
+          marginTop: style.marginTop,
+        };
+      });
+      expect(sourceStyle).toEqual({ borderTopWidth: "4px", borderLeftWidth: "0px", marginTop: "0px" });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    },
+  );
 });

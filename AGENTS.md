@@ -39,9 +39,9 @@ Run from the repository root containing `package.json`. Use focused checks durin
 | Production browser tests | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
 | Full static checks | `npm run verify:static` |
 | Full static, build and production Chromium checks | `npm run verify` |
-| Full production WebKit checks | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2` |
+| Mobile production WebKit checks | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2` |
 
-Replace angle-bracket placeholders with real paths. Install missing browsers with `npx playwright install chromium webkit`. Playwright starts an isolated server on port 3210 with provider credentials disabled; preserve that isolation. `npm test` runs the existing Node suite plus Vitest unit and integration projects. E2E tests use Playwright separately; CI runs the production browser matrix. Husky's pre-commit hook checks staged formatting and JavaScript/TypeScript lint; it does not replace CI.
+Replace angle-bracket placeholders with real paths. Install missing browsers with `npx playwright install chromium webkit`. Playwright starts an isolated server on port 3210 with provider credentials disabled; preserve that isolation. `npm test` runs the existing Node suite plus Vitest unit and integration projects. E2E tests use Playwright separately; CI runs the production browser matrix. Chromium covers all cases; WebKit selects `@mobile` cases with iPhone 13 emulation. Tag phone-only cases explicitly; desktop and cross-breakpoint cases remain in Chromium. Husky's pre-commit hook checks staged formatting and JavaScript/TypeScript lint; it does not replace CI.
 
 ## Task references
 

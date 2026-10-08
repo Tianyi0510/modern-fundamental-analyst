@@ -20,13 +20,14 @@ const copy = {
     heroIntro:
       "Long-term value research, financial modeling, and a fully disclosed portfolio built to empower every retail investor.",
     viewPortfolio: "View Portfolio",
-    readLatest: "Read Latest Investment Memo",
+    readLatest: "Read the Latest Investment Memo",
     portfolioSnapshot: "Portfolio Snapshot",
-    timeWeightedReturn: "Time-Weighted Return",
-    twrNote: "Reconstructed · cumulative · not annualized",
+    timeWeightedReturn: "TWRR",
+    twrNote: "Time-Weighted Return · Reconstructed · Cumulative",
     marketValue: "Market Value",
-    holdingsUnit: "stocks and ETFs",
-    portfolioXirr: "Portfolio XIRR",
+    holdingsUnit: "Stocks and ETFs",
+    portfolioXirr: "XIRR",
+    xirrNote: "Money-Weighted Return · Annualized",
     asOf: "As of",
     aboutLabel: "01 · About",
     aboutTitle: ["My Investment Beliefs and", "Commitment to Learning"],
@@ -45,7 +46,7 @@ const copy = {
     portfolioName: "Portfolio",
     performanceCopy: (benchmarkReturn: string) =>
       `Portfolio XIRR, versus ${benchmarkReturn} for ${portfolioSnapshot.benchmark} over the same cash-flow period.`,
-    verified: "Verified snapshot as of",
+    verified: "As of",
     viewPerformance: "View Performance",
     memosLabel: "04 · Investment Memos",
     memosTitle: ["Detailed Investment Theses", "Behind Every Position"],
@@ -53,8 +54,8 @@ const copy = {
     contactLabel: "05 · Contact",
     contactTitle: ["Stay Connected With", "My Latest Research"],
     contactLink: "Get in Touch",
-    marketValueSuffix: "market value",
-    updatedMonthly: "Updated monthly",
+    marketValueSuffix: "Market Value",
+    updatedMonthly: "Updated Monthly",
   },
   "zh-tw": {
     researchLabel: "首頁",
@@ -63,11 +64,12 @@ const copy = {
     viewPortfolio: "查看投資組合",
     readLatest: "閱讀最新投資備忘錄",
     portfolioSnapshot: "投資組合摘要",
-    timeWeightedReturn: "時間加權報酬",
-    twrNote: "重建值・累積・未年化",
+    timeWeightedReturn: "TWRR",
+    twrNote: "時間加權報酬・重建值・累積",
     marketValue: "市場價值",
     holdingsUnit: "檔股票與 ETF",
-    portfolioXirr: "投資組合 XIRR",
+    portfolioXirr: "XIRR",
+    xirrNote: "資金加權報酬・年化",
     asOf: "截至",
     aboutLabel: "01 · 關於",
     aboutTitle: ["我的投資信念與", "持續學習的承諾"],
@@ -104,11 +106,12 @@ const copy = {
     viewPortfolio: "查看投资组合",
     readLatest: "阅读最新投资备忘录",
     portfolioSnapshot: "投资组合摘要",
-    timeWeightedReturn: "时间加权回报",
-    twrNote: "重建值・累计・未年化",
+    timeWeightedReturn: "TWRR",
+    twrNote: "时间加权回报・重建值・累计",
     marketValue: "市场价值",
     holdingsUnit: "只股票与 ETF",
-    portfolioXirr: "投资组合 XIRR",
+    portfolioXirr: "XIRR",
+    xirrNote: "资金加权回报・年化",
     asOf: "截至",
     aboutLabel: "01 · 关于",
     aboutTitle: ["我的投资信念与", "持续学习的承诺"],
@@ -211,14 +214,12 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               className="metric compact:overflow-hidden"
               label={<>{text.portfolioXirr}</>}
               value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
-              note={
-                <>
-                  {text.asOf} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time> · {text.updatedMonthly}
-                </>
-              }
-              noteClassName="date-text tabular-nums"
+              note={<>{text.xirrNote}</>}
             />
           </dl>
+          <p className="date-text mt-[var(--space-4)] text-[length:var(--font-size-caption)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] tabular-nums">
+            {text.asOf} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time> · {text.updatedMonthly}
+          </p>
         </div>
 
         <section className={appearance["home-about"] + " " + appearance["shell"]}>

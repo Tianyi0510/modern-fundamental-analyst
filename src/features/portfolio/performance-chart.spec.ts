@@ -12,7 +12,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".methodology-explanation > p")).toHaveCount(4);
     const methodologyNote = page.getByRole("complementary");
     await expect(methodologyNote).toBeVisible();
-    await expect(methodologyNote).toContainText(prefix ? "2026年9月30日" : /30 Sept? 2026/);
+    await expect(methodologyNote).toContainText(prefix ? "2026年9月30日" : "30 Sep 2026");
     await expect(methodologyNote).toContainText(
       prefix === "/zh-tw" ? "並非即時報價" : prefix === "/zh-cn" ? "并非实时报价" : "not live quotes",
     );
@@ -30,7 +30,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     }
     await expect(page.locator(".performance-summary")).toContainText("+24.43%");
     await expect(page.locator(".performance-summary")).toContainText("+19.26%");
-    if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText(/As of 30 Sept? 2026/);
+    if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText("As of 30 Sep 2026");
     const summary = chart.locator("summary");
     await expect(summary.locator("svg.lucide-chevron-down")).toBeVisible();
     expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -88,52 +88,56 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   for (const width of [390, 1440]) {
-    test(`${prefix || "English"} monthly data animates and reverses at ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 844 });
-      await page.emulateMedia({ reducedMotion: "no-preference" });
-      await page.goto(`${prefix}/performance`);
-      const details = page.locator('figure[aria-labelledby="performance-twr-chart-title"] details');
-      const summary = details.locator("summary");
-      // Suspense may replace the SSR node during hydration; sample visibility and height together.
-      let collapsed = 0;
-      await expect
-        .poll(async () => {
-          collapsed = (await details.boundingBox())?.height ?? 0;
-          return collapsed;
-        })
-        .toBeGreaterThan(0);
-      await summary.click();
-      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
-      const expanded = (await details.boundingBox())!.height;
-      expect(expanded).toBeGreaterThan(collapsed + 100);
-      const heights = await details.evaluate((element) => {
-        const summary = element.querySelector("summary")!;
-        summary.click();
-        const closing = element.getAnimations()[0]!;
-        closing.pause();
-        closing.currentTime = Number(closing.effect!.getTiming().duration) / 2;
-        const before = element.getBoundingClientRect().height;
-        summary.click();
-        const opening = element.getAnimations()[0]!;
-        opening.pause();
-        opening.currentTime = 0;
-        const after = element.getBoundingClientRect().height;
-        opening.play();
-        return { before, after };
-      });
-      expect(heights.before).toBeGreaterThan(collapsed);
-      expect(heights.before).toBeLessThan(expanded);
-      expect(Math.abs(heights.before - heights.after)).toBeLessThan(1);
-      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
-      await summary.focus();
-      await page.keyboard.press("Space");
-      await expect(details).not.toHaveAttribute("open");
-      expect(Math.abs((await details.boundingBox())!.height - collapsed)).toBeLessThan(1);
-      await summary.click();
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
-      await summary.click();
-      await expect(details).not.toHaveAttribute("open");
-    });
+    test(
+      `${prefix || "English"} monthly data animates and reverses at ${width}px`,
+      width === 390 ? { tag: "@mobile" } : {},
+      async ({ page }) => {
+        await page.setViewportSize({ width, height: 844 });
+        await page.emulateMedia({ reducedMotion: "no-preference" });
+        await page.goto(`${prefix}/performance`);
+        const details = page.locator('figure[aria-labelledby="performance-twr-chart-title"] details');
+        const summary = details.locator("summary");
+        // Suspense may replace the SSR node during hydration; sample visibility and height together.
+        let collapsed = 0;
+        await expect
+          .poll(async () => {
+            collapsed = (await details.boundingBox())?.height ?? 0;
+            return collapsed;
+          })
+          .toBeGreaterThan(0);
+        await summary.click();
+        await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+        const expanded = (await details.boundingBox())!.height;
+        expect(expanded).toBeGreaterThan(collapsed + 100);
+        const heights = await details.evaluate((element) => {
+          const summary = element.querySelector("summary")!;
+          summary.click();
+          const closing = element.getAnimations()[0]!;
+          closing.pause();
+          closing.currentTime = Number(closing.effect!.getTiming().duration) / 2;
+          const before = element.getBoundingClientRect().height;
+          summary.click();
+          const opening = element.getAnimations()[0]!;
+          opening.pause();
+          opening.currentTime = 0;
+          const after = element.getBoundingClientRect().height;
+          opening.play();
+          return { before, after };
+        });
+        expect(heights.before).toBeGreaterThan(collapsed);
+        expect(heights.before).toBeLessThan(expanded);
+        expect(Math.abs(heights.before - heights.after)).toBeLessThan(1);
+        await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+        await summary.focus();
+        await page.keyboard.press("Space");
+        await expect(details).not.toHaveAttribute("open");
+        expect(Math.abs((await details.boundingBox())!.height - collapsed)).toBeLessThan(1);
+        await summary.click();
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+        await summary.click();
+        await expect(details).not.toHaveAttribute("open");
+      },
+    );
   }
 }
