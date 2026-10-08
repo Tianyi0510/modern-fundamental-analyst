@@ -251,16 +251,30 @@ test.describe("mobile content and navigation QA", () => {
     await page.goto("/");
     const metrics = page.locator(".home-page .metric");
     await expect(metrics).toHaveCount(3);
+    await page.evaluate(() => document.fonts.ready);
     const boxes = await metrics.evaluateAll((elements) =>
       elements.map((element) => {
         const box = element.getBoundingClientRect();
-        return { width: box.width, height: box.height, left: box.left };
+        const note = element.querySelector(".kpi-note small")!;
+        const noteBox = note.getBoundingClientRect();
+        const lineHeight = parseFloat(getComputedStyle(note).lineHeight);
+        return {
+          width: box.width,
+          height: box.height,
+          left: box.left,
+          extraNoteHeight: Math.max(0, noteBox.height - lineHeight),
+          noteFits: noteBox.bottom <= box.bottom && noteBox.left >= box.left && noteBox.right <= box.right,
+          contentFits: element.scrollHeight <= element.clientHeight && element.scrollWidth <= element.clientWidth,
+        };
       }),
     );
     for (const box of boxes) {
       expect(box.left).toBe(0);
       expect(box.width).toBe(390);
-      expect(box.height).toBeLessThanOrEqual(190);
+      // Preserve the compact single-line budget while allowing complete multiline explanations.
+      expect(box.height - box.extraNoteHeight).toBeLessThanOrEqual(190);
+      expect(box.noteFits).toBe(true);
+      expect(box.contentFits).toBe(true);
     }
   });
 
