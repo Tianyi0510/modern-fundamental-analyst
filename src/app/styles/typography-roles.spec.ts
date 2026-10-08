@@ -144,26 +144,33 @@ for (const [prefix, fallback] of [
 }
 
 for (const viewport of [viewports[0], viewports[2]]) {
-  test(viewport.name + " editorial surfaces retain their computed colors", async ({ page }) => {
-    await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    await page.goto("/");
-    await expect(page.locator(".site-footer")).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    await expect(page.locator(".site-footer")).toHaveCSS("color", "rgb(255, 255, 255)");
-    await expect(page.locator(".performance-home")).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(page.locator(".performance-home")).toHaveCSS("color", "rgb(0, 0, 0)");
+  test(
+    viewport.name + " editorial surfaces retain their computed colors",
+    viewport.name === "mobile" ? { tag: "@mobile" } : {},
+    async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/");
+      await expect(page.locator(".site-footer")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+      await expect(page.locator(".site-footer")).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(page.locator(".performance-home")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+      await expect(page.locator(".performance-home")).toHaveCSS("color", "rgb(0, 0, 0)");
 
-    await page.goto("/about");
-    await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("color", "rgb(255, 255, 255)");
-    await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("background-color", "rgb(95, 205, 253)");
-    await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("color", "rgb(0, 0, 0)");
+      await page.goto("/about");
+      await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("background-color", "rgb(0, 0, 0)");
+      await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(page.locator(".about-boundaries > section").last()).toHaveCSS(
+        "background-color",
+        "rgb(95, 205, 253)",
+      );
+      await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("color", "rgb(0, 0, 0)");
 
-    await page.goto("/contact");
-    await expect(page.locator(".contact-band")).toHaveCSS("background-color", "rgb(95, 205, 253)");
-    await expect(page.locator(".contact-section")).toHaveCSS("color", "rgb(0, 0, 0)");
-    await expect(page.locator("#contact-subscribe")).toHaveCSS("color", "rgb(0, 0, 0)");
-    await expect(page.locator("#contact-subscribe-title")).toBeVisible();
-  });
+      await page.goto("/contact");
+      await expect(page.locator(".contact-band")).toHaveCSS("background-color", "rgb(95, 205, 253)");
+      await expect(page.locator(".contact-section")).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(page.locator("#contact-subscribe")).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(page.locator("#contact-subscribe-title")).toBeVisible();
+    },
+  );
 }
 
 function expectedSize(role: Role, width: number) {
@@ -218,43 +225,47 @@ for (const viewport of viewports) {
   test.describe(`${viewport.name} typography at ${viewport.width}px`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
 
-    test("each semantic role resolves to one computed type treatment", async ({ page }) => {
-      const observed = new Map<Role, TypographySample[]>();
+    test(
+      "each semantic role resolves to one computed type treatment",
+      viewport.name === "mobile" ? { tag: "@mobile" } : {},
+      async ({ page }) => {
+        const observed = new Map<Role, TypographySample[]>();
 
-      for (const [route, roles] of Object.entries(routeRoles)) {
-        await page.goto(route);
-        expect(
-          await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-          `${route} has horizontal overflow at ${viewport.width}px`,
-        ).toBe(true);
-        for (const { role, values } of await readTypography(page, roles)) {
-          observed.set(role, [...(observed.get(role) ?? []), ...values]);
+        for (const [route, roles] of Object.entries(routeRoles)) {
+          await page.goto(route);
+          expect(
+            await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+            `${route} has horizontal overflow at ${viewport.width}px`,
+          ).toBe(true);
+          for (const { role, values } of await readTypography(page, roles)) {
+            observed.set(role, [...(observed.get(role) ?? []), ...values]);
+          }
         }
-      }
 
-      for (const [role, values] of observed) {
-        const expectedFontSize = expectedSize(role, viewport.width);
-        const rhythm = expectedRhythm(role);
-        for (const sample of values) {
+        for (const [role, values] of observed) {
+          const expectedFontSize = expectedSize(role, viewport.width);
+          const rhythm = expectedRhythm(role);
+          for (const sample of values) {
+            expect(
+              Math.abs(sample.fontSize - expectedFontSize),
+              `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
+            ).toBeLessThan(0.15);
+            expect(
+              Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
+              `${role} sample ${sample.selector} has an inconsistent line height`,
+            ).toBeLessThan(0.2);
+            expect(
+              Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
+              `${role} sample ${sample.selector} has inconsistent letter spacing`,
+            ).toBeLessThan(0.2);
+          }
           expect(
-            Math.abs(sample.fontSize - expectedFontSize),
-            `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
-          ).toBeLessThan(0.15);
-          expect(
-            Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
-            `${role} sample ${sample.selector} has an inconsistent line height`,
-          ).toBeLessThan(0.2);
-          expect(
-            Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
-            `${role} sample ${sample.selector} has inconsistent letter spacing`,
-          ).toBeLessThan(0.2);
+            new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
+            `${role} has multiple computed sizes`,
+          ).toBe(1);
         }
-        expect(
-          new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
-          `${role} has multiple computed sizes`,
-        ).toBe(1);
-      }
-    });
+      },
+    );
   });
 }
 
@@ -262,53 +273,57 @@ test.describe("form accessibility and preserved text colors", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-    test(`${prefix || "English"} fields retain color and visible focus with larger text`, async ({ page }) => {
-      await page.goto(`${prefix}/contact`);
-      const contactEmail = page
-        .locator("form[action], form")
-        .filter({ has: page.locator("textarea") })
-        .locator('input[name="email"]');
-      await contactEmail.focus();
-      await expect(contactEmail).toHaveCSS("color", "rgb(0, 0, 0)");
-      await expect(contactEmail).toHaveCSS("outline-style", "solid");
-      await expect(contactEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
-      const footerEmail = page.locator('.site-footer input[name="email"]');
-      await footerEmail.focus();
-      await expect(footerEmail).toHaveCSS("color", "rgb(255, 255, 255)");
-      await expect(footerEmail).toHaveCSS("outline-color", "rgb(95, 205, 253)");
-      await page.evaluate(() => {
-        document.documentElement.style.fontSize = "200%";
-      });
-      await expect(contactEmail).toHaveCSS("font-size", "32px");
-      const overflow = await page.evaluate(() =>
-        [...document.querySelectorAll("body *")]
-          .filter((element) => element.getBoundingClientRect().right > window.innerWidth + 1)
-          .map((element) => ({
-            tag: element.tagName,
-            className: element.className,
-            right: element.getBoundingClientRect().right,
-          }))
-          .slice(0, 15),
-      );
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-        JSON.stringify(overflow),
-      ).toBe(true);
-      for (const field of [contactEmail, footerEmail]) {
-        const box = await field.boundingBox();
-        expect(box).not.toBeNull();
-        expect(box!.x).toBeGreaterThanOrEqual(0);
-        expect(box!.x + box!.width).toBeLessThanOrEqual(390);
-      }
-      await page.goto(`${prefix}/subscription-preferences`);
-      const preferenceEmail = page.locator('main input[name="email"]').first();
-      await preferenceEmail.focus();
-      await expect(preferenceEmail).toHaveCSS("color", "rgb(0, 0, 0)");
-      await expect(preferenceEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
-    });
+    test(
+      `${prefix || "English"} fields retain color and visible focus with larger text`,
+      { tag: "@mobile" },
+      async ({ page }) => {
+        await page.goto(`${prefix}/contact`);
+        const contactEmail = page
+          .locator("form[action], form")
+          .filter({ has: page.locator("textarea") })
+          .locator('input[name="email"]');
+        await contactEmail.focus();
+        await expect(contactEmail).toHaveCSS("color", "rgb(0, 0, 0)");
+        await expect(contactEmail).toHaveCSS("outline-style", "solid");
+        await expect(contactEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        const footerEmail = page.locator('.site-footer input[name="email"]');
+        await footerEmail.focus();
+        await expect(footerEmail).toHaveCSS("color", "rgb(255, 255, 255)");
+        await expect(footerEmail).toHaveCSS("outline-color", "rgb(95, 205, 253)");
+        await page.evaluate(() => {
+          document.documentElement.style.fontSize = "200%";
+        });
+        await expect(contactEmail).toHaveCSS("font-size", "32px");
+        const overflow = await page.evaluate(() =>
+          [...document.querySelectorAll("body *")]
+            .filter((element) => element.getBoundingClientRect().right > window.innerWidth + 1)
+            .map((element) => ({
+              tag: element.tagName,
+              className: element.className,
+              right: element.getBoundingClientRect().right,
+            }))
+            .slice(0, 15),
+        );
+        expect(
+          await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+          JSON.stringify(overflow),
+        ).toBe(true);
+        for (const field of [contactEmail, footerEmail]) {
+          const box = await field.boundingBox();
+          expect(box).not.toBeNull();
+          expect(box!.x).toBeGreaterThanOrEqual(0);
+          expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+        }
+        await page.goto(`${prefix}/subscription-preferences`);
+        const preferenceEmail = page.locator('main input[name="email"]').first();
+        await preferenceEmail.focus();
+        await expect(preferenceEmail).toHaveCSS("color", "rgb(0, 0, 0)");
+        await expect(preferenceEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+      },
+    );
   }
 
-  test("KPI treatments preserve colors after card reordering", async ({ page }) => {
+  test("KPI treatments preserve colors after card reordering", { tag: "@mobile" }, async ({ page }) => {
     for (const route of ["/", "/portfolio", "/performance"]) {
       await page.goto(route);
       const cards = page.locator("[data-tone]");
@@ -340,7 +355,7 @@ test.describe("form accessibility and preserved text colors", () => {
     }
   });
 
-  test("reduced motion removes button scaling", async ({ page }) => {
+  test("reduced motion removes button scaling", { tag: "@mobile" }, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/contact");
     const button = page
@@ -388,42 +403,46 @@ test.describe("form accessibility and preserved text colors", () => {
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   for (const width of [320, 390]) {
-    test(`${prefix || "English"} content reflows at 200% text size at ${width}px`, async ({ context }) => {
-      for (const route of [
-        "/",
-        "/about",
-        "/portfolio",
-        "/performance",
-        "/disclaimer",
-        "/subscription-preferences",
-        "/memos/microsoft-stock-analysis-fiscal-year-2024",
-      ]) {
-        const path = `${prefix}${route === "/" ? "" : route}` || "/";
-        const page = await context.newPage();
-        await page.setViewportSize({ width, height: 800 });
-        await page.goto(path);
-        await page.evaluate(() => document.fonts.ready);
-        await page.addStyleTag({ content: "html { font-size: 200%; }" });
-        expect(
-          await page.evaluate(() => document.documentElement.scrollWidth),
-          `${path} overflows at ${width}px with enlarged text`,
-        ).toBeLessThanOrEqual(width);
-        if (route === "/") {
-          const clipped = await page
-            .locator(".metric strong, .performance-copy > strong, .holding-row")
-            .evaluateAll((elements) =>
-              elements
-                .filter((element) => element.scrollWidth > element.clientWidth + 1)
-                .map((element) => ({
-                  text: element.textContent?.trim(),
-                  scrollWidth: element.scrollWidth,
-                  clientWidth: element.clientWidth,
-                })),
-            );
-          expect(clipped, `${path} clips enlarged financial values`).toEqual([]);
+    test(
+      `${prefix || "English"} content reflows at 200% text size at ${width}px`,
+      { tag: "@mobile" },
+      async ({ context }) => {
+        for (const route of [
+          "/",
+          "/about",
+          "/portfolio",
+          "/performance",
+          "/disclaimer",
+          "/subscription-preferences",
+          "/memos/microsoft-stock-analysis-fiscal-year-2024",
+        ]) {
+          const path = `${prefix}${route === "/" ? "" : route}` || "/";
+          const page = await context.newPage();
+          await page.setViewportSize({ width, height: 800 });
+          await page.goto(path);
+          await page.evaluate(() => document.fonts.ready);
+          await page.addStyleTag({ content: "html { font-size: 200%; }" });
+          expect(
+            await page.evaluate(() => document.documentElement.scrollWidth),
+            `${path} overflows at ${width}px with enlarged text`,
+          ).toBeLessThanOrEqual(width);
+          if (route === "/") {
+            const clipped = await page
+              .locator(".metric strong, .performance-copy > strong, .holding-row")
+              .evaluateAll((elements) =>
+                elements
+                  .filter((element) => element.scrollWidth > element.clientWidth + 1)
+                  .map((element) => ({
+                    text: element.textContent?.trim(),
+                    scrollWidth: element.scrollWidth,
+                    clientWidth: element.clientWidth,
+                  })),
+              );
+            expect(clipped, `${path} clips enlarged financial values`).toEqual([]);
+          }
+          await page.close();
         }
-        await page.close();
-      }
-    });
+      },
+    );
   }
 }

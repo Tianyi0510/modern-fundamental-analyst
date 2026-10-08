@@ -13,8 +13,15 @@ export function runWebKit({ args = [], env = process.env, spawn = spawnSync } = 
   }
   const forwarded = args.filter((arg) => !arg.startsWith("--shard="));
   // These settings are owned by this runner; overrides could omit coverage or overwrite evidence.
-  if (forwarded.some((arg) => /^--(?:project|workers|fully-parallel|output|config)(?:=|$)/.test(arg) || arg === "-c")) {
-    throw new Error("WebKit project, workers, configuration and output are managed by this runner.");
+  if (
+    forwarded.some(
+      (arg) =>
+        /^--(?:project|workers|fully-parallel|output|config|grep)(?:=|$)/.test(arg) ||
+        arg === "-c" ||
+        arg.startsWith("-g"),
+    )
+  ) {
+    throw new Error("WebKit mobile selection, project, workers, configuration and output are managed by this runner.");
   }
   const shards = selected.length ? [selected[0].slice(-1)] : ["1", "2"];
   let failed = false;

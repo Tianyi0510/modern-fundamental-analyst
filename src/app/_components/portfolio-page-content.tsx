@@ -26,9 +26,9 @@ const copy = {
     marketValue: "Stock Market Value",
     currency: "USD",
     costBasis: "Net Cost Basis",
-    costBasisNote: "Purchases and transaction fees",
+    costBasisNote: "Purchases and Transaction Fees",
     timeWeightedReturn: "Time-Weighted Return",
-    twrNote: "Reconstructed · cumulative · not annualized",
+    twrNote: "Reconstructed · Cumulative · Not Annualized",
     holdings: "Holdings",
     holdingsNote: "Stocks and ETFs",
     currentHoldings: "Current Holdings",
@@ -150,7 +150,7 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
               <small className={appearance["date-text"]}>
                 {isChinese ? "截至 " : "As of "}
                 <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
-                {isChinese ? " · 每月更新" : " · Updated monthly"}
+                {isChinese ? " · 每月更新" : " · Updated Monthly"}
               </small>
             </>
           }

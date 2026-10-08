@@ -26,11 +26,11 @@ test("a selected CI shard forwards test filters and returns success", () => {
   let count = 0;
   assert.equal(
     runWebKit({
-      args: ["--shard=2", "--grep", "menu"],
+      args: ["--shard=2", "site-header.spec.ts"],
       spawn: (_, args) => {
         count++;
         assert.ok(args.includes("--shard=2/2"));
-        assert.deepEqual(args.slice(2, 4), ["--grep", "menu"]);
+        assert.equal(args[2], "site-header.spec.ts");
         return { status: 0 };
       },
     }),
@@ -45,6 +45,10 @@ test("invalid shard and coverage overrides fail before launching", () => {
     ["--shard=1", "--shard=2"],
     ["--project=chromium"],
     ["--output=shared"],
+    ["--grep", "desktop"],
+    ["--grep=desktop"],
+    ["-g", "desktop"],
+    ["-gdesktop"],
   ]) {
     assert.throws(() => runWebKit({ args, spawn: () => assert.fail("must not spawn") }));
   }

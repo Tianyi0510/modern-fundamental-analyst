@@ -2,7 +2,6 @@ import type { Locale } from "@/lib/i18n";
 
 const usdFormatters = new Map<number, Intl.NumberFormat>();
 const percentFormatters = new Map<number, Intl.NumberFormat>();
-const dateFormatters = new Map<string, Intl.DateTimeFormat>();
 const sharesFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 const MAX_CACHED_FRACTION_DIGITS = 4;
 
@@ -10,22 +9,21 @@ function shouldCacheFormatter(fractionDigits: number) {
   return Number.isInteger(fractionDigits) && fractionDigits >= 0 && fractionDigits <= MAX_CACHED_FRACTION_DIGITS;
 }
 
-function getDateFormatter(locale: Locale, compact: boolean) {
-  const dateLocale = locale === "zh-tw" ? "zh-TW" : locale === "zh-cn" ? "zh-CN" : "en-GB";
-  const month = compact ? "short" : "long";
-  const key = `${dateLocale}:${month}`;
-  let formatter = dateFormatters.get(key);
-  if (!formatter) {
-    formatter = new Intl.DateTimeFormat(dateLocale, {
-      day: "numeric",
-      month,
-      year: "numeric",
-      timeZone: "UTC",
-    });
-    dateFormatters.set(key, formatter);
-  }
-  return formatter;
-}
+// Fixed display names keep SSR and browser text identical across ICU/CLDR versions.
+const englishMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
 
 export function formatUsd(value: number, fractionDigits = 2) {
   const shouldCache = shouldCacheFormatter(fractionDigits);
@@ -51,7 +49,12 @@ export function formatDate(value: string, locale: Locale, compact = false) {
     throw new RangeError(`Invalid ISO date: ${value}`);
   }
 
-  return getDateFormatter(locale, compact).format(date);
+  const day = date.getUTCDate();
+  const month = date.getUTCMonth();
+  const year = date.getUTCFullYear();
+  if (locale !== "en") return `${year}年${month + 1}月${day}日`;
+  const monthName = englishMonths[month]!;
+  return `${day} ${compact ? monthName.slice(0, 3) : monthName} ${year}`;
 }
 
 export function formatPercent(value: number, fractionDigits = 2) {

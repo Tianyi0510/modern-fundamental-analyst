@@ -60,40 +60,42 @@ for (const route of ["memos", "performance"]) {
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   for (const route of ["memos", "performance"]) {
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-      test(`${prefix || "English"} ${route} closing restores content focus without scrolling under ${reducedMotion}`, async ({
-        page,
-      }) => {
-        await page.setViewportSize({ width: 390, height: 844 });
-        await page.emulateMedia({ reducedMotion });
-        await page.goto(`${prefix}/${route}`);
-        const details = page.locator(
-          route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
-        );
-        const summary = details.locator("summary");
-        await summary.click();
-        await expect(details).toHaveAttribute("open", "");
-        await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
-        const contentFocus = details.locator('a, [tabindex="0"]').first();
-        await contentFocus.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
-        await expect(contentFocus).toBeFocused();
-        const scrollPosition = await page.evaluate(() => window.scrollY);
-        // Programmatic activation preserves content focus until the disclosure handles dismissal.
-        await summary.evaluate((element: HTMLElement) => element.click());
-        await expect(details).not.toHaveAttribute("open");
-        await expect(summary).toBeFocused();
-        expect(await page.evaluate(() => window.scrollY)).toBe(scrollPosition);
-        await expect(details).not.toHaveAttribute("data-closing");
-        await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
+      test(
+        `${prefix || "English"} ${route} closing restores content focus without scrolling under ${reducedMotion}`,
+        { tag: "@mobile" },
+        async ({ page }) => {
+          await page.setViewportSize({ width: 390, height: 844 });
+          await page.emulateMedia({ reducedMotion });
+          await page.goto(`${prefix}/${route}`);
+          const details = page.locator(
+            route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
+          );
+          const summary = details.locator("summary");
+          await summary.click();
+          await expect(details).toHaveAttribute("open", "");
+          await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
+          const contentFocus = details.locator('a, [tabindex="0"]').first();
+          await contentFocus.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
+          await expect(contentFocus).toBeFocused();
+          const scrollPosition = await page.evaluate(() => window.scrollY);
+          // Programmatic activation preserves content focus until the disclosure handles dismissal.
+          await summary.evaluate((element: HTMLElement) => element.click());
+          await expect(details).not.toHaveAttribute("open");
+          await expect(summary).toBeFocused();
+          expect(await page.evaluate(() => window.scrollY)).toBe(scrollPosition);
+          await expect(details).not.toHaveAttribute("data-closing");
+          await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
 
-        await summary.click();
-        await expect(details).toHaveAttribute("open", "");
-        await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
-        const outsideLink = page.locator(".site-footer a").first();
-        await outsideLink.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
-        await summary.evaluate((element: HTMLElement) => element.click());
-        await expect(details).not.toHaveAttribute("open");
-        await expect(outsideLink).toBeFocused();
-      });
+          await summary.click();
+          await expect(details).toHaveAttribute("open", "");
+          await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
+          const outsideLink = page.locator(".site-footer a").first();
+          await outsideLink.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
+          await summary.evaluate((element: HTMLElement) => element.click());
+          await expect(details).not.toHaveAttribute("open");
+          await expect(outsideLink).toBeFocused();
+        },
+      );
     }
   }
 }

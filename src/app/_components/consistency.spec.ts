@@ -26,7 +26,7 @@ test("reduced motion keeps memo summary text stationary during keyboard focus", 
 
 test.describe("touch and keyboard state consistency", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 800 } });
-  test("memo focus feedback survives a simultaneous hover state", async ({ page }) => {
+  test("memo focus feedback survives a simultaneous hover state", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/memos");
     const summary = page.locator(".memo-disclosure > summary");
     await summary.focus();

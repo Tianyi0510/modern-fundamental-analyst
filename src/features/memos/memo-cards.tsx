@@ -11,7 +11,7 @@ const placeholderCopy = {
     status: "Planned",
     title: (number: string) => `Investment Memo ${number}`,
     summary: "Research is in progress. This space is reserved for a future investment thesis.",
-    availability: "Coming soon",
+    availability: "Coming Soon",
   },
   "zh-tw": {
     status: "規劃中",

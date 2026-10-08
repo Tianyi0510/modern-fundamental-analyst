@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const { prefix, label, note } of [
-  { prefix: "", label: "Time-Weighted Return", note: "Reconstructed · cumulative · not annualized" },
+  { prefix: "", label: "Time-Weighted Return", note: "Reconstructed · Cumulative · Not Annualized" },
   { prefix: "/zh-tw", label: "時間加權報酬", note: "重建值・累積・未年化" },
   { prefix: "/zh-cn", label: "时间加权回报", note: "重建值・累计・未年化" },
 ]) {

@@ -23,10 +23,10 @@ const copy = {
     intro:
       "A complete monthly record of portfolio results, methodology, benchmarks, dividends, fees, and periods of underperformance.",
     timeWeightedReturn: "Time-Weighted Return",
-    twrNote: "Reconstructed · cumulative · not annualized",
+    twrNote: "Reconstructed · Cumulative · Not Annualized",
     portfolioXirr: "Portfolio XIRR",
-    portfolioNote: "Cash-flow weighted",
-    benchmarkNote: "Same investment dates",
+    portfolioNote: "Cash-Flow Weighted",
+    benchmarkNote: "Same Investment Dates",
     chart: "Performance Chart",
     measured: "Measured Consistently.",
     methodology: "Methodology",
@@ -180,7 +180,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
               <small className={appearance["date-text"]}>
                 {isChinese ? "截至 " : "As of "}
                 <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
-                {isChinese ? " · 每月更新" : " · Updated monthly"}
+                {isChinese ? " · 每月更新" : " · Updated Monthly"}
               </small>
             </>
           }
