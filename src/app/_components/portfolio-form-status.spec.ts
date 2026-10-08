@@ -28,11 +28,18 @@ const locales = [
 ] as const;
 
 for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess, returnNote } of locales) {
-  test(`${name} portfolio table retains cost-basis return beside the TWR summary`, async ({ page }) => {
+  test(`${name} portfolio summary and table show the same cost-basis total return`, async ({ page }) => {
     await page.goto(`${prefix}/portfolio`);
     const summaryReturn = page.locator('.portfolio-kpis [data-tone="brand"] strong');
     const tableReturn = page.locator(".portfolio-total-return");
-    await expect(summaryReturn).toHaveText("+38.27%");
+    await expect(summaryReturn).toHaveText("+32.84%");
+    const summary = page.locator('.portfolio-kpis [data-tone="brand"]');
+    await expect(summary.getByRole("term")).toHaveText(
+      prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total Return",
+    );
+    await expect(summary.locator("small")).toHaveText(
+      prefix === "/zh-tw" ? "絕對報酬率" : prefix === "/zh-cn" ? "绝对回报率" : "Absolute Return",
+    );
     await expect(tableReturn).toHaveText("+32.84%");
     await expect(page.locator(".portfolio-table-wrap + .portfolio-return-note p")).toContainText(returnNote);
   });

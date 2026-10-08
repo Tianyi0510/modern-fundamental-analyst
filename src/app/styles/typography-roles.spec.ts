@@ -62,6 +62,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   "/performance": {
     pageTitle: [".page-hero h1"],
     sectionTitle: [".returns .section-heading h2", ".methodology h2"],
+    compactTitle: ["#performance-twr-chart-title", "#performance-chart-title"],
     lead: [".page-intro p"],
     bodyLarge: [".methodology-content"],
     label: [".eyebrow", ".performance-summary dt", ".returns .section-number"],

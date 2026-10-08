@@ -67,7 +67,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     },
   );
-  test(`${prefix || "English"} sorting survives a switch from mobile to desktop`, async ({ page }) => {
+  test(`${prefix || "English"} sorting survives a mobile-desktop-mobile round trip`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/portfolio`);
     const mobileSort = page.locator(".portfolio-mobile-sort");
@@ -92,5 +92,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(holdingRows.first().getByRole("rowheader")).toHaveCSS("text-align", "left");
     await expect(holdingRows.first().getByRole("cell").first()).toHaveCSS("text-align", "right");
     await expect(table.locator(".portfolio-total-market")).toHaveCSS("font-weight", "700");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(mobileSort).toBeVisible();
+    await expect(mobileSort.locator("select")).toHaveValue("shares");
+    await expect(sharesButton).toBeHidden();
+    await expect(sharesHeader).toHaveAttribute("aria-sort", "descending");
+    await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => b - a));
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 }

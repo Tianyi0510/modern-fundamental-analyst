@@ -22,22 +22,23 @@ const copy = {
     ),
     intro:
       "A complete monthly record of portfolio results, methodology, benchmarks, dividends, fees, and periods of underperformance.",
-    timeWeightedReturn: "Time-Weighted Return",
-    twrNote: "Reconstructed · Cumulative · Not Annualized",
+    timeWeightedReturn: "TWRR",
+    twrNote: "Time-Weighted Return · Reconstructed · Cumulative",
     portfolioXirr: "Portfolio XIRR",
-    portfolioNote: "Cash-Flow Weighted",
-    benchmarkNote: "Same Investment Dates",
+    portfolioNote: "Money-Weighted Return · Annualized",
+    benchmarkNote: "Benchmark Comparison · Simulated · Annualized",
     chart: "Performance Chart",
     measured: "Measured Consistently.",
     methodology: "Methodology",
+    dataSources: "Data Sources",
     methodologyCopy: (
       <>
         <p>
-          <strong>Reconstructed TWR.</strong> Geometrically links closing-price returns to show cumulative performance,
-          not an annualized rate. Purchase costs, including fees, and gifted securities are contributions at period
-          start; net dividends and financing costs settle at period end. Gifts use the preceding close; splits change
-          quantities without a cash flow. Non-trading dates use the preceding trading close. These assumptions do not
-          recover actual intraday valuations or establish GIPS compliance.
+          <strong>Cumulative Reconstructed TWRR.</strong> Geometrically links closing-price returns to show cumulative
+          performance, not an annualized rate. Purchase costs, including fees, and gifted securities are contributions
+          at period start; net dividends and financing costs settle at period end. Gifts use the preceding close; splits
+          change quantities without a cash flow. Non-trading dates use the preceding trading close. These assumptions do
+          not recover actual intraday valuations or establish GIPS compliance.
         </p>
         <p>
           <strong>Annualized XIRR.</strong> Measures money-weighted return using dated purchase costs, net dividends,
@@ -45,7 +46,7 @@ const copy = {
           month-end, not that month's return. Periods shorter than 30 days are not annualized.
         </p>
         <p>
-          <strong>{portfolioSnapshot.benchmark} Comparison.</strong> The TWR chart uses dividend-adjusted prices from
+          <strong>{portfolioSnapshot.benchmark} Comparison.</strong> The TWRR chart uses dividend-adjusted prices from
           one data vintage, starting on the first purchase date, without a synthetic trading-fee deduction. The XIRR
           chart simulates purchases on the portfolio's purchase dates: gross purchase amounts determine units, while
           cash outflows include fees. These are hypothetical comparisons, not actual SPY holdings.
@@ -75,18 +76,19 @@ const copy = {
       </>
     ),
     intro: "完整記錄每月投資組合結果、計算方法、基準、股息、費用與績效落後的時期。",
-    timeWeightedReturn: "時間加權報酬",
-    twrNote: "重建值・累積・未年化",
+    timeWeightedReturn: "TWRR",
+    twrNote: "時間加權報酬・重建值・累積",
     portfolioXirr: "投資組合 XIRR",
-    portfolioNote: "現金流加權",
-    benchmarkNote: "相同投資日期",
+    portfolioNote: "資金加權報酬・年化",
+    benchmarkNote: "基準比較・模擬・年化",
     chart: "績效圖表",
     measured: "以一致方式衡量。",
     methodology: "計算方法",
+    dataSources: "資料來源",
     methodologyCopy: (
       <>
         <p>
-          <strong>重建 TWR。</strong>{" "}
+          <strong>累積重建 TWRR。</strong>{" "}
           以幾何方式串接收盤估值期間的報酬，呈現未年化的累積績效。含交易費用的買入成本及獲贈股票視為期初投入，淨股息與融資費用於期末結算。贈股按前一期收盤價估值，拆股只調整股數；非交易日沿用前一交易日收盤價。這些假設無法還原實際日內估值，也不代表符合
           GIPS 標準。
         </p>
@@ -96,7 +98,7 @@ const copy = {
           30 天的期間不作年化。
         </p>
         <p>
-          <strong>{portfolioSnapshot.benchmark} 比較。</strong> TWR
+          <strong>{portfolioSnapshot.benchmark} 比較。</strong> TWRR
           圖表採用同一資料批次的股息調整價格，自首次買入日期起計算，不額外扣除模擬交易費用。XIRR
           圖表按投資組合的買入日期模擬投資：買入金額決定單位數，現金流出則包含交易費用。兩者均為假設性比較，並非實際持有
           SPY 的績效。
@@ -122,18 +124,19 @@ const copy = {
       </>
     ),
     intro: "完整记录每月投资组合结果、计算方法、基准、股息、费用与业绩落后的时期。",
-    timeWeightedReturn: "时间加权回报",
-    twrNote: "重建值・累计・未年化",
+    timeWeightedReturn: "TWRR",
+    twrNote: "时间加权回报・重建值・累计",
     portfolioXirr: "投资组合 XIRR",
-    portfolioNote: "现金流加权",
-    benchmarkNote: "相同投资日期",
+    portfolioNote: "资金加权回报・年化",
+    benchmarkNote: "基准比较・模拟・年化",
     chart: "业绩图表",
     measured: "以一致方式衡量。",
     methodology: "计算方法",
+    dataSources: "数据来源",
     methodologyCopy: (
       <>
         <p>
-          <strong>重建 TWR。</strong>{" "}
+          <strong>累计重建 TWRR。</strong>{" "}
           以几何方式串接收盘估值期间的回报，呈现未经年化的累计业绩。含交易费用的买入成本及获赠股票视为期初投入，净股息与融资费用于期末结算。赠股按前一期收盘价估值，拆股只调整股数；非交易日沿用前一交易日收盘价。这些假设无法还原实际日内估值，也不代表符合
           GIPS 标准。
         </p>
@@ -143,7 +146,7 @@ const copy = {
           30 天的期间不作年化。
         </p>
         <p>
-          <strong>{portfolioSnapshot.benchmark} 比较。</strong> TWR
+          <strong>{portfolioSnapshot.benchmark} 比较。</strong> TWRR
           图表采用同一数据批次的股息调整价格，自首次买入日期起计算，不额外扣除模拟交易费用。XIRR
           图表按投资组合的买入日期模拟投资：买入金额决定单位数，现金流出则包含交易费用。两者均为假设性比较，并非实际持有
           SPY 的业绩。
@@ -221,7 +224,12 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <h2>{text.methodology}</h2>
             <div className={appearance["methodology-content"]}>
               <div className={appearance["methodology-explanation"]}>{text.methodologyCopy}</div>
-              <aside className={appearance["methodology-source"]}>{text.snapshotCopy(asOf)}</aside>
+              <aside className={appearance["methodology-source"]}>
+                <h3 className="mb-[var(--space-3)] text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] font-bold tracking-[var(--tracking-heading)]">
+                  {text.dataSources}
+                </h3>
+                {text.snapshotCopy(asOf)}
+              </aside>
             </div>
           </section>
         </div>

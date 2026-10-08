@@ -1,4 +1,3 @@
-import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./portfolio-page-content.styles";
@@ -27,14 +26,14 @@ const copy = {
     currency: "USD",
     costBasis: "Net Cost Basis",
     costBasisNote: "Purchases and Transaction Fees",
-    timeWeightedReturn: "Time-Weighted Return",
-    twrNote: "Reconstructed · Cumulative · Not Annualized",
+    totalReturn: "Total Return",
+    returnSummaryNote: "Absolute Return",
     holdings: "Holdings",
     holdingsNote: "Stocks and ETFs",
     currentHoldings: "Current Holdings",
     positionCount: `${portfolioSnapshot.holdingsCount} Disclosed Positions.`,
     returnNote:
-      "Each position's return compares market value with cost basis. Net dividends and financing interest are not allocated to positions; they are added and deducted, respectively, only in the table’s total cost-basis return. The summary shows a separate reconstructed time-weighted return.",
+      "Each position's return compares market value with cost basis. Net dividends and financing interest are not allocated to positions; they are added and deducted, respectively, in the total cost-basis return shown in both the summary and the table.",
   },
   "zh-tw": {
     eyebrow: "投資組合",
@@ -51,14 +50,14 @@ const copy = {
     currency: "美元",
     costBasis: "淨成本基礎",
     costBasisNote: "買入金額與交易費用",
-    timeWeightedReturn: "時間加權報酬",
-    twrNote: "重建值・累積・未年化",
+    totalReturn: "總報酬率",
+    returnSummaryNote: "絕對報酬率",
     holdings: "持股數量",
     holdingsNote: "股票與 ETF",
     currentHoldings: "目前持股",
     positionCount: `${portfolioSnapshot.holdingsCount} 個已揭露部位。`,
     returnNote:
-      "個別持股報酬僅以市值與成本基礎計算。淨股息與融資利息不分攤至各持股，僅在表格的成本基礎合計報酬中分別加計與扣除。摘要另顯示重建的時間加權報酬。",
+      "個別持股報酬僅以市值與成本基礎計算。淨股息與融資利息不分攤至各持股，在摘要與表格共同顯示的成本基礎總報酬率中分別加計與扣除。",
   },
   "zh-cn": {
     eyebrow: "投资组合",
@@ -75,14 +74,14 @@ const copy = {
     currency: "美元",
     costBasis: "净成本基础",
     costBasisNote: "买入金额与交易费用",
-    timeWeightedReturn: "时间加权回报",
-    twrNote: "重建值・累计・未年化",
+    totalReturn: "总回报率",
+    returnSummaryNote: "绝对回报率",
     holdings: "持仓数量",
     holdingsNote: "股票与 ETF",
     currentHoldings: "当前持仓",
     positionCount: `${portfolioSnapshot.holdingsCount} 个已披露持仓。`,
     returnNote:
-      "单项持仓回报仅以市值与成本基础计算。净股息与融资利息不分摊至各持仓，仅在表格的成本基础合计回报中分别加计和扣除。摘要另显示重建的时间加权回报。",
+      "单项持仓回报仅以市值与成本基础计算。净股息与融资利息不分摊至各持仓，在摘要与表格共同显示的成本基础总回报率中分别加计和扣除。",
   },
 } as const;
 
@@ -173,9 +172,9 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
           <PortfolioMetric
             tone="brand"
             className="col-start-2 row-start-1 compact:col-auto compact:row-auto"
-            label={<>{text.timeWeightedReturn}</>}
-            value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
-            note={<>{text.twrNote}</>}
+            label={<>{text.totalReturn}</>}
+            value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
+            note={<>{text.returnSummaryNote}</>}
           />
           <PortfolioMetric
             tone="paper"

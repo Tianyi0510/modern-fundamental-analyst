@@ -54,7 +54,7 @@ Under `src/app/`, route groups such as `(en)` organize pages without adding a UR
 
 ## Content and Integrations
 
-Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/portfolio-detail.ts`; `src/features/portfolio/portfolio.ts` derives the website snapshot and return history. Server-only `src/features/portfolio/portfolio-twr.ts` derives reconstructed time-weighted returns from the dated ledger and closing marks. Home, Portfolio and Performance summary cards show cumulative, non-annualized TWR; Performance uses one cumulative TWR comparison chart against SPY and retains annualized XIRR in summary values and a monthly table. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/memos.ts`, with articles under `src/features/memos/articles/` registered in `src/features/memos/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
+Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/portfolio-detail.ts`; `src/features/portfolio/portfolio.ts` derives the website snapshot and return history. Server-only `src/features/portfolio/portfolio-twr.ts` derives reconstructed time-weighted returns from the dated ledger and closing marks. Home and Performance summary cards show cumulative, non-annualized TWRR; the Portfolio summary shows the same cost-basis total return as the holdings table. Performance renders cumulative TWR and annualized XIRR comparison charts against SPY, each with a monthly data table. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/memos.ts`, with articles under `src/features/memos/articles/` registered in `src/features/memos/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
 
 Contact and footer subscription forms have independent browser state and share the same backend consent and delivery protections. Subscriptions require email confirmation before activation. Existing subscribers can manage language or unsubscribe through secure preference links. Keep the three distinct server secrets (`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, and `SUBSCRIPTION_PREFERENCES_SECRET`); see [email secrets](docs/RESEND_INTEGRATION.md#server-secrets) for their roles and rotation constraints. Public signup cannot override delivery suppression.
 
@@ -66,6 +66,7 @@ Integration details:
 - [Sentry monitoring](docs/TECHNICAL_ARCHITECTURE.md#monitoring)
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
 - [Portfolio Data](docs/PORTFOLIO_DATA.md)
+- [Website Copy](docs/WEBSITE_COPY.md)
 
 Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
 
