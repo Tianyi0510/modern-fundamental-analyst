@@ -6,21 +6,21 @@ for (const { prefix, locale, title, success, error } of [
     locale: "en",
     title: "Subscribe",
     success: "Check your inbox and confirm your subscription.",
-    error: "Subscription could not be completed. Please try again.",
+    error: "Your subscription couldn’t be completed. Please try again.",
   },
   {
     prefix: "/zh-tw",
     locale: "zh-tw",
     title: "訂閱",
     success: "請查看電子郵件並確認你的訂閱。",
-    error: "目前無法完成訂閱，請稍後再試。",
+    error: "無法完成你的訂閱，請再試一次。",
   },
   {
     prefix: "/zh-cn",
     locale: "zh-cn",
     title: "订阅",
     success: "请查看电子邮件并确认你的订阅。",
-    error: "目前无法完成订阅，请稍后再试。",
+    error: "无法完成你的订阅，请重试。",
   },
 ]) {
   test(`${locale} Contact subscription retries independently of the footer`, async ({ page }) => {

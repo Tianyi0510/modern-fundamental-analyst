@@ -12,7 +12,7 @@ const copy = {
     send: "Send Message",
     sending: "Sending…",
     success: "Your message has been sent. Thank you for reaching out.",
-    error: "Your message could not be sent. Please try again later.",
+    error: "Your message couldn't be sent. Please try again later.",
   },
   "zh-tw": {
     title: "傳送訊息",

@@ -7,7 +7,8 @@ const locales = [
     contactSuccess: "Your message has been sent.",
     subscribeSuccess: "Check your inbox and confirm your subscription.",
     preferencesSuccess: "If this address is subscribed, a secure link is on its way.",
-    returnNote: "Net dividends and financing interest are not allocated to positions",
+    returnNote:
+      "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
   },
   {
     prefix: "/zh-tw",
@@ -15,7 +16,7 @@ const locales = [
     contactSuccess: "訊息已成功傳送",
     subscribeSuccess: "請查看電子郵件並確認你的訂閱。",
     preferencesSuccess: "若此地址已訂閱",
-    returnNote: "淨股息與融資利息不分攤至各持股",
+    returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
   },
   {
     prefix: "/zh-cn",
@@ -23,7 +24,7 @@ const locales = [
     contactSuccess: "信息已成功发送",
     subscribeSuccess: "请查看电子邮件并确认你的订阅。",
     preferencesSuccess: "如果此地址已订阅",
-    returnNote: "净股息与融资利息不分摊至各持仓",
+    returnNote: "净股息与融资利息在投资组合层面计入，不分摊至单项持仓。",
   },
 ] as const;
 
@@ -103,9 +104,9 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
 }
 
 for (const [prefix, message] of [
-  ["", "You've already subscribed"],
-  ["/zh-tw", "你已經訂閱了"],
-  ["/zh-cn", "你已经订阅了"],
+  ["", "You are already subscribed to Modern Fundamental Analyst."],
+  ["/zh-tw", "你已訂閱 Modern Fundamental Analyst。"],
+  ["/zh-cn", "你已订阅 Modern Fundamental Analyst。"],
 ]) {
   test(`${prefix || "English"} duplicate subscription keeps input and clears feedback on editing`, async ({ page }) => {
     await page.route("**/api/subscribe", (route) =>

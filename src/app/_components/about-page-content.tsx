@@ -69,7 +69,7 @@ const copy: Record<Locale, Copy> = {
         ],
       },
       {
-        label: "05 · Research and Writing",
+        label: "05 · Research and Publishing",
         title: "Turning Investment Ideas Into Testable Theses",
         paragraphs: [
           "I use investment memos to turn opinions into structured and testable arguments. Each thesis aims to explain the business, investment opportunity, supporting evidence, valuation, major risks, and conditions that would cause my view to change.",
@@ -161,7 +161,7 @@ const copy: Record<Locale, Copy> = {
         ],
       },
       {
-        label: "05 · 研究與寫作",
+        label: "05 · 研究與發布",
         title: "把投資觀點轉化為可驗證的論點",
         paragraphs: [
           "我運用投資備忘錄，將觀點轉化為有結構且可驗證的論證。每項投資論點都力求說明企業、投資機會、支持證據、估值、主要風險，以及會使我改變觀點的條件。",
@@ -249,7 +249,7 @@ const copy: Record<Locale, Copy> = {
         ],
       },
       {
-        label: "05 · 研究与写作",
+        label: "05 · 研究与发布",
         title: "把投资观点转化为可验证的论点",
         paragraphs: [
           "我运用投资备忘录，将观点转化为有结构且可验证的论证。每项投资论点都力求说明企业、投资机会、支持证据、估值、主要风险，以及会使我改变观点的条件。",

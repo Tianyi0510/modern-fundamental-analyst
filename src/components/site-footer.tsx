@@ -27,7 +27,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
             rights: "版权所有。",
           }
         : {
-            description: "Independent research. Transparent thinking. Long-term orientation.",
+            description: "Independent Research. Transparent Thinking. Long-term Orientation.",
             quickLinks: "Quick Links",
             contact: "Contact",
             support: "Support",

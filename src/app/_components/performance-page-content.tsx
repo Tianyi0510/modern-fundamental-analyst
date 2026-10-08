@@ -30,7 +30,7 @@ const copy = {
     chart: "Performance Chart",
     measured: "Measured Consistently.",
     methodology: "Methodology",
-    dataSources: "Data Sources",
+    dataSources: "Portfolio Data",
     methodologyCopy: (
       <>
         <p>
@@ -84,7 +84,7 @@ const copy = {
     chart: "績效圖表",
     measured: "以一致方式衡量。",
     methodology: "計算方法",
-    dataSources: "資料來源",
+    dataSources: "投資組合資料",
     methodologyCopy: (
       <>
         <p>
@@ -132,7 +132,7 @@ const copy = {
     chart: "业绩图表",
     measured: "以一致方式衡量。",
     methodology: "计算方法",
-    dataSources: "数据来源",
+    dataSources: "投资组合数据",
     methodologyCopy: (
       <>
         <p>

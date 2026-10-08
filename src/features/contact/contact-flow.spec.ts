@@ -22,7 +22,7 @@ test(
     await form.getByRole("button", { name: "Send Message" }).click();
     const response = await responsePromise;
     expect(response.status()).toBe(503);
-    await expect(form.getByRole("status")).toHaveText("Your message could not be sent. Please try again later.");
+    await expect(form.getByRole("status")).toHaveText("Your message couldn't be sent. Please try again later.");
     await expect(message).toHaveValue("Please explain the portfolio returns.");
     await expect(form.getByRole("button", { name: "Send Message" })).toBeEnabled();
     await expect(form.locator("form")).toHaveAttribute("aria-busy", "false");

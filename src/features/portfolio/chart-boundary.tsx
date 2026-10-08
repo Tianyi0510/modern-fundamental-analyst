@@ -33,7 +33,7 @@ export class ChartBoundary extends Component<Props, { failed: boolean }> {
     const fallback = (
       <div role="status" className="py-8">
         <p>
-          {measure.toUpperCase()}: {text.unavailable}
+          {measure === "twr" ? "TWRR" : "XIRR"}: {text.unavailable}
         </p>
         {this.state.failed ? (
           <Button type="button" onClick={() => this.setState({ failed: false })}>
