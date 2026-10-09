@@ -20,7 +20,6 @@ for (const { prefix, label, note } of [
       await expect(page.locator(path === "/" ? ".metric-band" : ".performance-summary")).toContainText(xirrNote);
       if (path === "/") {
         await expect(page.locator(".metric-band dt").last()).toHaveText("XIRR");
-        await expect(page.locator(".metric-band + .date-text")).toContainText(prefix ? "每月更新" : "Updated Monthly");
         if (!prefix)
           await expect(page.getByRole("link", { name: "Read the Latest Investment Memo", exact: true })).toBeVisible();
       }

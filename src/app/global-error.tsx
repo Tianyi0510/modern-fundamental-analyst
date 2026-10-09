@@ -8,7 +8,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
     <html lang="en">
       <body>
         <main id="main-content" tabIndex={-1}>
-          <h1>This Page Could Not Be Loaded.</h1>
+          <h1>This Page Couldn&apos;t Be Loaded.</h1>
           <button type="button" onClick={retry}>
             Try Again
           </button>

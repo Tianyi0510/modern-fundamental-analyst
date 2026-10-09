@@ -50,7 +50,7 @@ it("retains input and the retry identity after failure, then creates a new ident
   render(<ContactForm locale="en" />);
   const user = await fillMessage();
   const submit = screen.getByRole("button", { name: "Send Message" });
-  const error = "Your message could not be sent. Please try again later.";
+  const error = "Your message couldn't be sent. Please try again later.";
   await user.click(submit);
   expect(await screen.findByText(error)).toBeVisible();
   expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Please explain the portfolio returns.");

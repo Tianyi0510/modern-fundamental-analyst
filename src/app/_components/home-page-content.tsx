@@ -28,15 +28,14 @@ const copy = {
     holdingsUnit: "Stocks and ETFs",
     portfolioXirr: "XIRR",
     xirrNote: "Money-Weighted Return · Annualized",
-    asOf: "As of",
     aboutLabel: "01 · About",
     aboutTitle: ["My Investment Beliefs and", "Commitment to Learning"],
     aboutCopy:
       "I believe in focus investing, long-term value investing, and the coming waves of AI and other disruptive technologies. I value accounting as the language of business and use financial modeling to connect business fundamentals with valuation. I also promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning.",
-    aboutLink: "About the Process",
+    aboutLink: "Read More",
     portfolioLabel: "02 · Portfolio",
     portfolioTitle: ["A Focus Portfolio Built", "for Long-Term Ownership"],
-    fullPortfolio: "Full Portfolio",
+    fullPortfolio: "View Full Portfolio",
     holdingsAllocation: "Holdings Allocation",
     other: "Other",
     topHoldings: "Top Four Holdings and Other",
@@ -47,7 +46,7 @@ const copy = {
     performanceCopy: (benchmarkReturn: string) =>
       `Portfolio XIRR, versus ${benchmarkReturn} for ${portfolioSnapshot.benchmark} over the same cash-flow period.`,
     verified: "As of",
-    viewPerformance: "View Performance",
+    viewPerformance: "Track Portfolio Performance",
     memosLabel: "04 · Investment Memos",
     memosTitle: ["Detailed Investment Theses", "Behind Every Position"],
     viewAllMemos: "View All Investment Memos",
@@ -70,15 +69,14 @@ const copy = {
     holdingsUnit: "檔股票與 ETF",
     portfolioXirr: "XIRR",
     xirrNote: "資金加權報酬・年化",
-    asOf: "截至",
     aboutLabel: "01 · 關於",
     aboutTitle: ["我的投資信念與", "持續學習的承諾"],
     aboutCopy:
       "我相信集中投資、長期價值投資，以及即將到來的人工智慧與其他顛覆性科技浪潮。我重視會計作為商業語言的角色，並運用財務建模連結企業基本面與估值。我也提倡以好奇心、同理心與持續學習為基礎的「learn-it-all」成長思維。",
-    aboutLink: "了解投資過程",
+    aboutLink: "閱讀更多",
     portfolioLabel: "02 · 投資組合",
     portfolioTitle: ["為長期持有而建立的", "集中投資組合"],
-    fullPortfolio: "完整投資組合",
+    fullPortfolio: "查看完整投資組合",
     holdingsAllocation: "持倉佔比",
     other: "其他",
     topHoldings: "前四大持倉與其他",
@@ -89,7 +87,7 @@ const copy = {
     performanceCopy: (benchmarkReturn: string) =>
       `投資組合 XIRR；相同現金流期間的 ${portfolioSnapshot.benchmark} 為 ${benchmarkReturn}。`,
     verified: "截至",
-    viewPerformance: "查看績效",
+    viewPerformance: "追蹤投資組合績效",
     memosLabel: "04 · 投資備忘錄",
     memosTitle: ["每個部位背後的", "詳細投資論點"],
     viewAllMemos: "查看所有投資備忘錄",
@@ -112,15 +110,14 @@ const copy = {
     holdingsUnit: "只股票与 ETF",
     portfolioXirr: "XIRR",
     xirrNote: "资金加权回报・年化",
-    asOf: "截至",
     aboutLabel: "01 · 关于",
     aboutTitle: ["我的投资信念与", "持续学习的承诺"],
     aboutCopy:
       "我相信集中投资、长期价值投资，以及即将到来的人工智能与其他颠覆性科技浪潮。我重视会计作为商业语言的作用，并运用财务建模连接企业基本面与估值。我也倡导以好奇心、同理心与持续学习为基础的“learn-it-all”成长思维。",
-    aboutLink: "了解投资过程",
+    aboutLink: "阅读更多",
     portfolioLabel: "02 · 投资组合",
     portfolioTitle: ["为长期持有而建立的", "集中投资组合"],
-    fullPortfolio: "完整投资组合",
+    fullPortfolio: "查看完整投资组合",
     holdingsAllocation: "持仓占比",
     other: "其他",
     topHoldings: "前四大持仓与其他",
@@ -131,7 +128,7 @@ const copy = {
     performanceCopy: (benchmarkReturn: string) =>
       `投资组合 XIRR；相同现金流期间的 ${portfolioSnapshot.benchmark} 为 ${benchmarkReturn}。`,
     verified: "截至",
-    viewPerformance: "查看业绩",
+    viewPerformance: "追踪投资组合业绩",
     memosLabel: "04 · 投资备忘录",
     memosTitle: ["每个持仓背后的", "详细投资论点"],
     viewAllMemos: "查看所有投资备忘录",
@@ -217,9 +214,6 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               note={<>{text.xirrNote}</>}
             />
           </dl>
-          <p className="date-text mt-[var(--space-4)] text-[length:var(--font-size-caption)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] tabular-nums">
-            {text.asOf} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time> · {text.updatedMonthly}
-          </p>
         </div>
 
         <section className={appearance["home-about"] + " " + appearance["shell"]}>

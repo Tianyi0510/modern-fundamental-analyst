@@ -21,7 +21,7 @@ const copy = {
     title: "Manage Your Subscription.",
     intro: "Choose the language you prefer for research updates or unsubscribe from future emails.",
     invalid:
-      "Enter your email address and we’ll send you a secure preferences link. For your privacy, we’ll show the same confirmation whether or not the address is subscribed.",
+      "Enter your email to receive a secure link to manage your preferences. To protect your privacy, we show the same confirmation whether or not the email is subscribed.",
     email: "Email Address",
     language: "Preferred Language",
     chooseLanguage: "Choose a language",
@@ -34,14 +34,14 @@ const copy = {
     request: "Send Secure Link",
     requesting: "Sending…",
     sent: "If this address is subscribed, a secure link is on its way.",
-    error: "Your request could not be completed. Please try again.",
+    error: "Your request couldn't be completed. Please try again.",
   },
   "zh-tw": {
     label: "郵件偏好",
     title: "管理你的訂閱。",
     intro: "選擇接收研究更新的偏好語言，或取消日後的郵件訂閱。",
     invalid:
-      "輸入電子郵件地址，我們會寄送安全的偏好設定連結。為保障隱私，無論該地址是否已訂閱，都會顯示相同的確認訊息。",
+      "輸入你的電子郵件地址，即可取得管理偏好設定的安全連結。為保護你的隱私，無論該電子郵件地址是否已訂閱，我們都會顯示相同的確認訊息。",
     email: "電子郵件地址",
     language: "偏好語言",
     chooseLanguage: "請選擇語言",
@@ -61,7 +61,7 @@ const copy = {
     title: "管理你的订阅。",
     intro: "选择接收研究更新的偏好语言，或取消日后的邮件订阅。",
     invalid:
-      "输入电子邮件地址，我们会发送安全的偏好设置链接。为保护隐私，无论该地址是否已订阅，都会显示相同的确认信息。",
+      "输入你的电子邮件地址，即可获取管理偏好设置的安全链接。为保护你的隐私，无论该电子邮件地址是否已订阅，我们都会显示相同的确认信息。",
     email: "电子邮件地址",
     language: "偏好语言",
     chooseLanguage: "请选择语言",

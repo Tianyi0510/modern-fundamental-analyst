@@ -9,7 +9,7 @@ export const confirmationCopy = {
     note: "If you did not request this email, ignore it. Your subscription will not be activated.",
     busy: "Confirming…",
     success: "Your subscription is confirmed.",
-    error: "This request could not be completed. Try again or request a new confirmation from the subscription form.",
+    error: "We couldn't confirm your subscription. Please try again.",
   },
   "zh-tw": {
     subject: "確認你的訂閱",
@@ -19,7 +19,7 @@ export const confirmationCopy = {
     note: "如果你沒有提出此要求，請忽略這封郵件。我們不會啟用訂閱。",
     busy: "確認中…",
     success: "你的訂閱已確認。",
-    error: "目前無法完成要求。請重試，或透過訂閱表單取得新的確認連結。",
+    error: "無法確認你的訂閱。請再試一次。",
   },
   "zh-cn": {
     subject: "确认你的订阅",
@@ -29,7 +29,7 @@ export const confirmationCopy = {
     note: "如果你没有提出此请求，请忽略这封邮件。我们不会启用订阅。",
     busy: "确认中…",
     success: "你的订阅已确认。",
-    error: "目前无法完成请求。请重试，或通过订阅表单获取新的确认链接。",
+    error: "无法确认你的订阅。请重试。",
   },
 } satisfies Record<
   Locale,

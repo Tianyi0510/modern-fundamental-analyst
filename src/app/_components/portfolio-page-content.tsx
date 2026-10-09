@@ -22,7 +22,7 @@ const copy = {
     intro:
       "A monthly view of my holdings, position sizes, investment theses, and long-term approach to portfolio management.",
     summaryLabel: "Portfolio Summary",
-    marketValue: "Stock Market Value",
+    marketValue: "Total Market Value",
     currency: "USD",
     costBasis: "Net Cost Basis",
     costBasisNote: "Purchases and Transaction Fees",
@@ -33,7 +33,7 @@ const copy = {
     currentHoldings: "Current Holdings",
     positionCount: `${portfolioSnapshot.holdingsCount} Disclosed Positions.`,
     returnNote:
-      "Each position's return compares market value with cost basis. Net dividends and financing interest are not allocated to positions; they are added and deducted, respectively, in the total cost-basis return shown in both the summary and the table.",
+      "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
   },
   "zh-tw": {
     eyebrow: "投資組合",
@@ -46,7 +46,7 @@ const copy = {
     ),
     intro: "每月呈現我的持股、部位規模、投資論點，以及長期投資組合管理方法。",
     summaryLabel: "投資組合摘要",
-    marketValue: "股票市場價值",
+    marketValue: "總市值",
     currency: "美元",
     costBasis: "淨成本基礎",
     costBasisNote: "買入金額與交易費用",
@@ -56,8 +56,7 @@ const copy = {
     holdingsNote: "股票與 ETF",
     currentHoldings: "目前持股",
     positionCount: `${portfolioSnapshot.holdingsCount} 個已揭露部位。`,
-    returnNote:
-      "個別持股報酬僅以市值與成本基礎計算。淨股息與融資利息不分攤至各持股，在摘要與表格共同顯示的成本基礎總報酬率中分別加計與扣除。",
+    returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
   },
   "zh-cn": {
     eyebrow: "投资组合",
@@ -70,7 +69,7 @@ const copy = {
     ),
     intro: "每月呈现我的持仓、仓位规模、投资论点，以及长期投资组合管理方法。",
     summaryLabel: "投资组合摘要",
-    marketValue: "股票市场价值",
+    marketValue: "总市值",
     currency: "美元",
     costBasis: "净成本基础",
     costBasisNote: "买入金额与交易费用",
@@ -80,8 +79,7 @@ const copy = {
     holdingsNote: "股票与 ETF",
     currentHoldings: "当前持仓",
     positionCount: `${portfolioSnapshot.holdingsCount} 个已披露持仓。`,
-    returnNote:
-      "单项持仓回报仅以市值与成本基础计算。净股息与融资利息不分摊至各持仓，在摘要与表格共同显示的成本基础总回报率中分别加计和扣除。",
+    returnNote: "净股息与融资利息在投资组合层面计入，不分摊至单项持仓。",
   },
 } as const;
 

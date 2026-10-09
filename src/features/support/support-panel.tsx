@@ -6,7 +6,8 @@ import { supportCopy } from "./support-copy";
 import { type parseSupportSearchParams, type SupportStatus } from "./support-config";
 import { SUPPORT_CATALOG } from "./server/support-catalog";
 import { resolveSupportStatus } from "./server/stripe-checkout";
-import type { Locale } from "@/lib/i18n";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
+import Link from "next/link";
 
 type SupportPanelProps = {
   locale: Locale;
@@ -25,15 +26,23 @@ export function SupportPanel({ locale, params, status }: SupportPanelProps & { s
   const choices = SUPPORT_CATALOG.map((product) => ({ value: product.id, amount: product.unitAmount / 100 }));
   const checkoutLocale = params.checkoutLocale;
   const retired = status === "retired-checkout" || (recoveryAttempt && !isValidCheckoutAttempt(recoveryAttempt));
-  const formAttempt = retired ? "" : (recoveryAttempt ?? createCheckoutAttempt());
+  const pending = status === "pending";
+  const formAttempt = retired || pending ? "" : (recoveryAttempt ?? createCheckoutAttempt());
   return (
     <section className={appearance["support-section"]}>
       <div className={appearance["support-layout"] + " " + appearance["shell"]}>
         <div className={appearance["support-copy"]}>
-          <h2>{text.sectionTitle}</h2>
+          <h2>{pending ? text.statusTitle : text.sectionTitle}</h2>
           <p>{text.sectionText}</p>
+          <Link className="underline underline-offset-4" href={getLocalizedPath("/contact", locale)}>
+            {text.paymentHelp}
+          </Link>
         </div>
-        {retired ? (
+        {pending ? (
+          <Alert role="status" className={appearance["support-status"]}>
+            {text.statuses.pending}
+          </Alert>
+        ) : retired ? (
           <Alert role="status" className={appearance["support-status"]}>
             {text.statuses["retired-checkout"]}
           </Alert>
