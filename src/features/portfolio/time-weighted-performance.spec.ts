@@ -14,7 +14,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(xirr.getByRole("heading")).toHaveText(prefix ? "年化 XIRR" : "Annualized XIRR");
     await expect(
       page.getByRole("heading", {
-        name: prefix === "/zh-tw" ? "資料來源" : prefix === "/zh-cn" ? "数据来源" : "Data Sources",
+        name: prefix === "/zh-tw" ? "投資組合資料" : prefix === "/zh-cn" ? "投资组合数据" : "Portfolio Data",
         exact: true,
       }),
     ).toBeVisible();
