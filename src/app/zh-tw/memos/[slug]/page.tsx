@@ -3,6 +3,8 @@ import { MemoDetailPage } from "@/app/_components/memo-detail-page";
 import { getMemoStaticParams } from "@/features/memos/memos";
 import { createMemoPageMetadata } from "@/features/memos/memo-pages";
 
+export const dynamicParams = false;
+
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {

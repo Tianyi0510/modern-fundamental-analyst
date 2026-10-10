@@ -50,15 +50,31 @@ for (const { prefix, language, locale, retry, error } of variants) {
     }
   });
 
-  test(`${locale} unknown paths use a localized HTTP 404`, async ({ page }) => {
-    for (const suffix of ["/unknown-review-path", "/unknown-review-path/nested", "/memos/unknown-review-memo"]) {
-      const response = await page.goto(`${prefix}${suffix}`);
-      expect(response?.status()).toBe(404);
-      await expect(page.locator("html")).toHaveAttribute("lang", language);
-      await expect(page.locator("main h1")).toBeVisible();
-      await expect(page.locator("main a")).toHaveAttribute("href", prefix || "/");
-    }
-  });
+  for (const javaScriptEnabled of [true, false]) {
+    test.describe(`${locale} 404 with JavaScript ${javaScriptEnabled ? "enabled" : "disabled"}`, () => {
+      test.use({ javaScriptEnabled, extraHTTPHeaders: { "x-site-locale": "untrusted-locale" } });
+
+      test("unknown paths use a localized HTTP 404", async ({ page }) => {
+        for (const suffix of [
+          "/unknown-review-path",
+          "/unknown-review-path/nested",
+          "/unknown-review-path.html",
+          "/memos/unknown-review-memo",
+        ]) {
+          const response = await page.goto(`${prefix}${suffix}`);
+          expect(response?.status()).toBe(404);
+          await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+          await expect(page.locator("html")).toHaveAttribute("lang", language);
+          await expect(page.locator("main h1")).toBeVisible();
+          const home = page.locator("main a");
+          await expect(home).toHaveAttribute("href", prefix || "/");
+          await home.click();
+          await expect(page).toHaveURL(new RegExp(`${prefix || "/"}$`));
+          await expect(page.locator("main h1")).toBeVisible();
+        }
+      });
+    });
+  }
 
   test(`${locale} a fresh Support visit drops the previous recovery amount`, { tag: "@mobile" }, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });

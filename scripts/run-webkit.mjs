@@ -16,7 +16,7 @@ export function runWebKit({ args = [], env = process.env, spawn = spawnSync } = 
   if (
     forwarded.some(
       (arg) =>
-        /^--(?:project|workers|fully-parallel|output|config|grep)(?:=|$)/.test(arg) ||
+        /^--(?:project|workers|fully-parallel|output|config|grep|test-list|test-list-invert)(?:=|$)/.test(arg) ||
         arg === "-c" ||
         arg.startsWith("-g"),
     )
@@ -34,12 +34,16 @@ export function runWebKit({ args = [], env = process.env, spawn = spawnSync } = 
         ...forwarded,
         "--project=webkit",
         "--workers=1",
-        "--fully-parallel",
-        `--shard=${shard}/2`,
+        `${shard === "1" ? "--test-list" : "--test-list-invert"}=scripts/webkit-shard-1.txt`,
       ],
       {
         cwd: root,
-        env: { ...env, PLAYWRIGHT_USE_PRODUCTION_BUILD: "1", PLAYWRIGHT_SHARD: shard },
+        env: {
+          ...env,
+          PLAYWRIGHT_USE_PRODUCTION_BUILD: "1",
+          PLAYWRIGHT_SHARD: shard,
+          PLAYWRIGHT_JSON_OUTPUT_NAME: `node_modules/.cache/playwright/reports/webkit-shard-${shard}.json`,
+        },
         stdio: "inherit",
       },
     );

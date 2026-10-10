@@ -27,7 +27,7 @@ export async function findReusableCI({ event, sha, repository, get, now = Date.n
     )
       return null;
     const { jobs } = await get(`/actions/runs/${run.id}/attempts/${run.run_attempt}/jobs?per_page=100`);
-    const required = ["static", "chromium", "webkit-shard-1", "webkit-shard-2"];
+    const required = ["static", "chromium-shard-1", "chromium-shard-2", "webkit-shard-1", "webkit-shard-2"];
     if (
       !required.every((name) =>
         jobs.some((job) => job.name === name && job.status === "completed" && job.conclusion === "success"),
