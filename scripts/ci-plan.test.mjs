@@ -24,7 +24,7 @@ function fixture() {
       ],
     },
     "/actions/runs/42/attempts/1/jobs?per_page=100": {
-      jobs: ["static", "chromium", "webkit-shard-1", "webkit-shard-2"].map((name) => ({
+      jobs: ["static", "chromium-shard-1", "chromium-shard-2", "webkit-shard-1", "webkit-shard-2"].map((name) => ({
         name,
         status: "completed",
         conclusion: "success",
@@ -87,6 +87,13 @@ test("missing, skipped or failed test jobs require full CI", async () => {
   const data = fixture();
   data["/actions/runs/42/attempts/1/jobs?per_page=100"].jobs.pop();
   assert.equal(await evaluate(data), null);
+});
+test("each browser shard is required for reuse", async () => {
+  for (let index = 1; index < 5; index++) {
+    const data = fixture();
+    data["/actions/runs/42/attempts/1/jobs?per_page=100"].jobs.splice(index, 1);
+    assert.equal(await evaluate(data), null);
+  }
 });
 test("API failures fall back to full testing", async () => {
   assert.equal(

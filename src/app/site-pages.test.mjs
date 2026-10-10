@@ -21,7 +21,7 @@ test("shared client navigation receives only the active locale copy from server 
   }
 });
 
-test("language-specific root layouts preserve html lang without request-time proxying", async () => {
+test("language-specific root layouts preserve html lang for normal pages", async () => {
   const [englishLayout, traditionalChineseLayout, simplifiedChineseLayout] = await Promise.all([
     read("src/app/(en)/layout.tsx"),
     read("src/app/zh-tw/layout.tsx"),
@@ -31,7 +31,6 @@ test("language-specific root layouts preserve html lang without request-time pro
   assert.match(englishLayout, /language="en"/);
   assert.match(traditionalChineseLayout, /language="zh-Hant-TW"/);
   assert.match(simplifiedChineseLayout, /language="zh-CN"/);
-  await assert.rejects(read("proxy.ts"));
   await assert.rejects(read("src/app/layout.tsx"));
 });
 

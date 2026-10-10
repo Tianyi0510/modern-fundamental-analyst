@@ -61,6 +61,7 @@ Before changing Next.js APIs, routing or configuration, read the relevant instal
 ## Implementation constraints
 
 - Use `getLocalizedPath` / `getLanguageAlternates` from `src/lib/i18n.ts` and `createRootMetadata` / `createPageMetadata` from `src/lib/site-config.ts`. Links and metadata must identify the correct locale and page.
+- When changing website copy, search all test files, fixtures and snapshots for the previous text, accessible names and related translations. Update every affected assertion and run the relevant Node, component and browser tests; do not weaken behavioral checks to accommodate new wording.
 - Keep copy with its owning page/component, use server components for static content and minimize client boundaries. Reuse `escape-html`, `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
 - Preserve deliberate language, layout and form variants. Do not change verified research or monthly portfolio snapshots without a content-update request; they are not live prices.
 - Preserve text colors and opacity across states unless a color change is requested. Define color values in `src/app/styles/tokens.css` and reference those tokens from Tailwind and CSS Modules.

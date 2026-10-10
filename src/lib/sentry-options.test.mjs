@@ -11,6 +11,13 @@ test("DSN resolution treats empty or whitespace-only overrides as absent", () =>
   assert.equal(resolveSentryDsn("", " "), undefined);
 });
 
+test("runtime opt-out overrides both private and build-inlined public DSNs", () => {
+  const publicDsn = "https://public@sentry.invalid/1";
+  assert.equal(resolveSentryDsn("", publicDsn, "1"), undefined);
+  assert.equal(resolveSentryDsn("https://server@sentry.invalid/2", publicDsn, "1"), undefined);
+  assert.equal(resolveSentryDsn(undefined, publicDsn, "0"), publicDsn);
+});
+
 test("error events retain stack identity without request payloads or recovery secrets", () => {
   const event = sanitizeSentryEvent({
     event_id: "test-event",

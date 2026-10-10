@@ -49,11 +49,18 @@ jobs:
       - run: npm run verify:static
 
   chromium:
+    name: chromium-shard-${{ matrix.shard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     needs: plan
     if: needs.plan.outputs.reuse != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
+      PLAYWRIGHT_JSON_OUTPUT_NAME: node_modules/.cache/playwright/reports/chromium-shard-${{ matrix.shard }}.json
+      PLAYWRIGHT_SHARD: ${{ matrix.shard }}
       PLAYWRIGHT_SENTRY_TEST: "1"
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
       NEXT_PUBLIC_VERCEL_ENV: test
@@ -91,14 +98,23 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Verify Chromium
-        run: npm run test:computed-style:production
+        run: npm run test:computed-style:production -- --fully-parallel --shard=${{ matrix.shard }}/2
+
+      - name: Upload per-test timing report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-timings-chromium-${{ matrix.shard }}
+          path: node_modules/.cache/playwright/reports/chromium-shard-${{ matrix.shard }}.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Upload browser retry and failure evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-evidence-chromium
-          path: node_modules/.cache/playwright/chromium/
+          name: browser-evidence-chromium-${{ matrix.shard }}
+          path: node_modules/.cache/playwright/chromium-shard-${{ matrix.shard }}/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 7
@@ -129,6 +145,14 @@ jobs:
       - run: npm run build
       - run: npx playwright install webkit
       - run: npm run test:webkit -- --shard=${{ matrix.shard }}
+      - name: Upload per-test timing report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-timings-webkit-${{ matrix.shard }}
+          path: node_modules/.cache/playwright/reports/webkit-shard-${{ matrix.shard }}.json
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload browser retry and failure evidence
         if: always()
         uses: actions/upload-artifact@v4

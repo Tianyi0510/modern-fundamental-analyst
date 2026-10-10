@@ -12,9 +12,13 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   workers: process.env.CI ? 1 : undefined,
   retries: process.env.CI ? 1 : 0,
-  reporter: "line",
+  reporter: process.env.CI || process.env.PLAYWRIGHT_JSON_OUTPUT_NAME ? [["line"], ["json"]] : "line",
   projects: [
-    { name: "chromium", outputDir: "node_modules/.cache/playwright/chromium", use: { browserName: "chromium" } },
+    {
+      name: "chromium",
+      outputDir: `node_modules/.cache/playwright/chromium${shardSuffix}`,
+      use: { browserName: "chromium" },
+    },
     {
       name: "webkit",
       outputDir: `node_modules/.cache/playwright/webkit${shardSuffix}`,
@@ -45,6 +49,8 @@ export default defineConfig({
       // A fake DSN can be supplied explicitly for intercepted monitoring tests.
       NEXT_PUBLIC_SENTRY_DSN: process.env.PLAYWRIGHT_SENTRY_TEST === "1" ? "https://public@sentry.invalid/1" : "",
       NEXT_PUBLIC_VERCEL_ENV: process.env.PLAYWRIGHT_SENTRY_TEST === "1" ? "test" : "",
+      // Public DSNs can be baked into an existing production build.
+      SENTRY_DISABLED: "1",
       SENTRY_DSN: "",
       SENTRY_AUTH_TOKEN: "",
     },

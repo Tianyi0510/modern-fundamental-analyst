@@ -15,7 +15,7 @@ test("both shards run after a test failure, using production mode and separate e
   assert.equal(calls.length, 2);
   for (const [index, call] of calls.entries()) {
     assert.equal(call.command, process.execPath);
-    assert.ok(call.args.includes(`--shard=${index + 1}/2`));
+    assert.ok(call.args.includes(`${index === 0 ? "--test-list" : "--test-list-invert"}=scripts/webkit-shard-1.txt`));
     assert.ok(call.args.includes("--project=webkit"));
     assert.equal(call.options.env.PLAYWRIGHT_SHARD, String(index + 1));
     assert.equal(call.options.env.PLAYWRIGHT_USE_PRODUCTION_BUILD, "1");
@@ -29,7 +29,7 @@ test("a selected CI shard forwards test filters and returns success", () => {
       args: ["--shard=2", "site-header.spec.ts"],
       spawn: (_, args) => {
         count++;
-        assert.ok(args.includes("--shard=2/2"));
+        assert.ok(args.includes("--test-list-invert=scripts/webkit-shard-1.txt"));
         assert.equal(args[2], "site-header.spec.ts");
         return { status: 0 };
       },
@@ -45,6 +45,8 @@ test("invalid shard and coverage overrides fail before launching", () => {
     ["--shard=1", "--shard=2"],
     ["--project=chromium"],
     ["--output=shared"],
+    ["--test-list=partial.txt"],
+    ["--test-list-invert=partial.txt"],
     ["--grep", "desktop"],
     ["--grep=desktop"],
     ["-g", "desktop"],

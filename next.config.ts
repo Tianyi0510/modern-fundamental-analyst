@@ -15,6 +15,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  experimental: { globalNotFound: true },
   poweredByHeader: false,
   // Next.js requires this configuration hook to return a Promise.
   // eslint-disable-next-line @typescript-eslint/require-await

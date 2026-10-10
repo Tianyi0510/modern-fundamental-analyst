@@ -56,3 +56,35 @@ test(
     expect(JSON.stringify(spans)).not.toContain("private-recovery-token");
   },
 );
+
+test("session replay masks page text and excludes form contents", { tag: "@mobile" }, async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SENTRY_TEST !== "1", "Requires an explicitly enabled fake DSN");
+  const recordings: string[] = [];
+  await page.route("https://sentry.invalid/**", async (route) => {
+    const body = route.request().postData() ?? "";
+    if (body.includes('"type":"replay_recording"')) recordings.push(body);
+    await route.fulfill({ status: 200, json: {} });
+  });
+  await page.goto("/contact");
+  await page.getByRole("textbox", { name: "Name", exact: true }).fill("Replay Private Name");
+  await page.getByRole("textbox", { name: "Email", exact: true }).fill("replay-private@example.com");
+  await expect.poll(() => recordings.length, { timeout: 20_000 }).toBeGreaterThan(0);
+  const payload = recordings.join("\n");
+  expect(payload).toContain('"type":"replay_event"');
+  expect(payload).not.toContain("Replay Private Name");
+  expect(payload).not.toContain("replay-private@example.com");
+  expect(payload).not.toContain("Connect Through Research");
+  const forms: unknown[] = [];
+  function visit(value: unknown) {
+    if (!value || typeof value !== "object") return;
+    if ("tagName" in value && value.tagName === "form") {
+      forms.push("childNodes" in value ? value.childNodes : undefined);
+    }
+    for (const child of Object.values(value)) visit(child);
+  }
+  for (const line of payload.split("\n")) {
+    if (line.startsWith("[")) visit(JSON.parse(line));
+  }
+  expect(forms.length).toBeGreaterThan(0);
+  for (const children of forms) expect(children).toEqual([]);
+});
