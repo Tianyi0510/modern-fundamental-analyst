@@ -7,7 +7,7 @@ Status: release-preparation draft. This document does not establish current tag,
 The first stable release brings together multilingual equity research, portfolio reporting, and reader services.
 
 - English, Traditional Chinese, and Simplified Chinese pages with localized navigation, metadata, and sharing previews.
-- Portfolio holdings, allocation, sortable data, and performance history against SPY. Published data is a dated snapshot as of 31 August 2026, not live market data. The Performance chart presents since-inception annualized XIRR at each month-end.
+- Portfolio holdings, allocation, sortable data, and performance history against SPY. Published data is a dated snapshot as of 30 September 2026, not live market data. Performance presents separate reconstructed cumulative TWR and since-inception annualized XIRR comparison charts with monthly tables; SPY is the only benchmark. The stocks-and-ETFs boundary and closing-price reconstruction assumptions are documented in [Portfolio Data](PORTFOLIO_DATA.md).
 - Investment memos with native expandable sections, responsive layouts, and reduced-motion support.
 - Contact and subscription workflows using Resend, three-language confirmation emails, explicit double opt-in, encrypted preference links, and Redis-backed recipient limits and subscriber coordination.
 - Replay-safe confirmation and delivery feedback, persistent suppression, and confirmed consent retained when welcome delivery needs reconciliation.
@@ -40,7 +40,7 @@ Record the iPhone model, iOS/Safari version, tested commit or deployment URL, da
 ## Publication checklist
 
 - Review the final changes and release notes, confirm both version manifests, and commit the intended release scope; preserve unrelated workspace work.
-- Complete the deployment checks in [AGENTS.md](../AGENTS.md#verification-and-review), including WebKit for shared UI changes.
+- Complete the [deployment checks in AGENTS.md](../AGENTS.md#deployment-completion) for the final commit. CI owns the full Chromium/WebKit and production-build gates; do not routinely repeat full local suites before release.
 - Push the approved release commit through the existing GitHub Actions and Vercel Git integration. Require successful CI for that exact commit.
 - Confirm Vercel is READY and production aliases point to the release commit. Follow the existing workflow for any affected-route smoke checks.
 - Complete the [email release checks](RESEND_INTEGRATION.md#verification), including confirmation and webhook configuration, without rotating the existing secrets. Real test sends require separate authorization.

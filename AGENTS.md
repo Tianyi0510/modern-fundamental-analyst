@@ -19,27 +19,38 @@ An investor-research website using Next.js App Router, React, TypeScript, Tailwi
 - Inspect `git status` before edits; preserve unrelated changes and ignored `audit/` evidence. Historical audit files are not the current issue list. Stage only intended files.
 - Commit, open a PR or deploy when requested. A deployment request includes the required commit, push and merge; a PR-only request does not authorize merging. Report changes, checks, limitations and release status accurately.
 
+## Task execution
+
+- Define the intended outcome, preserved behavior and observable completion criteria before a nontrivial change. Use a short inline plan when scope or dependencies warrant it; routine edits do not need a separate planning ceremony.
+- Check consequential assumptions against code, configuration or current provider evidence. Surface conflicting requirements, unknown outcomes and material tradeoffs. Ask only when a missing decision blocks safe progress; continue independent authorized work. State assumptions when proceeding without confirmation.
+- Choose the simplest implementation that satisfies the contract. Add an abstraction, dependency or agent only for a concrete need; do not create extra layers merely to mirror a reference project. Delegate only when the user or an applicable instruction explicitly authorizes it.
+- Inspect the diff as work progresses. Preserve unrelated code, comments, variants and uncommitted work; remove obsolete code introduced or superseded by the task after checking its references. Broad cleanup requires its own scope.
+- Use tests, browser inspection and provider readbacks to evaluate the completion criteria. For a new behavior or reproducible bug, establish an independent expected result or regression case before relying on the implementation. Do not require test-first work for mechanical documentation or formatting changes.
+- Optimize against a measured baseline and a correctness check. Preserve failure, retry and accessibility behavior; fewer lines, more tests, longer agent activity or a green check alone do not establish improvement.
+- When attempts stop producing new evidence, reassess the premise and failure category before repeating them. Continue necessary work, but stop optional checks once the remaining risk is covered; report external blockers and unknowns accurately.
+- Review the final diff and explain the result, reasons, affected checks and remaining limitations. Separate workspace changes, mocked/local checks, CI evidence and live-provider state; a passing test cannot validate an assumption it shares with the implementation.
+
 ## Commands
 
 Run from the repository root containing `package.json`. Use focused checks during development; the full-suite commands below are for CI, explicit requests or diagnosis.
 
-| Task | Command |
-| --- | --- |
-| Install locked dependencies | `npm ci` |
-| Development server | `npm run dev` |
-| Production build / server | `npm run build` / `npm run start` |
-| Type checking | `npm run typecheck` |
-| Lint selected files | `npx eslint <files> --max-warnings=0` |
-| Check / format selected files | `npx prettier --check <files>` / `npx prettier --write <files>` |
-| Vitest unit / integration tests | `npm run test:unit` / `npm run test:integration`; append `-- <test-path>` to filter |
-| Vitest watch mode | `npm run test:watch` |
-| Browser E2E tests | `npm run test:e2e -- <spec-files> --project=chromium` (or `webkit`) |
-| Selected Node tests | `node --import ./scripts/register-server.mjs --test <test-files>` |
-| Selected browser tests | `npx playwright test <spec-files> --project=chromium` (or `webkit`) |
-| Production browser tests | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
-| Full static checks | `npm run verify:static` |
-| Full static, build and production Chromium checks | `npm run verify` |
-| Mobile production WebKit checks | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2` |
+| Task                                              | Command                                                                                                               |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Install locked dependencies                       | `npm ci`                                                                                                              |
+| Development server                                | `npm run dev`                                                                                                         |
+| Production build / server                         | `npm run build` / `npm run start`                                                                                     |
+| Type checking                                     | `npm run typecheck`                                                                                                   |
+| Lint selected files                               | `npx eslint <files> --max-warnings=0`                                                                                 |
+| Check / format selected files                     | `npx prettier --check <files>` / `npx prettier --write <files>`                                                       |
+| Vitest unit / integration tests                   | `npm run test:unit` / `npm run test:integration`; append `-- <test-path>` to filter                                   |
+| Vitest watch mode                                 | `npm run test:watch`                                                                                                  |
+| Browser E2E tests                                 | `npm run test:e2e -- <spec-files> --project=chromium` (or `webkit`)                                                   |
+| Selected Node tests                               | `node --import ./scripts/register-server.mjs --test <test-files>`                                                     |
+| Selected browser tests                            | `npx playwright test <spec-files> --project=chromium` (or `webkit`)                                                   |
+| Production browser tests                          | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
+| Full static checks                                | `npm run verify:static`                                                                                               |
+| Full static, build and production Chromium checks | `npm run verify`                                                                                                      |
+| Mobile production WebKit checks                   | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2`                           |
 
 Replace angle-bracket placeholders with real paths. Install missing browsers with `npx playwright install chromium webkit`. Playwright starts an isolated server on port 3210 with provider credentials disabled; preserve that isolation. `npm test` runs the existing Node suite plus Vitest unit and integration projects. E2E tests use Playwright separately; CI runs the production browser matrix. Chromium covers all cases; WebKit selects `@mobile` cases with iPhone 13 emulation. Tag phone-only cases explicitly; desktop and cross-breakpoint cases remain in Chromium. Husky's pre-commit hook checks staged formatting and JavaScript/TypeScript lint; it does not replace CI.
 
@@ -47,14 +58,14 @@ Replace angle-bracket placeholders with real paths. Install missing browsers wit
 
 Read only the guides relevant to the task; update them when behavior or commands change. Keep README concise and detailed procedures in `docs/`.
 
-| Area | Guide |
-| --- | --- |
-| UI, CSS, typography and motion | [Style Guide](docs/STYLE_GUIDE.md) |
-| Architecture, services, tests and releases | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) |
-| Portfolio snapshots and calculations | [Portfolio Data](docs/PORTFOLIO_DATA.md) |
-| Email and subscriptions | [Resend](docs/RESEND_INTEGRATION.md) |
-| Subscriber coordination and recovery | [Redis runtime](docs/UPSTASH_REDIS_INTEGRATION.md#redis-runtime) and [reconciliation](docs/UPSTASH_REDIS_INTEGRATION.md#subscription-reconciliation) |
-| Payments | [Stripe](docs/STRIPE_INTEGRATION.md) |
+| Area                                       | Guide                                                                                                                                                |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UI, CSS, typography and motion             | [Style Guide](docs/STYLE_GUIDE.md)                                                                                                                   |
+| Architecture, services, tests and releases | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)                                                                                             |
+| Portfolio snapshots and calculations       | [Portfolio Data](docs/PORTFOLIO_DATA.md)                                                                                                             |
+| Email and subscriptions                    | [Resend](docs/RESEND_INTEGRATION.md)                                                                                                                 |
+| Subscriber coordination and recovery       | [Redis runtime](docs/UPSTASH_REDIS_INTEGRATION.md#redis-runtime) and [reconciliation](docs/UPSTASH_REDIS_INTEGRATION.md#subscription-reconciliation) |
+| Payments                                   | [Stripe](docs/STRIPE_INTEGRATION.md)                                                                                                                 |
 
 Before changing Next.js APIs, routing or configuration, read the relevant installed-version guide in `node_modules/next/dist/docs/`; if unavailable, use matching official Next.js documentation. Do not assume tools or patterns from another React starter are installed here.
 
@@ -81,12 +92,12 @@ Before changing Next.js APIs, routing or configuration, read the relevant instal
 
 Local work owns affected checks; CI owns full verification; deployment owns release identity and live status. Do not routinely repeat full local suites before release. Fix related failures within scope; repeat passed checks only after relevant changes or unresolved failures.
 
-| Change | Completion checks |
-| --- | --- |
-| Documentation | Validate commands, links, anchors and references; run `git diff --check` |
-| Application/configuration | Affected type, lint, format and behavioral checks; `git diff --check` |
-| Shared UI | Targeted browser checks for affected interactions, keyboard, touch and reduced motion; production-style checks when style loading changes |
-| Deployment | The release gate below; no routine full local rerun |
+| Change                    | Completion checks                                                                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Documentation             | Validate commands, links, anchors and references; run `git diff --check`                                                                  |
+| Application/configuration | Affected type, lint, format and behavioral checks; `git diff --check`                                                                     |
+| Shared UI                 | Targeted browser checks for affected interactions, keyboard, touch and reduced motion; production-style checks when style loading changes |
+| Deployment                | The release gate below; no routine full local rerun                                                                                       |
 
 - Colocate Vitest unit tests as `*.test.ts`, Testing Library/MSW component integrations as `*.test.tsx`, and Playwright browser workflows as `*.spec.ts`. Existing `*.test.mjs` tests retain the Node runner (`npm run test:node`); keep configuration tests beside their configuration. Shared test helpers belong in `scripts/`. Update discovery and commands when moving tests; MSW handlers must cover all integration-test requests; reset handlers and clean up mounted components after each test.
 - Test observable outcomes and service integrations with provider I/O mocked. Preserve failure/retry coverage and user-visible assertions. Reserve source assertions for explicit architecture/configuration constraints that runtime tests cannot establish.
@@ -108,6 +119,6 @@ Preserve the stable `verify` and `webkit` result jobs, package-integrity checks,
 
 ## Maintaining this file
 
-Keep durable project constraints, verified commands and task-specific references here; put detailed procedures in linked guides. Consolidate duplicates and add nested instructions only for genuine subtree differences. Preserve referenced heading anchors. After edits, verify instruction-file discovery from the intended directory; a fresh Codex session is needed to confirm automatic loading of changed instructions.
+Keep durable project constraints, verified commands and task-specific references here; put detailed procedures in linked guides. Consolidate duplicates and add nested instructions only for genuine subtree differences. When updating project guides, check referenced paths, commands and heading anchors against the workspace. Preserve dated provider observations and release evidence as historical facts; a documentation update does not verify production or publish a release. Preserve referenced heading anchors. After edits, verify instruction-file discovery from the intended directory; a fresh Codex session is needed to confirm automatic loading of changed instructions.
 
 Format reference: [AGENTS.md](https://agents.md/).

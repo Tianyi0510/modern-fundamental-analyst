@@ -407,7 +407,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     test(
       `${prefix || "English"} content reflows at 200% text size at ${width}px`,
       { tag: "@mobile" },
-      async ({ context }) => {
+      async ({ page }) => {
+        await page.setViewportSize({ width, height: 800 });
         for (const route of [
           "/",
           "/about",
@@ -418,8 +419,6 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           "/memos/microsoft-stock-analysis-fiscal-year-2024",
         ]) {
           const path = `${prefix}${route === "/" ? "" : route}` || "/";
-          const page = await context.newPage();
-          await page.setViewportSize({ width, height: 800 });
           await page.goto(path);
           await page.evaluate(() => document.fonts.ready);
           await page.addStyleTag({ content: "html { font-size: 200%; }" });
@@ -441,7 +440,6 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
               );
             expect(clipped, `${path} clips enlarged financial values`).toEqual([]);
           }
-          await page.close();
         }
       },
     );

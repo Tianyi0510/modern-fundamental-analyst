@@ -15,5 +15,8 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api(?:/|$)|_next(?:/|$)).*)"],
+  // Exclude known resources, not every dotted path: missing article URLs still need a localized 404.
+  matcher: [
+    "/((?!api(?:/|$)|_next(?:/|$)|_vercel(?:/|$)|(?:robots\\.txt|sitemap\\.xml|favicon\\.ico|apple-icon\\.png|icon\\.(?:svg|png)|logo\\.(?:svg|png)|og-logo\\.png)$|images/(?:icon\\.(?:svg|png)|logo\\.(?:svg|png)|og-logo\\.png)$).*)",
+  ],
 };

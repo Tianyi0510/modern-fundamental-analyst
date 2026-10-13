@@ -14,9 +14,11 @@ IP rate limiting falls back to a bounded in-process counter. It tracks requests 
 
 ### Transport cutover
 
+These steps apply when migrating an environment still serving the former TCP implementation. For an environment already using REST, verify its deployed revision and configured endpoint/token before repeating any cutover work. The repository configuration does not establish the live database state.
+
 1. Obtain the existing database's REST endpoint and read/write token through the provider's secret settings. Configure the single pair above in the target environment before releasing this code. Do not create another database or use a read-only token.
 2. Keep `SUBSCRIPTION_PREFERENCES_SECRET` identical. New REST and old TCP deployments must address the same database, raw records and lock protocol. Check an existing journal and representative lease/retry operations with isolated test fixtures; real subscriber writes require authorization.
-3. Keep the old deployment and TCP setting through the rollback window. Verify the released version, Redis availability and existing journal readability before removing the unused TCP variable. This workspace change does not configure Vercel or mutate the database.
+3. Keep the old deployment and TCP setting through the rollback window. Verify the released version, Redis availability and existing journal readability before removing the unused TCP variable. Changing workspace transport code alone does not configure Vercel or mutate the database.
 
 ### Rate-limit identities
 

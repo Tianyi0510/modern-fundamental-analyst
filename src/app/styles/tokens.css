@@ -94,6 +94,7 @@
   --text-inverse-secondary: rgba(255, 255, 255, 0.68);
   --text-inverse-tertiary: rgba(255, 255, 255, 0.62);
   --text-highlight: var(--bright-blue);
+  --chart-benchmark: var(--medium-blue);
   --interactive-accent: var(--medium-blue);
 }
 @media (max-width: 800px) {
