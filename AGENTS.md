@@ -16,7 +16,7 @@ An investor-research website using Next.js App Router, React, TypeScript, Tailwi
 - Use Traditional Chinese for ordinary communication unless requested otherwise. Formal code-review output, including summaries, findings and follow-ups, must be English without emojis. Code comments and GitHub issue/PR comments must also be English without emojis.
 - Write documentation prose in English. Include non-English text only for an exact runtime/provider value needed for an operation, identifying its source in code.
 - Reviews are read-only unless changes are requested. For implementation, finish the authorized change and affected verification; resolve routine choices without unnecessary confirmation.
-- Inspect `git status` before edits; preserve unrelated changes and ignored `audit/` evidence. Historical audit files are not the current issue list. Stage only intended files.
+- Inspect `git status` before edits; preserve unrelated changes and local review evidence in `../local/audit/` (or a legacy ignored `audit/`). Historical audit files are not the current issue list. Stage only intended files.
 - Commit, open a PR or deploy when requested. A deployment request includes the required commit, push and merge; a PR-only request does not authorize merging. Report changes, checks, limitations and release status accurately.
 
 ## Task execution

@@ -1,4 +1,7 @@
 :root {
+  --layer-navigation: 90;
+  --layer-modal: 100;
+  --layer-popover: 110;
   --black: #000000;
   --white: #ffffff;
   --deep-blue: #002991;

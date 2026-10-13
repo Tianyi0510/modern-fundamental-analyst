@@ -2,6 +2,7 @@
 
 import { appearance } from "./subscription-preferences-form.styles";
 import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/form-field";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Alert } from "@/components/ui/alert";
@@ -82,52 +83,54 @@ export function SubscriptionPreferencesForm({
         void submit(event.currentTarget, "save");
       }}
     >
-      <div className={appearance["preferences-field"]}>
-        <span>{copy.email}</span>
-        <strong>{email}</strong>
-      </div>
-      <FormField label={copy.language}>
-        <NativeSelect
-          name="locale"
-          required
-          defaultValue={initialLocale ?? ""}
-          onChange={() => setStatus("idle")}
-          disabled={busy || status === "unsubscribed"}
-        >
-          <option value="" disabled>
-            {copy.chooseLanguage}
-          </option>
-          {locales.map((locale) => (
-            <option value={locale} key={locale}>
-              {localeConfig[locale].label}
+      <FieldGroup layout="contents">
+        <div className={appearance["preferences-field"]}>
+          <span>{copy.email}</span>
+          <strong>{email}</strong>
+        </div>
+        <FormField label={copy.language}>
+          <NativeSelect
+            name="locale"
+            required
+            defaultValue={initialLocale ?? ""}
+            onChange={() => setStatus("idle")}
+            disabled={busy || status === "unsubscribed"}
+          >
+            <option value="" disabled>
+              {copy.chooseLanguage}
             </option>
-          ))}
-        </NativeSelect>
-      </FormField>
-      <div className={appearance["preferences-actions"]}>
-        <Button
-          type="submit"
-          className="max-w-full min-w-0 wrap-anywhere"
-          disabledFeedback={busy ? "muted-busy" : "muted"}
-          disabled={busy || status === "unsubscribed"}
-        >
-          {status === "saving" ? copy.saving : copy.save}
-        </Button>
-        <Button
-          variant="quiet"
-          size="text"
-          disabledFeedback={busy ? "muted-busy" : "muted"}
-          className={`${appearance["preferences-unsubscribe"]} max-w-full min-w-0 wrap-anywhere`}
-          type="button"
-          disabled={busy || status === "unsubscribed"}
-          onClick={(event) => {
-            if (event.currentTarget.form) void submit(event.currentTarget.form, "unsubscribe");
-          }}
-        >
-          {status === "unsubscribing" ? copy.unsubscribing : copy.unsubscribe}
-        </Button>
-      </div>
-      <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
+            {locales.map((locale) => (
+              <option value={locale} key={locale}>
+                {localeConfig[locale].label}
+              </option>
+            ))}
+          </NativeSelect>
+        </FormField>
+        <div className={appearance["preferences-actions"]}>
+          <Button
+            type="submit"
+            className="max-w-full min-w-0 wrap-anywhere"
+            disabledFeedback={busy ? "muted-busy" : "muted"}
+            disabled={busy || status === "unsubscribed"}
+          >
+            {status === "saving" ? copy.saving : copy.save}
+          </Button>
+          <Button
+            variant="quiet"
+            size="text"
+            disabledFeedback={busy ? "muted-busy" : "muted"}
+            className={`${appearance["preferences-unsubscribe"]} max-w-full min-w-0 wrap-anywhere`}
+            type="button"
+            disabled={busy || status === "unsubscribed"}
+            onClick={(event) => {
+              if (event.currentTarget.form) void submit(event.currentTarget.form, "unsubscribe");
+            }}
+          >
+            {status === "unsubscribing" ? copy.unsubscribing : copy.unsubscribe}
+          </Button>
+        </div>
+        <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
+      </FieldGroup>
     </form>
   );
 }

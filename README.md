@@ -50,7 +50,7 @@ Layout and ordinary states use static Tailwind classes; complex component motion
 
 shadcn/ui configuration lives in `components.json`; owned primitives live in `src/components/ui/`. Native form, result and loading primitives preserve server rendering; interactive DropdownMenu and Sheet use Radix. All share the existing brand tokens and semantic HTML contracts. Follow the [component installation procedure](docs/STYLE_GUIDE.md#shadcnui-components) when adding or updating a primitive.
 
-Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays in ignored `audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
+Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays outside the checkout in `../local/audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
 
 Under `src/app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, `error.tsx`, and `route.ts`).
 

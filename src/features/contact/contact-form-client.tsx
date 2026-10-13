@@ -3,6 +3,7 @@
 import { appearance } from "./contact-form-client.styles";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/container";
+import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -80,52 +81,54 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
           }}
           aria-busy={status === "sending"}
         >
-          <FormField label={copy.name}>
-            <Input
-              disabled={status === "sending"}
-              name="name"
-              type="text"
-              autoComplete="name"
-              maxLength={100}
-              required
-            />
-          </FormField>
-          <FormField label={copy.email}>
-            <Input
-              disabled={status === "sending"}
-              name="email"
-              type="email"
-              autoComplete="email"
-              maxLength={254}
-              required
-            />
-          </FormField>
-          <FormField label={copy.subject} className="col-span-full compact:col-auto">
-            <Input disabled={status === "sending"} name="subject" type="text" maxLength={160} required />
-          </FormField>
-          <FormField label={copy.message} className="col-span-full compact:col-auto">
-            <Textarea
-              disabled={status === "sending"}
-              name="message"
-              rows={7}
-              minLength={10}
-              maxLength={5000}
-              required
-            />
-          </FormField>
-          <HoneypotField />
-          <div className={appearance["contact-actions"]}>
-            <Button
-              className="contact-submit shrink-0 max-[801px]:w-full"
-              type="submit"
-              disabled={status === "sending"}
-            >
-              {status === "sending" ? copy.sending : copy.send}
-            </Button>
-            <Alert className="max-w-[420px]">
-              {status === "success" ? copy.success : status === "error" ? copy.error : ""}
-            </Alert>
-          </div>
+          <FieldGroup layout="contents">
+            <FormField label={copy.name}>
+              <Input
+                disabled={status === "sending"}
+                name="name"
+                type="text"
+                autoComplete="name"
+                maxLength={100}
+                required
+              />
+            </FormField>
+            <FormField label={copy.email}>
+              <Input
+                disabled={status === "sending"}
+                name="email"
+                type="email"
+                autoComplete="email"
+                maxLength={254}
+                required
+              />
+            </FormField>
+            <FormField label={copy.subject} className="col-span-full compact:col-auto">
+              <Input disabled={status === "sending"} name="subject" type="text" maxLength={160} required />
+            </FormField>
+            <FormField label={copy.message} className="col-span-full compact:col-auto">
+              <Textarea
+                disabled={status === "sending"}
+                name="message"
+                rows={7}
+                minLength={10}
+                maxLength={5000}
+                required
+              />
+            </FormField>
+            <HoneypotField />
+            <div className={appearance["contact-actions"]}>
+              <Button
+                className="contact-submit shrink-0 max-[801px]:w-full"
+                type="submit"
+                disabled={status === "sending"}
+              >
+                {status === "sending" ? copy.sending : copy.send}
+              </Button>
+              <Alert className="max-w-[420px]">
+                {status === "success" ? copy.success : status === "error" ? copy.error : ""}
+              </Alert>
+            </div>
+          </FieldGroup>
         </form>
       </Container>
     </div>

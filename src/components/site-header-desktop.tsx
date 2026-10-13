@@ -5,7 +5,13 @@ import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ButtonLink } from "./button-link";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { appearance, desktopNavigationLink, languageChoice } from "./site-header.styles";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
@@ -91,19 +97,21 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
               languageTabExitRef.current = false;
             }}
           >
-            {locales.map((targetLocale) => (
-              <DropdownMenuItem asChild key={targetLocale}>
-                <Link
-                  className={languageChoice}
-                  href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
-                  hrefLang={localeConfig[targetLocale].hrefLang}
-                  aria-current={locale === targetLocale ? "page" : undefined}
-                >
-                  <span>{localeConfig[targetLocale].label}</span>
-                  {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuGroup>
+              {locales.map((targetLocale) => (
+                <DropdownMenuItem asChild key={targetLocale}>
+                  <Link
+                    className={languageChoice}
+                    href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
+                    hrefLang={localeConfig[targetLocale].hrefLang}
+                    aria-current={locale === targetLocale ? "page" : undefined}
+                  >
+                    <span>{localeConfig[targetLocale].label}</span>
+                    {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
