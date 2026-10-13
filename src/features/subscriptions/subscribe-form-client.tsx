@@ -1,6 +1,7 @@
 "use client";
 
 import { appearance } from "./subscribe-form-client.styles";
+import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
@@ -95,40 +96,42 @@ export function SubscribeFormClient({
         }}
         aria-busy={status === "submitting"}
       >
-        <FormField label={copy.email} visibility={variant === "inverse" ? "hidden" : "visible"}>
-          <Input
+        <FieldGroup layout="contents">
+          <FormField label={copy.email} visibility={variant === "inverse" ? "hidden" : "visible"}>
+            <Input
+              disabled={status === "submitting"}
+              variant={variant}
+              name="email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              placeholder={copy.placeholder}
+              maxLength={254}
+              required
+            />
+          </FormField>
+          <HoneypotField />
+          <Button
+            variant={variant === "inverse" ? "inverse" : "primary"}
+            className={cn("subscribe-submit min-w-[7.733em] compact:w-full", variant === "standard" && "self-end")}
+            type="submit"
             disabled={status === "submitting"}
-            variant={variant}
-            name="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            placeholder={copy.placeholder}
-            maxLength={254}
-            required
-          />
-        </FormField>
-        <HoneypotField />
-        <Button
-          variant={variant === "inverse" ? "inverse" : "primary"}
-          className={cn("subscribe-submit min-w-[7.733em] compact:w-full", variant === "standard" && "self-end")}
-          type="submit"
-          disabled={status === "submitting"}
-        >
-          {status === "submitting" ? copy.submitting : copy.submit}
-        </Button>
-        <a className={appearance.preferences[variant]} href={preferencesHref}>
-          {copy.preferences}
-        </a>
-        <Alert tone={variant} className="col-span-full max-w-[390px] compact:col-auto">
-          {status === "success"
-            ? copy.success
-            : status === "alreadySubscribed"
-              ? copy.alreadySubscribed
-              : status === "error"
-                ? copy.error
-                : ""}
-        </Alert>
+          >
+            {status === "submitting" ? copy.submitting : copy.submit}
+          </Button>
+          <a className={appearance.preferences[variant]} href={preferencesHref}>
+            {copy.preferences}
+          </a>
+          <Alert tone={variant} className="col-span-full max-w-[390px] compact:col-auto">
+            {status === "success"
+              ? copy.success
+              : status === "alreadySubscribed"
+                ? copy.alreadySubscribed
+                : status === "error"
+                  ? copy.error
+                  : ""}
+          </Alert>
+        </FieldGroup>
       </form>
     </section>
   );

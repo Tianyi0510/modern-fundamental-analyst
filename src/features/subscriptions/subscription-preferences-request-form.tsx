@@ -2,6 +2,7 @@
 
 import { appearance } from "./subscription-preferences-request-form.styles";
 import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
@@ -58,28 +59,30 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
       }}
       aria-busy={status === "requesting"}
     >
-      <FormField label={copy.email}>
-        <Input
-          name="email"
-          type="email"
-          autoComplete="email"
-          inputMode="email"
-          maxLength={254}
-          disabled={status === "requesting"}
-          required
-        />
-      </FormField>
-      <div className={appearance["preferences-actions"]}>
-        <Button
-          type="submit"
-          className="max-w-full min-w-0 wrap-anywhere"
-          disabledFeedback="muted-busy"
-          disabled={status === "requesting"}
-        >
-          {status === "requesting" ? copy.requesting : copy.request}
-        </Button>
-      </div>
-      <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
+      <FieldGroup layout="contents">
+        <FormField label={copy.email}>
+          <Input
+            name="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            maxLength={254}
+            disabled={status === "requesting"}
+            required
+          />
+        </FormField>
+        <div className={appearance["preferences-actions"]}>
+          <Button
+            type="submit"
+            className="max-w-full min-w-0 wrap-anywhere"
+            disabledFeedback="muted-busy"
+            disabled={status === "requesting"}
+          >
+            {status === "requesting" ? copy.requesting : copy.request}
+          </Button>
+        </div>
+        <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
+      </FieldGroup>
     </form>
   );
 }

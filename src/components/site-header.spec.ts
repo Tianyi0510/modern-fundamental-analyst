@@ -31,35 +31,38 @@ async function pauseNextTouchTransfer(page: Page) {
   });
 }
 
-test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const trigger = page.locator(".language-trigger");
-  const items = page.getByRole("menuitem");
-  for (const key of ["Enter", "Space", "ArrowDown", "ArrowUp"]) {
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} language menu supports keyboard entry and Tab exit`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(prefix || "/");
+    const trigger = page.locator(".language-trigger");
+    const items = page.getByRole("menuitem");
+    for (const key of ["Enter", "Space", "ArrowDown", "ArrowUp"]) {
+      await trigger.focus();
+      await page.keyboard.press(key);
+      await expect(key === "ArrowUp" ? items.last() : items.first()).toBeFocused();
+      await expect(page.getByRole("menu").getByRole("group").getByRole("menuitem")).toHaveCount(3);
+      await page.keyboard.press("Escape");
+      await expect(trigger).toBeFocused();
+    }
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Tab");
+    // Native Tab order may skip links according to the browser's keyboard settings.
+    expect(
+      await page.evaluate(
+        () =>
+          document.activeElement !== document.body &&
+          !document.querySelector(".language-menu")?.contains(document.activeElement),
+      ),
+    ).toBe(true);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
     await trigger.focus();
-    await page.keyboard.press(key);
-    await expect(key === "ArrowUp" ? items.last() : items.first()).toBeFocused();
-    await page.keyboard.press("Escape");
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Shift+Tab");
     await expect(trigger).toBeFocused();
-  }
-  await page.keyboard.press("Enter");
-  await page.keyboard.press("Tab");
-  // Native Tab order may skip links according to the browser's keyboard settings.
-  expect(
-    await page.evaluate(
-      () =>
-        document.activeElement !== document.body &&
-        !document.querySelector(".language-menu")?.contains(document.activeElement),
-    ),
-  ).toBe(true);
-  await expect(trigger).toHaveAttribute("aria-expanded", "false");
-  await trigger.focus();
-  await page.keyboard.press("Enter");
-  await page.keyboard.press("Shift+Tab");
-  await expect(trigger).toBeFocused();
-  await expect(trigger).toHaveAttribute("aria-expanded", "false");
-});
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+}
 
 test("closed language menu removes its focusable links", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

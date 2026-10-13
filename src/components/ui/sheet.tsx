@@ -21,7 +21,11 @@ export function SheetContent({
 }: ComponentProps<typeof Primitive.Content> & { layerClassName?: string; phase?: string }) {
   return (
     <Primitive.Portal>
-      <div className={cn("fixed inset-0 z-[100]", layerClassName)} data-state="open" data-menu-phase={phase}>
+      <div
+        className={cn("fixed inset-0 z-[var(--layer-modal)]", layerClassName)}
+        data-state="open"
+        data-menu-phase={phase}
+      >
         <Primitive.Overlay data-slot="sheet-overlay" className="fixed inset-0 bg-transparent" />
         <Primitive.Content
           data-slot="sheet-content"
