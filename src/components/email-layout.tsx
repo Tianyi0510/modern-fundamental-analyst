@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import {
-  Body,
   Button,
   Container,
   Head,
@@ -16,30 +15,50 @@ import { localeConfig, type Locale } from "@/lib/i18n";
 
 export function EmailLayout({ locale, heading, children }: { locale: Locale; heading: string; children: ReactNode }) {
   return (
-    <Html lang={localeConfig[locale].htmlLang}>
+    <Html lang={localeConfig[locale].htmlLang} dir="ltr">
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Head />
-        <Body
-          style={{
-            backgroundColor: "#ededed",
-            padding: "32px 16px",
-            margin: 0,
-            fontFamily: "Inter,Arial,Helvetica,sans-serif",
-          }}
-        >
-          <Preview>{heading}</Preview>
-          <Container style={{ backgroundColor: "#ffffff", color: "#000000", maxWidth: "600px", margin: "0 auto" }}>
-            <Section style={{ backgroundColor: "#002991", padding: "28px 32px" }}>
-              <Text style={{ color: "#ffffff", fontSize: "14px", fontWeight: 700, margin: "0 0 8px" }}>
-                Modern Fundamental Analyst<span style={{ color: "#008cff" }}>.</span>
-              </Text>
-              <Heading as="h1" style={{ color: "#ffffff", fontSize: "28px", lineHeight: "36px", margin: 0 }}>
-                {heading}
-              </Heading>
-            </Section>
-            <Section style={{ padding: "32px", overflowWrap: "anywhere" }}>{children}</Section>
-          </Container>
-        </Body>
+        <body lang={localeConfig[locale].htmlLang} dir="ltr" style={{ backgroundColor: "#ededed", margin: 0 }}>
+          <table
+            lang={localeConfig[locale].htmlLang}
+            dir="ltr"
+            width="100%"
+            cellPadding="0"
+            cellSpacing="0"
+            border={0}
+            role="presentation"
+            style={{ backgroundColor: "#ededed" }}
+          >
+            <tbody>
+              <tr>
+                <td
+                  style={{
+                    backgroundColor: "#ededed",
+                    padding: "32px 16px",
+                    fontFamily: "Inter,Arial,Helvetica,sans-serif",
+                  }}
+                >
+                  <Preview>{heading}</Preview>
+                  <Container
+                    lang={localeConfig[locale].htmlLang}
+                    dir="ltr"
+                    style={{ backgroundColor: "#ffffff", color: "#000000", maxWidth: "600px", margin: "0 auto" }}
+                  >
+                    <Section style={{ backgroundColor: "#002991", padding: "28px 32px" }}>
+                      <Text style={{ color: "#ffffff", fontSize: "14px", fontWeight: 700, margin: "0 0 8px" }}>
+                        Modern Fundamental Analyst<span style={{ color: "#008cff" }}>.</span>
+                      </Text>
+                      <Heading as="h1" style={{ color: "#ffffff", fontSize: "28px", lineHeight: "36px", margin: 0 }}>
+                        {heading}
+                      </Heading>
+                    </Section>
+                    <Section style={{ padding: "32px", overflowWrap: "anywhere" }}>{children}</Section>
+                  </Container>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </body>
       </Tailwind>
     </Html>
   );

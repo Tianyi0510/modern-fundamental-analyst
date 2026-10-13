@@ -20,6 +20,10 @@ These are the exact values written to Resend contacts, not translations of the d
 5. Configure a webhook for the deployed `/api/webhooks/resend` endpoint with `email.bounced`, `email.complained`, and `email.suppressed`. Store that endpoint's signing secret as `RESEND_WEBHOOK_SECRET`. The handler verifies the signature and marks affected contacts unsubscribed; unrelated events are acknowledged without contact changes.
 6. Use isolated resources and an owned test recipient to verify contact delivery, confirmation and welcome delivery, preference-link requests, language changes and unsubscribe. Confirm webhook processing with a signed provider test event. Local unit tests mock these services and cannot verify Dashboard setup. Confirmation and preference URLs use `SITE_URL` from [src/lib/site-config.ts](../src/lib/site-config.ts), so confirm the destination before testing against an alternate deployment.
 
+## Domain authentication status
+
+On October 12, 2026, the authoritative Vercel DNS zone and the public resolver returned `_dmarc.modernfundamentalanalyst.com` with `v=DMARC1; p=none; rua=mailto:contact@mail.modernfundamentalanalyst.com;`. This organizational-domain policy also applies to `mail.modernfundamentalanalyst.com` while that subdomain has no separate policy. Reports use the owner's confirmed receiving address. `p=none` collects evidence; it does not request rejection or quarantine. Inspect legitimate received-message authentication headers and aggregate reports before tightening the policy, following [Resend's DMARC rollout](https://resend.com/docs/dashboard/domains/dmarc). DNS publication alone does not prove inbox delivery or report receipt.
+
 ## Server secrets
 
 These credentials are independent and must not be merged or reused:
@@ -49,6 +53,8 @@ Contact notifications, preference-link emails and subscription confirmations use
 | Confirmation copy                                       | [`confirmation-copy.ts`](../src/features/subscriptions/confirmation-copy.ts)                        |
 | Confirmation token, consent and delivery                | [`subscription-confirmation.ts`](../src/features/subscriptions/server/subscription-confirmation.ts) |
 | Fictional preference and confirmation previews          | [`subscriptions/previews/`](../src/features/subscriptions/previews/)                                |
+
+The shared layout declares the locale and left-to-right direction on the document, body and explicit outer layout table, so content retains the intended reading language when clients strip document attributes. The three published welcome templates were updated and read back on October 12, 2026 with the same attributes; copy, variables and plain text were preserved.
 
 ### Preview workflow
 

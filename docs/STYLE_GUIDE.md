@@ -66,7 +66,7 @@ Shared appearance is maintained through components, with finite variants:
 | `Button` / `ButtonLink`                               | Primary, contrast or inverse surface; regular or small size. Native button and link semantics remain distinct. Disabled feedback uses standard, muted or muted-busy variants, preserving preferences opacity without parent overrides. |
 | `FormField`, `TextInput`, `TextArea`, `SelectControl` | Label association, visible or hidden label, standard square or inverse compact fields. Business validation and submission stay with the feature.                                                                                       |
 | `StatusMessage`                                       | Standard or inverse typography, reserved space and polite live feedback.                                                                                                                                                               |
-| `PortfolioMetric`                                     | Plain, highlight, brand or paper financial surfaces, shared typography and note opacity.                                                                                                                                               |
+| `PortfolioMetric`                                     | Plain, highlight, brand or paper financial surfaces, shared typography and surface-specific note colors.                                                                                                                               |
 
 Use Tailwind for normal layout and states, CSS Modules for owned complex structures and motion. Both reference the same tokens. This split follows [Next.js CSS recommendations](https://nextjs.org/docs/app/getting-started/css#recommendations), [Tailwind theme variables](https://tailwindcss.com/docs/theme) and the documented [Preflight effects](https://tailwindcss.com/docs/preflight).
 
@@ -80,6 +80,8 @@ A KPI's `tone` prop explicitly determines its colors, even if cards are reordere
 | `highlight` | Bright Blue | Deep Blue   |
 | `brand`     | Deep Blue   | Bright Blue |
 | `paper`     | White       | Deep Blue   |
+
+KPI notes use dedicated semantic text tokens for plain, highlight, brand and paper surfaces, with at least 4.5:1 contrast for normal text after alpha compositing. Avoid one opacity value across different surfaces. Performance benchmark lines and their legend keys use `--chart-benchmark`, mapped to Medium Blue, for at least 3:1 contrast against the white plot; retain the dashed pattern and monthly data alternative.
 
 Preserve established text colors and opacity, including hover, active, disabled, and inverse states, unless the task explicitly requests a color change. Pair positive and negative colors with numbers or symbols that convey the same meaning. Portfolio return values use dedicated `--text-return-positive` and `--text-return-negative` tokens on light surfaces, including the table's pale blue hover background. The return text tokens use the positive `#037B66` and negative `#D60A22` text colors observed in [Yahoo Finance's quote table](https://finance.yahoo.com/markets/stocks/most-active/) on October 5, 2026, as selected for this site. Both colors meet the 4.5:1 contrast threshold for normal text on white and the table's pale blue hover background. Keep `--price-up` and `--price-down` separate for non-text uses. Medium Blue on white remains about 3.39:1; do not claim full text-contrast compliance for the site.
 

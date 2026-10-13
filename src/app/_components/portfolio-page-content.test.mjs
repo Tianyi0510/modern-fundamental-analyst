@@ -85,18 +85,13 @@ test("all portfolio and performance locales share page structures", async () => 
   assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
 });
 
-test("portfolio table receives only the active locale labels from its server parent", async () => {
+test("portfolio page retains its server boundary and table keeps localized copy outside the client", async () => {
   const [table, page] = await Promise.all([
     read("src/features/portfolio/portfolio-table.tsx"),
     read("src/app/_components/portfolio-page-content.tsx"),
   ]);
 
   assert.match(table, /"use client"/);
-  assert.match(table, /copy: PortfolioTableCopy/);
+  assert.doesNotMatch(page, /^\s*["']use client["']/);
   assert.doesNotMatch(table, /投資組合持股|投资组合持仓|"zh-tw"|"zh-cn"/);
-  assert.match(page, /satisfies Record<Locale, PortfolioTableCopy>/);
-  assert.match(
-    page,
-    /PortfolioTable copy=\{tableCopy\[locale\]\} holdings=\{portfolioHoldings\} income=\{portfolioIncome\}/,
-  );
 });

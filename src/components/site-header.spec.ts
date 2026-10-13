@@ -14,6 +14,23 @@ async function pauseNextMenuEntrance(page: Page) {
   });
 }
 
+async function pauseNextTouchTransfer(page: Page) {
+  await page.evaluate(() => {
+    // Capture both rings before the tap round trip can consume the release animation.
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- The wrapper preserves the element receiver.
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function (...args) {
+      const animation = animate.apply(this, args);
+      if (this.matches(".mobile-menu-touch-ring")) {
+        animation.pause();
+        animation.currentTime = 0;
+        if (this.closest(".mobile-menu-close")) Element.prototype.animate = animate;
+      }
+      return animation;
+    };
+  });
+}
+
 test("language menu supports keyboard entry and Tab exit", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
@@ -132,7 +149,9 @@ test(
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(page.locator(".mobile-menu-content")).toHaveCSS("transform", "none");
     await expect
-      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length), {
+        intervals: [50, 100],
+      })
       .toBe(0);
     await expect(page.locator(".mobile-menu-layer")).toBeVisible();
     await page.keyboard.press("Escape");
@@ -141,7 +160,9 @@ test(
     await expect(page.locator(".mobile-menu-layer")).toBeVisible();
     await expect(page.locator(".mobile-menu-content")).toHaveCSS("transform", "none");
     await expect
-      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length), {
+        intervals: [50, 100],
+      })
       .toBe(0);
   },
 );
@@ -158,7 +179,9 @@ test(
       const trigger = page.locator(".mobile-menu-button");
       await trigger.click();
       await expect
-        .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+        .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length), {
+          intervals: [50, 100],
+        })
         .toBe(0);
       const result = await page.locator(".mobile-menu-close").evaluate((element: HTMLButtonElement) => {
         element.click();
@@ -205,7 +228,9 @@ test(
       await page.keyboard.press("Escape");
       await expect(page.locator(".mobile-menu-layer")).toBeHidden();
       await expect
-        .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0))
+        .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0), {
+          intervals: [50, 100],
+        })
         .toBe(0);
     }
   },
@@ -222,10 +247,14 @@ test("close button becomes the menu button before the header crossfades", { tag:
       await expect(page.locator(".mobile-menu-top")).toHaveCSS("opacity", "1");
       const icon = page.locator(".mobile-menu-close-icon");
       await expect
-        .poll(() => icon.evaluate((e) => e.getAnimations().filter((a) => a.playState === "running").length))
+        .poll(() => icon.evaluate((e) => e.getAnimations().filter((a) => a.playState === "running").length), {
+          intervals: [50, 100],
+        })
         .toBe(0);
       await expect
-        .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+        .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length), {
+          intervals: [50, 100],
+        })
         .toBe(0);
       const result = await page.locator(".mobile-menu-close").evaluate((button: HTMLButtonElement) => {
         button.click();
@@ -318,7 +347,10 @@ test("close button becomes the menu button before the header crossfades", { tag:
       expect(result.early.right).toBeLessThanOrEqual(390);
       await expect(page.locator(".mobile-menu-layer")).toBeHidden();
       await expect
-        .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-close-icon")?.getAnimations().length ?? 0))
+        .poll(
+          () => page.evaluate(() => document.querySelector(".mobile-menu-close-icon")?.getAnimations().length ?? 0),
+          { intervals: [50, 100] },
+        )
         .toBe(0);
       await expect(page.locator(".mobile-menu-button")).toBeFocused();
     }
@@ -353,36 +385,42 @@ test("menu hides before releasing the final dismissal frame", { tag: "@mobile" }
 test.describe("repeated touch menu animation", () => {
   test.use({ hasTouch: true });
 
-  test("each opening replays after the hidden state resets", { tag: "@mobile" }, async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-      await page.goto(prefix || "/");
-      const icon = page.locator(".mobile-menu-close-icon");
-      for (let opening = 1; opening <= 3; opening++) {
-        await pauseNextMenuEntrance(page);
-        await page.locator(".mobile-menu-button").tap();
-        const midpoint = await icon.evaluate((element) => {
-          const animation = element.getAnimations()[0]!;
-          animation.pause();
-          animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-          const transform = getComputedStyle(element).transform;
-          animation.play();
-          document
-            .querySelector(".mobile-menu-content")!
-            .getAnimations()
-            .forEach((entrance) => entrance.play());
-          return transform;
-        });
-        expect(midpoint).not.toBe("none");
-        expect(midpoint).not.toBe("matrix(1, 0, 0, 1, 0, 0)");
-        await expect.poll(() => icon.evaluate((element) => element.getAnimations().length)).toBe(0);
-        await page.locator(".mobile-menu-close").tap();
-        await expect(page.locator(".mobile-menu-layer")).toBeHidden();
-        await expect(icon).toHaveCount(0);
-      }
-    }
-  });
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    test(
+      `${prefix || "English"} each opening replays after the hidden state resets`,
+      { tag: "@mobile" },
+      async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.emulateMedia({ reducedMotion: "no-preference" });
+        await page.goto(prefix || "/");
+        const icon = page.locator(".mobile-menu-close-icon");
+        for (let opening = 1; opening <= 3; opening++) {
+          await pauseNextMenuEntrance(page);
+          await page.locator(".mobile-menu-button").tap();
+          const midpoint = await icon.evaluate((element) => {
+            const animation = element.getAnimations()[0]!;
+            animation.pause();
+            animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+            const transform = getComputedStyle(element).transform;
+            animation.play();
+            document
+              .querySelector(".mobile-menu-content")!
+              .getAnimations()
+              .forEach((entrance) => entrance.play());
+            return transform;
+          });
+          expect(midpoint).not.toBe("none");
+          expect(midpoint).not.toBe("matrix(1, 0, 0, 1, 0, 0)");
+          await expect
+            .poll(() => icon.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+            .toBe(0);
+          await page.locator(".mobile-menu-close").tap();
+          await expect(page.locator(".mobile-menu-layer")).toBeHidden();
+          await expect(icon).toHaveCount(0);
+        }
+      },
+    );
+  }
 });
 
 test("menu icon replays after navigation and returning to a visited page", { tag: "@mobile" }, async ({ page }) => {
@@ -406,7 +444,9 @@ test("menu icon replays after navigation and returning to a visited page", { tag
       return transform;
     });
     expect(midpoint).not.toBe("none");
-    await expect.poll(() => icon.evaluate((element) => element.getAnimations().length)).toBe(0);
+    await expect
+      .poll(() => icon.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+      .toBe(0);
     await page.locator(`.mobile-menu-layer nav a[href="${path}"]`).click();
     await expect(page).toHaveURL(path);
     await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
@@ -433,32 +473,37 @@ test.describe("mobile menu touch ring", () => {
               await button.dispatchEvent("pointerdown", touch);
               await expect(button.locator(".mobile-menu-touch-ring")).toHaveCSS("opacity", "1");
               await expect
-                .poll(() =>
-                  button.evaluate((element) => {
-                    const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
-                    return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
-                  }),
+                .poll(
+                  () =>
+                    button.evaluate((element) => {
+                      const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+                      return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
+                    }),
+                  { intervals: [50, 100] },
                 )
                 .toBe(reducedMotion === "reduce" ? 100 : 98);
-              await button.dispatchEvent("pointercancel", touch);
               if (reducedMotion === "no-preference") {
-                const opacity = await button.locator(".mobile-menu-touch-ring").evaluate((ring) => {
+                const opacity = await button.evaluate((element, pointer) => {
+                  // Dispatch and sample in one browser task so cancellation cannot finish between commands.
+                  element.dispatchEvent(new PointerEvent("pointercancel", { ...pointer, bubbles: true }));
+                  const ring = element.querySelector(".mobile-menu-touch-ring")!;
                   const animation = ring.getAnimations()[0];
                   if (!animation) throw new Error("Touch release feedback is missing.");
                   animation.pause();
                   animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
                   return Number(getComputedStyle(ring).opacity);
-                });
+                }, touch);
                 expect(opacity).toBeCloseTo(0.5, 1);
                 await button
                   .locator(".mobile-menu-touch-ring")
                   .evaluate((ring) => ring.getAnimations().forEach((animation) => animation.finish()));
-              }
+              } else await button.dispatchEvent("pointercancel", touch);
               await expect(button.locator(".mobile-menu-touch-ring")).toHaveCSS("opacity", "0");
             }
           }
           await close.tap();
           await expect(trigger).toHaveAttribute("aria-expanded", "false");
+          if (reducedMotion === "no-preference") await pauseNextTouchTransfer(page);
           await trigger.tap();
           if (reducedMotion === "no-preference") {
             // The release animation follows the replacement control even for a real short tap.
@@ -471,6 +516,9 @@ test.describe("mobile menu touch ring", () => {
             });
             expect(opacity).toBeCloseTo(0.5, 1);
             await close
+              .locator(".mobile-menu-touch-ring")
+              .evaluate((ring) => ring.getAnimations().forEach((animation) => animation.finish()));
+            await trigger
               .locator(".mobile-menu-touch-ring")
               .evaluate((ring) => ring.getAnimations().forEach((animation) => animation.finish()));
           }
@@ -486,11 +534,11 @@ test.describe("mobile menu touch ring", () => {
     }
   }
 
-  test(
-    "blue fill and black border persist without a keyboard outline on touch",
-    { tag: "@mobile" },
-    async ({ page }) => {
-      for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    test(
+      `${prefix || "English"} blue fill and black border persist without a keyboard outline on touch`,
+      { tag: "@mobile" },
+      async ({ page }) => {
         await page.goto(prefix || "/");
         for (const route of ["/about", "/memos", "/"]) {
           await page.emulateMedia({ reducedMotion: route === "/" ? "reduce" : "no-preference" });
@@ -506,23 +554,27 @@ test.describe("mobile menu touch ring", () => {
           await expect(page).toHaveURL(path);
           await expect(page.locator(".mobile-menu-button")).toHaveAttribute("aria-expanded", "false");
         }
-      }
-    },
-  );
+      },
+    );
 
-  test("mobile language drawer opens and closes on touch", { tag: "@mobile" }, async ({ page }) => {
-    for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-      await page.goto(`${prefix}/portfolio`);
-      await page.locator(".mobile-menu-button").tap();
-      const drawer = page.locator(".mobile-language-disclosure");
-      await drawer.locator("summary").tap();
-      await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
-      await expect(drawer.locator("a").last()).toBeVisible();
-      await drawer.locator("summary").tap();
-      await expect(drawer).not.toHaveAttribute("open");
-      await expect(drawer.locator("a").last()).not.toBeVisible();
-    }
-  });
+    test(
+      `${prefix || "English"} mobile language drawer opens and closes on touch`,
+      { tag: "@mobile" },
+      async ({ page }) => {
+        await page.goto(`${prefix}/portfolio`);
+        await page.locator(".mobile-menu-button").tap();
+        const drawer = page.locator(".mobile-language-disclosure");
+        await drawer.locator("summary").tap();
+        await expect
+          .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+          .toBe(0);
+        await expect(drawer.locator("a").last()).toBeVisible();
+        await drawer.locator("summary").tap();
+        await expect(drawer).not.toHaveAttribute("open");
+        await expect(drawer.locator("a").last()).not.toBeVisible();
+      },
+    );
+  }
 });
 
 test("narrow navigation keeps its close control and brand inside the drawer", { tag: "@mobile" }, async ({ page }) => {
@@ -531,7 +583,9 @@ test("narrow navigation keeps its close control and brand inside the drawer", { 
     await page.goto("/zh-tw");
     await page.locator(".mobile-menu-button").click();
     await expect
-      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length))
+      .poll(() => page.locator(".mobile-menu-content").evaluate((content) => content.getAnimations().length), {
+        intervals: [50, 100],
+      })
       .toBe(0);
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
@@ -817,7 +871,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await summary.focus();
         await page.keyboard.press("Enter");
         await expect(drawer).toHaveAttribute("open", "");
-        await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+        await expect
+          .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+          .toBe(0);
         await expect(options).toHaveCount(2);
         await expect(drawer.locator(`a[href="${prefix}/portfolio"]`)).toHaveCount(0);
         await expect(options.first()).toBeVisible();
@@ -832,7 +888,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(options.first()).not.toBeVisible();
         await page.keyboard.press("Space");
         await expect(drawer).toHaveAttribute("open", "");
-        await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+        await expect
+          .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+          .toBe(0);
         if (reducedMotion === "no-preference") {
           await summary.evaluate((element: HTMLElement) => {
             element.click();
@@ -841,7 +899,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
             element.click();
           });
-          await expect.poll(() => drawer.evaluate((element) => element.getAnimations().length)).toBe(0);
+          await expect
+            .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+            .toBe(0);
           await expect(drawer).toHaveAttribute("open", "");
         }
         await page.evaluate(() => (document.documentElement.style.fontSize = "200%"));
@@ -865,7 +925,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.locator(".mobile-menu-button").click();
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("padding-left", "4px");
     await expect
-      .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0))
+      .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0), {
+        intervals: [50, 100],
+      })
       .toBe(0);
     await page.locator(".mobile-language-disclosure > summary").click();
     await expect
@@ -937,7 +999,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await page.goto(prefix || "/");
         await page.locator(".mobile-menu-button").click();
         await expect
-          .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0))
+          .poll(
+            () => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0),
+            { intervals: [50, 100] },
+          )
           .toBe(0);
         await page.keyboard.press("Tab");
         const close = page.locator(".mobile-menu-close");

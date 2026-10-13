@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { colorContrast } from "../../../scripts/color-contrast";
 
 test.use({ hasTouch: true });
 
@@ -20,6 +21,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.getByRole("img")).toBeVisible();
     await expect(chart.getByRole("img")).toHaveAccessibleName(/38\.27%.*32\.20%/);
     await expect(chart.locator("polyline")).toHaveCount(2);
+    const strokes = await chart
+      .locator("polyline")
+      .evaluateAll((lines) => lines.map((line) => getComputedStyle(line).stroke));
+    for (const stroke of strokes) expect(colorContrast(stroke, "rgb(255, 255, 255)")).toBeGreaterThanOrEqual(3);
     for (const line of await chart.locator("polyline").all()) {
       expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(22);
       for (const point of (await line.getAttribute("points"))!.split(" ")) {

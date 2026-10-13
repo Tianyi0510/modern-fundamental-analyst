@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { colorContrast } from "../../../scripts/color-contrast";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} financial summaries associate labels, values, notes and snapshot dates`, async ({
@@ -29,7 +30,23 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         const valueBox = (await value.boundingBox())!;
         const noteBox = (await note.boundingBox())!;
         expect(noteBox.y).toBeGreaterThanOrEqual(valueBox.y + valueBox.height);
-        await expect(note.locator("small")).toHaveCSS("opacity", "0.62");
+        const notes = await summary.locator(":scope > div").evaluateAll((groups) =>
+          groups.map((group) => {
+            const note = getComputedStyle(group.querySelector(".kpi-note small")!);
+            return {
+              tone: group.getAttribute("data-tone"),
+              color: note.color,
+              opacity: Number(note.opacity),
+              background: getComputedStyle(group).backgroundColor,
+            };
+          }),
+        );
+        for (const sample of notes) {
+          expect(
+            colorContrast(sample.color, sample.background, sample.opacity),
+            `${route} ${sample.tone} note at ${width}px`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
       }
       await page.addStyleTag({ content: "html { font-size: 200%; }" });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);

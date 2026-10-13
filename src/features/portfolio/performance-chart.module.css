@@ -33,7 +33,7 @@
   border-top: 3px solid var(--deep-blue);
 }
 .benchmarkKey {
-  border-color: var(--bright-blue);
+  border-color: var(--chart-benchmark);
   border-top-style: dashed;
 }
 .plot {
@@ -81,7 +81,7 @@
   stroke: var(--deep-blue);
 }
 .benchmarkLine {
-  stroke: var(--bright-blue);
+  stroke: var(--chart-benchmark);
   stroke-dasharray: 8 5;
 }
 .dates {

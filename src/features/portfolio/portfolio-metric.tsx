@@ -7,6 +7,12 @@ const tones: Record<MetricTone, string> = {
   brand: "bg-brand text-highlight",
   paper: "bg-white text-brand",
 };
+const noteTones: Record<MetricTone, string> = {
+  plain: "text-[color:var(--text-secondary)]",
+  highlight: "text-[color:var(--text-on-highlight-secondary)]",
+  brand: "text-[color:var(--text-highlight-secondary)]",
+  paper: "text-[color:var(--text-brand-secondary)]",
+};
 
 export function PortfolioMetric({
   label,
@@ -38,7 +44,7 @@ export function PortfolioMetric({
       </dd>
       <dd className="kpi-note mt-[14px] compact:mt-[var(--space-2)]">
         <small
-          className={`block text-[length:var(--font-size-caption)] leading-[var(--leading-body)] font-normal tracking-[var(--tracking-body)] text-current opacity-[0.62] compact:max-w-[32ch] ${noteClassName}`}
+          className={`block text-[length:var(--font-size-caption)] leading-[var(--leading-body)] font-normal tracking-[var(--tracking-body)] compact:max-w-[32ch] ${noteTones[tone]} ${noteClassName}`}
         >
           {note}
         </small>

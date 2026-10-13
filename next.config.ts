@@ -1,10 +1,22 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs/config";
 
+// Static App Router pages need inline bootstrap scripts. This is an origin policy, not a nonce-based strict CSP.
+const contentSecurityPolicy = [
+  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vercel.live${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
+  "script-src-attr 'none'",
+  "object-src 'none'",
+  "worker-src 'self' blob:",
+  "base-uri 'self'",
+  "form-action 'self' https://checkout.stripe.com",
+  "frame-ancestors 'none'",
+  ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
+].join("; ");
+
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
-    value: "base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'",
+    value: contentSecurityPolicy,
   },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Permissions-Policy", value: "camera=(), geolocation=(), microphone=()" },
