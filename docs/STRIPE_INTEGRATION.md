@@ -38,6 +38,8 @@ Old paid Sessions remain verifiable through their original amount metadata. The 
 
 ## Environment verification checklist
 
+Focused local checks use `npm run test:integration -- src/features/support/support-panel.test.tsx` for rendered status behavior and `npx playwright test src/features/support/support-status.spec.ts --project=chromium` for the browser journey. These checks do not establish live payment outcomes.
+
 1. Configure a sandbox server key and verify permission to create an inline-price Session and retrieve it. Confirm account tax defaults, applicable registrations and the catalog's tax classification. Provider writes require separate authorization.
 2. Exercise all products and three languages, native submission without JavaScript, stopped-navigation resume, changed-selection rejection, cancellation, pending payment and server-confirmed payment.
 3. Before release, confirm retired links display the notice and make no provider request. Verify the new key and target account mode; sandbox success is not live payment evidence.
@@ -50,7 +52,7 @@ Payment status does not grant email-subscription consent. Checkout remains indep
 
 The asynchronous `VerifiedSupportPanel` retrieves payment status server-side and renders the synchronous `SupportPanel` through JSX. Payment verification uses a Suspense loading boundary; ordinary visits and retry states render the native form directly through JSX without awaiting a provider. Do not invoke either component as an ordinary function.
 
-The return page retrieves the Session server-side. Only a completed, paid USD research-support Session confirms success. New catalog Sessions must also match the known product ID, subtotal and amount metadata; tax may increase the total without changing the subtotal. Missing or unavailable evidence is unverified, and completed unpaid Sessions are pending. URL parameters alone never confirm payment. No customer details are returned to the page. Pending payments hide the checkout form and do not create another checkout attempt; users can refresh the same return URL to recheck status or follow the localized Contact link for help. Success copy confirms payment without promising an email receipt. Before payment, the page explains that applicable taxes are calculated at checkout.
+The return page retrieves the Session server-side. Only a completed, paid USD research-support Session confirms success. New catalog Sessions must also match the known product ID, subtotal and amount metadata; tax may increase the total without changing the subtotal. Missing or unavailable evidence is unverified, and completed unpaid Sessions are pending. URL parameters alone never confirm payment. A `status=cancelled` return only establishes that the reader returned from Checkout; it does not prove that payment was cancelled, failed or unpaid. The localized message asks the reader to check the Stripe confirmation before trying again. No customer details are returned to the page. Pending payments hide the checkout form and do not create another checkout attempt; users can refresh the same return URL to recheck status or follow the localized Contact link for help. Success copy confirms payment without promising an email receipt. Before payment, the page explains that applicable taxes are calculated at checkout.
 
 No webhook is required for voluntary support because payment does not unlock content or fulfill an order. Future entitlements or durable recovery require a payment ledger and verified Stripe webhooks.
 

@@ -36,15 +36,18 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             return {
               tone: group.getAttribute("data-tone"),
               color: note.color,
+              valueColor: getComputedStyle(group.querySelector(".kpi-value strong")!).color,
               opacity: Number(note.opacity),
               background: getComputedStyle(group).backgroundColor,
             };
           }),
         );
         for (const sample of notes) {
+          expect(sample.color, `${route} ${sample.tone} note matches its value at ${width}px`).toBe(sample.valueColor);
+          expect(sample.opacity).toBe(0.8);
           expect(
             colorContrast(sample.color, sample.background, sample.opacity),
-            `${route} ${sample.tone} note at ${width}px`,
+            `${route} ${sample.tone} note contrast at ${width}px`,
           ).toBeGreaterThanOrEqual(4.5);
         }
       }

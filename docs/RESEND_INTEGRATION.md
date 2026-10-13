@@ -48,7 +48,7 @@ Contact notifications, preference-link emails and subscription confirmations use
 | Contact recipient                                       | [`contact-config.ts`](../src/features/contact/server/contact-config.ts)                             |
 | Preference HTML                                         | [`preference-email.tsx`](../src/features/subscriptions/preference-email.tsx)                        |
 | Preference subject and three-language copy              | [`preference-email-copy.ts`](../src/features/subscriptions/preference-email-copy.ts)                |
-| Preference token, plain text and delivery orchestration | [`request/route.ts`](../src/app/api/subscription-preferences/request/route.ts)                      |
+| Preference token, plain text and delivery orchestration | [`request-preference-link.ts`](../src/features/subscriptions/server/request-preference-link.ts)     |
 | Fictional Contact previews                              | [`contact/previews/`](../src/features/contact/previews/)                                            |
 | Confirmation copy                                       | [`confirmation-copy.ts`](../src/features/subscriptions/confirmation-copy.ts)                        |
 | Confirmation token, consent and delivery                | [`subscription-confirmation.ts`](../src/features/subscriptions/server/subscription-confirmation.ts) |
@@ -126,6 +126,8 @@ A valid preference token allows a server-side contact lookup. The form displays 
 
 ## Request reliability
 
+The [request route](../src/app/api/subscription-preferences/request/route.ts) owns HTTP input validation and response mapping. The feature-owned [preference-link service](../src/features/subscriptions/server/request-preference-link.ts) owns recipient allowances, immutable retry payloads, contact lookup, localized rendering and sending. Missing and existing contacts receive the same successful public response; a missing contact does not trigger delivery.
+
 `UPSTASH_KV_REST_API_URL` and the read/write `UPSTASH_KV_REST_API_TOKEN` are required for subscriber mutations and preference-link requests. Only IP rate limiting has an in-process fallback. Recipient delivery allowances, confirmation and subscriber mutations fail closed if Redis is unavailable. No live email is sent by the unit tests.
 
 Preference requests store the complete email payload for 25 hours using atomic `SET NX`, covering Resend's 24-hour deduplication window plus a delay before the initial send. Retries reuse the original encrypted link, text, HTML and provider idempotency key. Changing the input under the same key returns 409. After 25 minutes, a fresh submission ID is required so users do not receive a nearly expired 30-minute link. The form resets its ID on that response. Redis records contain the recipient and email content; use the existing authenticated TLS connection and restrict database access.
@@ -141,6 +143,14 @@ A failed read before any mutation starts does not create an unknown write outcom
 Segment reconciliation reads all pages before changing membership, preserves unrelated segments, and rejects non-progressing cursors. Active subscriptions are rejected with HTTP 409 and the message "You've already subscribed" before any contact, language-segment, or welcome-event writes. The form displays localized duplicate feedback and retains the email for editing. Language changes belong in Email Preferences; previously unsubscribed contacts must confirm again, and delivery-suppressed contacts require operator review. Welcome prerequisites are checked before mutation. Language-segment failures retain the existing rollback protection; welcome delivery failures preserve confirmed consent and retain the journal for reconciliation.
 
 ## Verification
+
+For shared email layout or preference-link orchestration changes, run this focused mocked-provider and rendering check:
+
+```sh
+node --import ./scripts/register-server.mjs --test src/features/subscriptions/preference-email.test.mjs src/features/subscriptions/server/request-preference-link.test.mjs src/features/contact/server/send-contact-message.test.mjs
+```
+
+Rendering coverage includes all nine localized Contact, preference and confirmation previews, HTML escaping, plain text and inner language/direction metadata after document attributes are removed. It does not establish rendering in every email client.
 
 For affected UI workflows, run `npx playwright test src/features/subscriptions/subscription-confirmation.spec.ts src/app/_components/contact-subscription.spec.ts src/app/_components/portfolio-form-status.spec.ts --project=chromium --project=webkit --workers=2`. The configured server uses isolated provider settings; browser requests are mocked. Service tests cover confirmation, replay, expiry, consent, suppressed delivery, recipient allowances and journal recovery. Redis command behavior is mocked in these tests; this does not establish live Redis durability or provider delivery.
 

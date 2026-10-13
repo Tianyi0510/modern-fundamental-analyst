@@ -90,9 +90,6 @@
   --text-secondary: rgba(0, 0, 0, 0.62);
   --text-tertiary: rgba(0, 0, 0, 0.56);
   --text-brand: var(--deep-blue);
-  --text-brand-secondary: rgba(0, 41, 145, 0.72);
-  --text-on-highlight-secondary: rgba(0, 41, 145, 0.82);
-  --text-highlight-secondary: rgba(95, 205, 253, 0.82);
   --text-inverse: var(--white);
   --text-inverse-secondary: rgba(255, 255, 255, 0.68);
   --text-inverse-tertiary: rgba(255, 255, 255, 0.62);
