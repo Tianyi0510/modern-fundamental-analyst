@@ -10,7 +10,9 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self' https://checkout.stripe.com",
   "frame-ancestors 'none'",
-  ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
+  ...(process.env.NODE_ENV === "production" && process.env.VERCEL_ENV === "production"
+    ? ["upgrade-insecure-requests"]
+    : []),
 ].join("; ");
 
 const securityHeaders = [

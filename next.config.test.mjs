@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 
-function headersFor(environment) {
+function headersFor(environment, vercelEnvironment = "") {
   const output = execFileSync(
     process.execPath,
     [
@@ -14,7 +14,7 @@ function headersFor(environment) {
     ],
     {
       cwd: import.meta.dirname,
-      env: { ...process.env, NODE_ENV: environment, SENTRY_AUTH_TOKEN: "" },
+      env: { ...process.env, NODE_ENV: environment, VERCEL_ENV: vercelEnvironment, SENTRY_AUTH_TOKEN: "" },
       encoding: "utf8",
     },
   );
@@ -24,7 +24,7 @@ function headersFor(environment) {
 }
 
 test("production CSP limits script origins without disabling static hydration, Replay or Checkout", () => {
-  const policy = headersFor("production");
+  const policy = headersFor("production", "production");
   const directives = Object.fromEntries(
     policy.split("; ").map((part) => {
       const [name, ...values] = part.split(" ");
@@ -49,3 +49,12 @@ test("development CSP permits React debugging without forcing localhost onto HTT
   assert.ok(policy.includes("'unsafe-eval'"));
   assert.ok(!policy.includes("upgrade-insecure-requests"));
 });
+
+for (const vercelEnvironment of ["", "preview", "development"]) {
+  test(`production build keeps HTTP subresources usable outside Vercel Production (${vercelEnvironment || "local"})`, () => {
+    const policy = headersFor("production", vercelEnvironment);
+    assert.ok(!policy.includes("upgrade-insecure-requests"));
+    assert.ok(policy.includes("script-src-attr 'none'"));
+    assert.ok(!policy.includes("'unsafe-eval'"));
+  });
+}
