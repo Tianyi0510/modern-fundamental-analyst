@@ -430,6 +430,8 @@ Keep local screenshots and dated notes in `../local/audit/`. Legacy `audit/` rem
 
 Keep `node_modules/`, local environment files and Vercel project linkage in the checkout. npm and Next.js/Turbopack require normal module resolution. Local evidence is historical, not a current issue list, and is absent from fresh clones. Keep durable decisions in tracked docs. Share reviewed evidence with relative image paths and its date, commit, environment and resolution status.
 
+Desktop navigation uses an SSR-enabled dynamic client boundary to separate the language-menu engine from the initial Header module. Links and their server-rendered layout remain present; keyboard and locale recovery behavior are covered by Header regressions.
+
 The disposable Ubuntu performance runner supplies `LIGHTHOUSE_CHROME_FLAGS=--headless=new --no-sandbox` because Playwright's downloaded Chrome lacks an Ubuntu AppArmor sandbox profile. This override applies only to Lighthouse's provider-disabled localhost audit; local runs retain the default Chrome sandbox. Performance budgets remain unchanged. See [Lighthouse CI guidance](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md).
 
 CI keeps failed-attempt screenshots and traces for failed attempts and all retries, including passing retries. Upload artifacts even when the job passes; retain them for seven days.

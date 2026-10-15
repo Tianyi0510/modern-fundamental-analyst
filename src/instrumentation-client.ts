@@ -24,7 +24,9 @@ if (dsn) {
   if (replayAllowed) {
     // Load the DOM recorder separately so error monitoring does not block on Replay code.
     void import("@/lib/sentry-replay-client")
-      .then(({ initializeReplay }) => {
+      .then(async ({ initializeReplay }) => {
+        // Let the browser render between loading the recorder and taking its first snapshot.
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
         if (replayAllowed && canRecordReplay(window.location.href)) initializeReplay(environment);
       })
       .catch(() => {
