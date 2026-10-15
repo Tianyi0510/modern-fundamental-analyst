@@ -1,35 +1,54 @@
 # Modern Fundamental Analyst
 
-A public-equity research website in English, Traditional Chinese, and Simplified Chinese, featuring portfolio holdings, performance, investment memos, email subscriptions, and one-time research support.
+A public-equity research website in English, Traditional Chinese and Simplified Chinese. It publishes portfolio holdings, performance and investment memos, with email subscriptions and one-time research support.
 
 [Visit the website](https://www.modernfundamentalanalyst.com)
 
-Built with Next.js, React, TypeScript, Tailwind CSS, customized shadcn/ui primitives, and CSS Modules. Resend handles email, Upstash Redis stores confirmation and consent records and coordinates rate limits and subscriber updates, Stripe provides Checkout, and Vercel hosts the site and manages its domain.
+The site uses Next.js App Router, React, TypeScript, Tailwind CSS, customized shadcn/ui components and CSS Modules. Resend handles email, Upstash Redis coordinates reader services, Stripe provides Hosted Checkout, Sentry monitors errors and performance, and Vercel hosts the site.
 
 ## Local Development
 
-Requires Node.js 24 and npm.
+Use Node.js 24 and npm.
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). For service integrations, use [.env.example](.env.example) as a template for an uncommitted `.env.local`. Never commit credentials.
+Open [localhost:3000](http://localhost:3000). Copy [.env.example](.env.example) to an ignored `.env.local` when configuring services. Never commit credentials.
 
-For email development, run `npm run email:contact` (or `npm run email`) and open [localhost:3001](http://localhost:3001); use `npm run email:preferences` and [localhost:3002](http://localhost:3002) for preference and subscription-confirmation emails. Nine fictional, three-language previews are available without service credentials; see [Resend templates](docs/RESEND_INTEGRATION.md#email-templates-and-local-preview).
+Email previews need no service credentials:
+
+| Command                                    | Preview                                                                       |
+| ------------------------------------------ | ----------------------------------------------------------------------------- |
+| `npm run email:contact` or `npm run email` | Contact emails at [localhost:3001](http://localhost:3001)                     |
+| `npm run email:preferences`                | Preference and confirmation emails at [localhost:3002](http://localhost:3002) |
+
+See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-local-preview) for all nine localized examples.
 
 ## Verification
 
-`npm ci` installs the local Husky pre-commit hook. It runs `npm run lint:staged`: Prettier checks supported staged files, including CSS, and sorts recognized Tailwind class lists through `prettier-plugin-tailwindcss`; ESLint checks staged JavaScript/TypeScript with the shared local cache. Unknown formats are skipped. Concurrent tasks only read files, so overlapping format and lint checks do not race to rewrite them. These checks do not rewrite files. Run `npm run format` or fix reported lint errors, review and stage the changes, then commit again. Partially staged files are checked with their unstaged changes temporarily hidden and restored by lint-staged. CI, Vercel and production installs skip hook setup; local hooks do not replace CI or release verification. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node setup.
+Run checks for the changed files and behavior. CI runs full verification; release checks confirm the deployed commit and live status. Do not routinely repeat the full suite locally.
 
-Local development uses fast, affected-scope checks from [AGENTS.md](AGENTS.md#verification-and-review). GitHub Actions owns full verification; deployment verifies the release commit and live status. A release does not require repeating the complete suite locally.
+| Scope                                              | Command                                                           |
+| -------------------------------------------------- | ----------------------------------------------------------------- |
+| Unit tests                                         | `npm run test:unit -- <test-path>`                                |
+| Component integrations                             | `npm run test:integration -- <test-path>`                         |
+| Watch mode                                         | `npm run test:watch`                                              |
+| Node tests                                         | `node --import ./scripts/register-server.mjs --test <test-files>` |
+| Browser journeys                                   | `npm run test:e2e -- <spec-files> --project=chromium`             |
+| All Node and Vitest tests                          | `npm test`                                                        |
+| Full static verification                           | `npm run verify:static`                                           |
+| Static checks, build and production Chromium       | `npm run verify`                                                  |
+| Mobile WebKit against an existing production build | `npm run test:webkit`                                             |
 
-`npm test` runs the existing Node suite, Vitest unit tests and Testing Library/MSW integration tests. Use `npm run test:unit`, `npm run test:integration`, or `npm run test:watch` for focused development. `npm run test:e2e -- <spec-files> --project=chromium` runs selected Playwright journeys (use `webkit` for tagged mobile WebKit cases).
+Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack.
 
-`npm run verify:static` runs types, lint, formatting and all Node/Vitest tests. `npm run verify` adds a production build and Chromium tests when full local diagnosis is needed. `npm run test:webkit` runs only `@mobile` cases with iPhone 13 emulation across both shards against an existing production build; CI runs those shards concurrently on separate macOS runners. Install browsers with `npx playwright install chromium webkit` when needed. If local Turbopack workers cannot bind a port in a restricted environment, use `npm run build -- --webpack` for local production checks; CI retains the default Turbopack build.
+### Commit hooks
 
-PRs run full CI. A main-branch merge can reuse a recent successful full PR run with an identical Git tree; otherwise it runs full CI. The release workflow records the evidence and retains the exact-commit Vercel gate. GitHub deletes merged remote branches automatically; local merged branches are cleaned up after successful deployment. See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md#release-workflow).
+`npm ci` installs Husky locally. Before a commit, `npm run lint:staged` checks staged formatting and JavaScript/TypeScript lint. Prettier also checks CSS syntax and recognized Tailwind class ordering. Unknown formats are skipped. The checks do not rewrite files; concurrent tasks only read them.
+
+Fix failures, review and stage the changes, then commit again. lint-staged temporarily hides and restores unstaged edits in partially staged files. CI, Vercel and production installs skip hook setup. See [Husky](https://typicode.github.io/husky/how-to.html) for local opt-out and GUI Node configuration. Hooks do not replace CI.
 
 ## Project Layout
 
@@ -42,35 +61,37 @@ PRs run full CI. A main-branch merge can reuse a recent successful full PR run w
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
 | `public/`         | Public icons, logos, and the social sharing image                                      |
 | `.github/`        | GitHub Actions workflows                                                               |
-| `docs/`           | Style guide, operations, data, and service integration guides                          |
+| `docs/`           | Quality, design system, architecture, and integration documentation                    |
 
-KPI cards share `PortfolioMetric`; visual tone, note opacity and contrast requirements are maintained in the [Style Guide](docs/STYLE_GUIDE.md#css-layout-and-visual-language), while financial definitions belong in [Portfolio Data](docs/PORTFOLIO_DATA.md).
+English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
-Layout and ordinary states use static Tailwind classes; complex component motion and charts use adjacent CSS Modules. Tokens and the single reset live in `src/app/styles/`; see [style ownership](docs/STYLE_GUIDE.md#style-ownership). React Email maintains separate inbox-compatible styling.
+Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component. Presentation uses shared components and semantic tokens.
 
-shadcn/ui configuration lives in `components.json`; owned primitives live in `src/components/ui/`. Native form, result and loading primitives preserve server rendering; interactive DropdownMenu and Sheet use Radix. All share the existing brand tokens and semantic HTML contracts. Follow the [component installation procedure](docs/STYLE_GUIDE.md#shadcnui-components) when adding or updating a primitive.
+## Documentation
 
-Language routes are `/`, `/zh-tw`, and `/zh-cn`. Local review evidence stays outside the checkout in `../local/audit/`; see [evidence retention](docs/TECHNICAL_ARCHITECTURE.md#review-evidence).
+| Document                                                             | Use it for                                                                                                  |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| [Design System](docs/DESIGN_SYSTEM.md)                               | Design principles, tokens, typography, components, interaction, content and localization.                   |
+| [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
+| [Integrations](docs/INTEGRATIONS.md)                                 | Provider setup, secrets, email/consent, Redis recovery, payment verification and monitoring.                |
+| [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
+| [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Historical release-preparation evidence and checklist, not current deployment status.                       |
 
-Under `src/app/`, route groups such as `(en)` organize pages without adding a URL segment. The `zh-tw` and `zh-cn` folders are URL segments; their names intentionally appear in the path. Route files use Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`, `error.tsx`, and `route.ts`).
+### Documentation maintenance
 
-## Content and Integrations
+- Write clear, concise English. Include non-English text only for an exact runtime or provider value, with a link to its code definition.
+- Give each rule or fact one primary location. Link to it elsewhere instead of repeating it.
+- Explain decisions, boundaries, operations and completion criteria. Let code and configuration define current values.
+- Separate required behavior, historical evidence and proposals. Date external observations and name their source.
+- Use executable examples and mark placeholders. Explain a rule's purpose, exceptions and verification only when needed.
+- Before deleting or moving a document, migrate useful content and update all references. Check links, anchors, commands, formatting and `git diff --check`.
 
-Portfolio transactions, cash flows, corporate actions, and month-end valuations and XIRRs live in `src/features/portfolio/portfolio-detail.ts`; `src/features/portfolio/portfolio.ts` derives the website snapshot and return history. Server-only `src/features/portfolio/portfolio-twr.ts` derives reconstructed time-weighted returns from the dated ledger and closing marks. Home and Performance summary cards show cumulative, non-annualized TWRR; the Portfolio summary shows the same cost-basis total return as the holdings table. Performance renders cumulative TWR and annualized XIRR comparison charts against SPY, each with a monthly data table. See [Portfolio Data](docs/PORTFOLIO_DATA.md) for calculation scope and updates. Memo entries live in `src/features/memos/memos.ts`, with articles under `src/features/memos/articles/` registered in `src/features/memos/memo-content.ts`. Interface copy is maintained by its owning page or shared component.
-
-The Contact page and Footer subscription forms have independent browser state and share the same backend consent and delivery protections. Subscriptions require email confirmation before activation. Existing subscribers can manage language or unsubscribe through secure preference links. Keep the three distinct server secrets (`RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, and `SUBSCRIPTION_PREFERENCES_SECRET`); see [email secrets](docs/RESEND_INTEGRATION.md#server-secrets) for their roles and rotation constraints. Public signup cannot override delivery suppression.
-
-Integration details:
-
-- [Resend Integration](docs/RESEND_INTEGRATION.md)
-- [Upstash Redis Integration](docs/UPSTASH_REDIS_INTEGRATION.md)
-- [Stripe Integration](docs/STRIPE_INTEGRATION.md)
-- [Sentry monitoring](docs/TECHNICAL_ARCHITECTURE.md#monitoring)
-- [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
-- [Portfolio Data](docs/PORTFOLIO_DATA.md)
-
-Start with the [Style Guide](docs/STYLE_GUIDE.md) for code, UI, interaction, content, and documentation principles; detailed procedures remain in the relevant domain guides.
+Documentation-only changes do not require the full application suite. [AGENTS.md](AGENTS.md#verification-and-review) defines completion checks.
 
 ## Deployment
 
-Submit changes through a pull request and review its CI and Vercel Preview results. Merge only when release is authorized. Pushes to `main` trigger fresh GitHub Actions and Vercel production builds. Production requires successful CI for the exact commit; see the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow) and [production gate](docs/TECHNICAL_ARCHITECTURE.md#production-gate). Configure production credentials in Vercel and use isolated resources for preview integration testing.
+Submit changes through a PR. Review CI and Vercel Preview for its head commit; merge when release is authorized. Main CI may reuse recent full PR evidence only for an identical Git tree.
+
+Production must pass CI for the exact release commit. Report success after Vercel is `READY` and its commit and production aliases match. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow) and [production gate](docs/WEB_APPLICATION_ARCHITECTURE.md#production-gate). Use environment-scoped credentials and isolated Preview resources.
+
+Keep local review evidence in `../local/audit/`; see [evidence retention](docs/WEB_APPLICATION_ARCHITECTURE.md#review-evidence).

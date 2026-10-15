@@ -8,7 +8,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Alert } from "@/components/ui/alert";
 
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { SubmitEvent } from "react";
 import { updatePreferences } from "./subscription-api";
 import { getFormText } from "@/lib/form-data";
 import type { PreferencesAction } from "./subscription-contract";
@@ -78,7 +78,7 @@ export function SubscriptionPreferencesForm({
     <form
       className={appearance["preferences-form"]}
       aria-busy={busy}
-      onSubmit={(event: FormEvent<HTMLFormElement>) => {
+      onSubmit={(event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         void submit(event.currentTarget, "save");
       }}

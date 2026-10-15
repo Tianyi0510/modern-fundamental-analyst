@@ -1,13 +1,13 @@
 # Modern Fundamental Analyst 1.0.0
 
-Status: release-preparation draft. This document does not establish current tag, GitHub Release or production status; verify the final release commit before publication.
+Status: release-preparation draft. This is historical preparation evidence, not confirmation of a tag, GitHub Release or production version. Verify the final commit before publication.
 
 ## Release notes
 
-The first stable release brings together multilingual equity research, portfolio reporting, and reader services.
+The planned first stable release includes:
 
 - English, Traditional Chinese, and Simplified Chinese pages with localized navigation, metadata, and sharing previews.
-- Portfolio holdings, allocation, sortable data, and performance history against SPY. Published data is a dated snapshot as of 30 September 2026, not live market data. Performance presents separate reconstructed cumulative TWR and since-inception annualized XIRR comparison charts with monthly tables; SPY is the only benchmark. The stocks-and-ETFs boundary and closing-price reconstruction assumptions are documented in [Portfolio Data](PORTFOLIO_DATA.md).
+- Portfolio holdings, allocation, sorting and performance against SPY, the only benchmark. The snapshot is dated 30 September 2026. Separate cumulative reconstructed TWR and since-inception annualized XIRR charts have monthly tables. See [calculation scope and reconstruction](WEB_APPLICATION_ARCHITECTURE.md#portfolio-data).
 - Investment memos with native expandable sections, responsive layouts, and reduced-motion support.
 - Contact and subscription workflows using Resend, three-language confirmation emails, explicit double opt-in, encrypted preference links, and Redis-backed recipient limits and subscriber coordination.
 - Replay-safe confirmation and delivery feedback, persistent suppression, and confirmed consent retained when welcome delivery needs reconciliation.
@@ -20,17 +20,17 @@ The intended tag is `v1.0.0`. Both package manifests declare `1.0.0`; the applic
 
 The preparation baseline is commit `3d889dfc94b0c6733483999e40779226481f7094`. Its [GitHub Actions run](https://github.com/Tianyi0510/modern-fundamental-analyst/actions/runs/36490139992) passed. This evidence applies to the baseline, not the future release commit.
 
-No portfolio data or service configuration is changed by the version bump. Existing text-contrast limitations are recorded in the [Style Guide](STYLE_GUIDE.md); this release does not claim full accessibility compliance. Browser automation does not replace physical iPhone testing.
+The version bump changes no portfolio data or service settings. [Design System](DESIGN_SYSTEM.md#typography-roles) records text-contrast limits; this release claims no full accessibility compliance. Browser automation does not replace physical iPhone checks.
 
 ## Subscription delivery scope
 
-The release candidate requires an explicit confirmation POST before contact activation. Existing preference links remain compatible. Welcome failures retain a journal for operator reconciliation; no automatic retry worker or seamless preference-secret rotation is included. Local mocked tests and a successful build do not prove inbox delivery, DNS authentication or deployed provider configuration.
+Activation requires an explicit confirmation POST. Existing preference links remain compatible. Welcome failures retain a journal for reconciliation; no replay worker or seamless preference-secret rotation is included. Mocked tests and builds do not prove inbox delivery, DNS authentication or provider setup.
 
 ## Physical iPhone acceptance
 
 Status: pending; automated WebKit results do not establish physical-device acceptance.
 
-Record the iPhone model, iOS/Safari version, tested commit or deployment URL, date, and result. Check all three languages:
+Record device model, iOS/Safari version, commit or deployment URL, date and result. Test all three languages:
 
 - Open and close Menu repeatedly, including interrupted animation; navigate between pages and use browser Back.
 - Verify focus returns to the Menu button and the page returns to its previous scroll position after dismissal.
@@ -43,6 +43,6 @@ Record the iPhone model, iOS/Safari version, tested commit or deployment URL, da
 - Complete the [deployment checks in AGENTS.md](../AGENTS.md#deployment-completion) for the final commit. CI owns the full Chromium/WebKit and production-build gates; do not routinely repeat full local suites before release.
 - Push the approved release commit through the existing GitHub Actions and Vercel Git integration. Require successful CI for that exact commit.
 - Confirm Vercel is READY and production aliases point to the release commit. Follow the existing workflow for any affected-route smoke checks.
-- Complete the [email release checks](RESEND_INTEGRATION.md#verification), including confirmation and webhook configuration, without rotating the existing secrets. Real test sends require separate authorization.
+- Complete the [email release checks](INTEGRATIONS.md#resend-verification), including confirmation and webhook configuration, without rotating the existing secrets. Real test sends require separate authorization.
 - Create `v1.0.0` on the verified release commit and publish the GitHub Release using the Release notes section above.
 - Record the final commit, release URL, and publication date here after publication. Never tag the preparation baseline merely because its CI passed.

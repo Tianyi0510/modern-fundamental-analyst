@@ -11,8 +11,8 @@ const roleScale = {
   bodyLarge: { min: 18, max: 18 },
   body: { min: 16, max: 16 },
   label: { min: 16, max: 16 },
-  control: { min: 15, max: 15 },
-  caption: { min: 15, max: 15 },
+  control: { min: 16, max: 16 },
+  caption: { min: 16, max: 16 },
   dataDisplay: { min: 52, fluidRem: 2, fluidVw: 4, max: 96 },
   dataKpi: { min: 48, fluidRem: 2.5, fluidVw: 1.5, max: 64 },
   dataRing: { min: 40, max: 40 },
@@ -175,6 +175,7 @@ for (const viewport of [viewports[0], viewports[2]]) {
 }
 
 function expectedSize(role: Role, width: number) {
+  if (role === "pageTitle" && width <= 800) return Math.min(52, Math.max(40, width * 0.11));
   const scale = roleScale[role];
   if (!("fluidVw" in scale)) return scale.min;
   return Math.min(scale.max, Math.max(scale.min, scale.fluidRem * 16 + (width * scale.fluidVw) / 100));
@@ -182,16 +183,26 @@ function expectedSize(role: Role, width: number) {
 
 const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
 
-function expectedRhythm(role: Role) {
-  if (role === "pageTitle") return { lineHeight: 1.05, trackingEm: -0.05 };
-  if (role === "sectionTitle" || role === "cardTitle") return { lineHeight: 1.1, trackingEm: -0.05 };
-  if (role === "compactTitle") return { lineHeight: 1.2, trackingEm: -0.05 };
+function expectedRhythm(role: Role, language: string) {
+  const headingTracking = language.startsWith("zh") ? 0 : -0.025;
+  const labelTracking = language.startsWith("zh") ? 0 : 0.025;
+  if (role === "pageTitle") return { lineHeight: 1.05, trackingEm: headingTracking };
+  if (role === "sectionTitle" || role === "cardTitle") return { lineHeight: 1.1, trackingEm: headingTracking };
+  if (role === "compactTitle") return { lineHeight: 1.2, trackingEm: headingTracking };
   if (dataRoles.has(role)) return { lineHeight: 1, trackingEm: -0.05 };
-  if (role === "label") return { lineHeight: 1.5, trackingEm: 0.05 };
+  if (role === "label") return { lineHeight: 1.5, trackingEm: labelTracking };
   return { lineHeight: 1.5, trackingEm: 0 };
 }
 
-type TypographySample = { selector: string; fontSize: number; lineHeight: number; letterSpacing: number };
+type TypographySample = {
+  selector: string;
+  fontSize: number;
+  lineHeight: number;
+  letterSpacing: number;
+  weight: number;
+  family: string;
+  language: string;
+};
 
 async function readTypography(page: Page, roles: Partial<Record<Role, string[]>>) {
   // Sample the whole page in one browser round trip, retaining every selector.
@@ -208,6 +219,9 @@ async function readTypography(page: Page, roles: Partial<Record<Role, string[]>>
               fontSize: Number.parseFloat(style.fontSize),
               lineHeight: Number.parseFloat(style.lineHeight),
               letterSpacing: style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
+              weight: Number(style.fontWeight),
+              family: style.fontFamily,
+              language: element.closest("[lang]")?.getAttribute("lang") ?? "en",
             };
           }),
         })),
@@ -226,47 +240,80 @@ for (const viewport of viewports) {
   test.describe(`${viewport.name} typography at ${viewport.width}px`, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
 
-    test(
-      "each semantic role resolves to one computed type treatment",
-      viewport.name === "mobile" ? { tag: "@mobile" } : {},
-      async ({ page }) => {
-        const observed = new Map<Role, TypographySample[]>();
+    for (const prefix of ["", "/zh-tw", "/zh-cn"])
+      test(
+        `${prefix || "English"} each semantic role resolves to one computed type treatment`,
+        viewport.name === "mobile" ? { tag: "@mobile" } : {},
+        async ({ page }) => {
+          const observed = new Map<Role, TypographySample[]>();
 
-        for (const [route, roles] of Object.entries(routeRoles)) {
-          await page.goto(route);
-          expect(
-            await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-            `${route} has horizontal overflow at ${viewport.width}px`,
-          ).toBe(true);
-          for (const { role, values } of await readTypography(page, roles)) {
-            observed.set(role, [...(observed.get(role) ?? []), ...values]);
+          for (const [route, roles] of Object.entries(routeRoles)) {
+            await page.goto(`${prefix}${route === "/" ? "" : route}` || "/");
+            expect(
+              await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+              `${route} has horizontal overflow at ${viewport.width}px`,
+            ).toBe(true);
+            const undersized = await page.locator("body").evaluate((body) => {
+              const minimum = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+              return [...body.querySelectorAll("*")]
+                .filter((element) => {
+                  const rect = element.getBoundingClientRect();
+                  return (
+                    rect.width > 0 &&
+                    rect.height > 0 &&
+                    [...element.childNodes].some(
+                      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+                    ) &&
+                    Number.parseFloat(getComputedStyle(element).fontSize) < minimum - 0.1
+                  );
+                })
+                .map((element) => ({
+                  text: element.textContent?.trim().slice(0, 80),
+                  size: getComputedStyle(element).fontSize,
+                }));
+            });
+            expect(undersized, `${prefix}${route} has text smaller than 1rem`).toEqual([]);
+            for (const { role, values } of await readTypography(page, roles)) {
+              observed.set(role, [...(observed.get(role) ?? []), ...values]);
+            }
           }
-        }
 
-        for (const [role, values] of observed) {
-          const expectedFontSize = expectedSize(role, viewport.width);
-          const rhythm = expectedRhythm(role);
-          for (const sample of values) {
+          for (const [role, values] of observed) {
+            const expectedFontSize = expectedSize(role, viewport.width);
+
+            for (const sample of values) {
+              const rhythm = expectedRhythm(role, sample.language);
+              if (sample.selector.includes(".wordmark")) rhythm.trackingEm = -0.05;
+              expect(
+                Math.abs(sample.fontSize - expectedFontSize),
+                `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
+              ).toBeLessThan(0.15);
+              expect(
+                Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
+                `${role} sample ${sample.selector} has an inconsistent line height`,
+              ).toBeLessThan(0.2);
+              expect(
+                Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
+                `${role} sample ${sample.selector} has inconsistent letter spacing`,
+              ).toBeLessThan(0.2);
+              expect(sample.family.split(",")[0]!.replaceAll('"', "").trim()).toBe("Jost");
+              const boldRoles = ["pageTitle", "sectionTitle", "cardTitle", "compactTitle", "label", "control"];
+              if (role === "dataRow") {
+                // Position headings and totals retain their deliberate emphasis.
+                expect([400, 700]).toContain(sample.weight);
+              } else {
+                expect(sample.weight, `${role} sample ${sample.selector} weight`).toBe(
+                  boldRoles.includes(role) || dataRoles.has(role) ? 700 : 400,
+                );
+              }
+            }
             expect(
-              Math.abs(sample.fontSize - expectedFontSize),
-              `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
-            ).toBeLessThan(0.15);
-            expect(
-              Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
-              `${role} sample ${sample.selector} has an inconsistent line height`,
-            ).toBeLessThan(0.2);
-            expect(
-              Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
-              `${role} sample ${sample.selector} has inconsistent letter spacing`,
-            ).toBeLessThan(0.2);
+              new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
+              `${role} has multiple computed sizes`,
+            ).toBe(1);
           }
-          expect(
-            new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
-            `${role} has multiple computed sizes`,
-          ).toBe(1);
-        }
-      },
-    );
+        },
+      );
   });
 }
 
@@ -414,6 +461,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           "/about",
           "/portfolio",
           "/performance",
+          "/memos",
+          "/contact",
+          "/support",
           "/disclaimer",
           "/subscription-preferences",
           "/memos/microsoft-stock-analysis-fiscal-year-2024",
@@ -422,9 +472,24 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           await page.goto(path);
           await page.evaluate(() => document.fonts.ready);
           await page.addStyleTag({ content: "html { font-size: 200%; }" });
+          if (route === "/memos") {
+            await page.locator(".memo-disclosure > summary").click();
+            await expect(page.locator(".memo-index-row").first()).toBeVisible();
+          }
+          const overflow = await page.locator("body").evaluate((body) =>
+            [...body.querySelectorAll("*")]
+              .filter((element) => element.getBoundingClientRect().right > innerWidth + 1)
+              .map((element) => ({
+                tag: element.tagName,
+                className: element.className,
+                text: element.textContent?.slice(0, 80),
+                right: element.getBoundingClientRect().right,
+              }))
+              .slice(-15),
+          );
           expect(
             await page.evaluate(() => document.documentElement.scrollWidth),
-            `${path} overflows at ${width}px with enlarged text`,
+            `${path} overflows at ${width}px with enlarged text: ${JSON.stringify(overflow)}`,
           ).toBeLessThanOrEqual(width);
           if (route === "/") {
             const clipped = await page

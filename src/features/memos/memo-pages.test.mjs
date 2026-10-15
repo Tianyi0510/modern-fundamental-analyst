@@ -81,7 +81,8 @@ test("article metadata and structured data agree with the localized catalog", as
     assert.equal(article.datePublished, memo.publishedAt);
     assert.equal(article.inLanguage, "en");
     assert.ok(article.url.endsWith(metadata.alternates.canonical));
-    assert.ok(article.image.endsWith("/og-logo.png"));
+    assert.equal(article.image, undefined);
+    assert.ok(metadata.openGraph.images[0].url.endsWith("/og-logo.png"));
     assert.equal(article.dateModified, undefined);
     assert.equal(serialized.includes("<"), false);
   }

@@ -32,16 +32,16 @@ export function PageHero({
   return (
     <div className="page-hero-band bg-[var(--background-gray)]">
       <Container as="section" className="page-hero py-[var(--space-section)]">
-        <p className="eyebrow flex items-center gap-[10px] text-[length:var(--font-size-label)] leading-[var(--leading-body)] font-bold tracking-[var(--tracking-label)]">
+        <p className="eyebrow flex items-center gap-[10px] text-label">
           <span className="size-[9px] rounded-full bg-accent" /> {label}
         </p>
         <h1
-          className={`mt-[66px] text-[length:var(--font-size-page-title)] leading-[var(--leading-page-title)] font-bold tracking-[var(--tracking-heading)] text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+          className={`mt-[66px] text-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
         >
           {title}
         </h1>
         <div
-          className={`page-intro mt-[var(--space-heading-content)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-[length:var(--font-size-lead)] [&_p]:leading-[var(--leading-body)] [&_p]:font-normal [&_p]:tracking-[var(--tracking-body)] [&_p]:text-pretty [&_small]:text-[length:var(--font-size-caption)] [&_small]:leading-[var(--leading-body)] [&_small]:font-normal [&_small]:tracking-[var(--tracking-body)] [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
+          className={`page-intro mt-[var(--space-heading-content)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-lead [&_p]:text-pretty [&_small]:text-caption [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
         >
           {intro}
         </div>

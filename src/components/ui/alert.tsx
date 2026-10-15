@@ -2,18 +2,15 @@ import type { ComponentProps } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const alertVariants = cva(
-  "m-0 min-h-[var(--size-status-reserve)] leading-[var(--leading-body)] tracking-[var(--tracking-body)]",
-  {
-    variants: {
-      tone: {
-        standard: "text-[length:var(--font-size-body)]",
-        inverse: "text-[length:var(--font-size-caption)] font-bold text-white",
-      },
+const alertVariants = cva("m-0 min-h-[var(--size-status-reserve)]", {
+  variants: {
+    tone: {
+      standard: "text-body",
+      inverse: "text-caption font-bold text-white",
     },
-    defaultVariants: { tone: "standard" },
   },
-);
+  defaultVariants: { tone: "standard" },
+});
 export function Alert({
   className,
   tone,

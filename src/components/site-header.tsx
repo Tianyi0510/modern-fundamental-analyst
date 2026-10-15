@@ -1,12 +1,13 @@
 "use client";
 
-import { appearance, mobileNavigationLink } from "./site-header.styles";
+import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useRef, type MouseEvent } from "react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 import { usePathname } from "next/navigation";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
 import { useMobileMenu } from "./use-site-header";
@@ -142,22 +143,26 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             </button>
           </div>
           <div className={appearance["mobile-menu-content"]} ref={menuContentRef} inert={menuPhase === "closing"}>
-            <nav
-              className="relative z-[1] flex flex-col text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] font-bold tracking-[var(--tracking-heading)]"
-              aria-label={copy.mobilePrimary}
-            >
-              {mobileNavigation.map(({ href, label }) => (
-                <Link
-                  className={mobileNavigationLink}
-                  href={href}
-                  aria-current={isCurrentPath(href) ? "page" : undefined}
-                  onClick={closeForNavigation}
-                  tabIndex={isMenuOpen ? 0 : -1}
-                  key={href}
-                >
-                  <span className="mobile-menu-label">{label}</span>
-                </Link>
-              ))}
+            <nav className="relative z-[1]" aria-label={copy.mobilePrimary}>
+              <SidebarMenu>
+                {mobileNavigation.map(({ href, label }) => {
+                  const isActive = isCurrentPath(href);
+                  return (
+                    <SidebarMenuItem key={href}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link
+                          href={href}
+                          aria-current={isActive ? "page" : undefined}
+                          onClick={closeForNavigation}
+                          tabIndex={isMenuOpen ? 0 : -1}
+                        >
+                          <span className="mobile-menu-label">{label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
             </nav>
             <div className={appearance["mobile-language-links"]}>
               <AnimatedDisclosure

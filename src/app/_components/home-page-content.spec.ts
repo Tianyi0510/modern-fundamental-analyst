@@ -3,6 +3,10 @@ import { expect, test } from "@playwright/test";
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} holdings and footer links expose list semantics across layouts`, async ({ page }) => {
     await page.goto(prefix || "/");
+    const researchTitle = page.getByRole("heading", {
+      name: /Published Investment Research for Independent Evaluation|公開投資研究，\s*供讀者獨立評估|公开投资研究，\s*供读者独立评估/,
+    });
+    await expect(researchTitle).toBeVisible();
     const holdings = page.locator(".holdings-list");
     const links = page.locator(".footer-links");
     await expect(holdings).toMatchAriaSnapshot(`

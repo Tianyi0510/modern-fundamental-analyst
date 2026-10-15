@@ -217,6 +217,8 @@ test("monthly simulated SPY holdings and XIRRs reconcile", () => {
     else assert.ok(Math.abs(observed.xirr - calculateXirr(valuation.date, observed.simulatedValue)) < 0.0001);
   }
   assert.ok(Math.abs(portfolioSpySnapshot.simulatedUnits - 158.5991478936601) < 0.000001);
-  assert.ok(Math.abs(portfolioSpySnapshot.simulatedValue - 121237.00640905317) < 0.01);
-  assert.equal(portfolioSpySnapshot.adjustedClose, (766.95 * 762.63) / 765.15);
+  assert.ok(Math.abs(portfolioSpySnapshot.simulatedValue - 121237.01298784906) < 0.01);
+  // Yahoo Finance adjusted closes retrieved 2026-10-13, rebased onto the frozen August series.
+  assert.ok(Math.abs(portfolioSpySnapshot.adjustedClose - 764.4241132312882) < 1e-9);
+  assert.ok(Math.abs(portfolioSpySnapshot.xirr - 19.264638392858824) < 1e-9);
 });

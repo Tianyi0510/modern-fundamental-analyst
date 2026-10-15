@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Repository-wide instructions for Modern Fundamental Analyst. Follow explicit user requests within higher-priority instructions; more specific `AGENTS.md` files govern their subtree. Codex also supports `AGENTS.override.md` in place of `AGENTS.md` in the same directory.
+Instructions for agents working on Modern Fundamental Analyst. Follow higher-priority instructions and explicit user requests. A nested `AGENTS.md` governs its subtree; `AGENTS.override.md` can replace it in the same directory.
 
 ## Project context
 
-An investor-research website using Next.js App Router, React, TypeScript, Tailwind CSS and CSS Modules. Use Node.js 24 and npm; `package.json` and `package-lock.json` define the installed stack. English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`.
+The site uses Next.js App Router, React, TypeScript, Tailwind CSS and CSS Modules. Use Node.js 24 and npm. The package manifests define dependencies. English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`.
 
 - `src/app`: routes and application composition; page components live in `_components`.
 - `src/features`: domain code, data, UI and owned styles. Features must not import other features or `app`.
@@ -15,20 +15,20 @@ An investor-research website using Next.js App Router, React, TypeScript, Tailwi
 
 - Use Traditional Chinese for ordinary communication unless requested otherwise. Formal code-review output, including summaries, findings and follow-ups, must be English without emojis. Code comments and GitHub issue/PR comments must also be English without emojis.
 - Write documentation prose in English. Include non-English text only for an exact runtime/provider value needed for an operation, identifying its source in code.
-- Reviews are read-only unless changes are requested. For implementation, finish the authorized change and affected verification; resolve routine choices without unnecessary confirmation.
-- Inspect `git status` before edits; preserve unrelated changes and local review evidence in `../local/audit/` (or a legacy ignored `audit/`). Historical audit files are not the current issue list. Stage only intended files.
-- Commit, open a PR or deploy when requested. A deployment request includes the required commit, push and merge; a PR-only request does not authorize merging. Report changes, checks, limitations and release status accurately.
+- Keep reviews read-only unless changes are requested. Complete authorized implementation and affected checks; resolve routine choices without unnecessary confirmation.
+- Run `git status` before editing. Preserve unrelated changes and local evidence in `../local/audit/` or legacy ignored `audit/`. Historical audits are not the current issue list. Stage only intended files.
+- Commit, open a PR or deploy when requested. Deployment authorizes the required commit, push and merge. A PR-only request does not authorize merging. Report release status accurately.
 
 ## Task execution
 
-- Define the intended outcome, preserved behavior and observable completion criteria before a nontrivial change. Use a short inline plan when scope or dependencies warrant it; routine edits do not need a separate planning ceremony.
-- Check consequential assumptions against code, configuration or current provider evidence. Surface conflicting requirements, unknown outcomes and material tradeoffs. Ask only when a missing decision blocks safe progress; continue independent authorized work. State assumptions when proceeding without confirmation.
-- Choose the simplest implementation that satisfies the contract. Add an abstraction, dependency or agent only for a concrete need; do not create extra layers merely to mirror a reference project. Delegate only when the user or an applicable instruction explicitly authorizes it.
-- Inspect the diff as work progresses. Preserve unrelated code, comments, variants and uncommitted work; remove obsolete code introduced or superseded by the task after checking its references. Broad cleanup requires its own scope.
-- Use tests, browser inspection and provider readbacks to evaluate the completion criteria. For a new behavior or reproducible bug, establish an independent expected result or regression case before relying on the implementation. Do not require test-first work for mechanical documentation or formatting changes.
-- Optimize against a measured baseline and a correctness check. Preserve failure, retry and accessibility behavior; fewer lines, more tests, longer agent activity or a green check alone do not establish improvement.
-- When attempts stop producing new evidence, reassess the premise and failure category before repeating them. Continue necessary work, but stop optional checks once the remaining risk is covered; report external blockers and unknowns accurately.
-- Review the final diff and explain the result, reasons, affected checks and remaining limitations. Separate workspace changes, mocked/local checks, CI evidence and live-provider state; a passing test cannot validate an assumption it shares with the implementation.
+- Before a substantial change, state the outcome, behavior to preserve and completion criteria. Use a short plan when dependencies require one.
+- Verify consequential assumptions against code, configuration or current provider evidence. Explain conflicts and unknown outcomes. Ask only for a decision needed to proceed safely; continue independent work.
+- Choose the simplest solution that meets the contract. Add abstractions or dependencies for a concrete need. Delegate only with explicit authorization from the user or an applicable instruction.
+- Review the diff as you work. Preserve unrelated changes, comments and variants. Check references before removing code superseded by the task; keep broader cleanup out of scope.
+- For new behavior or a reproducible bug, establish an independent expected result or regression case. Documentation and formatting edits do not require test-first work.
+- Measure optimizations against a baseline and check correctness. Preserve failure, retry and accessibility behavior. Line count, test count and passing checks alone do not prove improvement.
+- When repeated attempts add no evidence, reassess the assumption and failure category. Stop optional checks once the remaining risk is covered; report blockers accurately.
+- Review the final diff. Report changes, reasons, checks and limits. Distinguish workspace results, mocked tests, CI evidence and live-provider state.
 
 ## Commands
 
@@ -56,18 +56,19 @@ Replace angle-bracket placeholders with real paths. Install missing browsers wit
 
 ## Task references
 
-Read only the guides relevant to the task; update them when behavior or commands change. Keep README concise and detailed procedures in `docs/`.
+Read the relevant guide and update it when behavior or commands change. README is the entry point; domain procedures belong in `docs/`.
 
-| Area                                       | Guide                                                                                                                                                |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| UI, CSS, typography and motion             | [Style Guide](docs/STYLE_GUIDE.md)                                                                                                                   |
-| Architecture, services, tests and releases | [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)                                                                                             |
-| Portfolio snapshots and calculations       | [Portfolio Data](docs/PORTFOLIO_DATA.md)                                                                                                             |
-| Email and subscriptions                    | [Resend](docs/RESEND_INTEGRATION.md)                                                                                                                 |
-| Subscriber coordination and recovery       | [Redis runtime](docs/UPSTASH_REDIS_INTEGRATION.md#redis-runtime) and [reconciliation](docs/UPSTASH_REDIS_INTEGRATION.md#subscription-reconciliation) |
-| Payments                                   | [Stripe](docs/STRIPE_INTEGRATION.md)                                                                                                                 |
+| Area                                                         | Guide                                                                                                                      |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| UI, content, localization, typography and motion             | [Design System](docs/DESIGN_SYSTEM.md)                                                                                     |
+| Code conventions, application boundaries, tests and releases | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md)                                                       |
+| Portfolio sources, calculations and monthly updates          | [Portfolio data](docs/WEB_APPLICATION_ARCHITECTURE.md#portfolio-data)                                                      |
+| Provider setup, email, payments and monitoring               | [Integrations](docs/INTEGRATIONS.md)                                                                                       |
+| Subscriber coordination and recovery                         | [Redis runtime](docs/INTEGRATIONS.md#redis-runtime) and [reconciliation](docs/INTEGRATIONS.md#subscription-reconciliation) |
 
-Before changing Next.js APIs, routing or configuration, read the relevant installed-version guide in `node_modules/next/dist/docs/`; if unavailable, use matching official Next.js documentation. Do not assume tools or patterns from another React starter are installed here.
+Use [README](README.md#documentation) for documentation scope and maintenance, [architecture](docs/WEB_APPLICATION_ARCHITECTURE.md#code-and-components) for code conventions, and [Design System](docs/DESIGN_SYSTEM.md#content-and-localization) for editorial rules. Keep agent execution requirements here.
+
+Before changing Next.js APIs, routing or configuration, read the installed-version guide in `node_modules/next/dist/docs/`. If unavailable, use the matching official documentation. Verify that a tool or pattern exists in this repo before using it.
 
 ## Implementation constraints
 
@@ -90,7 +91,7 @@ Before changing Next.js APIs, routing or configuration, read the relevant instal
 
 ## Verification and review
 
-Local work owns affected checks; CI owns full verification; deployment owns release identity and live status. Do not routinely repeat full local suites before release. Fix related failures within scope; repeat passed checks only after relevant changes or unresolved failures.
+Run affected checks locally. CI owns full verification; deployment checks establish release identity and live status. Do not routinely rerun full suites locally. Repeat a passed check only after a relevant change or to resolve a remaining failure.
 
 | Change                    | Completion checks                                                                                                                         |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -107,7 +108,7 @@ Local work owns affected checks; CI owns full verification; deployment owns rele
 
 ## Deployment completion
 
-Use GitHub Actions and the Vercel Git integration. Follow the [release workflow](docs/TECHNICAL_ARCHITECTURE.md#release-workflow):
+Use GitHub Actions and the Vercel Git integration. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow):
 
 1. Start new changes from current `main` on a `codex/` branch; reuse an existing branch/PR for ongoing work. Target PRs at `main` and review their diff and required CI before merging. Direct pushes to `main` require an explicit request.
 2. For an authorized deployment, merge the verified PR and record the resulting release SHA. PRs run full CI; main may reuse recent full PR evidence only when `scripts/ci-plan.mjs` verifies an identical Git tree and all required jobs. Missing or uncertain evidence requires full CI.
@@ -119,6 +120,6 @@ Preserve the stable `verify` and `webkit` result jobs, package-integrity checks,
 
 ## Maintaining this file
 
-Keep durable project constraints, verified commands and task-specific references here; put detailed procedures in linked guides. Consolidate duplicates and add nested instructions only for genuine subtree differences. When updating project guides, check referenced paths, commands and heading anchors against the workspace. Preserve dated provider observations and release evidence as historical facts; a documentation update does not verify production or publish a release. Preserve referenced heading anchors. After edits, verify instruction-file discovery from the intended directory; a fresh Codex session is needed to confirm automatic loading of changed instructions.
+Keep durable constraints, verified commands and task references here. Put detailed procedures in their domain guide. Add nested instructions only for real subtree differences. Check paths, commands, anchors and instruction-file discovery after edits. Preserve historical evidence; editing docs does not verify production or publish a release. Preserve referenced anchors. Automatic loading of changed instructions requires confirmation in a fresh Codex session.
 
 Format reference: [AGENTS.md](https://agents.md/).

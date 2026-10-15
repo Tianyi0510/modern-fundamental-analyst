@@ -34,6 +34,25 @@ for (const { prefix, saved, unsubscribed } of [
       const select = page.locator('select[name="locale"]');
       const form = page.locator("form").filter({ has: select });
       const status = form.locator('[role="status"]');
+      const unsubscribe = form.locator('button[type="button"]');
+      for (const width of [320, 390, 800]) {
+        await page.setViewportSize({ width, height: 900 });
+        await expect(unsubscribe).toHaveCSS("align-self", "flex-start");
+        await expect(unsubscribe).toBeVisible();
+        const boxes = await unsubscribe.evaluate((button) => {
+          const actions = button.parentElement!;
+          return {
+            buttonX: button.getBoundingClientRect().x,
+            actionsX: actions.getBoundingClientRect().x,
+            buttonWidth: button.getBoundingClientRect().width,
+            actionsWidth: actions.getBoundingClientRect().width,
+          };
+        });
+        expect(boxes.buttonX).toBeCloseTo(boxes.actionsX, 0);
+        expect(boxes.buttonWidth).toBeLessThan(boxes.actionsWidth);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      }
+      await page.setViewportSize({ width: 390, height: 900 });
       await expect(select).toHaveAccessibleName(/\S/);
       await expect(select).toHaveValue("");
       await form.locator('button[type="submit"]').click();
@@ -45,7 +64,7 @@ for (const { prefix, saved, unsubscribed } of [
       await expect(status).toBeEmpty();
       await page.reload();
       await expect(select).toHaveValue("");
-      await form.locator('button[type="button"]').click();
+      await unsubscribe.click();
       await expect(status).toHaveText(unsubscribed);
       await expect(select).toBeDisabled();
       await expect(select).toHaveCSS("cursor", "not-allowed");

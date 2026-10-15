@@ -1,9 +1,21 @@
 import type { Metadata } from "next";
-import { getLanguageAlternates, getLocalizedPath, type Locale } from "@/lib/i18n";
+import { getLanguageAlternates, getLocalizedPath, locales, type Locale } from "@/lib/i18n";
 
 export const SITE_URL = "https://www.modernfundamentalanalyst.com";
 export const SITE_NAME = "Modern Fundamental Analyst";
 const SITE_DESCRIPTION = "An independent public-equity portfolio, performance record, and investment memo archive.";
+
+const openGraphLocales: Record<Locale, string> = { en: "en_US", "zh-tw": "zh_TW", "zh-cn": "zh_CN" };
+
+export function createWebsiteStructuredData(): string {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
+  }).replace(/</g, "\\u003c");
+}
 
 const sharingImage = {
   url: `${SITE_URL}/og-logo.png`,
@@ -15,10 +27,20 @@ const sharingImage = {
 function createSharingMetadata(
   title: string,
   description: string,
-  url?: string,
+  url: string,
+  locale: Locale,
 ): Pick<Metadata, "openGraph" | "twitter"> {
   return {
-    openGraph: { title, description, ...(url ? { url } : {}), images: [sharingImage] },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: SITE_NAME,
+      type: "website",
+      locale: openGraphLocales[locale],
+      alternateLocale: locales.filter((target) => target !== locale).map((target) => openGraphLocales[target]),
+      images: [sharingImage],
+    },
     twitter: {
       card: "summary_large_image",
       title,
@@ -41,7 +63,7 @@ export function createRootMetadata(locale: Locale): Metadata {
     title: locale === "en" ? { default: title, template: `%s | ${SITE_NAME}` } : { absolute: title },
     description,
     alternates: { canonical: getLocalizedPath("/", locale), languages: getLanguageAlternates("/") },
-    ...createSharingMetadata(title, description),
+    ...createSharingMetadata(title, description, getLocalizedPath("/", locale), locale),
   };
 }
 
@@ -59,7 +81,7 @@ export function createPageMetadata({ title, description, path, locale = "en" }: 
   return {
     title: locale === "en" ? title : { absolute: fullTitle },
     description,
-    ...createSharingMetadata(fullTitle, description, canonical),
+    ...createSharingMetadata(fullTitle, description, canonical, locale),
     alternates: {
       canonical,
       languages: getLanguageAlternates(path),

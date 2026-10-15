@@ -12,6 +12,7 @@ import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/featur
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
+import { createWebsiteStructuredData } from "@/lib/site-config";
 
 const copy = {
   en: {
@@ -48,7 +49,7 @@ const copy = {
     verified: "As of",
     viewPerformance: "Track Portfolio Performance",
     memosLabel: "04 · Investment Memos",
-    memosTitle: ["Detailed Investment Theses", "Behind Every Position"],
+    memosTitle: ["Published Investment Research", "for Independent Evaluation"],
     viewAllMemos: "View All Investment Memos",
     contactLabel: "05 · Contact",
     contactTitle: ["Stay Connected With", "My Latest Research"],
@@ -89,7 +90,7 @@ const copy = {
     verified: "截至",
     viewPerformance: "追蹤投資組合績效",
     memosLabel: "04 · 投資備忘錄",
-    memosTitle: ["每個部位背後的", "詳細投資論點"],
+    memosTitle: ["公開投資研究，", "供讀者獨立評估"],
     viewAllMemos: "查看所有投資備忘錄",
     contactLabel: "05 · 聯絡",
     contactTitle: ["持續掌握我的", "最新研究"],
@@ -130,7 +131,7 @@ const copy = {
     verified: "截至",
     viewPerformance: "追踪投资组合业绩",
     memosLabel: "04 · 投资备忘录",
-    memosTitle: ["每个持仓背后的", "详细投资论点"],
+    memosTitle: ["公开投资研究，", "供读者独立评估"],
     viewAllMemos: "查看所有投资备忘录",
     contactLabel: "05 · 联系",
     contactTitle: ["持续关注我的", "最新研究"],
@@ -158,6 +159,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
 
   return (
     <div className="home-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createWebsiteStructuredData() }} />
       <div className={appearance["home-header"]}>
         <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       </div>
@@ -384,7 +386,8 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             </p>
             <h2>
               {text.contactTitle[0]}
-              <br />
+              {locale === "en" ? " " : null}
+              <br className="compact:hidden" />
               {text.contactTitle[1]}
             </h2>
             <ButtonLink href={getLocalizedPath("/contact", locale)}>{text.contactLink}</ButtonLink>

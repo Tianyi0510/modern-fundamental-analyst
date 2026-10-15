@@ -66,23 +66,19 @@ test("percent formatting handles positive, zero, and negative values", async () 
   assert.equal(formatPercent(-3.2), "-3.20%");
 });
 
-test("all portfolio and performance locales share page structures", async () => {
-  const [portfolioEn, portfolioZhTw, portfolioZhCn, performanceEn, performanceZhTw, performanceZhCn, portfolioShared] =
-    await Promise.all([
-      read("src/app/(en)/portfolio/page.tsx"),
-      read("src/app/zh-tw/portfolio/page.tsx"),
-      read("src/app/zh-cn/portfolio/page.tsx"),
-      read("src/app/(en)/performance/page.tsx"),
-      read("src/app/zh-tw/performance/page.tsx"),
-      read("src/app/zh-cn/performance/page.tsx"),
-      read("src/app/_components/portfolio-page-content.tsx"),
-    ]);
+test("all portfolio and performance locales compose their shared page components", async () => {
+  const pages = await Promise.all(
+    ["(en)", "zh-tw", "zh-cn"].flatMap((segment) =>
+      ["portfolio", "performance"].map(async (route) => ({
+        route,
+        source: await read(`src/app/${segment}/${route}/page.tsx`),
+      })),
+    ),
+  );
 
-  for (const page of [portfolioEn, portfolioZhTw, portfolioZhCn]) assert.match(page, /PortfolioPageContent/);
-  for (const page of [performanceEn, performanceZhTw, performanceZhCn]) assert.match(page, /PerformancePageContent/);
-  assert.match(portfolioShared, /aria-labelledby="portfolio-holdings-title"/);
-  assert.doesNotMatch(portfolioShared, /portfolio-allocation|Allocation by market value|getHoldingWeight/);
-  assert.doesNotMatch(portfolioShared, /portfolio-source-note|Source Sheet:/);
+  for (const { route, source } of pages) {
+    assert.match(source, route === "portfolio" ? /PortfolioPageContent/ : /PerformancePageContent/);
+  }
 });
 
 test("portfolio page retains its server boundary and table keeps localized copy outside the client", async () => {

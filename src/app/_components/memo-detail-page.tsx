@@ -14,9 +14,18 @@ const copy = {
   en: {
     memoLabel: "Investment Memo",
     languageNotice: "This article is available in English only; no translation is available.",
+    scopeTitle: "Research Scope",
   },
-  "zh-tw": { memoLabel: "投資備忘錄", languageNotice: "本文目前僅提供英文原文，尚無中文譯文。" },
-  "zh-cn": { memoLabel: "投资备忘录", languageNotice: "本文目前仅提供英文原文，尚无中文译文。" },
+  "zh-tw": {
+    memoLabel: "投資備忘錄",
+    languageNotice: "本文目前僅提供英文原文，尚無中文譯文。",
+    scopeTitle: "研究範圍",
+  },
+  "zh-cn": {
+    memoLabel: "投资备忘录",
+    languageNotice: "本文目前仅提供英文原文，尚无中文译文。",
+    scopeTitle: "研究范围",
+  },
 } as const;
 
 export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string }) {
@@ -51,7 +60,15 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
           </div>
           <div className={appearance["shell"]}>
             <p className={appearance["article-lead"]}>{memo.summary}</p>
-            {content.language !== locale ? <p>{text.languageNotice}</p> : null}
+            <div className={appearance["article-notes"]}>
+              {content.language !== locale ? <p className="memo-language-notice">{text.languageNotice}</p> : null}
+              <aside aria-labelledby="memo-scope-title">
+                <h2 id="memo-scope-title" className="mb-[var(--space-3)] text-title-small">
+                  {text.scopeTitle}
+                </h2>
+                <p>{memo.scopeNote}</p>
+              </aside>
+            </div>
             <MemoArticleContent content={content} />
           </div>
         </article>

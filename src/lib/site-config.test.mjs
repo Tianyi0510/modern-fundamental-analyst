@@ -34,6 +34,15 @@ test("page metadata provides canonical and bilingual alternate URLs", async () =
     );
     assert.equal(root.alternates.canonical, getLocalizedPath("/", locale));
     assert.equal(root.openGraph.title, rootTitle);
+    assert.equal(root.openGraph.url, getLocalizedPath("/", locale));
+    assert.equal(root.openGraph.siteName, SITE_NAME);
+    assert.equal(root.openGraph.type, "website");
+    const ogLocales = { en: "en_US", "zh-tw": "zh_TW", "zh-cn": "zh_CN" };
+    assert.equal(root.openGraph.locale, ogLocales[locale]);
+    assert.deepEqual(
+      root.openGraph.alternateLocale,
+      locales.filter((target) => target !== locale).map((target) => ogLocales[target]),
+    );
     assert.equal(root.twitter.title, rootTitle);
     const metadata = createPageMetadata({ title: "About", description: "About research", path: "/about", locale });
     assert.equal(metadata.alternates.canonical, getLocalizedPath("/about", locale));
@@ -42,8 +51,36 @@ test("page metadata provides canonical and bilingual alternate URLs", async () =
     assert.equal(metadata.alternates.languages["x-default"], "/about");
     assert.equal(metadata.openGraph.title, locale === "en" ? `About | ${SITE_NAME}` : `About｜${SITE_NAME}`);
     assert.equal(metadata.twitter.title, metadata.openGraph.title);
+    assert.equal(metadata.openGraph.url, metadata.alternates.canonical);
+    assert.equal(metadata.openGraph.siteName, SITE_NAME);
+    assert.equal(metadata.openGraph.type, "website");
+    assert.equal(metadata.openGraph.locale, ogLocales[locale]);
     assert.equal(metadata.openGraph.description, metadata.description);
     assert.equal(metadata.twitter.description, metadata.description);
     assert.ok(metadata.openGraph.images.length);
+  }
+});
+
+test("home structured data identifies one canonical website across languages", async () => {
+  const { createWebsiteStructuredData, SITE_NAME } = await import("./site-config.ts");
+  const serialized = createWebsiteStructuredData();
+  const website = JSON.parse(serialized);
+  assert.equal(website["@context"], "https://schema.org");
+  assert.equal(website["@type"], "WebSite");
+  assert.equal(website.name, SITE_NAME);
+  assert.equal(website.url, `${SITE_URL}/`);
+  assert.equal(website["@id"], `${SITE_URL}/#website`);
+  assert.equal(website.potentialAction, undefined);
+  assert.equal(serialized.includes("<"), false);
+});
+
+test("sitemap excludes private workflows and does not invent modification dates", () => {
+  for (const entry of sitemap()) {
+    assert.doesNotMatch(entry.url, /subscription-preferences|subscription-confirmation|\/api\/|\?/);
+    assert.equal(entry.lastModified, undefined);
+    for (const alternate of Object.values(entry.alternates.languages)) {
+      const target = sitemap().find(({ url }) => url === alternate);
+      assert.deepEqual(target.alternates.languages, entry.alternates.languages);
+    }
   }
 });

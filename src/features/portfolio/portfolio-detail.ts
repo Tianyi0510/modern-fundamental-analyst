@@ -2610,11 +2610,12 @@ export const portfolioMonthlyValuations = [
     },
     stockValue: 127533.11,
     spyPriceDate: "2026-09-30",
-    // Stock Analysis adjusted closes, reviewed 2026-10-05: Aug 31 = 765.15; Sep 30 = 762.63.
+    // Yahoo Finance adjusted closes, retrieved 2026-10-13: Aug 31 = 765.1499633789062; Sep 30 = 762.6300048828125.
     // Chain the same-vintage total-return ratio onto the published August price basis.
-    // https://stockanalysis.com/etf/spy/history/
-    spyAdjustedClose: (766.95 * 762.63) / 765.15,
+    // The August literal below is the exact binary64 value of the provider JSON number.
+    // https://finance.yahoo.com/quote/SPY/history/
+    spyAdjustedClose: (766.95 * 762.6300048828125) / 765.14996337890625,
     portfolioXirr: 24.426811448224484,
-    benchmarkXirr: 19.26463345453825,
+    benchmarkXirr: 19.264638392858824,
   },
 ] as const;
