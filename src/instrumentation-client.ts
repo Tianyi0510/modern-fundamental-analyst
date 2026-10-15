@@ -16,8 +16,7 @@ if (dsn) {
   const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV;
   Sentry.init({
     ...createSentryOptions(dsn, environment),
-    // Locale/timezone enrichment performs a costly Intl initialization before hydration.
-    integrations: (integrations) => integrations.filter((integration) => integration.name !== "CultureContext"),
+    integrations: [],
     replaysSessionSampleRate: environment === "test" ? 1 : 0.1,
     replaysOnErrorSampleRate: 1,
   });
@@ -25,9 +24,7 @@ if (dsn) {
   if (replayAllowed) {
     // Load the DOM recorder separately so error monitoring does not block on Replay code.
     void import("@/lib/sentry-replay-client")
-      .then(async ({ initializeReplay }) => {
-        // Let the browser render between loading the recorder and taking its first snapshot.
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      .then(({ initializeReplay }) => {
         if (replayAllowed && canRecordReplay(window.location.href)) initializeReplay(environment);
       })
       .catch(() => {

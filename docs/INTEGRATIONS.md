@@ -449,9 +449,7 @@ Do not include secrets or private provider responses in messages; filters cannot
 
 ### Session Replay
 
-Browser monitoring omits the optional `CultureContext` integration: locale, timezone and calendar enrichment is unnecessary for this site and incurs cold `Intl` initialization before hydration. Error capture, tracing, logs, metrics and Replay remain enabled.
-
-Browser instrumentation initializes error monitoring immediately and loads Replay through a separate dynamic module, yielding a browser task before its initial DOM snapshot. Private navigation permanently cancels a pending Replay initialization for the page lifetime, as well as stopping an active recording. A Replay chunk failure leaves error monitoring active. Sample normal sessions at 10% and error sessions at 100%. Isolated `test` builds use 100% sampling and uncompressed inspection payloads.
+Browser instrumentation initializes error monitoring immediately and loads Replay through a separate dynamic module. Private navigation permanently cancels a pending Replay initialization for the page lifetime, as well as stopping an active recording. A Replay chunk failure leaves error monitoring active. Sample normal sessions at 10% and error sessions at 100%. Isolated `test` builds use 100% sampling and uncompressed inspection payloads.
 
 Mask text and inputs, block media, discard custom console/network events, and block forms and links containing queries or fragments. Do not start Replay on query/fragment URLs, Support, Preferences or Confirmation. Navigating there stops recording without automatic restart; errors and tracing stay active.
 
