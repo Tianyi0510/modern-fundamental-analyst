@@ -88,3 +88,53 @@ test("session replay masks page text and excludes form contents", { tag: "@mobil
   expect(forms.length).toBeGreaterThan(0);
   for (const children of forms) expect(children).toEqual([]);
 });
+
+test("private navigation cancels pending Replay initialization", { tag: "@mobile" }, async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SENTRY_TEST !== "1", "Requires an explicitly enabled fake DSN");
+  let releaseReplay!: () => void;
+  const released = new Promise<void>((resolve) => {
+    releaseReplay = resolve;
+  });
+  let replayPending = false;
+  let replayLoaded = false;
+  let eventBody = "";
+  await page.route("https://sentry.invalid/**", async (route) => {
+    const body = route.request().postData() ?? "";
+    if (body.includes("Pending Replay privacy regression")) eventBody = body;
+    await route.fulfill({ status: 200, json: {} });
+  });
+  await page.route("**/_next/static/chunks/*.js", async (route) => {
+    const response = await route.fetch();
+    const body = await response.text();
+    // Hold the dynamic entry module while the normal application remains interactive.
+    if (body.includes('"initializeReplay"')) {
+      replayPending = true;
+      await released;
+      await route.fulfill({ response });
+      replayLoaded = true;
+    } else await route.fulfill({ response });
+  });
+  try {
+    await page.goto("/contact", { waitUntil: "domcontentloaded" });
+    await expect.poll(() => replayPending).toBe(true);
+    await page.locator(".site-footer").getByRole("link", { name: "Email Preferences", exact: true }).click();
+    await expect(page).toHaveURL(/\/subscription-preferences$/);
+    await page.getByRole("link", { name: "Modern Fundamental Analyst Home", exact: true }).click();
+    await expect(page).toHaveURL(/\/$/);
+    releaseReplay();
+    await expect.poll(() => replayLoaded).toBe(true);
+    await page.evaluate(() => {
+      const button = document.createElement("button");
+      button.textContent = "Trigger pending Replay privacy error";
+      button.onclick = () => {
+        throw new Error("Pending Replay privacy regression");
+      };
+      document.body.append(button);
+    });
+    await page.getByRole("button", { name: "Trigger pending Replay privacy error", exact: true }).click();
+    await expect.poll(() => eventBody).toContain("Pending Replay privacy regression");
+    expect(eventBody).not.toContain('"replay_id"');
+  } finally {
+    releaseReplay();
+  }
+});
