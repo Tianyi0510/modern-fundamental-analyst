@@ -48,6 +48,7 @@ Run from the repository root containing `package.json`. Use focused checks durin
 | Selected Node tests                               | `node --import ./scripts/register-server.mjs --test <test-files>`                                                     |
 | Selected browser tests                            | `npx playwright test <spec-files> --project=chromium` (or `webkit`)                                                   |
 | Production browser tests                          | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
+| Dedicated performance budgets after a production build | `npm run test:performance` |
 | Full static checks                                | `npm run verify:static`                                                                                               |
 | Full static, build and production Chromium checks | `npm run verify`                                                                                                      |
 | Mobile production WebKit checks                   | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2`                           |
@@ -116,7 +117,7 @@ Use GitHub Actions and the Vercel Git integration. Follow the [release workflow]
 4. Report completion promptly. Production smoke checks are optional unless requested or evidence indicates a failure; report incomplete diagnostics separately.
 5. After successful deployment, safely delete the local merged feature branch after checking for unmerged work and switching away. Preserve active branches. GitHub deletes the merged remote branch automatically.
 
-Preserve the stable `verify` and `webkit` result jobs, package-integrity checks, browser coverage and `vercel.json`'s exact-commit production gate. Keep the gate outside `npm run build` and runner workarounds in the workflow. Fix failed checks rather than bypassing them.
+Preserve the stable `verify` and `webkit` result jobs, the required `performance` budget job, package-integrity checks, browser coverage and `vercel.json`'s exact-commit production gate. Keep the gate outside `npm run build` and runner workarounds in the workflow. Fix failed checks rather than bypassing them.
 
 ## Maintaining this file
 

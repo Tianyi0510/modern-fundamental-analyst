@@ -30,17 +30,18 @@ See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-loca
 
 Run checks for the changed files and behavior. CI runs full verification; release checks confirm the deployed commit and live status. Do not routinely repeat the full suite locally.
 
-| Scope                                              | Command                                                           |
-| -------------------------------------------------- | ----------------------------------------------------------------- |
-| Unit tests                                         | `npm run test:unit -- <test-path>`                                |
-| Component integrations                             | `npm run test:integration -- <test-path>`                         |
-| Watch mode                                         | `npm run test:watch`                                              |
-| Node tests                                         | `node --import ./scripts/register-server.mjs --test <test-files>` |
-| Browser journeys                                   | `npm run test:e2e -- <spec-files> --project=chromium`             |
-| All Node and Vitest tests                          | `npm test`                                                        |
-| Full static verification                           | `npm run verify:static`                                           |
-| Static checks, build and production Chromium       | `npm run verify`                                                  |
-| Mobile WebKit against an existing production build | `npm run test:webkit`                                             |
+| Scope                                                    | Command                                                           |
+| -------------------------------------------------------- | ----------------------------------------------------------------- |
+| Unit tests                                               | `npm run test:unit -- <test-path>`                                |
+| Component integrations                                   | `npm run test:integration -- <test-path>`                         |
+| Watch mode                                               | `npm run test:watch`                                              |
+| Node tests                                               | `node --import ./scripts/register-server.mjs --test <test-files>` |
+| Browser journeys                                         | `npm run test:e2e -- <spec-files> --project=chromium`             |
+| All Node and Vitest tests                                | `npm test`                                                        |
+| Full static verification                                 | `npm run verify:static`                                           |
+| Static checks, build and production Chromium             | `npm run verify`                                                  |
+| Performance budgets against an existing production build | `npm run test:performance`                                        |
+| Mobile WebKit against an existing production build       | `npm run test:webkit`                                             |
 
 Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack.
 

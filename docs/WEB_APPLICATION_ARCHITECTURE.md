@@ -347,23 +347,36 @@ References: [Vitest projects](https://vitest.dev/guide/projects), [Testing Libra
 
 CI checks out the PR head SHA or exact push SHA. PRs always run full verification. The read-only `plan` job decides whether a main push may reuse complete PR evidence.
 
-After `plan`, full verification runs five jobs concurrently:
+After `plan`, full verification runs six jobs concurrently:
 
 | Jobs                                   | Runner and work                                                                                    |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `static`                               | Ubuntu: locked install, production dependency audit, types, ESLint, Prettier and Node/Vitest tests |
 | `chromium-shard-1`, `chromium-shard-2` | Ubuntu: production build and native Playwright shards with `--fully-parallel`                      |
+| `performance`                          | Ubuntu: isolated production build, pinned Chromium and sequential Lighthouse budget samples        |
 | `webkit-shard-1`, `webkit-shard-2`     | macOS: production build and mobile WebKit shards                                                   |
 
-Each browser job uses one worker. Fail-fast is disabled so one shard does not cancel another. Browser jobs do not wait for static checks; this can consume runner time after a static failure, but cannot authorize release. Stable `verify` and `webkit` result jobs reject failed, cancelled or unexpectedly skipped dependencies. There is no separate CSS lint job.
+Each browser job uses one worker. Fail-fast is disabled so one shard does not cancel another. Browser jobs do not wait for static checks; this can consume runner time after a static failure, but cannot authorize release. The `verify` result also requires `performance`. Stable `verify` and `webkit` result jobs reject failed, cancelled or unexpectedly skipped dependencies. There is no separate CSS lint job.
 
 `scripts/ci-plan.mjs` permits reuse only when:
 
 1. Main is a two-parent merge whose tree matches its second parent.
 2. The latest matching same-repository PR CI run succeeded within 24 hours.
-3. That run attempt passed all five jobs above; partial or previously reused evidence is insufficient.
+3. That run attempt passed all six jobs above; partial or previously reused evidence is insufficient.
 
 Changed trees, workflows, lockfiles or test settings; stale evidence; squash/rebase merges; missing records; and API errors require full testing. The summary records the source run, tree and release SHA. Main still creates its own successful CI record for the production gate. Runner and runtime changes can occur outside Git, so reuse expires.
+
+### Performance regression checks
+
+Font instances belong to their locale layouts. `SiteDocument` receives the selected Chinese variable and shares only Jost. Global 404 rendering selects the matching locale variable. Turbopack uses `experimental.cssChunking: "graph"` because the default merging heuristic kept an unrelated Chinese font stylesheet in English routes even after imports were split. Validate generated stylesheet contents and browser behavior rather than assuming an import refactor fixes the download graph. Webpack fallback builds do not exercise this Turbopack optimization.
+
+After a production build, `npm run test:performance` starts its own loopback server on port 3211 with provider credentials disabled. It runs Lighthouse 13.5.0 sequentially using Playwright's installed Chrome for Testing. Home in all three languages and English Performance each receive three fresh mobile samples. DevTools applies 4x CPU slowdown, 150ms request latency, 1638.4 Kbps download and 750 Kbps upload directly; this avoids extrapolating the loopback HTTP/1.1 waterfall with Lighthouse's simulated network model. Do not compare these values directly to a public HTTPS run using simulated throttling.
+
+The CI timing budgets are median LCP at most 3000ms, TBT at most 400ms and CLS at most 0.1. Resource budgets use the maximum sample's decoded sizes: CSS at most 160KiB for English and 270KiB for Chinese; JavaScript at most 1200KiB. Payload limits catch a single accidental language-font inclusion; medians reduce timing noise. These are regression budgets, not field CWV pass thresholds. Lighthouse scores are recorded but are not a gate. `scripts/performance-budgets.test.mjs` verifies failures and rejects incomplete evidence.
+
+The separate `performance` job builds with a non-production Sentry DSN and Production sampling, supplies no provider secrets and uploads all Lighthouse JSON reports plus a summary for 14 days, including on failure. Missing metrics, failed application stylesheet/script requests or failed budgets block `verify` and cannot authorize reuse. The two Vercel-injected analytics scripts are unavailable on a plain local Next.js server and are the only allowed script 404s; live analytics delivery remains a deployment/provider check. Keep the existing production browser jobs and exact-commit deployment gate.
+
+Field CWV still requires mobile/desktop p75 LCP, INP and CLS from Speed Insights or CrUX. A Lighthouse navigation run does not measure field INP; TBT is only a laboratory diagnostic. Query failures do not establish a pass or absence of field traffic. See [Google Web Vitals](https://web.dev/articles/vitals), [Chrome Lighthouse scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring), [Next.js CSS chunking](https://nextjs.org/docs/app/api-reference/config/next-config-js/cssChunking) and [font optimization](https://nextjs.org/docs/app/getting-started/fonts).
 
 ### Local runs and shard maintenance
 

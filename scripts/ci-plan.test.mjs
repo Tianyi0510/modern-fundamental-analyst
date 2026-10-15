@@ -24,11 +24,13 @@ function fixture() {
       ],
     },
     "/actions/runs/42/attempts/1/jobs?per_page=100": {
-      jobs: ["static", "chromium-shard-1", "chromium-shard-2", "webkit-shard-1", "webkit-shard-2"].map((name) => ({
-        name,
-        status: "completed",
-        conclusion: "success",
-      })),
+      jobs: ["static", "chromium-shard-1", "chromium-shard-2", "webkit-shard-1", "webkit-shard-2", "performance"].map(
+        (name) => ({
+          name,
+          status: "completed",
+          conclusion: "success",
+        }),
+      ),
     },
   };
 }
@@ -107,4 +109,13 @@ test("API failures fall back to full testing", async () => {
     }),
     null,
   );
+});
+
+test("performance evidence is required for reuse", async () => {
+  for (const conclusion of ["failure", "skipped", "cancelled"]) {
+    const data = fixture();
+    data["/actions/runs/42/attempts/1/jobs?per_page=100"].jobs.find((job) => job.name === "performance").conclusion =
+      conclusion;
+    assert.equal(await evaluate(data), null);
+  }
 });

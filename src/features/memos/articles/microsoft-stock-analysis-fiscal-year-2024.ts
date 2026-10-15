@@ -156,7 +156,6 @@ const sourceContent: MemoContent = {
     {
       citation: "Brand Finance. (2025). Brand Guardianship Index 2025.",
       href: "https://brandfinance.com/press-releases/microsoft-chief-satya-nadella-leads-2025-list-of-top-100-ceos-elon-musk-vaults-to-6th-place-from-19th",
-      linkLabel: "Publisher’s 2025 Overview",
     },
     {
       citation: "Microsoft Corporation. (2024). Microsoft Fiscal Year 2024 Annual Report.",

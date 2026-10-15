@@ -13,5 +13,7 @@ export const appearance = {
   "article-lead":
     "article-lead [max-width:900px] [margin:var(--space-section)_0_var(--space-related-content)] text-lead [text-transform:none] [text-wrap:pretty]",
   "article-notes":
-    "article-notes mx-auto mb-[var(--space-heading-content)] grid w-[min(1040px,100%)] gap-[var(--space-5)] text-body-large [overflow-wrap:anywhere]",
+    "article-notes mx-auto mb-[var(--space-heading-content)] w-[min(1040px,100%)] text-body-large [overflow-wrap:anywhere]",
+  "article-disclaimer":
+    "article-disclaimer mx-auto mt-[var(--space-heading-content)] w-[min(1040px,100%)] text-body-large [overflow-wrap:anywhere] [&_p]:m-0",
 } as const;

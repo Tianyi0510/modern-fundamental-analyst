@@ -62,6 +62,8 @@ Choose tokens by purpose. CSS defines values and breakpoints. Keep sizing, spaci
 
 ### Typography roles
 
+Jost is shared across locales. Each Chinese root layout owns its matching Noto Sans font; ordinary English pages must not load either Chinese font stylesheet. Keep the existing font options, fallback order and text metrics. The global 404 handles all locales in one entry and may load both Chinese stylesheets, but its body selects the correct locale variable. `src/lib/fonts.spec.ts` verifies stylesheet scope and the normal/404 fallback behavior.
+
 Type treatments combine size, line height, weight and tracking. The site keeps its own scale and font families. `--font-size-*`, `--leading-*`, `--tracking-*` and `--weight-*` define values; `@theme inline` in `tokens.css` maps them to Tailwind treatments:
 
 | Role           | Utility                                                                 | Use                                                    |
