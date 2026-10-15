@@ -2,7 +2,7 @@ const columns = "grid grid-cols-[1.05fr_0.5fr_0.75fr_0.9fr_1fr_0.65fr_0.6fr] gap
 const valueText = "text-data-row tabular-nums";
 const mobileControl =
   "w-full min-w-0 h-[var(--size-control)] border border-[var(--border-control)] rounded-control bg-white text-black text-control";
-const rowLayout = `${columns} min-h-[64px] [&_>_*]:p-0 [&_>_*:not(:first-child)]:text-right compact:min-h-0 compact:grid-cols-2 compact:gap-x-[var(--space-4)] compact:gap-y-[var(--space-3)] compact:py-[var(--space-4)] compact:[&_>_*]:min-w-0 compact:[&_>_*]:grid compact:[&_>_*]:gap-[5px] compact:[&_>_*]:text-left compact:[&_>_*]:wrap-anywhere compact:[&_>_*::before]:content-[attr(data-label)] compact:[&_>_*::before]:text-caption compact:[&_>_*::before]:tracking-[var(--tracking-label)] compact:[&_>_*::before]:font-bold compact:[&_>_*::before]:text-[var(--text-tertiary)] compact:[&_>_th:first-child]:col-span-full compact:[&_>_th:first-child]:font-bold compact:[&_>_th:first-child::before]:hidden`;
+const rowLayout = `${columns} min-h-[var(--size-control)] [&_>_*]:p-0 [&_>_*:not(:first-child)]:text-right compact:min-h-0 compact:grid-cols-2 compact:gap-x-[var(--space-4)] compact:gap-y-[var(--space-2)] compact:py-[var(--space-3)] compact:[&_>_*]:min-w-0 compact:[&_>_*]:grid compact:[&_>_*]:gap-[5px] compact:[&_>_*]:text-left compact:[&_>_*]:wrap-anywhere compact:[&_>_*::before]:content-[attr(data-label)] compact:[&_>_*::before]:text-caption compact:[&_>_*::before]:tracking-[var(--tracking-label)] compact:[&_>_*::before]:font-bold compact:[&_>_*::before]:text-[var(--text-tertiary)] compact:[&_>_th:first-child]:col-span-full compact:[&_>_th:first-child]:font-bold compact:[&_>_th:first-child::before]:hidden`;
 
 export const appearance = {
   "portfolio-mobile-sort":

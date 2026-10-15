@@ -12,7 +12,7 @@ export const appearance = {
   "footer-navigation": "footer-navigation min-w-0 self-start text-left",
   "footer-heading": "footer-heading mb-[14px] text-highlight text-title-small",
   "footer-links":
-    "footer-links grid justify-items-start gap-[var(--space-2)] text-control [&_a]:w-fit [&_a]:min-h-[44px] [&_a]:inline-flex [&_a]:items-center [&_a]:transition-colors [&_a]:duration-[var(--motion-duration-base)] [&_a]:ease-[var(--motion-ease-standard)] [&_a:hover]:text-highlight [&_a:focus-visible]:text-highlight touch:[&_a:hover:not(:focus-visible)]:text-white touch:[&_a:active]:text-highlight",
+    "footer-links grid justify-items-start gap-0 text-control [&_a]:w-fit [&_a]:min-h-[44px] [&_a]:inline-flex [&_a]:items-center [&_a]:transition-colors [&_a]:duration-[var(--motion-duration-base)] [&_a]:ease-[var(--motion-ease-standard)] [&_a:hover]:text-highlight [&_a:focus-visible]:text-highlight touch:[&_a:hover:not(:focus-visible)]:text-white touch:[&_a:active]:text-highlight",
   "footer-social-link": "footer-social-link gap-[var(--space-2)] [&>svg]:flex-none",
   "footer-bottom":
     "footer-bottom col-span-full py-[var(--space-footer-bottom)] border-t border-[rgba(255,255,255,0.22)] [&_small]:text-[var(--text-inverse-tertiary)] [&_small]:text-caption",
