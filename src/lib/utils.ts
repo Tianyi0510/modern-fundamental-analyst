@@ -5,21 +5,6 @@ const mergeClasses = extendTailwindMerge({
   extend: {
     theme: {
       text: [
-        "m3-display-large",
-        "m3-display-medium",
-        "m3-display-small",
-        "m3-headline-large",
-        "m3-headline-medium",
-        "m3-headline-small",
-        "m3-title-large",
-        "m3-title-medium",
-        "m3-title-small",
-        "m3-body-large",
-        "m3-body-medium",
-        "m3-body-small",
-        "m3-label-large",
-        "m3-label-medium",
-        "m3-label-small",
         "display",
         "headline",
         "title",

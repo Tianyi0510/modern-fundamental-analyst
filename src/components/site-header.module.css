@@ -2,18 +2,19 @@
 .languageTrigger {
   transform-origin: center;
   transition:
-    color var(--motion-effects-fast-duration) var(--motion-effects-fast-easing),
-    background-color var(--motion-effects-default-duration) var(--motion-effects-default-easing),
-    transform var(--motion-spatial-fast-duration) var(--motion-spatial-fast-easing);
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-emphasized);
 }
 .dropdownItem {
   transition:
-    color var(--motion-effects-fast-duration) var(--motion-effects-fast-easing),
-    background-color var(--motion-effects-fast-duration) var(--motion-effects-fast-easing),
-    transform var(--motion-spatial-fast-duration) var(--motion-spatial-fast-easing);
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-base) var(--motion-ease-emphasized);
 }
 .dropdownItem:active {
   transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
 }
 .desktopLink:hover,
 .desktopLink:focus-visible,
@@ -24,9 +25,10 @@
 .desktopLink:active,
 .languageTrigger:active {
   transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
 }
 .languageTrigger > svg {
-  transition: transform var(--motion-spatial-fast-duration) var(--motion-spatial-fast-easing);
+  transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized);
 }
 .languageTrigger[aria-expanded="true"] > svg {
   transform: rotate(180deg);
@@ -35,27 +37,28 @@
   transform-origin: center;
   backface-visibility: hidden;
   transition:
-    transform var(--motion-spatial-fast-duration) var(--motion-spatial-fast-easing),
-    background-color var(--motion-effects-default-duration) var(--motion-effects-default-easing),
-    color var(--motion-effects-default-duration) var(--motion-effects-default-easing);
+    transform var(--motion-duration-base) var(--motion-ease-standard),
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    color var(--motion-duration-base) var(--motion-ease-standard);
 }
 .openButton:hover {
-  background: var(--surface-highlight);
+  background: var(--bright-blue);
   transform: rotate(4deg) scale(var(--motion-scale-hover));
 }
 .closeButton:hover {
   transform: rotate(-4deg) scale(var(--motion-scale-hover));
 }
 .iconButton:focus-visible {
-  outline: 2px solid var(--focus-ring-default);
+  outline: 2px solid var(--medium-blue);
   outline-offset: 3px;
-  background: var(--surface-highlight);
+  background: var(--bright-blue);
   transform: scale(var(--motion-scale-hover));
 }
 .iconButton:active,
 .iconButton[data-touch-pressed="true"] {
-  background: var(--surface-highlight);
+  background: var(--bright-blue);
   transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
 }
 .iconButton[data-touch-pressed="true"] > .touchRing {
   opacity: 1;
@@ -71,11 +74,11 @@
 }
 .mobileLink,
 .languageDisclosure > summary {
-  transition: color var(--motion-effects-fast-duration) var(--motion-effects-fast-easing);
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 .languageDisclosure > summary {
   min-height: 48px;
-  padding: 0 var(--space-100);
+  padding: 0 var(--space-2);
   outline: none;
   display: flex;
   align-items: center;
@@ -89,7 +92,7 @@
 .languageDisclosure > summary > svg {
   width: 18px;
   height: 18px;
-  transition: transform var(--motion-spatial-fast-duration) var(--motion-spatial-fast-easing);
+  transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized);
 }
 .languageDisclosure[open]:not([data-closing]) > summary > svg {
   transform: rotate(180deg);
@@ -98,7 +101,7 @@
 .languageDisclosure > summary:focus-visible,
 .languageDisclosure > summary:active,
 .languageDisclosure[open]:not([data-closing]) > summary {
-  color: var(--text-interactive);
+  color: var(--medium-blue);
 }
 .languageDisclosure > summary:focus-visible {
   text-decoration: underline;
@@ -107,7 +110,7 @@
 }
 @media (hover: none) and (pointer: coarse) {
   .openButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
-    background: var(--surface-primary);
+    background: var(--white);
     transform: none;
   }
   .closeButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
@@ -115,7 +118,7 @@
   }
   .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
   .languageDisclosure:not([open]) > summary:hover:not(:active):not(:focus-visible) {
-    color: var(--text-primary);
+    color: var(--black);
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -5,38 +5,32 @@
 .figure h3 {
   margin: 0;
   font-size: var(--font-size-compact-title);
-  line-height: var(--md-sys-typescale-title-medium-line-height);
-  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
-  font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  line-height: var(--leading-compact-title);
+  letter-spacing: var(--tracking-heading);
 }
 .figure p {
-  margin: var(--space-150) 0;
+  margin: var(--space-3) 0;
   font-size: var(--font-size-body);
-  line-height: var(--md-sys-typescale-body-medium-line-height);
-  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
-  font-weight: var(--md-sys-typescale-body-medium-weight);
+  line-height: var(--leading-body);
 }
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-300);
+  gap: var(--space-5);
   list-style: none;
   padding: 0;
-  margin: var(--space-300) 0;
+  margin: var(--space-5) 0;
   font-size: var(--font-size-control);
-  line-height: var(--md-sys-typescale-label-large-line-height);
-  letter-spacing: var(--md-sys-typescale-label-large-tracking);
-  font-weight: var(--md-sys-typescale-label-large-weight);
 }
 .legend li {
   display: flex;
   align-items: center;
-  gap: var(--space-100);
+  gap: var(--space-2);
 }
 .portfolioKey,
 .benchmarkKey {
   width: 32px;
-  border-top: 3px solid var(--chart-portfolio);
+  border-top: 3px solid var(--deep-blue);
 }
 .benchmarkKey {
   border-color: var(--chart-benchmark);
@@ -62,19 +56,16 @@
   padding-block: 12px;
   font-size: var(--font-size-caption);
   font-variant-numeric: tabular-nums;
-  line-height: var(--md-sys-typescale-body-small-line-height);
-  letter-spacing: var(--md-sys-typescale-body-small-tracking);
-  font-weight: var(--md-sys-typescale-body-small-weight);
 }
 .ticks span {
   line-height: 0;
 }
 .grid {
-  stroke: var(--chart-grid);
+  stroke: var(--gray);
   vector-effect: non-scaling-stroke;
 }
 .zeroLine {
-  stroke: var(--chart-zero);
+  stroke: var(--black);
   stroke-width: 1;
   stroke-dasharray: 3 3;
   vector-effect: non-scaling-stroke;
@@ -87,7 +78,7 @@
   stroke-linejoin: round;
 }
 .portfolioLine {
-  stroke: var(--chart-portfolio);
+  stroke: var(--deep-blue);
 }
 .benchmarkLine {
   stroke: var(--chart-benchmark);
@@ -97,32 +88,26 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-150);
+  gap: var(--space-3);
   padding-left: 4.5rem;
-  margin-top: var(--space-200);
+  margin-top: var(--space-4);
   font-size: var(--font-size-caption);
-  line-height: var(--md-sys-typescale-body-small-line-height);
-  letter-spacing: var(--md-sys-typescale-body-small-tracking);
-  font-weight: var(--md-sys-typescale-body-small-weight);
 }
 .details {
-  margin-top: var(--space-300);
+  margin-top: var(--space-5);
   font-size: var(--font-size-body);
-  line-height: var(--md-sys-typescale-body-medium-line-height);
-  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
-  font-weight: var(--md-sys-typescale-body-medium-weight);
 }
 .details summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-200);
+  gap: var(--space-4);
   min-height: var(--size-control);
   cursor: pointer;
-  padding: var(--space-200) 0;
+  padding: var(--space-4) 0;
   list-style: none;
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--gray);
+  border-bottom: 1px solid var(--gray);
   touch-action: manipulation;
 }
 .details summary::-webkit-details-marker {
@@ -133,23 +118,22 @@
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
-  transition: transform var(--motion-spatial-fast-duration) var(--motion-spatial-fast-easing);
+  transition: transform var(--motion-duration-base) var(--motion-ease-standard);
 }
 .details[open]:not([data-closing]) .chevron {
   transform: rotate(180deg);
 }
 .details summary:active .chevron {
   transform: scale(var(--motion-scale-press));
+  transition-duration: var(--motion-duration-press);
 }
 .details[open]:not([data-closing]) summary:active .chevron {
   transform: rotate(180deg) scale(var(--motion-scale-press));
 }
 .figure .scrollHint {
   font-size: var(--font-size-caption);
-  line-height: var(--md-sys-typescale-body-small-line-height);
-  margin: var(--space-150) 0;
-  letter-spacing: var(--md-sys-typescale-body-small-tracking);
-  font-weight: var(--md-sys-typescale-body-small-weight);
+  line-height: var(--leading-body);
+  margin: var(--space-3) 0;
 }
 .details summary:focus-visible,
 .tableScroll:focus-visible {
@@ -160,7 +144,7 @@
   overflow: auto;
   max-height: min(28rem, 65svh);
   overscroll-behavior-x: contain;
-  margin-top: var(--space-150);
+  margin-top: var(--space-3);
 }
 .tableScroll table {
   width: 100%;
@@ -171,14 +155,14 @@
 }
 .tableScroll caption {
   text-align: left;
-  padding-bottom: var(--space-150);
+  padding-bottom: var(--space-3);
   caption-side: bottom;
-  padding-top: var(--space-150);
+  padding-top: var(--space-3);
 }
 .tableScroll th,
 .tableScroll td {
-  padding: var(--space-150);
-  border-bottom: 1px solid var(--border-subtle);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--gray);
   text-align: right;
   white-space: nowrap;
 }
@@ -201,7 +185,7 @@
 .tableScroll thead th {
   position: sticky;
   top: 0;
-  background: var(--surface-primary);
+  background: var(--white);
   z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {

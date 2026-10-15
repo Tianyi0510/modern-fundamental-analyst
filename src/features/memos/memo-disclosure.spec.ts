@@ -14,7 +14,7 @@ test("memo disclosure animates both directions and respects reduced motion", { t
       const animation = details.getAnimations()[0];
       if (!animation) throw new Error("Expected disclosure height animation");
       animation.pause();
-      animation.currentTime = 100;
+      animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
       return { height: details.getBoundingClientRect().height, full: details.scrollHeight };
     });
     expect(midpoint.height).toBeGreaterThan(closed);

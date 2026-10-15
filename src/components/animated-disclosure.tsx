@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useRef, type MouseEvent, type ReactNode } from "react";
 
-import { animateSpringValue, animationVelocity } from "@/lib/motion";
-
 export function AnimatedDisclosure({
   summary,
   children,
@@ -62,11 +60,6 @@ export function AnimatedDisclosure({
     const summary = event.currentTarget;
     event.preventDefault();
     const startHeight = details.getBoundingClientRect().height;
-    const styles = getComputedStyle(details);
-    const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
-    const minimumHeight = summary.offsetHeight + borderHeight;
-    // A clamped summary is stationary even while the virtual spring overshoots below it.
-    const velocity = startHeight <= minimumHeight + 0.02 ? 0 : animationVelocity(animationRef.current);
     const open = animationRef.current ? phaseRef.current === "closing" : !details.open;
     phaseRef.current = open ? "opening" : "closing";
     details.dataset.state = phaseRef.current;
@@ -84,14 +77,17 @@ export function AnimatedDisclosure({
 
     details.open = true;
     details.toggleAttribute("data-closing", !open);
-    const endHeight = open ? details.getBoundingClientRect().height : minimumHeight;
-    const animation = animateSpringValue(
-      details,
-      startHeight,
-      endHeight,
-      (height) => ({ height: `${Math.max(minimumHeight, height)}px`, overflow: "clip" }),
-      "spatialDefault",
-      velocity,
+    const styles = getComputedStyle(details);
+    const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
+    const endHeight = open ? details.getBoundingClientRect().height : summary.offsetHeight + borderHeight;
+    const durationToken = styles.getPropertyValue("--motion-duration-slow").trim();
+    const duration = parseFloat(durationToken) * (durationToken.endsWith("ms") ? 1 : 1000);
+    const animation = details.animate(
+      [
+        { height: `${startHeight}px`, overflow: "clip" },
+        { height: `${endHeight}px`, overflow: "clip" },
+      ],
+      { duration, easing: styles.getPropertyValue("--motion-ease-emphasized").trim(), fill: "forwards" },
     );
     animationRef.current = animation;
     animation.onfinish = () => {

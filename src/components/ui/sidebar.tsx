@@ -42,7 +42,7 @@ export function SidebarMenuButton({
       data-sidebar="menu-button"
       data-active={isActive}
       className={cn(
-        "grid min-h-[56px] w-full min-w-0 grid-cols-[minmax(0,1fr)] items-center bg-transparent px-[var(--space-100)] py-[var(--space-100)] text-left text-title-small [overflow-wrap:anywhere] whitespace-normal text-ink transition-[color] duration-[var(--motion-effects-fast-duration)] ease-[var(--motion-effects-fast-easing)] outline-none hover:text-interactive focus-visible:text-interactive focus-visible:underline focus-visible:decoration-2 focus-visible:underline-offset-[0.2em] active:text-interactive disabled:pointer-events-none disabled:opacity-[var(--opacity-disabled)] data-[active=true]:text-interactive touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:text-ink",
+        "grid min-h-[56px] w-full min-w-0 grid-cols-[minmax(0,1fr)] items-center bg-transparent px-[var(--space-2)] py-[var(--space-2)] text-left text-title-small [overflow-wrap:anywhere] whitespace-normal text-black transition-[color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] outline-none hover:text-accent focus-visible:text-accent focus-visible:underline focus-visible:decoration-2 focus-visible:underline-offset-[0.2em] active:text-accent disabled:pointer-events-none disabled:opacity-[var(--opacity-disabled)] data-[active=true]:text-accent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:text-black",
         className,
       )}
       {...props}

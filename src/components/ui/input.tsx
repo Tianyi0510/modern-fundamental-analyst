@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 export type FieldVariant = "standard" | "inverse";
 const variants: Record<FieldVariant, string> = {
   standard:
-    "border-[var(--border-field)] rounded-field bg-[var(--surface-muted)] text-ink placeholder:text-[var(--text-secondary)] focus-visible:outline-[var(--focus-ring-on-light)]",
+    "border-black rounded-none bg-[var(--background-gray)] text-black focus-visible:outline-[var(--focus-ring-on-light)]",
   inverse:
-    "border-[var(--border-field-inverse)] rounded-pill bg-transparent text-inverse placeholder:text-[var(--text-placeholder-inverse)] focus-visible:outline-[var(--focus-ring-on-dark)]",
+    "border-[rgba(255,255,255,0.7)] rounded-pill bg-transparent text-white placeholder:text-[rgba(255,255,255,0.6)] focus-visible:outline-[var(--focus-ring-on-dark)]",
 };
 export function inputAppearance(variant: FieldVariant, className = "", multiline = false) {
   const height = multiline
@@ -15,7 +15,7 @@ export function inputAppearance(variant: FieldVariant, className = "", multiline
       ? "min-h-[var(--size-control)]"
       : "min-h-[var(--size-field)]";
   return cn(
-    `block w-full min-w-0 border px-[var(--space-field-padding-inline)] py-[var(--space-field-padding-block)] text-body-large transition-[border-color,box-shadow] duration-[var(--motion-effects-fast-duration)] ease-[var(--motion-effects-fast-easing)] disabled:cursor-not-allowed disabled:border-dashed ${height} ${variants[variant]}`,
+    `block w-full min-w-0 border px-[var(--space-field-inline)] py-[var(--space-field-block)] text-body transition-[border-color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] disabled:cursor-not-allowed disabled:border-dashed ${height} ${variants[variant]}`,
     className,
   );
 }

@@ -148,14 +148,14 @@ test.describe("header interaction QA", () => {
           await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
           for (const link of await note.locator("a").all()) {
             await expect(link).toHaveCSS("font-weight", "400");
-            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
+            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
             await expect(link).toHaveCSS("text-decoration-line", "underline");
             await expect(link).toHaveCSS("text-underline-offset", "3px");
             await link.hover();
-            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
+            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
             await page.keyboard.press("Shift");
             await link.focus();
-            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
+            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
           }
         }
         if (path.startsWith("/memos/")) {
@@ -416,20 +416,14 @@ test.describe("touch CTA recovery", () => {
           );
           await control.hover();
           await expect(control).toHaveCSS("transform", "none");
-          await expect(control).toHaveCSS(
-            "background-color",
-            selector === ".hero .button-dark" || selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(0, 0, 0)",
-          );
+          await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
           await page.mouse.down();
           await expect(control).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
           await page.mouse.up();
           await control.tap();
           await control.hover();
           await expect(control).toHaveCSS("transform", "none");
-          await expect(control).toHaveCSS(
-            "background-color",
-            selector === ".hero .button-dark" || selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(0, 0, 0)",
-          );
+          await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
           await page.keyboard.press("Tab");
           await control.focus();
           // Keyboard focus may scroll the control away from the pointer in WebKit.
@@ -440,11 +434,7 @@ test.describe("touch CTA recovery", () => {
           await expect(control).toHaveCSS("outline-style", "solid");
           await expect(control).toHaveCSS(
             "background-color",
-            selector === ".round-link"
-              ? "rgb(95, 205, 253)"
-              : selector === ".performance-home .button-white"
-                ? "color(srgb 0.1 0.1 0.1)"
-                : "color(srgb 0.1 0.244706 0.611765)",
+            selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(95, 205, 253)",
           );
           await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
           await control.evaluate((element: HTMLElement) => element.blur());
