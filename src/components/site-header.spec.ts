@@ -812,23 +812,26 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-layer")).toBeHidden();
   });
 
-  test("navigation switches without overlap or a stranded scroll lock", async ({ page }) => {
-    await page.goto("/");
-    await page.locator(".mobile-menu-button").tap();
-    await expect(page.locator(".mobile-menu-layer")).toBeVisible();
-    await page.setViewportSize({ width: 801, height: 1000 });
-    await expect(page.locator(".mobile-menu-close")).toBeVisible();
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await expect(page.locator(".mobile-menu-layer")).toBeHidden();
-    await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
-    await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
-    for (const width of [801, 1100, 1150, 1151, 1440]) {
-      await page.setViewportSize({ width, height: 1000 });
-      const logo = await page.locator(".site-header > .wordmark").boundingBox();
-      const adjacent = await page.locator(width <= 1150 ? ".mobile-menu-button" : ".header-actions").boundingBox();
-      expect(logo!.x + logo!.width).toBeLessThan(adjacent!.x);
-    }
-  });
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    test(`${prefix || "English"} navigation switches without overlap or a stranded scroll lock`, async ({ page }) => {
+      await page.goto(prefix || "/");
+      await page.evaluate(() => document.fonts.ready);
+      await page.locator(".mobile-menu-button").tap();
+      await expect(page.locator(".mobile-menu-layer")).toBeVisible();
+      await page.setViewportSize({ width: 801, height: 1000 });
+      await expect(page.locator(".mobile-menu-close")).toBeVisible();
+      await page.setViewportSize({ width: 1440, height: 1000 });
+      await expect(page.locator(".mobile-menu-layer")).toBeHidden();
+      await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+      await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
+      for (const width of [801, 1100, 1150, 1151, 1440]) {
+        await page.setViewportSize({ width, height: 1000 });
+        const logo = await page.locator(".site-header > .wordmark").boundingBox();
+        const adjacent = await page.locator(width <= 1150 ? ".mobile-menu-button" : ".header-actions").boundingBox();
+        expect(logo!.x + logo!.width).toBeLessThan(adjacent!.x);
+      }
+    });
+  }
 
   test("Escape completes dismissal and rapid taps do not queue animations", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/");

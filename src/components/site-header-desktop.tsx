@@ -44,7 +44,7 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
 
   return (
     <div className={appearance["header-actions"]}>
-      <nav className="flex gap-[12px]" aria-label={copy.primary}>
+      <nav className="flex gap-[8px] min-[1280px]:gap-[12px]" aria-label={copy.primary}>
         {navigation.map(({ href, label }) => (
           <Link
             className={desktopNavigationLink}
