@@ -16,7 +16,8 @@ if (dsn) {
   const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV;
   Sentry.init({
     ...createSentryOptions(dsn, environment),
-    integrations: [],
+    // Locale/timezone enrichment performs a costly Intl initialization before hydration.
+    integrations: (integrations) => integrations.filter((integration) => integration.name !== "CultureContext"),
     replaysSessionSampleRate: environment === "test" ? 1 : 0.1,
     replaysOnErrorSampleRate: 1,
   });

@@ -24,6 +24,7 @@ test(
     });
     await page.getByRole("button", { name: "Trigger isolated monitoring error", exact: true }).click();
     await expect.poll(() => eventBody).toContain("Sentry regression error");
+    expect(eventBody).not.toContain('"culture"');
     for (const value of ["reader@example.com", "private-recovery-token", "private-session"]) {
       expect(eventBody).not.toContain(value);
     }

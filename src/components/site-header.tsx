@@ -1,7 +1,7 @@
 "use client";
 
 import { appearance } from "./site-header.styles";
-import dynamic from "next/dynamic";
+import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
 import {
@@ -25,8 +25,6 @@ import { useMobileMenu } from "./use-site-header";
 import { useMenuTouchFeedback } from "./use-menu-touch-feedback";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";
-
-const DesktopNavigation = dynamic(() => import("./site-header-desktop").then((module) => module.DesktopNavigation));
 
 type SiteHeaderProps = {
   copy: NavigationCopy;
