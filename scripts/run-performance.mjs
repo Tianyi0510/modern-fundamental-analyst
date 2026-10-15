@@ -94,7 +94,7 @@ try {
             "--throttling.uploadThroughputKbps=750",
             "--output=json",
             `--output-path=${path}`,
-            "--chrome-flags=--headless=new",
+            `--chrome-flags=${process.env.LIGHTHOUSE_CHROME_FLAGS || "--headless=new"}`,
             "--quiet",
           ],
           { cwd: root, env, stdio: "inherit", timeout: 120000 },

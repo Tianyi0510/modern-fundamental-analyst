@@ -171,6 +171,9 @@ jobs:
     env:
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
       NEXT_PUBLIC_VERCEL_ENV: production
+      # Playwright's downloaded Chrome has no Ubuntu AppArmor sandbox profile.
+      # This disposable runner audits only the isolated, provider-disabled local site.
+      LIGHTHOUSE_CHROME_FLAGS: --headless=new --no-sandbox
     steps:
       - uses: actions/checkout@v5
         with:
