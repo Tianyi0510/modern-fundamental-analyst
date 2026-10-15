@@ -2,10 +2,32 @@ import { expect, test } from "@playwright/test";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} page titles and sharing metadata describe the same page`, async ({ page }) => {
+    await page.goto(prefix || "/");
+    await expect(page.locator("main h1")).toBeVisible();
+    const website: unknown = JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
+    expect(website).toEqual({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://www.modernfundamentalanalyst.com/#website",
+      name: "Modern Fundamental Analyst",
+      url: "https://www.modernfundamentalanalyst.com/",
+    });
+    const sharingUrl = await page.locator('meta[property="og:url"]').getAttribute("content");
+    expect(new URL(sharingUrl!).href).toBe(new URL(`https://www.modernfundamentalanalyst.com${prefix || "/"}`).href);
     await page.goto(`${prefix}/about`);
     const title = await page.title();
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", title);
     await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute("content", title);
+    await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
+      "content",
+      "Modern Fundamental Analyst",
+    );
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "website");
+    await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
+      "content",
+      prefix === "/zh-tw" ? "zh_TW" : prefix === "/zh-cn" ? "zh_CN" : "en_US",
+    );
+    await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveCount(2);
     const description = await page.locator('meta[name="description"]').getAttribute("content");
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", description!);
     await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute("content", description!);

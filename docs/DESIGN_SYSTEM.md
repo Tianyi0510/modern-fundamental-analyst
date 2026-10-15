@@ -229,6 +229,8 @@ Desktop language selection uses Radix `DropdownMenu`. Put linked locale items in
 
 Mobile navigation uses `Sheet` (Radix Dialog) for naming, focus containment, background isolation and scroll locking. Keep it open until closing finishes. Do not add a second focus trap, body lock or background `inert` controller.
 
+Inside the Sheet, compose primary links with `SidebarMenu`, `SidebarMenuItem` and `SidebarMenuButton asChild`. These are the menu-only subset of the Radix Sidebar pattern, customized for this site's full-width text navigation. `SidebarMenu` retains an explicit list role for Safari when the reset removes list markers. Pass one route-derived active value to `isActive` and the link's `aria-current`; preserve real Next.js links, wrapping, Tab order and navigation dismissal. Sheet remains the state owner; the menu subset has no provider, collapse state, shortcut or tooltip. It does not implement the full upstream Sidebar API.
+
 `FieldGroup` groups controls. Contact, subscription and Preferences forms use `contents` to preserve the native form's grid, event target, validation and control placement; ordinary vertical groups can use `stack`.
 
 `FormField` connects `Field` and `FieldLabel`. `NativeSelect` keeps the platform picker. `Alert` provides shared result styling and live feedback. `ServiceLoading` pairs localized busy text with static, decorative `Skeleton` placeholders hidden from assistive technology.

@@ -60,7 +60,11 @@ Language links preserve only server-validated parameters:
 
 Support validates signatures and the 23-hour expiry. Invalid or expired attempts retain only the retirement notice. Query parameters never prove payment.
 
-Article metadata and safely serialized Article JSON-LD come from the localized memo catalog. Do not invent modification dates.
+Public pages use the shared metadata helpers for canonical URLs, reciprocal language alternates, sharing titles, site name and Open Graph locales. Each localized Home renders the same canonical `WebSite` identity; language directories do not represent separate sites. The sitemap includes public canonical pages only, with no query strings or private subscription workflows. Keep private pages crawlable so their `noindex` metadata can be read.
+
+Article metadata and safely serialized Article JSON-LD come from the localized memo catalog. Mark the language of the actual article body, even when its surrounding page is localized. The brand logo remains a social sharing fallback; omit the Article `image` until a representative research image is available. Do not invent modification dates, authorship or search actions.
+
+When changing SEO metadata, run the colocated metadata tests and the relevant browser metadata checks. After deployment, use Search Console URL Inspection and sitemap reports to confirm Google's view of the released pages. Local checks do not establish indexing, rich-result eligibility or ranking changes. References: [Google site names](https://developers.google.com/search/docs/appearance/site-names), [Article structured data](https://developers.google.com/search/docs/appearance/structured-data/article) and [Semrush technical SEO audits](https://www.semrush.com/blog/technical-seo-audit/).
 
 The locale Proxy excludes API, Next.js and Vercel paths, known public images and metadata resources. Unknown paths containing dots still receive localized 404 handling. Keep exclusions aligned with assets and metadata routes.
 

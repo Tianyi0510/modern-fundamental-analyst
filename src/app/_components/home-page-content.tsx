@@ -12,6 +12,7 @@ import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/featur
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
+import { createWebsiteStructuredData } from "@/lib/site-config";
 
 const copy = {
   en: {
@@ -158,6 +159,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
 
   return (
     <div className="home-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createWebsiteStructuredData() }} />
       <div className={appearance["home-header"]}>
         <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       </div>

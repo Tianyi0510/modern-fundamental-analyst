@@ -711,6 +711,10 @@ test.describe("mobile content and navigation QA", () => {
       .poll(() => page.locator(".mobile-menu-close").evaluate((element) => getComputedStyle(element).transform))
       .toBe("none");
     await expect(page.locator(".mobile-menu-drawer nav a")).toHaveCount(6);
+    const primaryList = page.getByRole("navigation", { name: "Mobile primary navigation" }).getByRole("list");
+    await expect(primaryList.getByRole("listitem")).toHaveCount(6);
+    await expect(primaryList.getByRole("button")).toHaveCount(0);
+    await expect(primaryList.locator('a[aria-current="page"]')).toHaveAttribute("data-active", "true");
     await expect(page.locator(".mobile-menu-index")).toHaveCount(0);
     await expect(page.locator(".mobile-menu-label")).toHaveText([
       "Home",
