@@ -143,7 +143,7 @@ test.describe("header interaction QA", () => {
         if (path === "/about") {
           await expect(note).toHaveCount(1);
           await expect(note).toHaveCSS("font-size", "18px");
-          await expect(note).toHaveCSS("line-height", "27px");
+          await expect(note).toHaveCSS("line-height", "28px");
           await expect(note).toHaveCSS("font-weight", "400");
           await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
           for (const link of await note.locator("a").all()) {
