@@ -81,12 +81,12 @@ export function SubscribeFormClient({
 
   return (
     <section className={appearance.section[variant]} id={id} aria-labelledby={titleId}>
-      <header>
+      <header className="grid gap-[var(--space-related-content)]">
         <h2 id={titleId}>{copy.title}</h2>
         {intro ? <p className={appearance.intro}>{intro}</p> : null}
       </header>
       <form
-        className={cn(appearance["subscribe-form"], variant === "inverse" && "mt-[var(--space-5)]")}
+        className={appearance["subscribe-form"]}
         onSubmit={(event) => {
           void submit(event);
         }}

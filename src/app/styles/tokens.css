@@ -4,6 +4,7 @@
   --layer-popover: 110;
   --black: #000000;
   --white: #ffffff;
+  --shadow-popover: 0 16px 40px rgba(0, 0, 0, 0.12);
   --deep-blue: #002991;
   --medium-blue: #008cff;
   --bright-blue: #5fcdfd;
@@ -13,118 +14,586 @@
   --price-down: #ff0000;
   --text-return-positive: #037b66;
   --text-return-negative: #d60a22;
-  --font-size-page-title: clamp(3.25rem, 1.75rem + 5vw, 7rem);
-  --font-size-section-title: clamp(2.75rem, 2.125rem + 2.5vw, 4.5rem);
-  --font-size-card-title: clamp(2rem, 1.75rem + 1vw, 2.625rem);
-  --font-size-compact-title: clamp(1.25rem, 1.125rem + 0.5vw, 1.5rem);
-  --font-size-lead: 1.375rem;
-  --font-size-body-large: 1.125rem;
-  --font-size-body: 1rem;
-  --font-size-label: 1rem;
-  --font-size-control: 1rem;
-  --font-size-caption: 1rem;
-  --font-size-data-display: clamp(3.25rem, 2rem + 4vw, 6rem);
-  --font-size-data-kpi: clamp(3rem, 2.5rem + 1.5vw, 4rem);
-  --font-size-data-ring: 2.5rem;
-  --font-size-data-row: 1.25rem;
+  /* Material 3 baseline roles, expressed in rem at a 16px root. */
+  --md-sys-typescale-display-large-size: 3.5625rem;
+  --md-sys-typescale-display-large-line-height: 4rem;
+  --md-sys-typescale-display-large-weight: 400;
+  --md-sys-typescale-display-large-tracking: -0.015625rem;
+  --md-sys-typescale-display-medium-size: 2.8125rem;
+  --md-sys-typescale-display-medium-line-height: 3.25rem;
+  --md-sys-typescale-display-medium-weight: 400;
+  --md-sys-typescale-display-medium-tracking: 0rem;
+  --md-sys-typescale-display-small-size: 2.25rem;
+  --md-sys-typescale-display-small-line-height: 2.75rem;
+  --md-sys-typescale-display-small-weight: 400;
+  --md-sys-typescale-display-small-tracking: 0rem;
+  --md-sys-typescale-headline-large-size: 2rem;
+  --md-sys-typescale-headline-large-line-height: 2.5rem;
+  --md-sys-typescale-headline-large-weight: 400;
+  --md-sys-typescale-headline-large-tracking: 0rem;
+  --md-sys-typescale-headline-medium-size: 1.75rem;
+  --md-sys-typescale-headline-medium-line-height: 2.25rem;
+  --md-sys-typescale-headline-medium-weight: 400;
+  --md-sys-typescale-headline-medium-tracking: 0rem;
+  --md-sys-typescale-headline-small-size: 1.5rem;
+  --md-sys-typescale-headline-small-line-height: 2rem;
+  --md-sys-typescale-headline-small-weight: 400;
+  --md-sys-typescale-headline-small-tracking: 0rem;
+  --md-sys-typescale-title-large-size: 1.375rem;
+  --md-sys-typescale-title-large-line-height: 1.75rem;
+  --md-sys-typescale-title-large-weight: 400;
+  --md-sys-typescale-title-large-tracking: 0rem;
+  --md-sys-typescale-title-medium-size: 1rem;
+  --md-sys-typescale-title-medium-line-height: 1.5rem;
+  --md-sys-typescale-title-medium-weight: 500;
+  --md-sys-typescale-title-medium-tracking: 0.009375rem;
+  --md-sys-typescale-title-small-size: 0.875rem;
+  --md-sys-typescale-title-small-line-height: 1.25rem;
+  --md-sys-typescale-title-small-weight: 500;
+  --md-sys-typescale-title-small-tracking: 0.00625rem;
+  --md-sys-typescale-body-large-size: 1rem;
+  --md-sys-typescale-body-large-line-height: 1.5rem;
+  --md-sys-typescale-body-large-weight: 400;
+  --md-sys-typescale-body-large-tracking: 0.03125rem;
+  --md-sys-typescale-body-medium-size: 0.875rem;
+  --md-sys-typescale-body-medium-line-height: 1.25rem;
+  --md-sys-typescale-body-medium-weight: 400;
+  --md-sys-typescale-body-medium-tracking: 0.015625rem;
+  --md-sys-typescale-body-small-size: 0.75rem;
+  --md-sys-typescale-body-small-line-height: 1rem;
+  --md-sys-typescale-body-small-weight: 400;
+  --md-sys-typescale-body-small-tracking: 0.025rem;
+  --md-sys-typescale-label-large-size: 0.875rem;
+  --md-sys-typescale-label-large-line-height: 1.25rem;
+  --md-sys-typescale-label-large-weight: 500;
+  --md-sys-typescale-label-large-tracking: 0.00625rem;
+  --md-sys-typescale-label-medium-size: 0.75rem;
+  --md-sys-typescale-label-medium-line-height: 1rem;
+  --md-sys-typescale-label-medium-weight: 500;
+  --md-sys-typescale-label-medium-tracking: 0.03125rem;
+  --md-sys-typescale-label-small-size: 0.6875rem;
+  --md-sys-typescale-label-small-line-height: 1rem;
+  --md-sys-typescale-label-small-weight: 500;
+  --md-sys-typescale-label-small-tracking: 0.03125rem;
+  /* M3 Emphasized retains baseline geometry and increases the role weight. */
+  --md-sys-typescale-emphasized-display-large-weight: 500;
+  --md-sys-typescale-emphasized-display-medium-weight: 500;
+  --md-sys-typescale-emphasized-display-small-weight: 500;
+  --md-sys-typescale-emphasized-headline-large-weight: 500;
+  --md-sys-typescale-emphasized-headline-medium-weight: 500;
+  --md-sys-typescale-emphasized-headline-small-weight: 500;
+  --md-sys-typescale-emphasized-title-large-weight: 500;
+  --md-sys-typescale-emphasized-title-medium-weight: 700;
+  --md-sys-typescale-emphasized-title-small-weight: 700;
+  --md-sys-typescale-emphasized-body-large-weight: 500;
+  --md-sys-typescale-emphasized-body-medium-weight: 500;
+  --md-sys-typescale-emphasized-body-small-weight: 500;
+  --md-sys-typescale-emphasized-label-large-weight: 700;
+  --md-sys-typescale-emphasized-label-medium-weight: 700;
+  --md-sys-typescale-emphasized-label-small-weight: 700;
+  --font-size-page-title: var(--md-sys-typescale-display-large-size);
+  --page-title-line-height: var(--md-sys-typescale-display-large-line-height);
+  --page-title-tracking: var(--md-sys-typescale-display-large-tracking);
+  --font-size-section-title: var(--md-sys-typescale-headline-large-size);
+  --font-size-card-title: var(--md-sys-typescale-title-large-size);
+  --font-size-compact-title: var(--md-sys-typescale-title-medium-size);
+  --font-size-lead: var(--md-sys-typescale-body-large-size);
+  --font-size-body-large: var(--md-sys-typescale-body-large-size);
+  --font-size-body: var(--md-sys-typescale-body-medium-size);
+  --font-size-label: var(--md-sys-typescale-label-large-size);
+  --font-size-control: var(--md-sys-typescale-label-large-size);
+  --font-size-caption: var(--md-sys-typescale-body-small-size);
+  --font-size-data-display: var(--md-sys-typescale-display-large-size);
+  --font-size-data-kpi: var(--md-sys-typescale-display-medium-size);
+  --font-size-data-ring: var(--md-sys-typescale-headline-large-size);
+  --font-size-data-row: var(--md-sys-typescale-title-medium-size);
   --weight-regular: 400;
+  --weight-medium: 500;
   --weight-bold: 700;
-  --tracking-heading: -0.025em;
   --tracking-brand: -0.05em;
-  --tracking-data: -0.05em;
-  --tracking-body: 0;
-  --tracking-label: 0.025em;
-  --leading-page-title: 1.05;
-  --leading-section-title: 1.1;
-  --leading-card-title: 1.1;
-  --leading-compact-title: 1.2;
-  --leading-data: 1;
-  --leading-body: 1.5;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 40px;
-  --space-8: 48px;
-  --space-9: 56px;
-  --space-10: 72px;
-  --space-11: 96px;
-  --space-page-gutter: var(--space-6);
-  --space-section: var(--space-11);
-  --space-section-compact: var(--space-10);
-  --space-heading-content: var(--space-9);
-  --space-related-content: var(--space-7);
-  --space-footer-main: var(--space-10);
-  --space-footer-bottom: var(--space-5);
+  --tracking-label: var(--md-sys-typescale-label-large-tracking);
+  /* Site CSS mapping of Material's 8dp measurement scale; see DESIGN_SYSTEM.md. */
+  --space-0: 0px;
+  --space-25: 2px;
+  --space-50: 4px;
+  --space-75: 6px;
+  --space-100: 8px;
+  --space-125: 10px;
+  --space-150: 12px;
+  --space-200: 16px;
+  --space-250: 20px;
+  --space-300: 24px;
+  --space-350: 28px;
+  --space-400: 32px;
+  --space-450: 36px;
+  --space-500: 40px;
+  --space-600: 48px;
+  --space-650: 52px;
+  --space-700: 56px;
+  --space-800: 64px;
+  --space-900: 72px;
+  --space-1000: 80px;
+  --space-1200: 96px;
+  --space-page-gutter: var(--space-400);
+  --space-section: var(--space-1200);
+  --space-section-compact: var(--space-900);
+  --space-heading-content: var(--space-700);
+  --space-related-content: var(--space-500);
+  --space-footer-main: var(--space-900);
+  --space-footer-bottom: var(--space-300);
+  --space-hero-title-gap: var(--space-800);
+  --space-heading-stack-gap: var(--space-400);
+  --space-paragraph-gap: var(--space-300);
+  --space-footer-content-gap: var(--space-200);
+  --space-card-padding: var(--space-400);
+  --space-button-padding-inline: var(--space-300);
+  --space-button-small-padding-inline: var(--space-250);
+  --space-button-icon-gap: var(--space-250);
   --size-control: 52px;
   --size-control-small: 42px;
   --size-field: 56px;
   --size-touch-target: 48px;
-  --radius-menu: 8px;
+  --radius-field: 8px;
+  --radius-quiet: 8px;
+  --radius-small: 8px;
+  --radius-menu: 12px;
+  --radius-skeleton: var(--radius-small);
+  --radius-round: calc(infinity * 1px);
   --radius-pill: 999px;
   --focus-ring-width: 2px;
   --focus-ring-offset: 4px;
+  --focus-ring-default: var(--deep-blue);
   --focus-ring-on-light: var(--deep-blue);
   --focus-ring-on-dark: var(--bright-blue);
-  --space-field-label: var(--space-3);
-  --space-form-row: var(--space-5);
-  --space-form-column: var(--space-5);
-  --space-field-block: var(--space-3);
-  --space-field-inline: var(--space-4);
+  --space-field-label-gap: var(--space-150);
+  --space-form-row-gap: var(--space-300);
+  --space-form-column-gap: var(--space-300);
+  --space-field-padding-block: var(--space-150);
+  --space-field-padding-inline: var(--space-200);
   --size-status-reserve: 1.65em;
+  --opacity-kpi-note: 0.87;
   --opacity-disabled: 0.64;
   --opacity-disabled-preferences: 0.55;
-  --motion-duration-press: 90ms;
-  --motion-duration-fast: 180ms;
-  --motion-duration-base: 220ms;
-  --motion-duration-medium: 280ms;
-  --motion-duration-slow: 360ms;
-  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
-  --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* Generated from src/lib/motion.ts; update with motionTokenDeclarations(). */
+  --motion-spatial-fast-duration: 525ms;
+  --motion-spatial-fast-easing: linear(
+    0,
+    0.02522,
+    0.09118,
+    0.18466,
+    0.29439,
+    0.41107,
+    0.52737,
+    0.63778,
+    0.73844,
+    0.8269,
+    0.9019,
+    0.96316,
+    1.01109,
+    1.04668,
+    1.07126,
+    1.08635,
+    1.09356,
+    1.09449,
+    1.09064,
+    1.08337,
+    1.07388,
+    1.06316,
+    1.05205,
+    1.04116,
+    1.03098,
+    1.02181,
+    1.01385,
+    1.00718,
+    1.00181,
+    0.99768,
+    0.99468,
+    0.99267,
+    0.99151,
+    0.99104,
+    0.99112,
+    0.99161,
+    0.99239,
+    0.99333,
+    0.99437,
+    0.99542,
+    0.99644,
+    0.99737,
+    0.9982,
+    0.99892,
+    0.99951,
+    0.99997,
+    1.00033,
+    1.00058,
+    1.00074,
+    1.00083,
+    1.00085,
+    1.00083,
+    1.00077,
+    1.00069,
+    1.0006,
+    1.0005,
+    1.0004,
+    1.00031,
+    1.00022,
+    1.00015,
+    1.00008,
+    1.00003,
+    0.99999,
+    1
+  );
+  --motion-spatial-default-duration: 533.333ms;
+  --motion-spatial-default-easing: linear(
+    0,
+    0.0121,
+    0.04433,
+    0.09135,
+    0.14867,
+    0.21261,
+    0.28018,
+    0.34897,
+    0.41711,
+    0.48317,
+    0.5461,
+    0.60514,
+    0.65983,
+    0.70989,
+    0.75522,
+    0.79585,
+    0.83191,
+    0.86362,
+    0.89123,
+    0.91504,
+    0.93538,
+    0.95255,
+    0.9669,
+    0.97873,
+    0.98835,
+    0.99603,
+    1.00205,
+    1.00664,
+    1.01003,
+    1.01241,
+    1.01396,
+    1.01483,
+    1.01515,
+    1.01505,
+    1.01463,
+    1.01396,
+    1.01312,
+    1.01217,
+    1.01116,
+    1.01011,
+    1.00908,
+    1.00807,
+    1.0071,
+    1.00619,
+    1.00534,
+    1.00457,
+    1.00387,
+    1.00323,
+    1.00267,
+    1.00217,
+    1.00174,
+    1.00137,
+    1.00105,
+    1.00078,
+    1.00055,
+    1.00036,
+    1.00021,
+    1.00008,
+    0.99999,
+    0.99991,
+    0.99986,
+    0.99982,
+    0.99979,
+    0.99978,
+    1
+  );
+  --motion-spatial-slow-duration: 700ms;
+  --motion-spatial-slow-easing: linear(
+    0,
+    0.00652,
+    0.02448,
+    0.05169,
+    0.08621,
+    0.12635,
+    0.17064,
+    0.21781,
+    0.26676,
+    0.31657,
+    0.36645,
+    0.41578,
+    0.46402,
+    0.51074,
+    0.55562,
+    0.5984,
+    0.63891,
+    0.67703,
+    0.71268,
+    0.74583,
+    0.7765,
+    0.80472,
+    0.83057,
+    0.85411,
+    0.87546,
+    0.89471,
+    0.91198,
+    0.9274,
+    0.94108,
+    0.95316,
+    0.96376,
+    0.97299,
+    0.98098,
+    0.98783,
+    0.99366,
+    0.99857,
+    1.00266,
+    1.006,
+    1.0087,
+    1.01082,
+    1.01245,
+    1.01363,
+    1.01444,
+    1.01493,
+    1.01514,
+    1.01513,
+    1.01493,
+    1.01457,
+    1.01409,
+    1.01352,
+    1.01287,
+    1.01217,
+    1.01144,
+    1.01069,
+    1.00993,
+    1.00918,
+    1.00844,
+    1.00772,
+    1.00703,
+    1.00636,
+    1.00573,
+    1.00514,
+    1.00458,
+    1.00407,
+    1.00358,
+    1.00314,
+    1.00273,
+    1.00236,
+    1.00202,
+    1.00172,
+    1.00144,
+    1.0012,
+    1.00098,
+    1.00079,
+    1.00062,
+    1.00047,
+    1.00034,
+    1.00023,
+    1.00013,
+    1.00005,
+    0.99998,
+    0.99993,
+    0.99988,
+    0.99985,
+    1
+  );
+  --motion-effects-fast-duration: 225ms;
+  --motion-effects-fast-easing: linear(
+    0,
+    0.09439,
+    0.27432,
+    0.45584,
+    0.60862,
+    0.72647,
+    0.8128,
+    0.87391,
+    0.91613,
+    0.94478,
+    0.96394,
+    0.97662,
+    0.98493,
+    0.99034,
+    0.99383,
+    0.99608,
+    0.99752,
+    0.99843,
+    0.99901,
+    0.99938,
+    0.99961,
+    0.99976,
+    0.99985,
+    0.99991,
+    0.99994,
+    0.99996,
+    0.99998,
+    1
+  );
+  --motion-effects-default-duration: 308.333ms;
+  --motion-effects-default-easing: linear(
+    0,
+    0.04462,
+    0.1443,
+    0.26424,
+    0.38494,
+    0.49633,
+    0.59399,
+    0.67676,
+    0.74523,
+    0.80085,
+    0.84541,
+    0.88071,
+    0.90842,
+    0.93001,
+    0.94671,
+    0.95957,
+    0.96942,
+    0.97694,
+    0.98265,
+    0.98698,
+    0.99024,
+    0.9927,
+    0.99456,
+    0.99594,
+    0.99698,
+    0.99776,
+    0.99834,
+    0.99877,
+    0.99909,
+    0.99932,
+    0.9995,
+    0.99963,
+    0.99973,
+    0.9998,
+    0.99985,
+    0.99989,
+    0.99992,
+    1
+  );
+  --motion-effects-slow-duration: 408.333ms;
+  --motion-effects-slow-easing: linear(
+    0,
+    0.02378,
+    0.08166,
+    0.15828,
+    0.24321,
+    0.32959,
+    0.41306,
+    0.49104,
+    0.56215,
+    0.62584,
+    0.68208,
+    0.73121,
+    0.77372,
+    0.81023,
+    0.84138,
+    0.86782,
+    0.89015,
+    0.90893,
+    0.92467,
+    0.93781,
+    0.94875,
+    0.95784,
+    0.96538,
+    0.97161,
+    0.97674,
+    0.98098,
+    0.98446,
+    0.98732,
+    0.98966,
+    0.99158,
+    0.99315,
+    0.99443,
+    0.99547,
+    0.99632,
+    0.99702,
+    0.99758,
+    0.99804,
+    0.99841,
+    0.99872,
+    0.99896,
+    0.99916,
+    0.99932,
+    0.99945,
+    0.99956,
+    0.99964,
+    0.99971,
+    0.99977,
+    0.99981,
+    0.99985,
+    1
+  );
   --motion-scale-hover: 1.04;
   --motion-offset-summary: 8px;
   --motion-offset-sort: -1px;
   --motion-scale-press: 0.98;
+  --state-hover: 8%;
+  --state-focus: 10%;
+  --state-pressed: 10%;
+  --radius-card: 16px;
+  --text-interactive: var(--deep-blue);
+  --surface-state-hover: color-mix(in srgb, var(--deep-blue) var(--state-hover), var(--white));
+  --surface-state-focus: color-mix(in srgb, var(--deep-blue) var(--state-focus), var(--white));
+  --surface-state-pressed: color-mix(in srgb, var(--deep-blue) var(--state-pressed), var(--white));
+  --surface-muted: var(--background-gray);
+  --surface-neutral: var(--gray);
+  --border-brand: var(--deep-blue);
+  --border-accent: var(--medium-blue);
+  --border-strong: var(--black);
+  --border-subtle: var(--gray);
+  --border-inverse: var(--white);
+  --border-muted: rgba(0, 0, 0, 0.18);
+  --border-ring: rgba(0, 0, 0, 0.2);
+  --border-chart: rgba(0, 0, 0, 0.28);
+  --border-inverse-subtle: rgba(255, 255, 255, 0.22);
+  --border-field: rgba(0, 0, 0, 0.72);
+  --border-field-inverse: rgba(255, 255, 255, 0.7);
+  --text-placeholder-inverse: rgba(255, 255, 255, 0.72);
+  --text-muted: color-mix(in srgb, var(--text-primary) 72%, transparent);
+  --surface-link-hover: var(--surface-state-hover);
+  --surface-disclosure-hover: var(--surface-state-hover);
+  --surface-card-hover: var(--surface-state-hover);
+  --surface-card-pressed: var(--surface-state-pressed);
+  --surface-row-hover: color-mix(in srgb, var(--black) 4%, var(--white));
+  --surface-nav-hover: var(--surface-state-hover);
+  --surface-nav-current: color-mix(in srgb, var(--bright-blue) 24%, var(--white));
+  --surface-language-current: color-mix(in srgb, var(--bright-blue) 20%, var(--white));
+  --surface-control-hover: color-mix(in srgb, var(--deep-blue) var(--state-hover), transparent);
+  --chart-allocation-first: var(--deep-blue);
+  --chart-allocation-second: var(--medium-blue);
+  --chart-allocation-third: var(--black);
+  --chart-allocation-fourth: var(--white);
+  --chart-allocation-other: var(--gray);
+  --chart-portfolio: var(--deep-blue);
+  --chart-grid: var(--gray);
+  --chart-zero: var(--black);
   --surface-primary: var(--white);
   --surface-inverse: var(--black);
   --surface-brand: var(--deep-blue);
   --surface-highlight: var(--bright-blue);
   --text-primary: var(--black);
-  --text-secondary: rgba(0, 0, 0, 0.62);
-  --text-tertiary: rgba(0, 0, 0, 0.56);
+  --text-secondary: rgba(0, 0, 0, 0.72);
+  --text-tertiary: rgba(0, 0, 0, 0.64);
   --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
-  --text-inverse-secondary: rgba(255, 255, 255, 0.68);
-  --text-inverse-tertiary: rgba(255, 255, 255, 0.62);
+  --text-inverse-secondary: rgba(255, 255, 255, 0.8);
+  --text-inverse-tertiary: rgba(255, 255, 255, 0.72);
   --text-highlight: var(--bright-blue);
   --chart-benchmark: var(--medium-blue);
   --interactive-accent: var(--medium-blue);
 }
-/* Text language controls tracking, including English articles on Chinese pages. */
-[lang|="zh"] {
-  --tracking-heading: 0;
-  --tracking-label: 0;
-}
-:where([lang="en"]) {
-  --tracking-heading: -0.025em;
-  --tracking-label: 0.025em;
-}
 @media (max-width: 800px) {
   :root {
-    --font-size-page-title: clamp(2.5rem, 11vw, 3.25rem);
-    --space-page-gutter: var(--space-4);
-    --space-section: var(--space-10);
-    --space-section-compact: var(--space-9);
-    --space-heading-content: var(--space-7);
-    --space-related-content: var(--space-6);
-    --motion-duration-fast: 140ms;
-    --motion-duration-base: 180ms;
-    --motion-duration-medium: 220ms;
-    --motion-duration-slow: 300ms;
-    --motion-duration-press: 90ms;
-    --space-footer-main: var(--space-8);
+    --font-size-page-title: var(--md-sys-typescale-display-small-size);
+    --page-title-line-height: var(--md-sys-typescale-display-small-line-height);
+    --page-title-tracking: var(--md-sys-typescale-display-small-tracking);
+    --space-page-gutter: var(--space-200);
+    --space-section: var(--space-900);
+    --space-section-compact: var(--space-700);
+    --space-heading-content: var(--space-500);
+    --space-related-content: var(--space-400);
+    --space-footer-main: var(--space-600);
+    --space-card-padding: var(--space-300);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -136,72 +605,142 @@
   }
 }
 @theme inline {
-  /* Semantic type treatments share the locale-aware Jost family from base.css. */
+  /* Full M3 roles and site aliases use the same source treatments. */
+  --text-m3-display-large: var(--md-sys-typescale-display-large-size);
+  --text-m3-display-large--line-height: var(--md-sys-typescale-display-large-line-height);
+  --text-m3-display-large--letter-spacing: var(--md-sys-typescale-display-large-tracking);
+  --text-m3-display-large--font-weight: var(--md-sys-typescale-display-large-weight);
+  --text-m3-display-medium: var(--md-sys-typescale-display-medium-size);
+  --text-m3-display-medium--line-height: var(--md-sys-typescale-display-medium-line-height);
+  --text-m3-display-medium--letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+  --text-m3-display-medium--font-weight: var(--md-sys-typescale-display-medium-weight);
+  --text-m3-display-small: var(--md-sys-typescale-display-small-size);
+  --text-m3-display-small--line-height: var(--md-sys-typescale-display-small-line-height);
+  --text-m3-display-small--letter-spacing: var(--md-sys-typescale-display-small-tracking);
+  --text-m3-display-small--font-weight: var(--md-sys-typescale-display-small-weight);
+  --text-m3-headline-large: var(--md-sys-typescale-headline-large-size);
+  --text-m3-headline-large--line-height: var(--md-sys-typescale-headline-large-line-height);
+  --text-m3-headline-large--letter-spacing: var(--md-sys-typescale-headline-large-tracking);
+  --text-m3-headline-large--font-weight: var(--md-sys-typescale-headline-large-weight);
+  --text-m3-headline-medium: var(--md-sys-typescale-headline-medium-size);
+  --text-m3-headline-medium--line-height: var(--md-sys-typescale-headline-medium-line-height);
+  --text-m3-headline-medium--letter-spacing: var(--md-sys-typescale-headline-medium-tracking);
+  --text-m3-headline-medium--font-weight: var(--md-sys-typescale-headline-medium-weight);
+  --text-m3-headline-small: var(--md-sys-typescale-headline-small-size);
+  --text-m3-headline-small--line-height: var(--md-sys-typescale-headline-small-line-height);
+  --text-m3-headline-small--letter-spacing: var(--md-sys-typescale-headline-small-tracking);
+  --text-m3-headline-small--font-weight: var(--md-sys-typescale-headline-small-weight);
+  --text-m3-title-large: var(--md-sys-typescale-title-large-size);
+  --text-m3-title-large--line-height: var(--md-sys-typescale-title-large-line-height);
+  --text-m3-title-large--letter-spacing: var(--md-sys-typescale-title-large-tracking);
+  --text-m3-title-large--font-weight: var(--md-sys-typescale-title-large-weight);
+  --text-m3-title-medium: var(--md-sys-typescale-title-medium-size);
+  --text-m3-title-medium--line-height: var(--md-sys-typescale-title-medium-line-height);
+  --text-m3-title-medium--letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+  --text-m3-title-medium--font-weight: var(--md-sys-typescale-title-medium-weight);
+  --text-m3-title-small: var(--md-sys-typescale-title-small-size);
+  --text-m3-title-small--line-height: var(--md-sys-typescale-title-small-line-height);
+  --text-m3-title-small--letter-spacing: var(--md-sys-typescale-title-small-tracking);
+  --text-m3-title-small--font-weight: var(--md-sys-typescale-title-small-weight);
+  --text-m3-body-large: var(--md-sys-typescale-body-large-size);
+  --text-m3-body-large--line-height: var(--md-sys-typescale-body-large-line-height);
+  --text-m3-body-large--letter-spacing: var(--md-sys-typescale-body-large-tracking);
+  --text-m3-body-large--font-weight: var(--md-sys-typescale-body-large-weight);
+  --text-m3-body-medium: var(--md-sys-typescale-body-medium-size);
+  --text-m3-body-medium--line-height: var(--md-sys-typescale-body-medium-line-height);
+  --text-m3-body-medium--letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+  --text-m3-body-medium--font-weight: var(--md-sys-typescale-body-medium-weight);
+  --text-m3-body-small: var(--md-sys-typescale-body-small-size);
+  --text-m3-body-small--line-height: var(--md-sys-typescale-body-small-line-height);
+  --text-m3-body-small--letter-spacing: var(--md-sys-typescale-body-small-tracking);
+  --text-m3-body-small--font-weight: var(--md-sys-typescale-body-small-weight);
+  --text-m3-label-large: var(--md-sys-typescale-label-large-size);
+  --text-m3-label-large--line-height: var(--md-sys-typescale-label-large-line-height);
+  --text-m3-label-large--letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  --text-m3-label-large--font-weight: var(--md-sys-typescale-label-large-weight);
+  --text-m3-label-medium: var(--md-sys-typescale-label-medium-size);
+  --text-m3-label-medium--line-height: var(--md-sys-typescale-label-medium-line-height);
+  --text-m3-label-medium--letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+  --text-m3-label-medium--font-weight: var(--md-sys-typescale-label-medium-weight);
+  --text-m3-label-small: var(--md-sys-typescale-label-small-size);
+  --text-m3-label-small--line-height: var(--md-sys-typescale-label-small-line-height);
+  --text-m3-label-small--letter-spacing: var(--md-sys-typescale-label-small-tracking);
+  --text-m3-label-small--font-weight: var(--md-sys-typescale-label-small-weight);
   --text-display: var(--font-size-page-title);
-  --text-display--line-height: var(--leading-page-title);
-  --text-display--letter-spacing: var(--tracking-heading);
-  --text-display--font-weight: var(--weight-bold);
-  --text-headline: var(--font-size-section-title);
-  --text-headline--line-height: var(--leading-section-title);
-  --text-headline--letter-spacing: var(--tracking-heading);
-  --text-headline--font-weight: var(--weight-bold);
-  --text-title: var(--font-size-card-title);
-  --text-title--line-height: var(--leading-card-title);
-  --text-title--letter-spacing: var(--tracking-heading);
-  --text-title--font-weight: var(--weight-bold);
-  --text-title-small: var(--font-size-compact-title);
-  --text-title-small--line-height: var(--leading-compact-title);
-  --text-title-small--letter-spacing: var(--tracking-heading);
-  --text-title-small--font-weight: var(--weight-bold);
-  --text-lead: var(--font-size-lead);
-  --text-lead--line-height: var(--leading-body);
-  --text-lead--letter-spacing: var(--tracking-body);
-  --text-lead--font-weight: var(--weight-regular);
-  --text-body-large: var(--font-size-body-large);
-  --text-body-large--line-height: var(--leading-body);
-  --text-body-large--letter-spacing: var(--tracking-body);
-  --text-body-large--font-weight: var(--weight-regular);
-  --text-body: var(--font-size-body);
-  --text-body--line-height: var(--leading-body);
-  --text-body--letter-spacing: var(--tracking-body);
-  --text-body--font-weight: var(--weight-regular);
-  --text-label: var(--font-size-label);
-  --text-label--line-height: var(--leading-body);
-  --text-label--letter-spacing: var(--tracking-label);
-  --text-label--font-weight: var(--weight-bold);
-  --text-control: var(--font-size-control);
-  --text-control--line-height: var(--leading-body);
-  --text-control--letter-spacing: var(--tracking-body);
-  --text-control--font-weight: var(--weight-bold);
-  --text-caption: var(--font-size-caption);
-  --text-caption--line-height: var(--leading-body);
-  --text-caption--letter-spacing: var(--tracking-body);
-  --text-caption--font-weight: var(--weight-regular);
-  --text-data-display: var(--font-size-data-display);
-  --text-data-display--line-height: var(--leading-data);
-  --text-data-display--letter-spacing: var(--tracking-data);
-  --text-data-display--font-weight: var(--weight-bold);
-  --text-data-kpi: var(--font-size-data-kpi);
-  --text-data-kpi--line-height: var(--leading-data);
-  --text-data-kpi--letter-spacing: var(--tracking-data);
-  --text-data-kpi--font-weight: var(--weight-bold);
-  --text-data-ring: var(--font-size-data-ring);
-  --text-data-ring--line-height: var(--leading-data);
-  --text-data-ring--letter-spacing: var(--tracking-data);
-  --text-data-ring--font-weight: var(--weight-bold);
-  --text-data-row: var(--font-size-data-row);
-  --text-data-row--line-height: var(--leading-data);
-  --text-data-row--letter-spacing: var(--tracking-data);
-  --text-data-row--font-weight: var(--weight-regular);
+  --text-display--line-height: var(--page-title-line-height);
+  --text-display--letter-spacing: var(--page-title-tracking);
+  --text-display--font-weight: var(--md-sys-typescale-emphasized-display-large-weight);
+  --text-headline: var(--md-sys-typescale-headline-large-size);
+  --text-headline--line-height: var(--md-sys-typescale-headline-large-line-height);
+  --text-headline--letter-spacing: var(--md-sys-typescale-headline-large-tracking);
+  --text-headline--font-weight: var(--md-sys-typescale-emphasized-headline-large-weight);
+  --text-title: var(--md-sys-typescale-title-large-size);
+  --text-title--line-height: var(--md-sys-typescale-title-large-line-height);
+  --text-title--letter-spacing: var(--md-sys-typescale-title-large-tracking);
+  --text-title--font-weight: var(--md-sys-typescale-emphasized-title-large-weight);
+  --text-title-small: var(--md-sys-typescale-title-medium-size);
+  --text-title-small--line-height: var(--md-sys-typescale-title-medium-line-height);
+  --text-title-small--letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+  --text-title-small--font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  --text-lead: var(--md-sys-typescale-body-large-size);
+  --text-lead--line-height: var(--md-sys-typescale-body-large-line-height);
+  --text-lead--letter-spacing: var(--md-sys-typescale-body-large-tracking);
+  --text-lead--font-weight: var(--md-sys-typescale-body-large-weight);
+  --text-body-large: var(--md-sys-typescale-body-large-size);
+  --text-body-large--line-height: var(--md-sys-typescale-body-large-line-height);
+  --text-body-large--letter-spacing: var(--md-sys-typescale-body-large-tracking);
+  --text-body-large--font-weight: var(--md-sys-typescale-body-large-weight);
+  --text-body: var(--md-sys-typescale-body-medium-size);
+  --text-body--line-height: var(--md-sys-typescale-body-medium-line-height);
+  --text-body--letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+  --text-body--font-weight: var(--md-sys-typescale-body-medium-weight);
+  --text-label: var(--md-sys-typescale-label-large-size);
+  --text-label--line-height: var(--md-sys-typescale-label-large-line-height);
+  --text-label--letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  --text-label--font-weight: var(--md-sys-typescale-label-large-weight);
+  --text-control: var(--md-sys-typescale-label-large-size);
+  --text-control--line-height: var(--md-sys-typescale-label-large-line-height);
+  --text-control--letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  --text-control--font-weight: var(--md-sys-typescale-label-large-weight);
+  --text-caption: var(--md-sys-typescale-body-small-size);
+  --text-caption--line-height: var(--md-sys-typescale-body-small-line-height);
+  --text-caption--letter-spacing: var(--md-sys-typescale-body-small-tracking);
+  --text-caption--font-weight: var(--md-sys-typescale-body-small-weight);
+  --text-data-display: var(--md-sys-typescale-display-large-size);
+  --text-data-display--line-height: var(--md-sys-typescale-display-large-line-height);
+  --text-data-display--letter-spacing: var(--md-sys-typescale-display-large-tracking);
+  --text-data-display--font-weight: var(--md-sys-typescale-emphasized-display-large-weight);
+  --text-data-kpi: var(--md-sys-typescale-display-medium-size);
+  --text-data-kpi--line-height: var(--md-sys-typescale-display-medium-line-height);
+  --text-data-kpi--letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+  --text-data-kpi--font-weight: var(--md-sys-typescale-emphasized-display-medium-weight);
+  --text-data-ring: var(--md-sys-typescale-headline-large-size);
+  --text-data-ring--line-height: var(--md-sys-typescale-headline-large-line-height);
+  --text-data-ring--letter-spacing: var(--md-sys-typescale-headline-large-tracking);
+  --text-data-ring--font-weight: var(--md-sys-typescale-emphasized-headline-large-weight);
+  --text-data-row: var(--md-sys-typescale-title-medium-size);
+  --text-data-row--line-height: var(--md-sys-typescale-title-medium-line-height);
+  --text-data-row--letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+  --text-data-row--font-weight: var(--md-sys-typescale-title-medium-weight);
 
-  --color-brand: var(--deep-blue);
-  --color-accent: var(--medium-blue);
-  --color-highlight: var(--bright-blue);
+  --color-brand: var(--text-brand);
+  --color-interactive: var(--text-interactive);
+  --color-accent: var(--interactive-accent);
+  --color-highlight: var(--text-highlight);
   --color-surface: var(--surface-primary);
   --color-ink: var(--text-primary);
+  --color-inverse: var(--text-inverse);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-surface-brand: var(--surface-brand);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-strong: var(--border-strong);
+  --color-line-inverse: var(--border-inverse);
   --font-sans: var(--font-ui);
   --font-weight-bold: var(--weight-bold);
   --font-weight-normal: var(--weight-regular);
   --spacing-page: var(--space-page-gutter);
+  --radius-field: var(--radius-field);
+  --radius-quiet: var(--radius-quiet);
+  --radius-round: var(--radius-round);
   --radius-pill: var(--radius-pill);
 }

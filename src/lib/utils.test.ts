@@ -17,4 +17,8 @@ describe("semantic typography class composition", () => {
     );
     expect(cn("text-[length:var(--font-size-body)]", "text-body-large")).toBe("text-body-large");
   });
+  it("merges Material 3 roles without removing colors", () => {
+    expect(cn("text-m3-display-large text-brand", "text-m3-body-medium")).toBe("text-brand text-m3-body-medium");
+    expect(cn("text-body text-white", "text-m3-label-small")).toBe("text-white text-m3-label-small");
+  });
 });

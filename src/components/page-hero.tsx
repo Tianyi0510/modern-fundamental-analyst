@@ -30,18 +30,23 @@ export function PageHero({
   variant?: HeroVariant;
 }) {
   return (
-    <div className="page-hero-band bg-[var(--background-gray)]">
-      <Container as="section" className="page-hero py-[var(--space-section)]">
-        <p className="eyebrow flex items-center gap-[10px] text-label">
-          <span className="size-[9px] rounded-full bg-accent" /> {label}
-        </p>
-        <h1
-          className={`mt-[66px] text-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
-        >
-          {title}
-        </h1>
+    <div className="page-hero-band bg-[var(--surface-muted)]">
+      <Container
+        as="section"
+        className="page-hero grid grid-cols-1 gap-[var(--space-heading-content)] py-[var(--space-section)]"
+      >
+        <div className="grid min-w-0 gap-[var(--space-hero-title-gap)]">
+          <p className="eyebrow flex items-center gap-[var(--space-125)] text-label">
+            <span className="size-[9px] rounded-round bg-accent" /> {label}
+          </p>
+          <h1
+            className={`m-0 text-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+          >
+            {title}
+          </h1>
+        </div>
         <div
-          className={`page-intro mt-[var(--space-heading-content)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-lead [&_p]:text-pretty [&_small]:text-caption [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
+          className={`page-intro [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-lead [&_p]:text-pretty [&_small]:text-caption [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
         >
           {intro}
         </div>

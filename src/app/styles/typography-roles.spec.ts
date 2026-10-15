@@ -3,20 +3,20 @@ import { expect, test, type Page } from "@playwright/test";
 type Role = keyof typeof roleScale;
 
 const roleScale = {
-  pageTitle: { min: 52, fluidRem: 1.75, fluidVw: 5, max: 112 },
-  sectionTitle: { min: 44, fluidRem: 2.125, fluidVw: 2.5, max: 72 },
-  cardTitle: { min: 32, fluidRem: 1.75, fluidVw: 1, max: 42 },
-  compactTitle: { min: 20, fluidRem: 1.125, fluidVw: 0.5, max: 24 },
-  lead: { min: 22, max: 22 },
-  bodyLarge: { min: 18, max: 18 },
-  body: { min: 16, max: 16 },
-  label: { min: 16, max: 16 },
-  control: { min: 16, max: 16 },
-  caption: { min: 16, max: 16 },
-  dataDisplay: { min: 52, fluidRem: 2, fluidVw: 4, max: 96 },
-  dataKpi: { min: 48, fluidRem: 2.5, fluidVw: 1.5, max: 64 },
-  dataRing: { min: 40, max: 40 },
-  dataRow: { min: 20, max: 20 },
+  pageTitle: { size: 57, lineHeight: 64, weight: 500, tracking: -0.25 },
+  sectionTitle: { size: 32, lineHeight: 40, weight: 500, tracking: 0 },
+  cardTitle: { size: 22, lineHeight: 28, weight: 500, tracking: 0 },
+  compactTitle: { size: 16, lineHeight: 24, weight: 700, tracking: 0.15 },
+  lead: { size: 16, lineHeight: 24, weight: 400, tracking: 0.5 },
+  bodyLarge: { size: 16, lineHeight: 24, weight: 400, tracking: 0.5 },
+  body: { size: 14, lineHeight: 20, weight: 400, tracking: 0.25 },
+  label: { size: 14, lineHeight: 20, weight: 500, tracking: 0.1 },
+  control: { size: 14, lineHeight: 20, weight: 500, tracking: 0.1 },
+  caption: { size: 12, lineHeight: 16, weight: 400, tracking: 0.4 },
+  dataDisplay: { size: 57, lineHeight: 64, weight: 500, tracking: -0.25 },
+  dataKpi: { size: 45, lineHeight: 52, weight: 500, tracking: 0 },
+  dataRing: { size: 32, lineHeight: 40, weight: 500, tracking: 0 },
+  dataRow: { size: 16, lineHeight: 24, weight: 500, tracking: 0.15 },
 } as const;
 
 const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
@@ -174,24 +174,10 @@ for (const viewport of [viewports[0], viewports[2]]) {
   );
 }
 
-function expectedSize(role: Role, width: number) {
-  if (role === "pageTitle" && width <= 800) return Math.min(52, Math.max(40, width * 0.11));
-  const scale = roleScale[role];
-  if (!("fluidVw" in scale)) return scale.min;
-  return Math.min(scale.max, Math.max(scale.min, scale.fluidRem * 16 + (width * scale.fluidVw) / 100));
-}
-
-const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
-
-function expectedRhythm(role: Role, language: string) {
-  const headingTracking = language.startsWith("zh") ? 0 : -0.025;
-  const labelTracking = language.startsWith("zh") ? 0 : 0.025;
-  if (role === "pageTitle") return { lineHeight: 1.05, trackingEm: headingTracking };
-  if (role === "sectionTitle" || role === "cardTitle") return { lineHeight: 1.1, trackingEm: headingTracking };
-  if (role === "compactTitle") return { lineHeight: 1.2, trackingEm: headingTracking };
-  if (dataRoles.has(role)) return { lineHeight: 1, trackingEm: -0.05 };
-  if (role === "label") return { lineHeight: 1.5, trackingEm: labelTracking };
-  return { lineHeight: 1.5, trackingEm: 0 };
+function expectedTreatment(role: Role, width: number) {
+  return role === "pageTitle" && width <= 800
+    ? { size: 36, lineHeight: 44, weight: 500, tracking: 0 }
+    : roleScale[role];
 }
 
 type TypographySample = {
@@ -254,7 +240,7 @@ for (const viewport of viewports) {
               `${route} has horizontal overflow at ${viewport.width}px`,
             ).toBe(true);
             const undersized = await page.locator("body").evaluate((body) => {
-              const minimum = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+              const minimum = (11 / 16) * Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
               return [...body.querySelectorAll("*")]
                 .filter((element) => {
                   const rect = element.getBoundingClientRect();
@@ -272,40 +258,37 @@ for (const viewport of viewports) {
                   size: getComputedStyle(element).fontSize,
                 }));
             });
-            expect(undersized, `${prefix}${route} has text smaller than 1rem`).toEqual([]);
+            expect(undersized, `${prefix}${route} has text smaller than Material 3 Label Small`).toEqual([]);
             for (const { role, values } of await readTypography(page, roles)) {
               observed.set(role, [...(observed.get(role) ?? []), ...values]);
             }
           }
 
           for (const [role, values] of observed) {
-            const expectedFontSize = expectedSize(role, viewport.width);
+            const treatment = expectedTreatment(role, viewport.width);
+            const expectedFontSize = treatment.size;
 
             for (const sample of values) {
-              const rhythm = expectedRhythm(role, sample.language);
-              if (sample.selector.includes(".wordmark")) rhythm.trackingEm = -0.05;
+              const rhythm = treatment;
+              const tracking = sample.selector.includes(".wordmark") ? sample.fontSize * -0.05 : rhythm.tracking;
               expect(
                 Math.abs(sample.fontSize - expectedFontSize),
                 `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
               ).toBeLessThan(0.15);
               expect(
-                Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
+                Math.abs(sample.lineHeight - rhythm.lineHeight),
                 `${role} sample ${sample.selector} has an inconsistent line height`,
               ).toBeLessThan(0.2);
               expect(
-                Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
+                Math.abs(sample.letterSpacing - tracking),
                 `${role} sample ${sample.selector} has inconsistent letter spacing`,
               ).toBeLessThan(0.2);
               expect(sample.family.split(",")[0]!.replaceAll('"', "").trim()).toBe("Jost");
-              const boldRoles = ["pageTitle", "sectionTitle", "cardTitle", "compactTitle", "label", "control"];
-              if (role === "dataRow") {
-                // Position headings and totals retain their deliberate emphasis.
-                expect([400, 700]).toContain(sample.weight);
-              } else {
-                expect(sample.weight, `${role} sample ${sample.selector} weight`).toBe(
-                  boldRoles.includes(role) || dataRoles.has(role) ? 700 : 400,
-                );
-              }
+              const prominent = role === "dataRow" || role === "label";
+              expect(
+                prominent ? [rhythm.weight, 700] : [rhythm.weight],
+                `${role} sample ${sample.selector} weight`,
+              ).toContain(sample.weight);
             }
             expect(
               new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
@@ -510,3 +493,67 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     );
   }
 }
+
+const materialScale = [
+  ["display-large", 57, 64, 400, -0.25],
+  ["display-medium", 45, 52, 400, 0],
+  ["display-small", 36, 44, 400, 0],
+  ["headline-large", 32, 40, 400, 0],
+  ["headline-medium", 28, 36, 400, 0],
+  ["headline-small", 24, 32, 400, 0],
+  ["title-large", 22, 28, 400, 0],
+  ["title-medium", 16, 24, 500, 0.15],
+  ["title-small", 14, 20, 500, 0.1],
+  ["body-large", 16, 24, 400, 0.5],
+  ["body-medium", 14, 20, 400, 0.25],
+  ["body-small", 12, 16, 400, 0.4],
+  ["label-large", 14, 20, 500, 0.1],
+  ["label-medium", 12, 16, 500, 0.5],
+  ["label-small", 11, 16, 500, 0.5],
+] as const;
+
+test(
+  "all 15 baseline and emphasized Material 3 roles scale with text preferences",
+  { tag: "@mobile" },
+  async ({ page }) => {
+    await page.goto("/");
+    for (const emphasized of [false, true]) {
+      for (const multiplier of [1, 2]) {
+        const samples = await page.evaluate(
+          ({ roles, multiplier, emphasized }) => {
+            document.documentElement.style.fontSize = `${multiplier * 100}%`;
+            return roles.map(([name]) => {
+              const node = document.createElement("span");
+              node.textContent = "Typography";
+              const token = `--md-sys-typescale-${name}`;
+              node.style.fontSize = `var(${token}-size)`;
+              node.style.lineHeight = `var(${token}-line-height)`;
+              node.style.fontWeight = emphasized
+                ? `var(--md-sys-typescale-emphasized-${name}-weight)`
+                : `var(${token}-weight)`;
+              node.style.letterSpacing = `var(${token}-tracking)`;
+              document.body.append(node);
+              const style = getComputedStyle(node);
+              const result = [
+                parseFloat(style.fontSize),
+                parseFloat(style.lineHeight),
+                Number(style.fontWeight),
+                style.letterSpacing === "normal" ? 0 : parseFloat(style.letterSpacing),
+              ];
+              node.remove();
+              return result;
+            });
+          },
+          { roles: materialScale, multiplier, emphasized },
+        );
+        for (const [index, [name, size, lineHeight, weight, tracking]] of materialScale.entries()) {
+          const actual = samples[index]!;
+          expect(actual[0], name + " size").toBeCloseTo(size * multiplier, 3);
+          expect(actual[1], name + " line height").toBeCloseTo(lineHeight * multiplier, 3);
+          expect(actual[2], name + " weight").toBe(emphasized ? (weight === 400 ? 500 : 700) : weight);
+          expect(actual[3], name + " tracking").toBeCloseTo(tracking * multiplier, 3);
+        }
+      }
+    }
+  },
+);

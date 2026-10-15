@@ -136,6 +136,8 @@ Private `*.styles.ts` maps contain complete utility strings. Components import t
 
 `site-header-desktop.tsx` owns desktop navigation and language-menu state. `use-site-header.ts` owns mobile phases and measured panel/icon animations. `use-menu-touch-feedback.ts` owns the trigger/close touch ring.
 
+`src/lib/motion.ts` owns the M3 Expressive spring presets, analytic solver and sampled CSS/WAAPI trajectories. Static motion declarations in `tokens.css` are generated from it and checked by a colocated unit test. No animation package or global client provider is required. Stateful Menu and disclosure animations preserve velocity when retargeted; ordinary CSS transitions use the same zero-velocity presets.
+
 The mobile phase drives Sheet's open state; Radix owns modal isolation, focus containment and scroll locking. Native disclosures work without JavaScript. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.
 
 Before a presentation migration, capture screenshots and computed styles. Compare in the same browser and viewport. Verify direct loads, client navigation and browser return against a production build; hot reload does not prove production style ordering. Measure assets before claiming a performance improvement. Test behavior independently of utility strings; physical iPhone checks remain separate.

@@ -109,14 +109,16 @@ table {
 }
 
 *:focus-visible {
-  outline: var(--focus-ring-width) solid var(--medium-blue);
+  outline: var(--focus-ring-width) solid var(--focus-ring-default);
   outline-offset: var(--focus-ring-offset);
 }
 body {
   --font-ui: var(--font-jost), Arial, Helvetica, sans-serif;
   font-family: var(--font-ui);
   font-size: var(--font-size-body);
-  line-height: var(--leading-body);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+  font-weight: var(--md-sys-typescale-body-medium-weight);
   font-kerning: normal;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;

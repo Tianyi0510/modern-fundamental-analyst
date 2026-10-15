@@ -58,7 +58,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         );
         for (const sample of notes) {
           expect(sample.color, `${route} ${sample.tone} note matches its value at ${width}px`).toBe(sample.valueColor);
-          expect(sample.opacity).toBe(0.8);
+          expect(sample.opacity).toBe(0.87);
           expect(
             colorContrast(sample.color, sample.background, sample.opacity),
             `${route} ${sample.tone} note contrast at ${width}px`,

@@ -148,7 +148,7 @@ const allocationStops = [...featuredWeights, otherWeight].reduce<number[]>((stop
   return stops;
 }, []);
 const [firstStop = 0, secondStop = firstStop, thirdStop = secondStop, fourthStop = thirdStop] = allocationStops;
-const allocationGradient = `conic-gradient(var(--deep-blue) 0 ${firstStop}%, var(--medium-blue) ${firstStop}% ${secondStop}%, var(--black) ${secondStop}% ${thirdStop}%, var(--white) ${thirdStop}% ${fourthStop}%, var(--gray) ${fourthStop}% 100%)`;
+const allocationGradient = `conic-gradient(var(--chart-allocation-first) 0 ${firstStop}%, var(--chart-allocation-second) ${firstStop}% ${secondStop}%, var(--chart-allocation-third) ${secondStop}% ${thirdStop}%, var(--chart-allocation-fourth) ${thirdStop}% ${fourthStop}%, var(--chart-allocation-other) ${fourthStop}% 100%)`;
 
 export function HomePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
@@ -176,9 +176,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <div className={appearance["hero-bottom"]}>
                 <p>{text.heroIntro}</p>
                 <div className={appearance["hero-actions"]}>
-                  <ButtonLink variant="contrast" href={getLocalizedPath("/portfolio", locale)}>
-                    {text.viewPortfolio}
-                  </ButtonLink>
+                  <ButtonLink href={getLocalizedPath("/portfolio", locale)}>{text.viewPortfolio}</ButtonLink>
                   <Link className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
                     {text.readLatest}
                     <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />

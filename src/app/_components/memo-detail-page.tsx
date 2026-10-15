@@ -63,7 +63,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
             <div className={appearance["article-notes"]}>
               {content.language !== locale ? <p className="memo-language-notice">{text.languageNotice}</p> : null}
               <aside aria-labelledby="memo-scope-title">
-                <h2 id="memo-scope-title" className="mb-[var(--space-3)] text-title-small">
+                <h2 id="memo-scope-title" className="mb-[var(--space-150)] text-title-small">
                   {text.scopeTitle}
                 </h2>
                 <p>{memo.scopeNote}</p>

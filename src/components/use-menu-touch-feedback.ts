@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, type PointerEventHandler, type RefObject } from "react";
 
+import { springTiming } from "@/lib/motion";
+
 // Touch feedback spans both buttons because opening replaces the trigger with the close control.
 export function useMenuTouchFeedback(
   triggerRef: RefObject<HTMLButtonElement | null>,
@@ -28,12 +30,11 @@ export function useMenuTouchFeedback(
       const ring = button.querySelector(".mobile-menu-touch-ring");
       const animation = source?.getAnimations()[0];
       if (!source || !ring || !animation || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const remaining = Number(animation.effect?.getComputedTiming().duration) - Number(animation.currentTime);
-      if (remaining > 0)
-        ring.animate([{ opacity: getComputedStyle(source).opacity }, { opacity: 0 }], {
-          duration: remaining,
-          easing: "linear",
-        });
+      // Transfer the same timeline rather than restarting a fade on the replacement control.
+      const effect = animation.effect;
+      if (!(effect instanceof KeyframeEffect)) return;
+      const transferred = ring.animate(effect.getKeyframes(), springTiming("effectsSlow"));
+      transferred.currentTime = animation.currentTime;
     },
     [closeRef, triggerRef],
   );
@@ -56,10 +57,8 @@ export function useMenuTouchFeedback(
       delete button.dataset.touchPressed;
       const ring = button.querySelector(".mobile-menu-touch-ring");
       if (!ring || window.matchMedia("(prefers-reduced-motion: reduce)").matches) continue;
-      const token = getComputedStyle(button).getPropertyValue("--motion-duration-medium").trim();
-      const duration = Number.parseFloat(token) * (token.endsWith("ms") ? 1 : 1000);
       // Explicit keyframes keep a quick tap visible even when down/up occur before a paint.
-      ring.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing: "linear" });
+      ring.animate([{ opacity: 1 }, { opacity: 0 }], springTiming("effectsSlow"));
     }
   };
   useEffect(() => {

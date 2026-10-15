@@ -42,6 +42,11 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.keyboard.press(key);
       await expect(key === "ArrowUp" ? items.last() : items.first()).toBeFocused();
       await expect(page.getByRole("menu").getByRole("group").getByRole("menuitem")).toHaveCount(3);
+      // Tailwind composes transparent ring layers before the visible shadow.
+      await expect(page.getByRole("menu")).toHaveCSS(
+        "box-shadow",
+        /^(?:rgba\(0, 0, 0, 0\) 0px 0px 0px 0px, )*rgba\(0, 0, 0, 0\.12\) 0px 16px 40px 0px$/,
+      );
       await page.keyboard.press("Escape");
       await expect(trigger).toBeFocused();
     }
@@ -115,7 +120,7 @@ test(
       const entrance = content.getAnimations()[0];
       if (!entrance) throw new Error("Menu entrance animation did not start");
       entrance.pause();
-      entrance.currentTime = Number(entrance.effect!.getTiming().duration) * 0.45;
+      entrance.currentTime = 100;
       const enteringLeft = content.getBoundingClientRect().left;
       const linksVisible = Array.from(content.querySelectorAll("nav a, .mobile-language-links a")).every((link) => {
         const style = getComputedStyle(link);
@@ -129,7 +134,7 @@ test(
       dismissal.pause();
       dismissal.currentTime = 0;
       const dismissalStartLeft = content.getBoundingClientRect().left;
-      dismissal.currentTime = Number(dismissal.effect!.getTiming().duration) * 0.5;
+      dismissal.currentTime = 200;
       const dismissalMidLeft = content.getBoundingClientRect().left;
       dismissal.play();
       return { enteringLeft, linksVisible, languageLinksVisible, dismissalStartLeft, dismissalMidLeft };
@@ -193,7 +198,7 @@ test(
         const animation = content.getAnimations()[0];
         if (!animation) throw new Error("Menu dismissal animation did not start");
         animation.pause();
-        animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
+        animation.currentTime = 100;
         element.click();
         const panel = content.getBoundingClientRect();
         const menuTop = layer.querySelector(".mobile-menu-top")!.getBoundingClientRect();
@@ -267,26 +272,22 @@ test("close button becomes the menu button before the header crossfades", { tag:
         const trigger = document.querySelector(".mobile-menu-button")!;
         const content = layer.querySelector(".mobile-menu-content")!;
         const panelAnimation = content.getAnimations()[0]!;
-        const iconAnimation = icon.getAnimations().find((a) => !(a instanceof CSSAnimation))!;
-        const returnAnimation = returnIcon.getAnimations()[0]!;
         const topBar = layer.querySelector(".mobile-menu-top")!;
         const topBarAnimation = topBar.getAnimations()[0]!;
-        const buttonAnimation = button.getAnimations().find((a) => !(a instanceof CSSTransition))!;
         const nav = content.querySelector("nav")!;
         const navAnimation = nav.getAnimations()[0]!;
-        panelAnimation.pause();
-        iconAnimation.pause();
-        returnAnimation.pause();
-        buttonAnimation.pause();
-        topBarAnimation.pause();
-        navAnimation.pause();
-        const midpoint = Number(iconAnimation.effect!.getTiming().duration) * 0.55;
-        panelAnimation.currentTime = midpoint;
-        iconAnimation.currentTime = midpoint;
-        returnAnimation.currentTime = midpoint;
-        buttonAnimation.currentTime = midpoint;
-        topBarAnimation.currentTime = midpoint;
-        navAnimation.currentTime = midpoint;
+        const animations = [
+          panelAnimation,
+          ...icon.getAnimations(),
+          ...returnIcon.getAnimations(),
+          ...button.getAnimations(),
+          topBarAnimation,
+          navAnimation,
+        ];
+        for (const animation of animations) {
+          animation.pause();
+          animation.currentTime = 80;
+        }
         const closeMatrix = new DOMMatrixReadOnly(getComputedStyle(icon).transform);
         const returnMatrix = new DOMMatrixReadOnly(getComputedStyle(returnIcon).transform);
         const early = {
@@ -302,12 +303,7 @@ test("close button becomes the menu button before the header crossfades", { tag:
           right: button.getBoundingClientRect().right,
         };
         const duration = Number(panelAnimation.effect!.getTiming().duration);
-        panelAnimation.currentTime = duration * 0.82;
-        iconAnimation.currentTime = Number(iconAnimation.effect!.getTiming().duration);
-        buttonAnimation.currentTime = duration * 0.82;
-        returnAnimation.currentTime = Number(returnAnimation.effect!.getTiming().duration);
-        topBarAnimation.currentTime = duration * 0.82;
-        navAnimation.currentTime = Number(navAnimation.effect!.getTiming().duration);
+        for (const animation of animations) animation.currentTime = duration * 0.82;
         const late = {
           panelLeft: content.getBoundingClientRect().left,
           navOpacity: Number(getComputedStyle(nav).opacity),
@@ -318,12 +314,7 @@ test("close button becomes the menu button before the header crossfades", { tag:
           triggerBackground: getComputedStyle(trigger).backgroundColor,
           topBarOpacity: Number(getComputedStyle(topBar).opacity),
         };
-        iconAnimation.play();
-        returnAnimation.play();
-        buttonAnimation.play();
-        navAnimation.play();
-        topBarAnimation.play();
-        panelAnimation.play();
+        for (const animation of animations) animation.play();
         return { early, late };
       });
       expect(result.early.closeIconOpacity).toBeGreaterThan(0);
@@ -496,7 +487,8 @@ test.describe("mobile menu touch ring", () => {
                   animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
                   return Number(getComputedStyle(ring).opacity);
                 }, touch);
-                expect(opacity).toBeCloseTo(0.5, 1);
+                expect(opacity).toBeGreaterThan(0);
+                expect(opacity).toBeLessThan(1);
                 await button
                   .locator(".mobile-menu-touch-ring")
                   .evaluate((ring) => ring.getAnimations().forEach((animation) => animation.finish()));
@@ -510,14 +502,22 @@ test.describe("mobile menu touch ring", () => {
           await trigger.tap();
           if (reducedMotion === "no-preference") {
             // The release animation follows the replacement control even for a real short tap.
-            const opacity = await close.locator(".mobile-menu-touch-ring").evaluate((ring) => {
+            const transfer = await close.locator(".mobile-menu-touch-ring").evaluate((ring) => {
               const animation = ring.getAnimations()[0];
               if (!animation) throw new Error("Quick-tap feedback is missing.");
               animation.pause();
               animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-              return Number(getComputedStyle(ring).opacity);
+              const source = document.querySelector(".mobile-menu-button .mobile-menu-touch-ring")!;
+              const sourceAnimation = source.getAnimations()[0]!;
+              sourceAnimation.currentTime = animation.currentTime;
+              return {
+                opacity: Number(getComputedStyle(ring).opacity),
+                sourceOpacity: Number(getComputedStyle(source).opacity),
+              };
             });
-            expect(opacity).toBeCloseTo(0.5, 1);
+            expect(transfer.opacity).toBeGreaterThan(0);
+            expect(transfer.opacity).toBeLessThan(1);
+            expect(transfer.opacity).toBeCloseTo(transfer.sourceOpacity, 4);
             await close
               .locator(".mobile-menu-touch-ring")
               .evaluate((ring) => ring.getAnimations().forEach((animation) => animation.finish()));
@@ -705,6 +705,7 @@ test.describe("mobile content and navigation QA", () => {
     await page.locator(".mobile-menu-button").tap();
     await expect(page.locator(".mobile-menu-layer")).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+    await expect(page.getByRole("dialog")).toHaveCSS("box-shadow", "none");
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
     await expect
       .poll(() => page.locator(".mobile-menu-close").evaluate((element) => getComputedStyle(element).transform))
@@ -737,7 +738,7 @@ test.describe("mobile content and navigation QA", () => {
       "background-color",
       "rgba(0, 0, 0, 0)",
     );
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 140, 255)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 41, 145)");
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "0px");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "8px");
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "8px");
@@ -945,13 +946,22 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(link).toHaveCSS("padding-left", "8px");
       await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(link).toHaveCSS("transition-property", "color");
-      await expect(link).toHaveCSS("transition-duration", "0.14s");
-      await expect(link).toHaveCSS("transition-timing-function", "cubic-bezier(0.2, 0, 0, 1)");
+      const feedback = await link.evaluate((element) => {
+        const style = getComputedStyle(element);
+        const duration = style.getPropertyValue("--motion-effects-fast-duration").trim();
+        return {
+          duration: Number.parseFloat(style.transitionDuration),
+          expected: Number.parseFloat(duration) * (duration.endsWith("ms") ? 0.001 : 1),
+          easing: style.transitionTimingFunction,
+        };
+      });
+      expect(feedback.duration).toBeCloseTo(feedback.expected, 4);
+      expect(feedback.easing).toMatch(/^linear\(/);
       await expect(link).toHaveCSS("transform", "none");
       const originalBox = await link.boundingBox();
       const initialColor = await link.evaluate((element) => getComputedStyle(element).color);
       await link.hover();
-      if (initialColor !== "rgb(0, 140, 255)") {
+      if (initialColor !== "rgb(0, 41, 145)") {
         const midpointColor = await link.evaluate((element) => {
           const transition = element
             .getAnimations()
@@ -964,20 +974,20 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           return color;
         });
         expect(midpointColor).not.toBe(initialColor);
-        expect(midpointColor).not.toBe("rgb(0, 140, 255)");
+        expect(midpointColor).not.toBe("rgb(0, 41, 145)");
       }
-      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+      await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
       await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(link).toHaveCSS("transform", "none");
       await page.keyboard.press("Tab");
       await link.focus();
       await expect(link).toBeFocused();
-      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+      await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
       await expect(link).toHaveCSS("outline-style", "none");
       await expect(link).toHaveCSS("text-decoration-line", "underline");
       await expect(link).toHaveCSS("text-decoration-thickness", "2px");
       await page.mouse.down();
-      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+      await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
       await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       await expect(link).toHaveCSS("transform", "none");
       await expect(link).toHaveCSS("border-radius", "0px");
@@ -1018,7 +1028,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         expect(await close.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
         await expect(close).toHaveCSS("outline-style", "solid");
         await expect(close).toHaveCSS("outline-width", "2px");
-        await expect(close).toHaveCSS("outline-color", "rgb(0, 140, 255)");
+        await expect(close).toHaveCSS("outline-color", "rgb(0, 41, 145)");
         await expect(close).toHaveCSS("background-color", "rgb(95, 205, 253)");
         await page.keyboard.press("Escape");
         await expect(page.locator(".mobile-menu-button")).toBeFocused();
@@ -1042,19 +1052,19 @@ test.describe("touch CTA recovery", () => {
         await expect(current).toHaveCSS("text-decoration-line", "none");
         await page.keyboard.press("Tab");
         await current.focus();
-        await expect(current).toHaveCSS("color", "rgb(0, 140, 255)");
+        await expect(current).toHaveCSS("color", "rgb(0, 41, 145)");
         await expect(current).toHaveCSS("text-decoration-line", "underline");
         await summary.focus();
         await expect(current).toHaveCSS("text-decoration-line", "none");
         await page.keyboard.press("Enter");
-        await expect(summary).toHaveCSS("color", "rgb(0, 140, 255)");
+        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
         await expect(summary).toHaveCSS("text-decoration-line", "underline");
         await page.keyboard.press("Tab");
         const option = page.locator(".mobile-menu-language").first();
         await expect(option).toBeFocused();
         await expect(option).toHaveCSS("text-decoration-line", "underline");
         await expect(summary).toHaveCSS("text-decoration-line", "none");
-        await expect(summary).toHaveCSS("color", "rgb(0, 140, 255)");
+        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
         await page.emulateMedia({ reducedMotion: "reduce" });
         await expect(option).toHaveCSS("text-decoration-line", "underline");
         await page.keyboard.press("Escape");

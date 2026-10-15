@@ -10,7 +10,7 @@ export function FieldGroup({
     <div
       data-slot="field-group"
       className={cn(
-        layout === "contents" ? "contents" : "flex min-w-0 flex-col gap-[var(--space-form-row)]",
+        layout === "contents" ? "contents" : "flex min-w-0 flex-col gap-[var(--space-form-row-gap)]",
         className,
       )}
       {...props}
@@ -23,7 +23,7 @@ export function Field({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="field"
       role="group"
-      className={cn("grid min-w-0 gap-[var(--space-field-label)]", className)}
+      className={cn("grid min-w-0 gap-[var(--space-field-label-gap)]", className)}
       {...props}
     />
   );
