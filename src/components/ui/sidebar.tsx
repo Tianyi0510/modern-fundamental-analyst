@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { Slot } from "radix-ui";
+import { useRender } from "@base-ui/react/use-render";
 import { cn } from "@/lib/utils";
 
 export function SidebarMenu({ className, ...props }: ComponentProps<"ul">) {
@@ -11,7 +11,7 @@ export function SidebarMenu({ className, ...props }: ComponentProps<"ul">) {
       role="list"
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-[calc(var(--space-2)/2)]", className)}
       {...props}
     />
   );
@@ -29,23 +29,26 @@ export function SidebarMenuItem({ className, ...props }: ComponentProps<"li">) {
 }
 
 export function SidebarMenuButton({
-  asChild = false,
+  render,
+  ref,
   isActive = false,
   className,
   ...props
-}: ComponentProps<"button"> & { asChild?: boolean; isActive?: boolean }) {
-  const Component = asChild ? Slot.Root : "button";
-  return (
-    <Component
-      type={asChild ? undefined : "button"}
-      data-slot="sidebar-menu-button"
-      data-sidebar="menu-button"
-      data-active={isActive}
-      className={cn(
-        "grid min-h-[56px] w-full min-w-0 grid-cols-[minmax(0,1fr)] items-center bg-transparent px-[var(--space-2)] py-[var(--space-2)] text-left text-title-small [overflow-wrap:anywhere] whitespace-normal text-black transition-[color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] outline-none hover:text-accent focus-visible:text-accent focus-visible:underline focus-visible:decoration-2 focus-visible:underline-offset-[0.2em] active:text-accent disabled:pointer-events-none disabled:opacity-[var(--opacity-disabled)] data-[active=true]:text-accent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:text-black",
+}: useRender.ComponentProps<"button"> & { isActive?: boolean }) {
+  return useRender({
+    defaultTagName: "button",
+    render,
+    ref,
+    props: {
+      type: render ? undefined : "button",
+      "data-slot": "sidebar-menu-button",
+      "data-sidebar": "menu-button",
+      "data-active": isActive,
+      ...props,
+      className: cn(
+        "flex min-h-[var(--size-touch-target)] w-full min-w-0 items-center gap-[var(--space-3)] rounded-control bg-transparent px-[var(--space-3)] py-[var(--space-3)] text-left text-control [overflow-wrap:anywhere] whitespace-normal text-[var(--sidebar-text)] transition-[color,background-color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] outline-none hover:text-accent hover:not-data-[active=true]:bg-[var(--sidebar-hover-surface)] focus-visible:text-accent focus-visible:outline-[length:var(--focus-ring-width)] focus-visible:outline-offset-[calc(var(--focus-ring-width)*-1)] focus-visible:outline-accent focus-visible:outline-solid focus-visible:not-data-[active=true]:bg-[var(--sidebar-hover-surface)] active:bg-[var(--sidebar-pressed-surface)] active:text-accent disabled:pointer-events-none disabled:opacity-[var(--opacity-disabled)] data-[active=true]:bg-[var(--sidebar-selected-surface)] data-[active=true]:text-accent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:bg-transparent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:text-[var(--sidebar-text)] [&>span]:min-w-0 [&>svg]:size-[18px] [&>svg]:shrink-0",
         className,
-      )}
-      {...props}
-    />
-  );
+      ),
+    },
+  });
 }

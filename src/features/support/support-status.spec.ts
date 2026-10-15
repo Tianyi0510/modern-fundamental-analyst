@@ -29,6 +29,24 @@ const supportLocales = [
 ];
 
 for (const copy of supportLocales) {
+  test(
+    `${copy.locale} Support error feedback preserves its red border and retry action`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(`${copy.prefix}/support?status=error`);
+      const status = page.locator(".support-status-error");
+      await expect(status).toBeVisible();
+      await expect(status).toHaveAttribute("role", "status");
+      await expect(status).toHaveCSS("border-left-color", "rgb(255, 0, 0)");
+      await expect(status).toHaveCSS("border-left-width", "4px");
+      await expect(status).toHaveCSS("border-left-style", "solid");
+      await expect(status).toHaveCSS("color", "rgb(0, 0, 0)");
+      await expect(page.locator(".support-submit")).toHaveText(copy.retry);
+      await expect(page.locator(".support-submit")).toBeEnabled();
+    },
+  );
+
   test(`${copy.locale} stopped checkout navigation can resume the same product and attempt`, async ({
     page,
     baseURL,

@@ -4,13 +4,13 @@ import { cn } from "@/lib/utils";
 export type FieldVariant = "standard" | "inverse";
 const variants: Record<FieldVariant, string> = {
   standard:
-    "border-black rounded-none bg-[var(--background-gray)] text-black focus-visible:outline-[var(--focus-ring-on-light)]",
+    "border-[var(--field-border)] rounded-field bg-[var(--field-surface)] text-[var(--field-text)] focus-visible:outline-[var(--focus-ring-on-light)] focus-visible:border-[var(--field-focus-border)]",
   inverse:
-    "border-[rgba(255,255,255,0.7)] rounded-pill bg-transparent text-white placeholder:text-[rgba(255,255,255,0.6)] focus-visible:outline-[var(--focus-ring-on-dark)]",
+    "border-[var(--field-inverse-border)] rounded-action bg-transparent text-[var(--field-inverse-text)] placeholder:text-[var(--field-inverse-placeholder)] focus-visible:outline-[var(--focus-ring-on-dark)]",
 };
 export function inputAppearance(variant: FieldVariant, className = "", multiline = false) {
   const height = multiline
-    ? "min-h-[190px]"
+    ? "min-h-[176px]"
     : variant === "inverse"
       ? "min-h-[var(--size-control)]"
       : "min-h-[var(--size-field)]";

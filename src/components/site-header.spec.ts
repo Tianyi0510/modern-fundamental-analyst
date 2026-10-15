@@ -78,6 +78,24 @@ test("closed language menu removes its focusable links", async ({ page }) => {
   await expect(page.getByRole("menuitem").first()).toBeFocused();
 });
 
+for (const exit of ["pointer", "focus"] as const) {
+  test(`language menu ${exit} dismissal preserves the outside control's focus`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const outside = page.locator('.header-actions nav a[href="/about"]');
+    await outside.evaluate((element) =>
+      element.addEventListener("click", (event) => event.preventDefault(), { once: true }),
+    );
+    await page.locator(".language-trigger").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+    await expect(page.getByRole("menu")).toBeFocused();
+    if (exit === "pointer") await outside.click();
+    else await outside.focus();
+    await expect(page.locator(".language-trigger")).toHaveAttribute("aria-expanded", "false");
+    await expect(outside).toBeFocused();
+  });
+}
+
 test(
   "mobile menu keeps background isolated through dismissal and then restores focus",
   { tag: "@mobile" },
@@ -484,7 +502,7 @@ test.describe("mobile menu touch ring", () => {
                     }),
                   { intervals: [50, 100] },
                 )
-                .toBe(reducedMotion === "reduce" ? 100 : 98);
+                .toBe(reducedMotion === "reduce" ? 100 : 99);
               if (reducedMotion === "no-preference") {
                 const opacity = await button.evaluate((element, pointer) => {
                   // Dispatch and sample in one browser task so cancellation cannot finish between commands.
@@ -629,13 +647,13 @@ test.describe("header interaction QA", () => {
     });
     expect(hoverState.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
     expect(hoverState.transform).not.toBe("none");
-    await expect(about).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+    await expect(about).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
     await about.evaluate((element) =>
       element.addEventListener("click", (event) => event.preventDefault(), { once: true }),
     );
     await page.mouse.down();
     try {
-      await expect(about).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
+      await expect(about).toHaveCSS("transform", "matrix(0.985, 0, 0, 0.985, 0, 0)");
     } finally {
       await page.mouse.up();
     }
@@ -723,11 +741,11 @@ test.describe("mobile content and navigation QA", () => {
       "Investment Memos",
       "Contact",
     ]);
-    await expect(page.locator(".mobile-menu-drawer nav svg")).toHaveCount(0);
+    await expect(page.locator(".mobile-menu-drawer nav svg[aria-hidden=true]")).toHaveCount(6);
     await expect(page.locator(".mobile-language-links a")).toHaveCount(2);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("color", "rgb(0, 0, 0)");
     await expect(page.locator(".mobile-language-links a").nth(1)).toHaveCSS("color", "rgb(0, 0, 0)");
-    await expect(page.locator(".mobile-language-links summary svg")).toHaveCount(1);
+    await expect(page.locator(".mobile-language-links summary svg[aria-hidden=true]")).toHaveCount(2);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "0px");
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(drawer).toHaveCSS("transform", "none");
@@ -737,14 +755,14 @@ test.describe("mobile content and navigation QA", () => {
     expect(drawerBox).not.toBeNull();
     expect(drawerBox!.x).toBe(0);
     expect(drawerBox!.width).toBe(390);
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS(
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).not.toHaveCSS(
       "background-color",
       "rgba(0, 0, 0, 0)",
     );
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 140, 255)");
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "0px");
-    await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "8px");
-    await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "8px");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 41, 145)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "6px");
+    await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "12px");
+    await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "42px");
     const menuTop = page.locator(".mobile-menu-top");
     const topBeforeScroll = await menuTop.boundingBox();
     expect(topBeforeScroll).not.toBeNull();
@@ -925,77 +943,62 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     );
   }
 
-  test(`${prefix || "English"} mobile menu choices preserve color feedback and mark keyboard focus`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${prefix}/portfolio`);
-    const brand = page.locator(".site-header > .wordmark");
-    await expect(brand).toHaveCSS("padding-left", "4px");
-    await page.locator(".mobile-menu-button").click();
-    await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("padding-left", "4px");
-    await expect
-      .poll(() => page.evaluate(() => document.querySelector(".mobile-menu-content")?.getAnimations().length ?? 0), {
-        intervals: [50, 100],
-      })
-      .toBe(0);
-    await page.locator(".mobile-language-disclosure > summary").click();
-    await expect
-      .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
-      .toBe(0);
-    const links = page.locator(
-      ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > summary",
-    );
-    for (const link of await links.all()) {
-      await expect(link).toHaveCSS("border-top-width", "0px");
-      await expect(link).toHaveCSS("border-bottom-width", "0px");
-      await expect(link).toHaveCSS("padding-left", "8px");
-      await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(link).toHaveCSS("transition-property", "color");
-      await expect(link).toHaveCSS("transition-duration", "0.14s");
-      await expect(link).toHaveCSS("transition-timing-function", "cubic-bezier(0.2, 0, 0, 1)");
-      await expect(link).toHaveCSS("transform", "none");
-      const originalBox = await link.boundingBox();
-      const initialColor = await link.evaluate((element) => getComputedStyle(element).color);
-      await link.hover();
-      if (initialColor !== "rgb(0, 140, 255)") {
-        const midpointColor = await link.evaluate((element) => {
-          const transition = element
-            .getAnimations()
-            .find((animation) => animation instanceof CSSTransition && animation.transitionProperty === "color");
-          if (!transition) throw new Error("Menu color transition did not start");
-          transition.pause();
-          transition.currentTime = Number(transition.effect!.getTiming().duration) / 2;
-          const color = getComputedStyle(element).color;
-          transition.play();
-          return color;
-        });
-        expect(midpointColor).not.toBe(initialColor);
-        expect(midpointColor).not.toBe("rgb(0, 140, 255)");
+  test(
+    `${prefix || "English"} mobile Sidebar distinguishes selection, pointer feedback and keyboard focus`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(`${prefix}/portfolio`);
+      await page.locator(".mobile-menu-button").click();
+      await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+      const links = page.locator(".mobile-menu-drawer nav a");
+      await expect(links).toHaveCount(6);
+      const current = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
+      await expect(current).toHaveCount(1);
+      await expect(current).toHaveAttribute("href", `${prefix}/portfolio`);
+      await expect(current).toHaveCSS("color", "rgb(0, 41, 145)");
+      await expect(current).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      const selectedSurface = await current.evaluate((element) => getComputedStyle(element).backgroundColor);
+      for (const link of await links.all()) {
+        await expect(link).toHaveCSS("font-size", "16px");
+        await expect(link).toHaveCSS("border-radius", "6px");
+        await expect(link.locator(":scope > svg")).toHaveAttribute("aria-hidden", "true");
+        const bounds = await link.boundingBox();
+        expect(bounds!.height).toBeGreaterThanOrEqual(48);
       }
-      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
-      await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(link).toHaveCSS("transform", "none");
-      await page.keyboard.press("Tab");
-      await link.focus();
-      await expect(link).toBeFocused();
-      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
-      await expect(link).toHaveCSS("outline-style", "none");
-      await expect(link).toHaveCSS("text-decoration-line", "underline");
-      await expect(link).toHaveCSS("text-decoration-thickness", "2px");
-      await page.mouse.down();
-      await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
-      await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(link).toHaveCSS("transform", "none");
-      await expect(link).toHaveCSS("border-radius", "0px");
-      expect(await link.boundingBox()).toEqual(originalBox);
-      // Release away from the link so testing its pressed state does not navigate.
-      await page.mouse.move(0, 0);
-      await page.mouse.up();
-    }
-    await page.keyboard.press("Escape");
-    await expect(page.locator(".mobile-menu-button")).toBeFocused();
-  });
+      const home = links.first();
+      await expect(home).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      if (await page.evaluate(() => matchMedia("(hover: hover)").matches)) {
+        await home.hover();
+        await expect(home).toHaveCSS("background-color", "rgb(242, 242, 242)");
+        await expect(home).toHaveCSS("color", "rgb(0, 41, 145)");
+        await page.mouse.move(0, 0);
+        await expect(home).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      }
+      await page.locator(".mobile-language-disclosure > summary").click();
+      await expect(page.locator(".mobile-menu-language")).toHaveCount(2);
+      await expect
+        .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
+        .toBe(0);
+      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(248, 249, 251)");
+      for (const target of await page
+        .locator(".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > summary")
+        .all()) {
+        const before = await target.boundingBox();
+        await page.keyboard.press("Tab");
+        await target.focus();
+        await expect(target).toBeFocused();
+        await expect(target).toHaveCSS("outline-style", "solid");
+        await expect(target).toHaveCSS("outline-width", "2px");
+        await expect(target).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        await expect(target).toHaveCSS("transform", "none");
+        expect(await target.boundingBox()).toEqual(before);
+      }
+      await expect(current).toHaveCSS("background-color", selectedSurface);
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".mobile-menu-button")).toBeFocused();
+    },
+  );
 }
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
@@ -1034,6 +1037,90 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   }
 }
 
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(
+    `${prefix || "English"} mobile Sidebar shares touch target and focus tokens`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`${prefix}/portfolio`);
+      await page.locator(".mobile-menu-button").click();
+      await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+      await expect(page.locator(".mobile-menu-close")).toBeFocused();
+      const summary = page.locator(".mobile-language-disclosure > summary");
+      await summary.click();
+      await expect
+        .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
+        .toBe(0);
+      const targets = page.locator(
+        ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > summary",
+      );
+      await expect(targets).toHaveCount(9);
+      for (const [height, width] of [
+        [48, 2],
+        [64, 4],
+      ] as const) {
+        await page.evaluate(
+          ({ height, width }) => {
+            document.documentElement.style.setProperty("--size-touch-target", `${height}px`);
+            document.documentElement.style.setProperty("--focus-ring-width", `${width}px`);
+          },
+          { height, width },
+        );
+        await page.locator(".mobile-menu-close").focus();
+        for (const target of await targets.all()) {
+          await page.keyboard.press("Tab");
+          await expect(target).toBeFocused();
+          await expect(target).toHaveCSS("min-height", `${height}px`);
+          expect((await target.boundingBox())!.height).toBeGreaterThanOrEqual(height);
+          await expect(target).toHaveCSS("outline-style", "solid");
+          await expect(target).toHaveCSS("outline-width", `${width}px`);
+          await expect(target).toHaveCSS("outline-offset", `-${width}px`);
+          await expect(target).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        }
+      }
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".mobile-menu-button")).toBeFocused();
+    },
+  );
+}
+
+test.describe("language disclosure touch hover recovery", () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+    test(
+      `${prefix || "English"} mobile language summary clears released touch hover in both states`,
+      { tag: "@mobile" },
+      async ({ page }) => {
+        await page.goto(`${prefix}/portfolio`);
+        await page.locator(".mobile-menu-button").tap();
+        await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+        await expect(page.locator(".mobile-menu-close")).toBeFocused();
+        const disclosure = page.locator(".mobile-language-disclosure");
+        const summary = disclosure.locator("summary");
+        await summary.tap();
+        await expect(disclosure).toHaveAttribute("open", "");
+        await expect.poll(() => summary.evaluate((element) => element.matches(":active, :focus-visible"))).toBe(false);
+        await expect(summary).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
+        await summary.tap();
+        await expect(disclosure).not.toHaveAttribute("open");
+        await expect(summary).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        await expect(summary).toHaveCSS("color", "rgb(0, 0, 0)");
+        await summary.focus();
+        await page.keyboard.press("Shift+Tab");
+        await page.keyboard.press("Tab");
+        await expect(summary).toBeFocused();
+        await expect(summary).toHaveCSS("background-color", "rgb(242, 242, 242)");
+        await expect(summary).toHaveCSS("outline-style", "solid");
+        await page.keyboard.press("Escape");
+        await expect(page.locator(".mobile-menu-button")).toBeFocused();
+      },
+    );
+  }
+});
+
 test.describe("touch CTA recovery", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
@@ -1046,24 +1133,24 @@ test.describe("touch CTA recovery", () => {
         await page.locator(".mobile-menu-button").tap();
         const current = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
         const summary = page.locator(".mobile-language-disclosure > summary");
-        await expect(current).toHaveCSS("text-decoration-line", "none");
+        await expect(current).toHaveCSS("outline-style", "none");
         await page.keyboard.press("Tab");
         await current.focus();
-        await expect(current).toHaveCSS("color", "rgb(0, 140, 255)");
-        await expect(current).toHaveCSS("text-decoration-line", "underline");
+        await expect(current).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(current).toHaveCSS("outline-style", "solid");
         await summary.focus();
-        await expect(current).toHaveCSS("text-decoration-line", "none");
+        await expect(current).toHaveCSS("outline-style", "none");
         await page.keyboard.press("Enter");
-        await expect(summary).toHaveCSS("color", "rgb(0, 140, 255)");
-        await expect(summary).toHaveCSS("text-decoration-line", "underline");
+        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(summary).toHaveCSS("outline-style", "solid");
         await page.keyboard.press("Tab");
         const option = page.locator(".mobile-menu-language").first();
         await expect(option).toBeFocused();
-        await expect(option).toHaveCSS("text-decoration-line", "underline");
-        await expect(summary).toHaveCSS("text-decoration-line", "none");
-        await expect(summary).toHaveCSS("color", "rgb(0, 140, 255)");
+        await expect(option).toHaveCSS("outline-style", "solid");
+        await expect(summary).toHaveCSS("outline-style", "none");
+        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
         await page.emulateMedia({ reducedMotion: "reduce" });
-        await expect(option).toHaveCSS("text-decoration-line", "underline");
+        await expect(option).toHaveCSS("outline-style", "solid");
         await page.keyboard.press("Escape");
         await expect(page.locator(".mobile-menu-button")).toBeFocused();
       },

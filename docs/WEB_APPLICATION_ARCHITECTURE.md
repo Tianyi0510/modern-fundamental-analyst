@@ -11,6 +11,8 @@ Use this guide for code conventions, application and data boundaries, portfolio 
 
 ## Application boundaries
 
+The five-layer Design System is the frontend design and engineering model. This guide separately owns application and data architecture: routing, server/client boundaries, validation, caching, feature state, security, testing and monitoring. Provider credentials and operational recovery belong in Integrations. Base UI manages interactive component mechanics; it does not own portfolio calculations, API calls, payment outcomes, subscription consent or provider retries. Public research pages do not require an account system; do not infer authentication requirements from dashboard examples in a design reference.
+
 Pages render localized Server Components. Add small Client Components for interactive controls. Provider and preference-token modules declare `server-only`; shared support IDs, legacy amounts and types live in `src/features/support/support-config.ts`.
 
 Node tests and the operator CLI use `scripts/register-server.mjs` to load TypeScript and TSX. The loader bypasses `server-only` for these entry points and does not type-check. TypeScript and Next.js separately enforce types and build boundaries.
@@ -134,13 +136,15 @@ Keep Prettier last in the ESLint configuration. It owns formatting; import order
 
 The root layout imports `src/app/globals.css` once. PostCSS compiles Tailwind themes and utilities. Tokens feed both Tailwind and CSS Modules; `base` provides the only reset and document defaults. Preflight and component-specific global selectors are not used.
 
-Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `radix-ui`; only interactive components and their owners declare `use client`.
+Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `@base-ui/react/menu` and `@base-ui/react/dialog`; Sidebar composition uses `@base-ui/react/use-render`. Only interactive components and their owners declare `use client`. Static buttons, links and native form controls retain their server-compatible implementations. The `base-nova` registry in `components.json` selects Base UI source; the layered design system is implemented through customized styles and global-to-semantic token aliases.
+
+Geist Typography, Colors and Materials are expressed in the shared tokens and owned components, with the retained brand exceptions documented in [Design System](DESIGN_SYSTEM.md#neutral-colors-and-materials). The wordmark has an independent typography role; Menu material owns its outline and shadow without a duplicate CSS border. No additional theme provider or visual component package is introduced.
 
 Private `*.styles.ts` maps contain complete utility strings. Components import their own CSS Modules for chart structure and complex motion. `components.json` configures source installation. Email styling remains separate. [Design System](DESIGN_SYSTEM.md#style-ownership) defines variants and visual ownership.
 
 `site-header-desktop.tsx` owns desktop navigation and language-menu state. `use-site-header.ts` owns mobile phases and measured panel/icon animations. `use-menu-touch-feedback.ts` owns the trigger/close touch ring.
 
-The mobile phase drives Sheet's open state; Radix owns modal isolation, focus containment and scroll locking. Native disclosures work without JavaScript. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.
+The mobile phase drives Sheet's open state through the final closing frame; Base UI owns modal isolation, focus containment and scroll locking. Base UI `render` replaces Slot composition without adding interactive wrappers. Popup `initialFocus` and `finalFocus` preserve close-button entry and route-aware focus restoration. Desktop Menu uses its own non-modal positioning and keyboard model, with explicit Tab and outside-focus exits. Native disclosures work without JavaScript. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.
 
 Before a presentation migration, capture screenshots and computed styles. Compare in the same browser and viewport. Verify direct loads, client navigation and browser return against a production build; hot reload does not prove production style ordering. Measure assets before claiming a performance improvement. Test behavior independently of utility strings; physical iPhone checks remain separate.
 

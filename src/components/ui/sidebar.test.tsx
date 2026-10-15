@@ -1,4 +1,5 @@
 import { createRef } from "react";
+import { ChartPie } from "lucide-react";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
@@ -11,16 +12,26 @@ it("keeps navigation as a list of real links with one current page", async () =>
     <nav aria-label="Primary">
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild isActive aria-current="page">
-            <a href="/portfolio">Portfolio</a>
-          </SidebarMenuButton>
+          <SidebarMenuButton
+            render={
+              <a href="/portfolio">
+                <ChartPie aria-hidden="true" />
+                <span>Portfolio</span>
+              </a>
+            }
+            isActive
+            aria-current="page"
+          />
         </SidebarMenuItem>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild onClick={onNavigate}>
-            <a href="/about" hrefLang="en">
-              About
-            </a>
-          </SidebarMenuButton>
+          <SidebarMenuButton
+            render={
+              <a href="/about" hrefLang="en">
+                About
+              </a>
+            }
+            onClick={onNavigate}
+          />
         </SidebarMenuItem>
       </SidebarMenu>
     </nav>,
@@ -38,6 +49,28 @@ it("keeps navigation as a list of real links with one current page", async () =>
   expect(about).toHaveFocus();
   await user.keyboard("{Enter}");
   expect(onNavigate).toHaveBeenCalledOnce();
+});
+
+it("merges the rendered link's ref, accessible name and handlers without adding a button", async () => {
+  const user = userEvent.setup();
+  const ref = createRef<HTMLAnchorElement>();
+  const onLinkClick = vi.fn((event: React.MouseEvent) => event.preventDefault());
+  const onItemClick = vi.fn();
+  render(
+    <SidebarMenuButton
+      render={<a ref={ref} href="/portfolio" aria-label="Full Portfolio" onClick={onLinkClick} />}
+      onClick={onItemClick}
+    >
+      Portfolio
+    </SidebarMenuButton>,
+  );
+  const link = screen.getByRole("link", { name: "Full Portfolio" });
+  expect(ref.current).toBe(link);
+  expect(link).not.toHaveAttribute("type");
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  await user.click(link);
+  expect(onLinkClick).toHaveBeenCalledOnce();
+  expect(onItemClick).toHaveBeenCalledOnce();
 });
 
 it("keeps native button behavior without submitting its enclosing form", async () => {

@@ -1,22 +1,25 @@
 import { expect, test, type Page } from "@playwright/test";
+import { colorContrast } from "../../../scripts/color-contrast";
 
 type Role = keyof typeof roleScale;
 
+// Expected Geist treatments are independent of the CSS token implementation.
 const roleScale = {
-  pageTitle: { min: 52, fluidRem: 1.75, fluidVw: 5, max: 112 },
-  sectionTitle: { min: 44, fluidRem: 2.125, fluidVw: 2.5, max: 72 },
-  cardTitle: { min: 32, fluidRem: 1.75, fluidVw: 1, max: 42 },
-  compactTitle: { min: 20, fluidRem: 1.125, fluidVw: 0.5, max: 24 },
-  lead: { min: 22, max: 22 },
-  bodyLarge: { min: 18, max: 18 },
-  body: { min: 16, max: 16 },
-  label: { min: 16, max: 16 },
-  control: { min: 16, max: 16 },
-  caption: { min: 16, max: 16 },
-  dataDisplay: { min: 52, fluidRem: 2, fluidVw: 4, max: 96 },
-  dataKpi: { min: 48, fluidRem: 2.5, fluidVw: 1.5, max: 64 },
-  dataRing: { min: 40, max: 40 },
-  dataRow: { min: 20, max: 20 },
+  pageTitle: 72,
+  sectionTitle: 40,
+  cardTitle: 24,
+  compactTitle: 20,
+  brand: 24,
+  lead: 20,
+  bodyLarge: 18,
+  body: 16,
+  label: 16,
+  control: 16,
+  caption: 16,
+  dataDisplay: 72,
+  dataKpi: 64,
+  dataRing: 40,
+  dataRow: 20,
 } as const;
 
 const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
@@ -24,7 +27,8 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     pageTitle: [".hero h1"],
     sectionTitle: [".home-about h2", ".intro h2", ".section-heading h2", ".cta h2"],
     cardTitle: [".memo-card h3"],
-    compactTitle: [".site-header .wordmark", ".footer-heading", ".holding-row strong"],
+    compactTitle: [".footer-heading", ".holding-row strong"],
+    brand: [".site-header .wordmark", ".footer-mark"],
     lead: [".hero-bottom > p", ".home-about > div:last-child p", ".performance-copy p"],
     body: [".memo-card p", ".holding-row small"],
     label: [".eyebrow", ".section-number", ".metric > dt", ".memo-card > div"],
@@ -175,22 +179,25 @@ for (const viewport of [viewports[0], viewports[2]]) {
 }
 
 function expectedSize(role: Role, width: number) {
-  if (role === "pageTitle" && width <= 800) return Math.min(52, Math.max(40, width * 0.11));
-  const scale = roleScale[role];
-  if (!("fluidVw" in scale)) return scale.min;
-  return Math.min(scale.max, Math.max(scale.min, scale.fluidRem * 16 + (width * scale.fluidVw) / 100));
+  if (role === "pageTitle" && width <= 800) return 40;
+  if (role === "brand") return Math.min(24, Math.max(20, 18 + width * 0.005));
+  return roleScale[role];
 }
 
 const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
 
-function expectedRhythm(role: Role, language: string) {
-  const headingTracking = language.startsWith("zh") ? 0 : -0.025;
-  const labelTracking = language.startsWith("zh") ? 0 : 0.025;
-  if (role === "pageTitle") return { lineHeight: 1.05, trackingEm: headingTracking };
-  if (role === "sectionTitle" || role === "cardTitle") return { lineHeight: 1.1, trackingEm: headingTracking };
-  if (role === "compactTitle") return { lineHeight: 1.2, trackingEm: headingTracking };
-  if (dataRoles.has(role)) return { lineHeight: 1, trackingEm: -0.05 };
-  if (role === "label") return { lineHeight: 1.5, trackingEm: labelTracking };
+function expectedRhythm(role: Role, language: string, width: number) {
+  const chinese = language.startsWith("zh");
+  if (role === "brand") return { lineHeight: 1.2, trackingEm: -0.05 };
+  if (role === "pageTitle") return { lineHeight: width <= 800 ? 1.2 : 1, trackingEm: chinese ? 0 : -0.06 };
+  if (role === "sectionTitle" || role === "dataRing") return { lineHeight: 1.2, trackingEm: chinese ? 0 : -0.06 };
+  if (role === "cardTitle") return { lineHeight: 32 / 24, trackingEm: chinese ? 0 : -0.04 };
+  if (role === "dataRow") return { lineHeight: 1.6, trackingEm: 0 };
+  if (role === "compactTitle") return { lineHeight: 1.3, trackingEm: chinese ? 0 : -0.02 };
+  if (dataRoles.has(role)) return { lineHeight: 1, trackingEm: -0.06 };
+  if (role === "label" || role === "control") return { lineHeight: 1.25, trackingEm: 0 };
+  if (role === "lead") return { lineHeight: 1.8, trackingEm: 0 };
+  if (role === "bodyLarge") return { lineHeight: 28 / 18, trackingEm: 0 };
   return { lineHeight: 1.5, trackingEm: 0 };
 }
 
@@ -282,35 +289,51 @@ for (const viewport of viewports) {
             const expectedFontSize = expectedSize(role, viewport.width);
 
             for (const sample of values) {
-              const rhythm = expectedRhythm(role, sample.language);
+              const rhythm = expectedRhythm(role, sample.language, viewport.width);
               if (sample.selector.includes(".wordmark")) rhythm.trackingEm = -0.05;
-              expect(
-                Math.abs(sample.fontSize - expectedFontSize),
-                `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
-              ).toBeLessThan(0.15);
-              expect(
-                Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
-                `${role} sample ${sample.selector} has an inconsistent line height`,
-              ).toBeLessThan(0.2);
-              expect(
-                Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
-                `${role} sample ${sample.selector} has inconsistent letter spacing`,
-              ).toBeLessThan(0.2);
-              expect(sample.family.split(",")[0]!.replaceAll('"', "").trim()).toBe("Jost");
-              const boldRoles = ["pageTitle", "sectionTitle", "cardTitle", "compactTitle", "label", "control"];
+              expect
+                .soft(
+                  Math.abs(sample.fontSize - expectedFontSize),
+                  `${role} sample ${sample.selector} resolved to ${sample.fontSize}px instead of ${expectedFontSize}px`,
+                )
+                .toBeLessThan(0.15);
+              expect
+                .soft(
+                  Math.abs(sample.lineHeight - sample.fontSize * rhythm.lineHeight),
+                  `${role} sample ${sample.selector} has an inconsistent line height`,
+                )
+                .toBeLessThan(0.2);
+              expect
+                .soft(
+                  Math.abs(sample.letterSpacing - sample.fontSize * rhythm.trackingEm),
+                  `${role} sample ${sample.selector} has inconsistent letter spacing`,
+                )
+                .toBeLessThan(0.2);
+              expect.soft(sample.family.split(",")[0]!.replaceAll('"', "").trim()).toBe("Jost");
+              const headingRoles = ["pageTitle", "sectionTitle", "cardTitle", "compactTitle"];
               if (role === "dataRow") {
                 // Position headings and totals retain their deliberate emphasis.
-                expect([400, 700]).toContain(sample.weight);
+                expect.soft([400, 700]).toContain(sample.weight);
               } else {
-                expect(sample.weight, `${role} sample ${sample.selector} weight`).toBe(
-                  boldRoles.includes(role) || dataRoles.has(role) ? 700 : 400,
-                );
+                expect
+                  .soft(sample.weight, `${role} sample ${sample.selector} weight`)
+                  .toBe(
+                    role === "brand"
+                      ? 700
+                      : ["label", "control"].includes(role)
+                        ? 500
+                        : headingRoles.includes(role) || dataRoles.has(role)
+                          ? 600
+                          : 400,
+                  );
               }
             }
-            expect(
-              new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
-              `${role} has multiple computed sizes`,
-            ).toBe(1);
+            expect
+              .soft(
+                new Set(values.map(({ fontSize }) => fontSize.toFixed(2))).size,
+                `${role} has multiple computed sizes`,
+              )
+              .toBe(1);
           }
         },
       );
@@ -504,6 +527,64 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
                   })),
               );
             expect(clipped, `${path} clips enlarged financial values`).toEqual([]);
+          }
+        }
+      },
+    );
+  }
+}
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  for (const width of [390, 1440]) {
+    test(
+      `${prefix || "English"} interaction text has readable contrast at ${width}px`,
+      width === 390 ? { tag: "@mobile" } : {},
+      async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(prefix || "/");
+        let controls;
+        if (width === 390) {
+          await page.locator(".mobile-menu-button").click();
+          await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+          controls = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
+        } else {
+          controls = page.locator('.header-actions nav a[aria-current="page"]');
+        }
+        await expect(controls).toHaveCSS("color", "rgb(0, 41, 145)");
+        const readContrast = () =>
+          controls.evaluate((element) => {
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = 1;
+            const context = canvas.getContext("2d")!;
+            const rgb = () => `rgb(${[...context.getImageData(0, 0, 1, 1).data].slice(0, 3).join(", ")})`;
+            context.fillStyle = "white";
+            context.fillRect(0, 0, 1, 1);
+            const ancestors = [];
+            for (let current: Element | null = element; current; current = current.parentElement)
+              ancestors.push(current);
+            for (const ancestor of ancestors.reverse()) {
+              context.fillStyle = getComputedStyle(ancestor).backgroundColor;
+              context.fillRect(0, 0, 1, 1);
+            }
+            const background = rgb();
+            context.fillStyle = getComputedStyle(element).color;
+            context.fillRect(0, 0, 1, 1);
+            return { background, foreground: rgb() };
+          });
+        for (const state of ["current", "hover", "keyboard"] as const) {
+          if (state === "hover") await controls.hover();
+          if (state === "keyboard") {
+            await page.keyboard.press("Tab");
+            await controls.focus();
+          }
+          await controls.evaluate(async (element) => {
+            await Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {})));
+          });
+          const colors = await readContrast();
+          expect(colorContrast(colors.foreground, colors.background), state).toBeGreaterThanOrEqual(4.5);
+          if (state === "keyboard") {
+            await expect(controls).toBeFocused();
+            expect(await controls.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
           }
         }
       },

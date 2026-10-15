@@ -82,7 +82,7 @@ export function SupportPanel({ locale, params, status }: SupportPanelProps & { s
             </fieldset>
             {status ? (
               <Alert
-                className={`${appearance["support-status"]} ${status === "error" ? "support-status-error border-l-[var(--price-down)]" : "border-l-accent"}`}
+                className={`${appearance["support-status"]} ${status === "error" ? "support-status-error border-l-[var(--border-error)]" : "border-l-accent"}`}
                 role="status"
                 aria-live="polite"
               >

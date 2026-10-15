@@ -43,10 +43,10 @@
 }
 .openButton:hover {
   background: var(--bright-blue);
-  transform: rotate(4deg) scale(var(--motion-scale-hover));
+  transform: scale(var(--motion-scale-hover));
 }
 .closeButton:hover {
-  transform: rotate(-4deg) scale(var(--motion-scale-hover));
+  transform: scale(var(--motion-scale-hover));
 }
 .iconButton:focus-visible {
   outline: 2px solid var(--medium-blue);
@@ -74,11 +74,14 @@
 }
 .mobileLink,
 .languageDisclosure > summary {
-  transition: color var(--motion-duration-fast) var(--motion-ease-standard);
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 .languageDisclosure > summary {
-  min-height: 48px;
-  padding: 0 var(--space-2);
+  min-height: var(--size-touch-target);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
   outline: none;
   display: flex;
   align-items: center;
@@ -101,12 +104,18 @@
 .languageDisclosure > summary:focus-visible,
 .languageDisclosure > summary:active,
 .languageDisclosure[open]:not([data-closing]) > summary {
-  color: var(--medium-blue);
+  color: var(--interactive-accent);
+}
+.languageDisclosure > summary:hover,
+.languageDisclosure > summary:focus-visible {
+  background: var(--sidebar-hover-surface);
+}
+.languageDisclosure > summary:active {
+  background: var(--sidebar-pressed-surface);
 }
 .languageDisclosure > summary:focus-visible {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
+  outline: var(--focus-ring-width) solid var(--focus-ring-on-light);
+  outline-offset: calc(var(--focus-ring-width) * -1);
 }
 @media (hover: none) and (pointer: coarse) {
   .openButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
@@ -115,6 +124,10 @@
   }
   .closeButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
     transform: none;
+  }
+  .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
+  .languageDisclosure > summary:hover:not(:active):not(:focus-visible) {
+    background: transparent;
   }
   .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
   .languageDisclosure:not([open]) > summary:hover:not(:active):not(:focus-visible) {
