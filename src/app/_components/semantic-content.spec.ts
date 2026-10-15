@@ -11,6 +11,20 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       ["/performance", ".performance-summary", 3],
     ] as const) {
       await page.goto(`${prefix}${route}`);
+      if (route === "/portfolio") {
+        const positions =
+          prefix === "/zh-tw"
+            ? /^\d+ 個已揭露部位。$/
+            : prefix === "/zh-cn"
+              ? /^\d+ 个已披露持仓。$/
+              : /^\d+ Disclosed Positions\.$/;
+        const holdings = page.getByRole("region", { name: positions });
+        await expect(holdings).toBeVisible();
+        await expect(holdings.getByRole("heading", { level: 2, name: positions })).toBeVisible();
+        await expect(holdings.getByRole("table")).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Allocation by market value", exact: true })).toHaveCount(0);
+        await expect(page.getByText("Source Sheet:", { exact: false })).toHaveCount(0);
+      }
       const summary = page.locator(selector);
       await expect(summary).toHaveJSProperty("tagName", "DL");
       await expect(summary.getByRole("term")).toHaveCount(count);

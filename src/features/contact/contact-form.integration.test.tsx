@@ -1,9 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import { expect, it } from "vitest";
+import { beforeEach, expect, it, vi } from "vitest";
 import { server } from "../../../scripts/test-server";
 import { ContactForm } from "./contact-form";
+
+beforeEach(() => sessionStorage.clear());
 
 async function fillMessage() {
   const user = userEvent.setup();
@@ -37,6 +39,48 @@ it("submits the real form through its API client and clears fields after success
   });
   expect(requests[0]?.key).toMatch(/^[0-9a-f-]{36}$/);
   expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("");
+  expect(sessionStorage.length).toBe(0);
+});
+
+it("restores an unsent draft and failed submission identity after returning to Contact", async () => {
+  const keys: (string | null)[] = [];
+  server.use(
+    http.post("http://localhost:3210/api/contact", ({ request }) => {
+      keys.push(request.headers.get("idempotency-key"));
+      return HttpResponse.json({ error: "Unavailable" }, { status: 503 });
+    }),
+  );
+  const { unmount: leaveDraft } = render(<ContactForm locale="en" />);
+  const user = await fillMessage();
+  leaveDraft();
+  const { unmount: leaveFailedAttempt } = render(<ContactForm locale="en" />);
+  expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Reader");
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Please explain the portfolio returns.");
+  await user.click(screen.getByRole("button", { name: "Send Message" }));
+  expect(await screen.findByText("Your message couldn't be sent. Please try again later.")).toBeVisible();
+  leaveFailedAttempt();
+  render(<ContactForm locale="en" />);
+  await user.click(screen.getByRole("button", { name: "Send Message" }));
+  expect(await screen.findByText("Your message couldn't be sent. Please try again later.")).toBeVisible();
+  expect(keys).toHaveLength(2);
+  expect(keys[1]).toBe(keys[0]);
+});
+
+it("keeps drafts isolated by language and tolerates denied storage", async () => {
+  const { unmount: leaveEnglish } = render(<ContactForm locale="en" />);
+  await fillMessage();
+  leaveEnglish();
+  render(<ContactForm locale="zh-tw" />);
+  expect(screen.getByRole("textbox", { name: "訊息" })).toHaveValue("");
+  vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+    throw new Error("Storage denied");
+  });
+  vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    throw new Error("Storage denied");
+  });
+  const user = userEvent.setup();
+  await user.type(screen.getByRole("textbox", { name: "訊息" }), "A new independent draft.");
+  expect(screen.getByRole("textbox", { name: "訊息" })).toHaveValue("A new independent draft.");
 });
 
 it("retains input and the retry identity after failure, then creates a new identity for an edited message", async () => {

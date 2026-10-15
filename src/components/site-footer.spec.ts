@@ -8,13 +8,13 @@ test.describe("header interaction QA", () => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto("/subscription-preferences");
       const status = page.locator(".site-footer [role=status]");
-      await expect(status).toHaveCSS("font-size", "15px");
+      await expect(status).toHaveCSS("font-size", "16px");
       await expect(status).toHaveCSS("font-weight", "700");
       await expect(status).toBeVisible();
       await expect(page.locator("main input[name=email]").first()).toHaveCSS("font-weight", "400");
       await expect(page.locator(".site-footer input[name=email]")).toHaveCSS("font-weight", "400");
       await page.goto("/disclaimer");
-      await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-size", "15px");
+      await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-size", "16px");
       await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-weight", "700");
       const inset = await page.locator(".legal-body").evaluate((body) => {
         const first = body.querySelector(".legal-section-heading")!;

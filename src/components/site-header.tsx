@@ -142,10 +142,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             </button>
           </div>
           <div className={appearance["mobile-menu-content"]} ref={menuContentRef} inert={menuPhase === "closing"}>
-            <nav
-              className="relative z-[1] flex flex-col text-[length:var(--font-size-compact-title)] leading-[var(--leading-compact-title)] font-bold tracking-[var(--tracking-heading)]"
-              aria-label={copy.mobilePrimary}
-            >
+            <nav className="relative z-[1] flex flex-col text-title-small" aria-label={copy.mobilePrimary}>
               {mobileNavigation.map(({ href, label }) => (
                 <Link
                   className={mobileNavigationLink}

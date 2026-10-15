@@ -1,5 +1,40 @@
 import { expect, test } from "@playwright/test";
 
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(
+    `${prefix || "English"} Contact restores an unsent draft after navigation and reload`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.goto(`${prefix}/contact`);
+      const form = page.locator("main form").filter({ has: page.locator("textarea") });
+      const draft = {
+        name: "Reader",
+        email: "reader@example.com",
+        subject: "Research question",
+        message: "Please explain the portfolio returns.",
+      };
+      for (const [name, value] of Object.entries(draft)) await form.locator(`[name="${name}"]`).fill(value);
+      const desktopAbout = page.locator(`header nav a[href="${prefix}/about"]`);
+      if (await desktopAbout.isVisible()) {
+        await desktopAbout.click();
+      } else {
+        await page.locator(".mobile-menu-button").click();
+        await page.getByRole("dialog").locator(`a[href="${prefix}/about"]`).click();
+      }
+      await expect(page).toHaveURL(`${prefix}/about`);
+      await page.goBack();
+      for (const [name, value] of Object.entries(draft))
+        await expect(form.locator(`[name="${name}"]`)).toHaveValue(value);
+      await page.reload();
+      for (const [name, value] of Object.entries(draft))
+        await expect(form.locator(`[name="${name}"]`)).toHaveValue(value);
+      await expect(form.locator('button[type="submit"]')).toBeEnabled();
+      await expect(page.locator("main .subscribe-section input[type=email]")).toHaveValue("");
+      await expect(page.locator("main .subscribe-section button[type=submit]")).toBeEnabled();
+    },
+  );
+}
+
 // This journey reaches the real route with Playwright's isolated provider configuration.
 test(
   "contact submission preserves input when the email service is unavailable",

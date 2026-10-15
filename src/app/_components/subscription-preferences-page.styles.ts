@@ -3,5 +3,5 @@ export const appearance = {
   "preferences-request":
     "preferences-request [max-width:760px] grid [grid-template-columns:minmax(0,_1fr)] [gap:var(--space-6)]",
   "preferences-invalid":
-    "preferences-invalid [min-height:var(--size-status-reserve)] [margin:0] [overflow-wrap:anywhere] [font-size:var(--font-size-body)] [line-height:var(--leading-body)] [letter-spacing:var(--tracking-body)]",
+    "preferences-invalid [min-height:var(--size-status-reserve)] [margin:0] [overflow-wrap:anywhere] text-body",
 } as const;

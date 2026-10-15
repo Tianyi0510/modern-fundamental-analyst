@@ -8,7 +8,7 @@ export type MemoContent = {
     subsections: Array<{ title: string; paragraphs: string[] }>;
   }>;
   referencesTitle: string;
-  references: string[];
+  references: Array<{ citation: string; href: string; linkLabel?: string }>;
 };
 
 // The article body below mirrors the source Google Doc verbatim. Do not edit its
@@ -144,11 +144,28 @@ const sourceContent: MemoContent = {
   ],
   referencesTitle: "References:",
   references: [
-    "Cohan, P. (2024, February 13). Why Microsoft Azure could take the cloud lead from Amazon AWS by 2026. Forbes. ",
-    "Forrester Consulting. (2024, May). The Total Economic Impact™ of Microsoft Fabric. Microsoft.",
-    "Brand Finance. (2025). Brand Guardianship Index 2025.",
-    "Microsoft Corporation. (2024). Microsoft Fiscal Year 2024 Annual Report.",
-    "Buffett, W. (1988). 1987 Letter to Shareholders. In Berkshire Hathaway Inc. 1987 Annual Report.",
+    {
+      citation:
+        "Cohan, P. (2024, February 13). Why Microsoft Azure could take the cloud lead from Amazon AWS by 2026. Forbes. ",
+      href: "https://www.forbes.com/sites/petercohan/2024/02/13/why-microsoft-azure-could-take-the-cloud-lead-from-amazon-aws-by-2026/",
+    },
+    {
+      citation: "Forrester Consulting. (2024, May). The Total Economic Impact™ of Microsoft Fabric. Microsoft.",
+      href: "https://tei.forrester.com/go/microsoft/fabric/",
+    },
+    {
+      citation: "Brand Finance. (2025). Brand Guardianship Index 2025.",
+      href: "https://brandfinance.com/press-releases/microsoft-chief-satya-nadella-leads-2025-list-of-top-100-ceos-elon-musk-vaults-to-6th-place-from-19th",
+      linkLabel: "Publisher’s 2025 Overview",
+    },
+    {
+      citation: "Microsoft Corporation. (2024). Microsoft Fiscal Year 2024 Annual Report.",
+      href: "https://www.microsoft.com/investor/reports/ar24/index.html",
+    },
+    {
+      citation: "Buffett, W. (1988). 1987 Letter to Shareholders. In Berkshire Hathaway Inc. 1987 Annual Report.",
+      href: "https://www.berkshirehathaway.com/letters/1987.html",
+    },
   ],
 };
 

@@ -2,12 +2,12 @@
 
 import { useRef } from "react";
 
-export function useSubmissionId() {
+export function useSubmissionId(restoreId?: () => string | undefined) {
   const submissionId = useRef<string | null>(null);
 
   return {
     getSubmissionId: () => {
-      submissionId.current ??= crypto.randomUUID();
+      submissionId.current ??= restoreId?.() ?? crypto.randomUUID();
       return submissionId.current;
     },
     resetSubmissionId: () => {

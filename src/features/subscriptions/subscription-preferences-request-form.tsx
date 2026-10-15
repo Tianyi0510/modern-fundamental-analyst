@@ -7,7 +7,7 @@ import { FormField } from "@/components/form-field";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { PostJsonError } from "@/lib/client-post-json";
 import { requestPreferencesLink } from "./subscription-api";
 import { getFormText } from "@/lib/form-data";
@@ -28,7 +28,7 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
   const runExclusive = useExclusiveSubmit();
   const { getSubmissionId, resetSubmissionId } = useSubmissionId();
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const email = getFormText(new FormData(form), "email");

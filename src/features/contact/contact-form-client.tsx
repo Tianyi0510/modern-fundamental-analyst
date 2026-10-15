@@ -9,14 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert } from "@/components/ui/alert";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { SubmitEvent } from "react";
 import { sendContactMessage } from "./contact-api";
 import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 import { useSubmissionId } from "@/components/use-submission-id";
+import { clearContactDraft, contactFieldLimits, readContactDraft, saveContactDraft } from "./contact-draft";
 
 export type ContactFormCopy = {
   title: string;
@@ -34,13 +35,45 @@ export type ContactFormCopy = {
 export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; locale: Locale }) {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const runExclusive = useExclusiveSubmit();
-  const { getSubmissionId, resetSubmissionId } = useSubmissionId();
+  const formRef = useRef<HTMLFormElement>(null);
+  const { getSubmissionId, resetSubmissionId } = useSubmissionId(() => {
+    const draft = readContactDraft(locale);
+    const form = formRef.current;
+    if (!draft || !form) return;
+    const current = new FormData(form);
+    return (Object.keys(contactFieldLimits) as Array<keyof typeof contactFieldLimits>).every(
+      (field) => getFormText(current, field) === draft[field],
+    )
+      ? draft.submissionId
+      : undefined;
+  });
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    const draft = readContactDraft(locale);
+    if (!draft) return;
+    for (const field of Object.keys(contactFieldLimits) as Array<keyof typeof contactFieldLimits>) {
+      const input = formRef.current?.elements.namedItem(field);
+      if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) input.value = draft[field];
+    }
+  }, [locale]);
+
+  function saveDraft(formData: FormData, submissionId?: string) {
+    saveContactDraft(locale, {
+      name: getFormText(formData, "name"),
+      email: getFormText(formData, "email"),
+      subject: getFormText(formData, "subject"),
+      message: getFormText(formData, "message"),
+      ...(submissionId ? { submissionId } : {}),
+    });
+  }
+
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     await runExclusive(async () => {
+      const submissionId = getSubmissionId();
+      saveDraft(formData, submissionId);
       setStatus("sending");
       try {
         await sendContactMessage(
@@ -52,8 +85,9 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
             website: getFormText(formData, "website"),
             locale,
           },
-          getSubmissionId(),
+          submissionId,
         );
+        clearContactDraft(locale, submissionId);
         form.reset();
         resetSubmissionId();
         setStatus("success");
@@ -71,12 +105,14 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
           <p className={appearance["contact-headingIntro"]}>{copy.intro}</p>
         </div>
         <form
+          ref={formRef}
           className={appearance["contact-form"]}
           onSubmit={(event) => {
             void submit(event);
           }}
-          onChange={() => {
+          onChange={(event) => {
             resetSubmissionId();
+            saveDraft(new FormData(event.currentTarget));
             setStatus("idle");
           }}
           aria-busy={status === "sending"}
@@ -88,7 +124,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                 name="name"
                 type="text"
                 autoComplete="name"
-                maxLength={100}
+                maxLength={contactFieldLimits.name}
                 required
               />
             </FormField>
@@ -98,12 +134,18 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                 name="email"
                 type="email"
                 autoComplete="email"
-                maxLength={254}
+                maxLength={contactFieldLimits.email}
                 required
               />
             </FormField>
             <FormField label={copy.subject} className="col-span-full compact:col-auto">
-              <Input disabled={status === "sending"} name="subject" type="text" maxLength={160} required />
+              <Input
+                disabled={status === "sending"}
+                name="subject"
+                type="text"
+                maxLength={contactFieldLimits.subject}
+                required
+              />
             </FormField>
             <FormField label={copy.message} className="col-span-full compact:col-auto">
               <Textarea
@@ -111,7 +153,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                 name="message"
                 rows={7}
                 minLength={10}
-                maxLength={5000}
+                maxLength={contactFieldLimits.message}
                 required
               />
             </FormField>

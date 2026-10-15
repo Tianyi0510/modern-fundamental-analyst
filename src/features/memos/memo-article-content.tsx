@@ -24,7 +24,15 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
         <h2>{content.referencesTitle}</h2>
         <ol>
           {content.references.map((reference) => (
-            <li key={reference}>{reference}</li>
+            <li key={reference.citation}>
+              {reference.citation}{" "}
+              <a
+                className="underline underline-offset-[3px] focus-visible:outline-2 focus-visible:outline-offset-4"
+                href={reference.href}
+              >
+                {reference.linkLabel ?? "Read Source"}
+              </a>
+            </li>
           ))}
         </ol>
       </section>

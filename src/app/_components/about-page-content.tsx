@@ -9,7 +9,7 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 type Section = { label: string; title: string; paragraphs: string[] };
 type Copy = {
   eyebrow: string;
-  headline: [string, string];
+  headline: [string, string | string[]];
   introduction: string;
   disciplines: string;
   sections: Section[];
@@ -29,7 +29,7 @@ const copy: Record<Locale, Copy> = {
     eyebrow: "About",
     headline: ["Learning Continuously.", "Investing With Accountability."],
     introduction:
-      "I am Tianyi (David) Li, an incoming Rutgers Honors College student building a transparent, long-term investment process.",
+      "I am Tianyi (David) Li, a Rutgers University–New Brunswick Honors College student building a transparent, long-term investment process.",
     disciplines: "Finance · BAIT · Philosophy · Music",
     sections: [
       {
@@ -37,7 +37,7 @@ const copy: Record<Locale, Copy> = {
         title: "Why I Built Modern Fundamental Analyst",
         paragraphs: [
           "Modern Fundamental Analyst documents how I research stocks, value businesses, manage my portfolio, and evaluate my results.",
-          "I believe retail investors should have access to transparent investment research and understandable valuation methods. By publishing my portfolio, performance, financial models, and investment theses, I aim to create a public record that can be examined over time.",
+          "I believe retail investors should have access to transparent investment research and understandable valuation methods. By publishing my portfolio, performance, and available research, I aim to create a public record that can be examined over time.",
           "The mission of this website is to empower every retail investor to understand businesses, question assumptions, and make independent investment decisions.",
         ],
       },
@@ -64,7 +64,7 @@ const copy: Record<Locale, Copy> = {
         title: "Making Every Investment Decision Open to Review",
         paragraphs: [
           "I promote transparency and accountability by fully disclosing my portfolio and performance every month and publishing detailed investment theses.",
-          "Monthly disclosure creates a public record of what I own and how my decisions perform. My investment theses explain why I own each stock, what I believe it is worth, what the market may be missing, and what could cause my view to change.",
+          "Monthly disclosure creates a public record of what I own and how my decisions perform. Published research currently covers selected companies. A detailed thesis or public financial model is not yet available for every holding.",
           "The objective is not to present a flawless record. It is to make my reasoning and results clear enough to be evaluated honestly, including mistakes, thesis changes, and periods of underperformance.",
         ],
       },
@@ -81,7 +81,7 @@ const copy: Record<Locale, Copy> = {
         label: "06 · Background",
         title: "Growing Through Curiosity, Empathy, and Continuous Learning",
         paragraphs: [
-          "I am an incoming Rutgers University–New Brunswick Honors College student intending to double major in Finance and Business Analytics and Information Technology. I also intend to pursue a minor in either Philosophy or Music.",
+          "I am a Rutgers University–New Brunswick Honors College student intending to double major in Finance and Business Analytics and Information Technology. I also intend to pursue a minor in either Philosophy or Music.",
           "I promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning. I do not expect to begin with every answer. Instead, I aim to ask better questions, listen to different perspectives, accept feedback, and continuously improve my knowledge and skills.",
           "This mindset also shapes how I invest. When evidence challenges an existing view, I would rather examine it and revise my thesis than defend an earlier conclusion simply for consistency.",
         ],
@@ -92,7 +92,7 @@ const copy: Record<Locale, Copy> = {
         title: "What This Website Is",
         items: [
           "A fully disclosed monthly record of my portfolio and performance",
-          "A repository for detailed investment theses and financial models",
+          "An archive of published investment research",
           "A resource created to empower every retail investor",
         ],
       },
@@ -120,8 +120,9 @@ const copy: Record<Locale, Copy> = {
   },
   "zh-tw": {
     eyebrow: "關於",
-    headline: ["持續學習。", "以問責精神投資。"],
-    introduction: "我是 Tianyi（David）Li，即將進入羅格斯大學榮譽學院，並正在建立一套透明、長期的投資流程。",
+    headline: ["持續學習。", ["以問責精神", "投資。"]],
+    introduction:
+      "我是 Tianyi（David）Li，現就讀於羅格斯大學新布朗斯維克分校榮譽學院，並正在建立一套透明、長期的投資流程。",
     disciplines: "金融 · 商業分析與資訊科技 · 哲學 · 音樂",
     sections: [
       {
@@ -129,7 +130,7 @@ const copy: Record<Locale, Copy> = {
         title: "我為何建立 Modern Fundamental Analyst",
         paragraphs: [
           "Modern Fundamental Analyst 記錄我如何研究股票、評估企業價值、管理投資組合，以及檢視自己的成果。",
-          "我相信個人投資者應能取得透明的投資研究與容易理解的估值方法。透過公開投資組合、績效、財務模型與投資論點，我希望建立一份可隨時間檢驗的公開紀錄。",
+          "我相信個人投資者應能取得透明的投資研究與容易理解的估值方法。透過公開投資組合、績效與已發布的研究，我希望建立一份可隨時間檢驗的公開紀錄。",
           "這個網站的使命，是幫助每一位個人投資者理解企業、質疑假設，並作出獨立的投資決策。",
         ],
       },
@@ -156,7 +157,7 @@ const copy: Record<Locale, Copy> = {
         title: "讓每項投資決策接受公開檢視",
         paragraphs: [
           "我透過每月完整揭露投資組合與績效，並發布詳細投資論點，推動透明度與問責。",
-          "每月揭露建立了一份我持有什麼、以及決策表現如何的公開紀錄。我的投資論點會說明為何持有每一檔股票、我認為它價值多少、市場可能忽略了什麼，以及什麼因素會使我的觀點改變。",
+          "每月揭露建立了一份我持有什麼、以及決策表現如何的公開紀錄。目前已發布的研究涵蓋部分企業，並非每個持股都已有詳細投資論點或公開財務模型。",
           "目標不是呈現一份毫無瑕疵的紀錄，而是讓我的推理與結果清楚到足以被誠實評估，包括錯誤、論點變化與績效落後的時期。",
         ],
       },
@@ -173,7 +174,7 @@ const copy: Record<Locale, Copy> = {
         label: "06 · 背景",
         title: "以好奇心、同理心與持續學習成長",
         paragraphs: [
-          "我即將進入羅格斯大學新布朗斯維克分校榮譽學院，計畫雙主修金融與商業分析及資訊科技，並考慮輔修哲學或音樂。",
+          "我目前就讀於羅格斯大學新布朗斯維克分校榮譽學院，計畫雙主修金融與商業分析及資訊科技，並考慮輔修哲學或音樂。",
           "我提倡以好奇心、同理心與持續學習為基礎的「learn-it-all」成長思維。我不期待自己一開始就擁有所有答案，而是希望提出更好的問題、聆聽不同觀點、接受回饋，並持續提升知識與能力。",
           "這種思維也塑造了我的投資方式。當證據挑戰既有觀點時，我寧願重新檢視並修正投資論點，也不會只為了維持一致而捍衛先前的結論。",
         ],
@@ -182,11 +183,7 @@ const copy: Record<Locale, Copy> = {
     boundaries: [
       {
         title: "這個網站是",
-        items: [
-          "每月完整揭露的投資組合與績效紀錄",
-          "詳細投資論點與財務模型的資料庫",
-          "為幫助每一位個人投資者而建立的資源",
-        ],
+        items: ["每月完整揭露的投資組合與績效紀錄", "已發布投資研究的資料庫", "為幫助每一位個人投資者而建立的資源"],
       },
       {
         title: "這個網站不是",
@@ -208,8 +205,9 @@ const copy: Record<Locale, Copy> = {
   },
   "zh-cn": {
     eyebrow: "关于",
-    headline: ["持续学习。", "以问责精神投资。"],
-    introduction: "我是 Tianyi（David）Li，即将进入罗格斯大学荣誉学院，并正在建立一套透明、长期的投资流程。",
+    headline: ["持续学习。", ["以问责精神", "投资。"]],
+    introduction:
+      "我是 Tianyi（David）Li，现就读于罗格斯大学新布朗斯维克分校荣誉学院，并正在建立一套透明、长期的投资流程。",
     disciplines: "金融 · 商业分析与信息技术 · 哲学 · 音乐",
     sections: [
       {
@@ -217,7 +215,7 @@ const copy: Record<Locale, Copy> = {
         title: "我为何建立 Modern Fundamental Analyst",
         paragraphs: [
           "Modern Fundamental Analyst 记录我如何研究股票、评估企业价值、管理投资组合，以及检视自己的成果。",
-          "我相信个人投资者应该能够获得透明的投资研究与容易理解的估值方法。通过公开投资组合、业绩、财务模型与投资论点，我希望建立一份可以随时间检验的公开记录。",
+          "我相信个人投资者应该能够获得透明的投资研究与容易理解的估值方法。通过公开投资组合、业绩与已发布的研究，我希望建立一份可以随时间检验的公开记录。",
           "这个网站的使命，是帮助每一位个人投资者理解企业、质疑假设，并作出独立的投资决策。",
         ],
       },
@@ -244,7 +242,7 @@ const copy: Record<Locale, Copy> = {
         title: "让每项投资决策接受公开检视",
         paragraphs: [
           "我通过每月完整披露投资组合与业绩，并发布详细投资论点，推动透明度与问责。",
-          "每月披露建立了一份我持有什么、以及决策表现如何的公开记录。我的投资论点会说明为何持有每一只股票、我认为它价值多少、市场可能忽略了什么，以及什么因素会使我的观点改变。",
+          "每月披露建立了一份我持有什么、以及决策表现如何的公开记录。目前已发布的研究涵盖部分企业，并非每个持仓都已有详细投资论点或公开财务模型。",
           "目标不是呈现一份毫无瑕疵的记录，而是让我的推理与结果清楚到足以被诚实评估，包括错误、论点变化与业绩落后的时期。",
         ],
       },
@@ -261,7 +259,7 @@ const copy: Record<Locale, Copy> = {
         label: "06 · 背景",
         title: "以好奇心、同理心与持续学习成长",
         paragraphs: [
-          "我即将进入罗格斯大学新布朗斯维克分校荣誉学院，计划双主修金融与商业分析及信息技术，并考虑辅修哲学或音乐。",
+          "我目前就读于罗格斯大学新布朗斯维克分校荣誉学院，计划双主修金融与商业分析及信息技术，并考虑辅修哲学或音乐。",
           "我倡导以好奇心、同理心与持续学习为基础的“learn-it-all”成长思维。我不期待自己一开始就拥有所有答案，而是希望提出更好的问题、倾听不同观点、接受反馈，并持续提升知识与能力。",
           "这种思维也塑造了我的投资方式。当证据挑战既有观点时，我宁愿重新检视并修正投资论点，也不会只为了维持一致而捍卫先前的结论。",
         ],
@@ -270,11 +268,7 @@ const copy: Record<Locale, Copy> = {
     boundaries: [
       {
         title: "这个网站是",
-        items: [
-          "每月完整披露的投资组合与业绩记录",
-          "详细投资论点与财务模型的资料库",
-          "为帮助每一位个人投资者而建立的资源",
-        ],
+        items: ["每月完整披露的投资组合与业绩记录", "已发布投资研究的资料库", "为帮助每一位个人投资者而建立的资源"],
       },
       {
         title: "这个网站不是",
@@ -308,8 +302,17 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
           title={
             <>
               {text.headline[0]}
-              <br />
-              <em>{text.headline[1]}</em>
+              {locale === "en" ? " " : null}
+              <br className="compact:hidden" />
+              <em>
+                {Array.isArray(text.headline[1])
+                  ? text.headline[1].map((phrase) => (
+                      <span key={phrase} className="compact:inline-block">
+                        {phrase}
+                      </span>
+                    ))
+                  : text.headline[1]}
+              </em>
             </>
           }
           intro={

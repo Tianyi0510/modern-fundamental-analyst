@@ -21,17 +21,19 @@
   --font-size-body-large: 1.125rem;
   --font-size-body: 1rem;
   --font-size-label: 1rem;
-  --font-size-control: 0.9375rem;
-  --font-size-caption: 0.9375rem;
+  --font-size-control: 1rem;
+  --font-size-caption: 1rem;
   --font-size-data-display: clamp(3.25rem, 2rem + 4vw, 6rem);
   --font-size-data-kpi: clamp(3rem, 2.5rem + 1.5vw, 4rem);
   --font-size-data-ring: 2.5rem;
   --font-size-data-row: 1.25rem;
   --weight-regular: 400;
   --weight-bold: 700;
-  --tracking-heading: -0.05em;
+  --tracking-heading: -0.025em;
+  --tracking-brand: -0.05em;
+  --tracking-data: -0.05em;
   --tracking-body: 0;
-  --tracking-label: 0.05em;
+  --tracking-label: 0.025em;
   --leading-page-title: 1.05;
   --leading-section-title: 1.1;
   --leading-card-title: 1.1;
@@ -100,8 +102,18 @@
   --chart-benchmark: var(--medium-blue);
   --interactive-accent: var(--medium-blue);
 }
+/* Text language controls tracking, including English articles on Chinese pages. */
+[lang|="zh"] {
+  --tracking-heading: 0;
+  --tracking-label: 0;
+}
+:where([lang="en"]) {
+  --tracking-heading: -0.025em;
+  --tracking-label: 0.025em;
+}
 @media (max-width: 800px) {
   :root {
+    --font-size-page-title: clamp(2.5rem, 11vw, 3.25rem);
     --space-page-gutter: var(--space-4);
     --space-section: var(--space-10);
     --space-section-compact: var(--space-9);
@@ -124,6 +136,64 @@
   }
 }
 @theme inline {
+  /* Semantic type treatments share the locale-aware Jost family from base.css. */
+  --text-display: var(--font-size-page-title);
+  --text-display--line-height: var(--leading-page-title);
+  --text-display--letter-spacing: var(--tracking-heading);
+  --text-display--font-weight: var(--weight-bold);
+  --text-headline: var(--font-size-section-title);
+  --text-headline--line-height: var(--leading-section-title);
+  --text-headline--letter-spacing: var(--tracking-heading);
+  --text-headline--font-weight: var(--weight-bold);
+  --text-title: var(--font-size-card-title);
+  --text-title--line-height: var(--leading-card-title);
+  --text-title--letter-spacing: var(--tracking-heading);
+  --text-title--font-weight: var(--weight-bold);
+  --text-title-small: var(--font-size-compact-title);
+  --text-title-small--line-height: var(--leading-compact-title);
+  --text-title-small--letter-spacing: var(--tracking-heading);
+  --text-title-small--font-weight: var(--weight-bold);
+  --text-lead: var(--font-size-lead);
+  --text-lead--line-height: var(--leading-body);
+  --text-lead--letter-spacing: var(--tracking-body);
+  --text-lead--font-weight: var(--weight-regular);
+  --text-body-large: var(--font-size-body-large);
+  --text-body-large--line-height: var(--leading-body);
+  --text-body-large--letter-spacing: var(--tracking-body);
+  --text-body-large--font-weight: var(--weight-regular);
+  --text-body: var(--font-size-body);
+  --text-body--line-height: var(--leading-body);
+  --text-body--letter-spacing: var(--tracking-body);
+  --text-body--font-weight: var(--weight-regular);
+  --text-label: var(--font-size-label);
+  --text-label--line-height: var(--leading-body);
+  --text-label--letter-spacing: var(--tracking-label);
+  --text-label--font-weight: var(--weight-bold);
+  --text-control: var(--font-size-control);
+  --text-control--line-height: var(--leading-body);
+  --text-control--letter-spacing: var(--tracking-body);
+  --text-control--font-weight: var(--weight-bold);
+  --text-caption: var(--font-size-caption);
+  --text-caption--line-height: var(--leading-body);
+  --text-caption--letter-spacing: var(--tracking-body);
+  --text-caption--font-weight: var(--weight-regular);
+  --text-data-display: var(--font-size-data-display);
+  --text-data-display--line-height: var(--leading-data);
+  --text-data-display--letter-spacing: var(--tracking-data);
+  --text-data-display--font-weight: var(--weight-bold);
+  --text-data-kpi: var(--font-size-data-kpi);
+  --text-data-kpi--line-height: var(--leading-data);
+  --text-data-kpi--letter-spacing: var(--tracking-data);
+  --text-data-kpi--font-weight: var(--weight-bold);
+  --text-data-ring: var(--font-size-data-ring);
+  --text-data-ring--line-height: var(--leading-data);
+  --text-data-ring--letter-spacing: var(--tracking-data);
+  --text-data-ring--font-weight: var(--weight-bold);
+  --text-data-row: var(--font-size-data-row);
+  --text-data-row--line-height: var(--leading-data);
+  --text-data-row--letter-spacing: var(--tracking-data);
+  --text-data-row--font-weight: var(--weight-regular);
+
   --color-brand: var(--deep-blue);
   --color-accent: var(--medium-blue);
   --color-highlight: var(--bright-blue);

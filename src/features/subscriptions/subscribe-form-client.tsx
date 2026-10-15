@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { SubmitEvent } from "react";
 import { PostJsonError } from "@/lib/client-post-json";
 import { subscribeToUpdates } from "./subscription-api";
 import { getFormText } from "@/lib/form-data";
@@ -53,7 +53,7 @@ export function SubscribeFormClient({
   const { getSubmissionId, resetSubmissionId } = useSubmissionId();
   const runExclusive = useExclusiveSubmit();
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
