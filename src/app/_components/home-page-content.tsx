@@ -3,6 +3,7 @@ import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
+import { IntentLink } from "@/components/intent-link";
 import { MoveRight, MoveUpRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
@@ -181,10 +182,10 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   <ButtonLink variant="contrast" href={getLocalizedPath("/portfolio", locale)}>
                     {text.viewPortfolio}
                   </ButtonLink>
-                  <Link className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
+                  <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
                     {text.readLatest}
                     <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
-                  </Link>
+                  </IntentLink>
                 </div>
               </div>
             </section>
@@ -229,10 +230,10 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           </div>
           <div>
             <p>{text.aboutCopy}</p>
-            <Link className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
+            <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
               {text.aboutLink}
               <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
-            </Link>
+            </IntentLink>
           </div>
         </section>
 

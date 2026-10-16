@@ -414,6 +414,14 @@ Each shard uploads per-test JSON timing reports for 14 days and separate failure
 
 A PR-only request does not authorize merging. Deployment includes safe local cleanup of the released branch. Production browser smoke tests are optional follow-up checks unless evidence indicates a failure. Report deployment completion promptly once version and live-state checks pass.
 
+## Navigation prefetching
+
+`IntentLink` retains Next.js Link's native anchor, client navigation, cache and invalidation behavior. It keeps speculative prefetching off until hover, keyboard focus or pointer press, then restores Next's default prefetch mode. Caller handlers and refs pass through; explicit `prefetch` settings remain authoritative. No custom router cache or click interception is introduced.
+
+Use this policy for the Header wordmark and desktop navigation, shared `ButtonLink` CTAs, and Home's text CTAs. These links previously fetched complete RSC payloads during initial rendering, including the current Home route. Other content links retain their existing behavior. Pointer press supplies intent for touch users; click and modified-click semantics remain owned by Next.js Link.
+
+`src/components/intent-link.spec.ts` checks idle prefetch traffic, focus-triggered warming and real navigation in all three languages. Component tests cover hover, focus, pointer intent, caller cancellation and forwarded refs. Production builds are required to exercise Next.js prefetching. Preserve the existing performance budgets and immediate Sentry error, trace and Replay initialization.
+
 ## Production gate
 
 Vercel waits up to 30 minutes for the latest main push CI run matching `VERCEL_GIT_COMMIT_SHA`. Only `success` permits the build to proceed. Preview and local builds skip the gate.
