@@ -23,6 +23,7 @@ const copy = {
     invalid:
       "Enter your email to receive a secure link to manage your preferences. To protect your privacy, we show the same confirmation whether or not the email is subscribed.",
     email: "Email Address",
+    invalidEmail: "Enter a valid email address.",
     language: "Preferred Language",
     chooseLanguage: "Choose a language",
     save: "Save Preferences",
@@ -43,6 +44,7 @@ const copy = {
     invalid:
       "輸入你的電子郵件地址，即可取得管理偏好設定的安全連結。為保護你的隱私，無論該電子郵件地址是否已訂閱，我們都會顯示相同的確認訊息。",
     email: "電子郵件地址",
+    invalidEmail: "請輸入有效的電子郵件地址。",
     language: "偏好語言",
     chooseLanguage: "請選擇語言",
     save: "儲存偏好",
@@ -63,6 +65,7 @@ const copy = {
     invalid:
       "输入你的电子邮件地址，即可获取管理偏好设置的安全链接。为保护你的隐私，无论该电子邮件地址是否已订阅，我们都会显示相同的确认信息。",
     email: "电子邮件地址",
+    invalidEmail: "请输入有效的电子邮件地址。",
     language: "偏好语言",
     chooseLanguage: "请选择语言",
     save: "保存偏好",

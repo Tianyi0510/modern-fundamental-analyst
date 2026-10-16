@@ -386,7 +386,7 @@ Field CWV still requires mobile/desktop p75 LCP, INP and CLS from Speed Insights
 
 ### Local runs and shard maintenance
 
-Use affected checks locally. Full `npm run verify` and `npm run test:webkit` are for diagnosis or explicit requests. If Turbopack cannot bind a worker port locally, use `npm run build -- --webpack` and report it; CI retains Turbopack.
+Use affected checks locally. Full `npm run verify` and `npm run test:webkit` are for diagnosis or explicit requests. If Turbopack cannot bind a worker port locally, use `npm run build -- --webpack` and report it; CI retains Turbopack. Next.js selects the bundler before loading configuration: use graph CSS chunking for Turbopack and the supported default chunking for Webpack. The configuration regression test loads both modes through Next.js's configuration loader.
 
 The WebKit runner accepts `--shard=1` or `--shard=2`; otherwise it runs two sequential processes. Positional spec paths narrow coverage. It rejects `--grep` and `-g`, which would replace the mobile filter. Inspect coverage with `npx playwright test --project=webkit --list`.
 

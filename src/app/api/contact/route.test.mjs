@@ -22,8 +22,10 @@ test.afterEach(() => {
 test.after(() => server.close());
 
 const attempt = "550e8400-e29b-41d4-a716-446655440000";
+let client = 0;
 
 test.beforeEach((t) => {
+  client++;
   const previous = process.env.RESEND_API_KEY;
   process.env.RESEND_API_KEY = "re_test_contact_route";
   t.after(() => {
@@ -33,7 +35,7 @@ test.beforeEach((t) => {
   t.mock.method(console, "error", () => {});
 });
 
-function request(locale) {
+function request(locale, fields = {}) {
   return new Request("https://www.modernfundamentalanalyst.com/api/contact", {
     method: "POST",
     headers: {
@@ -41,7 +43,7 @@ function request(locale) {
       origin: "https://www.modernfundamentalanalyst.com",
       "content-type": "application/json",
       "idempotency-key": attempt.toUpperCase(),
-      "x-forwarded-for": `192.0.2.${locale === "en" ? 1 : locale === "zh-tw" ? 2 : 3}`,
+      "x-forwarded-for": `192.0.2.${client}`,
     },
     body: JSON.stringify({
       name: " Reader <name> ",
@@ -50,9 +52,23 @@ function request(locale) {
       message: " A question <tag> about the portfolio. ",
       website: "",
       locale,
+      ...fields,
     }),
   });
 }
+
+test("contact POST rejects blank fields and trimmed short messages before delivery", async () => {
+  for (const fields of [
+    { name: "   " },
+    { subject: " \t " },
+    { email: "reader@example" },
+    { message: "    short    " },
+  ]) {
+    const response = await POST(request("en", fields));
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: "Please complete every required field." });
+  }
+});
 
 for (const locale of ["en", "zh-tw", "zh-cn"]) {
   test(`${locale} valid contact POST forwards normalized fields and retry identity to Resend`, async () => {

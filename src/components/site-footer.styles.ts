@@ -1,7 +1,7 @@
 import { containerAppearance } from "./container";
 export const appearance = {
   shell: containerAppearance,
-  "site-footer": "site-footer bg-black text-white text-left",
+  "site-footer": "site-footer bg-black text-white text-left [--focus-ring-color:var(--focus-ring-on-dark)]",
   "footer-main":
     "footer-main py-[var(--space-footer-main)] grid grid-cols-[minmax(220px,0.9fr)_minmax(140px,0.45fr)_minmax(360px,1.35fr)] gap-x-[var(--space-8)] items-start [@media(max-width:1100px)_and_(min-width:801px)]:grid-cols-[minmax(0,0.9fr)_minmax(0,0.55fr)_minmax(0,1.25fr)] [@media(max-width:1100px)_and_(min-width:801px)]:gap-[var(--space-5)] compact:grid-cols-1 compact:gap-[var(--space-6)]",
   "footer-brand": "footer-brand min-w-0 self-start text-left grid justify-items-start gap-[14px]",

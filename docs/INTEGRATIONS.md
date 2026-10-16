@@ -141,6 +141,8 @@ Receiving does not change the Contact recipient, senders or webhook secret. Prov
 
 ### Contact draft recovery
 
+Contact's client and API share field validation. Whitespace-only names and subjects, invalid email addresses and messages shorter than ten characters after trimming are rejected before delivery. The client associates localized inline errors with each field and focuses the first invalid field. An HTTP 400 response focuses a validation summary; service failures retain separate retry guidance. Neither failure clears the draft or a valid attempt's retry identity.
+
 Contact stores unsent fields and the failed attempt's retry ID in versioned, locale-specific `sessionStorage`. This supports reload and navigation recovery within the tab. Editing starts a new attempt; confirmed success clears only the matching draft, preserving newer edits. Never store the honeypot or share drafts across locales or form types. Submission must work without storage.
 
 ### Subscription entry points
@@ -148,6 +150,8 @@ Contact stores unsent fields and the failed attempt's retry ID in versioned, loc
 Each Contact page places `contact-subscribe` before Send a Message; Footer uses `subscribe`. Both compose `SubscribeForm` and `SubscribeFormClient` with unique field and heading IDs. Each owns its input, lock, feedback and retry ID. Submitting one must not affect the other. Success asks readers to check their inbox; it does not claim activation.
 
 Both forms share the API, recipient limits, confirmation, suppression and coordination rules. Independent browser state does not bypass them. These limits and form choices are project decisions, not Resend requirements. Contact messages do not grant newsletter consent.
+
+Subscription and preference-link request forms use the API's shared email validator before sending. Invalid input and HTTP 400 responses show a localized, associated email error and focus the enabled field. Editing clears the error and starts a new attempt; retrying unchanged input after a server rejection retains its retry ID. Service failures keep separate feedback. Preference-link success remains identical whether or not the address is subscribed.
 
 ### Subscription confirmation and delivery feedback
 

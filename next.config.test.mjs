@@ -58,3 +58,31 @@ for (const vercelEnvironment of ["", "preview", "development"]) {
     assert.ok(!policy.includes("'unsafe-eval'"));
   });
 }
+
+test("the documented Webpack build and default Turbopack build accept their CSS strategy", () => {
+  for (const [bundler, turbo, expected] of [
+    ["Webpack", "", true],
+    ["Turbopack", "1", "graph"],
+  ]) {
+    const output = execFileSync(
+      process.execPath,
+      [
+        "-e",
+        `
+      const load = require("next/dist/server/config").default;
+      const { PHASE_PRODUCTION_BUILD } = require("next/constants");
+      const { Bundler } = require("next/dist/lib/bundler");
+      load(PHASE_PRODUCTION_BUILD, process.cwd(), { bundler: Bundler.${bundler} })
+        .then(config => console.log(JSON.stringify(config.experimental.cssChunking)))
+        .catch(error => { console.error(error.message); process.exitCode = 1; });
+    `,
+      ],
+      {
+        cwd: import.meta.dirname,
+        env: { ...process.env, NODE_ENV: "production", TURBOPACK: turbo, SENTRY_AUTH_TOKEN: "" },
+        encoding: "utf8",
+      },
+    );
+    assert.equal(JSON.parse(output.trim()), expected);
+  }
+});

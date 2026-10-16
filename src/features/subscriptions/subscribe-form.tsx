@@ -5,6 +5,7 @@ const copy = {
   en: {
     title: "Stay Updated.",
     email: "Email Address",
+    invalidEmail: "Enter a valid email address.",
     placeholder: "you@example.com",
     submit: "Subscribe",
     submitting: "Subscribing…",
@@ -16,6 +17,7 @@ const copy = {
   "zh-tw": {
     title: "掌握最新研究。",
     email: "電子郵件地址",
+    invalidEmail: "請輸入有效的電子郵件地址。",
     placeholder: "you@example.com",
     submit: "訂閱",
     submitting: "訂閱中…",
@@ -27,6 +29,7 @@ const copy = {
   "zh-cn": {
     title: "掌握最新研究。",
     email: "电子邮件地址",
+    invalidEmail: "请输入有效的电子邮件地址。",
     placeholder: "you@example.com",
     submit: "订阅",
     submitting: "订阅中…",

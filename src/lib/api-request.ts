@@ -46,9 +46,7 @@ export function normalizeEmail(value: unknown) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
 }
 
-export function isValidEmail(value: string) {
-  return value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+export { isValidEmail } from "./email-validation";
 
 export function isSameOrigin(request: Request) {
   const origin = request.headers.get("origin");

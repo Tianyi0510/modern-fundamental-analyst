@@ -111,6 +111,7 @@
   --focus-ring-offset: 4px;
   --focus-ring-on-light: var(--deep-blue);
   --focus-ring-on-dark: var(--bright-blue);
+  --focus-ring-color: var(--focus-ring-on-light);
   --space-field-label: var(--space-3);
   --space-form-row: var(--space-5);
   --space-form-column: var(--space-5);
