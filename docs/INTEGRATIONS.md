@@ -433,6 +433,8 @@ Prefer integration-managed values. Never expose the upload token with `NEXT_PUBL
 
 `next.config.ts` wraps Next.js with Sentry, uploads maps only with complete upload settings, then deletes uploaded generated maps from output. Runtime reporting needs no upload token.
 
+Production builds replace `__SENTRY_DEBUG__` with `false` through Next.js `compiler.define`, allowing both bundlers to remove internal SDK debug diagnostics. Development retains those diagnostics. This does not disable Sentry Logs, errors, tracing, metrics or Replay; their sampling and initialization remain unchanged.
+
 `src/lib/sentry-server.ts` reports Checkout failures, missing Contact configuration and Resend failures using fixed operation names and failure classes. It attaches no provider messages or request values. `runResendOperation` reports both thrown exceptions and returned SDK errors once, preserving the original result and retry behavior. All subscription segment requests, including rollback, use this boundary. Contact does not report the same provider rejection again.
 
 Callers explicitly allow expected statuses: contact lookups and feedback-driven unsubscribe updates accept 404. Other returned errors, including provider 5xx responses, remain reportable. Public input validation and application rate limits do not call this reporting boundary. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.

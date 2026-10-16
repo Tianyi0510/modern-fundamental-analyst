@@ -59,7 +59,7 @@ for (const vercelEnvironment of ["", "preview", "development"]) {
   });
 }
 
-test("the documented Webpack build and default Turbopack build accept their CSS strategy", () => {
+test("production bundlers accept CSS chunking and remove only SDK debug diagnostics", () => {
   for (const [bundler, turbo, expected] of [
     ["Webpack", "", true],
     ["Turbopack", "1", "graph"],
@@ -73,7 +73,7 @@ test("the documented Webpack build and default Turbopack build accept their CSS 
       const { PHASE_PRODUCTION_BUILD } = require("next/constants");
       const { Bundler } = require("next/dist/lib/bundler");
       load(PHASE_PRODUCTION_BUILD, process.cwd(), { bundler: Bundler.${bundler} })
-        .then(config => console.log(JSON.stringify(config.experimental.cssChunking)))
+        .then(config => console.log(JSON.stringify({ cssChunking: config.experimental.cssChunking, define: config.compiler.define })))
         .catch(error => { console.error(error.message); process.exitCode = 1; });
     `,
       ],
@@ -83,6 +83,8 @@ test("the documented Webpack build and default Turbopack build accept their CSS 
         encoding: "utf8",
       },
     );
-    assert.equal(JSON.parse(output.trim()), expected);
+    const config = JSON.parse(output.trim());
+    assert.equal(config.cssChunking, expected);
+    assert.deepEqual(config.define, { __SENTRY_DEBUG__: false });
   }
 });

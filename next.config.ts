@@ -29,6 +29,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  // Remove SDK diagnostics at build time without disabling errors, tracing, Logs or Replay.
+  compiler: { define: { __SENTRY_DEBUG__: process.env.NODE_ENV !== "production" } },
   // Next's CLI selects the bundler before loading this configuration.
   experimental: { globalNotFound: true, cssChunking: process.env.TURBOPACK ? "graph" : true },
   poweredByHeader: false,

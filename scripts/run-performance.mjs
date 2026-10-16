@@ -94,6 +94,7 @@ try {
             "--throttling.uploadThroughputKbps=750",
             "--output=json",
             `--output-path=${path}`,
+            "--save-assets",
             `--chrome-flags=${process.env.LIGHTHOUSE_CHROME_FLAGS || "--headless=new"}`,
             "--quiet",
           ],
