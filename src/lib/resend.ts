@@ -66,9 +66,21 @@ export function getResendClient() {
   return globalForResend.__mfaResendState.client;
 }
 
-export async function runResendOperation<T>(label: string, operation: () => Promise<T>): Promise<T | null> {
+export async function runResendOperation<T>(
+  label: string,
+  operation: () => Promise<T>,
+  { expectedStatuses = [] }: { expectedStatuses?: readonly number[] } = {},
+): Promise<T | null> {
   try {
-    return await operation();
+    const result = await operation();
+    if (result && typeof result === "object" && "error" in result && result.error) {
+      const error = result.error;
+      const status = typeof error === "object" && "statusCode" in error ? error.statusCode : undefined;
+      if (typeof status !== "number" || !expectedStatuses.includes(status)) {
+        reportServiceFailure("resend.request", "provider-error");
+      }
+    }
+    return result;
   } catch (error) {
     reportServiceFailure("resend.request", "exception");
     console.error(label, error instanceof Error ? error.name : "UnknownError");

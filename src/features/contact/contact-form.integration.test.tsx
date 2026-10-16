@@ -134,3 +134,43 @@ it("disables editing and duplicate submission until the pending request complete
   expect(await screen.findByText("Your message has been sent. Thank you for reaching out.")).toBeVisible();
   expect(screen.getByRole("button", { name: "Send Message" })).toBeEnabled();
 });
+
+it("rejects whitespace-only names locally and focuses the described field error", async () => {
+  let calls = 0;
+  server.use(
+    http.post("http://localhost:3210/api/contact", () => {
+      calls++;
+      return HttpResponse.json({ ok: true });
+    }),
+  );
+  render(<ContactForm locale="en" />);
+  const user = await fillMessage();
+  const name = screen.getByRole("textbox", { name: "Name" });
+  await user.clear(name);
+  await user.type(name, "   ");
+  await user.click(screen.getByRole("button", { name: "Send Message" }));
+  expect(await screen.findByText("Enter your name.")).toBeVisible();
+  expect(name).toHaveFocus();
+  expect(name).toHaveAttribute("aria-invalid", "true");
+  expect(name).toHaveAccessibleDescription("Enter your name.");
+  expect(calls).toBe(0);
+  await user.clear(name);
+  await user.type(name, "Reader");
+  expect(name).not.toHaveAttribute("aria-invalid", "true");
+  await user.click(screen.getByRole("button", { name: "Send Message" }));
+  expect(await screen.findByText("Your message has been sent. Thank you for reaching out.")).toBeVisible();
+  expect(calls).toBe(1);
+});
+
+it("explains HTTP 400 as an input problem while preserving a valid draft", async () => {
+  server.use(
+    http.post("http://localhost:3210/api/contact", () => HttpResponse.json({ error: "Invalid" }, { status: 400 })),
+  );
+  render(<ContactForm locale="en" />);
+  const user = await fillMessage();
+  await user.click(screen.getByRole("button", { name: "Send Message" }));
+  const feedback = await screen.findByText("Check the required fields, then send your message again.");
+  expect(feedback).toHaveFocus();
+  expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Reader");
+  expect(screen.queryByText("Your message couldn't be sent. Please try again later.")).not.toBeInTheDocument();
+});

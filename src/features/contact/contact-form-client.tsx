@@ -12,6 +12,8 @@ import { Alert } from "@/components/ui/alert";
 import { useEffect, useRef, useState } from "react";
 import type { SubmitEvent } from "react";
 import { sendContactMessage } from "./contact-api";
+import { PostJsonError } from "@/lib/client-post-json";
+import { getInvalidContactFields, type ContactField } from "./contact-validation";
 import { getFormText } from "@/lib/form-data";
 import type { Locale } from "@/lib/i18n";
 import { HoneypotField } from "@/components/honeypot-field";
@@ -30,10 +32,13 @@ export type ContactFormCopy = {
   sending: string;
   success: string;
   error: string;
+  validation: Record<ContactField | "summary", string>;
 };
 
 export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; locale: Locale }) {
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error" | "invalid">("idle");
+  const [invalidFields, setInvalidFields] = useState<ContactField[]>([]);
+  const feedbackRef = useRef<HTMLDivElement>(null);
   const runExclusive = useExclusiveSubmit();
   const formRef = useRef<HTMLFormElement>(null);
   const { getSubmissionId, resetSubmissionId } = useSubmissionId(() => {
@@ -57,6 +62,14 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
     }
   }, [locale]);
 
+  useEffect(() => {
+    if (status !== "invalid") return;
+    const first = invalidFields[0];
+    const field = first ? formRef.current?.elements.namedItem(first) : undefined;
+    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) field.focus();
+    else feedbackRef.current?.focus();
+  }, [status, invalidFields]);
+
   function saveDraft(formData: FormData, submissionId?: string) {
     saveContactDraft(locale, {
       name: getFormText(formData, "name"),
@@ -67,10 +80,30 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
     });
   }
 
+  function validate(form: HTMLFormElement, formData: FormData) {
+    const invalidValues = getInvalidContactFields({
+      name: getFormText(formData, "name"),
+      email: getFormText(formData, "email"),
+      subject: getFormText(formData, "subject"),
+      message: getFormText(formData, "message"),
+    });
+    const invalid = (Object.keys(contactFieldLimits) as ContactField[]).filter((field) => {
+      const control = form.elements.namedItem(field);
+      return (
+        invalidValues.includes(field) ||
+        ((control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) && !control.validity.valid)
+      );
+    });
+    setInvalidFields(invalid);
+    if (invalid.length > 0) setStatus("invalid");
+    return invalid.length === 0;
+  }
+
   async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+    if (!validate(form, formData)) return;
     await runExclusive(async () => {
       const submissionId = getSubmissionId();
       saveDraft(formData, submissionId);
@@ -91,8 +124,8 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
         form.reset();
         resetSubmissionId();
         setStatus("success");
-      } catch {
-        setStatus("error");
+      } catch (error) {
+        setStatus(error instanceof PostJsonError && error.status === 400 ? "invalid" : "error");
       }
     });
   }
@@ -113,12 +146,20 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
           onChange={(event) => {
             resetSubmissionId();
             saveDraft(new FormData(event.currentTarget));
+            const control = event.target;
+            if (control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) {
+              setInvalidFields((fields) => fields.filter((field) => field !== control.name));
+            }
             setStatus("idle");
+          }}
+          onInvalid={(event) => {
+            event.preventDefault();
+            validate(event.currentTarget, new FormData(event.currentTarget));
           }}
           aria-busy={status === "sending"}
         >
           <FieldGroup layout="contents">
-            <FormField label={copy.name}>
+            <FormField error={invalidFields.includes("name") ? copy.validation.name : undefined} label={copy.name}>
               <Input
                 disabled={status === "sending"}
                 name="name"
@@ -128,7 +169,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                 required
               />
             </FormField>
-            <FormField label={copy.email}>
+            <FormField error={invalidFields.includes("email") ? copy.validation.email : undefined} label={copy.email}>
               <Input
                 disabled={status === "sending"}
                 name="email"
@@ -138,7 +179,11 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                 required
               />
             </FormField>
-            <FormField label={copy.subject} className="col-span-full compact:col-auto">
+            <FormField
+              error={invalidFields.includes("subject") ? copy.validation.subject : undefined}
+              label={copy.subject}
+              className="col-span-full compact:col-auto"
+            >
               <Input
                 disabled={status === "sending"}
                 name="subject"
@@ -147,7 +192,11 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                 required
               />
             </FormField>
-            <FormField label={copy.message} className="col-span-full compact:col-auto">
+            <FormField
+              error={invalidFields.includes("message") ? copy.validation.message : undefined}
+              label={copy.message}
+              className="col-span-full compact:col-auto"
+            >
               <Textarea
                 disabled={status === "sending"}
                 name="message"
@@ -166,8 +215,14 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
               >
                 {status === "sending" ? copy.sending : copy.send}
               </Button>
-              <Alert className="max-w-[420px]">
-                {status === "success" ? copy.success : status === "error" ? copy.error : ""}
+              <Alert ref={feedbackRef} tabIndex={-1} className="max-w-[420px]">
+                {status === "success"
+                  ? copy.success
+                  : status === "error"
+                    ? copy.error
+                    : status === "invalid"
+                      ? copy.validation.summary
+                      : ""}
               </Alert>
             </div>
           </FieldGroup>

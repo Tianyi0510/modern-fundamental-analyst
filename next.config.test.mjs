@@ -58,3 +58,33 @@ for (const vercelEnvironment of ["", "preview", "development"]) {
     assert.ok(!policy.includes("'unsafe-eval'"));
   });
 }
+
+test("production bundlers accept CSS chunking and remove only SDK debug diagnostics", () => {
+  for (const [bundler, turbo, expected] of [
+    ["Webpack", "", true],
+    ["Turbopack", "1", "graph"],
+  ]) {
+    const output = execFileSync(
+      process.execPath,
+      [
+        "-e",
+        `
+      const load = require("next/dist/server/config").default;
+      const { PHASE_PRODUCTION_BUILD } = require("next/constants");
+      const { Bundler } = require("next/dist/lib/bundler");
+      load(PHASE_PRODUCTION_BUILD, process.cwd(), { bundler: Bundler.${bundler} })
+        .then(config => console.log(JSON.stringify({ cssChunking: config.experimental.cssChunking, define: config.compiler.define })))
+        .catch(error => { console.error(error.message); process.exitCode = 1; });
+    `,
+      ],
+      {
+        cwd: import.meta.dirname,
+        env: { ...process.env, NODE_ENV: "production", TURBOPACK: turbo, SENTRY_AUTH_TOKEN: "" },
+        encoding: "utf8",
+      },
+    );
+    const config = JSON.parse(output.trim());
+    assert.equal(config.cssChunking, expected);
+    assert.deepEqual(config.define, { __SENTRY_DEBUG__: false });
+  }
+});

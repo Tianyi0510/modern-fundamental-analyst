@@ -4,6 +4,7 @@ import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
+import { IntentLink } from "./intent-link";
 import {
   BookOpen,
   ChartNoAxesCombined,
@@ -83,14 +84,14 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
       }}
     >
       <header className={appearance["site-header"] + " " + appearance["shell"]}>
-        <Link
+        <IntentLink
           className={appearance["wordmark"]}
           href={getLocalizedPath("/", locale)}
           aria-label={`Modern Fundamental Analyst ${copy.home}`}
           tabIndex={isMenuOpen ? -1 : undefined}
         >
           Modern Fundamental Analyst<span>.</span>
-        </Link>
+        </IntentLink>
         <SheetTrigger
           onClick={() => {
             navigationClosingRef.current = false;

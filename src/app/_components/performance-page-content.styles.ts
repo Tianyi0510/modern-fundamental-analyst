@@ -4,7 +4,8 @@ export const appearance = {
   shell: containerAppearance,
   "date-text":
     "date-text [.performance-page_.page-intro_&]:[margin-left:auto] [.performance-page_.page-intro_&]:[max-width:100%] [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums] [@media((max-width:_800px))]:[.performance-page_.page-intro_&]:[margin-left:0]",
-  "performance-summary": "performance-summary grid grid-cols-3 gap-px bg-black compact:grid-cols-1",
+  "performance-summary":
+    "performance-summary grid grid-cols-3 @max-[48rem]/financial-summary:grid-cols-1 gap-px bg-[var(--surface-inverse)] compact:grid-cols-1",
   returns:
     "returns [padding:var(--space-section)_0] grid [grid-template-columns:0.7fr_1.3fr] [gap:80px] [.performance-page_&]:[grid-template-columns:minmax(0,_1fr)] [.performance-page_&]:[gap:var(--space-heading-content)] [.performance-page_&_>_*]:min-w-0 [.performance-page_&_>_*]:[overflow-wrap:anywhere] [@media((max-width:_1100px)_and_(min-width:_801px))]:[grid-template-columns:1fr] [@media((max-width:_1100px)_and_(min-width:_801px))]:[gap:var(--space-related-content)] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[padding:var(--space-section)_0] [@media((max-width:_800px))]:[.performance-page_&]:[gap:var(--space-heading-content)] [&_h2]:[color:var(--text-brand)]",
   "section-heading":

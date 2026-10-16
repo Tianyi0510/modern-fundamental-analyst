@@ -3,6 +3,7 @@ import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
+import { IntentLink } from "@/components/intent-link";
 import { MoveRight, MoveUpRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
@@ -163,7 +164,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       <div className={appearance["home-header"]}>
         <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       </div>
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <div className={appearance["home-opening"]}>
           <div className={appearance["hero-band"]}>
             <section className={appearance["hero"] + " " + appearance["shell"]}>
@@ -181,10 +182,10 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   <ButtonLink variant="contrast" href={getLocalizedPath("/portfolio", locale)}>
                     {text.viewPortfolio}
                   </ButtonLink>
-                  <Link className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
+                  <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
                     {text.readLatest}
                     <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
-                  </Link>
+                  </IntentLink>
                 </div>
               </div>
             </section>
@@ -229,10 +230,10 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           </div>
           <div>
             <p>{text.aboutCopy}</p>
-            <Link className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
+            <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
               {text.aboutLink}
               <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
-            </Link>
+            </IntentLink>
           </div>
         </section>
 
@@ -310,7 +311,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
 
         <section className={appearance["performance-home"]}>
-          <div className={appearance["shell"]}>
+          <div className={appearance["shell"] + " @container/home-performance"}>
             <div className={appearance["section-heading"] + " " + "inverse"}>
               <p className={appearance["section-number"]}>{text.performanceLabel}</p>
               <h2>

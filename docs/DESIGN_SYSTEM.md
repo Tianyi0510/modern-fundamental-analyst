@@ -8,7 +8,7 @@ The site adopts the five layers below as its design system. Preserve its editori
 
 | Layer                  | Responsibility                                                                                                                                                                                                                      | Reference                                                                                                           |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 01: Design foundations | Geist supplies Typography, Colors and Materials. Fluent 2 organizes primitives, semantic aliases and component roles. Explicit brand exceptions remain.                                                                             | [Geist](https://vercel.com/geist/introduction), [Fluent 2 tokens](https://fluent2.microsoft.design/design-tokens)   |
+| 01: Design foundations | Geist supplies Typography, Colors, Materials and guided Grid layouts. Fluent 2 organizes primitives, semantic aliases and component roles. Explicit brand exceptions remain.                                                        | [Geist](https://vercel.com/geist/introduction), [Fluent 2 tokens](https://fluent2.microsoft.design/design-tokens)   |
 | 02: UX guidelines      | Evaluate clarity, feedback, navigation and input behavior against the actual task. Record justified exceptions instead of applying every recommendation mechanically.                                                               | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book) |
 | 03: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                       | [shadcn/ui](https://ui.shadcn.com/docs), [Lucide](https://lucide.dev/)                                              |
 | 04: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations. | [Base UI](https://base-ui.com/react/overview/quick-start)                                                           |
@@ -45,6 +45,25 @@ A new treatment needs a reason, an owning role or component variant, and verific
 
 `--shadow-popover` owns Geist's Menu material shadow; `--shadow-surface` owns its Base surface outline. `--width-content` owns the 1440px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
 
+### Color and stroke ownership
+
+Follow Fluent 2's [global and alias layers](https://fluent2.microsoft.design/design-tokens) and [color roles](https://fluent2.microsoft.design/color-tokens). Keep raw palette and alpha values in `tokens.css`; website components consume semantic aliases. Centralize derived `color-mix()` expressions there as well. Preserve existing values and justified differences rather than assigning one tint to every interaction.
+
+| Role                         | Tokens and use                                                                                                                                                                                                                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Decorative separators        | `--border-subtle`, `--border-strong`, `--border-inverse-subtle`; section, table and Footer dividers. They do not identify inputs or keyboard focus.                                                                                                                          |
+| Control boundaries           | `--border-control`, `--border-control-inverse`, consumed through `--field-*`; identify editable controls on light and inverse surfaces.                                                                                                                                      |
+| Brand and validation strokes | `--border-brand` for editorial/status accents; `--border-error` for the existing error stroke. Financial return colors remain separate from validation status.                                                                                                               |
+| Focus and touch feedback     | `--focus-ring-on-light`, `--focus-ring-on-dark`, and the existing Medium Blue `--focus-ring-brand` treatment for Menu/Support. `--focus-ring-color` inherits the surrounding surface's focus treatment. Touch feedback and persistent keyboard focus remain separate states. |
+| Data decoration              | `--allocation-divider`, `--allocation-swatch-border`, `--chart-axis-border` and `--text-chart-secondary` preserve the existing alpha treatments.                                                                                                                             |
+| Interaction surfaces         | `--holding-row-hover-surface`, `--portfolio-row-hover-surface`, `--memo-*-hover-surface`, `--memo-card-pressed-surface`, `--memo-card-touch-pressed-surface` and `--support-option-*` preserve component-specific hover, press and selection treatments.                     |
+
+Equal current values do not imply equal responsibilities. Memo cards retain their existing 22% tint while hovered and pressed together; the separate pressed alias does not change selector precedence. Selection persists independently of hover; focus remains visible independently of selection. Disabled controls retain their existing opacity/cursor/border treatment; do not invent unused state colors or change their behavior during token maintenance. These aliases do not certify every existing contrast combination as WCAG AA.
+
+React Email keeps literal inline colors for email-client compatibility. Standalone error documents and metadata/brand artwork also keep their independently rendered color values. These exceptions must not become a reason to hardcode website component colors.
+
+`src/app/styles/color-roles.spec.ts` checks rendered colors and stroke roles across all three languages, including component hover/press/selection and touch variants. Existing material and focus tests cover control boundaries, modal behavior and focus contrast.
+
 ### Component token contract
 
 Component roles are aliases within the same token system. `--action-primary-*`, `--action-contrast-*`, `--action-inverse-*` and `--action-quiet-*` describe action appearance and feedback. Button and ButtonLink consume the same variant definition. `--field-*` describes standard input, textarea and native-select surfaces; inverse fields have their own text, border and placeholder roles.
@@ -78,6 +97,18 @@ Make the site easier to understand, use, change and verify. Share components whe
 ## CSS, layout, and visual language
 
 The site uses an editorial financial style: clear type hierarchy, generous section spacing, square data surfaces, pill-shaped primary controls and restrained motion.
+
+### Grid layout
+
+Follow [Geist Grid](https://vercel.com/geist/grid) for layouts where visible guides organize cells. `Grid` in `src/components/grid.tsx` is the site's Server Component implementation, using CSS Grid and Tailwind rather than an additional component package. Keep ordinary cards, forms, KPI bands and editorial columns on plain Tailwind grids when visible guides add no meaning. `Container` continues to own page width and gutters.
+
+The guided grid uses one column through 800px, two from 801px, and three from 1101px when configured for three columns. Two-column grids retain two columns above 800px. Rows follow content height and DOM order; do not fix text-bearing rows to a pixel height. Tracks use `minmax(0, 1fr)` to contain long translated content.
+
+Home and the memo index share this grid. Their three memo cells occupy three desktop columns; on tablets, the third cell spans the second row. Mobile retains the published memo and hides planned placeholders. Cards own their opaque surfaces, corners and focus feedback. The one-pixel gap exposes `--grid-guide`, an alias of the original gray divider color. The shared material outline remains unchanged.
+
+Guides are decorative CSS backgrounds, with no focus targets or ARIA grid role. Content keeps native headings, articles and links; keyboard order follows reading order. Do not clip focus outlines or nest guided grids more than one level. Cross markers, dashed guides and overlaying cells are not needed by the current content.
+
+Home's performance comparison uses a named inline-size container. Below 45rem of available content width, its chart and headline figure stack vertically. The rem-based container query responds to enlarged root text as well as available width, preserving the two-column layout at ordinary tablet and desktop text sizes. Keep the percentage's type size and value intact; do not hide horizontal overflow to compensate for insufficient column width.
 
 ### Style ownership
 
@@ -128,20 +159,27 @@ Type treatments combine size, line height, weight and tracking. The site adopts 
 
 Keep website text at least `1rem`, including controls, captions, chart labels, notes and feedback; email has separate compatibility rules. At a 16px root, the adopted treatments are:
 
-| Site role                      | Geist treatment                  | Size / line height        | Weight                         | English tracking |
-| ------------------------------ | -------------------------------- | ------------------------- | ------------------------------ | ---------------- |
-| Page display                   | Heading 72; Heading 40 on mobile | 72 / 72; 40 / 48          | 600                            | -0.06em          |
-| Section heading                | Heading 40                       | 40 / 48                   | 600                            | -0.06em          |
-| Card title                     | Heading 24                       | 24 / 32                   | 600                            | -0.04em          |
-| Compact title                  | Heading 20                       | 20 / 26                   | 600                            | -0.02em          |
-| Lead                           | Copy 20                          | 20 / 36                   | 400                            | 0                |
-| Long-form body                 | Copy 18                          | 18 / 28                   | 400                            | 0                |
-| Body and caption               | Copy 16                          | 16 / 24                   | 400                            | 0                |
-| Label and action               | Label 16 Strong / Button 16      | 16 / 20                   | 500                            | 0                |
-| Financial display / KPI / ring | Heading 72 / 64 / 40             | 72 / 72; 64 / 64; 40 / 48 | 600                            | -0.06em          |
-| Financial row                  | Label 20                         | 20 / 32                   | 400, with explicit bold totals | 0                |
+| Site role               | Geist treatment                  | Size / line height | Weight                         | English tracking |
+| ----------------------- | -------------------------------- | ------------------ | ------------------------------ | ---------------- |
+| Page display            | Heading 72; Heading 40 on mobile | 72 / 72; 40 / 48   | 600                            | -0.06em          |
+| Section heading         | Heading 40                       | 40 / 48            | 600                            | -0.06em          |
+| Card title              | Heading 24                       | 24 / 32            | 600                            | -0.04em          |
+| Compact title           | Heading 20                       | 20 / 26            | 600                            | -0.02em          |
+| Lead                    | Copy 20                          | 20 / 36            | 400                            | 0                |
+| Long-form body          | Copy 18                          | 18 / 28            | 400                            | 0                |
+| Body and caption        | Copy 16                          | 16 / 24            | 400                            | 0                |
+| Label and action        | Label 16 Strong / Button 16      | 16 / 20            | 500                            | 0                |
+| Financial display / KPI | Heading 32; Heading 24 on mobile | 32 / 40; 24 / 32   | 600                            | -0.04em          |
+| Financial ring          | Heading 40                       | 40 / 48            | 600                            | -0.06em          |
+| Financial row           | Label 20                         | 20 / 32            | 400, with explicit bold totals | 0                |
 
 Financial values use tabular numerals. The Logo wordmark retains its original 20–24px scale, 1.2 line height, 700 weight and -0.05em tracking through a separate `text-wordmark` role. It must not inherit ordinary compact-heading changes.
+
+Page and major section headings lead the reading order. KPI values and Home's performance callout use the same subordinate financial scale: `2rem` above 800px and `1.5rem` at 800px or below. These are site-specific assignments from Geist's Heading 32 and Heading 24 tiers, not a Geist requirement for financial data. The shared KPI treatment also sizes Support's amount choices. Chart-center labels and table figures retain their separate roles. Preserve data text, colors, note opacity and tabular alignment; do not enlarge headings to compensate for oversized values.
+
+Home, Portfolio and Performance establish a named `financial-summary` inline-size container on their main content. Three-column KPI bands stack below 48rem of available width; Portfolio's two-column summary stacks below 32rem and resets explicit cell positions. These rem thresholds respond to enlarged root text, keeping numbers on one line without shrinking them. The existing 800px phone layout still applies. Ordinary desktop column counts and square data surfaces remain unchanged.
+
+`financial-type-hierarchy.spec.ts` checks Home, Portfolio, Performance and Support across three languages, both sides of the 800px breakpoint, 320/390px phones and 200% text size. Values must remain below page and major section headings without clipping, wrapping the number or introducing page overflow. The existing Home performance checks preserve chart reflow and navigation.
 
 Chinese headings use zero tracking. A nested `lang="en"` article restores the English role's tracking on Chinese pages. Sizes use rem rather than fixed pixels so browser text enlargement works. Fix narrow layouts instead of shrinking body text; cards, metadata and controls must wrap.
 
@@ -198,7 +236,9 @@ Preserve information and action priorities at every width.
 
 ### Contrast policy
 
-Use `--interactive-accent` (Deep Blue) for normal-size interactive text. Medium Blue remains a brand primitive for decorative details, non-text focus rings and the dashed benchmark line; it is not a normal-text color on white. `--surface-selected` provides a pale blue surface for desktop navigation and language states. Use Deep Blue text on that surface.
+Use `--interactive-accent` (Deep Blue) for normal-size interactive text. Medium Blue remains a brand primitive for decorative details, surface-appropriate non-text indicators and the dashed benchmark line; it is not a normal-text color on white. `--surface-selected` provides a pale blue surface for desktop navigation and language states. Use Deep Blue text on that surface.
+
+The baseline focus outline consumes `--focus-ring-color`, which defaults to `--focus-ring-on-light` (Deep Blue). The black Footer sets the inherited role to `--focus-ring-on-dark` (Bright Blue). Inputs retain their explicit surface variants. Check the outline against its adjacent surface at a minimum of 3:1: Medium Blue on Bright Blue is insufficient. Forced-colors mode continues to use the system Highlight color.
 
 Validate normal-size text at 4.5:1 after compositing opacity and non-text indicators at 3:1 where required. KPI notes retain their value's color at 0.8 opacity. Footer secondary text uses dedicated inverse aliases, with 0.84 and 0.78 white opacity on black. Disabled controls have separate feedback and must not acquire enabled hover states.
 
@@ -209,6 +249,8 @@ Tests cover these specific combinations and input states. They do not establish 
 The project owns its customized [shadcn/ui](https://ui.shadcn.com/docs) source. `components.json` targets the `base-nova` registry, Tailwind v4, `@/*` imports and `src/components/ui/`. The registry selects Base UI source for additions. Owned tokens, component variants and brand adaptations define the rendered design; a registry preset is not a second visual system. `cn` in `src/lib/utils.ts` merges classes; Button variants use `class-variance-authority`. Import primitives directly. `ButtonLink` shares Button styles and preserves link semantics without introducing a client boundary for ordinary links.
 
 Use the Button variants and sizes listed above. The quiet text variant preserves the Preferences unsubscribe treatment. Fields keep `standard` and `inverse` styles; Textarea and NativeSelect share the input appearance. Disabled fields retain text colors and use a dashed border with a not-allowed cursor. Native controls keep refs, labels, validation and submission without a client boundary.
+
+`FormField` accepts a feature-owned error message, preserves existing descriptions and associates the error through `aria-describedby` and `aria-invalid`. Features own validation rules and focus decisions; ordinary fields retain their native behavior and appearance.
 
 To add a primitive:
 

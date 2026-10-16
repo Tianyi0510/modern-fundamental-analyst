@@ -141,6 +141,8 @@ Receiving does not change the Contact recipient, senders or webhook secret. Prov
 
 ### Contact draft recovery
 
+Contact's client and API share field validation. Whitespace-only names and subjects, invalid email addresses and messages shorter than ten characters after trimming are rejected before delivery. The client associates localized inline errors with each field and focuses the first invalid field. An HTTP 400 response focuses a validation summary; service failures retain separate retry guidance. Neither failure clears the draft or a valid attempt's retry identity.
+
 Contact stores unsent fields and the failed attempt's retry ID in versioned, locale-specific `sessionStorage`. This supports reload and navigation recovery within the tab. Editing starts a new attempt; confirmed success clears only the matching draft, preserving newer edits. Never store the honeypot or share drafts across locales or form types. Submission must work without storage.
 
 ### Subscription entry points
@@ -148,6 +150,8 @@ Contact stores unsent fields and the failed attempt's retry ID in versioned, loc
 Each Contact page places `contact-subscribe` before Send a Message; Footer uses `subscribe`. Both compose `SubscribeForm` and `SubscribeFormClient` with unique field and heading IDs. Each owns its input, lock, feedback and retry ID. Submitting one must not affect the other. Success asks readers to check their inbox; it does not claim activation.
 
 Both forms share the API, recipient limits, confirmation, suppression and coordination rules. Independent browser state does not bypass them. These limits and form choices are project decisions, not Resend requirements. Contact messages do not grant newsletter consent.
+
+Subscription and preference-link request forms use the API's shared email validator before sending. Invalid input and HTTP 400 responses show a localized, associated email error and focus the enabled field. Editing clears the error and starts a new attempt; retrying unchanged input after a server rejection retains its retry ID. Service failures keep separate feedback. Preference-link success remains identical whether or not the address is subscribed.
 
 ### Subscription confirmation and delivery feedback
 
@@ -429,7 +433,11 @@ Prefer integration-managed values. Never expose the upload token with `NEXT_PUBL
 
 `next.config.ts` wraps Next.js with Sentry, uploads maps only with complete upload settings, then deletes uploaded generated maps from output. Runtime reporting needs no upload token.
 
-`src/lib/sentry-server.ts` reports Checkout failures, Contact rejections and thrown Resend operations using fixed operation names and failure classes. It attaches no provider messages or request values. Report Resend exceptions once at the shared boundary; validation and normal rate limits are not service failures. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.
+Production builds replace `__SENTRY_DEBUG__` with `false` through Next.js `compiler.define`, allowing both bundlers to remove internal SDK debug diagnostics. Development retains those diagnostics. This does not disable Sentry Logs, errors, tracing, metrics or Replay; their sampling and initialization remain unchanged.
+
+`src/lib/sentry-server.ts` reports Checkout failures, missing Contact configuration and Resend failures using fixed operation names and failure classes. It attaches no provider messages or request values. `runResendOperation` reports both thrown exceptions and returned SDK errors once, preserving the original result and retry behavior. All subscription segment requests, including rollback, use this boundary. Contact does not report the same provider rejection again.
+
+Callers explicitly allow expected statuses: contact lookups and feedback-driven unsubscribe updates accept 404. Other returned errors, including provider 5xx responses, remain reportable. Public input validation and application rate limits do not call this reporting boundary. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.
 
 ### Traces, logs and metrics
 
@@ -459,6 +467,10 @@ The fake-DSN regression checks real Replay envelopes and masking. It does not ve
 
 An empty dashboard or incomplete onboarding does not prove collection is disabled. Local transport tests verify envelope generation and filtering; accepted cloud events verify ingestion. After deployment, check the Vercel Integration, release and an authorized controlled error in Sentry Issues.
 
+For CSS chunk errors, inspect the environment and runtime frames before changing application code. On October 15, 2026, issue `SENTRY-MODERN-FUNDAMENTAL-ANALYST-6` recorded four localhost development events. Turbopack rejected CSS updates because the stylesheet link was missing after component unmounting.
+
+Next.js 16.4.2 passed isolated Chromium and WebKit checks for CSS updates after unmounting; see the [upstream fix](https://github.com/vercel/next.js/pull/94551). Restart development servers normally and reload existing tabs after a framework update. Keep stylesheet errors reportable, and verify the fix in its target environment before resolving the cloud issue.
+
 Set `NEXT_PUBLIC_SENTRY_DSN` in ignored `.env.local` to enable local reporting; leave it empty to disable it. `.env.example` supplies organization and project identifiers. Only authenticated map uploads need `SENTRY_AUTH_TOKEN`.
 
 Before `vercel env pull .env.local`, preserve local configuration: the command replaces the file and needs a Development connection.
@@ -480,5 +492,13 @@ PLAYWRIGHT_SENTRY_TEST=1 npx playwright test src/lib/sentry.spec.ts --project=ch
 ```
 
 Verify cloud traces in Traces. After an actual service failure, look for `Service operation failed` in Logs and `mfa.service.failures` in Metrics. Local emission does not prove cloud ingestion.
+
+When investigating missing spans, inspect project ingestion outcomes for the affected deployment window. Sampling drops are expected at the configured rate; distinguish them from network and timestamp failures. Rejected spans cannot be attributed to a release from accepted-event searches alone. Do not change timestamps, sampling or privacy filters without a reproducible cause.
+
+Uptime monitoring is separate from the SDK. Use one anonymous GET monitor for the production site, verify its URL returns 2xx, and connect outage notifications before treating reachability as monitored. Check existing monitors and the account's included allowance before creating one; an Error Monitor or active trace stream does not establish uptime coverage.
+
+On October 16, 2026, [production monitor 10662057](https://modern-fundamental-analyst.sentry.io/monitors/10662057/) was created for `GET https://www.modernfundamentalanalyst.com/` in `production`: a 60-second interval, 5-second timeout, 2xx response assertion, three failures to open an issue and one success to resolve it. The manual test passed. Existing project alerts appear on its detail page; notification delivery has not been tested.
+
+Activation remains blocked: billing shows the Developer plan with one included Uptime Monitor, usage `0 / 1` and `$0.00` additional spend, but enabling the monitor returns `You don't have enough budget available to create a new seat`. The monitor is disabled and has no scheduled checks. Resolve this entitlement discrepancy with Sentry before claiming uptime coverage. No trial, upgrade or spending increase was enabled. Recheck live status and allowance rather than treating this dated observation as current configuration.
 
 References: [Next.js tracing](https://docs.sentry.io/platforms/javascript/guides/nextjs/tracing/), [Logs](https://docs.sentry.io/platforms/javascript/guides/nextjs/logs/), [Metrics](https://docs.sentry.io/platforms/javascript/guides/nextjs/metrics/), and [data collection](https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection).

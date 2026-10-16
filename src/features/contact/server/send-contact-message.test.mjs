@@ -57,7 +57,7 @@ test("provider rejection reports one safe error and retains the Contact failure 
   assert.deepEqual(await sendContactMessage(input), { ok: false, error: "Message could not be sent.", status: 502 });
   await flush();
   assert.equal(events.length, 1);
-  assert.equal(events[0].tags.operation, "contact.delivery");
+  assert.equal(events[0].tags.operation, "resend.request");
   assert.equal(events[0].tags.failure_kind, "provider-error");
   assert.doesNotMatch(JSON.stringify(events), /private message|reader@example.com|re_test_contact_only/);
 });

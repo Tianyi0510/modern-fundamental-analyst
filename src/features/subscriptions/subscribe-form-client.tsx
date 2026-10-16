@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SubmitEvent } from "react";
 import { PostJsonError } from "@/lib/client-post-json";
 import { subscribeToUpdates } from "./subscription-api";
 import { getFormText } from "@/lib/form-data";
+import { isValidEmail } from "@/lib/email-validation";
 import type { Locale } from "@/lib/i18n";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useSubmissionId } from "@/components/use-submission-id";
@@ -28,10 +29,11 @@ export type SubscribeFormCopy = {
   success: string;
   alreadySubscribed: string;
   error: string;
+  invalidEmail: string;
   preferences: string;
 };
 
-type Status = "idle" | "submitting" | "success" | "alreadySubscribed" | "error";
+type Status = "idle" | "submitting" | "success" | "alreadySubscribed" | "error" | "invalid";
 
 export function SubscribeFormClient({
   copy,
@@ -50,13 +52,23 @@ export function SubscribeFormClient({
 }) {
   const titleId = `${id}-title`;
   const [status, setStatus] = useState<Status>("idle");
+  const emailRef = useRef<HTMLInputElement>(null);
   const { getSubmissionId, resetSubmissionId } = useSubmissionId();
   const runExclusive = useExclusiveSubmit();
+
+  useEffect(() => {
+    if (status === "invalid") emailRef.current?.focus();
+  }, [status]);
 
   async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+    if (!isValidEmail(getFormText(formData, "email").trim())) {
+      setStatus("invalid");
+      emailRef.current?.focus();
+      return;
+    }
 
     await runExclusive(async () => {
       setStatus("submitting");
@@ -74,7 +86,13 @@ export function SubscribeFormClient({
         setStatus("success");
       } catch (error) {
         if (error instanceof PostJsonError && (error.status === 409 || error.status === 422)) resetSubmissionId();
-        setStatus(error instanceof PostJsonError && error.status === 409 ? "alreadySubscribed" : "error");
+        setStatus(
+          error instanceof PostJsonError && error.status === 400
+            ? "invalid"
+            : error instanceof PostJsonError && error.status === 409
+              ? "alreadySubscribed"
+              : "error",
+        );
       }
     });
   }
@@ -97,8 +115,13 @@ export function SubscribeFormClient({
         aria-busy={status === "submitting"}
       >
         <FieldGroup layout="contents">
-          <FormField label={copy.email} visibility={variant === "inverse" ? "hidden" : "visible"}>
+          <FormField
+            label={copy.email}
+            visibility={variant === "inverse" ? "hidden" : "visible"}
+            error={status === "invalid" ? copy.invalidEmail : undefined}
+          >
             <Input
+              ref={emailRef}
               disabled={status === "submitting"}
               variant={variant}
               name="email"

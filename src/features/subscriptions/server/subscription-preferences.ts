@@ -85,7 +85,9 @@ export function maskEmail(email: string) {
 export async function getSavedPreferenceLocale(email: string): Promise<Locale | null> {
   const resend = getResendClient();
   if (!resend) return null;
-  const result = await runResendOperation("Preference language lookup failed", () => resend.contacts.get({ email }));
+  const result = await runResendOperation("Preference language lookup failed", () => resend.contacts.get({ email }), {
+    expectedStatuses: [404],
+  });
   const value = result?.data?.properties?.preferred_language?.value;
   return locales.find((locale) => localeConfig[locale].label === value || locale === value) ?? null;
 }

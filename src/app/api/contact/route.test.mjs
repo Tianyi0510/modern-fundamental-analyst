@@ -3,6 +3,7 @@ import test from "node:test";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { POST } from "./route.ts";
+import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
 
 const server = setupServer();
 const unexpectedRequests = [];
@@ -21,8 +22,10 @@ test.afterEach(() => {
 test.after(() => server.close());
 
 const attempt = "550e8400-e29b-41d4-a716-446655440000";
+let client = 0;
 
 test.beforeEach((t) => {
+  client++;
   const previous = process.env.RESEND_API_KEY;
   process.env.RESEND_API_KEY = "re_test_contact_route";
   t.after(() => {
@@ -32,7 +35,7 @@ test.beforeEach((t) => {
   t.mock.method(console, "error", () => {});
 });
 
-function request(locale) {
+function request(locale, fields = {}) {
   return new Request("https://www.modernfundamentalanalyst.com/api/contact", {
     method: "POST",
     headers: {
@@ -40,7 +43,7 @@ function request(locale) {
       origin: "https://www.modernfundamentalanalyst.com",
       "content-type": "application/json",
       "idempotency-key": attempt.toUpperCase(),
-      "x-forwarded-for": `192.0.2.${locale === "en" ? 1 : locale === "zh-tw" ? 2 : 3}`,
+      "x-forwarded-for": `192.0.2.${client}`,
     },
     body: JSON.stringify({
       name: " Reader <name> ",
@@ -49,9 +52,23 @@ function request(locale) {
       message: " A question <tag> about the portfolio. ",
       website: "",
       locale,
+      ...fields,
     }),
   });
 }
+
+test("contact POST rejects blank fields and trimmed short messages before delivery", async () => {
+  for (const fields of [
+    { name: "   " },
+    { subject: " \t " },
+    { email: "reader@example" },
+    { message: "    short    " },
+  ]) {
+    const response = await POST(request("en", fields));
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: "Please complete every required field." });
+  }
+});
 
 for (const locale of ["en", "zh-tw", "zh-cn"]) {
   test(`${locale} valid contact POST forwards normalized fields and retry identity to Resend`, async () => {
@@ -81,7 +98,8 @@ for (const locale of ["en", "zh-tw", "zh-cn"]) {
   });
 }
 
-test("contact POST maps provider rejection to a safe failure response", async () => {
+test("contact POST maps provider rejection to a safe failure response and reports it once", async (t) => {
+  const capture = monitoringCapture(t);
   let calls = 0;
   server.use(
     http.post("https://api.resend.com/emails", () => {
@@ -93,6 +111,11 @@ test("contact POST maps provider rejection to a safe failure response", async ()
   assert.equal(response.status, 502);
   assert.deepEqual(await response.json(), { error: "Message could not be sent." });
   assert.equal(calls, 1);
+  await capture.flush();
+  assert.equal(capture.events.length, 1);
+  assert.equal(capture.logs.length, 1);
+  assert.equal(capture.metrics.length, 1);
+  assert.doesNotMatch(JSON.stringify(capture.events), /private provider detail/);
 });
 
 test("contact POST fails without provider requests when email configuration is missing", async () => {

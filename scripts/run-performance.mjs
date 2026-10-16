@@ -4,6 +4,8 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { performanceRoutes, evaluateReports } from "./performance-budgets.mjs";
 import { chromium } from "@playwright/test";
+import { pageFunctions } from "lighthouse/core/lib/page-functions.js";
+import { createCpuCalibration, validateCpuCalibration } from "./performance-cpu.mjs";
 
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -75,6 +77,21 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
   if (!ready) throw new Error("Isolated production server did not become ready");
+  const browser = await chromium.launch({
+    args: (process.env.LIGHTHOUSE_CHROME_FLAGS || "").split(/\s+/).filter(Boolean),
+  });
+  let calibration;
+  try {
+    const page = await browser.newPage();
+    const samples = [];
+    for (let sample = 0; sample < 3; sample++) samples.push(await page.evaluate(pageFunctions.computeBenchmarkIndex));
+    await writeFile(new URL("cpu-calibration-samples.json", output), JSON.stringify(samples) + "\n");
+    calibration = { ...createCpuCalibration(samples), browserVersion: browser.version() };
+  } finally {
+    await browser.close();
+  }
+  await writeFile(new URL("cpu-calibration.json", output), JSON.stringify(calibration, null, 2) + "\n");
+  console.log("CPU calibration:", JSON.stringify(calibration));
   const results = [];
   for (const [index, route] of performanceRoutes.entries()) {
     const reports = [];
@@ -88,12 +105,13 @@ try {
             origin + route.path,
             "--only-categories=performance",
             "--throttling-method=devtools",
-            "--throttling.cpuSlowdownMultiplier=4",
+            `--throttling.cpuSlowdownMultiplier=${calibration.cpuSlowdownMultiplier}`,
             "--throttling.requestLatencyMs=150",
             "--throttling.downloadThroughputKbps=1638.4",
             "--throttling.uploadThroughputKbps=750",
             "--output=json",
             `--output-path=${path}`,
+            "--save-assets",
             `--chrome-flags=${process.env.LIGHTHOUSE_CHROME_FLAGS || "--headless=new"}`,
             "--quiet",
           ],
@@ -105,6 +123,7 @@ try {
         );
       });
       const report = JSON.parse(await readFile(path, "utf8"));
+      validateCpuCalibration(report, calibration);
       if (new URL(report.finalDisplayedUrl).href !== origin + route.path)
         throw new Error("Lighthouse measured an unexpected URL");
       reports.push(report);

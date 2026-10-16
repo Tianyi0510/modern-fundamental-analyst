@@ -38,8 +38,10 @@ async function updatePreferencesLocked(
   locale: Locale,
   action: PreferencesAction,
 ): Promise<PreferencesUpdateResult> {
-  const existing = await runResendOperation("Resend preferences contact lookup failed", () =>
-    resend.contacts.get({ email: payload.email }),
+  const existing = await runResendOperation(
+    "Resend preferences contact lookup failed",
+    () => resend.contacts.get({ email: payload.email }),
+    { expectedStatuses: [404] },
   );
   if (!existing) return { ok: false, error: "Subscription service is temporarily unavailable.", status: 503 };
   if (!existing.data)

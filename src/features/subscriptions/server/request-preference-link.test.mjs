@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
 
 process.env.UPSTASH_KV_REST_API_URL = "https://redis.example.com";
 process.env.UPSTASH_KV_REST_API_TOKEN = "test-only-token";
@@ -135,6 +136,26 @@ test("lookup failure fails closed without sending", async () => {
     status: 503,
   });
   assert.equal(sends.length, 0);
+});
+
+test("a handled provider failure reports monitoring signals while an expected missing contact stays silent", async (t) => {
+  const capture = monitoringCapture(t);
+  contactStatus = 404;
+  assert.deepEqual(await requestPreferenceLink("missing@example.com", "en", "preferences/missing"), { ok: true });
+  await capture.flush();
+  assert.equal(capture.events.length, 0);
+  contactStatus = 200;
+  sendStatus = 500;
+  assert.deepEqual(await requestPreferenceLink("reader@example.com", "en", "preferences/provider-failure"), {
+    ok: false,
+    reason: "failed",
+    status: 503,
+  });
+  await capture.flush();
+  assert.equal(capture.events.length, 1);
+  assert.equal(capture.logs.length, 1);
+  assert.equal(capture.metrics.length, 1);
+  assert.doesNotMatch(JSON.stringify(capture), /reader@example.com|missing@example.com|preferences\/provider-failure/);
 });
 
 test("reusing a retry identity with changed input fails without another delivery", async () => {

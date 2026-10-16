@@ -1,6 +1,7 @@
 import { sendContactMessage } from "@/features/contact/server/send-contact-message";
 import { NextResponse } from "next/server";
-import { cleanSingleLine, cleanText, isValidEmail, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
+import { cleanSingleLine, cleanText, normalizeEmail, readProtectedObjectJson } from "@/lib/api-request";
+import { getInvalidContactFields } from "@/features/contact/contact-validation";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { getResendIdempotencyKey } from "@/lib/resend";
 
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
   const website = cleanText(body.website, 200);
   const locale = cleanText(body.locale, 10);
   if (website) return NextResponse.json({ ok: true });
-  if (!name || !subject || message.length < 10 || !isValidEmail(email)) {
+  if (getInvalidContactFields({ name, email, subject, message }).length > 0) {
     return NextResponse.json({ error: "Please complete every required field." }, { status: 400 });
   }
 

@@ -49,7 +49,7 @@
   transform: scale(var(--motion-scale-hover));
 }
 .iconButton:focus-visible {
-  outline: 2px solid var(--medium-blue);
+  outline: 2px solid var(--focus-ring-brand);
   outline-offset: 3px;
   background: var(--bright-blue);
   transform: scale(var(--motion-scale-hover));
