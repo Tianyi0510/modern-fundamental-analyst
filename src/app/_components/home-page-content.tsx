@@ -163,7 +163,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       <div className={appearance["home-header"]}>
         <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
       </div>
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <div className={appearance["home-opening"]}>
           <div className={appearance["hero-band"]}>
             <section className={appearance["hero"] + " " + appearance["shell"]}>

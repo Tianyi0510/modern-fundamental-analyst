@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 
 type MetricTone = "plain" | "highlight" | "brand" | "paper";
 const tones: Record<MetricTone, string> = {
-  plain: "bg-white text-black",
+  plain: "bg-surface text-ink",
   highlight: "bg-highlight text-brand",
   brand: "bg-brand text-highlight",
-  paper: "bg-white text-brand",
+  paper: "bg-surface text-brand",
 };
 
 export function PortfolioMetric({

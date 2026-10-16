@@ -16,8 +16,8 @@ const roleScale = {
   label: 16,
   control: 16,
   caption: 16,
-  dataDisplay: 72,
-  dataKpi: 64,
+  dataDisplay: 32,
+  dataKpi: 32,
   dataRing: 40,
   dataRow: 20,
 } as const;
@@ -180,6 +180,7 @@ for (const viewport of [viewports[0], viewports[2]]) {
 
 function expectedSize(role: Role, width: number) {
   if (role === "pageTitle" && width <= 800) return 40;
+  if ((role === "dataDisplay" || role === "dataKpi") && width <= 800) return 24;
   if (role === "brand") return Math.min(24, Math.max(20, 18 + width * 0.005));
   return roleScale[role];
 }
@@ -194,7 +195,9 @@ function expectedRhythm(role: Role, language: string, width: number) {
   if (role === "cardTitle") return { lineHeight: 32 / 24, trackingEm: chinese ? 0 : -0.04 };
   if (role === "dataRow") return { lineHeight: 1.6, trackingEm: 0 };
   if (role === "compactTitle") return { lineHeight: 1.3, trackingEm: chinese ? 0 : -0.02 };
-  if (dataRoles.has(role)) return { lineHeight: 1, trackingEm: -0.06 };
+  if (role === "dataDisplay" || role === "dataKpi") {
+    return { lineHeight: width <= 800 ? 32 / 24 : 1.25, trackingEm: -0.04 };
+  }
   if (role === "label" || role === "control") return { lineHeight: 1.25, trackingEm: 0 };
   if (role === "lead") return { lineHeight: 1.8, trackingEm: 0 };
   if (role === "bodyLarge") return { lineHeight: 28 / 18, trackingEm: 0 };

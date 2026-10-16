@@ -9,7 +9,7 @@ export const appearance = {
   eyebrow:
     "eyebrow [margin:0] flex items-center [gap:10px] [font-family:var(--font-ui)] text-label [text-transform:none] [&_span]:[width:9px] [&_span]:[height:9px] [&_span]:rounded-full [&_span]:[color:var(--interactive-accent)] [&_span]:[background:var(--interactive-accent)] [.cta_&]:[grid-column:1_/_-1] [.cta_&]:[margin:0_0_46px] [.about-closing_>_&]:[grid-column:1_/_-1] [@media((max-width:_800px))]:[.cta_&]:[margin-bottom:0]",
   "article-meta":
-    "article-meta flex items-center [flex-wrap:wrap] [gap:28px] [padding:18px_0] [border-top:1px_solid_var(--black)] [border-bottom:1px_solid_var(--gray)] text-caption [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums]",
+    "article-meta flex items-center [flex-wrap:wrap] [gap:28px] [padding:18px_0] [border-top:1px_solid_var(--border-strong)] [border-bottom:1px_solid_var(--border-subtle)] text-caption [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums]",
   "article-lead":
     "article-lead [max-width:900px] [margin:var(--space-section)_0_var(--space-related-content)] text-lead [text-transform:none] [text-wrap:pretty]",
   "article-notes":

@@ -6,7 +6,7 @@ const alertVariants = cva("m-0 min-h-[var(--size-status-reserve)]", {
   variants: {
     tone: {
       standard: "text-body",
-      inverse: "text-caption font-bold text-white",
+      inverse: "text-caption font-bold text-[var(--text-inverse)]",
     },
   },
   defaultVariants: { tone: "standard" },

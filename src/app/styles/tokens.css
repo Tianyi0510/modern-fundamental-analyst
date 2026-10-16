@@ -28,6 +28,18 @@
   /* Preserve the original brand grays alongside the Geist neutral scale. */
   --gray: #ededed;
   --background-gray: #f8f9fb;
+  /* Global color values; semantic aliases below own their use. */
+  --black-alpha-18: rgba(0, 0, 0, 0.18);
+  --black-alpha-20: rgba(0, 0, 0, 0.2);
+  --black-alpha-28: rgba(0, 0, 0, 0.28);
+  --white-alpha-22: rgba(255, 255, 255, 0.22);
+  --white-alpha-60: rgba(255, 255, 255, 0.6);
+  --white-alpha-70: rgba(255, 255, 255, 0.7);
+  --white-alpha-78: rgba(255, 255, 255, 0.78);
+  --white-alpha-84: rgba(255, 255, 255, 0.84);
+  --red-error: #ff0000;
+  --green-return: #037b66;
+  --red-return: #d60a22;
   --width-content: 1440px;
   --radius-0: 0px;
   --radius-6: 6px;
@@ -41,11 +53,15 @@
   --grid-guide: var(--border-subtle);
   --border-strong: var(--black);
   --border-control: var(--neutral-800);
-  --border-error: #ff0000;
+  /* Decorative strokes must not replace control boundaries or focus rings. */
+  --border-inverse-subtle: var(--white-alpha-22);
+  --border-control-inverse: var(--white-alpha-70);
+  --border-brand: var(--medium-blue);
+  --border-error: var(--red-error);
   --surface-subtle: var(--background-gray);
   --surface-selected: color-mix(in srgb, var(--medium-blue) 8%, var(--white));
-  --text-return-positive: #037b66;
-  --text-return-negative: #d60a22;
+  --text-return-positive: var(--green-return);
+  --text-return-negative: var(--red-return);
   /* Geist treatments use rem to retain browser text enlargement. Jost is retained. */
   --font-size-page-title: 4.5rem;
   --font-size-section-title: 2.5rem;
@@ -58,8 +74,8 @@
   --font-size-label: 1rem;
   --font-size-control: 1rem;
   --font-size-caption: 1rem;
-  --font-size-data-display: 4.5rem;
-  --font-size-data-kpi: 4rem;
+  --font-size-data-display: 2rem;
+  --font-size-data-kpi: 2rem;
   --font-size-data-ring: 2.5rem;
   --font-size-data-row: 1.25rem;
   --weight-regular: 400;
@@ -70,14 +86,14 @@
   --tracking-title: -0.04em;
   --tracking-compact: -0.02em;
   --tracking-brand: -0.05em;
-  --tracking-data: -0.06em;
+  --tracking-data: -0.04em;
   --tracking-body: 0;
   --tracking-label: 0;
   --leading-page-title: 1;
   --leading-section-title: 1.2;
   --leading-card-title: calc(32 / 24);
   --leading-compact-title: 1.3;
-  --leading-data: 1;
+  --leading-data: 1.25;
   --leading-data-ring: 1.2;
   --leading-data-row: 1.6;
   --leading-lead: 1.8;
@@ -111,6 +127,7 @@
   --focus-ring-offset: 4px;
   --focus-ring-on-light: var(--deep-blue);
   --focus-ring-on-dark: var(--bright-blue);
+  --focus-ring-brand: var(--medium-blue);
   --focus-ring-color: var(--focus-ring-on-light);
   --space-field-label: var(--space-3);
   --space-form-row: var(--space-5);
@@ -141,8 +158,8 @@
   --text-tertiary: var(--neutral-1000);
   --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
-  --text-inverse-secondary: rgba(255, 255, 255, 0.84);
-  --text-inverse-tertiary: rgba(255, 255, 255, 0.78);
+  --text-inverse-secondary: var(--white-alpha-84);
+  --text-inverse-tertiary: var(--white-alpha-78);
   --text-highlight: var(--bright-blue);
   --chart-benchmark: var(--medium-blue);
   --interactive-accent: var(--deep-blue);
@@ -164,13 +181,29 @@
   --sidebar-pressed-surface: var(--neutral-200);
   --sidebar-selected-surface: var(--surface-selected);
   --sidebar-language-surface: var(--surface-subtle);
+  --holding-row-hover-surface: color-mix(in srgb, var(--bright-blue) 12%, var(--white));
+  --portfolio-row-hover-surface: color-mix(in srgb, var(--bright-blue) 10%, var(--white));
+  --memo-disclosure-hover-surface: color-mix(in srgb, var(--bright-blue) 18%, var(--white));
+  --memo-row-hover-surface: var(--memo-disclosure-hover-surface);
+  --memo-card-hover-surface: color-mix(in srgb, var(--bright-blue) 22%, var(--white));
+  /* Preserve hover/focus precedence when those states coexist with :active. */
+  --memo-card-pressed-surface: color-mix(in srgb, var(--bright-blue) 28%, var(--white));
+  /* Touch cards retain the existing softer pressed treatment. */
+  --memo-card-touch-pressed-surface: var(--memo-card-hover-surface);
+  --support-option-hover-surface: color-mix(in srgb, var(--bright-blue) 24%, var(--white));
+  --support-option-selected-surface: var(--surface-brand);
+  --support-option-selected-text: var(--text-inverse);
+  --allocation-divider: var(--black-alpha-18);
+  --allocation-swatch-border: var(--black-alpha-20);
+  --chart-axis-border: var(--black-alpha-28);
+  --text-chart-secondary: color-mix(in srgb, var(--text-primary) 68%, transparent);
   --field-surface: var(--surface-primary);
   --field-text: var(--text-primary);
   --field-border: var(--border-control);
   --field-focus-border: var(--interactive-accent);
   --field-inverse-text: var(--text-inverse);
-  --field-inverse-border: rgba(255, 255, 255, 0.7);
-  --field-inverse-placeholder: rgba(255, 255, 255, 0.6);
+  --field-inverse-border: var(--border-control-inverse);
+  --field-inverse-placeholder: var(--white-alpha-60);
 }
 /* Text language controls tracking, including English articles on Chinese pages. */
 [lang|="zh"] {
@@ -188,6 +221,9 @@
 @media (max-width: 800px) {
   :root {
     --font-size-page-title: 2.5rem;
+    --font-size-data-display: 1.5rem;
+    --font-size-data-kpi: 1.5rem;
+    --leading-data: calc(32 / 24);
     --leading-page-title: 1.2;
     --space-page-gutter: var(--space-4);
     --space-section: var(--space-10);

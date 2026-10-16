@@ -136,7 +136,7 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
   return (
     <div className="portfolio-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <PageHero
           variant="portfolio"
           label={<>{text.eyebrow}</>}

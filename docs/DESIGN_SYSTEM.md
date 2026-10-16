@@ -45,6 +45,25 @@ A new treatment needs a reason, an owning role or component variant, and verific
 
 `--shadow-popover` owns Geist's Menu material shadow; `--shadow-surface` owns its Base surface outline. `--width-content` owns the 1440px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
 
+### Color and stroke ownership
+
+Follow Fluent 2's [global and alias layers](https://fluent2.microsoft.design/design-tokens) and [color roles](https://fluent2.microsoft.design/color-tokens). Keep raw palette and alpha values in `tokens.css`; website components consume semantic aliases. Centralize derived `color-mix()` expressions there as well. Preserve existing values and justified differences rather than assigning one tint to every interaction.
+
+| Role                         | Tokens and use                                                                                                                                                                                                                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Decorative separators        | `--border-subtle`, `--border-strong`, `--border-inverse-subtle`; section, table and Footer dividers. They do not identify inputs or keyboard focus.                                                                                                                          |
+| Control boundaries           | `--border-control`, `--border-control-inverse`, consumed through `--field-*`; identify editable controls on light and inverse surfaces.                                                                                                                                      |
+| Brand and validation strokes | `--border-brand` for editorial/status accents; `--border-error` for the existing error stroke. Financial return colors remain separate from validation status.                                                                                                               |
+| Focus and touch feedback     | `--focus-ring-on-light`, `--focus-ring-on-dark`, and the existing Medium Blue `--focus-ring-brand` treatment for Menu/Support. `--focus-ring-color` inherits the surrounding surface's focus treatment. Touch feedback and persistent keyboard focus remain separate states. |
+| Data decoration              | `--allocation-divider`, `--allocation-swatch-border`, `--chart-axis-border` and `--text-chart-secondary` preserve the existing alpha treatments.                                                                                                                             |
+| Interaction surfaces         | `--holding-row-hover-surface`, `--portfolio-row-hover-surface`, `--memo-*-hover-surface`, `--memo-card-pressed-surface`, `--memo-card-touch-pressed-surface` and `--support-option-*` preserve component-specific hover, press and selection treatments.                     |
+
+Equal current values do not imply equal responsibilities. Memo cards retain their existing 22% tint while hovered and pressed together; the separate pressed alias does not change selector precedence. Selection persists independently of hover; focus remains visible independently of selection. Disabled controls retain their existing opacity/cursor/border treatment; do not invent unused state colors or change their behavior during token maintenance. These aliases do not certify every existing contrast combination as WCAG AA.
+
+React Email keeps literal inline colors for email-client compatibility. Standalone error documents and metadata/brand artwork also keep their independently rendered color values. These exceptions must not become a reason to hardcode website component colors.
+
+`src/app/styles/color-roles.spec.ts` checks rendered colors and stroke roles across all three languages, including component hover/press/selection and touch variants. Existing material and focus tests cover control boundaries, modal behavior and focus contrast.
+
 ### Component token contract
 
 Component roles are aliases within the same token system. `--action-primary-*`, `--action-contrast-*`, `--action-inverse-*` and `--action-quiet-*` describe action appearance and feedback. Button and ButtonLink consume the same variant definition. `--field-*` describes standard input, textarea and native-select surfaces; inverse fields have their own text, border and placeholder roles.
@@ -140,20 +159,27 @@ Type treatments combine size, line height, weight and tracking. The site adopts 
 
 Keep website text at least `1rem`, including controls, captions, chart labels, notes and feedback; email has separate compatibility rules. At a 16px root, the adopted treatments are:
 
-| Site role                      | Geist treatment                  | Size / line height        | Weight                         | English tracking |
-| ------------------------------ | -------------------------------- | ------------------------- | ------------------------------ | ---------------- |
-| Page display                   | Heading 72; Heading 40 on mobile | 72 / 72; 40 / 48          | 600                            | -0.06em          |
-| Section heading                | Heading 40                       | 40 / 48                   | 600                            | -0.06em          |
-| Card title                     | Heading 24                       | 24 / 32                   | 600                            | -0.04em          |
-| Compact title                  | Heading 20                       | 20 / 26                   | 600                            | -0.02em          |
-| Lead                           | Copy 20                          | 20 / 36                   | 400                            | 0                |
-| Long-form body                 | Copy 18                          | 18 / 28                   | 400                            | 0                |
-| Body and caption               | Copy 16                          | 16 / 24                   | 400                            | 0                |
-| Label and action               | Label 16 Strong / Button 16      | 16 / 20                   | 500                            | 0                |
-| Financial display / KPI / ring | Heading 72 / 64 / 40             | 72 / 72; 64 / 64; 40 / 48 | 600                            | -0.06em          |
-| Financial row                  | Label 20                         | 20 / 32                   | 400, with explicit bold totals | 0                |
+| Site role               | Geist treatment                  | Size / line height | Weight                         | English tracking |
+| ----------------------- | -------------------------------- | ------------------ | ------------------------------ | ---------------- |
+| Page display            | Heading 72; Heading 40 on mobile | 72 / 72; 40 / 48   | 600                            | -0.06em          |
+| Section heading         | Heading 40                       | 40 / 48            | 600                            | -0.06em          |
+| Card title              | Heading 24                       | 24 / 32            | 600                            | -0.04em          |
+| Compact title           | Heading 20                       | 20 / 26            | 600                            | -0.02em          |
+| Lead                    | Copy 20                          | 20 / 36            | 400                            | 0                |
+| Long-form body          | Copy 18                          | 18 / 28            | 400                            | 0                |
+| Body and caption        | Copy 16                          | 16 / 24            | 400                            | 0                |
+| Label and action        | Label 16 Strong / Button 16      | 16 / 20            | 500                            | 0                |
+| Financial display / KPI | Heading 32; Heading 24 on mobile | 32 / 40; 24 / 32   | 600                            | -0.04em          |
+| Financial ring          | Heading 40                       | 40 / 48            | 600                            | -0.06em          |
+| Financial row           | Label 20                         | 20 / 32            | 400, with explicit bold totals | 0                |
 
 Financial values use tabular numerals. The Logo wordmark retains its original 20–24px scale, 1.2 line height, 700 weight and -0.05em tracking through a separate `text-wordmark` role. It must not inherit ordinary compact-heading changes.
+
+Page and major section headings lead the reading order. KPI values and Home's performance callout use the same subordinate financial scale: `2rem` above 800px and `1.5rem` at 800px or below. These are site-specific assignments from Geist's Heading 32 and Heading 24 tiers, not a Geist requirement for financial data. The shared KPI treatment also sizes Support's amount choices. Chart-center labels and table figures retain their separate roles. Preserve data text, colors, note opacity and tabular alignment; do not enlarge headings to compensate for oversized values.
+
+Home, Portfolio and Performance establish a named `financial-summary` inline-size container on their main content. Three-column KPI bands stack below 48rem of available width; Portfolio's two-column summary stacks below 32rem and resets explicit cell positions. These rem thresholds respond to enlarged root text, keeping numbers on one line without shrinking them. The existing 800px phone layout still applies. Ordinary desktop column counts and square data surfaces remain unchanged.
+
+`financial-type-hierarchy.spec.ts` checks Home, Portfolio, Performance and Support across three languages, both sides of the 800px breakpoint, 320/390px phones and 200% text size. Values must remain below page and major section headings without clipping, wrapping the number or introducing page overflow. The existing Home performance checks preserve chart reflow and navigation.
 
 Chinese headings use zero tracking. A nested `lang="en"` article restores the English role's tracking on Chinese pages. Sizes use rem rather than fixed pixels so browser text enlargement works. Fix narrow layouts instead of shrinking body text; cards, metadata and controls must wrap.
 

@@ -3,7 +3,7 @@ export const appearance = {
     inverse:
       "subscribe-section min-w-0 [align-self:start] [&_h2]:[margin:0] [&_h2]:[color:var(--white)] [&_h2]:text-title-small [&_h2]:[text-transform:none]",
     standard:
-      "subscribe-section grid min-w-0 grid-cols-[minmax(260px,0.72fr)_minmax(0,1.28fr)] items-start gap-[72px] py-[var(--space-section)] text-black [&_h2]:m-0 [&_h2]:text-title max-[800px]:grid-cols-1 max-[800px]:gap-[var(--space-heading-content)]",
+      "subscribe-section grid min-w-0 grid-cols-[minmax(260px,0.72fr)_minmax(0,1.28fr)] items-start gap-[72px] py-[var(--space-section)] text-ink [&_h2]:m-0 [&_h2]:text-title max-[800px]:grid-cols-1 max-[800px]:gap-[var(--space-heading-content)]",
   },
   intro: "mt-[var(--space-related-content)] max-w-[390px] text-body",
   "subscribe-form":
@@ -12,6 +12,6 @@ export const appearance = {
     inverse:
       "subscribe-preferences [grid-column:1] [width:fit-content] [min-height:24px] [margin-top:var(--space-2)] [color:var(--white)] text-control [text-decoration:underline] [transition:color_var(--motion-duration-base)_var(--motion-ease-standard)] [&:hover]:[color:var(--bright-blue)] [&:focus-visible]:[color:var(--bright-blue)] [@media((max-width:_800px))]:[grid-column:auto]",
     standard:
-      "subscribe-preferences col-start-1 mt-[var(--space-2)] min-h-[24px] w-fit text-control text-black underline transition-colors duration-[var(--motion-duration-base)] hover:text-brand focus-visible:text-brand max-[800px]:col-auto",
+      "subscribe-preferences col-start-1 mt-[var(--space-2)] min-h-[24px] w-fit text-control text-ink underline transition-colors duration-[var(--motion-duration-base)] hover:text-brand focus-visible:text-brand max-[800px]:col-auto",
   },
 } as const;
