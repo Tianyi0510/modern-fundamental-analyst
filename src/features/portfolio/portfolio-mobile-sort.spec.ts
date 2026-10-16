@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { portfolioHoldings, portfolioIncome, getPortfolioTotals, getHoldingCostPerShare } from "./portfolio";
+import { portfolioHoldings, portfolioIncome } from "./portfolio";
+import { getPortfolioTotals, getHoldingCostPerShare } from "./portfolio-calculations";
 import { formatUsd } from "@/lib/format";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {

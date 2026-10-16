@@ -18,13 +18,13 @@ function serviceAttributes(attributes?: Record<string, unknown>) {
   return result;
 }
 
-export function sanitizeSentryLog(log: Log): Log | null {
+function sanitizeSentryLog(log: Log): Log | null {
   const attributes = serviceAttributes(log.attributes);
   if (log.message !== "Service operation failed" || log.level !== "error" || !attributes) return null;
   return { ...log, attributes };
 }
 
-export function sanitizeSentryMetric(metric: Metric): Metric | null {
+function sanitizeSentryMetric(metric: Metric): Metric | null {
   const attributes = serviceAttributes(metric.attributes);
   if (metric.name !== "mfa.service.failures" || metric.type !== "counter" || metric.value !== 1 || !attributes)
     return null;

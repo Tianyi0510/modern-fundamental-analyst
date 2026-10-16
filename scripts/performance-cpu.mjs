@@ -1,6 +1,6 @@
 // The accepted PR #85 baseline had a median host index of 4193.25 at 4x slowdown.
 // Target 1000 is slightly slower than that reference's effective index of 1048.31.
-export const targetBenchmarkIndex = 1000;
+const targetBenchmarkIndex = 1000;
 const maximumDrift = 0.15;
 
 export function createCpuCalibration(samples) {

@@ -1,10 +1,8 @@
 import type { Locale } from "@/lib/i18n";
 
-export const memoCategoryIds = ["company-analysis", "industry-analysis", "monthly-report", "annual-report"] as const;
+type MemoCategoryId = "company-analysis" | "industry-analysis" | "monthly-report" | "annual-report";
 
-export type MemoCategoryId = (typeof memoCategoryIds)[number];
-
-export type MemoCategory = {
+type MemoCategory = {
   id: MemoCategoryId;
   label: string;
 };

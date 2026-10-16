@@ -31,7 +31,7 @@ const disabledFeedback: Record<ButtonDisabledFeedback, string> = {
 const interaction =
   "origin-center transition-[transform,background-color,border-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] [&:hover:not(:is(:active,[data-touch-pressed=true])):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:focus-visible:not(:is(:active,[data-touch-pressed=true])):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:transform-none motion-reduce:transform-none!";
 
-export const buttonVariants = cva(`button inline-flex items-center justify-center text-control ${interaction}`, {
+const buttonVariants = cva(`button inline-flex items-center justify-center text-control ${interaction}`, {
   variants: { variant: variants, size: sizes, disabledFeedback },
   compoundVariants: [{ variant: ["primary", "contrast", "inverse"], className: "rounded-action" }],
   defaultVariants: { variant: "primary", size: "regular", disabledFeedback: "standard" },
