@@ -80,22 +80,30 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
     });
   }
 
-  async function submit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const invalid = getInvalidContactFields({
+  function validate(form: HTMLFormElement, formData: FormData) {
+    const invalidValues = getInvalidContactFields({
       name: getFormText(formData, "name"),
       email: getFormText(formData, "email"),
       subject: getFormText(formData, "subject"),
       message: getFormText(formData, "message"),
     });
-    if (invalid.length > 0) {
-      setInvalidFields(invalid);
-      setStatus("invalid");
-      return;
-    }
-    setInvalidFields([]);
+    const invalid = (Object.keys(contactFieldLimits) as ContactField[]).filter((field) => {
+      const control = form.elements.namedItem(field);
+      return (
+        invalidValues.includes(field) ||
+        ((control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) && !control.validity.valid)
+      );
+    });
+    setInvalidFields(invalid);
+    if (invalid.length > 0) setStatus("invalid");
+    return invalid.length === 0;
+  }
+
+  async function submit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    if (!validate(form, formData)) return;
     await runExclusive(async () => {
       const submissionId = getSubmissionId();
       saveDraft(formData, submissionId);
@@ -143,6 +151,10 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
               setInvalidFields((fields) => fields.filter((field) => field !== control.name));
             }
             setStatus("idle");
+          }}
+          onInvalid={(event) => {
+            event.preventDefault();
+            validate(event.currentTarget, new FormData(event.currentTarget));
           }}
           aria-busy={status === "sending"}
         >

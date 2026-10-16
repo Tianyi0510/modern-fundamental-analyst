@@ -48,6 +48,12 @@ for (const copy of [
       const subject = form.locator('[name="subject"]');
       const message = form.locator('[name="message"]');
       const submit = form.locator('button[type="submit"]');
+      await submit.click();
+      await expect(name).toHaveAccessibleDescription(copy.name);
+      await expect(name).toBeFocused();
+      await expect(subject).toHaveAccessibleDescription(copy.subject);
+      await expect(message).toHaveAccessibleDescription(copy.message);
+      expect(requests).toBe(0);
       await name.fill("   ");
       await form.locator('[name="email"]').fill("reader@example.com");
       await subject.fill("   ");
@@ -70,6 +76,14 @@ for (const copy of [
       await expect(message).toBeFocused();
       await expect(message).toHaveAccessibleDescription(copy.message);
       expect(requests).toBe(0);
+      for (const short of ["a", "123456789"]) {
+        await message.fill(short);
+        await submit.click();
+        await expect(message).toBeFocused();
+        await expect(message).toHaveAccessibleDescription(copy.message);
+        await expect(message).toHaveAttribute("aria-invalid", "true");
+        expect(requests).toBe(0);
+      }
       await message.fill("Please explain the portfolio methodology.");
       await submit.click();
       const status = form.getByRole("status");
