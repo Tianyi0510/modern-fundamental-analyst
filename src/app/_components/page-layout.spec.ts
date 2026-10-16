@@ -77,7 +77,7 @@ test.describe("header interaction QA", () => {
       await page.keyboard.press("Shift");
       const control = page.locator(selector).first();
       await control.focus();
-      await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+      await expect(control).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
       await expect(control).toHaveCSS("box-shadow", "none");
       await control.hover();
       // Release on the control without following links or submitting forms.
@@ -93,7 +93,7 @@ test.describe("header interaction QA", () => {
           .toBe(true);
         await expect(control, `${path} ${selector} uses the press duration`).toHaveCSS(
           "transition-duration",
-          /^(?:0\.09s)(?:,\s*0\.09s)*$/,
+          /^(?:0\.08s)(?:,\s*0\.08s)*$/,
         );
       } finally {
         await page.mouse.up();
@@ -143,19 +143,19 @@ test.describe("header interaction QA", () => {
         if (path === "/about") {
           await expect(note).toHaveCount(1);
           await expect(note).toHaveCSS("font-size", "18px");
-          await expect(note).toHaveCSS("line-height", "27px");
+          await expect(note).toHaveCSS("line-height", "28px");
           await expect(note).toHaveCSS("font-weight", "400");
           await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
           for (const link of await note.locator("a").all()) {
             await expect(link).toHaveCSS("font-weight", "400");
-            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
             await expect(link).toHaveCSS("text-decoration-line", "underline");
             await expect(link).toHaveCSS("text-underline-offset", "3px");
             await link.hover();
-            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
             await page.keyboard.press("Shift");
             await link.focus();
-            await expect(link).toHaveCSS("color", "rgb(0, 140, 255)");
+            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
           }
         }
         if (path.startsWith("/memos/")) {
@@ -355,7 +355,7 @@ test.describe("mobile content and navigation QA", () => {
             return Math.round(Math.hypot(matrix.a, matrix.b) * 100);
           }),
         )
-        .toBe(98);
+        .toBe(99);
     } finally {
       await page.mouse.up();
     }
@@ -366,7 +366,7 @@ test.describe("mobile content and navigation QA", () => {
     const box = (await button.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
-    await expect(button).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
+    await expect(button).toHaveCSS("transform", "matrix(0.985, 0, 0, 0.985, 0, 0)");
     await page.mouse.move(1, 1);
     await page.mouse.up();
     const textCta = page.locator(".hero .text-link");
@@ -418,7 +418,7 @@ test.describe("touch CTA recovery", () => {
           await expect(control).toHaveCSS("transform", "none");
           await expect(control).toHaveCSS("background-color", "rgb(0, 0, 0)");
           await page.mouse.down();
-          await expect(control).toHaveCSS("transform", "matrix(0.98, 0, 0, 0.98, 0, 0)");
+          await expect(control).toHaveCSS("transform", "matrix(0.985, 0, 0, 0.985, 0, 0)");
           await page.mouse.up();
           await control.tap();
           await control.hover();
@@ -436,7 +436,7 @@ test.describe("touch CTA recovery", () => {
             "background-color",
             selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(95, 205, 253)",
           );
-          await expect(control).toHaveCSS("transform", "matrix(1.04, 0, 0, 1.04, 0, 0)");
+          await expect(control).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
           await control.evaluate((element: HTMLElement) => element.blur());
         }
       },

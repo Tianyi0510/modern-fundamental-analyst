@@ -34,23 +34,24 @@ The site uses Next.js App Router, React, TypeScript, Tailwind CSS and CSS Module
 
 Run from the repository root containing `package.json`. Use focused checks during development; the full-suite commands below are for CI, explicit requests or diagnosis.
 
-| Task                                              | Command                                                                                                               |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Install locked dependencies                       | `npm ci`                                                                                                              |
-| Development server                                | `npm run dev`                                                                                                         |
-| Production build / server                         | `npm run build` / `npm run start`                                                                                     |
-| Type checking                                     | `npm run typecheck`                                                                                                   |
-| Lint selected files                               | `npx eslint <files> --max-warnings=0`                                                                                 |
-| Check / format selected files                     | `npx prettier --check <files>` / `npx prettier --write <files>`                                                       |
-| Vitest unit / integration tests                   | `npm run test:unit` / `npm run test:integration`; append `-- <test-path>` to filter                                   |
-| Vitest watch mode                                 | `npm run test:watch`                                                                                                  |
-| Browser E2E tests                                 | `npm run test:e2e -- <spec-files> --project=chromium` (or `webkit`)                                                   |
-| Selected Node tests                               | `node --import ./scripts/register-server.mjs --test <test-files>`                                                     |
-| Selected browser tests                            | `npx playwright test <spec-files> --project=chromium` (or `webkit`)                                                   |
-| Production browser tests                          | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
-| Full static checks                                | `npm run verify:static`                                                                                               |
-| Full static, build and production Chromium checks | `npm run verify`                                                                                                      |
-| Mobile production WebKit checks                   | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2`                           |
+| Task                                                   | Command                                                                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Install locked dependencies                            | `npm ci`                                                                                                              |
+| Development server                                     | `npm run dev`                                                                                                         |
+| Production build / server                              | `npm run build` / `npm run start`                                                                                     |
+| Type checking                                          | `npm run typecheck`                                                                                                   |
+| Lint selected files                                    | `npx eslint <files> --max-warnings=0`                                                                                 |
+| Check / format selected files                          | `npx prettier --check <files>` / `npx prettier --write <files>`                                                       |
+| Vitest unit / integration tests                        | `npm run test:unit` / `npm run test:integration`; append `-- <test-path>` to filter                                   |
+| Vitest watch mode                                      | `npm run test:watch`                                                                                                  |
+| Browser E2E tests                                      | `npm run test:e2e -- <spec-files> --project=chromium` (or `webkit`)                                                   |
+| Selected Node tests                                    | `node --import ./scripts/register-server.mjs --test <test-files>`                                                     |
+| Selected browser tests                                 | `npx playwright test <spec-files> --project=chromium` (or `webkit`)                                                   |
+| Production browser tests                               | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
+| Dedicated performance budgets after a production build | `npm run test:performance`                                                                                            |
+| Full static checks                                     | `npm run verify:static`                                                                                               |
+| Full static, build and production Chromium checks      | `npm run verify`                                                                                                      |
+| Mobile production WebKit checks                        | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2`                           |
 
 Replace angle-bracket placeholders with real paths. Install missing browsers with `npx playwright install chromium webkit`. Playwright starts an isolated server on port 3210 with provider credentials disabled; preserve that isolation. `npm test` runs the existing Node suite plus Vitest unit and integration projects. E2E tests use Playwright separately; CI runs the production browser matrix. Chromium covers all cases; WebKit selects `@mobile` cases with iPhone 13 emulation. Tag phone-only cases explicitly; desktop and cross-breakpoint cases remain in Chromium. Husky's pre-commit hook checks staged formatting and JavaScript/TypeScript lint; it does not replace CI.
 
@@ -79,6 +80,7 @@ Before changing Next.js APIs, routing or configuration, read the installed-versi
 - Preserve text colors and opacity across states unless a color change is requested. Define color values in `src/app/styles/tokens.css` and reference those tokens from Tailwind and CSS Modules.
 - Keep `globals.css` to layers/imports/variants and `base.css` to the single reset/document defaults. Use complete static utility classes for normal layout/states, adjacent CSS Modules for complex owned motion, and inline styles for data/measurements. Share appearance through finite component variants; do not override another component's internals.
 - Use ESLint and Prettier with `prettier-plugin-tailwindcss`; keep its stylesheet entry aligned with `src/app/globals.css`. Formatting does not validate CSS behavior.
+- Use the Base UI shadcn registry for interactive primitives. Compose custom elements with `render`, preserving native links, refs and handlers. Base UI owns modal isolation, focus containment and scroll locking; retain the existing navigation phase and animation ownership. Do not restore a second interaction engine. Follow the five-layer Design System while preserving Jost, the three brand blues, Logo and the editorial identity. Use the documented Geist Typography, Colors and Materials treatments; preserve all brand colors (including the two original grays), square data blocks, pill CTAs, black Footer and wordmark metrics. Fluent 2 supplies token architecture. Use shared component roles and finite variants; keep business state and provider workflows with the owning feature. Reference defaults must be adapted to owned tokens and components; use the accessible interaction text alias rather than Medium Blue on white.
 - Synchronize menu visibility, focus, interactivity and scroll restoration. Use one state source and one animation owner per property; handle interruption, reversal, cancellation, reduced motion and unmount. Touch hover resets must preserve active and keyboard-focus feedback.
 
 ## Service boundaries
@@ -116,7 +118,7 @@ Use GitHub Actions and the Vercel Git integration. Follow the [release workflow]
 4. Report completion promptly. Production smoke checks are optional unless requested or evidence indicates a failure; report incomplete diagnostics separately.
 5. After successful deployment, safely delete the local merged feature branch after checking for unmerged work and switching away. Preserve active branches. GitHub deletes the merged remote branch automatically.
 
-Preserve the stable `verify` and `webkit` result jobs, package-integrity checks, browser coverage and `vercel.json`'s exact-commit production gate. Keep the gate outside `npm run build` and runner workarounds in the workflow. Fix failed checks rather than bypassing them.
+Preserve the stable `verify` and `webkit` result jobs, the required `performance` budget job, package-integrity checks, browser coverage and `vercel.json`'s exact-commit production gate. Keep the gate outside `npm run build` and runner workarounds in the workflow. Fix failed checks rather than bypassing them.
 
 ## Maintaining this file
 

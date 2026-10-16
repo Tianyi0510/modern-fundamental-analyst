@@ -52,7 +52,7 @@ test.describe("touch and keyboard state consistency", () => {
     await page.goto("/memos");
     const summary = page.locator(".memo-disclosure > summary");
     await summary.focus();
-    await expect(summary.locator("span").first()).toHaveCSS("transform", "matrix(1, 0, 0, 1, 8, 0)");
+    await expect(summary.locator("span").first()).toHaveCSS("transform", "matrix(1, 0, 0, 1, 4, 0)");
     const background = await summary.evaluate((element) => getComputedStyle(element).backgroundColor);
     await summary.hover();
     await expect(summary).toHaveCSS("background-color", background);

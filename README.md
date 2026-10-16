@@ -4,7 +4,7 @@ A public-equity research website in English, Traditional Chinese and Simplified 
 
 [Visit the website](https://www.modernfundamentalanalyst.com)
 
-The site uses Next.js App Router, React, TypeScript, Tailwind CSS, customized shadcn/ui components and CSS Modules. Resend handles email, Upstash Redis coordinates reader services, Stripe provides Hosted Checkout, Sentry monitors errors and performance, and Vercel hosts the site.
+The site uses Next.js App Router, React, TypeScript, Tailwind CSS, customized shadcn/ui components with Base UI interactions, Lucide icons and CSS Modules. Resend handles email, Upstash Redis coordinates reader services, Stripe provides Hosted Checkout, Sentry monitors errors and performance, and Vercel hosts the site.
 
 ## Local Development
 
@@ -30,17 +30,18 @@ See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-loca
 
 Run checks for the changed files and behavior. CI runs full verification; release checks confirm the deployed commit and live status. Do not routinely repeat the full suite locally.
 
-| Scope                                              | Command                                                           |
-| -------------------------------------------------- | ----------------------------------------------------------------- |
-| Unit tests                                         | `npm run test:unit -- <test-path>`                                |
-| Component integrations                             | `npm run test:integration -- <test-path>`                         |
-| Watch mode                                         | `npm run test:watch`                                              |
-| Node tests                                         | `node --import ./scripts/register-server.mjs --test <test-files>` |
-| Browser journeys                                   | `npm run test:e2e -- <spec-files> --project=chromium`             |
-| All Node and Vitest tests                          | `npm test`                                                        |
-| Full static verification                           | `npm run verify:static`                                           |
-| Static checks, build and production Chromium       | `npm run verify`                                                  |
-| Mobile WebKit against an existing production build | `npm run test:webkit`                                             |
+| Scope                                                    | Command                                                           |
+| -------------------------------------------------------- | ----------------------------------------------------------------- |
+| Unit tests                                               | `npm run test:unit -- <test-path>`                                |
+| Component integrations                                   | `npm run test:integration -- <test-path>`                         |
+| Watch mode                                               | `npm run test:watch`                                              |
+| Node tests                                               | `node --import ./scripts/register-server.mjs --test <test-files>` |
+| Browser journeys                                         | `npm run test:e2e -- <spec-files> --project=chromium`             |
+| All Node and Vitest tests                                | `npm test`                                                        |
+| Full static verification                                 | `npm run verify:static`                                           |
+| Static checks, build and production Chromium             | `npm run verify`                                                  |
+| Performance budgets against an existing production build | `npm run test:performance`                                        |
+| Mobile WebKit against an existing production build       | `npm run test:webkit`                                             |
 
 Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack.
 
@@ -65,7 +66,7 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
-Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component. Presentation uses shared components and semantic tokens.
+Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component. Presentation uses shared components and semantic tokens. The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) assigns responsibilities to Geist, Fluent 2, UX references, shadcn/ui and Base UI; Geist supplies Typography, Colors and Materials, Fluent 2 organizes tokens, and explicit brand exceptions preserve Jost, brand colors (including the two original grays), square KPIs, pill actions and the black Footer. The application and provider guides cover data, security and operational reliability separately.
 
 ## Documentation
 

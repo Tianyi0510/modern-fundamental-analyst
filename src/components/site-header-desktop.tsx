@@ -29,10 +29,8 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
   const [isLanguageOpen, setLanguageOpen] = useState(false);
   const languageTriggerRef = useRef<HTMLButtonElement>(null);
-  const languageContentRef = useRef<HTMLDivElement>(null);
   const contactLinkRef = useRef<HTMLAnchorElement>(null);
-  const enterLastLanguageRef = useRef(false);
-  const languageTabExitRef = useRef(false);
+  const skipLanguageReturnFocusRef = useRef(false);
   useEffect(() => {
     const compact = window.matchMedia("(max-width: 1150px)");
     const closeDesktopMenu = () => {
@@ -56,16 +54,20 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
           </Link>
         ))}
       </nav>
-      <div className={appearance["language-menu"]}>
+      <div
+        className={appearance["language-menu"]}
+        onKeyDownCapture={(event) => {
+          if (event.key !== "Tab" || !isLanguageOpen) return;
+          event.preventDefault();
+          event.stopPropagation();
+          skipLanguageReturnFocusRef.current = true;
+          setLanguageOpen(false);
+          (event.shiftKey ? languageTriggerRef.current : contactLinkRef.current)?.focus();
+        }}
+      >
         <DropdownMenu modal={false} open={isLanguageOpen} onOpenChange={setLanguageOpen}>
           <DropdownMenuTrigger
             ref={languageTriggerRef}
-            onKeyDown={(event) => {
-              if (event.key !== "ArrowUp" || isLanguageOpen) return;
-              event.preventDefault();
-              enterLastLanguageRef.current = true;
-              setLanguageOpen(true);
-            }}
             className={appearance["language-trigger"]}
             aria-label={copy.change}
             aria-controls="desktop-language-menu"
@@ -74,41 +76,41 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
             <ChevronDown aria-hidden="true" strokeWidth={2.75} />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            ref={languageContentRef}
             className="language-dropdown"
             align="end"
             id="desktop-language-menu"
-            onFocusCapture={() => {
-              if (!enterLastLanguageRef.current) return;
-              enterLastLanguageRef.current = false;
-              requestAnimationFrame(() =>
-                languageContentRef.current?.querySelector<HTMLElement>("[role=menuitem]:last-child")?.focus(),
-              );
-            }}
-            onKeyDown={(event) => {
-              if (event.key !== "Tab") return;
-              event.preventDefault();
-              languageTabExitRef.current = true;
+            onBlur={(event) => {
+              const destination = event.relatedTarget;
+              if (
+                !(destination instanceof Node) ||
+                event.currentTarget.contains(destination) ||
+                destination === languageTriggerRef.current
+              )
+                return;
+              skipLanguageReturnFocusRef.current = true;
               setLanguageOpen(false);
-              (event.shiftKey ? languageTriggerRef.current : contactLinkRef.current)?.focus();
             }}
-            onCloseAutoFocus={(event) => {
-              if (languageTabExitRef.current) event.preventDefault();
-              languageTabExitRef.current = false;
+            finalFocus={() => {
+              const restoreTrigger = !skipLanguageReturnFocusRef.current;
+              skipLanguageReturnFocusRef.current = false;
+              return restoreTrigger;
             }}
           >
             <DropdownMenuGroup>
               {locales.map((targetLocale) => (
-                <DropdownMenuItem asChild key={targetLocale}>
-                  <Link
-                    className={languageChoice}
-                    href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
-                    hrefLang={localeConfig[targetLocale].hrefLang}
-                    aria-current={locale === targetLocale ? "page" : undefined}
-                  >
-                    <span>{localeConfig[targetLocale].label}</span>
-                    {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
-                  </Link>
+                <DropdownMenuItem
+                  key={targetLocale}
+                  render={
+                    <Link
+                      className={languageChoice}
+                      href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
+                      hrefLang={localeConfig[targetLocale].hrefLang}
+                      aria-current={locale === targetLocale ? "page" : undefined}
+                    />
+                  }
+                >
+                  <span>{localeConfig[targetLocale].label}</span>
+                  {locale === targetLocale && <Check aria-hidden="true" strokeWidth={2.25} />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuGroup>

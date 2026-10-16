@@ -51,10 +51,17 @@ for (const copy of cases) {
     await expect(methodology.locator("p > strong")).toHaveCount(4);
 
     await page.goto(`${copy.prefix}/memos/microsoft-stock-analysis-fiscal-year-2024`);
-    await expect(page.getByRole("complementary", { name: /Research Scope|研究範圍|研究范围/ })).toContainText("DCF");
+    await expect(page.getByRole("heading", { name: /Research Scope|研究範圍|研究范围/ })).toHaveCount(0);
+    const disclaimer = page.getByRole("complementary", { name: /Disclaimer|免責聲明|免责声明/ });
+    await expect(disclaimer).toContainText("DCF");
+    expect(
+      await disclaimer.evaluate((element) => Boolean(element.previousElementSibling?.matches(".article-body"))),
+    ).toBe(true);
+    await expect(page.locator(".article-meta time")).toHaveAttribute("datetime", "2025-10-10");
     await expect(page.locator(".memo-references a")).toHaveCount(5);
     for (const link of await page.locator(".memo-references a").all()) {
       await expect(link).toHaveAttribute("href", /^https:\/\//);
+      await expect(link).toHaveText("Read Source");
     }
     await expect(page.locator(".article-body")).toHaveAttribute("lang", "en");
     if (copy.memoNotice) await expect(page.getByRole("article")).toContainText(copy.memoNotice);
@@ -86,15 +93,12 @@ for (const prefix of ["/zh-tw", "/zh-cn"]) {
       for (const width of widths) {
         await page.setViewportSize({ width, height: 900 });
         const notice = page.locator(".memo-language-notice");
-        const scope = page.getByRole("complementary");
         const body = page.locator(".article-body");
         await expect(notice).toBeVisible();
-        const boxes = await Promise.all([notice.boundingBox(), scope.boundingBox(), body.boundingBox()]);
-        const [noticeBox, scopeBox, bodyBox] = boxes;
+        const [noticeBox, bodyBox] = await Promise.all([notice.boundingBox(), body.boundingBox()]);
         expect(noticeBox!.x).toBeCloseTo(bodyBox!.x, 0);
         expect(noticeBox!.width).toBeCloseTo(bodyBox!.width, 0);
-        expect(scopeBox!.y - noticeBox!.y - noticeBox!.height).toBeGreaterThanOrEqual(23);
-        expect(bodyBox!.y - scopeBox!.y - scopeBox!.height).toBeGreaterThanOrEqual(width <= 800 ? 39 : 55);
+        expect(bodyBox!.y - noticeBox!.y - noticeBox!.height).toBeGreaterThanOrEqual(width <= 800 ? 39 : 55);
         expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       }
     },

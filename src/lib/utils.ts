@@ -9,6 +9,7 @@ const mergeClasses = extendTailwindMerge({
         "headline",
         "title",
         "title-small",
+        "wordmark",
         "lead",
         "body-large",
         "body",

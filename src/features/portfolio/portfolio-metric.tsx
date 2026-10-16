@@ -26,7 +26,7 @@ export function PortfolioMetric({
   return (
     <div
       data-tone={tone}
-      className={`flex min-h-[240px] min-w-0 flex-col p-[var(--space-5)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] ${tones[tone]} ${className}`}
+      className={`flex min-h-[240px] min-w-0 flex-col rounded-surface p-[var(--space-5)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] ${tones[tone]} ${className}`}
     >
       <dt className="text-label">{label}</dt>
       <dd className="kpi-value mt-auto compact:mt-[var(--space-5)]">

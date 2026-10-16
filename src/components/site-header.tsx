@@ -4,9 +4,20 @@ import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
-import { ChevronDown, Menu, X } from "lucide-react";
+import {
+  BookOpen,
+  ChartNoAxesCombined,
+  ChartPie,
+  ChevronDown,
+  Globe,
+  House,
+  Mail,
+  Menu,
+  UserRound,
+  X,
+} from "lucide-react";
 import { useRef, type MouseEvent } from "react";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 import { usePathname } from "next/navigation";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
@@ -50,17 +61,27 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
   const closeLabel = copy.close;
   const homePath = getLocalizedPath("/", locale);
   const navigation = [
-    { href: homePath, label: copy.home },
-    { href: getLocalizedPath("/about", locale), label: copy.about },
-    { href: getLocalizedPath("/portfolio", locale), label: copy.portfolio },
-    { href: getLocalizedPath("/performance", locale), label: copy.performance },
-    { href: getLocalizedPath("/memos", locale), label: copy.memos },
+    { href: homePath, label: copy.home, icon: House },
+    { href: getLocalizedPath("/about", locale), label: copy.about, icon: UserRound },
+    { href: getLocalizedPath("/portfolio", locale), label: copy.portfolio, icon: ChartPie },
+    { href: getLocalizedPath("/performance", locale), label: copy.performance, icon: ChartNoAxesCombined },
+    { href: getLocalizedPath("/memos", locale), label: copy.memos, icon: BookOpen },
   ];
-  const mobileNavigation = [...navigation, { href: getLocalizedPath("/contact", locale), label: copy.contact }];
+  const mobileNavigation = [
+    ...navigation,
+    { href: getLocalizedPath("/contact", locale), label: copy.contact, icon: Mail },
+  ];
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
 
   return (
-    <Sheet open={isMenuOpen} onOpenChange={(open) => (open ? openMenu() : closeMenu())}>
+    <Sheet
+      open={isMenuOpen}
+      onOpenChange={(open, details) => {
+        if (open || details.reason === "trigger-press") openMenu();
+        else if (details.reason === "escape-key" && menuPhase === "closing") closeMenuForNavigation();
+        else closeMenu();
+      }}
+    >
       <header className={appearance["site-header"] + " " + appearance["shell"]}>
         <Link
           className={appearance["wordmark"]}
@@ -70,25 +91,26 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
         >
           Modern Fundamental Analyst<span>.</span>
         </Link>
-        <SheetTrigger asChild>
-          <button
-            ref={menuButtonRef}
-            className={appearance["mobile-menu-button"]}
-            type="button"
-            aria-label={menuLabel}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-site-menu"
-            tabIndex={isMenuOpen ? -1 : undefined}
-            {...menuTouchFeedback}
-            onClick={(event) => {
-              event.preventDefault();
-              navigationClosingRef.current = false;
-              openMenu();
-            }}
-          >
-            <span className={appearance["mobile-menu-touch-ring"]} aria-hidden="true" />
-            <Menu aria-hidden="true" strokeWidth={2} />
-          </button>
+        <SheetTrigger
+          onClick={() => {
+            navigationClosingRef.current = false;
+          }}
+          render={
+            <button
+              ref={menuButtonRef}
+              className={appearance["mobile-menu-button"]}
+              type="button"
+              aria-label={menuLabel}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-site-menu"
+              tabIndex={isMenuOpen ? -1 : undefined}
+              inert={isMenuOpen}
+              {...menuTouchFeedback}
+            />
+          }
+        >
+          <span className={appearance["mobile-menu-touch-ring"]} aria-hidden="true" />
+          <Menu aria-hidden="true" strokeWidth={2} />
         </SheetTrigger>
         <DesktopNavigation copy={copy} locale={locale} languageQuery={languageQuery} navigation={navigation} />
 
@@ -100,19 +122,8 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           id="mobile-site-menu"
           aria-modal="true"
           aria-describedby={undefined}
-          onOpenAutoFocus={(event) => {
-            event.preventDefault();
-            menuCloseButtonRef.current?.focus({ preventScroll: true });
-          }}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            if (!navigationClosingRef.current) menuButtonRef.current?.focus({ preventScroll: true });
-          }}
-          onEscapeKeyDown={(event) => {
-            event.preventDefault();
-            if (menuPhase === "closing") closeMenuForNavigation();
-            else closeMenu();
-          }}
+          initialFocus={menuCloseButtonRef}
+          finalFocus={() => (navigationClosingRef.current ? false : menuButtonRef.current)}
           onPointerCancel={handleMenuPointerCancel}
           onPointerDown={handleMenuPointerDown}
           onPointerUp={handleMenuPointerUp}
@@ -128,36 +139,43 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
             >
               Modern Fundamental Analyst<span>.</span>
             </Link>
-            <button
-              ref={attachClose}
-              className={appearance["mobile-menu-close"]}
-              type="button"
-              aria-label={closeLabel}
-              {...menuTouchFeedback}
-              onClick={closeMenu}
-              tabIndex={isMenuOpen ? 0 : -1}
+            <SheetClose
+              render={
+                <button
+                  ref={attachClose}
+                  className={appearance["mobile-menu-close"]}
+                  type="button"
+                  aria-label={closeLabel}
+                  {...menuTouchFeedback}
+                  tabIndex={isMenuOpen ? 0 : -1}
+                />
+              }
             >
               <span className={appearance["mobile-menu-touch-ring"]} aria-hidden="true" />
               <X className={appearance["mobile-menu-close-icon"]} aria-hidden="true" strokeWidth={2} />
               <Menu className={appearance["mobile-menu-return-icon"]} aria-hidden="true" strokeWidth={2} />
-            </button>
+            </SheetClose>
           </div>
           <div className={appearance["mobile-menu-content"]} ref={menuContentRef} inert={menuPhase === "closing"}>
-            <nav className="relative z-[1]" aria-label={copy.mobilePrimary}>
+            <nav className="relative z-[1] shrink-0" aria-label={copy.mobilePrimary}>
               <SidebarMenu>
-                {mobileNavigation.map(({ href, label }) => {
+                {mobileNavigation.map(({ href, label, icon: Icon }) => {
                   const isActive = isCurrentPath(href);
                   return (
                     <SidebarMenuItem key={href}>
-                      <SidebarMenuButton asChild isActive={isActive}>
-                        <Link
-                          href={href}
-                          aria-current={isActive ? "page" : undefined}
-                          onClick={closeForNavigation}
-                          tabIndex={isMenuOpen ? 0 : -1}
-                        >
-                          <span className="mobile-menu-label">{label}</span>
-                        </Link>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        render={
+                          <Link
+                            href={href}
+                            aria-current={isActive ? "page" : undefined}
+                            onClick={closeForNavigation}
+                            tabIndex={isMenuOpen ? 0 : -1}
+                          />
+                        }
+                      >
+                        <Icon aria-hidden="true" strokeWidth={1.75} />
+                        <span className="mobile-menu-label">{label}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
@@ -169,7 +187,10 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                 className={appearance["mobile-language-disclosure"]}
                 summary={
                   <>
-                    <span>{localeConfig[locale].label}</span>
+                    <span className="inline-flex min-w-0 items-center gap-[var(--space-3)]">
+                      <Globe aria-hidden="true" strokeWidth={1.75} />
+                      <span>{localeConfig[locale].label}</span>
+                    </span>
                     <ChevronDown aria-hidden="true" strokeWidth={2.75} />
                   </>
                 }

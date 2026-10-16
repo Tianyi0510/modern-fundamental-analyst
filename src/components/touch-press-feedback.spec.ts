@@ -45,7 +45,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
             });
             await expect(control).toHaveAttribute("data-touch-pressed", "true");
-            await expect.poll(() => scale(control)).toBeCloseTo(reducedMotion === "reduce" ? 1 : 0.98, 3);
+            await expect.poll(() => scale(control)).toBeCloseTo(reducedMotion === "reduce" ? 1 : 0.985, 3);
             await session.send("Input.dispatchTouchEvent", { type: release, touchPoints: [] });
             await expect(control).not.toHaveAttribute("data-touch-pressed");
             await expect.poll(() => scale(control)).toBeCloseTo(1, 3);
@@ -84,7 +84,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           clientY: 0,
         });
         await expect(control).toHaveAttribute("data-touch-pressed", "true");
-        await expect.poll(() => scale(control)).toBeCloseTo(reducedMotion === "reduce" ? 1 : 0.98, 3);
+        await expect.poll(() => scale(control)).toBeCloseTo(reducedMotion === "reduce" ? 1 : 0.985, 3);
         if (cancellation === "blur" || cancellation === "pagehide") {
           await page.evaluate((name) => window.dispatchEvent(new Event(name)), cancellation);
         } else {

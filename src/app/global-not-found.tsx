@@ -10,15 +10,17 @@ export const metadata = { title: "404 | Modern Fundamental Analyst" };
 export default async function GlobalNotFound() {
   const locale = (await headers()).get("x-site-locale");
   if (locale === "zh-tw") {
+    const { notoSansTc } = await import("./zh-tw/font");
     return (
-      <SiteDocument language="zh-Hant-TW">
+      <SiteDocument language="zh-Hant-TW" fontVariable={notoSansTc.variable}>
         <TraditionalChineseNotFound />
       </SiteDocument>
     );
   }
   if (locale === "zh-cn") {
+    const { notoSansSc } = await import("./zh-cn/font");
     return (
-      <SiteDocument language="zh-CN">
+      <SiteDocument language="zh-CN" fontVariable={notoSansSc.variable}>
         <SimplifiedChineseNotFound />
       </SiteDocument>
     );

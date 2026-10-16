@@ -11,6 +11,8 @@ Use this guide for code conventions, application and data boundaries, portfolio 
 
 ## Application boundaries
 
+The five-layer Design System is the frontend design and engineering model. This guide separately owns application and data architecture: routing, server/client boundaries, validation, caching, feature state, security, testing and monitoring. Provider credentials and operational recovery belong in Integrations. Base UI manages interactive component mechanics; it does not own portfolio calculations, API calls, payment outcomes, subscription consent or provider retries. Public research pages do not require an account system; do not infer authentication requirements from dashboard examples in a design reference.
+
 Pages render localized Server Components. Add small Client Components for interactive controls. Provider and preference-token modules declare `server-only`; shared support IDs, legacy amounts and types live in `src/features/support/support-config.ts`.
 
 Node tests and the operator CLI use `scripts/register-server.mjs` to load TypeScript and TSX. The loader bypasses `server-only` for these entry points and does not type-check. TypeScript and Next.js separately enforce types and build boundaries.
@@ -134,13 +136,15 @@ Keep Prettier last in the ESLint configuration. It owns formatting; import order
 
 The root layout imports `src/app/globals.css` once. PostCSS compiles Tailwind themes and utilities. Tokens feed both Tailwind and CSS Modules; `base` provides the only reset and document defaults. Preflight and component-specific global selectors are not used.
 
-Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `radix-ui`; only interactive components and their owners declare `use client`.
+Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `@base-ui/react/menu` and `@base-ui/react/dialog`; Sidebar composition uses `@base-ui/react/use-render`. Only interactive components and their owners declare `use client`. Static buttons, links and native form controls retain their server-compatible implementations. The `base-nova` registry in `components.json` selects Base UI source; the layered design system is implemented through customized styles and global-to-semantic token aliases.
+
+Geist Typography, Colors and Materials are expressed in the shared tokens and owned components, with the retained brand exceptions documented in [Design System](DESIGN_SYSTEM.md#neutral-colors-and-materials). The wordmark has an independent typography role; Menu material owns its outline and shadow without a duplicate CSS border. No additional theme provider or visual component package is introduced.
 
 Private `*.styles.ts` maps contain complete utility strings. Components import their own CSS Modules for chart structure and complex motion. `components.json` configures source installation. Email styling remains separate. [Design System](DESIGN_SYSTEM.md#style-ownership) defines variants and visual ownership.
 
 `site-header-desktop.tsx` owns desktop navigation and language-menu state. `use-site-header.ts` owns mobile phases and measured panel/icon animations. `use-menu-touch-feedback.ts` owns the trigger/close touch ring.
 
-The mobile phase drives Sheet's open state; Radix owns modal isolation, focus containment and scroll locking. Native disclosures work without JavaScript. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.
+The mobile phase drives Sheet's open state through the final closing frame; Base UI owns modal isolation, focus containment and scroll locking. Base UI `render` replaces Slot composition without adding interactive wrappers. Popup `initialFocus` and `finalFocus` preserve close-button entry and route-aware focus restoration. Desktop Menu uses its own non-modal positioning and keyboard model, with explicit Tab and outside-focus exits. Native disclosures work without JavaScript. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.
 
 Before a presentation migration, capture screenshots and computed styles. Compare in the same browser and viewport. Verify direct loads, client navigation and browser return against a production build; hot reload does not prove production style ordering. Measure assets before claiming a performance improvement. Test behavior independently of utility strings; physical iPhone checks remain separate.
 
@@ -347,23 +351,36 @@ References: [Vitest projects](https://vitest.dev/guide/projects), [Testing Libra
 
 CI checks out the PR head SHA or exact push SHA. PRs always run full verification. The read-only `plan` job decides whether a main push may reuse complete PR evidence.
 
-After `plan`, full verification runs five jobs concurrently:
+After `plan`, full verification runs six jobs concurrently:
 
 | Jobs                                   | Runner and work                                                                                    |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `static`                               | Ubuntu: locked install, production dependency audit, types, ESLint, Prettier and Node/Vitest tests |
 | `chromium-shard-1`, `chromium-shard-2` | Ubuntu: production build and native Playwright shards with `--fully-parallel`                      |
+| `performance`                          | Ubuntu: isolated production build, pinned Chromium and sequential Lighthouse budget samples        |
 | `webkit-shard-1`, `webkit-shard-2`     | macOS: production build and mobile WebKit shards                                                   |
 
-Each browser job uses one worker. Fail-fast is disabled so one shard does not cancel another. Browser jobs do not wait for static checks; this can consume runner time after a static failure, but cannot authorize release. Stable `verify` and `webkit` result jobs reject failed, cancelled or unexpectedly skipped dependencies. There is no separate CSS lint job.
+Each browser job uses one worker. Fail-fast is disabled so one shard does not cancel another. Browser jobs do not wait for static checks; this can consume runner time after a static failure, but cannot authorize release. The `verify` result also requires `performance`. Stable `verify` and `webkit` result jobs reject failed, cancelled or unexpectedly skipped dependencies. There is no separate CSS lint job.
 
 `scripts/ci-plan.mjs` permits reuse only when:
 
 1. Main is a two-parent merge whose tree matches its second parent.
 2. The latest matching same-repository PR CI run succeeded within 24 hours.
-3. That run attempt passed all five jobs above; partial or previously reused evidence is insufficient.
+3. That run attempt passed all six jobs above; partial or previously reused evidence is insufficient.
 
 Changed trees, workflows, lockfiles or test settings; stale evidence; squash/rebase merges; missing records; and API errors require full testing. The summary records the source run, tree and release SHA. Main still creates its own successful CI record for the production gate. Runner and runtime changes can occur outside Git, so reuse expires.
+
+### Performance regression checks
+
+Font instances belong to their locale layouts. `SiteDocument` receives the selected Chinese variable and shares only Jost. Global 404 rendering selects the matching locale variable. Turbopack uses `experimental.cssChunking: "graph"` because the default merging heuristic kept an unrelated Chinese font stylesheet in English routes even after imports were split. Validate generated stylesheet contents and browser behavior rather than assuming an import refactor fixes the download graph. Webpack fallback builds do not exercise this Turbopack optimization.
+
+After a production build, `npm run test:performance` starts its own loopback server on port 3211 with provider credentials disabled. It runs Lighthouse 13.5.0 sequentially using Playwright's installed Chrome for Testing. Home in all three languages and English Performance each receive three fresh mobile samples. DevTools applies 4x CPU slowdown, 150ms request latency, 1638.4 Kbps download and 750 Kbps upload directly; this avoids extrapolating the loopback HTTP/1.1 waterfall with Lighthouse's simulated network model. Do not compare these values directly to a public HTTPS run using simulated throttling.
+
+The CI timing budgets are median LCP at most 3000ms, TBT at most 400ms and CLS at most 0.1. Resource budgets use the maximum sample's decoded sizes: CSS at most 160KiB for English and 270KiB for Chinese; JavaScript at most 1200KiB. Payload limits catch a single accidental language-font inclusion; medians reduce timing noise. These are regression budgets, not field CWV pass thresholds. Lighthouse scores are recorded but are not a gate. `scripts/performance-budgets.test.mjs` verifies failures and rejects incomplete evidence.
+
+The separate `performance` job builds with a non-production Sentry DSN and Production sampling, supplies no provider secrets and uploads all Lighthouse JSON reports plus a summary for 14 days, including on failure. Missing metrics, failed application stylesheet/script requests or failed budgets block `verify` and cannot authorize reuse. The two Vercel-injected analytics scripts are unavailable on a plain local Next.js server and are the only allowed script 404s; live analytics delivery remains a deployment/provider check. Keep the existing production browser jobs and exact-commit deployment gate.
+
+Field CWV still requires mobile/desktop p75 LCP, INP and CLS from Speed Insights or CrUX. A Lighthouse navigation run does not measure field INP; TBT is only a laboratory diagnostic. Query failures do not establish a pass or absence of field traffic. See [Google Web Vitals](https://web.dev/articles/vitals), [Chrome Lighthouse scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring), [Next.js CSS chunking](https://nextjs.org/docs/app/api-reference/config/next-config-js/cssChunking) and [font optimization](https://nextjs.org/docs/app/getting-started/fonts).
 
 ### Local runs and shard maintenance
 
@@ -412,6 +429,8 @@ The macOS job allows 20 minutes. The remaining wait covers ordinary queueing and
 Keep local screenshots and dated notes in `../local/audit/`. Legacy `audit/` remains excluded by Git and Vercel. Archive inactive caches or builds under `../local/archives/`; tools recreate their normal output paths.
 
 Keep `node_modules/`, local environment files and Vercel project linkage in the checkout. npm and Next.js/Turbopack require normal module resolution. Local evidence is historical, not a current issue list, and is absent from fresh clones. Keep durable decisions in tracked docs. Share reviewed evidence with relative image paths and its date, commit, environment and resolution status.
+
+The disposable Ubuntu performance runner supplies `LIGHTHOUSE_CHROME_FLAGS=--headless=new --no-sandbox` because Playwright's downloaded Chrome lacks an Ubuntu AppArmor sandbox profile. This override applies only to Lighthouse's provider-disabled localhost audit; local runs retain the default Chrome sandbox. Performance budgets remain unchanged. See [Lighthouse CI guidance](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md).
 
 CI keeps failed-attempt screenshots and traces for failed attempts and all retries, including passing retries. Upload artifacts even when the job passes; retain them for seven days.
 

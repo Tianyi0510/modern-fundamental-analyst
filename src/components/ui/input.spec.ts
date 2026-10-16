@@ -58,3 +58,43 @@ for (const width of [390, 1440]) {
     );
   });
 }
+
+for (const width of [390, 1440]) {
+  test(
+    `semantic component tokens propagate without changing native controls at ${width}px`,
+    width === 390 ? { tag: "@mobile" } : {},
+    async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/");
+      const contactLink = page.locator(".cta .button");
+      await expect(contactLink).toHaveJSProperty("tagName", "A");
+      await expect(contactLink).toHaveAttribute("href", "/contact");
+      await page.evaluate(() => {
+        document.documentElement.style.setProperty("--action-primary-surface", "var(--deep-blue)");
+      });
+      await expect(contactLink).toHaveCSS("background-color", "rgb(0, 41, 145)");
+      await expect(page.locator(".hero .button")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+      await contactLink.click();
+      await expect(page).toHaveURL(/\/contact$/);
+      const actions = page.locator('main button[type="submit"]');
+      await expect(actions).toHaveCount(2);
+      for (const action of await actions.all()) {
+        await expect(action).toHaveCSS("background-color", "rgb(0, 41, 145)");
+        await expect(action).toBeEnabled();
+      }
+      const fields = page.locator('main input[type="email"], main textarea');
+      await expect(fields).toHaveCount(3);
+      await page.evaluate(() => {
+        document.documentElement.style.setProperty("--field-surface", "var(--white)");
+        document.documentElement.style.setProperty("--field-text", "var(--deep-blue)");
+      });
+      for (const field of await fields.all()) {
+        await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
+        await expect(field).toHaveCSS("color", "rgb(0, 41, 145)");
+      }
+      await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    },
+  );
+}

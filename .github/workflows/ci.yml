@@ -163,9 +163,42 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  performance:
+    needs: plan
+    if: needs.plan.outputs.reuse != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
+      NEXT_PUBLIC_VERCEL_ENV: production
+      # Playwright's downloaded Chrome has no Ubuntu AppArmor sandbox profile.
+      # This disposable runner audits only the isolated, provider-disabled local site.
+      LIGHTHOUSE_CHROME_FLAGS: --headless=new --no-sandbox
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # The Ubuntu image already supplies browser libraries; use Playwright's pinned Chrome.
+      - run: npx playwright install chromium
+      - run: npm run test:performance
+      - name: Upload performance samples and budget summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-evidence
+          path: node_modules/.cache/performance/
+          retention-days: 14
+          if-no-files-found: warn
+
   verify:
     if: always()
-    needs: [plan, static, chromium]
+    needs: [plan, static, chromium, performance]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -175,11 +208,13 @@ jobs:
           REUSE: ${{ needs.plan.outputs.reuse }}
           STATIC: ${{ needs.static.result }}
           CHROMIUM: ${{ needs.chromium.result }}
+          PERFORMANCE: ${{ needs.performance.result }}
         run: |
           test "$PLAN" = success
           if [ "$REUSE" != true ]; then
             test "$STATIC" = success
             test "$CHROMIUM" = success
+            test "$PERFORMANCE" = success
           fi
 
   webkit:

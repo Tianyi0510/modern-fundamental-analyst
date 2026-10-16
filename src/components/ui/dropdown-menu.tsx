@@ -1,6 +1,6 @@
 "use client";
 import type { ComponentProps } from "react";
-import { DropdownMenu as Primitive } from "radix-ui";
+import { Menu as Primitive } from "@base-ui/react/menu";
 import { cn } from "@/lib/utils";
 
 export function DropdownMenu(props: ComponentProps<typeof Primitive.Root>) {
@@ -15,22 +15,36 @@ export function DropdownMenuTrigger(props: ComponentProps<typeof Primitive.Trigg
 export function DropdownMenuContent({
   className,
   sideOffset = 10,
+  align = "center",
   ...props
-}: ComponentProps<typeof Primitive.Content>) {
+}: Omit<ComponentProps<typeof Primitive.Popup>, "className"> & {
+  className?: string;
+  align?: ComponentProps<typeof Primitive.Positioner>["align"];
+  sideOffset?: number;
+}) {
   return (
     <Primitive.Portal>
-      <Primitive.Content
-        data-slot="dropdown-menu-content"
+      <Primitive.Positioner
         sideOffset={sideOffset}
-        className={cn(
-          "z-[var(--layer-popover)] max-h-[var(--radix-dropdown-menu-content-available-height)] w-40 overflow-y-auto rounded-[var(--radius-menu)] border border-[var(--gray)] bg-white text-black shadow-[0_16px_40px_rgba(0,0,0,0.12)] outline-none",
-          className,
-        )}
-        {...props}
-      />
+        align={align}
+        positionMethod="fixed"
+        className="z-[var(--layer-popover)]"
+      >
+        <Primitive.Popup
+          data-slot="dropdown-menu-content"
+          className={cn(
+            "max-h-[var(--available-height)] w-40 overflow-y-auto rounded-[var(--radius-menu)] bg-surface p-[var(--space-2)] text-black shadow-[var(--shadow-popover)] outline-none",
+            className,
+          )}
+          {...props}
+        />
+      </Primitive.Positioner>
     </Primitive.Portal>
   );
 }
-export function DropdownMenuItem({ className, ...props }: ComponentProps<typeof Primitive.Item>) {
+export function DropdownMenuItem({
+  className,
+  ...props
+}: Omit<ComponentProps<typeof Primitive.Item>, "className"> & { className?: string }) {
   return <Primitive.Item data-slot="dropdown-menu-item" className={cn("outline-none", className)} {...props} />;
 }

@@ -14,17 +14,17 @@ const copy = {
   en: {
     memoLabel: "Investment Memo",
     languageNotice: "This article is available in English only; no translation is available.",
-    scopeTitle: "Research Scope",
+    disclaimerTitle: "Disclaimer",
   },
   "zh-tw": {
     memoLabel: "投資備忘錄",
     languageNotice: "本文目前僅提供英文原文，尚無中文譯文。",
-    scopeTitle: "研究範圍",
+    disclaimerTitle: "免責聲明",
   },
   "zh-cn": {
     memoLabel: "投资备忘录",
     languageNotice: "本文目前仅提供英文原文，尚无中文译文。",
-    scopeTitle: "研究范围",
+    disclaimerTitle: "免责声明",
   },
 } as const;
 
@@ -60,16 +60,16 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
           </div>
           <div className={appearance["shell"]}>
             <p className={appearance["article-lead"]}>{memo.summary}</p>
-            <div className={appearance["article-notes"]}>
-              {content.language !== locale ? <p className="memo-language-notice">{text.languageNotice}</p> : null}
-              <aside aria-labelledby="memo-scope-title">
-                <h2 id="memo-scope-title" className="mb-[var(--space-3)] text-title-small">
-                  {text.scopeTitle}
-                </h2>
-                <p>{memo.scopeNote}</p>
-              </aside>
-            </div>
+            {content.language !== locale ? (
+              <p className={appearance["article-notes"] + " memo-language-notice"}>{text.languageNotice}</p>
+            ) : null}
             <MemoArticleContent content={content} />
+            <aside className={appearance["article-disclaimer"]} aria-labelledby="memo-disclaimer-title">
+              <h2 id="memo-disclaimer-title" className="mb-[var(--space-3)] text-title-small">
+                {text.disclaimerTitle}
+              </h2>
+              <p>{memo.scopeNote}</p>
+            </aside>
           </div>
         </article>
       </main>
