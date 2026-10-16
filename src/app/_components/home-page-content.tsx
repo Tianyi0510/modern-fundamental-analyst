@@ -310,7 +310,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         </div>
 
         <section className={appearance["performance-home"]}>
-          <div className={appearance["shell"]}>
+          <div className={appearance["shell"] + " @container/home-performance"}>
             <div className={appearance["section-heading"] + " " + "inverse"}>
               <p className={appearance["section-number"]}>{text.performanceLabel}</p>
               <h2>

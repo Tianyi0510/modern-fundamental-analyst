@@ -54,7 +54,11 @@ export async function requestSubscriptionConfirmation(email: string, locale: Loc
   if (!resend) throw new ResendCoordinationError();
   await requireRecipientAllowance(email, requestId);
   if (await isDeliverySuppressed(email)) return;
-  const existing = await runResendOperation("Confirmation contact lookup failed", () => resend.contacts.get({ email }));
+  const existing = await runResendOperation(
+    "Confirmation contact lookup failed",
+    () => resend.contacts.get({ email }),
+    { expectedStatuses: [404] },
+  );
   if (!existing || (existing.error && existing.error.statusCode !== 404)) throw new ResendCoordinationError();
   if (existing.data && !existing.data.unsubscribed) throw new ResendCoordinationError("You've already subscribed", 409);
 

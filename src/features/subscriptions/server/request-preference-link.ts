@@ -29,8 +29,10 @@ export async function requestPreferenceLink(email: string, locale: Locale, idemp
         };
       },
     );
-    const existing = await runResendOperation("Preference link contact lookup failed", () =>
-      resend.contacts.get({ email }),
+    const existing = await runResendOperation(
+      "Preference link contact lookup failed",
+      () => resend.contacts.get({ email }),
+      { expectedStatuses: [404] },
     );
     if (!existing) throw new ResendCoordinationError();
     if (existing.data) {

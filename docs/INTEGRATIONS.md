@@ -429,7 +429,9 @@ Prefer integration-managed values. Never expose the upload token with `NEXT_PUBL
 
 `next.config.ts` wraps Next.js with Sentry, uploads maps only with complete upload settings, then deletes uploaded generated maps from output. Runtime reporting needs no upload token.
 
-`src/lib/sentry-server.ts` reports Checkout failures, Contact rejections and thrown Resend operations using fixed operation names and failure classes. It attaches no provider messages or request values. Report Resend exceptions once at the shared boundary; validation and normal rate limits are not service failures. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.
+`src/lib/sentry-server.ts` reports Checkout failures, missing Contact configuration and Resend failures using fixed operation names and failure classes. It attaches no provider messages or request values. `runResendOperation` reports both thrown exceptions and returned SDK errors once, preserving the original result and retry behavior. All subscription segment requests, including rollback, use this boundary. Contact does not report the same provider rejection again.
+
+Callers explicitly allow expected statuses: contact lookups and feedback-driven unsubscribe updates accept 404. Other returned errors, including provider 5xx responses, remain reportable. Public input validation and application rate limits do not call this reporting boundary. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.
 
 ### Traces, logs and metrics
 
@@ -459,6 +461,10 @@ The fake-DSN regression checks real Replay envelopes and masking. It does not ve
 
 An empty dashboard or incomplete onboarding does not prove collection is disabled. Local transport tests verify envelope generation and filtering; accepted cloud events verify ingestion. After deployment, check the Vercel Integration, release and an authorized controlled error in Sentry Issues.
 
+For CSS chunk errors, inspect the environment and runtime frames before changing application code. On October 15, 2026, issue `SENTRY-MODERN-FUNDAMENTAL-ANALYST-6` recorded four localhost development events. Turbopack rejected CSS updates because the stylesheet link was missing after component unmounting.
+
+Next.js 16.4.2 passed isolated Chromium and WebKit checks for CSS updates after unmounting; see the [upstream fix](https://github.com/vercel/next.js/pull/94551). Restart development servers normally and reload existing tabs after a framework update. Keep stylesheet errors reportable, and verify the fix in its target environment before resolving the cloud issue.
+
 Set `NEXT_PUBLIC_SENTRY_DSN` in ignored `.env.local` to enable local reporting; leave it empty to disable it. `.env.example` supplies organization and project identifiers. Only authenticated map uploads need `SENTRY_AUTH_TOKEN`.
 
 Before `vercel env pull .env.local`, preserve local configuration: the command replaces the file and needs a Development connection.
@@ -480,5 +486,13 @@ PLAYWRIGHT_SENTRY_TEST=1 npx playwright test src/lib/sentry.spec.ts --project=ch
 ```
 
 Verify cloud traces in Traces. After an actual service failure, look for `Service operation failed` in Logs and `mfa.service.failures` in Metrics. Local emission does not prove cloud ingestion.
+
+When investigating missing spans, inspect project ingestion outcomes for the affected deployment window. Sampling drops are expected at the configured rate; distinguish them from network and timestamp failures. Rejected spans cannot be attributed to a release from accepted-event searches alone. Do not change timestamps, sampling or privacy filters without a reproducible cause.
+
+Uptime monitoring is separate from the SDK. Use one anonymous GET monitor for the production site, verify its URL returns 2xx, and connect outage notifications before treating reachability as monitored. Check existing monitors and the account's included allowance before creating one; an Error Monitor or active trace stream does not establish uptime coverage.
+
+On October 16, 2026, [production monitor 10662057](https://modern-fundamental-analyst.sentry.io/monitors/10662057/) was created for `GET https://www.modernfundamentalanalyst.com/` in `production`: a 60-second interval, 5-second timeout, 2xx response assertion, three failures to open an issue and one success to resolve it. The manual test passed. Existing project alerts appear on its detail page; notification delivery has not been tested.
+
+Activation remains blocked: billing shows the Developer plan with one included Uptime Monitor, usage `0 / 1` and `$0.00` additional spend, but enabling the monitor returns `You don't have enough budget available to create a new seat`. The monitor is disabled and has no scheduled checks. Resolve this entitlement discrepancy with Sentry before claiming uptime coverage. No trial, upgrade or spending increase was enabled. Recheck live status and allowance rather than treating this dated observation as current configuration.
 
 References: [Next.js tracing](https://docs.sentry.io/platforms/javascript/guides/nextjs/tracing/), [Logs](https://docs.sentry.io/platforms/javascript/guides/nextjs/logs/), [Metrics](https://docs.sentry.io/platforms/javascript/guides/nextjs/metrics/), and [data collection](https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection).

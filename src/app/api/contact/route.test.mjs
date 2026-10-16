@@ -3,6 +3,7 @@ import test from "node:test";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { POST } from "./route.ts";
+import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
 
 const server = setupServer();
 const unexpectedRequests = [];
@@ -81,7 +82,8 @@ for (const locale of ["en", "zh-tw", "zh-cn"]) {
   });
 }
 
-test("contact POST maps provider rejection to a safe failure response", async () => {
+test("contact POST maps provider rejection to a safe failure response and reports it once", async (t) => {
+  const capture = monitoringCapture(t);
   let calls = 0;
   server.use(
     http.post("https://api.resend.com/emails", () => {
@@ -93,6 +95,11 @@ test("contact POST maps provider rejection to a safe failure response", async ()
   assert.equal(response.status, 502);
   assert.deepEqual(await response.json(), { error: "Message could not be sent." });
   assert.equal(calls, 1);
+  await capture.flush();
+  assert.equal(capture.events.length, 1);
+  assert.equal(capture.logs.length, 1);
+  assert.equal(capture.metrics.length, 1);
+  assert.doesNotMatch(JSON.stringify(capture.events), /private provider detail/);
 });
 
 test("contact POST fails without provider requests when email configuration is missing", async () => {

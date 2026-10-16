@@ -40,8 +40,10 @@ export async function processDeliveryFeedback(event: WebhookEventPayload, eventI
       // Persist feedback before the provider write. A later public signup must
       // never undo a complaint or bounce, including after a partial failure.
       await executeRedisCommand(redis, () => redis.set(subscriptionKey("suppression", email), event.type));
-      const result = await runResendOperation("Resend webhook contact update failed", () =>
-        resend.contacts.update({ email, unsubscribed: true }),
+      const result = await runResendOperation(
+        "Resend webhook contact update failed",
+        () => resend.contacts.update({ email, unsubscribed: true }),
+        { expectedStatuses: [404] },
       );
       if (!result || (result.error && result.error.statusCode !== 404)) throw new Error("Webhook processing failed");
       // Retain completed IDs: dashboard replays are not limited to retry windows.

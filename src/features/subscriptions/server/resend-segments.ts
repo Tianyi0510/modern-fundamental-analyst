@@ -1,7 +1,7 @@
 import "server-only";
 import type { Resend } from "resend";
 import type { Locale } from "@/lib/i18n";
-import { reportResendRollbackFailure } from "@/lib/resend";
+import { reportResendRollbackFailure, runResendOperation } from "@/lib/resend";
 
 const preferredLanguageSegments = {
   en: process.env.RESEND_SEGMENT_EN || "39c96ed5-94c2-4755-876a-b29b414433e0",
@@ -25,10 +25,18 @@ async function restorePreferredLanguageSegments(
   targetId: string,
 ) {
   const results = await Promise.allSettled([
-    ...segmentIds.map((segmentId) => resend.contacts.segments.add({ email, segmentId })),
-    ...(removeTarget ? [resend.contacts.segments.remove({ email, segmentId: targetId })] : []),
+    ...segmentIds.map((segmentId) =>
+      runResendOperation("Restore language segment failed", () => resend.contacts.segments.add({ email, segmentId })),
+    ),
+    ...(removeTarget
+      ? [
+          runResendOperation("Remove target language segment failed", () =>
+            resend.contacts.segments.remove({ email, segmentId: targetId }),
+          ),
+        ]
+      : []),
   ]);
-  const failed = results.some((result) => result.status === "rejected" || result.value.error);
+  const failed = results.some((result) => result.status === "rejected" || !result.value || result.value.error);
   if (failed) {
     reportResendRollbackFailure();
     throw new Error("Unable to restore preferred language segments");
@@ -44,8 +52,10 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
   // independently of the shared operation deadline.
   for (let page = 0; ; page += 1) {
     if (page >= 100) throw new Error("Contact segment pagination limit exceeded");
-    const current = await resend.contacts.segments.list({ email, limit: 100, ...(after ? { after } : {}) });
-    if (current.error || !current.data) throw new Error("Unable to read contact segments");
+    const current = await runResendOperation("Read contact language segments failed", () =>
+      resend.contacts.segments.list({ email, limit: 100, ...(after ? { after } : {}) }),
+    );
+    if (!current || current.error || !current.data) throw new Error("Unable to read contact segments");
     for (const { id } of current.data.data) if (languageSegmentIds.has(id)) found.add(id);
     if (!current.data.has_more) break;
     after = current.data.data.at(-1)?.id;
@@ -61,23 +71,27 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
 
   try {
     if (targetWasAdded) {
-      const added = await resend.contacts.segments.add({ email, segmentId: targetId });
-      if (added.error) throw new Error(`Unable to add preferred language segment: ${added.error.name}`);
+      const added = await runResendOperation("Add preferred language segment failed", () =>
+        resend.contacts.segments.add({ email, segmentId: targetId }),
+      );
+      if (!added || added.error) throw new Error("Unable to add preferred language segment");
       targetAdded = true;
     }
 
     const removals = await Promise.allSettled(
       previousLanguageIds.map(async (segmentId) => ({
         segmentId,
-        result: await resend.contacts.segments.remove({ email, segmentId }),
+        result: await runResendOperation("Remove previous language segment failed", () =>
+          resend.contacts.segments.remove({ email, segmentId }),
+        ),
       })),
     );
     let removalError: unknown;
     for (const removal of removals) {
       if (removal.status === "rejected") {
         removalError ??= removal.reason;
-      } else if (removal.value.result.error) {
-        removalError ??= new Error(`Unable to remove previous language segment: ${removal.value.result.error.name}`);
+      } else if (!removal.value.result || removal.value.result.error) {
+        removalError ??= new Error("Unable to remove previous language segment");
       } else {
         removedLanguageIds.push(removal.value.segmentId);
       }

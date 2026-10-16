@@ -50,7 +50,9 @@ export async function activateConfirmedContactLocked(
     return { ok: false, message: "Subscription service is temporarily unavailable.", status: 503 };
   }
 
-  const existing = await runResendOperation("Resend contact lookup failed", () => resend.contacts.get({ email }));
+  const existing = await runResendOperation("Resend contact lookup failed", () => resend.contacts.get({ email }), {
+    expectedStatuses: [404],
+  });
   if (!existing || (existing.error && existing.error.statusCode !== 404)) return unavailable();
 
   if (existing.data && !existing.data.unsubscribed) {

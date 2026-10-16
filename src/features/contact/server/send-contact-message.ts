@@ -34,7 +34,6 @@ export async function sendContactMessage(
 
   if (!result || result.error) {
     if (result?.error) {
-      reportServiceFailure("contact.delivery", "provider-error");
       console.error("Resend contact delivery failed", result.error.name);
     }
     return { ok: false, error: "Message could not be sent.", status: 502 };

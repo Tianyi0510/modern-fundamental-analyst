@@ -42,6 +42,41 @@ test("Resend operation boundary returns successful provider responses", async ()
   assert.deepEqual(result, { data: { id: "contact-id" } });
 });
 
+test("returned provider failures emit one sanitized error, log and metric without changing the result", async (t) => {
+  const capture = monitoringCapture(t);
+  const response = {
+    data: null,
+    error: { name: "application_error", statusCode: 500, message: "private provider details" },
+  };
+  assert.equal(await runResendOperation("Synthetic provider failure", async () => response), response);
+  await capture.flush();
+  assert.equal(capture.events.length, 1);
+  assert.deepEqual(capture.events[0].tags, { operation: "resend.request", failure_kind: "provider-error" });
+  assert.equal(capture.logs.length, 1);
+  assert.equal(capture.metrics.length, 1);
+  assert.doesNotMatch(JSON.stringify(capture), /private provider details|application_error/);
+});
+
+test("only explicitly expected provider statuses bypass monitoring", async (t) => {
+  const capture = monitoringCapture(t);
+  const missing = { data: null, error: { name: "not_found", statusCode: 404 } };
+  assert.equal(
+    await runResendOperation("Expected missing contact", async () => missing, { expectedStatuses: [404] }),
+    missing,
+  );
+  assert.deepEqual(await runResendOperation("Success", async () => ({ data: { id: "contact" }, error: null })), {
+    data: { id: "contact" },
+    error: null,
+  });
+  await capture.flush();
+  assert.equal(capture.events.length, 0);
+  assert.equal(capture.logs.length, 0);
+  assert.equal(capture.metrics.length, 0);
+  await runResendOperation("Unexpected missing resource", async () => missing);
+  await capture.flush();
+  assert.equal(capture.events.length, 1);
+});
+
 test("Resend operation boundary converts thrown provider failures to null", async (t) => {
   const { events, flush } = monitoringCapture(t);
   const originalError = console.error;

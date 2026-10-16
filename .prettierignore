@@ -8,3 +8,4 @@ out/
 playwright-report/
 package-lock.json
 AGENTS.md
+.agents/skills/

@@ -142,6 +142,8 @@ Geist Typography, Colors and Materials are expressed in the shared tokens and ow
 
 Private `*.styles.ts` maps contain complete utility strings. Components import their own CSS Modules for chart structure and complex motion. `components.json` configures source installation. Email styling remains separate. [Design System](DESIGN_SYSTEM.md#style-ownership) defines variants and visual ownership.
 
+`Grid` is a server-compatible guided layout shared by Home and the memo index. It owns responsive tracks and decorative gaps; memo cards own their solid surfaces and the tablet spanning rule. It adds no interaction engine or client boundary. Ordinary content grids remain Tailwind utilities. See [Grid layout](DESIGN_SYSTEM.md#grid-layout) for breakpoints and accessibility rules.
+
 `site-header-desktop.tsx` owns desktop navigation and language-menu state. `use-site-header.ts` owns mobile phases and measured panel/icon animations. `use-menu-touch-feedback.ts` owns the trigger/close touch ring.
 
 The mobile phase drives Sheet's open state through the final closing frame; Base UI owns modal isolation, focus containment and scroll locking. Base UI `render` replaces Slot composition without adding interactive wrappers. Popup `initialFocus` and `finalFocus` preserve close-button entry and route-aware focus restoration. Desktop Menu uses its own non-modal positioning and keyboard model, with explicit Tab and outside-focus exits. Native disclosures work without JavaScript. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.

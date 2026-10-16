@@ -1,5 +1,6 @@
 import { appearance } from "./memo-cards.styles";
 import Link from "next/link";
+import { Grid } from "@/components/grid";
 import type { MemoSummary } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
@@ -38,7 +39,7 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
   const Heading = placement === "featured" ? "h2" : "h3";
 
   return (
-    <div
+    <Grid
       className={`${appearance["memo-grid"]} ${placement === "featured" ? "memo-index-featured mt-0 mb-[var(--space-section)]" : "mt-[var(--space-heading-content)]"}`}
     >
       {slotIndexes.map((index) => {
@@ -77,6 +78,6 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
           </Link>
         );
       })}
-    </div>
+    </Grid>
   );
 }

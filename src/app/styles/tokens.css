@@ -38,6 +38,7 @@
   --radius-field: var(--radius-6);
   --radius-action: var(--radius-pill);
   --border-subtle: var(--gray);
+  --grid-guide: var(--border-subtle);
   --border-strong: var(--black);
   --border-control: var(--neutral-800);
   --border-error: #ff0000;

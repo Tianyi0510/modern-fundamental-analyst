@@ -49,7 +49,7 @@ export const appearance = {
   "section-heading":
     "section-heading grid [grid-template-columns:1fr_2fr] [align-items:start] [&_h2]:[margin:0] [&_h2]:text-headline [&_h2]:[text-transform:none] [&_h2]:[text-wrap:balance] [.returns_&]:block [.returns_&_h2]:[margin-top:var(--space-related-content)] [@media((max-width:_800px))]:[&_h2]:[overflow-wrap:anywhere] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[gap:var(--space-related-content)]",
   "performance-grid":
-    "performance-grid grid [grid-template-columns:1.45fr_0.7fr] [gap:80px] [margin-top:var(--space-heading-content)] [align-items:end] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[margin-top:var(--space-heading-content)]",
+    "performance-grid grid @max-[45rem]/home-performance:grid-cols-1 [grid-template-columns:1.45fr_0.7fr] [gap:80px] [margin-top:var(--space-heading-content)] [align-items:end] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[margin-top:var(--space-heading-content)]",
   "performance-bars":
     "performance-bars [height:360px] flex [align-items:end] [gap:clamp(18px,_4vw,_62px)] [padding:40px_26px_0] [border-left:1px_solid] [border-bottom:1px_solid] [@media((max-width:_800px))]:[height:280px] [@media((max-width:_800px))]:[gap:18px] [@media((max-width:_800px))]:[padding-inline:12px] [.performance-home_&]:[border-color:rgba(0,_0,_0,_0.28)]",
   "year-bar":

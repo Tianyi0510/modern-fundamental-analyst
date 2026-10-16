@@ -8,7 +8,7 @@ The site adopts the five layers below as its design system. Preserve its editori
 
 | Layer                  | Responsibility                                                                                                                                                                                                                      | Reference                                                                                                           |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 01: Design foundations | Geist supplies Typography, Colors and Materials. Fluent 2 organizes primitives, semantic aliases and component roles. Explicit brand exceptions remain.                                                                             | [Geist](https://vercel.com/geist/introduction), [Fluent 2 tokens](https://fluent2.microsoft.design/design-tokens)   |
+| 01: Design foundations | Geist supplies Typography, Colors, Materials and guided Grid layouts. Fluent 2 organizes primitives, semantic aliases and component roles. Explicit brand exceptions remain.                                                        | [Geist](https://vercel.com/geist/introduction), [Fluent 2 tokens](https://fluent2.microsoft.design/design-tokens)   |
 | 02: UX guidelines      | Evaluate clarity, feedback, navigation and input behavior against the actual task. Record justified exceptions instead of applying every recommendation mechanically.                                                               | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book) |
 | 03: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                       | [shadcn/ui](https://ui.shadcn.com/docs), [Lucide](https://lucide.dev/)                                              |
 | 04: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations. | [Base UI](https://base-ui.com/react/overview/quick-start)                                                           |
@@ -78,6 +78,18 @@ Make the site easier to understand, use, change and verify. Share components whe
 ## CSS, layout, and visual language
 
 The site uses an editorial financial style: clear type hierarchy, generous section spacing, square data surfaces, pill-shaped primary controls and restrained motion.
+
+### Grid layout
+
+Follow [Geist Grid](https://vercel.com/geist/grid) for layouts where visible guides organize cells. `Grid` in `src/components/grid.tsx` is the site's Server Component implementation, using CSS Grid and Tailwind rather than an additional component package. Keep ordinary cards, forms, KPI bands and editorial columns on plain Tailwind grids when visible guides add no meaning. `Container` continues to own page width and gutters.
+
+The guided grid uses one column through 800px, two from 801px, and three from 1101px when configured for three columns. Two-column grids retain two columns above 800px. Rows follow content height and DOM order; do not fix text-bearing rows to a pixel height. Tracks use `minmax(0, 1fr)` to contain long translated content.
+
+Home and the memo index share this grid. Their three memo cells occupy three desktop columns; on tablets, the third cell spans the second row. Mobile retains the published memo and hides planned placeholders. Cards own their opaque surfaces, corners and focus feedback. The one-pixel gap exposes `--grid-guide`, an alias of the original gray divider color. The shared material outline remains unchanged.
+
+Guides are decorative CSS backgrounds, with no focus targets or ARIA grid role. Content keeps native headings, articles and links; keyboard order follows reading order. Do not clip focus outlines or nest guided grids more than one level. Cross markers, dashed guides and overlaying cells are not needed by the current content.
+
+Home's performance comparison uses a named inline-size container. Below 45rem of available content width, its chart and headline figure stack vertically. The rem-based container query responds to enlarged root text as well as available width, preserving the two-column layout at ordinary tablet and desktop text sizes. Keep the percentage's type size and value intact; do not hide horizontal overflow to compensate for insufficient column width.
 
 ### Style ownership
 

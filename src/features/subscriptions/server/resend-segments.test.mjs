@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
 
 const { getPreferredLanguageSegmentId, syncPreferredLanguageSegment } = await import("./resend-segments.ts");
 
@@ -41,7 +42,8 @@ test("preferred-language segment sync leaves only the selected language", async 
   assert.deepEqual([...mock.segmentIds], [english]);
 });
 
-test("preferred-language segment sync rolls back a partial failure", async () => {
+test("preferred-language segment sync reports a partial failure once and rolls it back", async (t) => {
+  const capture = monitoringCapture(t);
   const english = getPreferredLanguageSegmentId("en");
   const traditionalChinese = getPreferredLanguageSegmentId("zh-tw");
   const simplifiedChinese = getPreferredLanguageSegmentId("zh-cn");
@@ -55,6 +57,11 @@ test("preferred-language segment sync rolls back a partial failure", async () =>
   assert.equal(mock.segmentIds.has(english), true);
   assert.equal(mock.segmentIds.has(simplifiedChinese), true);
   assert.equal(mock.segmentIds.has(traditionalChinese), false);
+  await capture.flush();
+  assert.equal(capture.events.length, 1);
+  assert.equal(capture.logs.length, 1);
+  assert.equal(capture.metrics.length, 1);
+  assert.doesNotMatch(JSON.stringify(capture), /reader@example.com|SegmentRemovalError/);
 });
 
 test("segment sync reads later pages and preserves unrelated memberships", async () => {
