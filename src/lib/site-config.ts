@@ -72,9 +72,16 @@ type PageMetadataOptions = {
   description: string;
   path: `/${string}` | "/";
   locale?: Locale;
+  indexable?: boolean;
 };
 
-export function createPageMetadata({ title, description, path, locale = "en" }: PageMetadataOptions): Metadata {
+export function createPageMetadata({
+  title,
+  description,
+  path,
+  locale = "en",
+  indexable = true,
+}: PageMetadataOptions): Metadata {
   const canonical = getLocalizedPath(path, locale);
   const fullTitle = locale === "en" ? `${title} | ${SITE_NAME}` : `${title}｜${SITE_NAME}`;
 
@@ -84,7 +91,8 @@ export function createPageMetadata({ title, description, path, locale = "en" }: 
     ...createSharingMetadata(fullTitle, description, canonical, locale),
     alternates: {
       canonical,
-      languages: getLanguageAlternates(path),
+      ...(indexable ? { languages: getLanguageAlternates(path) } : {}),
     },
+    ...(!indexable ? { robots: { index: false, follow: false } } : {}),
   };
 }

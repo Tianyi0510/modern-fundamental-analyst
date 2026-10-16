@@ -23,10 +23,13 @@ export function TouchPressFeedback() {
     };
     const move = (event: PointerEvent) => {
       if (!press || press.pointerId !== event.pointerId) return;
-      const bounds = press.element.getBoundingClientRect();
       // Cancel as a gesture develops; do not re-arm until the next touch.
+      if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > 10) {
+        clear();
+        return;
+      }
+      const bounds = press.element.getBoundingClientRect();
       if (
-        Math.hypot(event.clientX - press.x, event.clientY - press.y) > 10 ||
         event.clientX < bounds.left ||
         event.clientX > bounds.right ||
         event.clientY < bounds.top ||

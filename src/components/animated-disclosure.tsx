@@ -59,7 +59,8 @@ export function AnimatedDisclosure({
     if (!details) return;
     const summary = event.currentTarget;
     event.preventDefault();
-    const startHeight = details.getBoundingClientRect().height;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const startHeight = reducedMotion ? 0 : details.getBoundingClientRect().height;
     const open = animationRef.current ? phaseRef.current === "closing" : !details.open;
     phaseRef.current = open ? "opening" : "closing";
     details.dataset.state = phaseRef.current;
@@ -70,7 +71,7 @@ export function AnimatedDisclosure({
     animationRef.current = null;
     details.removeAttribute("data-closing");
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion) {
       settle();
       return;
     }

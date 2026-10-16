@@ -1,5 +1,5 @@
 import { appearance } from "./memo-detail-page.styles";
-import { createMemoStructuredData } from "@/features/memos/memo-pages";
+import { createMemoBreadcrumbStructuredData, createMemoStructuredData } from "@/features/memos/memo-pages";
 import { notFound } from "next/navigation";
 import { MemoArticleContent } from "@/features/memos/memo-article-content";
 import { PageFooter } from "@/app/_components/page-footer";
@@ -35,6 +35,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
 
   const text = copy[locale];
   const structuredData = createMemoStructuredData(slug, locale);
+  const breadcrumb = createMemoBreadcrumbStructuredData(slug, locale);
   return (
     <>
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
@@ -42,6 +43,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
         {structuredData ? (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData }} />
         ) : null}
+        {breadcrumb ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumb }} /> : null}
         <article className={appearance["memo-article"]}>
           <div className={appearance["memo-article-header-band"]}>
             <header className={appearance["memo-article-header"] + " " + appearance["shell"]}>

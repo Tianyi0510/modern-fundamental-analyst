@@ -4,8 +4,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { performanceRoutes, evaluateReports } from "./performance-budgets.mjs";
 import { chromium } from "@playwright/test";
-import { pageFunctions } from "lighthouse/core/lib/page-functions.js";
-import { createCpuCalibration, validateCpuCalibration } from "./performance-cpu.mjs";
+import { calibrateCpu, validateCpuCalibration } from "./performance-cpu.mjs";
 
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -78,15 +77,19 @@ try {
   }
   if (!ready) throw new Error("Isolated production server did not become ready");
   const browser = await chromium.launch({
+    executablePath: env.CHROME_PATH,
     args: (process.env.LIGHTHOUSE_CHROME_FLAGS || "").split(/\s+/).filter(Boolean),
   });
   let calibration;
   try {
     const page = await browser.newPage();
-    const samples = [];
-    for (let sample = 0; sample < 3; sample++) samples.push(await page.evaluate(pageFunctions.computeBenchmarkIndex));
-    await writeFile(new URL("cpu-calibration-samples.json", output), JSON.stringify(samples) + "\n");
-    calibration = { ...createCpuCalibration(samples), browserVersion: browser.version() };
+    calibration = {
+      ...(await calibrateCpu(page, (stage, samples) =>
+        writeFile(new URL(`cpu-${stage}-samples.json`, output), JSON.stringify(samples) + "\n"),
+      )),
+      browserVersion: browser.version(),
+      executablePath: env.CHROME_PATH,
+    };
   } finally {
     await browser.close();
   }

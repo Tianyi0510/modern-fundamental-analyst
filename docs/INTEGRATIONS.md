@@ -457,7 +457,7 @@ Do not include secrets or private provider responses in messages; filters cannot
 
 ### Session Replay
 
-Browser instrumentation initializes error monitoring immediately and loads Replay through a separate dynamic module. Private navigation permanently cancels a pending Replay initialization for the page lifetime, as well as stopping an active recording. A Replay chunk failure leaves error monitoring active. Sample normal sessions at 10% and error sessions at 100%. Isolated `test` builds use 100% sampling and uncompressed inspection payloads.
+Browser instrumentation initializes error monitoring immediately and loads Replay through a separate dynamic module. Yield to the browser before requesting that module and again before starting its DOM snapshot, so optional recording work does not extend the same initialization task. Use `scheduler.yield()` when available and a zero-delay timer fallback elsewhere; there is no fixed multi-second delay or Lighthouse-specific bypass. Recheck privacy permission after each asynchronous boundary. Private navigation permanently cancels a pending Replay initialization for the page lifetime, as well as stopping an active recording. A Replay chunk failure leaves error monitoring active. Sample normal sessions at 10% and error sessions at 100%. Isolated `test` builds use 100% sampling and uncompressed inspection payloads.
 
 Mask text and inputs, block media, discard custom console/network events, and block forms and links containing queries or fragments. Do not start Replay on query/fragment URLs, Support, Preferences or Confirmation. Navigating there stops recording without automatic restart; errors and tracing stay active.
 

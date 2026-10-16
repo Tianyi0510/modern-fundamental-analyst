@@ -22,7 +22,7 @@ test("SEO routes emit unique production URLs and localized alternates", () => {
   assert.deepEqual(robots(), { rules: { userAgent: "*", allow: "/" }, sitemap: `${SITE_URL}/sitemap.xml` });
 });
 
-test("page metadata provides canonical and bilingual alternate URLs", async () => {
+test("page metadata provides canonical and localized alternate URLs", async () => {
   const { createPageMetadata, createRootMetadata, SITE_NAME } = await import("./site-config.ts");
   const { locales, localeConfig, getLocalizedPath } = await import("./i18n.ts");
   for (const locale of locales) {
@@ -81,6 +81,25 @@ test("sitemap excludes private workflows and does not invent modification dates"
     for (const alternate of Object.values(entry.alternates.languages)) {
       const target = sitemap().find(({ url }) => url === alternate);
       assert.deepEqual(target.alternates.languages, entry.alternates.languages);
+    }
+  }
+});
+
+test("private metadata excludes search language alternates and retains a query-free canonical", async () => {
+  const { createPageMetadata } = await import("./site-config.ts");
+  for (const locale of ["en", "zh-tw", "zh-cn"]) {
+    for (const path of ["/subscription-preferences", "/subscription-confirmation"]) {
+      const metadata = createPageMetadata({
+        title: "Private workflow",
+        description: "Private workflow",
+        path,
+        locale,
+        indexable: false,
+      });
+      assert.deepEqual(metadata.robots, { index: false, follow: false });
+      assert.equal(metadata.alternates.languages, undefined);
+      assert.ok(metadata.alternates.canonical.endsWith(path));
+      assert.equal(metadata.alternates.canonical.includes("?"), false);
     }
   }
 });

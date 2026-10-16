@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createSentryOptions, resolveSentryDsn } from "@/lib/sentry-options";
 
 import { canRecordReplay } from "@/lib/sentry-replay";
+import { yieldToMain } from "@/lib/yield-to-main";
 
 let replayAllowed = false;
 function stopPrivateReplay(href: string) {
@@ -23,9 +24,15 @@ if (dsn) {
   replayAllowed = canRecordReplay(window.location.href);
   if (replayAllowed) {
     // Load the DOM recorder separately so error monitoring does not block on Replay code.
-    void import("@/lib/sentry-replay-client")
-      .then(({ initializeReplay }) => {
-        if (replayAllowed && canRecordReplay(window.location.href)) initializeReplay(environment);
+    void yieldToMain()
+      .then(() =>
+        replayAllowed && canRecordReplay(window.location.href) ? import("@/lib/sentry-replay-client") : null,
+      )
+      .then(async (replay) => {
+        if (!replay) return;
+        // Module evaluation and the initial DOM snapshot must not share one task.
+        await yieldToMain();
+        if (replayAllowed && canRecordReplay(window.location.href)) replay.initializeReplay(environment);
       })
       .catch(() => {
         // Optional Replay loading must not interrupt navigation or error monitoring.

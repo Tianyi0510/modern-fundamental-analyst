@@ -92,7 +92,7 @@ test("article metadata and structured data agree with the localized catalog", as
 
 test("structured data escapes script terminators without changing article text", async () => {
   const { getMemo } = await import("./memos.ts");
-  const { createMemoStructuredData } = await import("./memo-pages.ts");
+  const { createMemoStructuredData, createMemoBreadcrumbStructuredData } = await import("./memo-pages.ts");
   const slug = "microsoft-stock-analysis-fiscal-year-2024";
   const memo = getMemo(slug, "en");
   const previous = memo.title;
@@ -101,7 +101,47 @@ test("structured data escapes script terminators without changing article text",
     const serialized = createMemoStructuredData(slug, "en");
     assert.equal(serialized.includes("<"), false);
     assert.equal(JSON.parse(serialized).headline, memo.title);
+    const breadcrumb = createMemoBreadcrumbStructuredData(slug, "en");
+    assert.equal(breadcrumb.includes("<"), false);
+    assert.equal(JSON.parse(breadcrumb).itemListElement[2].name, memo.title);
   } finally {
     memo.title = previous;
   }
+});
+
+test("memo breadcrumbs describe the real localized navigation hierarchy", async () => {
+  const { createMemoBreadcrumbStructuredData } = await import("./memo-pages.ts");
+  const { getMemo } = await import("./memos.ts");
+  const { getNavigationCopy } = await import("@/lib/navigation-copy.ts");
+  const { getLocalizedPath } = await import("@/lib/i18n.ts");
+  const slug = "microsoft-stock-analysis-fiscal-year-2024";
+  for (const locale of ["en", "zh-tw", "zh-cn"]) {
+    const serialized = createMemoBreadcrumbStructuredData(slug, locale);
+    const breadcrumb = JSON.parse(serialized);
+    const navigation = getNavigationCopy(locale);
+    assert.equal(breadcrumb["@context"], "https://schema.org");
+    assert.equal(breadcrumb["@type"], "BreadcrumbList");
+    assert.deepEqual(breadcrumb.itemListElement, [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: navigation.home,
+        item: `https://www.modernfundamentalanalyst.com${getLocalizedPath("/", locale)}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: navigation.memos,
+        item: `https://www.modernfundamentalanalyst.com${getLocalizedPath("/memos", locale)}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: getMemo(slug, locale).title,
+        item: `https://www.modernfundamentalanalyst.com${getLocalizedPath(`/memos/${slug}`, locale)}`,
+      },
+    ]);
+    assert.equal(serialized.includes("<"), false);
+  }
+  assert.equal(createMemoBreadcrumbStructuredData("missing", "en"), null);
 });

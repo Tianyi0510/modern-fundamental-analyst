@@ -9,6 +9,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(researchTitle).toBeVisible();
     const holdings = page.locator(".holdings-list");
     const links = page.locator(".footer-links");
+    const aboutLabel =
+      prefix === "" ? "Read About My Approach" : prefix === "/zh-tw" ? "了解我的投資理念" : "了解我的投资理念";
+    const about = page.getByRole("link", { name: aboutLabel, exact: true });
+    await expect(about).toHaveAttribute("href", `${prefix}/about`);
     await expect(holdings).toMatchAriaSnapshot(`
       - list:
         - listitem
@@ -21,11 +25,17 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.setViewportSize({ width, height: 900 });
       await expect(holdings).toBeVisible();
       await expect(links).toBeVisible();
+      await expect(about).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       const contact = links.getByRole("link").first();
       await contact.focus();
       await expect(contact).toBeFocused();
       await expect(contact).toHaveAttribute("href", `${prefix}/contact`);
     }
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    await expect(about).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    await about.focus();
+    await expect(about).toBeFocused();
   });
 }

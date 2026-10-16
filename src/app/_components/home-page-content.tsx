@@ -34,7 +34,7 @@ const copy = {
     aboutTitle: ["My Investment Beliefs and", "Commitment to Learning"],
     aboutCopy:
       "I believe in focus investing, long-term value investing, and the coming waves of AI and other disruptive technologies. I value accounting as the language of business and use financial modeling to connect business fundamentals with valuation. I also promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning.",
-    aboutLink: "Read More",
+    aboutLink: "Read About My Approach",
     portfolioLabel: "02 · Portfolio",
     portfolioTitle: ["A Focus Portfolio Built", "for Long-Term Ownership"],
     fullPortfolio: "View Full Portfolio",
@@ -75,7 +75,7 @@ const copy = {
     aboutTitle: ["我的投資信念與", "持續學習的承諾"],
     aboutCopy:
       "我相信集中投資、長期價值投資，以及即將到來的人工智慧與其他顛覆性科技浪潮。我重視會計作為商業語言的角色，並運用財務建模連結企業基本面與估值。我也提倡以好奇心、同理心與持續學習為基礎的「learn-it-all」成長思維。",
-    aboutLink: "閱讀更多",
+    aboutLink: "了解我的投資理念",
     portfolioLabel: "02 · 投資組合",
     portfolioTitle: ["為長期持有而建立的", "集中投資組合"],
     fullPortfolio: "查看完整投資組合",
@@ -116,7 +116,7 @@ const copy = {
     aboutTitle: ["我的投资信念与", "持续学习的承诺"],
     aboutCopy:
       "我相信集中投资、长期价值投资，以及即将到来的人工智能与其他颠覆性科技浪潮。我重视会计作为商业语言的作用，并运用财务建模连接企业基本面与估值。我也倡导以好奇心、同理心与持续学习为基础的“learn-it-all”成长思维。",
-    aboutLink: "阅读更多",
+    aboutLink: "了解我的投资理念",
     portfolioLabel: "02 · 投资组合",
     portfolioTitle: ["为长期持有而建立的", "集中投资组合"],
     fullPortfolio: "查看完整投资组合",
