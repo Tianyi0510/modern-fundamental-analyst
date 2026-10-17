@@ -1,6 +1,20 @@
 import { expect, test } from "@playwright/test";
 import { colorContrast } from "../../scripts/color-contrast";
 
+test.beforeEach(async ({ page }) => {
+  await page.route("https://sentry.invalid/**", (route) =>
+    route.fulfill({
+      status: 200,
+      body: "{}",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      },
+    }),
+  );
+});
+
 const labels = [
   { prefix: "", label: "Appearance" },
   { prefix: "/zh-tw", label: "外觀" },

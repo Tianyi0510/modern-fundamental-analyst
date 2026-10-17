@@ -2,14 +2,14 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { captureException } from "@sentry/nextjs";
+import { reportClientError } from "@/lib/sentry-client";
 import { ChartBoundary } from "./chart-boundary";
 import { PerformanceChartView } from "./performance-chart-view";
 
-vi.mock("@sentry/nextjs", () => ({ captureException: vi.fn() }));
+vi.mock("@/lib/sentry-client", () => ({ reportClientError: vi.fn() }));
 beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
-  vi.mocked(captureException).mockClear();
+  vi.mocked(reportClientError).mockClear();
 });
 
 it.each([
@@ -29,7 +29,7 @@ it.each([
   expect(screen.getByRole("status")).toHaveTextContent(message);
   expect(screen.getByRole("navigation")).toBeVisible();
   expect(screen.getByRole("region", { name: "Methodology" })).toBeVisible();
-  expect(captureException).toHaveBeenCalledWith(expect.any(Error), {
+  expect(reportClientError).toHaveBeenCalledWith(expect.any(Error), {
     tags: { feature: "performance-chart", measure: "twr" },
   });
 });
@@ -47,10 +47,10 @@ it("reports the original rendering error for SDK stack parsing", () => {
     </ChartBoundary>,
   );
   expect(screen.getByRole("status")).toHaveTextContent("This chart is temporarily unavailable.");
-  expect(captureException).toHaveBeenCalledWith(renderError, {
+  expect(reportClientError).toHaveBeenCalledWith(renderError, {
     tags: { feature: "performance-chart", measure: "xirr" },
   });
-  expect(vi.mocked(captureException).mock.calls[0]?.[0]).toBe(renderError);
+  expect(vi.mocked(reportClientError).mock.calls[0]?.[0]).toBe(renderError);
 });
 
 it("retries only the failed chart and leaves its healthy sibling mounted", async () => {

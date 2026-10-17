@@ -138,7 +138,7 @@ Keep Prettier last in the ESLint configuration. It owns formatting; import order
 
 ## Presentation and style loading
 
-`SiteHeader` composes a small client `ThemeProvider` from `next-themes` around its desktop and mobile controls. The document and page content stay outside this provider, limiting theme-context updates to the consumers. It initializes `data-theme` before hydration and persists the preference in local storage. `ThemeSelect` is the only theme control; CSS semantic aliases and the SVG Logo module own appearance. Provider/business workflows do not depend on theme state.
+`SiteHeader` composes a small client `ThemeProvider` from `next-themes` around its desktop and mobile controls. The document and page content stay outside this provider, limiting theme-context updates to the consumers. It initializes `data-theme` before hydration and persists the preference in local storage. Tailwind scans runtime files under `src/`, excluding test fixtures and documentation so unused example utilities do not enter the shipped stylesheet. `ThemeSelect` is the only theme control; CSS semantic aliases and the SVG Logo module own appearance. Provider/business workflows do not depend on theme state.
 
 The root layout imports `src/app/globals.css` once. PostCSS compiles Tailwind themes and utilities. Tokens feed both Tailwind and CSS Modules; `base` provides the only reset and document defaults. Preflight and component-specific global selectors are not used.
 
@@ -452,7 +452,7 @@ A PR-only request does not authorize merging. Deployment includes safe local cle
 
 Use this policy for the Header wordmark and desktop navigation, shared `ButtonLink` CTAs, and Home's text CTAs. These links previously fetched complete RSC payloads during initial rendering, including the current Home route. Other content links retain their existing behavior. Pointer press supplies intent for touch users; click and modified-click semantics remain owned by Next.js Link.
 
-`src/components/intent-link.spec.ts` checks idle prefetch traffic, focus-triggered warming and real navigation in all three languages. Component tests cover hover, focus, pointer intent, caller cancellation and forwarded refs. Production builds are required to exercise Next.js prefetching. Preserve the existing performance budgets and immediate Sentry error, trace and Replay initialization.
+`src/components/intent-link.spec.ts` checks idle prefetch traffic, focus-triggered warming and real navigation in all three languages. Component tests cover hover, focus, pointer intent, caller cancellation and forwarded refs. Production builds are required to exercise Next.js prefetching. Preserve the existing performance budgets and immediate startup error capture. The Sentry bridge buffers original errors while the SDK loads on a separate browser turn, forwards route transitions after readiness, and starts privacy-gated Replay without a fixed delay.
 
 ## Production gate
 

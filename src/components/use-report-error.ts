@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { captureException } from "@sentry/nextjs";
+import { reportClientError } from "@/lib/sentry-client";
 
 export function useReportError(error: Error) {
   useEffect(() => {
-    captureException(error);
+    reportClientError(error);
   }, [error]);
 }
