@@ -7,7 +7,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   }) => {
     for (const [route, selector, count] of [
       ["/", ".metric-band", 3],
-      ["/portfolio", ".portfolio-kpis", 4],
+      ["/portfolio", ".portfolio-kpis", 3],
       ["/performance", ".performance-summary", 3],
     ] as const) {
       await page.goto(`${prefix}${route}`);

@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
 
@@ -90,7 +91,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           aria-label={`Modern Fundamental Analyst ${copy.home}`}
           tabIndex={isMenuOpen ? -1 : undefined}
         >
-          Modern Fundamental Analyst<span>.</span>
+          <BrandLogo />
         </IntentLink>
         <SheetTrigger
           onClick={() => {
@@ -129,7 +130,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           onPointerDown={handleMenuPointerDown}
           onPointerUp={handleMenuPointerUp}
         >
-          <SheetTitle className="sr-only">{copy.siteMenu}</SheetTitle>
+          <SheetTitle className="sr-only text-title">{copy.siteMenu}</SheetTitle>
           <div className={appearance["mobile-menu-top"]}>
             <Link
               className={appearance["wordmark"] + " " + appearance["mobile-menu-wordmark"]}
@@ -138,7 +139,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
               inert={menuPhase === "closing"}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              Modern Fundamental Analyst<span>.</span>
+              <BrandLogo />
             </Link>
             <SheetClose
               render={

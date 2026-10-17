@@ -295,7 +295,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
   return (
     <div className="about-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className="@container/about-page">
         <PageHero
           variant="standard"
           label={<>{text.eyebrow}</>}
@@ -326,7 +326,10 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
           const [number, sectionName] = section.label.split(" · ");
           return (
             <div className={index % 2 === 1 ? appearance["section-gray"] : undefined} key={section.label}>
-              <section className={appearance["about-section"] + " " + appearance["shell"]}>
+              <section
+                data-after-hero={index === 0 ? "" : undefined}
+                className={appearance["about-section"] + " " + appearance["shell"]}
+              >
                 <div className={appearance["about-section-heading"]}>
                   <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
                     <span>{number}</span>

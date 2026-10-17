@@ -112,6 +112,13 @@ table {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
 }
+strong,
+b {
+  font-weight: var(--weight-copy-strong);
+}
+th {
+  font-weight: inherit;
+}
 body {
   --font-ui: var(--font-jost), Arial, Helvetica, sans-serif;
   font-family: var(--font-ui);

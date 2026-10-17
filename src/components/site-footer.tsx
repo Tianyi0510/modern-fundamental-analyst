@@ -1,3 +1,4 @@
+import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-footer.styles";
 import Link from "next/link";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
@@ -44,7 +45,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
               className={appearance["wordmark"] + " " + appearance["footer-mark"]}
               href={getLocalizedPath("/", locale)}
             >
-              Modern Fundamental Analyst<span>.</span>
+              <BrandLogo inverse />
             </Link>
             <p className={appearance["footer-description"]}>{copy.description}</p>
           </div>

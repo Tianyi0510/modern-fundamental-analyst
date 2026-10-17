@@ -29,13 +29,13 @@ Apply decisions in this order:
 3. Express that treatment through the shared tokens and owned component variants, following Fluent 2's global/alias structure.
 4. Adapt shadcn defaults to those decisions. Add Base UI behavior only where an interactive primitive needs it.
 
-| Brand adaptation | Site rule and reason                                                                                                                                                                  |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Font             | Keep Jost and the locale-specific Chinese fallbacks. Financial figures use tabular numerals; Geist Sans or Mono is not required.                                                      |
-| Palette          | Retain all brand and financial colors, including the two original grays. Use Geist neutral roles with the documented brand overrides; retain black primary text and inverse surfaces. |
-| Geometry         | Retain square financial surfaces, pill actions and the editorial container. Standard fields and the memo grid use 6px corners; floating menus use 12px.                               |
-| Typography       | Use Geist heading, copy, label and button treatments with Jost, rem units and a 1rem minimum. Preserve the wordmark's original metrics and use zero tracking for Chinese text.        |
-| Features         | References do not imply dark mode, a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                              |
+| Brand adaptation | Site rule and reason                                                                                                                                                                                  |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Font             | Keep Jost and the locale-specific Chinese fallbacks. Financial figures use tabular numerals; Geist Sans or Mono is not required.                                                                      |
+| Palette          | Retain all brand and financial colors, including the two original grays. Use Geist neutral roles with the documented brand overrides; retain black primary text and inverse surfaces.                 |
+| Geometry         | Retain square financial surfaces, pill actions and the editorial container. Standard fields and the memo grid use 6px corners; floating menus use 12px.                                               |
+| Typography       | Use Geist heading, copy, label and button treatments with Jost, rem units and a 1rem minimum. Use complete Geist presets except for the preserved Logo wordmark; no locale-specific metric overrides. |
+| Features         | References do not imply dark mode, a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                                              |
 
 A new treatment needs a reason, an owning role or component variant, and verification in its real context. Do not import another visual preset to solve an isolated component problem.
 
@@ -43,7 +43,7 @@ A new treatment needs a reason, an owning role or component variant, and verific
 
 `tokens.css` remains the single source of values. Global primitives such as brand colors, spacing and motion feed semantic aliases such as `--surface-brand`, `--text-brand`, `--interactive-accent` and `--chart-benchmark`; Tailwind references the same aliases. This follows Fluent 2's global/alias separation. Raw neutral values and brand colors feed surface, border, text and interaction roles; retaining useful token names avoids unnecessary churn. Component roles may have distinct aliases even when their current values match.
 
-`--shadow-popover` owns Geist's Menu material shadow; `--shadow-surface` owns its Base surface outline. `--width-content` owns the 1440px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
+`--shadow-popover` owns Geist's Menu material shadow; `--shadow-surface` owns its Base surface outline. `--width-content` owns the 1312px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
 
 ### Color and stroke ownership
 
@@ -138,50 +138,51 @@ Use Tailwind for layout and ordinary states, and CSS Modules for complex structu
 
 Choose tokens by purpose. CSS defines values and breakpoints. Keep sizing, spacing and overflow predictable.
 
-- Use semantic text roles, `rem` units and bounded `clamp()` for display sizes. Do not invent a size to fit one screenshot or change a role solely at a breakpoint.
+- Use semantic text roles and complete Geist presets in `rem` units. Responsive roles switch presets; do not interpolate metrics with `clamp()` or invent a treatment to fit one screenshot.
 - Choose heading levels by document structure, independent of visual size. Memo cards use H2 on the index and H3 on Home, including placeholders. Each disclaimer section has an H2 in every locale, even without an introductory lead.
 - Use tabular figures for financial comparisons.
 
 ### Typography roles
 
-Jost is shared across locales. Each Chinese root layout owns its matching Noto Sans font; ordinary English pages must not load either Chinese font stylesheet. Keep the existing font options, fallback order and text metrics. The global 404 handles all locales in one entry and may load both Chinese stylesheets, but its body selects the correct locale variable. `src/lib/fonts.spec.ts` verifies stylesheet scope and the normal/404 fallback behavior.
+Jost is shared across locales. Each Chinese root layout owns its matching Noto Sans font; ordinary English pages must not load either Chinese font stylesheet. Keep the existing font options and fallback order; typography roles below own text metrics. The global 404 handles all locales in one entry and may load both Chinese stylesheets, but its body selects the correct locale variable. `src/lib/fonts.spec.ts` verifies stylesheet scope and the normal/404 fallback behavior.
 
-Type treatments combine size, line height, weight and tracking. The site adopts [Geist Typography](https://vercel.com/geist/typography) with Jost and locale-specific fallbacks. `--font-size-*`, `--leading-*`, `--tracking-*` and `--weight-*` define values; `@theme inline` in `tokens.css` maps them to Tailwind treatments:
+Type treatments combine size, line height, weight and tracking. Use only the complete presets from [Geist Typography](https://vercel.com/geist/typography), with Jost and locale-specific fallback families. The selected first concept supplies the prominent display hierarchy and stacked introduction/actions. The user's complete-preset constraint takes precedence over the mockup's approximate font metrics, invented copy and oversized KPI figures. Do not reproduce its custom 700-weight display, 78px line height or -0.03em tracking.
 
-| Role           | Utility                                                                 | Use                                                    |
-| -------------- | ----------------------------------------------------------------------- | ------------------------------------------------------ |
-| Display        | `text-display`                                                          | Page and Hero titles                                   |
-| Headline       | `text-headline`                                                         | Major section headings                                 |
-| Title          | `text-title`, `text-title-small`                                        | Cards, forms, chart headings and compact titles        |
-| Body           | `text-lead`, `text-body-large`, `text-body`                             | Introductions and reading text                         |
-| Label          | `text-label`, `text-control`, `text-caption`                            | Section markers, actions and supplementary information |
-| Financial data | `text-data-display`, `text-data-kpi`, `text-data-ring`, `text-data-row` | Financial values; pair with `tabular-nums`             |
+`--type-<preset>-*` primitives store the official size, line height, weight and tracking. Semantic aliases and Tailwind treatments select those combinations; components must not mix metrics from different presets. Sizes are rem-based to support text enlargement. Keep the adopted 1rem minimum; smaller Geist presets are available upstream but are not used here. Email and the standalone root-error document retain their independent rendering rules.
 
-Keep website text at least `1rem`, including controls, captions, chart labels, notes and feedback; email has separate compatibility rules. At a 16px root, the adopted treatments are:
+| Site role                     | Utility                              | Complete Geist preset                                  | Size / line height        | Weight | Tracking         |
+| ----------------------------- | ------------------------------------ | ------------------------------------------------------ | ------------------------- | ------ | ---------------- |
+| Home display                  | `text-hero`                          | Heading 72; Heading 40 on mobile                       | 72 / 72; 40 / 48          | 600    | -0.06em          |
+| Page display                  | `text-display`                       | Heading 64; Heading 40 on mobile                       | 64 / 64; 40 / 48          | 600    | -0.06em          |
+| Section heading               | `text-headline`                      | Heading 48; Heading 32 on mobile                       | 48 / 56; 32 / 40          | 600    | -0.06em; -0.04em |
+| Editorial title               | `text-editorial-title`               | Heading 32; Heading 24 on mobile                       | 32 / 40; 24 / 32          | 600    | -0.04em          |
+| Hero and article introduction | `text-hero-copy`                     | Copy 24; Copy 20 on mobile                             | 24 / 36; 20 / 36          | 400    | 0                |
+| Card title                    | `text-title`                         | Heading 24                                             | 24 / 32                   | 600    | -0.04em          |
+| Compact title                 | `text-title-small`                   | Heading 20                                             | 20 / 26                   | 600    | -0.02em          |
+| Lead                          | `text-lead`                          | Copy 20                                                | 20 / 36                   | 400    | 0                |
+| Long-form body                | `text-body-large`                    | Copy 18                                                | 18 / 28                   | 400    | 0                |
+| Body and caption              | `text-body`, `text-caption`          | Copy 16                                                | 16 / 24                   | 400    | 0                |
+| Label                         | `text-label`                         | Label 16 Strong                                        | 16 / 20                   | 500    | 0                |
+| Action                        | `text-control`                       | Button 16                                              | 16 / 20                   | 500    | 0                |
+| Financial display / KPI       | `text-data-display`, `text-data-kpi` | Heading 40; Heading 32 on tablet; Heading 24 on mobile | 40 / 48; 32 / 40; 24 / 32 | 600    | -0.06em; -0.04em |
+| Financial ring                | `text-data-ring`                     | Heading 40                                             | 40 / 48                   | 600    | -0.06em          |
+| Financial row                 | `text-data-row`                      | Label 20                                               | 20 / 32                   | 400    | 0                |
+| Holdings table figures        | `text-body`                          | Copy 16                                                | 16 / 24                   | 400    | 0                |
+| Holdings symbols and totals   | `text-label`                         | Label 16 Strong                                        | 16 / 20                   | 500    | 0                |
 
-| Site role               | Geist treatment                  | Size / line height | Weight                         | English tracking |
-| ----------------------- | -------------------------------- | ------------------ | ------------------------------ | ---------------- |
-| Page display            | Heading 72; Heading 40 on mobile | 72 / 72; 40 / 48   | 600                            | -0.06em          |
-| Section heading         | Heading 40                       | 40 / 48            | 600                            | -0.06em          |
-| Card title              | Heading 24                       | 24 / 32            | 600                            | -0.04em          |
-| Compact title           | Heading 20                       | 20 / 26            | 600                            | -0.02em          |
-| Lead                    | Copy 20                          | 20 / 36            | 400                            | 0                |
-| Long-form body          | Copy 18                          | 18 / 28            | 400                            | 0                |
-| Body and caption        | Copy 16                          | 16 / 24            | 400                            | 0                |
-| Label and action        | Label 16 Strong / Button 16      | 16 / 20            | 500                            | 0                |
-| Financial display / KPI | Heading 32; Heading 24 on mobile | 32 / 40; 24 / 32   | 600                            | -0.04em          |
-| Financial ring          | Heading 40                       | 40 / 48            | 600                            | -0.06em          |
-| Financial row           | Label 20                         | 20 / 32            | 400, with explicit bold totals | 0                |
+Metrics were checked against the official public stylesheet on 2026-10-17. Geist's Copy Strong modifier uses 550, not 700; `text-body-strong` and `text-body-large-strong` apply that complete treatment. Native `strong` and `b` use Copy Strong by default; explicit heading/data treatments retain their own preset weight. Labels use the full Label 16 Strong treatment instead of adding a bold weight to Copy 16. Font family, brand colors, opacity and semantic heading levels remain separate from text metrics; adopting a Strong modifier does not recolor existing text.
 
-Financial values use tabular numerals. The Logo wordmark retains its original 20–24px scale, 1.2 line height, 700 weight and -0.05em tracking through a separate `text-wordmark` role. It must not inherit ordinary compact-heading changes.
+Financial values keep tabular numerals. Chart axis labels use Copy 16 with normal line height; the axis container compensates for the line box so label centers stay aligned with the SVG grid at both normal and enlarged text sizes. `performance-chart.spec.ts` verifies the alignment after scrolling each deferred chart into view. The Logo uses SVG images rather than typography utilities. `BrandLogo` renders tightly framed derivatives of `public/logo.svg`: `logo-wordmark.svg` for light surfaces and `logo-wordmark-inverse.svg` for the black Footer. Both preserve the original outlined paths and blue period; the inverse uses a black SVG background and changes black glyph fills to white. Keep the master unchanged. `--width-brand-logo` controls responsive image width; preserve its intrinsic aspect ratio and constrain it to available space. Do not reconstruct the Logo with live text or CSS font metrics.
 
-Page and major section headings lead the reading order. KPI values and Home's performance callout use the same subordinate financial scale: `2rem` above 800px and `1.5rem` at 800px or below. These are site-specific assignments from Geist's Heading 32 and Heading 24 tiers, not a Geist requirement for financial data. The shared KPI treatment also sizes Support's amount choices. Chart-center labels and table figures retain their separate roles. Preserve data text, colors, note opacity and tabular alignment; do not enlarge headings to compensate for oversized values.
+Page and major section headings lead the reading order. KPI values and Home's performance callout use the same subordinate financial scale: `2.5rem` above 1100px, `2rem` from 801–1100px and `1.5rem` at 800px or below. These are site-specific assignments from Geist's Heading 40, Heading 32 and Heading 24 tiers, not a Geist requirement for financial data. The shared KPI treatment also sizes Support's amount choices. Chart-center labels and table figures retain their separate roles. Preserve data text, colors, note opacity and tabular alignment; do not enlarge headings to compensate for oversized values.
 
 Home, Portfolio and Performance establish a named `financial-summary` inline-size container on their main content. Three-column KPI bands stack below 48rem of available width; Portfolio's two-column summary stacks below 32rem and resets explicit cell positions. These rem thresholds respond to enlarged root text, keeping numbers on one line without shrinking them. The existing 800px phone layout still applies. Ordinary desktop column counts and square data surfaces remain unchanged.
 
 `financial-type-hierarchy.spec.ts` checks Home, Portfolio, Performance and Support across three languages, both sides of the 800px breakpoint, 320/390px phones and 200% text size. Values must remain below page and major section headings without clipping, wrapping the number or introducing page overflow. The existing Home performance checks preserve chart reflow and navigation.
 
-Chinese headings use zero tracking. A nested `lang="en"` article restores the English role's tracking on Chinese pages. Sizes use rem rather than fixed pixels so browser text enlargement works. Fix narrow layouts instead of shrinking body text; cards, metadata and controls must wrap.
+Home uses a 72px display, a Copy 24 introduction above left-aligned actions, and a 1312px content maximum. The About heading precedes its body in one editorial column. KPI labels, values and notes form a compact group rather than pushing values to the bottom of tall cells. Keep the hero lead within 64ch and allow actions to wrap. Memo and form titles use the editorial title role; chart and Footer titles use Heading 24. Article body, language notice and disclaimer share a 65ch reading measure. Preserve existing content and square KPI surfaces. The generated concept is art direction, not an exact source for colors, invented copy or oversized financial figures. Production brand tokens, verified content and the subordinate KPI scale take precedence.
+
+All three languages use the same preset metrics, including tracking. Chinese roots keep their own font fallback and English articles retain `lang="en"`; neither changes the preset metrics. Sizes use rem rather than fixed pixels so browser text enlargement works. Fix narrow layouts instead of shrinking body text; cards, metadata and controls must wrap.
 
 ### Neutral colors and materials
 
@@ -198,9 +199,9 @@ Use solid gray for borders and translucent black for material shadows. Standard 
 
 Values were checked against the official Geist stylesheets on 2026-10-15. `tokens.css` owns the implementation; no Geist font or component package is required. Do not add unused tooltip or modal materials for components the site does not render.
 
-Apply a complete type treatment rather than repeating its utilities. Keep color, opacity, spacing and heading semantics independent. Preserve intentional emphasis and table-label weight or tracking overrides. CSS Modules use the same source tokens.
+Apply a complete type treatment rather than repeating its utilities. Keep color, opacity, spacing and heading semantics independent. Use the corresponding complete Strong or heading preset for emphasis and table labels; do not add weight or tracking overrides. CSS Modules use the same source tokens.
 
-Register new size names in `src/lib/utils.ts` so class merging distinguishes sizes from colors. Test computed styles and reflow rather than class strings. Reference: [Tailwind font-size themes](https://tailwindcss.com/docs/font-size#customizing-your-theme).
+Register new size names in `src/lib/utils.ts` so class merging distinguishes sizes from colors. Test computed styles and reflow rather than class strings. `typography-roles.spec.ts` checks role metrics and complete preset membership (size, line height, weight and tracking) across the public pages, with separate SVG loading, aspect-ratio, navigation and reflow checks in `brand-logo.spec.ts`; `financial-type-hierarchy.spec.ts` covers 200% scaling and subordinate financial values. Reference: [Tailwind font-size themes](https://tailwindcss.com/docs/font-size#customizing-your-theme).
 
 A KPI's `tone` determines its colors, independent of card order:
 
@@ -231,7 +232,7 @@ Preserve information and action priorities at every width.
 
 - Bound mobile title sizes and allow emergency wrapping for enlarged or unbreakable text. Desktop line breaks must not isolate words or split short Chinese phrases on mobile.
 - Align related form fields unless a visible container explains an inset. Contact and Preferences use the shared 6px field treatment; compact Footer fields are pill-shaped.
-- Check all three languages, root font sizes up to 200%, long translations and changed content. The footer wordmark may wrap.
+- Check all three languages, root font sizes up to 200%, long translations and changed content. The SVG Logo must shrink proportionally within its available width.
 - Allow local values for chart geometry and optical adjustments when shared spacing tokens do not fit.
 
 ### Contrast policy
@@ -348,3 +349,11 @@ Compare direct loads, client navigation and browser return in the same browser a
 `src/app/_components/semantic-content.spec.ts` checks KPI note/value color equality, 0.8 opacity and at least 4.5:1 composited contrast across locales and desktop/mobile widths. `src/features/portfolio/performance-chart.spec.ts` checks benchmark contrast. `scripts/color-contrast.ts` composites transparency before calculating WCAG luminance.
 
 Typography and layout tests stay beside their owners. Use [AGENTS.md](../AGENTS.md#verification-and-review) to select affected checks and the [test workflow](WEB_APPLICATION_ARCHITECTURE.md#test-workflow) for runner and CI details.
+
+### Hero summaries and vertical rhythm
+
+Home, Portfolio and Performance contain their KPI summaries inside the Hero content container, aligned to the title edges rather than the viewport. Keep 48px between the introduction/actions and summary, and 48px of outer Hero padding above and below. Portfolio shows three summary cells (market value, total return and holdings), in one desktop row or stacked when the Hero summary is narrower than 48rem. Net Cost Basis remains in the underlying data and holdings calculations, not as a summary cell. Current Holdings uses the white primary surface. When its Hero summary is narrower than 10rem (for example, 320px with 200% root text), reduce cell inline padding to 4px so full currency amounts stay on one line without reducing the type size. The following About, Holdings and Performance chart sections use 48px top and bottom padding, avoiding stacked section-sized gaps. All page heroes, including Disclaimer and the memo article header, use symmetric 48px top and bottom padding. The first content section below a general page Hero uses 48px top and bottom padding, including About, Memos, Subscribe, Support, Disclaimer and Preferences. This makes the introduction-to-content transition 96px across page families. Home About uses symmetric 48px top and bottom padding. Later sections retain their existing spacing (normally 96px desktop and 72px mobile). Keep form status-message reserve space inside the form; symmetric section padding does not remove that reserve. About content and closing columns stack below 56rem of available page width, allowing enlarged text to reflow without shrinking typography. Footer Logo artwork uses a 32px alignment box matching the adjacent heading line boxes; the glyphs keep their intrinsic aspect ratio.
+
+Footer subscription buttons use black text through a local `--action-inverse-text` override. Keep that color for idle, hover, keyboard focus and submitting states; other inverse buttons retain their existing treatment.
+
+Current Holdings owns symmetric 48px outer vertical padding. Its heading and return note own only internal spacing. Holdings figures use Copy 16; stock symbols and totals use Label 16 Strong on desktop and mobile. Keep tabular figures, native table semantics and sorting controls.

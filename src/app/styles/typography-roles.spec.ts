@@ -5,31 +5,34 @@ type Role = keyof typeof roleScale;
 
 // Expected Geist treatments are independent of the CSS token implementation.
 const roleScale = {
-  pageTitle: 72,
-  sectionTitle: 40,
+  heroTitle: 72,
+  heroCopy: 24,
+  editorialTitle: 32,
+  pageTitle: 64,
+  sectionTitle: 48,
   cardTitle: 24,
   compactTitle: 20,
-  brand: 24,
   lead: 20,
   bodyLarge: 18,
   body: 16,
   label: 16,
   control: 16,
   caption: 16,
-  dataDisplay: 32,
-  dataKpi: 32,
+  dataDisplay: 40,
+  dataKpi: 40,
   dataRing: 40,
   dataRow: 20,
 } as const;
 
 const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   "/": {
-    pageTitle: [".hero h1"],
+    heroTitle: [".hero h1"],
     sectionTitle: [".home-about h2", ".intro h2", ".section-heading h2", ".cta h2"],
-    cardTitle: [".memo-card h3"],
-    compactTitle: [".footer-heading", ".holding-row strong"],
-    brand: [".site-header .wordmark", ".footer-mark"],
-    lead: [".hero-bottom > p", ".home-about > div:last-child p", ".performance-copy p"],
+    editorialTitle: [".memo-card h3"],
+    cardTitle: [".footer-heading"],
+    compactTitle: [".holding-row strong"],
+    heroCopy: [".hero-bottom > p"],
+    lead: [".home-about > div:last-child p", ".performance-copy p"],
     body: [".memo-card p", ".holding-row small"],
     label: [".eyebrow", ".section-number", ".metric > dt", ".memo-card > div"],
     control: [".header-actions nav a", ".button", ".text-link"],
@@ -42,7 +45,8 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   "/about": {
     pageTitle: [".page-hero h1"],
     sectionTitle: [".about-section-heading h2", ".about-closing h2"],
-    compactTitle: [".about-boundaries h2", ".footer-heading"],
+    compactTitle: [".about-boundaries h2"],
+    cardTitle: [".footer-heading"],
     lead: [".page-intro p"],
     bodyLarge: [".about-copy", ".about-boundaries ol", ".about-closing > div"],
     label: [".eyebrow", ".about-section-label"],
@@ -57,16 +61,18 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
       ".portfolio-kpis dt",
       ".portfolio-holdings-heading > div > span",
       ".portfolio-mobile-sort label > span",
+      ".portfolio-row > th",
+      ".portfolio-total-row > td",
     ],
     control: [".portfolio-mobile-sort button"],
     caption: [".page-intro small", ".portfolio-kpis small"],
     dataKpi: [".portfolio-kpis strong"],
-    dataRow: [".portfolio-row > *"],
+    body: ["tbody .portfolio-row > td"],
   },
   "/performance": {
     pageTitle: [".page-hero h1"],
     sectionTitle: [".returns .section-heading h2", ".methodology h2"],
-    compactTitle: ["#performance-twr-chart-title", "#performance-chart-title"],
+    cardTitle: ["#performance-twr-chart-title", "#performance-chart-title"],
     lead: [".page-intro p"],
     bodyLarge: [".methodology-content"],
     label: [".eyebrow", ".performance-summary dt", ".returns .section-number"],
@@ -75,7 +81,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/memos": {
     pageTitle: [".page-hero h1"],
-    cardTitle: [".memo-card h2", ".memo-index-row h2"],
+    editorialTitle: [".memo-card h2", ".memo-index-row h2"],
     compactTitle: [".memo-disclosure > summary"],
     lead: [".page-intro p"],
     body: [".memo-card p", ".memo-index-row p"],
@@ -84,7 +90,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/contact": {
     pageTitle: [".page-hero h1"],
-    cardTitle: ["#contact-subscribe-title", "#contact-form-title"],
+    editorialTitle: ["#contact-subscribe-title", "#contact-form-title"],
     lead: [".contact-note"],
     body: ["#contact-subscribe > header > p", ".contact-headingIntro"],
     label: [".eyebrow"],
@@ -113,9 +119,9 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/memos/microsoft-stock-analysis-fiscal-year-2024": {
     pageTitle: [".memo-article h1"],
-    cardTitle: [".article-body h2"],
+    editorialTitle: [".article-body h2"],
     compactTitle: [".memo-subsection h3"],
-    lead: [".article-lead"],
+    heroCopy: [".article-lead"],
     bodyLarge: [".article-body"],
     label: [".memo-article .eyebrow"],
     caption: [".article-meta"],
@@ -179,29 +185,90 @@ for (const viewport of [viewports[0], viewports[2]]) {
 }
 
 function expectedSize(role: Role, width: number) {
-  if (role === "pageTitle" && width <= 800) return 40;
+  if ((role === "pageTitle" || role === "heroTitle") && width <= 800) return 40;
+  if (role === "sectionTitle" && width <= 800) return 32;
+  if (role === "editorialTitle" && width <= 800) return 24;
+  if (role === "heroCopy" && width <= 800) return 20;
+  if ((role === "dataDisplay" || role === "dataKpi") && width > 800 && width <= 1100) return 32;
   if ((role === "dataDisplay" || role === "dataKpi") && width <= 800) return 24;
-  if (role === "brand") return Math.min(24, Math.max(20, 18 + width * 0.005));
   return roleScale[role];
 }
 
 const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
 
-function expectedRhythm(role: Role, language: string, width: number) {
-  const chinese = language.startsWith("zh");
-  if (role === "brand") return { lineHeight: 1.2, trackingEm: -0.05 };
-  if (role === "pageTitle") return { lineHeight: width <= 800 ? 1.2 : 1, trackingEm: chinese ? 0 : -0.06 };
-  if (role === "sectionTitle" || role === "dataRing") return { lineHeight: 1.2, trackingEm: chinese ? 0 : -0.06 };
-  if (role === "cardTitle") return { lineHeight: 32 / 24, trackingEm: chinese ? 0 : -0.04 };
+function expectedRhythm(role: Role, width: number) {
+  if (role === "pageTitle" || role === "heroTitle") return { lineHeight: width <= 800 ? 1.2 : 1, trackingEm: -0.06 };
+  if (role === "sectionTitle")
+    return { lineHeight: width <= 800 ? 40 / 32 : 56 / 48, trackingEm: width <= 800 ? -0.04 : -0.06 };
+  if (role === "dataRing") return { lineHeight: 1.2, trackingEm: -0.06 };
+  if (role === "editorialTitle") return { lineHeight: width <= 800 ? 32 / 24 : 40 / 32, trackingEm: -0.04 };
+  if (role === "heroCopy") return { lineHeight: width <= 800 ? 36 / 20 : 36 / 24, trackingEm: 0 };
+  if (role === "cardTitle") return { lineHeight: 32 / 24, trackingEm: -0.04 };
   if (role === "dataRow") return { lineHeight: 1.6, trackingEm: 0 };
-  if (role === "compactTitle") return { lineHeight: 1.3, trackingEm: chinese ? 0 : -0.02 };
+  if (role === "compactTitle") return { lineHeight: 1.3, trackingEm: -0.02 };
   if (role === "dataDisplay" || role === "dataKpi") {
-    return { lineHeight: width <= 800 ? 32 / 24 : 1.25, trackingEm: -0.04 };
+    return {
+      lineHeight: width <= 800 ? 32 / 24 : width <= 1100 ? 40 / 32 : 48 / 40,
+      trackingEm: width <= 1100 ? -0.04 : -0.06,
+    };
   }
   if (role === "label" || role === "control") return { lineHeight: 1.25, trackingEm: 0 };
   if (role === "lead") return { lineHeight: 1.8, trackingEm: 0 };
   if (role === "bodyLarge") return { lineHeight: 28 / 18, trackingEm: 0 };
   return { lineHeight: 1.5, trackingEm: 0 };
+}
+
+// Numeric tuples from the public Geist stylesheet, retrieved 2026-10-17.
+// Order: font size, line height, weight, tracking in em. Brand family/color are separate.
+const geistTreatments = [
+  [72, 72, 600, -0.06],
+  [64, 64, 600, -0.06],
+  [56, 56, 600, -0.06],
+  [48, 56, 600, -0.06],
+  [40, 48, 600, -0.06],
+  [32, 40, 600, -0.04],
+  [24, 32, 600, -0.04],
+  [20, 26, 600, -0.02],
+  [16, 24, 600, -0.02],
+  [24, 36, 400, 0],
+  [20, 36, 400, 0],
+  [18, 28, 400, 0],
+  [16, 24, 400, 0],
+  [24, 36, 550, 0],
+  [20, 36, 550, 0],
+  [18, 28, 550, 0],
+  [16, 24, 550, 0],
+  [20, 32, 400, 0],
+  [18, 20, 400, 0],
+  [16, 20, 400, 0],
+  [16, 20, 500, 0],
+];
+
+async function invalidTreatments(page: Page) {
+  return page.locator("body").evaluate((body, presets) => {
+    const root = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    return [...body.querySelectorAll("*")].flatMap((element) => {
+      const rect = element.getBoundingClientRect();
+      if (
+        !rect.width ||
+        !rect.height ||
+        ![...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim())
+      )
+        return [];
+      const style = getComputedStyle(element);
+      const size = Number.parseFloat(style.fontSize);
+      const actual = [
+        (size / root) * 16,
+        (Number.parseFloat(style.lineHeight) / root) * 16,
+        Number(style.fontWeight),
+        style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing) / size,
+      ];
+      const matches = presets.some((preset) =>
+        preset.every((value, index) => Math.abs(value - actual[index]!) < (index === 3 ? 0.001 : 0.1)),
+      );
+      return matches ? [] : [{ text: element.textContent?.trim().slice(0, 60), tag: element.tagName, actual }];
+    });
+  }, geistTreatments);
 }
 
 type TypographySample = {
@@ -263,26 +330,7 @@ for (const viewport of viewports) {
               await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
               `${route} has horizontal overflow at ${viewport.width}px`,
             ).toBe(true);
-            const undersized = await page.locator("body").evaluate((body) => {
-              const minimum = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
-              return [...body.querySelectorAll("*")]
-                .filter((element) => {
-                  const rect = element.getBoundingClientRect();
-                  return (
-                    rect.width > 0 &&
-                    rect.height > 0 &&
-                    [...element.childNodes].some(
-                      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-                    ) &&
-                    Number.parseFloat(getComputedStyle(element).fontSize) < minimum - 0.1
-                  );
-                })
-                .map((element) => ({
-                  text: element.textContent?.trim().slice(0, 80),
-                  size: getComputedStyle(element).fontSize,
-                }));
-            });
-            expect(undersized, `${prefix}${route} has text smaller than 1rem`).toEqual([]);
+            expect(await invalidTreatments(page), `${prefix}${route} must use a complete Geist preset`).toEqual([]);
             for (const { role, values } of await readTypography(page, roles)) {
               observed.set(role, [...(observed.get(role) ?? []), ...values]);
             }
@@ -292,8 +340,11 @@ for (const viewport of viewports) {
             const expectedFontSize = expectedSize(role, viewport.width);
 
             for (const sample of values) {
-              const rhythm = expectedRhythm(role, sample.language, viewport.width);
-              if (sample.selector.includes(".wordmark")) rhythm.trackingEm = -0.05;
+              const rhythm = expectedRhythm(role, viewport.width);
+              if (role === "dataRow" && sample.weight === 600) {
+                rhythm.lineHeight = 26 / 20;
+                rhythm.trackingEm = -0.02;
+              }
               expect
                 .soft(
                   Math.abs(sample.fontSize - expectedFontSize),
@@ -313,21 +364,26 @@ for (const viewport of viewports) {
                 )
                 .toBeLessThan(0.2);
               expect.soft(sample.family.split(",")[0]!.replaceAll('"', "").trim()).toBe("Jost");
-              const headingRoles = ["pageTitle", "sectionTitle", "cardTitle", "compactTitle"];
+              const headingRoles = [
+                "heroTitle",
+                "pageTitle",
+                "sectionTitle",
+                "cardTitle",
+                "compactTitle",
+                "editorialTitle",
+              ];
               if (role === "dataRow") {
                 // Position headings and totals retain their deliberate emphasis.
-                expect.soft([400, 700]).toContain(sample.weight);
+                expect.soft([400, 600]).toContain(sample.weight);
               } else {
                 expect
                   .soft(sample.weight, `${role} sample ${sample.selector} weight`)
                   .toBe(
-                    role === "brand"
-                      ? 700
-                      : ["label", "control"].includes(role)
-                        ? 500
-                        : headingRoles.includes(role) || dataRoles.has(role)
-                          ? 600
-                          : 400,
+                    ["label", "control"].includes(role)
+                      ? 500
+                      : headingRoles.includes(role) || dataRoles.has(role)
+                        ? 600
+                        : 400,
                   );
               }
             }
@@ -549,6 +605,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         if (width === 390) {
           await page.locator(".mobile-menu-button").click();
           await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+          const logo = page.locator(".mobile-menu-wordmark img");
+          await expect(logo).toHaveAttribute("src", "/logo-wordmark.svg");
           controls = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
         } else {
           controls = page.locator('.header-actions nav a[aria-current="page"]');
@@ -593,4 +651,68 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       },
     );
   }
+}
+
+for (const mobile of [false, true]) {
+  test(
+    `selected typography keeps the Home reading order on ${mobile ? "mobile" : "desktop"}`,
+    mobile ? { tag: "@mobile" } : {},
+    async ({ page }, testInfo) => {
+      await page.setViewportSize(mobile ? { width: 390, height: 844 } : { width: 1488, height: 1058 });
+      await page.goto("/");
+      await page.evaluate(() => document.fonts.ready);
+      const heading = page.locator(".hero h1");
+      await expect(heading).toHaveCSS("font-weight", "600");
+      const intro = await page.locator(".hero-bottom > p").boundingBox();
+      const actions = await page.locator(".hero-actions").boundingBox();
+      expect(actions!.x).toBeCloseTo(intro!.x, 0);
+      expect(actions!.y).toBeGreaterThanOrEqual(intro!.y + intro!.height);
+      const aboutHeading = page.locator(".home-about h2");
+      const aboutCopy = page.locator(".home-about > div:last-child");
+      await aboutHeading.scrollIntoViewIfNeeded();
+      const titleBox = await aboutHeading.boundingBox();
+      const copyBox = await aboutCopy.boundingBox();
+      expect(copyBox!.y).toBeGreaterThanOrEqual(titleBox!.y + titleBox!.height);
+      expect(copyBox!.x).toBeCloseTo(titleBox!.x, 0);
+      await heading.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: testInfo.outputPath(`typography-home-${mobile ? "mobile" : "desktop"}.png`) });
+      await page.locator(".hero-actions .button").click();
+      await expect(page).toHaveURL(/\/portfolio$/);
+    },
+  );
+}
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(
+    `${prefix || "English"} drawer and mobile table labels use complete presets`,
+    { tag: "@mobile" },
+    async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(prefix || "/");
+      await page.locator(".mobile-menu-button").click();
+      await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+      const logo = page.locator(".mobile-menu-wordmark img");
+      await expect(logo).toHaveAttribute("src", "/logo-wordmark.svg");
+      expect(await invalidTreatments(page)).toEqual([]);
+      await page.locator(".mobile-language-disclosure > summary").click();
+      await expect(page.locator(".mobile-language-disclosure")).toHaveAttribute("open", "");
+      expect(await invalidTreatments(page)).toEqual([]);
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".mobile-menu-button")).toBeFocused();
+      await page.goto(`${prefix}/portfolio`);
+      const labels = await page.locator(".portfolio-row td[data-label]").evaluateAll((elements) =>
+        elements.map((element) => {
+          const style = getComputedStyle(element, "::before");
+          return [
+            Number.parseFloat(style.fontSize),
+            Number.parseFloat(style.lineHeight),
+            Number(style.fontWeight),
+            style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing),
+          ];
+        }),
+      );
+      expect(labels.length).toBeGreaterThan(0);
+      for (const label of labels) expect(label).toEqual([16, 20, 500, 0]);
+    },
+  );
 }

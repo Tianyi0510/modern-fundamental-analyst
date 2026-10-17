@@ -16,5 +16,10 @@ describe("semantic typography class composition", () => {
       "text-brand compact:text-title text-headline",
     );
     expect(cn("text-[length:var(--font-size-body)]", "text-body-large")).toBe("text-body-large");
+    expect(cn("text-body text-brand", "text-body-strong")).toBe("text-brand text-body-strong");
+    expect(cn("text-body-large text-ink", "text-body-large-strong")).toBe("text-ink text-body-large-strong");
+    expect(cn("text-display text-brand", "text-hero")).toBe("text-brand text-hero");
+    expect(cn("text-lead text-ink", "text-hero-copy")).toBe("text-ink text-hero-copy");
+    expect(cn("text-title text-ink", "text-editorial-title")).toBe("text-ink text-editorial-title");
   });
 });

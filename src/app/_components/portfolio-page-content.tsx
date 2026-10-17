@@ -24,8 +24,6 @@ const copy = {
     summaryLabel: "Portfolio Summary",
     marketValue: "Total Market Value",
     currency: "USD",
-    costBasis: "Net Cost Basis",
-    costBasisNote: "Purchases and Transaction Fees",
     totalReturn: "Total Return",
     returnSummaryNote: "Absolute Return",
     holdings: "Holdings",
@@ -48,8 +46,6 @@ const copy = {
     summaryLabel: "投資組合摘要",
     marketValue: "總市值",
     currency: "美元",
-    costBasis: "淨成本基礎",
-    costBasisNote: "買入金額與交易費用",
     totalReturn: "總報酬率",
     returnSummaryNote: "絕對報酬率",
     holdings: "持股數量",
@@ -71,8 +67,6 @@ const copy = {
     summaryLabel: "投资组合摘要",
     marketValue: "总市值",
     currency: "美元",
-    costBasis: "净成本基础",
-    costBasisNote: "买入金额与交易费用",
     totalReturn: "总回报率",
     returnSummaryNote: "绝对回报率",
     holdings: "持仓数量",
@@ -151,37 +145,28 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
               </small>
             </>
           }
-        />
-        <dl className={appearance["portfolio-kpis"]} aria-label={text.summaryLabel}>
-          <PortfolioMetric
-            tone="plain"
-            className="col-start-1 row-start-1 compact:col-auto compact:row-auto"
-            label={<>{text.marketValue}</>}
-            value={<>{formatUsd(portfolioSnapshot.marketValue)}</>}
-            note={<>{text.currency}</>}
-          />
-          <PortfolioMetric
-            tone="highlight"
-            className="col-start-1 row-start-2 compact:col-auto compact:row-auto"
-            label={<>{text.costBasis}</>}
-            value={<>{formatUsd(portfolioSnapshot.costBasis)}</>}
-            note={<>{text.costBasisNote}</>}
-          />
-          <PortfolioMetric
-            tone="brand"
-            className="col-start-2 row-start-1 compact:col-auto compact:row-auto"
-            label={<>{text.totalReturn}</>}
-            value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
-            note={<>{text.returnSummaryNote}</>}
-          />
-          <PortfolioMetric
-            tone="paper"
-            className="col-start-2 row-start-2 compact:col-auto compact:row-auto"
-            label={<>{text.holdings}</>}
-            value={<>{portfolioSnapshot.holdingsCount}</>}
-            note={<>{text.holdingsNote}</>}
-          />
-        </dl>
+        >
+          <dl className={appearance["portfolio-kpis"]} aria-label={text.summaryLabel}>
+            <PortfolioMetric
+              tone="plain"
+              label={<>{text.marketValue}</>}
+              value={<>{formatUsd(portfolioSnapshot.marketValue)}</>}
+              note={<>{text.currency}</>}
+            />
+            <PortfolioMetric
+              tone="brand"
+              label={<>{text.totalReturn}</>}
+              value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
+              note={<>{text.returnSummaryNote}</>}
+            />
+            <PortfolioMetric
+              tone="paper"
+              label={<>{text.holdings}</>}
+              value={<>{portfolioSnapshot.holdingsCount}</>}
+              note={<>{text.holdingsNote}</>}
+            />
+          </dl>
+        </PageHero>
         <section className={appearance["portfolio-holdings-section"]} aria-labelledby="portfolio-holdings-title">
           <div className={appearance["portfolio-holdings-heading"] + " " + appearance["shell"]}>
             <div>

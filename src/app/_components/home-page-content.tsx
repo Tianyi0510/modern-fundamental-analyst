@@ -188,35 +188,35 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   </IntentLink>
                 </div>
               </div>
+              <dl className={appearance["metric-band"]} aria-label={text.portfolioSnapshot}>
+                <PortfolioMetric
+                  tone="highlight"
+                  className="metric compact:overflow-hidden"
+                  label={<>{text.timeWeightedReturn}</>}
+                  value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
+                  note={<>{text.twrNote}</>}
+                />
+                <PortfolioMetric
+                  tone="brand"
+                  className="metric compact:overflow-hidden"
+                  label={<>{text.marketValue}</>}
+                  value={<>{formatUsd(portfolioSnapshot.marketValue, 0)}</>}
+                  note={
+                    <>
+                      {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
+                    </>
+                  }
+                />
+                <PortfolioMetric
+                  tone="paper"
+                  className="metric compact:overflow-hidden"
+                  label={<>{text.portfolioXirr}</>}
+                  value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
+                  note={<>{text.xirrNote}</>}
+                />
+              </dl>
             </section>
           </div>
-          <dl className={appearance["metric-band"]} aria-label={text.portfolioSnapshot}>
-            <PortfolioMetric
-              tone="highlight"
-              className="metric compact:overflow-hidden"
-              label={<>{text.timeWeightedReturn}</>}
-              value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
-              note={<>{text.twrNote}</>}
-            />
-            <PortfolioMetric
-              tone="brand"
-              className="metric compact:overflow-hidden"
-              label={<>{text.marketValue}</>}
-              value={<>{formatUsd(portfolioSnapshot.marketValue, 0)}</>}
-              note={
-                <>
-                  {portfolioSnapshot.holdingsCount} {text.holdingsUnit}
-                </>
-              }
-            />
-            <PortfolioMetric
-              tone="paper"
-              className="metric compact:overflow-hidden"
-              label={<>{text.portfolioXirr}</>}
-              value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
-              note={<>{text.xirrNote}</>}
-            />
-          </dl>
         </div>
 
         <section className={appearance["home-about"] + " " + appearance["shell"]}>

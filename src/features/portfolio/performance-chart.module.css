@@ -4,9 +4,9 @@
 }
 .figure h3 {
   margin: 0;
-  font-size: var(--font-size-compact-title);
-  line-height: var(--leading-compact-title);
-  letter-spacing: var(--tracking-compact);
+  font-size: var(--font-size-card-title);
+  line-height: var(--leading-card-title);
+  letter-spacing: var(--tracking-title);
   font-weight: var(--weight-semibold);
 }
 .figure p {
@@ -54,12 +54,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding-block: 12px;
+  /* Keep label centers on the SVG's 12px inset as text scales. */
+  margin-block: calc(12px - var(--font-size-caption) * var(--leading-body) / 2);
   font-size: var(--font-size-caption);
   font-variant-numeric: tabular-nums;
 }
 .ticks span {
-  line-height: 0;
+  line-height: var(--leading-body);
 }
 .grid {
   stroke: var(--gray);

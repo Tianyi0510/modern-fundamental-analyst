@@ -6,13 +6,17 @@ const mergeClasses = extendTailwindMerge({
     theme: {
       text: [
         "display",
+        "hero",
+        "hero-copy",
+        "editorial-title",
         "headline",
         "title",
         "title-small",
-        "wordmark",
         "lead",
         "body-large",
+        "body-large-strong",
         "body",
+        "body-strong",
         "label",
         "control",
         "caption",

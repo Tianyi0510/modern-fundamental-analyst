@@ -42,7 +42,7 @@ test.describe("header interaction QA", () => {
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "24px");
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "24px");
     const legalBody = page.locator(".legal-body");
-    await expect(legalBody).toHaveCSS("padding-top", "96px");
+    await expect(legalBody).toHaveCSS("padding-top", "48px");
     await expect(legalBody).toHaveCSS("padding-bottom", "96px");
   });
 
@@ -60,8 +60,8 @@ test.describe("header interaction QA", () => {
     ]) {
       await page.goto(path);
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
-      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
-      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "48px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "48px");
     }
   });
 
@@ -247,7 +247,7 @@ test.describe("mobile content and navigation QA", () => {
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1",
   });
 
-  test("home metrics form a compact full-width mobile data band", { tag: "@mobile" }, async ({ page }) => {
+  test("home metrics form a compact inset mobile Hero summary", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/");
     const metrics = page.locator(".home-page .metric");
     await expect(metrics).toHaveCount(3);
@@ -269,8 +269,8 @@ test.describe("mobile content and navigation QA", () => {
       }),
     );
     for (const box of boxes) {
-      expect(box.left).toBe(0);
-      expect(box.width).toBe(390);
+      expect(box.left).toBe(16);
+      expect(box.width).toBe(358);
       // Preserve the compact single-line budget while allowing complete multiline explanations.
       expect(box.height - box.extraNoteHeight).toBeLessThanOrEqual(190);
       expect(box.noteFits).toBe(true);
@@ -297,7 +297,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(upperBlock).toHaveCSS("row-gap", "32px");
     await expect(footer.locator(".footer-links")).toHaveCSS("grid-template-columns", "358px");
     const legalBody = page.locator(".legal-body");
-    await expect(legalBody).toHaveCSS("padding-top", "72px");
+    await expect(legalBody).toHaveCSS("padding-top", "48px");
     await expect(legalBody).toHaveCSS("padding-bottom", "72px");
   });
 
@@ -315,8 +315,8 @@ test.describe("mobile content and navigation QA", () => {
     ]) {
       await page.goto(path);
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
-      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "72px");
-      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "72px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "48px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "48px");
     }
   });
 

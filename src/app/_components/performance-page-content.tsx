@@ -187,30 +187,31 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
               </small>
             </>
           }
-        />
-        <dl className={appearance["performance-summary"]}>
-          <PortfolioMetric
-            tone="highlight"
-            className=""
-            label={<>{text.timeWeightedReturn}</>}
-            value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
-            note={<>{text.twrNote}</>}
-          />
-          <PortfolioMetric
-            tone="brand"
-            className=""
-            label={<>{text.portfolioXirr}</>}
-            value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
-            note={<>{text.portfolioNote}</>}
-          />
-          <PortfolioMetric
-            tone="paper"
-            className=""
-            label={<>{portfolioSnapshot.benchmark} XIRR</>}
-            value={<>{formatPercent(portfolioSnapshot.benchmarkXirr)}</>}
-            note={<>{text.benchmarkNote}</>}
-          />
-        </dl>
+        >
+          <dl className={appearance["performance-summary"]}>
+            <PortfolioMetric
+              tone="highlight"
+              className=""
+              label={<>{text.timeWeightedReturn}</>}
+              value={<>{formatPercent(portfolioTwrSnapshot.portfolioTwr)}</>}
+              note={<>{text.twrNote}</>}
+            />
+            <PortfolioMetric
+              tone="brand"
+              className=""
+              label={<>{text.portfolioXirr}</>}
+              value={<>{formatPercent(portfolioSnapshot.xirr)}</>}
+              note={<>{text.portfolioNote}</>}
+            />
+            <PortfolioMetric
+              tone="paper"
+              className=""
+              label={<>{portfolioSnapshot.benchmark} XIRR</>}
+              value={<>{formatPercent(portfolioSnapshot.benchmarkXirr)}</>}
+              note={<>{text.benchmarkNote}</>}
+            />
+          </dl>
+        </PageHero>
         <section className={appearance["returns"] + " " + appearance["shell"]}>
           <div className={appearance["section-heading"]}>
             <p className={appearance["section-number"]}>{text.chart}</p>
