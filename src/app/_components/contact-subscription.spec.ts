@@ -1,26 +1,29 @@
 import { expect, test } from "@playwright/test";
 
-for (const { prefix, locale, title, success, error } of [
+for (const { prefix, locale, title, success, error, contactIntro } of [
   {
     prefix: "",
     locale: "en",
     title: "Subscribe",
-    success: "Check your inbox and confirm your subscription.",
-    error: "Your subscription couldn’t be completed. Please try again.",
+    contactIntro: "Send your question or proposal to receive a reply by email.",
+    success: "Check your inbox. Open the confirmation email to finish subscribing.",
+    error: "Unable to confirm your subscription request. Try again.",
   },
   {
     prefix: "/zh-tw",
     locale: "zh-tw",
     title: "訂閱",
-    success: "請查看電子郵件並確認你的訂閱。",
-    error: "無法完成你的訂閱，請再試一次。",
+    contactIntro: "傳送你的問題或合作提案，透過電子郵件取得回覆。",
+    success: "請查看收件匣，開啟確認郵件以完成訂閱。",
+    error: "目前無法確認你的訂閱要求，請再試一次。",
   },
   {
     prefix: "/zh-cn",
     locale: "zh-cn",
     title: "订阅",
-    success: "请查看电子邮件并确认你的订阅。",
-    error: "无法完成你的订阅，请重试。",
+    contactIntro: "发送你的问题或合作提案，通过电子邮件获取回复。",
+    success: "请查看收件箱，打开确认邮件以完成订阅。",
+    error: "目前无法确认你的订阅请求，请重试。",
   },
 ]) {
   test(`${locale} Contact subscription retries independently of the footer`, async ({ page }) => {
@@ -45,10 +48,11 @@ for (const { prefix, locale, title, success, error } of [
     const section = page.getByRole("main").getByRole("region", { name: title, exact: true });
     await expect(section.getByRole("heading", { level: 2 })).toHaveText(title);
     await expect(page.locator(".contact-grid")).toHaveCount(0);
+    await expect(page.locator(".contact-headingIntro")).toHaveText(contactIntro);
     const messageForm = page.locator(".contact-form");
     expect((await section.boundingBox())!.y).toBeLessThan((await messageForm.boundingBox())!.y);
     const email = section.getByRole("textbox");
-    await expect(email).toHaveAccessibleName(/Email Address|電子郵件地址|电子邮件地址/);
+    await expect(email).toHaveAccessibleName(/Email address|電子郵件地址|电子邮件地址/);
     await expect(section.getByRole("link")).toHaveAttribute("href", `${prefix}/subscription-preferences`);
     const footer = page.locator(".site-footer .subscribe-section");
     await email.fill("reader@example.com");

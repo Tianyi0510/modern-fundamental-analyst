@@ -3,7 +3,7 @@ import { containerAppearance } from "@/components/container";
 export const appearance = {
   "memo-article":
     "memo-article [padding:0_0_var(--space-section)] [&_h1]:[max-width:1120px] [&_h1]:[margin:50px_0_46px] [&_h1]:text-display [&_h1]:[text-transform:none] [&_h1]:[text-wrap:balance] [@media((max-width:_800px))]:[&_h1]:[overflow-wrap:anywhere] [@media((max-width:_800px))]:[&_h1]:[letter-spacing:var(--tracking-heading)]",
-  "memo-article-header-band": "memo-article-header-band [background:var(--background-gray)]",
+  "memo-article-header-band": "memo-article-header-band [background:var(--surface-secondary)]",
   "memo-article-header": "memo-article-header [padding:var(--space-8)_0]",
   shell: containerAppearance,
   eyebrow:

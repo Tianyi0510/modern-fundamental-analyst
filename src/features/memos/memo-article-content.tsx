@@ -30,7 +30,7 @@ export function MemoArticleContent({ content }: { content: MemoContent }) {
                 className="underline underline-offset-[3px] focus-visible:outline-2 focus-visible:outline-offset-4"
                 href={reference.href}
               >
-                {reference.linkLabel ?? "Read Source"}
+                {reference.linkLabel ?? "Read source"}
               </a>
             </li>
           ))}

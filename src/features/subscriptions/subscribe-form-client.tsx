@@ -138,7 +138,7 @@ export function SubscribeFormClient({
             variant={variant === "inverse" ? "inverse" : "primary"}
             className={cn(
               "subscribe-submit min-w-[7.733em] compact:w-full",
-              variant === "standard" ? "self-end" : "[--action-inverse-text:var(--text-primary)]",
+              variant === "standard" ? "self-end" : "[--action-inverse-text:var(--black)]",
             )}
             type="submit"
             disabled={status === "submitting"}

@@ -1,10 +1,11 @@
+import { brandSurface } from "@/components/brand-surface";
 import type { ReactNode } from "react";
 
 type MetricTone = "plain" | "highlight" | "brand" | "paper";
 const tones: Record<MetricTone, string> = {
   plain: "bg-surface text-ink",
-  highlight: "bg-highlight text-brand",
-  brand: "bg-brand text-highlight",
+  highlight: `bg-highlight text-brand ${brandSurface}`,
+  brand: "bg-[var(--surface-brand)] text-highlight",
   paper: "bg-surface text-brand",
 };
 

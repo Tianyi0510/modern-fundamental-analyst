@@ -12,7 +12,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         [footer, "/logo-wordmark-inverse.svg"],
       ] as const) {
         await expect(link).toHaveAccessibleName(/Modern Fundamental Analyst/);
-        const image = link.locator("img");
+        const image = link.locator("img:visible");
         await image.scrollIntoViewIfNeeded();
         await expect(image).toBeInViewport();
         await expect(image).toHaveAttribute("src", src);
@@ -28,8 +28,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
         const drawer = page.locator(".mobile-menu-wordmark");
         await expect(drawer).toHaveAccessibleName("Modern Fundamental Analyst.");
-        await expect(drawer.locator("img")).toHaveAttribute("src", "/logo-wordmark.svg");
-        await expect(drawer.locator("img")).toHaveJSProperty("naturalWidth", 1098);
+        await expect(drawer.locator("img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
+        await expect(drawer.locator("img:visible")).toHaveJSProperty("naturalWidth", 1098);
         await drawer.click();
       } else await header.click();
       await expect(page).toHaveURL(new RegExp(`${prefix || "/"}$`));

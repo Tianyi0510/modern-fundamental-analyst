@@ -4,7 +4,7 @@ import { ContactFormClient, type ContactFormCopy } from "./contact-form-client";
 const copy = {
   en: {
     title: "Send a Message",
-    intro: "Use the form below and I will respond as soon as possible.",
+    intro: "Send your question or proposal to receive a reply by email.",
     name: "Name",
     email: "Email",
     subject: "Subject",
@@ -23,7 +23,7 @@ const copy = {
   },
   "zh-tw": {
     title: "傳送訊息",
-    intro: "請填寫以下表單，我會盡快回覆。",
+    intro: "傳送你的問題或合作提案，透過電子郵件取得回覆。",
     name: "姓名",
     email: "電子郵件",
     subject: "主旨",
@@ -42,7 +42,7 @@ const copy = {
   },
   "zh-cn": {
     title: "发送信息",
-    intro: "请填写以下表单，我会尽快回复。",
+    intro: "发送你的问题或合作提案，通过电子邮件获取回复。",
     name: "姓名",
     email: "电子邮件",
     subject: "主题",

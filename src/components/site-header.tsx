@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeSelect } from "./theme-select";
 import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
@@ -215,6 +216,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                 </div>
               </AnimatedDisclosure>
             </div>
+            <ThemeSelect locale={locale} />
           </div>
         </SheetContent>
       </header>

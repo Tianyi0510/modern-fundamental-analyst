@@ -147,11 +147,11 @@ Contact stores unsent fields and the failed attempt's retry ID in versioned, loc
 
 ### Subscription entry points
 
-Each Contact page places `contact-subscribe` before Send a Message; Footer uses `subscribe`. Both compose `SubscribeForm` and `SubscribeFormClient` with unique field and heading IDs. Each owns its input, lock, feedback and retry ID. Submitting one must not affect the other. Success asks readers to check their inbox; it does not claim activation.
+Each Contact page places `contact-subscribe` before Send a Message; Footer uses `subscribe`. Both compose `SubscribeForm` and `SubscribeFormClient` with unique field and heading IDs. Each owns its input, lock, feedback and retry ID. Submitting one must not affect the other. Success asks readers to open the confirmation email to finish subscribing; it does not claim activation.
 
 Both forms share the API, recipient limits, confirmation, suppression and coordination rules. Independent browser state does not bypass them. These limits and form choices are project decisions, not Resend requirements. Contact messages do not grant newsletter consent.
 
-Subscription and preference-link request forms use the API's shared email validator before sending. Invalid input and HTTP 400 responses show a localized, associated email error and focus the enabled field. Editing clears the error and starts a new attempt; retrying unchanged input after a server rejection retains its retry ID. Service failures keep separate feedback. Preference-link success remains identical whether or not the address is subscribed.
+Subscription and preference-link request forms use the API's shared email validator before sending. Invalid input and HTTP 400 responses show a localized, associated email error and focus the enabled field. Editing clears the error and starts a new attempt; retrying unchanged input after a server rejection retains its retry ID. Service failures keep separate feedback. Preference-link success remains identical whether or not the address is subscribed. It conditionally directs subscribed readers to their inbox without asserting that a link was sent or delivered. Keep this service-state boundary when applying the [content design workflow](DESIGN_SYSTEM.md#content-design-workflow).
 
 ### Subscription confirmation and delivery feedback
 

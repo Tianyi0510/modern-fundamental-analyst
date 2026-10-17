@@ -32,7 +32,7 @@ export function PageHero({
   variant?: HeroVariant;
 }) {
   return (
-    <div className="page-hero-band bg-[var(--background-gray)]">
+    <div className="page-hero-band bg-[var(--surface-secondary)]">
       <Container as="section" className="page-hero py-[var(--space-8)]">
         <p className="eyebrow flex items-center gap-[10px] text-label">
           <span className="size-[9px] rounded-full bg-accent" /> {label}

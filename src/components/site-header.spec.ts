@@ -842,10 +842,10 @@ test.describe("mobile content and navigation QA", () => {
       await expect(page.locator(".mobile-menu-layer")).toBeHidden();
       await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
       await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
-      for (const width of [801, 1100, 1150, 1151, 1440]) {
+      for (const width of [801, 1100, 1151, 1279, 1280, 1440]) {
         await page.setViewportSize({ width, height: 1000 });
         const logo = await page.locator(".site-header > .wordmark").boundingBox();
-        const adjacent = await page.locator(width <= 1150 ? ".mobile-menu-button" : ".header-actions").boundingBox();
+        const adjacent = await page.locator(width <= 1279 ? ".mobile-menu-button" : ".header-actions").boundingBox();
         expect(logo!.x + logo!.width).toBeLessThan(adjacent!.x);
       }
     });

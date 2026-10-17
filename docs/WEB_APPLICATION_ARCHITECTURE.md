@@ -1,4 +1,4 @@
-# Web Application Architecture
+# Web application architecture
 
 Use this guide for code conventions, application and data boundaries, portfolio updates, testing and releases. [Design System](DESIGN_SYSTEM.md) covers visual and editorial rules. [Integrations](INTEGRATIONS.md) covers provider setup, credentials and recovery.
 
@@ -138,9 +138,11 @@ Keep Prettier last in the ESLint configuration. It owns formatting; import order
 
 ## Presentation and style loading
 
+`SiteDocument` composes a small client `ThemeProvider` from `next-themes` around server-rendered children. It initializes `data-theme` before hydration and persists the preference in local storage. `ThemeSelect` is the only theme control; CSS semantic aliases and the SVG Logo module own appearance. Provider/business workflows do not depend on theme state.
+
 The root layout imports `src/app/globals.css` once. PostCSS compiles Tailwind themes and utilities. Tokens feed both Tailwind and CSS Modules; `base` provides the only reset and document defaults. Preflight and component-specific global selectors are not used.
 
-Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `@base-ui/react/menu` and `@base-ui/react/dialog`; Sidebar composition uses `@base-ui/react/use-render`. Only interactive components and their owners declare `use client`. Static buttons, links and native form controls retain their server-compatible implementations. The `base-nova` registry in `components.json` selects Base UI source; the layered design system is implemented through customized styles and global-to-semantic token aliases.
+Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `@base-ui/react/menu` and `@base-ui/react/dialog`; Sidebar composition uses `@base-ui/react/use-render`. Only interactive components and their owners declare `use client`. Static buttons, links and native form controls retain their server-compatible implementations. The `base-nova` registry in `components.json` selects Base UI source. The [five design layers](DESIGN_SYSTEM.md#architecture-and-reference-ownership) separate design style, foundations, UX guidelines, components and interaction engine. React, Next.js, TypeScript, Tailwind CSS and CSS Modules implement these layers through owned components, customized styles and global-to-semantic token aliases.
 
 Geist Typography, Colors and Materials are expressed in the shared tokens and owned components, with the retained brand exceptions documented in [Design System](DESIGN_SYSTEM.md#neutral-colors-and-materials). Typography roles alias complete Geist presets (size, line height, weight and tracking) in rem. Responsive roles switch presets without interpolation or locale-specific metric overrides. The shared `BrandLogo` component renders SVG artwork independently of typography roles; Menu material owns its outline and shadow without a duplicate CSS border. No additional theme provider or visual component package is introduced.
 

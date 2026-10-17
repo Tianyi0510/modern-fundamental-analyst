@@ -3,7 +3,7 @@ import { SupportPageContent } from "@/app/_components/support-page-content";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({
-  title: "Support Independent Research",
+  title: "Support independent research",
   description:
     "Make a voluntary one-time contribution to support independent public-equity research from Modern Fundamental Analyst.",
   path: "/support",

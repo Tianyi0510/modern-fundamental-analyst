@@ -2,7 +2,7 @@ import { MemoListPage } from "@/app/_components/memo-list-page";
 import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({
-  title: "Investment Memos",
+  title: "Investment memos",
   description: "Long-form notes on business quality, valuation, risk, and capital allocation.",
   path: "/memos",
 });

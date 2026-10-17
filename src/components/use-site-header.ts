@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEventHandler } from "react";
 
 // Keep in sync with the nav-compact variant in globals.css.
-const compactNavigationQuery = "(max-width: 1150px)";
+const compactNavigationQuery = "(max-width: 1279px)";
 
 function animateMenuDismissal(
   content: HTMLElement,

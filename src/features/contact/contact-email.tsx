@@ -6,7 +6,7 @@ import { resolveLocale } from "@/lib/i18n";
 export type ContactMessage = { name: string; email: string; subject: string; message: string; locale: string };
 const copy = {
   en: {
-    heading: "New Website Message",
+    heading: "New website message",
     name: "Name",
     email: "Email",
     language: "Language",

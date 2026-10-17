@@ -23,7 +23,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
               if (route === "/portfolio") {
                 await expect(summary.getByRole("term")).toHaveCount(3);
                 await expect(
-                  summary.getByRole("term").filter({ hasText: /Net Cost Basis|淨成本基礎|净成本基础/ }),
+                  summary.getByRole("term").filter({ hasText: /Net Cost basis|淨成本基礎|净成本基础/ }),
                 ).toHaveCount(0);
                 await expect(page.locator(".portfolio-holdings-section")).toHaveCSS(
                   "background-color",

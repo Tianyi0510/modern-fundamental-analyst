@@ -19,7 +19,7 @@ const cases = [
           invalidEmail: "Enter a valid email address.",
           request: "Send Secure Link",
           requesting: "Sending…",
-          sent: "If this address is subscribed, a secure link is on its way.",
+          sent: "If this address is subscribed, check your inbox for a secure link to manage your preferences.",
           error: "Your request couldn't be completed. Please try again.",
         }}
       />

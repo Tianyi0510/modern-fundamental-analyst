@@ -12,7 +12,7 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
-    memoLabel: "Investment Memo",
+    memoLabel: "Investment memo",
     languageNotice: "This article is available in English only; no translation is available.",
     disclaimerTitle: "Disclaimer",
   },

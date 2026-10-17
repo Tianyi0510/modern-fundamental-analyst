@@ -1,4 +1,4 @@
-# Design System
+# Design system
 
 Use this guide for visual design, component behavior, interface copy and localization. Preserve Jost, brand assets and intentional language variants. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) covers code conventions, rendering, style loading and tooling. [README](../README.md#documentation) maps the documents.
 
@@ -6,21 +6,30 @@ Use this guide for visual design, component behavior, interface copy and localiz
 
 The site adopts the five layers below as its design system. Preserve its editorial identity: Jost headings, three brand blues, square financial surfaces, pill-shaped actions and generous whitespace. Apply reference principles through these owned components and tokens. Upstream defaults do not override the brand or justify unrelated features.
 
-| Layer                  | Responsibility                                                                                                                                                                                                                      | Reference                                                                                                           |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 01: Design foundations | Geist supplies Typography, Colors, Materials and guided Grid layouts. Fluent 2 organizes primitives, semantic aliases and component roles. Explicit brand exceptions remain.                                                        | [Geist](https://vercel.com/geist/introduction), [Fluent 2 tokens](https://fluent2.microsoft.design/design-tokens)   |
-| 02: UX guidelines      | Evaluate clarity, feedback, navigation and input behavior against the actual task. Record justified exceptions instead of applying every recommendation mechanically.                                                               | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book) |
-| 03: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                       | [shadcn/ui](https://ui.shadcn.com/docs), [Lucide](https://lucide.dev/)                                              |
-| 04: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations. | [Base UI](https://base-ui.com/react/overview/quick-start)                                                           |
-| 05: Implementation     | React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implement the system.                                                                                                                                     | [Application architecture](WEB_APPLICATION_ARCHITECTURE.md#presentation-and-style-loading)                          |
+| Layer                  | Responsibility                                                                                                                                                                                                                      | Reference                                                                                                                                                                                                                                                                                                                           |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01: Design style       | Pentagram, PayPal and Jost guide the editorial identity, typographic character and brand composition. Preserve the site's own assets and explicit brand adaptations.                                                                | [Pentagram](https://www.pentagram.com/), [PayPal](https://www.pentagram.com/work/paypal), [Jost](https://indestructibletype.com/Jost.html)                                                                                                                                                                                          |
+| 02: Design foundations | Geist supplies Colors, Typography, Materials and Grid. Fluent 2 supplies Design Tokens and Color Tokens: global values, semantic aliases and color roles.                                                                           | [Geist Colors](https://vercel.com/geist/colors), [Typography](https://vercel.com/geist/typography), [Materials](https://vercel.com/geist/materials), [Grid](https://vercel.com/geist/grid), [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens), [color tokens](https://fluent2.microsoft.design/color-tokens) |
+| 03: UX guidelines      | Fluent 2 Content Design guides information and interface copy. Vercel guides web interaction quality; Cieden guides task analysis, information architecture and usability.                                                          | [Fluent 2 content design](https://fluent2.microsoft.design/content-design), [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book)                                                                                                                                     |
+| 04: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                       | [shadcn/ui](https://ui.shadcn.com/), [Lucide](https://lucide.dev/)                                                                                                                                                                                                                                                                  |
+| 05: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations. | [Base UI](https://base-ui.com/)                                                                                                                                                                                                                                                                                                     |
+
+React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implement these five design layers. Their dependencies, rendering boundaries and style loading belong in [Application architecture](WEB_APPLICATION_ARCHITECTURE.md#presentation-and-style-loading).
 
 WCAG 2.2 AA, responsive design, semantic HTML and Core Web Vitals are cross-layer quality targets. Automated checks cover specific requirements; they do not establish full accessibility conformance or field CWV compliance. See the [contrast policy](#contrast-policy) and [performance verification](WEB_APPLICATION_ARCHITECTURE.md#performance-regression-checks).
 
-Preserve Jost, Noto Sans language fallbacks, the three brand blues and Logo. Pentagram's [PayPal work](https://www.pentagram.com/work/paypal), Lineto's [Supreme](https://lineto.com/typefaces/supreme) and [PayPal typography](https://lineto.com/bespoke/paypal), and [Jost](https://indestructibletype.com/Jost.html) are visual references, not replacement assets or font licenses. Geist and Fluent 2 guide the owned design system; their component packages and fonts are not installed. No dark mode, search or command palette is implied by adoption.
+Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The style references guide composition and typographic character; they do not supply replacement assets or font licenses. Geist and Fluent 2 guide the owned design system; their component packages and fonts are not installed. Light, dark and system appearance are supported. Search and a command palette are not implied by adoption.
+
+### Design style references
+
+- [Pentagram](https://www.pentagram.com/) and its [PayPal identity](https://www.pentagram.com/work/paypal): brand composition and typographic direction.
+- [Swiss Themes](https://swissthemes.design/) and [Bauer Types](https://bauertypes.com/): supplementary layout and type references.
+- Lineto's [Supreme](https://lineto.com/typefaces/supreme) and [PayPal typography](https://lineto.com/bespoke/paypal): type and wordmark references.
+- [Jost](https://indestructibletype.com/Jost.html): the site's retained typeface.
 
 ### Decision authority and brand adaptations
 
-Geist is the primary visual reference for typography, colors, spacing, grids, shapes and elevation. Fluent 2 contributes token architecture and naming, not a competing palette or component library. This is the site's integration of these references, not an official combined standard.
+Geist is the primary visual reference for typography, colors, spacing, grids, shapes and elevation. Fluent 2 contributes token architecture, semantic color roles and content-design guidance. The site retains its owned palette and components. This is the site's integration of these references, not an official combined standard.
 
 Apply decisions in this order:
 
@@ -35,9 +44,19 @@ Apply decisions in this order:
 | Palette          | Retain all brand and financial colors, including the two original grays. Use Geist neutral roles with the documented brand overrides; retain black primary text and inverse surfaces.                 |
 | Geometry         | Retain square financial surfaces, pill actions and the editorial container. Standard fields and the memo grid use 6px corners; floating menus use 12px.                                               |
 | Typography       | Use Geist heading, copy, label and button treatments with Jost, rem units and a 1rem minimum. Use complete Geist presets except for the preserved Logo wordmark; no locale-specific metric overrides. |
-| Features         | References do not imply dark mode, a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                                              |
+| Features         | References do not imply a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                                                         |
 
 A new treatment needs a reason, an owning role or component variant, and verification in its real context. Do not import another visual preset to solve an isolated component problem.
+
+### Light, dark and system appearance
+
+Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. The desktop Header and mobile Menu expose one localized Appearance selection. Preferences persist across reloads, routes and languages; system mode follows OS changes. The provider sets the document theme before hydration. Suppress hydration warnings only on the root HTML attribute that this bootstrap changes.
+
+`tokens.css` owns theme colors through `light-dark()` and `color-scheme`; supported browsers follow system appearance even without JavaScript. Keep brand primitives unchanged. Dark page surfaces use black and `#0a0a0a`, text uses white and lighter neutral roles, and links/focus use Bright Blue. Financial return aliases use readable dark-mode variants. Test modern Chromium and WebKit; older browsers without `light-dark()` are outside this theme implementation's support boundary.
+
+Bright Blue brand regions use the shared `brandSurface` treatment with explicit local semantic aliases and a light color context so their text, controls and focus retain the established dark lettering. The Footer stays black with white text. Footer Subscribe retains black text on its white pill. Header and Menu switch between the existing black- and white-letter SVG artwork without filtering the brand colors. Logo geometry, typography, spacing and content remain independent of theme selection.
+
+Verify system changes, explicit overrides, persistence, keyboard/native-select operation, Menu focus/scroll behavior, three languages, 320/390px phones, desktop and 200% text. Check text contrast at 4.5:1 and control/focus boundaries at 3:1 on actual surfaces, including hover and selected states. No theme transition animation is added. Full desktop navigation starts at 1280px so the Appearance control fits without overlapping the Logo; narrower layouts expose it in the Menu.
 
 ### Token structure
 
@@ -68,7 +87,7 @@ React Email keeps literal inline colors for email-client compatibility. Standalo
 
 Component roles are aliases within the same token system. `--action-primary-*`, `--action-contrast-*`, `--action-inverse-*` and `--action-quiet-*` describe action appearance and feedback. Button and ButtonLink consume the same variant definition. `--field-*` describes standard input, textarea and native-select surfaces; inverse fields have their own text, border and placeholder roles.
 
-Change a shared role in `tokens.css` to update all consumers. Keep background, foreground, border and hover colors compatible as a set. Use `variant` for an existing appearance and `className` for placement or sizing, rather than overriding a shared component's colors from its caller. Preserve justified variants such as the Footer's inverse form. Theme-ready aliases do not activate a second theme.
+Change a shared role in `tokens.css` to update all consumers. Keep background, foreground, border and hover colors compatible as a set. Use `variant` for an existing appearance and `className` for placement or sizing, rather than overriding a shared component's colors from its caller. Preserve justified variants such as the Footer's inverse form. Light and dark aliases share the same component structure and state rules.
 
 `src/components/ui/input.spec.ts` verifies propagation from a native link through client navigation to form buttons, shared input/textarea roles, and the independent inverse field treatment. Existing control-state checks verify loading, disabled, failure and retry behavior.
 
@@ -186,7 +205,7 @@ All three languages use the same preset metrics, including tracking. Chinese roo
 
 ### Neutral colors and materials
 
-Adopt the light sRGB values from [Geist Colors](https://vercel.com/geist/colors). There is no dark theme. The ten gray steps serve component backgrounds (100–300), borders (400–600), high-contrast fills (700–800) and text (900–1000). The scale is role-based, not a monotonically spaced brightness ramp. Page Background 1 is white. The site overrides Geist Background 2 with the original `--background-gray: #f8f9fb` for Hero and secondary section bands, subtle surfaces and the material background outline. The original `--gray: #ededed` supplies dividers, chart grids and `--border-subtle`, including memo-grid separators. Keep the ten-step Geist neutral palette unchanged; these two brand aliases are explicit exceptions. Secondary text uses Gray 900 (30% gray); stronger supplementary text uses Gray 1000 (9% gray).
+Adopt the light sRGB values from [Geist Colors](https://vercel.com/geist/colors), with owned dark semantic aliases. The ten gray steps serve component backgrounds (100–300), borders (400–600), high-contrast fills (700–800) and text (900–1000). The scale is role-based, not a monotonically spaced brightness ramp. Page Background 1 is white. The site overrides Geist Background 2 with the original `--background-gray: #f8f9fb` for Hero and secondary section bands, subtle surfaces and the material background outline. The original `--gray: #ededed` supplies dividers, chart grids and `--border-subtle`, including memo-grid separators. Keep the ten-step Geist neutral palette unchanged; these two brand aliases are explicit exceptions. In light mode, secondary text uses Gray 900 (30% gray); stronger supplementary text uses Gray 1000 (9% gray).
 
 Use solid gray for borders and translucent black for material shadows. Standard fields use white, 6px corners and Gray 800 borders to meet the non-text contrast target; do not use a faint decorative surface outline as their only boundary. Brand-colored selection, hover and focus states remain independent of the neutral palette. Black primary text, the two original grays, all existing brand/financial colors and the black Footer are explicit exceptions.
 
@@ -239,7 +258,7 @@ Preserve information and action priorities at every width.
 
 Use `--interactive-accent` (Deep Blue) for normal-size interactive text. Medium Blue remains a brand primitive for decorative details, surface-appropriate non-text indicators and the dashed benchmark line; it is not a normal-text color on white. `--surface-selected` provides a pale blue surface for desktop navigation and language states. Use Deep Blue text on that surface.
 
-The baseline focus outline consumes `--focus-ring-color`, which defaults to `--focus-ring-on-light` (Deep Blue). The black Footer sets the inherited role to `--focus-ring-on-dark` (Bright Blue). Inputs retain their explicit surface variants. Check the outline against its adjacent surface at a minimum of 3:1: Medium Blue on Bright Blue is insufficient. Forced-colors mode continues to use the system Highlight color.
+The baseline focus outline consumes `--focus-ring-color`, which follows `--interactive-accent`: Deep Blue in light mode and Bright Blue in dark mode. The black Footer sets the inherited role to `--focus-ring-on-dark` (Bright Blue). Inputs retain their explicit surface variants. Check the outline against its adjacent surface at a minimum of 3:1: Medium Blue on Bright Blue is insufficient. Forced-colors mode continues to use the system Highlight color.
 
 Validate normal-size text at 4.5:1 after compositing opacity and non-text indicators at 3:1 where required. KPI notes retain their value's color at 0.8 opacity. Footer secondary text uses dedicated inverse aliases, with 0.84 and 0.78 white opacity on black. Disabled controls have separate feedback and must not acquire enabled hover states.
 
@@ -275,7 +294,7 @@ UI primitives own stacking through `--layer-navigation`, `--layer-modal` and `--
 
 ## UX tasks and acceptance
 
-Use Vercel's interface guidelines for input behavior, focus, loading and errors. Use Cieden as a reference for task analysis, information architecture and usability checks. The tasks below describe the site's current intent; they are working assumptions, not findings from a user-research study.
+Use Fluent 2 Content Design to identify the reader, their task and the information needed at each decision. Use Vercel's interface guidelines for input behavior, focus, loading and errors. Use Cieden as a reference for task analysis, information architecture and usability checks. The tasks below describe the site's current intent; they are working assumptions, not findings from a user-research study.
 
 | Reader task                            | Interface contract                                                                                            | Acceptance evidence                                                                |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -329,14 +348,49 @@ Describe verified outcomes and give a clear next step. A confirmation request is
 
 Keep meaning, tone and action intent equivalent across languages; line counts and layout may differ.
 
-- Use consistent terminology for the same concepts. State the outcome first, then give the next step when needed.
-- Use concise, descriptive visible link text that identifies the destination. Replace generic labels such as `Read More` with a meaningful action in every language; see [Chrome's link-text guidance](https://developer.chrome.com/docs/lighthouse/seo/link-text).
-- Follow [APA title case](https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case) for English page and section headings, form titles, data labels, chart and table headings, and disclosure titles. Capitalize the first word of the title or heading and the first word of a subtitle, including after a colon or a dash. Capitalize nouns, verbs (including linking verbs), adjectives, adverbs, pronouns, and words of four or more letters. Lowercase articles (`a`, `an`, `the`) and conjunctions or prepositions of three letters or fewer unless they begin the title, heading, or subtitle. Capitalize particles in phrasal verbs and major words in hyphenated compounds. Treat wrapped lines as one title and preserve brand names and acronyms.
-- Apply the same capitalization to CTA labels, including links and buttons, as a site design convention; APA does not prescribe interface button capitalization. Examples: `Connect Through Research`, `View All Investment Memos`, `Get in Touch`, `Continue to Stripe`, and `Portfolio: A Monthly Record`. Apply title case to short visible annotations and supplementary labels as well: `Updated Monthly`, `Verified Snapshot as of`, `Purchases and Transaction Fees`, `Cash-Flow Weighted`, `Last Updated on`, and `Coming Soon`. Keep sentence case for complete explanatory sentences and paragraphs, methodology, form feedback, status messages, and loading feedback. Preserve date formats, unit symbols such as `min`, brand names, acronyms, and non-English copy.
+Apply [Fluent 2 Content Design](https://fluent2.microsoft.design/content-design) through plain language, concise headings, descriptive links and clear next steps. Adapt tone to the reader's task and emotional context. Prefer active voice and address the reader directly in operational guidance. Use second person for reader tasks and named third person for author background. Preserve verified financial and legal meaning when simplifying copy.
+
+### Content design workflow
+
+Before writing, identify the reader, the task they want to complete and the information they need at that step. For an error or uncertain outcome, consider what may worry them and make the next safe action clear. Keep copy with the page or feature that owns the behavior.
+
+| Context                | Content responsibility                                                                                                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Research and portfolio | Explain the evidence, data date, calculation boundary and limitations. Define specialist terms where readers need them.                                                |
+| Navigation and actions | Use short labels that name the destination or action. Instructions must work without relying on screen position, color or device.                                      |
+| Subscription           | Distinguish requesting a confirmation email from confirming consent. Tell readers how to finish subscribing; do not describe a request as an active subscription.      |
+| Preferences            | Explain the secure-link step and keep the same confirmation for every address. Do not reveal subscriber status or promise delivery that the response cannot establish. |
+| Errors and payments    | State what is known, explain any necessary wait and give a safe next step. A failed request or return navigation does not prove a provider operation failed.           |
+
+Use short sentences, familiar words and active voice. Prefer present tense for current states; use past or future tense when it accurately describes an event or next step. Keep a neutral, reassuring tone for errors. Avoid filler, blame, unsupported response-time promises and celebratory punctuation in routine feedback. Use headings and lists to support scanning. Decorative icons remain hidden from assistive technology; informative visuals need meaningful alternatives.
+
+Review each change in all three languages. Check content against actual consent, privacy, financial and legal states. If a content decision requires a behavior change, implement and verify that behavior before publishing the promise. Search for the previous wording in tests and fixtures, update affected assertions, then verify the visible message, accessible name, next action and mobile wrapping. Provider writes stay mocked during routine verification.
+
+### Capitalization and editorial conventions
+
+Fluent 2 owns content design: reader needs, plain language, tone, active voice and clear next steps. [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines#copywriting) owns capitalization: interface headings and buttons use Chicago Title Case; marketing pages use sentence case. This is an explicit project choice from Vercel's brand-specific guidance, not a universal accessibility rule.
+
+| Context                                                                                      | Capitalization                                                                                                                                                                                     |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home, About, memo index and articles, Disclaimer; Contact and Support introduction/Hero copy | Sentence case for editorial headings and page-specific links/actions. Capitalize the first word, proper nouns and acronyms.                                                                        |
+| Portfolio and Performance; preferences, confirmation and recovery screens                    | Chicago Title Case for interface headings and buttons. Use the same treatment for short field labels and table column headings. Explanations, status messages and data notes remain sentence case. |
+| Contact, subscription and payment forms, including forms embedded in introduction pages      | Chicago Title Case for form headings, labels and buttons. Instructions and error/success messages remain sentence case.                                                                            |
+| Shared Header, Menu and Footer                                                               | Consistent Title Case for visible navigation/control labels and section headings across routes. Accessible instructions such as “Open menu” remain sentence case.                                  |
+| Transactional emails and source material                                                     | Email copy follows Fluent 2 sentence case. Preserve source quotations, names, technical identifiers and published source titles.                                                                   |
+
+Use Chicago's 18th-edition rules: capitalize the first and last words, nouns, pronouns, verbs, adjectives and adverbs. Lowercase internal articles (`a`, `an`, `the`), coordinating conjunctions (`and`, `but`, `for`, `or`, `nor`), `to` in infinitives and short prepositions used as prepositions. Capitalize prepositions of five or more letters; for example, `Get Help with a Payment` and `Connect Through Research`. [Chicago's capitalization clarification](https://www.chicagomanualofstyle.org/qanda/data/faq/topics/CapitalizationTitles/faq0035.html) explains the edition change.
+
+Maintain capitalization in owned copy; do not use CSS `text-transform: capitalize` or a runtime word converter. Determine the phrase's grammar and context. A visual line break does not start a new sentence or title. Keep Modern Fundamental Analyst, Microsoft, Stripe, Rutgers University–New Brunswick Honors College, AI, ETF, TWRR and XIRR unchanged. Chinese content does not acquire English casing rules.
+
+- Write directly to the reader with active voice and familiar words. Use the named author for factual biography rather than first-person narration. Do not assign the author's beliefs to the reader.
+- Remove terminal periods from headings, buttons, labels and fragment lists in all languages. Keep punctuation in complete explanatory sentences, source quotations and actual questions.
+- Use descriptive action and destination labels. Instructions must work without references such as “below”, “on the right” or “the blue button”.
+- Express a failed or uncertain operation accurately and give the next safe action. A request, redirect or provider acknowledgment alone does not establish delivery, consent or payment completion.
+- The content design rules govern wording and interaction decisions. Existing capitalization, voice, punctuation or workflow contracts are not exceptions by themselves. A changed workflow needs corresponding implementation and focused verification.
 - Present dates, currency, percentages, and data timestamps clearly and consistently. Portfolio and performance data are timestamped snapshots and must not imply live quotes; see [portfolio data](WEB_APPLICATION_ARCHITECTURE.md#portfolio-data) for definitions.
 - Preserve meaning, tone, and action intent in translation rather than matching words or line counts literally. Language differences may justify layout and content variants.
 
-Describe research coverage accurately. Selected-company coverage does not imply a thesis or model for every holding. Preserve source-article wording and publication dates. Put scope and language notices in the page's language, aligned with the article body and spaced apart from its first heading. Label publisher overviews when they are not the full report.
+Describe research coverage accurately. Selected-company coverage does not imply a thesis or model for every holding. Keep research evidence, source quotations and publication dates accurate. Article headings follow sentence case; source paragraphs remain attributable to the published research. Put scope and language notices in the page's language, aligned with the article body and spaced apart from its first heading. Label publisher overviews when they are not the full report.
 
 ## Design verification
 

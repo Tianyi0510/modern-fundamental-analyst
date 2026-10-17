@@ -31,7 +31,7 @@
 .portfolioKey,
 .benchmarkKey {
   width: 32px;
-  border-top: 3px solid var(--deep-blue);
+  border-top: 3px solid var(--chart-portfolio);
 }
 .benchmarkKey {
   border-color: var(--chart-benchmark);
@@ -63,11 +63,11 @@
   line-height: var(--leading-body);
 }
 .grid {
-  stroke: var(--gray);
+  stroke: var(--border-subtle);
   vector-effect: non-scaling-stroke;
 }
 .zeroLine {
-  stroke: var(--black);
+  stroke: var(--border-strong);
   stroke-width: 1;
   stroke-dasharray: 3 3;
   vector-effect: non-scaling-stroke;
@@ -80,7 +80,7 @@
   stroke-linejoin: round;
 }
 .portfolioLine {
-  stroke: var(--deep-blue);
+  stroke: var(--chart-portfolio);
 }
 .benchmarkLine {
   stroke: var(--chart-benchmark);
@@ -108,8 +108,8 @@
   cursor: pointer;
   padding: var(--space-4) 0;
   list-style: none;
-  border-top: 1px solid var(--gray);
-  border-bottom: 1px solid var(--gray);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
   touch-action: manipulation;
 }
 .details summary::-webkit-details-marker {
@@ -164,7 +164,7 @@
 .tableScroll th,
 .tableScroll td {
   padding: var(--space-3);
-  border-bottom: 1px solid var(--gray);
+  border-bottom: 1px solid var(--border-subtle);
   text-align: right;
   white-space: nowrap;
 }
@@ -187,7 +187,7 @@
 .tableScroll thead th {
   position: sticky;
   top: 0;
-  background: var(--white);
+  background: var(--surface-primary);
   z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,17 @@
+.dark {
+  display: none;
+}
+:global(html[data-theme="dark"]) .light {
+  display: none;
+}
+:global(html[data-theme="dark"]) .dark {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-theme])) .light {
+    display: none;
+  }
+  :global(html:not([data-theme])) .dark {
+    display: block;
+  }
+}

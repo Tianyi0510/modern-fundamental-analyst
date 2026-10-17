@@ -16,7 +16,7 @@ for (const { prefix, action, success } of [
         await page.route("**/api/subscription-confirmation", async (route) => {
           calls += 1;
           expect(route.request().postDataJSON()).toEqual({ token: "a".repeat(43) });
-          if (calls === 1) return route.fulfill({ status: 503, json: { error: "Try again" } });
+          if (calls === 1) return route.fulfill({ status: 503, json: { error: "Try Again" } });
           await new Promise<void>((resolve) => {
             release = resolve;
           });

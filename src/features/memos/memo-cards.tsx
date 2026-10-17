@@ -10,9 +10,9 @@ const slotIndexes = [0, 1, 2] as const;
 const placeholderCopy = {
   en: {
     status: "Planned",
-    title: (number: string) => `Investment Memo ${number}`,
+    title: (number: string) => `Investment memo ${number}`,
     summary: "Research is in progress. This space is reserved for a future investment thesis.",
-    availability: "Coming Soon",
+    availability: "Coming soon",
   },
   "zh-tw": {
     status: "規劃中",

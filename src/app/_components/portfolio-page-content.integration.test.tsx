@@ -8,7 +8,7 @@ vi.mock("@/components/site-header", () => ({ SiteHeader: () => null }));
 vi.mock("./page-footer", () => ({ PageFooter: () => null }));
 
 it.each([
-  { locale: "en", name: "Portfolio Holdings", position: "Sort By Position", total: "Total" },
+  { locale: "en", name: "Portfolio holdings", position: "Sort by Position", total: "Total" },
   { locale: "zh-tw", name: "投資組合持股", position: "排序依據 部位", total: "合計" },
   { locale: "zh-cn", name: "投资组合持仓", position: "排序依据 持仓", total: "合计" },
 ] as const)(

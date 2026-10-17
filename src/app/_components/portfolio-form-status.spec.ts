@@ -5,8 +5,8 @@ const locales = [
     prefix: "",
     name: "English",
     contactSuccess: "Your message has been sent.",
-    subscribeSuccess: "Check your inbox and confirm your subscription.",
-    preferencesSuccess: "If this address is subscribed, a secure link is on its way.",
+    subscribeSuccess: "Check your inbox. Open the confirmation email to finish subscribing.",
+    preferencesSuccess: "If this address is subscribed, check your inbox for a secure link to manage your preferences.",
     returnNote:
       "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
   },
@@ -14,7 +14,7 @@ const locales = [
     prefix: "/zh-tw",
     name: "Traditional Chinese",
     contactSuccess: "訊息已成功傳送",
-    subscribeSuccess: "請查看電子郵件並確認你的訂閱。",
+    subscribeSuccess: "請查看收件匣，開啟確認郵件以完成訂閱。",
     preferencesSuccess: "若此地址已訂閱",
     returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
   },
@@ -22,7 +22,7 @@ const locales = [
     prefix: "/zh-cn",
     name: "Simplified Chinese",
     contactSuccess: "信息已成功发送",
-    subscribeSuccess: "请查看电子邮件并确认你的订阅。",
+    subscribeSuccess: "请查看收件箱，打开确认邮件以完成订阅。",
     preferencesSuccess: "如果此地址已订阅",
     returnNote: "净股息与融资利息在投资组合层面计入，不分摊至单项持仓。",
   },
@@ -36,10 +36,10 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
     await expect(summaryReturn).toHaveText("+32.84%");
     const summary = page.locator('.portfolio-kpis [data-tone="brand"]');
     await expect(summary.getByRole("term")).toHaveText(
-      prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total Return",
+      prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total return",
     );
     await expect(summary.locator("small")).toHaveText(
-      prefix === "/zh-tw" ? "絕對報酬率" : prefix === "/zh-cn" ? "绝对回报率" : "Absolute Return",
+      prefix === "/zh-tw" ? "絕對報酬率" : prefix === "/zh-cn" ? "绝对回报率" : "Absolute return",
     );
     await expect(tableReturn).toHaveText("+32.84%");
     await expect(page.locator(".portfolio-table-wrap + .portfolio-return-note p")).toContainText(returnNote);
