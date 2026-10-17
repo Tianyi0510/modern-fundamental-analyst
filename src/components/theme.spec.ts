@@ -1,14 +1,16 @@
 import { expect, test } from "@playwright/test";
 import { colorContrast } from "../../scripts/color-contrast";
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, baseURL }) => {
+  // Credentialed keepalive requests require an explicit origin, including in WebKit mocks.
   await page.route("https://sentry.invalid/**", (route) =>
     route.fulfill({
       status: 200,
       body: "{}",
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": new URL(baseURL!).origin,
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "Content-Type, Sentry-Trace, Baggage",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
       },
     }),
@@ -185,4 +187,20 @@ test("a native appearance choice made before hydration persists", async ({ page 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.getByRole("combobox", { name: "Appearance" })).toHaveValue("dark");
+});
+
+test("isolated monitoring transport accepts credentialed keepalive requests @mobile", async ({ page }) => {
+  await page.goto("/contact");
+  expect(
+    await page.evaluate(async () => {
+      const response = await fetch("https://sentry.invalid/cors-probe", {
+        method: "POST",
+        body: "{}",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        keepalive: true,
+      });
+      return response.ok;
+    }),
+  ).toBe(true);
 });
