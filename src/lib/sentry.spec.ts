@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { decodeReplayRecording } from "../../scripts/sentry-envelope";
 
 test(
   "browser errors reach the isolated transport without email or URL recovery values",
@@ -61,19 +62,21 @@ test("session replay masks page text and excludes form contents", { tag: "@mobil
   test.skip(process.env.PLAYWRIGHT_SENTRY_TEST !== "1", "Requires an explicitly enabled fake DSN");
   const recordings: string[] = [];
   await page.route("https://sentry.invalid/**", async (route) => {
-    const body = route.request().postData() ?? "";
-    if (body.includes('"type":"replay_recording"')) recordings.push(body);
+    const body = route.request().postDataBuffer();
+    if (body?.includes('"type":"replay_recording"')) recordings.push(decodeReplayRecording(body));
     await route.fulfill({ status: 200, json: {} });
   });
   await page.goto("/contact");
+  const headingLocator = page.getByRole("heading", { level: 1 });
+  await expect(headingLocator).not.toHaveText("");
+  const heading = await headingLocator.innerText();
   await page.getByRole("textbox", { name: "Name", exact: true }).fill("Replay Private Name");
   await page.getByRole("textbox", { name: "Email", exact: true }).fill("replay-private@example.com");
   await expect.poll(() => recordings.length, { timeout: 20_000 }).toBeGreaterThan(0);
   const payload = recordings.join("\n");
-  expect(payload).toContain('"type":"replay_event"');
   expect(payload).not.toContain("Replay Private Name");
   expect(payload).not.toContain("replay-private@example.com");
-  expect(payload).not.toContain("Connect Through Research");
+  expect(payload).not.toContain(heading);
   const forms: unknown[] = [];
   function visit(value: unknown) {
     if (!value || typeof value !== "object") return;

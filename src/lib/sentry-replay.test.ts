@@ -16,6 +16,7 @@ describe("Replay privacy", () => {
 
   it("masks content, blocks forms and omits custom recording payloads", () => {
     const options = createReplayOptions();
+    expect(options.useCompression).toBe(true);
     expect(options.maskAllText).toBe(true);
     expect(options.maskAllInputs).toBe(true);
     expect(options.blockAllMedia).toBe(true);

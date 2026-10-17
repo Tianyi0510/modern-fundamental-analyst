@@ -36,7 +36,7 @@ if (dsn) {
         if (!replay) return;
         // Module evaluation and the initial DOM snapshot must not share one task.
         await yieldToMain();
-        if (replayAllowed && canRecordReplay(window.location.href)) replay.initializeReplay(environment);
+        if (replayAllowed && canRecordReplay(window.location.href)) replay.initializeReplay();
       })
       .catch(() => {
         // Optional Replay loading must not interrupt navigation or error monitoring.

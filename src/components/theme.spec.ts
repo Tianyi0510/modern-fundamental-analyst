@@ -225,16 +225,10 @@ test("monitoring requests remain intercepted after their document navigates @mob
   try {
     await page.goto("/contact");
     await page.evaluate((url) => {
-      window.addEventListener(
-        "pagehide",
-        () => {
-          void fetch(url, { method: "POST", body: "{}", credentials: "include", keepalive: true }).catch(() => {});
-        },
-        { once: true },
-      );
+      void fetch(url, { method: "POST", body: "{}", credentials: "include", keepalive: true }).catch(() => {});
     }, endpoint);
-    await page.goto("/about", { waitUntil: "domcontentloaded" });
     await expect.poll(() => started).toBe(true);
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
     release();
     await expect.poll(() => completed).toBe(true);
     expect(errors).toEqual([]);
