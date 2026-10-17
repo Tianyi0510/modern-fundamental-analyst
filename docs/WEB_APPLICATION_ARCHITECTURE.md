@@ -47,7 +47,7 @@ Routes validate untrusted HTTP input and map service results to responses. Subsc
 - Memo routes use `generateStaticParams` and `dynamicParams = false` to reject unknown slugs.
 - Payment verification and saved preferences stream under local Suspense boundaries. Ordinary Support visits and retry states render the native form before streaming. Header and Hero do not wait for providers.
 - Localized error boundaries offer retry and Home actions; global errors use a minimal document. Never display raw errors or provider data.
-- Each performance chart has `ChartBoundary`: Suspense contains streaming SSR errors; a client boundary offers localized retry and reports the original error to Sentry. Filtering replaces chart messages and nested causes, retains types and stack locations, and removes payloads and URL queries.
+- Performance chart geometry, labels and monthly table cells render on the server; only `AnimatedDisclosure` and the error boundary require client code. Each performance chart has `ChartBoundary`: Suspense contains streaming SSR errors; a client boundary offers localized retry and reports the original error to Sentry. Filtering replaces chart messages and nested causes, retains types and stack locations, and removes payloads and URL queries.
 - Chart clients receive monthly observations only. Ledgers and return reconstruction stay server-side. Chart boundaries preserve sibling charts, navigation and methodology; they do not cover module initialization or shared page-data preparation.
 
 ### Routing and metadata

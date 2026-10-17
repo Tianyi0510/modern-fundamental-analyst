@@ -1,5 +1,3 @@
-"use client";
-
 import { ChevronDown } from "lucide-react";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
