@@ -1,14 +1,14 @@
 export const supportCopy = {
   en: {
     label: "Support",
-    title: ["Support Independent", "Research."],
+    title: ["Support independent", "research"],
     intro:
       "Help sustain rigorous, transparent public-equity research and keep every investment memo freely accessible to all readers.",
-    sectionTitle: "Choose an Amount.",
+    sectionTitle: "Choose an Amount",
     sectionText:
       "Your one-time contribution supports research tools, data access, and the time required to publish accountable analysis.",
     statusTitle: "Payment Status",
-    paymentHelp: "Contact Me About a Payment",
+    paymentHelp: "Get Help with a Payment",
     legend: "One-Time Support Amount",
     submit: "Continue to Stripe",
     submitting: "Redirecting to Stripe…",
@@ -20,12 +20,12 @@ export const supportCopy = {
       "retired-checkout":
         "This checkout attempt can no longer be resumed. Check your original Stripe confirmation before starting another payment.",
       pending:
-        "Your payment is still processing. Please do not submit another payment while its status is pending. Refresh this page to check its status, or contact me if you need help.",
-      unverified: "We could not confirm this payment. Check your Stripe confirmation before trying again.",
+        "Your payment is still processing. Wait before making another payment. Refresh this page to check the status, or use Contact for help.",
+      unverified: "Payment status is unconfirmed. Check your Stripe confirmation before trying again.",
       success: "Your payment was successful. Thank you for supporting independent research.",
       cancelled:
         "You returned from Checkout. Payment status has not been verified. Check your Stripe confirmation before trying again.",
-      error: "Checkout is temporarily unavailable. Please try again later.",
+      error: "Checkout is temporarily unavailable. Try again later.",
       "rate-limited":
         "Too many checkout attempts. Wait 10 minutes before trying again. This attempt did not start a payment.",
       "invalid-amount": "Choose USD 6, 12, or 18, then try again.",
@@ -33,12 +33,12 @@ export const supportCopy = {
   },
   "zh-tw": {
     label: "支持研究",
-    title: ["支持獨立", "投資研究。"],
+    title: ["支持獨立", "投資研究"],
     intro: "協助維持嚴謹、透明的公開股票研究，讓每一篇投資備忘錄都能持續免費開放閱讀。",
-    sectionTitle: "選擇支持金額。",
+    sectionTitle: "選擇支持金額",
     sectionText: "你的一次性支持將用於研究工具、數據存取，以及撰寫可被檢驗之分析所需的時間。",
     statusTitle: "付款狀態",
-    paymentHelp: "聯絡我詢問付款問題",
+    paymentHelp: "取得付款協助",
     legend: "一次性支持金額",
     submit: "前往 Stripe",
     submitting: "正在前往 Stripe…",
@@ -48,7 +48,7 @@ export const supportCopy = {
     note: "付款由 Stripe 安全處理。適用稅項會於結帳時計算。這是自願支持，並非慈善捐款、投資產品或投資顧問服務。",
     statuses: {
       "retired-checkout": "此付款嘗試已無法恢復。請先查閱原本的 Stripe 付款確認，再決定是否開始另一筆付款。",
-      pending: "付款仍在處理中。在狀態待確認期間，請勿再次付款。請重新整理此頁以查看狀態，如需協助，請聯絡我。",
+      pending: "付款仍在處理中。在狀態待確認期間，請勿再次付款。請重新整理此頁以查看狀態，如需協助，請使用聯絡頁面。",
       unverified: "目前無法確認這筆付款，請先查閱 Stripe 付款確認，再決定是否重試。",
       success: "付款已成功。感謝你支持獨立研究。",
       cancelled: "你已返回本頁，付款狀態尚未確認。請先查閱 Stripe 付款確認，再決定是否重試。",
@@ -59,12 +59,12 @@ export const supportCopy = {
   },
   "zh-cn": {
     label: "支持研究",
-    title: ["支持独立", "投资研究。"],
+    title: ["支持独立", "投资研究"],
     intro: "协助维持严谨、透明的公开股票研究，让每一篇投资备忘录都能持续免费开放阅读。",
-    sectionTitle: "选择支持金额。",
+    sectionTitle: "选择支持金额",
     sectionText: "你的一次性支持将用于研究工具、数据访问，以及撰写可被检验之分析所需的时间。",
     statusTitle: "付款状态",
-    paymentHelp: "联系我咨询付款问题",
+    paymentHelp: "获取付款帮助",
     legend: "一次性支持金额",
     submit: "前往 Stripe",
     submitting: "正在前往 Stripe…",
@@ -74,7 +74,7 @@ export const supportCopy = {
     note: "付款由 Stripe 安全处理。适用税费会在结账时计算。这是自愿支持，并非慈善捐款、投资产品或投资顾问服务。",
     statuses: {
       "retired-checkout": "此付款尝试已无法恢复。请先查阅原本的 Stripe 付款确认，再决定是否开始另一笔付款。",
-      pending: "付款仍在处理中。在状态待确认期间，请勿再次付款。请刷新此页以查看状态，如需帮助，请联系我。",
+      pending: "付款仍在处理中。在状态待确认期间，请勿再次付款。请刷新此页以查看状态，如需帮助，请使用联系页面。",
       unverified: "目前无法确认这笔付款，请先查阅 Stripe 付款确认，再决定是否重试。",
       success: "付款已成功。感谢你支持独立研究。",
       cancelled: "你已返回本页，付款状态尚未确认。请先查阅 Stripe 付款确认，再决定是否重试。",

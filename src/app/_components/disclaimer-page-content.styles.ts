@@ -5,13 +5,13 @@ export const appearance = {
     "max-w-[1000px] mt-[var(--space-heading-content)] text-display text-balance text-ink [&_em]:not-italic [&_em]:text-brand compact:wrap-anywhere",
   legal: "legal bg-surface",
   "legal-hero":
-    "legal-hero [padding:var(--space-section)_0] [background:var(--background-gray)] [@media((max-width:_800px))]:[padding:var(--space-section)_0]",
+    "legal-hero [padding:var(--space-8)_0] [background:var(--surface-secondary)] [@media((max-width:_800px))]:[padding:var(--space-8)_0]",
   shell: containerAppearance,
   eyebrow:
     "eyebrow max-w-[720px] m-0 flex items-center gap-[10px] text-label [&_span]:w-[9px] [&_span]:h-[9px] [&_span]:rounded-full [&_span]:bg-accent [&_span]:text-accent",
   "legal-subtitle": "legal-subtitle max-w-[720px] mt-[var(--space-related-content)] text-ink text-lead text-pretty",
   "legal-body":
-    "legal-body [padding:var(--space-section)_0] [background:var(--white)] [@media((max-width:_800px))]:[padding:var(--space-section)_0]",
+    "legal-body [padding:var(--space-8)_0] [background:var(--surface-primary)] [@media((max-width:_800px))]:[padding:var(--space-8)_0]",
   "legal-content":
     "legal-content grid [gap:var(--space-section)] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)]",
   "legal-section":

@@ -1,9 +1,9 @@
 export const appearance = {
   section: {
     inverse:
-      "subscribe-section min-w-0 [align-self:start] [&_h2]:[margin:0] [&_h2]:[color:var(--white)] [&_h2]:text-title-small [&_h2]:[text-transform:none]",
+      "subscribe-section min-w-0 [align-self:start] [&_h2]:[margin:0] [&_h2]:[color:var(--white)] [&_h2]:text-title [&_h2]:[text-transform:none]",
     standard:
-      "subscribe-section grid min-w-0 grid-cols-[minmax(260px,0.72fr)_minmax(0,1.28fr)] items-start gap-[72px] py-[var(--space-section)] text-ink [&_h2]:m-0 [&_h2]:text-title max-[800px]:grid-cols-1 max-[800px]:gap-[var(--space-heading-content)]",
+      "subscribe-section grid min-w-0 grid-cols-[minmax(260px,0.72fr)_minmax(0,1.28fr)] items-start gap-[72px] py-[var(--space-8)] text-ink [&_h2]:m-0 [&_h2]:text-editorial-title max-[800px]:grid-cols-1 max-[800px]:gap-[var(--space-heading-content)]",
   },
   intro: "mt-[var(--space-related-content)] max-w-[390px] text-body",
   "subscribe-form":

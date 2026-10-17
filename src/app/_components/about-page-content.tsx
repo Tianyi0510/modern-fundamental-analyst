@@ -1,3 +1,4 @@
+import { brandSurface } from "@/components/brand-surface";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./about-page-content.styles";
 import Link from "next/link";
@@ -27,77 +28,77 @@ type Copy = {
 const copy: Record<Locale, Copy> = {
   en: {
     eyebrow: "About",
-    headline: ["Learning Continuously.", "Investing With Accountability."],
+    headline: ["Learn continuously", "and invest with accountability"],
     introduction:
-      "I am Tianyi (David) Li, a Rutgers University–New Brunswick Honors College student building a transparent, long-term investment process.",
-    disciplines: "Finance · BAIT · Philosophy · Music",
+      "Meet Tianyi (David) Li, a Rutgers University–New Brunswick Honors College student developing a transparent, long-term investment process.",
+    disciplines: "Finance · BAIT · philosophy · music",
     sections: [
       {
         label: "01 · Introduction",
-        title: "Why I Built Modern Fundamental Analyst",
+        title: "Why this research is published",
         paragraphs: [
-          "Modern Fundamental Analyst documents how I research stocks, value businesses, manage my portfolio, and evaluate my results.",
-          "I believe retail investors should have access to transparent investment research and understandable valuation methods. By publishing my portfolio, performance, and available research, I aim to create a public record that can be examined over time.",
-          "The mission of this website is to empower every retail investor to understand businesses, question assumptions, and make independent investment decisions.",
+          "Explore how stocks are researched, businesses are valued and portfolio decisions are evaluated.",
+          "Modern Fundamental Analyst gives you access to published research, monthly holdings and performance. You can examine this public record over time.",
+          "The goal is to help you understand businesses, question assumptions and make independent investment decisions.",
         ],
       },
       {
-        label: "02 · What Is a Modern Fundamental Analyst?",
-        title: "Traditional Fundamentals for the Coming Technological Waves",
+        label: "02 · What is a modern fundamental analyst?",
+        title: "Traditional fundamentals for the coming technological waves",
         paragraphs: [
-          "A modern fundamental analyst begins with the business: its operations, competitive position, financial statements, capital allocation, long-term opportunities, and risks.",
-          "I value accounting as the language of business and as the foundation of financial modeling. I build integrated 3-statement models to understand how the income statement, balance sheet, and cash flow statement work together. I then use DCF models to determine the intrinsic value of stocks.",
-          "I also believe in the coming waves of AI and other disruptive technologies. Traditional fundamental analysis remains essential, but it must be applied to businesses operating in a rapidly changing technological environment.",
+          "Start with the business: its operations, competitive position, financial statements, capital allocation, opportunities and risks.",
+          "Accounting connects business activity to valuation. Integrated three-statement models link the income statement, balance sheet and cash flow statement. Discounted cash flow (DCF) models estimate the intrinsic value of stocks.",
+          "Consider how AI and other disruptive technologies affect each business. Traditional fundamental analysis remains essential in a changing technological environment.",
         ],
       },
       {
-        label: "03 · Investment Philosophy",
-        title: "Focus the Portfolio and Value Businesses Long-Term",
+        label: "03 · Investment philosophy",
+        title: "Focus the portfolio and value businesses long-term",
         paragraphs: [
-          "I believe in focus investing for portfolio management. I prefer a limited number of positions that I understand and genuinely believe in, allowing my strongest ideas to contribute meaningfully to performance.",
-          "For stock pitching, I believe in long-term value investing. I study the business, build financial forecasts, determine its intrinsic value, and compare that value with its market price. I am willing to hold a stock for the long term when the business continues to develop as expected and the original thesis remains valid.",
-          "I also look for businesses positioned to benefit from AI and other disruptive technologies. However, a powerful trend does not automatically make every related stock a good investment. Business quality, valuation, and risk still matter.",
+          "The portfolio uses focus investing: a limited number of well-understood positions lets the strongest ideas contribute meaningfully to results.",
+          "The research uses long-term value investing. It compares business forecasts and estimated intrinsic value with market prices. A position can remain in the portfolio while the business develops as expected and the thesis remains valid.",
+          "AI and other disruptive technologies can create opportunities. A strong trend alone does not make a stock a good investment; business quality, valuation and risk still matter.",
         ],
       },
       {
-        label: "04 · Transparency and Accountability",
-        title: "Making Every Investment Decision Open to Review",
+        label: "04 · Transparency and accountability",
+        title: "Making every investment decision open to review",
         paragraphs: [
-          "I promote transparency and accountability by fully disclosing my portfolio and performance every month and publishing detailed investment theses.",
-          "Monthly disclosure creates a public record of what I own and how my decisions perform. Published research currently covers selected companies. A detailed thesis or public financial model is not yet available for every holding.",
-          "The objective is not to present a flawless record. It is to make my reasoning and results clear enough to be evaluated honestly, including mistakes, thesis changes, and periods of underperformance.",
+          "Review the full portfolio and performance record, disclosed monthly, alongside published investment theses.",
+          "Published research currently covers selected companies. A detailed thesis or public financial model is not yet available for every holding.",
+          "The record includes mistakes, thesis changes and periods of underperformance. Use it to evaluate the reasoning and results, rather than expect a flawless history.",
         ],
       },
       {
-        label: "05 · Research and Publishing",
-        title: "Turning Investment Ideas Into Testable Theses",
+        label: "05 · Research and publishing",
+        title: "Turning investment ideas into testable theses",
         paragraphs: [
-          "I use investment memos to turn opinions into structured and testable arguments. Each thesis aims to explain the business, investment opportunity, supporting evidence, valuation, major risks, and conditions that would cause my view to change.",
-          "Where appropriate, I support my research with an integrated 3-statement model and DCF valuation. The model connects operating assumptions with financial performance and intrinsic value.",
-          "Publishing the thesis creates a record before the outcome is known. Readers can examine my assumptions, disagree with my conclusions, and evaluate each idea independently as new evidence becomes available.",
+          "Each investment memo turns an idea into a structured argument. It aims to explain the business, opportunity, evidence, valuation, risks and conditions that would change the thesis.",
+          "Where appropriate, integrated three-statement models and DCF valuations connect operating assumptions with financial results and intrinsic value.",
+          "Published theses record the reasoning before the outcome is known. You can examine the assumptions, challenge the conclusions and evaluate new evidence independently.",
         ],
       },
       {
         label: "06 · Background",
-        title: "Growing Through Curiosity, Empathy, and Continuous Learning",
+        title: "Growing through curiosity, empathy, and continuous learning",
         paragraphs: [
-          "I am a Rutgers University–New Brunswick Honors College student intending to double major in Finance and Business Analytics and Information Technology. I also intend to pursue a minor in either Philosophy or Music.",
-          "I promote a “learn-it-all” growth mindset based on curiosity, empathy, and continuous learning. I do not expect to begin with every answer. Instead, I aim to ask better questions, listen to different perspectives, accept feedback, and continuously improve my knowledge and skills.",
-          "This mindset also shapes how I invest. When evidence challenges an existing view, I would rather examine it and revise my thesis than defend an earlier conclusion simply for consistency.",
+          "Tianyi (David) Li studies at Rutgers University–New Brunswick Honors College. His planned double major is finance and Business Analytics and Information Technology, with a possible minor in philosophy or music.",
+          "The research approach reflects a “learn-it-all” mindset: ask better questions, listen with empathy, accept feedback and keep building knowledge and skills.",
+          "When evidence challenges a view, revisit the thesis. Consistency should not come at the expense of learning.",
         ],
       },
     ],
     boundaries: [
       {
-        title: "What This Website Is",
+        title: "What this website is",
         items: [
-          "A fully disclosed monthly record of my portfolio and performance",
+          "A fully disclosed monthly portfolio and performance record",
           "An archive of published investment research",
           "A resource created to empower every retail investor",
         ],
       },
       {
-        title: "What This Website Is Not",
+        title: "What this website is not",
         items: [
           "A promise that every investment thesis will be correct",
           "A recommendation to buy or sell any particular security",
@@ -106,11 +107,11 @@ const copy: Record<Locale, Copy> = {
       },
     ],
     closingLabel: "Closing",
-    closingTitle: "Learn Openly, Think Independently, Improve Continuously",
+    closingTitle: "Learn openly, think independently, improve continuously",
     closingParagraphs: [
-      "I believe in learning openly, investing transparently, and empowering others to think independently.",
-      "I do not expect to have every answer. I aim to remain curious, approach different perspectives with empathy, make my assumptions clear, and revise my conclusions when the evidence changes.",
-      "Modern Fundamental Analyst preserves the reasoning behind my investment decisions and measures those decisions against their results. Through monthly portfolio and performance disclosure, detailed investment theses, and transparent valuation methods, I hope to build a more rigorous investment process while empowering every retail investor to develop their own.",
+      "Use this record to explore the reasoning behind investment decisions and compare it with the results.",
+      "Question the assumptions, consider other perspectives and revise conclusions when the evidence changes.",
+      "Monthly disclosures, published theses and transparent valuation methods help you develop an independent investment process.",
     ],
     legalPrefix: "For detailed legal and methodological information, see the ",
     disclaimer: "Disclaimer",
@@ -120,63 +121,62 @@ const copy: Record<Locale, Copy> = {
   },
   "zh-tw": {
     eyebrow: "關於",
-    headline: ["持續學習。", ["以問責精神", "投資。"]],
-    introduction:
-      "我是 Tianyi（David）Li，現就讀於羅格斯大學新布朗斯維克分校榮譽學院，並正在建立一套透明、長期的投資流程。",
+    headline: ["持續學習", ["以問責精神", "投資"]],
+    introduction: "認識 Tianyi（David）Li：現就讀於羅格斯大學新布朗斯維克分校榮譽學院，正在建立透明、長期的投資流程。",
     disciplines: "金融 · 商業分析與資訊科技 · 哲學 · 音樂",
     sections: [
       {
         label: "01 · 介紹",
-        title: "我為何建立 Modern Fundamental Analyst",
+        title: "為何公開這些投資研究",
         paragraphs: [
-          "Modern Fundamental Analyst 記錄我如何研究股票、評估企業價值、管理投資組合，以及檢視自己的成果。",
-          "我相信個人投資者應能取得透明的投資研究與容易理解的估值方法。透過公開投資組合、績效與已發布的研究，我希望建立一份可隨時間檢驗的公開紀錄。",
-          "這個網站的使命，是幫助每一位個人投資者理解企業、質疑假設，並作出獨立的投資決策。",
+          "探索股票研究、企業估值與投資組合決策的評估方式。",
+          "你可以在 Modern Fundamental Analyst 查閱已發布的研究、每月持股與績效，並隨時間檢驗這份公開紀錄。",
+          "目標是幫助你理解企業、質疑假設，並作出獨立的投資決策。",
         ],
       },
       {
         label: "02 · 什麼是現代基本面分析師？",
         title: "以傳統基本面迎接下一波科技浪潮",
         paragraphs: [
-          "現代基本面分析師從企業本身出發：其營運、競爭地位、財務報表、資本配置、長期機會與風險。",
-          "我重視會計作為商業語言及財務建模基礎的角色。我建立整合式三大財務報表模型，以理解損益表、資產負債表與現金流量表如何相互連動，再運用 DCF 模型評估股票的內在價值。",
-          "我也相信人工智慧與其他顛覆性科技浪潮即將到來。傳統基本面分析仍不可或缺，但必須應用於在快速變化科技環境中營運的企業。",
+          "從企業本身出發：營運、競爭地位、財務報表、資本配置、機會與風險。",
+          "會計將企業活動與估值連結起來。整合式三大財務報表模型串接損益表、資產負債表與現金流量表；現金流折現（DCF）模型則用於估計股票的內在價值。",
+          "考慮人工智慧與其他顛覆性科技如何影響每家企業。面對科技環境的變化，傳統基本面分析仍不可或缺。",
         ],
       },
       {
         label: "03 · 投資哲學",
         title: "集中投資組合，長期評估企業價值",
         paragraphs: [
-          "在投資組合管理上，我相信集中投資。我偏好持有少數自己真正理解並抱有信念的部位，讓最強的投資觀點能對績效產生實質貢獻。",
-          "在股票分析上，我相信長期價值投資。我研究企業、建立財務預測、評估其內在價值，並將該價值與市場價格比較。只要企業持續按照預期發展，而且原始投資論點仍然成立，我願意長期持有股票。",
-          "我也尋找有望受益於人工智慧與其他顛覆性科技的企業。然而，強大的趨勢並不會自動使每一檔相關股票成為良好投資；企業品質、估值與風險仍然重要。",
+          "投資組合採用集中投資：持有少數經充分理解的部位，讓最強的投資觀點能對成果產生實質貢獻。",
+          "研究採用長期價值投資，比較企業預測、估計內在價值與市場價格。只要企業按預期發展，且投資論點仍然成立，就可以繼續持有。",
+          "人工智慧與其他顛覆性科技可能帶來機會。但強大的趨勢不會自動讓相關股票成為良好投資；企業品質、估值與風險仍然重要。",
         ],
       },
       {
         label: "04 · 透明度與問責",
         title: "讓每項投資決策接受公開檢視",
         paragraphs: [
-          "我透過每月完整揭露投資組合與績效，並發布詳細投資論點，推動透明度與問責。",
-          "每月揭露建立了一份我持有什麼、以及決策表現如何的公開紀錄。目前已發布的研究涵蓋部分企業，並非每個持股都已有詳細投資論點或公開財務模型。",
-          "目標不是呈現一份毫無瑕疵的紀錄，而是讓我的推理與結果清楚到足以被誠實評估，包括錯誤、論點變化與績效落後的時期。",
+          "查閱每月完整揭露的投資組合與績效紀錄，以及已發布的投資論點。",
+          "目前已發布的研究涵蓋部分企業，並非每檔持股都已有詳細投資論點或公開財務模型。",
+          "紀錄包括錯誤、論點變化與績效落後的時期。你可以藉此檢視推理與結果，而非期待一份毫無瑕疵的歷史。",
         ],
       },
       {
         label: "05 · 研究與發布",
         title: "把投資觀點轉化為可驗證的論點",
         paragraphs: [
-          "我運用投資備忘錄，將觀點轉化為有結構且可驗證的論證。每項投資論點都力求說明企業、投資機會、支持證據、估值、主要風險，以及會使我改變觀點的條件。",
-          "在適當情況下，我會以整合式三大財務報表模型與 DCF 估值支持研究。模型將營運假設與財務表現及內在價值連結起來。",
-          "在結果出現前發布投資論點，能留下當時的公開紀錄。讀者可以檢視我的假設、不同意我的結論，並隨新證據出現而獨立評估每一項觀點。",
+          "每篇投資備忘錄將觀點轉化為有結構的論證，力求說明企業、機會、證據、估值、風險，以及會改變論點的條件。",
+          "在適當情況下，整合式三大財務報表模型與 DCF 估值會將營運假設、財務成果與內在價值連結起來。",
+          "已發布的論點保存結果出現前的推理。你可以檢視假設、質疑結論，並獨立評估新證據。",
         ],
       },
       {
         label: "06 · 背景",
         title: "以好奇心、同理心與持續學習成長",
         paragraphs: [
-          "我目前就讀於羅格斯大學新布朗斯維克分校榮譽學院，計畫雙主修金融與商業分析及資訊科技，並考慮輔修哲學或音樂。",
-          "我提倡以好奇心、同理心與持續學習為基礎的「learn-it-all」成長思維。我不期待自己一開始就擁有所有答案，而是希望提出更好的問題、聆聽不同觀點、接受回饋，並持續提升知識與能力。",
-          "這種思維也塑造了我的投資方式。當證據挑戰既有觀點時，我寧願重新檢視並修正投資論點，也不會只為了維持一致而捍衛先前的結論。",
+          "Tianyi（David）Li 現就讀於羅格斯大學新布朗斯維克分校榮譽學院，計劃雙主修金融與商業分析及資訊科技，並考慮輔修哲學或音樂。",
+          "研究方式體現「learn-it-all」成長思維：提出更好的問題、以同理心傾聽、接受回饋，並持續累積知識與能力。",
+          "當證據挑戰既有觀點時，重新檢視投資論點。不要為了維持一致而放棄學習。",
         ],
       },
     ],
@@ -193,9 +193,9 @@ const copy: Record<Locale, Copy> = {
     closingLabel: "結語",
     closingTitle: "公開學習，獨立思考，持續進步",
     closingParagraphs: [
-      "我相信公開學習、透明投資，並幫助他人獨立思考。",
-      "我不期待自己擁有所有答案。我希望保持好奇、以同理心面對不同觀點、清楚說明自己的假設，並在證據改變時修正結論。",
-      "Modern Fundamental Analyst 保存我每項投資決策背後的推理，並以結果衡量這些決策。透過每月揭露投資組合與績效、發布詳細投資論點與透明的估值方法，我希望建立更嚴謹的投資流程，同時幫助每一位個人投資者發展自己的判斷。",
+      "透過這份紀錄，探索投資決策背後的推理，並與結果比較。",
+      "質疑假設、考慮不同觀點，並在證據改變時修正結論。",
+      "每月揭露、已發布的論點與透明的估值方法，幫助你建立獨立的投資流程。",
     ],
     legalPrefix: "更詳細的法律與方法資訊，請參閱",
     disclaimer: "免責聲明",
@@ -205,63 +205,62 @@ const copy: Record<Locale, Copy> = {
   },
   "zh-cn": {
     eyebrow: "关于",
-    headline: ["持续学习。", ["以问责精神", "投资。"]],
-    introduction:
-      "我是 Tianyi（David）Li，现就读于罗格斯大学新布朗斯维克分校荣誉学院，并正在建立一套透明、长期的投资流程。",
+    headline: ["持续学习", ["以问责精神", "投资"]],
+    introduction: "认识 Tianyi（David）Li：现就读于罗格斯大学新布朗斯维克分校荣誉学院，正在建立透明、长期的投资流程。",
     disciplines: "金融 · 商业分析与信息技术 · 哲学 · 音乐",
     sections: [
       {
         label: "01 · 介绍",
-        title: "我为何建立 Modern Fundamental Analyst",
+        title: "为何公开这些投资研究",
         paragraphs: [
-          "Modern Fundamental Analyst 记录我如何研究股票、评估企业价值、管理投资组合，以及检视自己的成果。",
-          "我相信个人投资者应该能够获得透明的投资研究与容易理解的估值方法。通过公开投资组合、业绩与已发布的研究，我希望建立一份可以随时间检验的公开记录。",
-          "这个网站的使命，是帮助每一位个人投资者理解企业、质疑假设，并作出独立的投资决策。",
+          "探索股票研究、企业估值与投资组合决策的评估方式。",
+          "你可以在 Modern Fundamental Analyst 查阅已发布的研究、每月持仓与业绩，并随时间检验这份公开记录。",
+          "目标是帮助你理解企业、质疑假设，并作出独立的投资决策。",
         ],
       },
       {
         label: "02 · 什么是现代基本面分析师？",
         title: "以传统基本面迎接下一波科技浪潮",
         paragraphs: [
-          "现代基本面分析师从企业本身出发：其运营、竞争地位、财务报表、资本配置、长期机会与风险。",
-          "我重视会计作为商业语言及财务建模基础的作用。我建立整合式三大财务报表模型，以理解利润表、资产负债表与现金流量表如何相互联动，再运用 DCF 模型评估股票的内在价值。",
-          "我也相信人工智能与其他颠覆性科技浪潮即将到来。传统基本面分析仍不可或缺，但必须应用于在快速变化的科技环境中运营的企业。",
+          "从企业本身出发：运营、竞争地位、财务报表、资本配置、机会与风险。",
+          "会计将企业活动与估值联系起来。整合式三大财务报表模型连接利润表、资产负债表与现金流量表；现金流折现（DCF）模型则用于估计股票的内在价值。",
+          "考虑人工智能与其他颠覆性科技如何影响每家企业。面对科技环境的变化，传统基本面分析仍不可或缺。",
         ],
       },
       {
         label: "03 · 投资哲学",
         title: "集中投资组合，长期评估企业价值",
         paragraphs: [
-          "在投资组合管理上，我相信集中投资。我偏好持有少数自己真正理解并抱有信念的仓位，让最强的投资观点能够对业绩产生实质贡献。",
-          "在股票分析上，我相信长期价值投资。我研究企业、建立财务预测、评估其内在价值，并将该价值与市场价格比较。只要企业持续按照预期发展，而且原始投资论点仍然成立，我愿意长期持有股票。",
-          "我也寻找有望受益于人工智能与其他颠覆性科技的企业。然而，强大的趋势并不会自动使每一只相关股票成为良好投资；企业质量、估值与风险仍然重要。",
+          "投资组合采用集中投资：持有少数经过充分理解的仓位，让最强的投资观点能对结果产生实质贡献。",
+          "研究采用长期价值投资，比较企业预测、估计内在价值与市场价格。只要企业按预期发展，且投资论点仍然成立，就可以继续持有。",
+          "人工智能与其他颠覆性科技可能带来机会。但强大的趋势不会自动让相关股票成为良好投资；企业质量、估值与风险仍然重要。",
         ],
       },
       {
         label: "04 · 透明度与问责",
         title: "让每项投资决策接受公开检视",
         paragraphs: [
-          "我通过每月完整披露投资组合与业绩，并发布详细投资论点，推动透明度与问责。",
-          "每月披露建立了一份我持有什么、以及决策表现如何的公开记录。目前已发布的研究涵盖部分企业，并非每个持仓都已有详细投资论点或公开财务模型。",
-          "目标不是呈现一份毫无瑕疵的记录，而是让我的推理与结果清楚到足以被诚实评估，包括错误、论点变化与业绩落后的时期。",
+          "查阅每月完整披露的投资组合与业绩记录，以及已发布的投资论点。",
+          "目前已发布的研究涵盖部分企业，并非每个持仓都已有详细投资论点或公开财务模型。",
+          "记录包括错误、论点变化与业绩落后的时期。你可以据此检视推理与结果，而非期待一份毫无瑕疵的历史。",
         ],
       },
       {
         label: "05 · 研究与发布",
         title: "把投资观点转化为可验证的论点",
         paragraphs: [
-          "我运用投资备忘录，将观点转化为有结构且可验证的论证。每项投资论点都力求说明企业、投资机会、支持证据、估值、主要风险，以及会使我改变观点的条件。",
-          "在适当情况下，我会以整合式三大财务报表模型与 DCF 估值支持研究。模型将运营假设与财务表现及内在价值连接起来。",
-          "在结果出现前发布投资论点，能够留下当时的公开记录。读者可以检视我的假设、不同意我的结论，并随新证据出现而独立评估每一项观点。",
+          "每篇投资备忘录将观点转化为有结构的论证，力求说明企业、机会、证据、估值、风险，以及会改变论点的条件。",
+          "在适当情况下，整合式三大财务报表模型与 DCF 估值会将运营假设、财务结果与内在价值联系起来。",
+          "已发布的论点保留结果出现前的推理。你可以检视假设、质疑结论，并独立评估新证据。",
         ],
       },
       {
         label: "06 · 背景",
         title: "以好奇心、同理心与持续学习成长",
         paragraphs: [
-          "我目前就读于罗格斯大学新布朗斯维克分校荣誉学院，计划双主修金融与商业分析及信息技术，并考虑辅修哲学或音乐。",
-          "我倡导以好奇心、同理心与持续学习为基础的“learn-it-all”成长思维。我不期待自己一开始就拥有所有答案，而是希望提出更好的问题、倾听不同观点、接受反馈，并持续提升知识与能力。",
-          "这种思维也塑造了我的投资方式。当证据挑战既有观点时，我宁愿重新检视并修正投资论点，也不会只为了维持一致而捍卫先前的结论。",
+          "Tianyi（David）Li 现就读于罗格斯大学新布朗斯维克分校荣誉学院，计划双主修金融与商业分析及信息技术，并考虑辅修哲学或音乐。",
+          "研究方式体现“learn-it-all”成长思维：提出更好的问题、以同理心倾听、接受反馈，并持续积累知识与能力。",
+          "当证据挑战既有观点时，重新检视投资论点。不要为了维持一致而放弃学习。",
         ],
       },
     ],
@@ -278,9 +277,9 @@ const copy: Record<Locale, Copy> = {
     closingLabel: "结语",
     closingTitle: "公开学习，独立思考，持续进步",
     closingParagraphs: [
-      "我相信公开学习、透明投资，并帮助他人独立思考。",
-      "我不期待自己拥有所有答案。我希望保持好奇、以同理心面对不同观点、清楚说明自己的假设，并在证据改变时修正结论。",
-      "Modern Fundamental Analyst 保存我每项投资决策背后的推理，并以结果衡量这些决策。通过每月披露投资组合与业绩、发布详细投资论点与透明的估值方法，我希望建立更严谨的投资流程，同时帮助每一位个人投资者发展自己的判断。",
+      "通过这份记录，探索投资决策背后的推理，并与结果比较。",
+      "质疑假设、考虑不同观点，并在证据改变时修正结论。",
+      "每月披露、已发布的论点与透明的估值方法，帮助你建立独立的投资流程。",
     ],
     legalPrefix: "更详细的法律与方法信息，请参阅",
     disclaimer: "免责声明",
@@ -295,7 +294,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
   return (
     <div className="about-page">
       <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1} className="@container/about-page">
         <PageHero
           variant="standard"
           label={<>{text.eyebrow}</>}
@@ -326,7 +325,10 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
           const [number, sectionName] = section.label.split(" · ");
           return (
             <div className={index % 2 === 1 ? appearance["section-gray"] : undefined} key={section.label}>
-              <section className={appearance["about-section"] + " " + appearance["shell"]}>
+              <section
+                data-after-hero={index === 0 ? "" : undefined}
+                className={appearance["about-section"] + " " + appearance["shell"]}
+              >
                 <div className={appearance["about-section-heading"]}>
                   <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
                     <span>{number}</span>
@@ -345,8 +347,8 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
           );
         })}
         <section className={appearance["about-boundaries"]}>
-          {text.boundaries.map((boundary) => (
-            <section key={boundary.title}>
+          {text.boundaries.map((boundary, index) => (
+            <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>
               <h2>{boundary.title}</h2>
               <ol>
                 {boundary.items.map((item, index) => (

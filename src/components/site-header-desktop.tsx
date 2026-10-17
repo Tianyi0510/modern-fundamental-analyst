@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeSelect } from "./theme-select";
 import { IntentLink as Link } from "./intent-link";
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -29,10 +30,10 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
   const [isLanguageOpen, setLanguageOpen] = useState(false);
   const languageTriggerRef = useRef<HTMLButtonElement>(null);
-  const contactLinkRef = useRef<HTMLAnchorElement>(null);
+  const appearanceRef = useRef<HTMLSelectElement>(null);
   const skipLanguageReturnFocusRef = useRef(false);
   useEffect(() => {
-    const compact = window.matchMedia("(max-width: 1150px)");
+    const compact = window.matchMedia("(max-width: 1279px)");
     const closeDesktopMenu = () => {
       if (compact.matches) setLanguageOpen(false);
     };
@@ -62,7 +63,7 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
           event.stopPropagation();
           skipLanguageReturnFocusRef.current = true;
           setLanguageOpen(false);
-          (event.shiftKey ? languageTriggerRef.current : contactLinkRef.current)?.focus();
+          (event.shiftKey ? languageTriggerRef.current : appearanceRef.current)?.focus();
         }}
       >
         <DropdownMenu modal={false} open={isLanguageOpen} onOpenChange={setLanguageOpen}>
@@ -117,8 +118,8 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <ThemeSelect locale={locale} compact selectRef={appearanceRef} />
       <ButtonLink
-        ref={contactLinkRef}
         variant="contrast"
         size="small"
         href={getLocalizedPath("/contact", locale)}

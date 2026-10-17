@@ -1,20 +1,23 @@
-import * as Sentry from "@sentry/nextjs";
+import { getSentryClient, startSentryClient } from "@/lib/sentry-client";
+import type { captureRouterTransitionStart } from "@sentry/nextjs";
 import { createSentryOptions, resolveSentryDsn } from "@/lib/sentry-options";
 
 import { canRecordReplay } from "@/lib/sentry-replay";
+import { yieldToMain } from "@/lib/yield-to-main";
 
 let replayAllowed = false;
 function stopPrivateReplay(href: string) {
   if (!canRecordReplay(href)) {
     replayAllowed = false;
-    void Sentry.getReplay()?.stop();
+    void getSentryClient()?.getReplay()?.stop();
   }
 }
 
+let startup: ReturnType<typeof startSentryClient> | undefined;
 const dsn = resolveSentryDsn(undefined, process.env.NEXT_PUBLIC_SENTRY_DSN);
 if (dsn) {
   const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV;
-  Sentry.init({
+  startup = startSentryClient({
     ...createSentryOptions(dsn, environment),
     integrations: [],
     replaysSessionSampleRate: environment === "test" ? 1 : 0.1,
@@ -23,9 +26,17 @@ if (dsn) {
   replayAllowed = canRecordReplay(window.location.href);
   if (replayAllowed) {
     // Load the DOM recorder separately so error monitoring does not block on Replay code.
-    void import("@/lib/sentry-replay-client")
-      .then(({ initializeReplay }) => {
-        if (replayAllowed && canRecordReplay(window.location.href)) initializeReplay(environment);
+    void startup
+      .then(async (sdk) => {
+        if (!sdk) return null;
+        await yieldToMain();
+        return replayAllowed && canRecordReplay(window.location.href) ? import("@/lib/sentry-replay-client") : null;
+      })
+      .then(async (replay) => {
+        if (!replay) return;
+        // Module evaluation and the initial DOM snapshot must not share one task.
+        await yieldToMain();
+        if (replayAllowed && canRecordReplay(window.location.href)) replay.initializeReplay();
       })
       .catch(() => {
         // Optional Replay loading must not interrupt navigation or error monitoring.
@@ -40,7 +51,9 @@ if (dsn) {
   });
 }
 
-export const onRouterTransitionStart: typeof Sentry.captureRouterTransitionStart = (...args) => {
+export const onRouterTransitionStart: typeof captureRouterTransitionStart = (...args) => {
   stopPrivateReplay(args[0]);
-  Sentry.captureRouterTransitionStart(...args);
+  const client = getSentryClient();
+  if (client) client.captureRouterTransitionStart(...args);
+  else void startup?.then((sdk) => sdk?.captureRouterTransitionStart(...args));
 };

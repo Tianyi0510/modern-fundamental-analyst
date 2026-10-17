@@ -17,7 +17,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         expect(prefetched).toEqual([]);
         const portfolio = page
           .locator(".hero a")
-          .filter({ hasText: /View Portfolio|投資組合|投资组合/ })
+          .filter({ hasText: /View portfolio|投資組合|投资组合/ })
           .first();
         await portfolio.focus();
         await expect.poll(() => prefetched).toContain(`${prefix}/portfolio`);

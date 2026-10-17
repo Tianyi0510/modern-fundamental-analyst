@@ -31,15 +31,6 @@ export function Field({ className, ...props }: ComponentProps<"div">) {
 export function FieldLabel({ className, htmlFor, ...props }: ComponentProps<"label"> & { htmlFor: string }) {
   return <label data-slot="field-label" htmlFor={htmlFor} className={cn("text-label", className)} {...props} />;
 }
-export function FieldDescription({ className, ...props }: ComponentProps<"p">) {
-  return (
-    <p
-      data-slot="field-description"
-      className={cn("m-0 text-caption text-[var(--text-secondary)]", className)}
-      {...props}
-    />
-  );
-}
 export function FieldError({ className, ...props }: ComponentProps<"p">) {
   return <p data-slot="field-error" role="alert" className={cn("m-0 text-body", className)} {...props} />;
 }

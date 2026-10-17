@@ -4,7 +4,7 @@ import { createPageMetadata } from "@/lib/site-config";
 export const metadata = createPageMetadata({
   title: "Disclaimer",
   description:
-    "Please read these terms carefully before relying on any research, financial information, valuation, or performance data published on this website.",
+    "Read these terms before using this website’s research, financial information, valuations or performance data.",
   path: "/disclaimer",
 });
 

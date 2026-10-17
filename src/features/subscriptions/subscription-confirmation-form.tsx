@@ -28,7 +28,7 @@ export function SubscriptionConfirmationForm({ token, locale }: { token: string;
       }}
     >
       <Button type="submit" disabled={!token || status === "busy" || status === "success"}>
-        {status === "busy" ? copy.busy : copy.action}
+        {status === "busy" ? copy.busy : locale === "en" ? "Confirm Subscription" : copy.action}
       </Button>
       <Alert>{status === "success" ? copy.success : status === "error" || !token ? copy.error : ""}</Alert>
     </form>

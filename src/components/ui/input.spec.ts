@@ -73,14 +73,15 @@ for (const width of [390, 1440]) {
       await page.evaluate(() => {
         document.documentElement.style.setProperty("--action-primary-surface", "var(--deep-blue)");
       });
-      await expect(contactLink).toHaveCSS("background-color", "rgb(0, 41, 145)");
+      await expect(contactLink).toHaveCSS("background-color", "rgb(0, 0, 0)");
       await expect(page.locator(".hero .button")).toHaveCSS("background-color", "rgb(0, 0, 0)");
       await contactLink.click();
       await expect(page).toHaveURL(/\/contact$/);
       const actions = page.locator('main button[type="submit"]');
       await expect(actions).toHaveCount(2);
       for (const action of await actions.all()) {
-        await expect(action).toHaveCSS("background-color", "rgb(0, 41, 145)");
+        const isBrandSurface = await action.evaluate((element) => Boolean(element.closest(".contact-band")));
+        await expect(action).toHaveCSS("background-color", isBrandSurface ? "rgb(0, 0, 0)" : "rgb(0, 41, 145)");
         await expect(action).toBeEnabled();
       }
       const fields = page.locator('main input[type="email"], main textarea');
@@ -91,10 +92,18 @@ for (const width of [390, 1440]) {
       });
       for (const field of await fields.all()) {
         await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
-        await expect(field).toHaveCSS("color", "rgb(0, 41, 145)");
+        const isBrandSurface = await field.evaluate((element) => Boolean(element.closest(".contact-band")));
+        await expect(field).toHaveCSS("color", isBrandSurface ? "rgb(0, 0, 0)" : "rgb(0, 41, 145)");
       }
       await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await page.goto("/subscription-preferences");
+      await page.evaluate(() => {
+        document.documentElement.style.setProperty("--action-primary-surface", "var(--deep-blue)");
+        document.documentElement.style.setProperty("--field-text", "var(--deep-blue)");
+      });
+      await expect(page.locator('main button[type="submit"]')).toHaveCSS("background-color", "rgb(0, 41, 145)");
+      await expect(page.locator('main input[type="email"]')).toHaveCSS("color", "rgb(0, 41, 145)");
     },
   );
 }

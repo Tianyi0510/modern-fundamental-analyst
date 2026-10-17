@@ -5,7 +5,7 @@ export const performanceRoutes = [
   { path: "/performance", stylesheetBytes: 160 * 1024 },
 ];
 
-const limits = { lcpMs: 3000, tbtMs: 400, cls: 0.1, scriptBytes: 1200 * 1024 };
+const limits = { lcpMs: 3000, tbtMs: 200, cls: 0.1, scriptBytes: 1200 * 1024 };
 const vercelRuntimeScripts = new Set(["/_vercel/insights/script.js", "/_vercel/speed-insights/script.js"]);
 
 export function evaluateReports(reports, route) {

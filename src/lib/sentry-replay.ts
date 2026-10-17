@@ -8,9 +8,9 @@ export function canRecordReplay(href: string) {
   );
 }
 
-export function createReplayOptions(environment?: string): NonNullable<Parameters<typeof replayIntegration>[0]> {
+export function createReplayOptions(): NonNullable<Parameters<typeof replayIntegration>[0]> {
   return {
-    useCompression: environment !== "test",
+    useCompression: true,
     maskAllText: true,
     maskAllInputs: true,
     blockAllMedia: true,

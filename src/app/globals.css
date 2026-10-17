@@ -1,9 +1,11 @@
 @layer theme, base, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import "tailwindcss/utilities.css" layer(utilities) source("../");
+@source not "../**/*.spec.ts";
+@source not "../**/*.test.{ts,tsx,mjs}";
 @import "./styles/tokens.css";
 @import "./styles/base.css" layer(base);
 
-@custom-variant nav-compact (@media (max-width: 1150px));
+@custom-variant nav-compact (@media (max-width: 1279px));
 @custom-variant compact (@media (max-width: 800px));
 @custom-variant touch (@media (hover: none) and (pointer: coarse));

@@ -32,7 +32,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
                 .evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
               for (const value of await values.all()) {
                 const size = await value.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
-                expect(size).toBe((mobile ? 24 : 32) * scale);
+                expect(size).toBe((width <= 800 ? 24 : width <= 1100 ? 32 : 40) * scale);
                 expect(size).toBeLessThan(heading);
                 expect(size).toBeLessThan(title);
                 await expect(value).toHaveCSS("font-variant-numeric", "tabular-nums");
@@ -53,7 +53,16 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
                 ).toBe(1);
               }
               await expect(values).toHaveText(originalValues);
-              expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+              const overflow = await page.locator("body").evaluate((body) =>
+                [...body.querySelectorAll("*")]
+                  .filter((element) => element.getBoundingClientRect().right > innerWidth + 1)
+                  .map((element) => ({ tag: element.tagName, text: element.textContent?.trim().slice(0, 80) }))
+                  .slice(-10),
+              );
+              expect(
+                await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+                `${prefix}${surface.path} at ${width}px / ${scale}x: ${JSON.stringify(overflow)}`,
+              ).toBe(true);
               if (
                 prefix === "" &&
                 testInfo.project.name === "chromium" &&

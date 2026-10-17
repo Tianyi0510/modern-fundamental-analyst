@@ -10,11 +10,6 @@ import {
   spyAdjustedClosesByDate,
 } from "@/features/portfolio/portfolio-detail";
 
-export {
-  getHoldingCostPerShare,
-  getHoldingReturn,
-  getPortfolioTotals,
-} from "@/features/portfolio/portfolio-calculations";
 export type { PortfolioHolding } from "@/features/portfolio/portfolio-calculations";
 
 const latestValuation = portfolioMonthlyValuations.at(-1);

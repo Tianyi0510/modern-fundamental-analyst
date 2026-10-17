@@ -1,3 +1,4 @@
+import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-footer.styles";
 import Link from "next/link";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
@@ -10,29 +11,29 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
   const copy =
     locale === "zh-tw"
       ? {
-          description: "獨立研究、透明思考、長期視角。",
+          description: "獨立研究、透明思考、長期視角",
           quickLinks: "快速連結",
           contact: "聯絡",
           support: "支持研究",
           disclaimer: "免責聲明",
-          rights: "版權所有。",
+          rights: "版權所有",
         }
       : locale === "zh-cn"
         ? {
-            description: "独立研究、透明思考、长期视角。",
+            description: "独立研究、透明思考、长期视角",
             quickLinks: "快速链接",
             contact: "联系",
             support: "支持研究",
             disclaimer: "免责声明",
-            rights: "版权所有。",
+            rights: "版权所有",
           }
         : {
-            description: "Independent Research. Transparent Thinking. Long-term Orientation.",
+            description: "Independent research, transparent thinking and long-term orientation",
             quickLinks: "Quick Links",
             contact: "Contact",
             support: "Support",
             disclaimer: "Disclaimer",
-            rights: "All Rights Reserved.",
+            rights: "All rights reserved",
           };
 
   return (
@@ -44,7 +45,7 @@ export function SiteFooter({ locale = "en", subscription }: SiteFooterProps) {
               className={appearance["wordmark"] + " " + appearance["footer-mark"]}
               href={getLocalizedPath("/", locale)}
             >
-              Modern Fundamental Analyst<span>.</span>
+              <BrandLogo inverse />
             </Link>
             <p className={appearance["footer-description"]}>{copy.description}</p>
           </div>

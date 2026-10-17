@@ -66,7 +66,9 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
-Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component. Presentation uses shared components and semantic tokens. The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) assigns responsibilities to Geist, Fluent 2, UX references, shadcn/ui and Base UI; Geist supplies Typography, Colors and Materials, Fluent 2 organizes tokens, and explicit brand exceptions preserve Jost, brand colors (including the two original grays), square KPIs, pill actions and the black Footer. The application and provider guides cover data, security and operational reliability separately.
+Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component and follows the [content design workflow](docs/DESIGN_SYSTEM.md#content-design-workflow).
+
+The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) defines five layers: design style, foundations, UX guidelines, components and interaction engine. Geist supplies Colors, Typography, Materials and Grid. Fluent 2 guides design/color tokens and content design, including reader-focused copy. Vercel guides capitalization: Chicago Title Case for functional interfaces and sentence case for marketing/editorial content, as defined in the Design System. The site supports light, dark and system appearance while retaining Jost, brand colors, Logo, square KPIs, pill actions and the black Footer. The application and provider guides cover implementation, data, security and operations.
 
 ## Documentation
 

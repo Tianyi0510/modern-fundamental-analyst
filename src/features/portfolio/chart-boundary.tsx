@@ -1,7 +1,7 @@
 "use client";
 
 import { Component, Suspense, type ReactNode } from "react";
-import { captureException } from "@sentry/nextjs";
+import { reportClientError } from "@/lib/sentry-client";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/lib/i18n";
 
@@ -22,7 +22,7 @@ export class ChartBoundary extends Component<Props, { failed: boolean }> {
 
   componentDidCatch(error: Error) {
     // Preserve the original stack; beforeSend removes chart error messages and payloads.
-    captureException(error, {
+    reportClientError(error, {
       tags: { feature: "performance-chart", measure: this.props.measure },
     });
   }

@@ -146,3 +146,52 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     );
   }
 }
+
+for (const width of [390, 1440]) {
+  test(
+    `chart tick labels retain Geist Copy 16 and grid alignment at ${width}px`,
+    width === 390 ? { tag: "@mobile" } : {},
+    async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+        await page.goto(`${prefix}/performance`);
+        const charts = page.locator('figure svg[role="img"]');
+        await expect(charts).toHaveCount(2);
+        for (const scale of [1, 2]) {
+          await page.addStyleTag({ content: `html { font-size: ${scale * 100}% !important; }` });
+          for (const chart of await charts.all()) {
+            // Offscreen sections defer layout; measure each chart after real scrolling.
+            await chart.scrollIntoViewIfNeeded();
+            await expect(chart).toBeInViewport();
+            const ticks = await chart.evaluate((chart) => {
+              const svg = chart as SVGSVGElement;
+              const labels = [...chart.parentElement!.querySelectorAll('[aria-hidden="true"] > span')];
+              const lines = [...svg.querySelectorAll("line")];
+              return labels.map((label, index) => {
+                const box = label.getBoundingClientRect();
+                const line = lines[index]!;
+                const point = new DOMPoint(0, Number(line.getAttribute("y1"))).matrixTransform(svg.getScreenCTM()!);
+                const style = getComputedStyle(label);
+                return {
+                  offset: box.y + box.height / 2 - point.y,
+                  size: style.fontSize,
+                  leading: style.lineHeight,
+                  weight: style.fontWeight,
+                  height: box.height,
+                };
+              });
+            });
+            expect(ticks.length).toBeGreaterThan(1);
+            for (const tick of ticks) {
+              expect(tick.height).toBeGreaterThan(0);
+              expect(tick.size).toBe(`${16 * scale}px`);
+              expect(tick.leading).toBe(`${24 * scale}px`);
+              expect(tick.weight).toBe("400");
+              expect(Math.abs(tick.offset), `${prefix} at ${width}px / ${scale}x`).toBeLessThan(1);
+            }
+          }
+        }
+      }
+    },
+  );
+}

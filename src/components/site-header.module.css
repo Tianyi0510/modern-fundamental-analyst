@@ -43,7 +43,11 @@
 }
 .openButton:hover {
   background: var(--bright-blue);
+  color: var(--black);
   transform: scale(var(--motion-scale-hover));
+}
+.closeButton {
+  color: var(--black);
 }
 .closeButton:hover {
   transform: scale(var(--motion-scale-hover));
@@ -52,11 +56,13 @@
   outline: 2px solid var(--focus-ring-brand);
   outline-offset: 3px;
   background: var(--bright-blue);
+  color: var(--black);
   transform: scale(var(--motion-scale-hover));
 }
 .iconButton:active,
 .iconButton[data-touch-pressed="true"] {
   background: var(--bright-blue);
+  color: var(--black);
   transform: scale(var(--motion-scale-press));
   transition-duration: var(--motion-duration-press);
 }
@@ -114,12 +120,13 @@
   background: var(--sidebar-pressed-surface);
 }
 .languageDisclosure > summary:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-on-light);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: calc(var(--focus-ring-width) * -1);
 }
 @media (hover: none) and (pointer: coarse) {
   .openButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
-    background: var(--white);
+    background: var(--surface-primary);
+    color: var(--text-primary);
     transform: none;
   }
   .closeButton:hover:not(:active):not(:focus-visible):not([data-touch-pressed="true"]) {
@@ -131,7 +138,7 @@
   }
   .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
   .languageDisclosure:not([open]) > summary:hover:not(:active):not(:focus-visible) {
-    color: var(--black);
+    color: var(--text-primary);
   }
 }
 @media (prefers-reduced-motion: reduce) {

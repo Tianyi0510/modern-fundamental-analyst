@@ -46,13 +46,19 @@ registerHooks({
   },
 });
 const { POST: requestPreferences } = await import("@/app/api/subscription-preferences/request/route.ts");
-const { subscribeContact } = await import("./subscription-service.ts");
+const { activateConfirmedContactLocked } = await import("./subscription-service.ts");
 const { getPreferredLanguageSegmentId } = await import("./resend-segments.ts");
 const { withSubscriptionJournal, readSubscriptionJournal, resolveSubscriptionJournal } =
   await import("./subscription-journal.ts");
 const { POST: updatePreferences } = await import("@/app/api/subscription-preferences/route.ts");
 const { updateSubscriptionPreferences } = await import("./update-subscription-preferences.ts");
 const { createPreferenceToken } = await import("./subscription-preferences.ts");
+
+function activateContactInTest(email, locale, getWelcomeMemo) {
+  return withSubscriberLock(email, () =>
+    withSubscriptionJournal(email, locale, () => activateConfirmedContactLocked(email, locale, getWelcomeMemo)),
+  );
+}
 
 function preferencesMutation(action) {
   return new Request("https://www.modernfundamentalanalyst.com/api/subscription-preferences", {
@@ -488,7 +494,7 @@ test("active subscriptions reject repeats in every locale without provider write
   });
   for (const locale of ["en", "zh-tw", "zh-cn"]) {
     assert.deepEqual(
-      await subscribeContact("reader@example.com", locale, () =>
+      await activateContactInTest("reader@example.com", locale, () =>
         assert.fail("duplicate subscription must not look up a memo"),
       ),
       {
@@ -529,7 +535,7 @@ test("a rejected welcome retains consent and a durable pending journal", async (
       properties: { preferred_language: { type: "string", value: "English" } },
     });
   });
-  assert.equal((await subscribeContact("reader@example.com", "zh-tw", getLatestMemo)).ok, true);
+  assert.equal((await activateContactInTest("reader@example.com", "zh-tw", getLatestMemo)).ok, true);
   assert.equal(updates.length, 1);
   assert.equal(updates[0].unsubscribed, false);
   assert.equal(memberships.has(english), false);
@@ -576,7 +582,9 @@ test("failed initial subscription reads can retry without looking up or sending 
     return Response.json({ name: "application_error", message: "unavailable" }, { status: 503 });
   });
   for (let attempt = 0; attempt < 2; attempt++) {
-    const result = await subscribeContact("initial-read@example.com", "en", () => assert.fail("must not request memo"));
+    const result = await activateContactInTest("initial-read@example.com", "en", () =>
+      assert.fail("must not request memo"),
+    );
     assert.equal(result.ok, false);
     assert.equal(result.status, 502);
     assert.equal(await readSubscriptionJournal("initial-read@example.com"), null);

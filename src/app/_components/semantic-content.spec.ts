@@ -7,17 +7,17 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   }) => {
     for (const [route, selector, count] of [
       ["/", ".metric-band", 3],
-      ["/portfolio", ".portfolio-kpis", 4],
+      ["/portfolio", ".portfolio-kpis", 3],
       ["/performance", ".performance-summary", 3],
     ] as const) {
       await page.goto(`${prefix}${route}`);
       if (route === "/portfolio") {
         const positions =
           prefix === "/zh-tw"
-            ? /^\d+ 個已揭露部位。$/
+            ? /^\d+ 個已揭露部位$/
             : prefix === "/zh-cn"
-              ? /^\d+ 个已披露持仓。$/
-              : /^\d+ Disclosed Positions\.$/;
+              ? /^\d+ 个已披露持仓$/
+              : /^\d+ Disclosed Positions$/;
         const holdings = page.getByRole("region", { name: positions });
         await expect(holdings).toBeVisible();
         await expect(holdings.getByRole("heading", { level: 2, name: positions })).toBeVisible();

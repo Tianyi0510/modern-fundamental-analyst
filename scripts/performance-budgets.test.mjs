@@ -3,11 +3,11 @@ import test from "node:test";
 import { evaluateReports, performanceRoutes } from "./performance-budgets.mjs";
 
 const route = performanceRoutes[0];
-function report({ lcp = 1800, css = 135000, js = 900000 } = {}) {
+function report({ lcp = 1800, tbt = 100, css = 135000, js = 900000 } = {}) {
   return {
     audits: {
       "largest-contentful-paint": { numericValue: lcp },
-      "total-blocking-time": { numericValue: 100 },
+      "total-blocking-time": { numericValue: tbt },
       "cumulative-layout-shift": { numericValue: 0 },
       "network-requests": {
         details: {
@@ -27,6 +27,26 @@ test("three healthy samples pass without relying on a Lighthouse score", () => {
 });
 test("timing uses the median so one slow sample does not fail the gate", () => {
   assert.equal(evaluateReports([report(), report({ lcp: 10000 }), report()], route).values.lcpMs, 1800);
+});
+test("the mobile TBT budget accepts 200ms and rejects any excess", () => {
+  for (const tbt of [0, 199.99, 200]) {
+    const result = evaluateReports([report({ tbt }), report({ tbt }), report({ tbt })], route);
+    assert.equal(result.budgets.tbtMs, 200);
+    assert.deepEqual(result.failures, []);
+  }
+  for (const tbt of [200.01, 300, 400]) {
+    const result = evaluateReports([report({ tbt }), report({ tbt }), report({ tbt })], route);
+    assert.deepEqual(result.failures, [`tbtMs: ${tbt} exceeds 200`]);
+  }
+});
+test("TBT uses the median without hiding a majority of slow samples", () => {
+  assert.equal(
+    evaluateReports([report({ tbt: 900 }), report({ tbt: 200 }), report({ tbt: 100 })], route).values.tbtMs,
+    200,
+  );
+  const result = evaluateReports([report({ tbt: 201 }), report({ tbt: 100 }), report({ tbt: 900 })], route);
+  assert.equal(result.values.tbtMs, 201);
+  assert.deepEqual(result.failures, ["tbtMs: 201 exceeds 200"]);
 });
 test("the observed unrelated font CSS regression fails even in just one sample", () => {
   const result = evaluateReports([report(), report({ css: 330000 }), report()], route);

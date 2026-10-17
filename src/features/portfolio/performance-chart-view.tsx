@@ -1,5 +1,3 @@
-"use client";
-
 import { ChevronDown } from "lucide-react";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
@@ -15,8 +13,8 @@ const copy = {
     data: "View Monthly Data",
     month: "Month End",
     value: "Stock Market Value",
-    caption: "Month-End Data · Newest First",
-    scroll: "Swipe horizontally to compare columns; scroll vertically for earlier months.",
+    caption: "Month-end data · newest first",
+    scroll: "Scroll the table to compare columns and find earlier months.",
   },
   "zh-tw": {
     portfolio: "投資組合",
@@ -24,7 +22,7 @@ const copy = {
     month: "月底日期",
     value: "股票市場價值",
     caption: "月底數據・最新月份在前",
-    scroll: "左右滑動比較欄位，上下捲動查看較早月份。",
+    scroll: "捲動表格以比較欄位，並查看較早月份。",
   },
   "zh-cn": {
     portfolio: "投资组合",
@@ -32,7 +30,7 @@ const copy = {
     month: "月底日期",
     value: "股票市场价值",
     caption: "月底数据・最新月份在前",
-    scroll: "左右滑动比较各列，上下滚动查看较早月份。",
+    scroll: "滚动表格以比较各列，并查看较早月份。",
   },
 } as const;
 

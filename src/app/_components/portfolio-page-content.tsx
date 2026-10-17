@@ -16,22 +16,19 @@ const copy = {
       <>
         A Fully Disclosed
         <br />
-        <em>Focus Portfolio.</em>
+        <em>Focus Portfolio</em>
       </>
     ),
-    intro:
-      "A monthly view of my holdings, position sizes, investment theses, and long-term approach to portfolio management.",
+    intro: "Review monthly holdings, position sizes, published research and the long-term portfolio approach.",
     summaryLabel: "Portfolio Summary",
     marketValue: "Total Market Value",
     currency: "USD",
-    costBasis: "Net Cost Basis",
-    costBasisNote: "Purchases and Transaction Fees",
     totalReturn: "Total Return",
-    returnSummaryNote: "Absolute Return",
+    returnSummaryNote: "Absolute return",
     holdings: "Holdings",
     holdingsNote: "Stocks and ETFs",
     currentHoldings: "Current Holdings",
-    positionCount: `${portfolioSnapshot.holdingsCount} Disclosed Positions.`,
+    positionCount: `${portfolioSnapshot.holdingsCount} Disclosed Positions`,
     returnNote:
       "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
   },
@@ -41,21 +38,19 @@ const copy = {
       <>
         完整揭露的
         <br />
-        <em>集中投資組合。</em>
+        <em>集中投資組合</em>
       </>
     ),
-    intro: "每月呈現我的持股、部位規模、投資論點，以及長期投資組合管理方法。",
+    intro: "查看每月持股、部位規模、已發布研究與長期投資組合管理方式。",
     summaryLabel: "投資組合摘要",
     marketValue: "總市值",
     currency: "美元",
-    costBasis: "淨成本基礎",
-    costBasisNote: "買入金額與交易費用",
     totalReturn: "總報酬率",
     returnSummaryNote: "絕對報酬率",
     holdings: "持股數量",
     holdingsNote: "股票與 ETF",
     currentHoldings: "目前持股",
-    positionCount: `${portfolioSnapshot.holdingsCount} 個已揭露部位。`,
+    positionCount: `${portfolioSnapshot.holdingsCount} 個已揭露部位`,
     returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
   },
   "zh-cn": {
@@ -64,28 +59,26 @@ const copy = {
       <>
         完整披露的
         <br />
-        <em>集中投资组合。</em>
+        <em>集中投资组合</em>
       </>
     ),
-    intro: "每月呈现我的持仓、仓位规模、投资论点，以及长期投资组合管理方法。",
+    intro: "查看每月持仓、仓位规模、已发布研究与长期投资组合管理方式。",
     summaryLabel: "投资组合摘要",
     marketValue: "总市值",
     currency: "美元",
-    costBasis: "净成本基础",
-    costBasisNote: "买入金额与交易费用",
     totalReturn: "总回报率",
     returnSummaryNote: "绝对回报率",
     holdings: "持仓数量",
     holdingsNote: "股票与 ETF",
     currentHoldings: "当前持仓",
-    positionCount: `${portfolioSnapshot.holdingsCount} 个已披露持仓。`,
+    positionCount: `${portfolioSnapshot.holdingsCount} 个已披露持仓`,
     returnNote: "净股息与融资利息在投资组合层面计入，不分摊至单项持仓。",
   },
 } as const;
 
 const tableCopy = {
   en: {
-    ariaLabel: "Portfolio Holdings",
+    ariaLabel: "Portfolio holdings",
     symbol: "Position",
     shares: "Shares",
     costBasis: "Cost Basis",
@@ -93,7 +86,7 @@ const tableCopy = {
     marketValue: "Market Value",
     returnPct: "Return",
     weight: "Weight",
-    sortBy: "Sort By",
+    sortBy: "Sort by",
     ascending: "Ascending",
     descending: "Descending",
     total: "Total",
@@ -147,41 +140,32 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
               <small className={appearance["date-text"]}>
                 {isChinese ? "截至 " : "As of "}
                 <time dateTime={portfolioSnapshot.asOf}>{asOf}</time>
-                {isChinese ? " · 每月更新" : " · Updated Monthly"}
+                {isChinese ? " · 每月更新" : " · Updated monthly"}
               </small>
             </>
           }
-        />
-        <dl className={appearance["portfolio-kpis"]} aria-label={text.summaryLabel}>
-          <PortfolioMetric
-            tone="plain"
-            className="col-start-1 row-start-1 compact:col-auto compact:row-auto"
-            label={<>{text.marketValue}</>}
-            value={<>{formatUsd(portfolioSnapshot.marketValue)}</>}
-            note={<>{text.currency}</>}
-          />
-          <PortfolioMetric
-            tone="highlight"
-            className="col-start-1 row-start-2 compact:col-auto compact:row-auto"
-            label={<>{text.costBasis}</>}
-            value={<>{formatUsd(portfolioSnapshot.costBasis)}</>}
-            note={<>{text.costBasisNote}</>}
-          />
-          <PortfolioMetric
-            tone="brand"
-            className="col-start-2 row-start-1 compact:col-auto compact:row-auto"
-            label={<>{text.totalReturn}</>}
-            value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
-            note={<>{text.returnSummaryNote}</>}
-          />
-          <PortfolioMetric
-            tone="paper"
-            className="col-start-2 row-start-2 compact:col-auto compact:row-auto"
-            label={<>{text.holdings}</>}
-            value={<>{portfolioSnapshot.holdingsCount}</>}
-            note={<>{text.holdingsNote}</>}
-          />
-        </dl>
+        >
+          <dl className={appearance["portfolio-kpis"]} aria-label={text.summaryLabel}>
+            <PortfolioMetric
+              tone="plain"
+              label={<>{text.marketValue}</>}
+              value={<>{formatUsd(portfolioSnapshot.marketValue)}</>}
+              note={<>{text.currency}</>}
+            />
+            <PortfolioMetric
+              tone="brand"
+              label={<>{text.totalReturn}</>}
+              value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
+              note={<>{text.returnSummaryNote}</>}
+            />
+            <PortfolioMetric
+              tone="paper"
+              label={<>{text.holdings}</>}
+              value={<>{portfolioSnapshot.holdingsCount}</>}
+              note={<>{text.holdingsNote}</>}
+            />
+          </dl>
+        </PageHero>
         <section className={appearance["portfolio-holdings-section"]} aria-labelledby="portfolio-holdings-title">
           <div className={appearance["portfolio-holdings-heading"] + " " + appearance["shell"]}>
             <div>

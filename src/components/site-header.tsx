@@ -1,5 +1,8 @@
 "use client";
 
+import { ThemeProvider } from "./theme-provider";
+import { ThemeSelect } from "./theme-select";
+import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
 
@@ -33,7 +36,15 @@ type SiteHeaderProps = {
   languageQuery?: string;
 };
 
-export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
+export function SiteHeader(props: SiteHeaderProps) {
+  return (
+    <ThemeProvider>
+      <HeaderContent {...props} />
+    </ThemeProvider>
+  );
+}
+
+function HeaderContent({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
   const pathname = usePathname();
   const {
     close: closeMenu,
@@ -90,7 +101,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           aria-label={`Modern Fundamental Analyst ${copy.home}`}
           tabIndex={isMenuOpen ? -1 : undefined}
         >
-          Modern Fundamental Analyst<span>.</span>
+          <BrandLogo />
         </IntentLink>
         <SheetTrigger
           onClick={() => {
@@ -129,7 +140,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           onPointerDown={handleMenuPointerDown}
           onPointerUp={handleMenuPointerUp}
         >
-          <SheetTitle className="sr-only">{copy.siteMenu}</SheetTitle>
+          <SheetTitle className="sr-only text-title">{copy.siteMenu}</SheetTitle>
           <div className={appearance["mobile-menu-top"]}>
             <Link
               className={appearance["wordmark"] + " " + appearance["mobile-menu-wordmark"]}
@@ -138,7 +149,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
               inert={menuPhase === "closing"}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              Modern Fundamental Analyst<span>.</span>
+              <BrandLogo />
             </Link>
             <SheetClose
               render={
@@ -214,6 +225,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                 </div>
               </AnimatedDisclosure>
             </div>
+            <ThemeSelect locale={locale} />
           </div>
         </SheetContent>
       </header>

@@ -4,15 +4,10 @@ import test from "node:test";
 import { read } from "../../../scripts/repository-helpers.mjs";
 
 test("portfolio calculations remain internally consistent", async () => {
-  const {
-    getHoldingCostPerShare,
-    getHoldingReturn,
-    getHoldingWeight,
-    getPortfolioTotals,
-    portfolioHoldings,
-    portfolioSnapshot,
-    portfolioIncome,
-  } = await import("@/features/portfolio/portfolio.ts");
+  const { getHoldingWeight, portfolioHoldings, portfolioSnapshot, portfolioIncome } =
+    await import("@/features/portfolio/portfolio.ts");
+  const { getHoldingCostPerShare, getHoldingReturn, getPortfolioTotals } =
+    await import("@/features/portfolio/portfolio-calculations.ts");
   const totals = getPortfolioTotals(portfolioHoldings, portfolioIncome);
 
   assert.equal(totals.holdingsCount, portfolioHoldings.length);

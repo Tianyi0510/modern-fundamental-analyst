@@ -1,19 +1,17 @@
 import type { Locale } from "@/lib/i18n";
 
-export const memoCategoryIds = ["company-analysis", "industry-analysis", "monthly-report", "annual-report"] as const;
+type MemoCategoryId = "company-analysis" | "industry-analysis" | "monthly-report" | "annual-report";
 
-export type MemoCategoryId = (typeof memoCategoryIds)[number];
-
-export type MemoCategory = {
+type MemoCategory = {
   id: MemoCategoryId;
   label: string;
 };
 
 const memoCategoryLabels = {
-  "company-analysis": { en: "Company Analysis", "zh-tw": "企業分析", "zh-cn": "企业分析" },
-  "industry-analysis": { en: "Industry Analysis", "zh-tw": "產業分析", "zh-cn": "行业分析" },
-  "monthly-report": { en: "Monthly Report", "zh-tw": "月度報告", "zh-cn": "月度报告" },
-  "annual-report": { en: "Annual Report", "zh-tw": "年度報告", "zh-cn": "年度报告" },
+  "company-analysis": { en: "Company analysis", "zh-tw": "企業分析", "zh-cn": "企业分析" },
+  "industry-analysis": { en: "Industry analysis", "zh-tw": "產業分析", "zh-cn": "行业分析" },
+  "monthly-report": { en: "Monthly report", "zh-tw": "月度報告", "zh-cn": "月度报告" },
+  "annual-report": { en: "Annual report", "zh-tw": "年度報告", "zh-cn": "年度报告" },
 } satisfies Record<MemoCategoryId, Record<Locale, string>>;
 
 export type MemoSummary = {
@@ -36,7 +34,7 @@ const memoCatalog = [
     category: "company-analysis",
     locales: {
       en: {
-        title: "Microsoft Stock Analysis Fiscal Year 2024",
+        title: "Microsoft stock analysis fiscal year 2024",
         scopeNote:
           "This historical article reviews Microsoft’s fiscal 2024 business and financial quality. No DCF model, fair-value range, explicit thesis-invalidation criteria, or quantified downside scenarios is published with it. Its conclusions do not establish that the shares are attractively priced or constitute a current investment recommendation.",
         summary:

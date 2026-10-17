@@ -61,7 +61,7 @@ for (const copy of cases) {
     await expect(page.locator(".memo-references a")).toHaveCount(5);
     for (const link of await page.locator(".memo-references a").all()) {
       await expect(link).toHaveAttribute("href", /^https:\/\//);
-      await expect(link).toHaveText("Read Source");
+      await expect(link).toHaveText("Read source");
     }
     await expect(page.locator(".article-body")).toHaveAttribute("lang", "en");
     if (copy.memoNotice) await expect(page.getByRole("article")).toContainText(copy.memoNotice);

@@ -1,7 +1,40 @@
-// The accepted PR #85 baseline had a median host index of 4193.25 at 4x slowdown.
+import { pageFunctions } from "lighthouse/core/lib/page-functions.js";
+
+// PR #85, attempt 2, artifact 12030638016 had a median host index of 4193.25 at 4x slowdown.
 // Target 1000 is slightly slower than that reference's effective index of 1048.31.
-export const targetBenchmarkIndex = 1000;
+const targetBenchmarkIndex = 1000;
 const maximumDrift = 0.15;
+
+function withinDrift(value, reference) {
+  return Number.isFinite(value) && Math.abs(value - reference) <= reference * maximumDrift;
+}
+
+export async function calibrateCpu(page, recordSamples = async () => {}) {
+  const sample = async () => {
+    const samples = [];
+    for (let index = 0; index < 3; index++) samples.push(await page.evaluate(pageFunctions.computeBenchmarkIndex));
+    return samples;
+  };
+  const samples = await sample();
+  await recordSamples("host", samples);
+  const calibration = createCpuCalibration(samples);
+  const session = await page.context().newCDPSession(page);
+  try {
+    await session.send("Emulation.setCPUThrottlingRate", { rate: calibration.cpuSlowdownMultiplier });
+    const effectiveSamples = await sample();
+    await recordSamples("effective", effectiveSamples);
+    if (effectiveSamples.some((value) => !withinDrift(value, targetBenchmarkIndex))) {
+      throw new Error("Applied CPU slowdown did not reproduce the performance reference");
+    }
+    return { ...calibration, effectiveSamples };
+  } finally {
+    try {
+      await session.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+    } finally {
+      await session.detach();
+    }
+  }
+}
 
 export function createCpuCalibration(samples) {
   if (samples.length !== 3 || samples.some((value) => !Number.isFinite(value) || value <= 0)) {
@@ -9,7 +42,7 @@ export function createCpuCalibration(samples) {
   }
   const median = [...samples].sort((a, b) => a - b)[1];
   if (median < targetBenchmarkIndex) throw new Error("Host CPU is slower than the performance reference");
-  if (samples.some((value) => Math.abs(value / median - 1) > maximumDrift)) {
+  if (samples.some((value) => !withinDrift(value, median))) {
     throw new Error("Host CPU is unstable during calibration");
   }
   return {
@@ -22,7 +55,7 @@ export function createCpuCalibration(samples) {
 
 export function validateCpuCalibration(report, calibration) {
   const benchmark = report.environment?.benchmarkIndex;
-  if (!Number.isFinite(benchmark) || Math.abs(benchmark / calibration.benchmarkIndex - 1) > maximumDrift) {
+  if (!withinDrift(benchmark, calibration.benchmarkIndex)) {
     throw new Error("Host CPU drifted outside the calibrated range");
   }
   if (

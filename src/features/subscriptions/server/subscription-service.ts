@@ -1,14 +1,12 @@
 import "server-only";
 import { getLocalizedPath, localeConfig, type Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
-import { withSubscriptionJournal } from "@/features/subscriptions/server/subscription-journal";
 import {
   getPreferredLanguageSegmentId,
   syncPreferredLanguageSegment,
 } from "@/features/subscriptions/server/resend-segments";
 import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/features/subscriptions/server/subscription-preferences";
-import { withSubscriberLock } from "@/features/subscriptions/server/resend-coordination";
 
 type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 409 | 502 | 503 };
 
@@ -21,20 +19,6 @@ const unavailable = (status: 502 | 503 = 502): SubscriptionResult => ({
 export type WelcomeMemoProvider = (
   locale: Locale,
 ) => { title: string; summary: string; slug: string } | null | undefined;
-
-export async function subscribeContact(
-  email: string,
-  locale: Locale,
-  getWelcomeMemo: WelcomeMemoProvider,
-): Promise<SubscriptionResult> {
-  try {
-    return await withSubscriberLock(email, () =>
-      withSubscriptionJournal(email, locale, () => activateConfirmedContactLocked(email, locale, getWelcomeMemo)),
-    );
-  } catch {
-    return unavailable(503);
-  }
-}
 
 export async function activateConfirmedContactLocked(
   email: string,

@@ -64,11 +64,6 @@ function createIdentifierRateLimiter(options: RateLimiterOptions) {
   };
 }
 
-export function createMemoryRateLimiter(options: RateLimiterOptions) {
-  const isIdentifierRateLimited = createIdentifierRateLimiter(options);
-  return (request: Request) => isIdentifierRateLimited(getRequestIdentifier(request));
-}
-
 const rateLimitScript = `
 local count = redis.call("INCR", KEYS[1])
 if count == 1 then redis.call("PEXPIRE", KEYS[1], ARGV[1]) end

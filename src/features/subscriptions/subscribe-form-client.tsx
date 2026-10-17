@@ -136,7 +136,10 @@ export function SubscribeFormClient({
           <HoneypotField />
           <Button
             variant={variant === "inverse" ? "inverse" : "primary"}
-            className={cn("subscribe-submit min-w-[7.733em] compact:w-full", variant === "standard" && "self-end")}
+            className={cn(
+              "subscribe-submit min-w-[7.733em] compact:w-full",
+              variant === "standard" ? "self-end" : "[--action-inverse-text:var(--black)]",
+            )}
             type="submit"
             disabled={status === "submitting"}
           >

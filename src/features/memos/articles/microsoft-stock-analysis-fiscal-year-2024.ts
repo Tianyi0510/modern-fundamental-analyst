@@ -11,13 +11,13 @@ export type MemoContent = {
   references: Array<{ citation: string; href: string; linkLabel?: string }>;
 };
 
-// The article body below mirrors the source Google Doc verbatim. Do not edit its
-// prose independently; update it only from the source document.
+// Article paragraphs mirror the source Google Doc. Headings follow the site
+// content-design conventions; update research prose only from the source document.
 const sourceContent: MemoContent = {
   language: "en",
   sections: [
     {
-      title: "Section 1: Business Analysis",
+      title: "Section 1: business analysis",
       subsections: [
         {
           title: "Introduction",
@@ -27,7 +27,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Framework for Understanding Business",
+          title: "Framework for understanding business",
           paragraphs: [
             "So how can you actually understand a business like Buffett does? Just follow this three-part framework:",
             "First, analyze how the company generates revenue. This sounds obvious, but you’d be surprised how many investors can’t clearly explain how the companies they invested in make money.",
@@ -36,7 +36,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Microsoft Overview ",
+          title: "Microsoft overview ",
           paragraphs: [
             "Now, let’s apply this framework to one of the world’s most valuable companies: Microsoft.",
             "Microsoft stands as a dominant force in the global technology landscape today, but it’s almost unrecognizable from the Microsoft of a decade ago. Microsoft has experienced a significant transformation, shifting from a Windows-centric business model to one centered on cloud computing and artificial intelligence.",
@@ -44,7 +44,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Intelligent Cloud Segment",
+          title: "Intelligent Cloud segment",
           paragraphs: [
             "Let’s start with the Intelligent Cloud segment, Microsoft’s fastest-growing segment.",
             "The Intelligent Cloud segment represents Microsoft’s strategic transformation into the future of computing. But wait, what is cloud, and how does Microsoft make money from it?",
@@ -55,7 +55,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Productivity and Business Processes Segment",
+          title: "Productivity and Business Processes segment",
           paragraphs: [
             "Now, let’s explore Microsoft’s Productivity and Business Processes segment, which includes the widely adopted Microsoft 365 suite, along with LinkedIn and Dynamics products, generating revenues in both commercial and consumer markets by collecting subscription fees.",
             "The suite’s core applications, such as Word, Excel, PowerPoint, Outlook, and Teams, have become indispensable for daily business operations across various industries, creating a strong foundation for recurring revenue and a significant economic moat due to the high irreplaceability of these tools.",
@@ -64,7 +64,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Investment Conclusion",
+          title: "Investment conclusion",
           paragraphs: [
             "In conclusion, Microsoft’s Intelligent Cloud is already skyrocketing with 30% annual growth, while its Productivity and Business Process segment is quietly building pressure for its next explosive breakout.",
           ],
@@ -72,7 +72,7 @@ const sourceContent: MemoContent = {
       ],
     },
     {
-      title: "Section 2: Management Analysis",
+      title: "Section 2: management analysis",
       subsections: [
         {
           title: "Introduction",
@@ -81,7 +81,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Framework for Assessing Management",
+          title: "Framework for assessing management",
           paragraphs: [
             "Before diving into the details, let me introduce how we’ll assess Microsoft’s management team: As before, I’ve divided this section into three distinct groups.",
             "The first group is ethical leadership: Jeff Bezos once said, “It’s harder to be kind than be clever.” It is very important that we thoroughly evaluate the integrity, transparency, and values demonstrated by the management team before investing in them.",
@@ -90,7 +90,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Microsoft Management Analysis",
+          title: "Microsoft management analysis",
           paragraphs: [
             "Let’s now put this framework into action with Satya Nadella, the current CEO of Microsoft.",
             "Satya Nadella’s ethical leadership is a masterclass in transforming a rigid, “know-it-all” corporate culture into a dynamic, “learn-it-all” ecosystem. He achieved this by shifting Microsoft’s focus from internal competition to a deep, empathetic obsession with the customer. By championing a growth mindset, he reframed failure as a valuable learning opportunity, dismantling the fear-based “stack ranking” system and fostering a culture of psychological safety. His leadership is not one of command and control, but of curiosity and empowerment, proving that a culture built on empathy and self-awareness is not just a more humane way to work, but an exponentially more successful one. ",
@@ -99,7 +99,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Investment Conclusion",
+          title: "Investment conclusion",
           paragraphs: [
             "To wrap it up, Satya Nadella’s journey at Microsoft is an inspiring story of how a leader with vision, empathy, and an innovative mindset can transform a company’s fortunes. According to Brand Finance’s 2025 Brand Guardianship Index, Microsoft CEO Satya Nadella ranks as the top brand guardian among the world’s 100 leading CEOs. Since taking the reins in 2014, Nadella has redefined Microsoft, transforming it into one of the world’s most valuable companies.",
           ],
@@ -107,7 +107,7 @@ const sourceContent: MemoContent = {
       ],
     },
     {
-      title: "Section 3: Financial Analysis",
+      title: "Section 3: financial analysis",
       subsections: [
         {
           title: "Introduction",
@@ -116,7 +116,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Framework for Financial Analysis",
+          title: "Framework for financial analysis",
           paragraphs: [
             "To evaluate a company’s overall financial health, we can use a simple yet powerful three-part framework: growth, profitability, and liquidity. ",
             "Growth, which contains both revenue growth and margin expansion, indicates whether the company is successful in attracting new customers, entering new markets, and adapting its offerings to meet evolving customers’ needs. ",
@@ -126,7 +126,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Microsoft Financial Analysis",
+          title: "Microsoft financial analysis",
           paragraphs: [
             "Starting with growth, Microsoft has demonstrated impressive consistency. In fiscal year 2024, its revenue reached $245.1 billion—a 16% increase from $211.9 billion in the previous year. Looking back, in 2019, revenue was $125.8 billion, representing a 5-year compound annual growth rate (CAGR) of 14.3%. Additionally, net income grew from $39.2 billion in 2019 to $88.1 billion in 2024 with a 5-year CAGR of 17.6%. This strong growth also contributed to margin expansion, as the bottom line (net income) outpaced the top line (net revenue or sales).",
             "Turning to profitability, Microsoft demonstrated impressive margins in 2024. Its gross margin, which reflects profitability after subtracting direct costs from revenue, reached 69.8%, far exceeding Buffett‘s target of 40%. Meanwhile, its operating margin, which considers all operating expenses, increased from 41.8% to 44.6% over the past two years, also meeting Buffett’s benchmark. Buffett has repeatedly emphasized the significance of ROE and ROIC, asserting that a sound investment should maintain an average ROE above 20% over the past decade. Remarkably, Microsoft’s Return on Equity (ROE) stands at an impressive 32.8%, meaning it generates 32.8 cents of profit for each dollar invested by shareholders. Its Return on Invested Capital (ROIC) is 31.2%, also surpassing Buffett’s benchmark.",
@@ -134,7 +134,7 @@ const sourceContent: MemoContent = {
           ],
         },
         {
-          title: "Investment Conclusion",
+          title: "Investment conclusion",
           paragraphs: [
             "In conclusion, Microsoft’s financials satisfy all of Buffett‘s benchmarks. Its revenue consistently increases across all segments; its profitability is exceptional, with strong margins and high returns that operate like a well-oiled money machine, and its balance sheet is solid, maintaining ample cash reserves and minimal debt. For beginner investors seeking an attractive investment opportunity, Microsoft’s robust financial health makes it a compelling choice.",
           ],

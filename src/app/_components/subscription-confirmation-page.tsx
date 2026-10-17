@@ -23,6 +23,7 @@ export async function SubscriptionConfirmationPage({
   const params = await searchParams;
   const token = typeof params.token === "string" && /^[A-Za-z0-9_-]{43}$/.test(params.token) ? params.token : "";
   const copy = confirmationCopy[locale];
+  const title = locale === "en" ? "Confirm Your Subscription" : copy.heading;
   return (
     <div>
       <SiteHeader
@@ -31,7 +32,12 @@ export async function SubscriptionConfirmationPage({
         languageQuery={token ? new URLSearchParams({ token }).toString() : undefined}
       />
       <main id="main-content" tabIndex={-1}>
-        <PageHero variant="standard" label={copy.subject} title={copy.heading} intro={<p>{pageBody[locale]}</p>} />
+        <PageHero
+          variant="standard"
+          label={locale === "en" ? title : copy.subject}
+          title={title}
+          intro={<p>{pageBody[locale]}</p>}
+        />
         <Container className="grid gap-6 [padding-block:var(--space-section)]">
           <SubscriptionConfirmationForm token={token} locale={locale} />
           <a href={`${getLocalizedPath("/", locale)}#subscribe`}>{getNavigationCopy(locale).home}</a>

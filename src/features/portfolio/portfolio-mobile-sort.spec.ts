@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { portfolioHoldings, portfolioIncome, getPortfolioTotals, getHoldingCostPerShare } from "./portfolio";
+import { portfolioHoldings, portfolioIncome } from "./portfolio";
+import { getPortfolioTotals, getHoldingCostPerShare } from "./portfolio-calculations";
 import { formatUsd } from "@/lib/format";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
@@ -91,7 +92,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => b - a));
     await expect(holdingRows.first().getByRole("rowheader")).toHaveCSS("text-align", "left");
     await expect(holdingRows.first().getByRole("cell").first()).toHaveCSS("text-align", "right");
-    await expect(table.locator(".portfolio-total-market")).toHaveCSS("font-weight", "700");
+    await expect(table.locator(".portfolio-total-market")).toHaveCSS("font-weight", "500");
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(mobileSort).toBeVisible();
     await expect(mobileSort.locator("select")).toHaveValue("shares");

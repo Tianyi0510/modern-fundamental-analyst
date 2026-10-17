@@ -22,29 +22,32 @@ export function PageHero({
   label,
   title,
   intro,
+  children,
   variant = "standard",
 }: {
   label: ReactNode;
   title: ReactNode;
   intro: ReactNode;
+  children?: ReactNode;
   variant?: HeroVariant;
 }) {
   return (
-    <div className="page-hero-band bg-[var(--background-gray)]">
-      <Container as="section" className="page-hero py-[var(--space-section)]">
+    <div className="page-hero-band bg-[var(--surface-secondary)]">
+      <Container as="section" className="page-hero py-[var(--space-8)]">
         <p className="eyebrow flex items-center gap-[10px] text-label">
           <span className="size-[9px] rounded-full bg-accent" /> {label}
         </p>
         <h1
-          className={`mt-[66px] text-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+          className={`mt-[var(--space-6)] text-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
         >
           {title}
         </h1>
         <div
-          className={`page-intro mt-[var(--space-heading-content)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-lead [&_p]:text-pretty [&_small]:text-caption [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
+          className={`page-intro mt-[var(--space-6)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-lead [&_p]:text-pretty [&_small]:text-caption [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
         >
           {intro}
         </div>
+        {children ? <div className="hero-summary @container/hero-summary mt-[var(--space-8)]">{children}</div> : null}
       </Container>
     </div>
   );

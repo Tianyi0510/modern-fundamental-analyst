@@ -4,7 +4,7 @@ import { ResendCoordinationError, subscriptionKey } from "./resend-coordination"
 
 // One allowance per immutable request; retries neither consume a second slot nor
 // bypass the cooldown by choosing a fresh UUID. Redis failure blocks sending.
-export const recipientAllowanceScript = `
+const recipientAllowanceScript = `
 if redis.call('EXISTS', KEYS[3]) == 1 then return 1 end
 if redis.call('EXISTS', KEYS[1]) == 1 then return 0 end
 local count = tonumber(redis.call('GET', KEYS[2]) or '0')

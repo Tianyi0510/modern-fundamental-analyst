@@ -107,7 +107,7 @@ test("test rules report misuse only in their intended runners", async () => {
   const domCode =
     'import { expect } from "vitest"; import { screen } from "@testing-library/react"; expect(screen.getByRole("button").disabled).toBe(true);';
   const cases = [
-    ["vitest/no-focused-tests", vitestCode, "src/lib/escape-html.test.ts"],
+    ["vitest/no-focused-tests", vitestCode, "src/lib/sentry-replay.test.ts"],
     ["playwright/missing-playwright-await", playwrightCode, "src/app/security-headers.spec.ts"],
     ["jest-dom/prefer-enabled-disabled", domCode, "src/features/contact/contact-form.integration.test.tsx"],
     [
@@ -128,7 +128,7 @@ test("test rules report misuse only in their intended runners", async () => {
   const browser = await eslint.calculateConfigForFile("src/app/security-headers.spec.ts");
   assert.equal(browser.rules["vitest/valid-expect"], undefined);
   assert.equal(browser.rules["jest-dom/prefer-enabled-disabled"], undefined);
-  const unit = await eslint.calculateConfigForFile("src/lib/escape-html.test.ts");
+  const unit = await eslint.calculateConfigForFile("src/lib/sentry-replay.test.ts");
   assert.equal(unit.rules["testing-library/await-async-queries"], undefined);
   assert.equal(unit.rules["playwright/missing-playwright-await"], undefined);
 });

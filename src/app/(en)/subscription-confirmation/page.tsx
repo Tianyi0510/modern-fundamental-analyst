@@ -7,9 +7,9 @@ export const metadata = {
     title: confirmationCopy["en"].subject,
     description: confirmationCopy["en"].body,
     path: "/subscription-confirmation",
+    indexable: false,
     locale: "en",
   }),
-  robots: { index: false, follow: false },
   referrer: "no-referrer" as const,
 };
 export default function Page({ searchParams }: { searchParams: Promise<{ token?: string | string[] }> }) {

@@ -3,21 +3,24 @@ import { expect, test } from "@playwright/test";
 for (const copy of [
   {
     prefix: "",
+    privacy: "The confirmation is the same for every address to protect your privacy.",
     invalid: "Enter a valid email address.",
-    subscribed: "Check your inbox and confirm your subscription.",
-    sent: "If this address is subscribed, a secure link is on its way.",
+    subscribed: "Check your inbox. Open the confirmation email to finish subscribing.",
+    sent: "If this address is subscribed, check your inbox for a secure link to manage your preferences.",
   },
   {
     prefix: "/zh-tw",
+    privacy: "為保護你的隱私，所有地址都會顯示相同的確認訊息。",
     invalid: "請輸入有效的電子郵件地址。",
-    subscribed: "請查看電子郵件並確認你的訂閱。",
-    sent: "若此地址已訂閱，安全連結將寄至你的信箱。",
+    subscribed: "請查看收件匣，開啟確認郵件以完成訂閱。",
+    sent: "若此地址已訂閱，請查看信箱中的安全連結，以管理偏好設定。",
   },
   {
     prefix: "/zh-cn",
+    privacy: "为保护你的隐私，所有地址都会显示相同的确认信息。",
     invalid: "请输入有效的电子邮件地址。",
-    subscribed: "请查看电子邮件并确认你的订阅。",
-    sent: "如果此地址已订阅，安全链接将发送至你的邮箱。",
+    subscribed: "请查看收件箱，打开确认邮件以完成订阅。",
+    sent: "如果此地址已订阅，请查看邮箱中的安全链接，以管理偏好设置。",
   },
 ]) {
   test(
@@ -38,6 +41,9 @@ for (const copy of [
       });
       for (const path of ["/contact", "/subscription-preferences"]) {
         await page.goto(`${copy.prefix}${path}`);
+        if (path === "/subscription-preferences") {
+          await expect(page.locator(".preferences-invalid")).toContainText(copy.privacy);
+        }
         const forms =
           path === "/contact"
             ? [page.locator("#contact-subscribe form"), page.locator("footer form")]

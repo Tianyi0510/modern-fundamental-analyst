@@ -6,9 +6,9 @@ export const metadata = {
     title: "邮件偏好",
     description: "管理 Modern Fundamental Analyst 邮件偏好。",
     path: "/subscription-preferences",
+    indexable: false,
     locale: "zh-cn",
   }),
-  robots: { index: false, follow: false },
 };
 
 export default function Page({ searchParams }: { searchParams: Promise<{ token?: string | string[] }> }) {

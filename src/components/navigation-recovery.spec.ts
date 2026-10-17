@@ -3,9 +3,9 @@ import { expect, test } from "@playwright/test";
 
 const attempt = "550e8400-e29b-41d4-a716-446655440000";
 const variants = [
-  { prefix: "", language: "en", locale: "en", retry: "Try Again", error: "This Page Could Not Be Loaded." },
-  { prefix: "/zh-tw", language: "zh-Hant-TW", locale: "zh-tw", retry: "重試", error: "目前無法載入此頁面。" },
-  { prefix: "/zh-cn", language: "zh-CN", locale: "zh-cn", retry: "重试", error: "目前无法加载此页面。" },
+  { prefix: "", language: "en", locale: "en", retry: "Try Again", error: "Unable to Load This Page" },
+  { prefix: "/zh-tw", language: "zh-Hant-TW", locale: "zh-tw", retry: "重試", error: "目前無法載入此頁面" },
+  { prefix: "/zh-cn", language: "zh-CN", locale: "zh-cn", retry: "重试", error: "目前无法加载此页面" },
 ];
 
 function preferenceToken() {
@@ -135,12 +135,43 @@ for (const { prefix, language, locale, retry, error } of variants) {
     await page.goto(path);
     await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
     await expect(page.locator('meta[property="article:published_time"]')).toHaveAttribute("content", "2025-10-10");
-    const article = JSON.parse(await page.locator('script[type="application/ld+json"]').innerText()) as {
-      url: string;
-      headline: string;
-    };
+    const data = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
+      (value) =>
+        JSON.parse(value) as {
+          "@type": string;
+          url: string;
+          headline: string;
+          itemListElement?: { position: number; name: string; item: string }[];
+        },
+    );
+    const articles = data.filter((item) => item["@type"] === "Article");
+    expect(articles).toHaveLength(1);
+    const article = articles[0]!;
     expect(article.url).toBe(`https://www.modernfundamentalanalyst.com${path}`);
     await expect(page.locator("h1")).toHaveText(article.headline);
+    const breadcrumbs = data.filter((item) => item["@type"] === "BreadcrumbList");
+    expect(breadcrumbs).toHaveLength(1);
+    expect(breadcrumbs[0]!.itemListElement).toEqual([
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: expect.any(String),
+        item: `https://www.modernfundamentalanalyst.com${prefix || "/"}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: expect.any(String),
+        item: `https://www.modernfundamentalanalyst.com${prefix}/memos`,
+      },
+      { "@type": "ListItem", position: 3, name: article.headline, item: article.url },
+    ]);
+    for (const item of breadcrumbs[0]!.itemListElement!.slice(0, 2)) {
+      await expect(page.getByRole("link", { name: item.name, exact: true }).first()).toHaveAttribute(
+        "href",
+        new URL(item.item).pathname,
+      );
+    }
   });
 
   test(`${locale} a client rendering failure offers a localized working retry`, async ({ page }) => {

@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <main className={appearance["not-found"]} id="main-content" tabIndex={-1}>
       <span>404</span>
-      <h1>Nothing Invested Here.</h1>
+      <h1>Page Not Found</h1>
       <ButtonLink href="/">Return Home</ButtonLink>
     </main>
   );

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const { prefix, label, note } of [
-  { prefix: "", label: "TWRR", note: "Time-Weighted Return · Reconstructed · Cumulative" },
+  { prefix: "", label: "TWRR", note: "Time-weighted return · reconstructed · cumulative" },
   { prefix: "/zh-tw", label: "TWRR", note: "時間加權報酬・重建值・累積" },
   { prefix: "/zh-cn", label: "TWRR", note: "时间加权回报・重建值・累计" },
 ]) {
@@ -16,12 +16,12 @@ for (const { prefix, label, note } of [
           ? "資金加權報酬・年化"
           : prefix === "/zh-cn"
             ? "资金加权回报・年化"
-            : "Money-Weighted Return · Annualized";
+            : "Money-weighted return · annualized";
       await expect(page.locator(path === "/" ? ".metric-band" : ".performance-summary")).toContainText(xirrNote);
       if (path === "/") {
         await expect(page.locator(".metric-band dt").last()).toHaveText("XIRR");
         if (!prefix)
-          await expect(page.getByRole("link", { name: "Read the Latest Investment Memo", exact: true })).toBeVisible();
+          await expect(page.getByRole("link", { name: "Read the latest investment memo", exact: true })).toBeVisible();
       }
       await page.addStyleTag({ content: "html { font-size: 32px !important; }" });
       for (const width of [320, 390, 1440]) {

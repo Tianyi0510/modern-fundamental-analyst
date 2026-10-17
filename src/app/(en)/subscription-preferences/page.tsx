@@ -6,8 +6,8 @@ export const metadata = {
     title: "Email Preferences",
     description: "Manage your Modern Fundamental Analyst email preferences.",
     path: "/subscription-preferences",
+    indexable: false,
   }),
-  robots: { index: false, follow: false },
 };
 
 export default function Page({ searchParams }: { searchParams: Promise<{ token?: string | string[] }> }) {
