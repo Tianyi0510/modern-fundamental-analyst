@@ -11,6 +11,8 @@ for (const { prefix, label } of labels) {
     page,
     browserName,
   }, testInfo) => {
+    const pageErrors: string[] = [];
+    page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.emulateMedia({ colorScheme: "dark" });
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${prefix}/contact`);
@@ -130,6 +132,8 @@ for (const { prefix, label } of labels) {
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.getByRole("combobox", { name: label })).toHaveCount(0);
+    expect(pageErrors).toEqual([]);
   });
 }
 
@@ -146,4 +150,25 @@ test("system appearance works without JavaScript @mobile", async ({ browser, bas
   } finally {
     await context.close();
   }
+});
+
+test("a native appearance choice made before hydration persists", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  let release!: () => void;
+  const scriptsReady = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/_next/static/chunks/*.js", async (route) => {
+    await scriptsReady;
+    await route.continue();
+  });
+  try {
+    await page.goto("/contact", { waitUntil: "domcontentloaded" });
+    await page.getByRole("combobox", { name: "Appearance" }).selectOption("dark");
+  } finally {
+    release();
+  }
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(page.getByRole("combobox", { name: "Appearance" })).toHaveValue("dark");
 });

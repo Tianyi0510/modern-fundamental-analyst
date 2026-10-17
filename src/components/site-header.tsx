@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeProvider } from "./theme-provider";
 import { ThemeSelect } from "./theme-select";
 import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-header.styles";
@@ -35,7 +36,15 @@ type SiteHeaderProps = {
   languageQuery?: string;
 };
 
-export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
+export function SiteHeader(props: SiteHeaderProps) {
+  return (
+    <ThemeProvider>
+      <HeaderContent {...props} />
+    </ThemeProvider>
+  );
+}
+
+function HeaderContent({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
   const pathname = usePathname();
   const {
     close: closeMenu,

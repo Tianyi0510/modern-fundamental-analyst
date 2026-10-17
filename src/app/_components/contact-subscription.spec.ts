@@ -52,7 +52,7 @@ for (const { prefix, locale, title, success, error, contactIntro } of [
     const messageForm = page.locator(".contact-form");
     expect((await section.boundingBox())!.y).toBeLessThan((await messageForm.boundingBox())!.y);
     const email = section.getByRole("textbox");
-    await expect(email).toHaveAccessibleName(/Email address|電子郵件地址|电子邮件地址/);
+    await expect(email).toHaveAccessibleName(/Email Address|電子郵件地址|电子邮件地址/);
     await expect(section.getByRole("link")).toHaveAttribute("href", `${prefix}/subscription-preferences`);
     const footer = page.locator(".site-footer .subscribe-section");
     await email.fill("reader@example.com");

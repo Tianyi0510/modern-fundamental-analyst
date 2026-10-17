@@ -693,7 +693,7 @@ test.describe("mobile content and navigation QA", () => {
       const header = page.locator(".site-header").first();
       await expect(header).toHaveCSS("position", "relative");
       await expect(header).toHaveCSS("height", "70px");
-      await expect(header.locator(":scope > .wordmark img")).toHaveAttribute("src", "/logo-wordmark.svg");
+      await expect(header.locator(":scope > .wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
       const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
       expect(wordmarkBox).not.toBeNull();
       expect(wordmarkBox!.height).toBeLessThanOrEqual(25);
@@ -774,7 +774,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-content")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
-    await expect(page.locator(".mobile-menu-wordmark img")).toHaveAttribute("src", "/logo-wordmark.svg");
+    await expect(page.locator(".mobile-menu-wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
     await page.setViewportSize({ width: 390, height: 620 });
     await page
       .locator(".mobile-menu-content")
@@ -892,7 +892,11 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(options.first()).not.toBeVisible();
         await summary.focus();
         await page.keyboard.press("Tab");
+        await expect(page.locator(".mobile-menu-content select")).toBeFocused();
+        await page.keyboard.press("Tab");
         await expect(page.locator(".mobile-menu-wordmark")).toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(page.locator(".mobile-menu-content select")).toBeFocused();
         await page.keyboard.press("Shift+Tab");
         await expect(summary).toBeFocused();
         const collapsedHeight = await drawer.evaluate((element) => element.getBoundingClientRect().height);

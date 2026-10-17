@@ -605,7 +605,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         if (width === 390) {
           await page.locator(".mobile-menu-button").click();
           await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
-          const logo = page.locator(".mobile-menu-wordmark img");
+          const logo = page.locator(".mobile-menu-wordmark img:visible");
           await expect(logo).toHaveAttribute("src", "/logo-wordmark.svg");
           controls = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
         } else {
@@ -691,7 +691,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.goto(prefix || "/");
       await page.locator(".mobile-menu-button").click();
       await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
-      const logo = page.locator(".mobile-menu-wordmark img");
+      const logo = page.locator(".mobile-menu-wordmark img:visible");
       await expect(logo).toHaveAttribute("src", "/logo-wordmark.svg");
       expect(await invalidTreatments(page)).toEqual([]);
       await page.locator(".mobile-language-disclosure > summary").click();

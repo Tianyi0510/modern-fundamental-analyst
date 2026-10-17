@@ -50,7 +50,7 @@ A new treatment needs a reason, an owning role or component variant, and verific
 
 ### Light, dark and system appearance
 
-Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. The desktop Header and mobile Menu expose one localized Appearance selection. Preferences persist across reloads, routes and languages; system mode follows OS changes. The provider sets the document theme before hydration. Suppress hydration warnings only on the root HTML attribute that this bootstrap changes.
+Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. The desktop Header and mobile Menu expose one localized Appearance selection. Preferences persist across reloads, routes and languages; system mode follows OS changes. The Header owns the provider and sets the document theme before hydration; page content does not subscribe to its context. The native selection restores preferences through a DOM effect, preserves pre-hydration choices and does not force a synchronous mount-state render. Suppress hydration warnings only on the root HTML attribute that this bootstrap changes.
 
 `tokens.css` owns theme colors through `light-dark()` and `color-scheme`; supported browsers follow system appearance even without JavaScript. Keep brand primitives unchanged. Dark page surfaces use black and `#0a0a0a`, text uses white and lighter neutral roles, and links/focus use Bright Blue. Financial return aliases use readable dark-mode variants. Test modern Chromium and WebKit; older browsers without `light-dark()` are outside this theme implementation's support boundary.
 

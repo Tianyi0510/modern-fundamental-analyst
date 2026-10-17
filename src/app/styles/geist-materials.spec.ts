@@ -43,7 +43,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(grid).not.toHaveCSS("box-shadow", "none");
         await expect(page.locator(".memo-card p").first()).toHaveCSS("color", "rgb(77, 77, 77)");
         const logo = page.locator(".site-header > .wordmark");
-        await expect(logo.locator("img")).toHaveAttribute("src", "/logo-wordmark.svg");
+        await expect(logo.locator("img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
 
         if (width === 1440) {
           await page.locator(".language-trigger").click();

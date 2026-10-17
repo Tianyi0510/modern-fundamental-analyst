@@ -36,7 +36,7 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
     await expect(summaryReturn).toHaveText("+32.84%");
     const summary = page.locator('.portfolio-kpis [data-tone="brand"]');
     await expect(summary.getByRole("term")).toHaveText(
-      prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total return",
+      prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total Return",
     );
     await expect(summary.locator("small")).toHaveText(
       prefix === "/zh-tw" ? "絕對報酬率" : prefix === "/zh-cn" ? "绝对回报率" : "Absolute return",

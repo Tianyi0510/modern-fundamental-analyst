@@ -1,4 +1,3 @@
-import { ThemeProvider } from "./theme-provider";
 import { TouchPressFeedback } from "./touch-press-feedback";
 import { appearance } from "./site-document.styles";
 import { Analytics } from "@vercel/analytics/next";
@@ -16,15 +15,13 @@ export function SiteDocument({
   return (
     <html lang={language} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${jost.variable} ${fontVariable}`.trim()}>
-        <ThemeProvider>
-          <a className={appearance["skip-link"]} href="#main-content">
-            {skipLabel}
-          </a>
-          {children}
-          <TouchPressFeedback />
-          <Analytics />
-          <SpeedInsights />
-        </ThemeProvider>
+        <a className={appearance["skip-link"]} href="#main-content">
+          {skipLabel}
+        </a>
+        {children}
+        <TouchPressFeedback />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

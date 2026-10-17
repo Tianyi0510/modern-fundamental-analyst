@@ -43,7 +43,7 @@ test.describe("header interaction QA", () => {
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "24px");
     const legalBody = page.locator(".legal-body");
     await expect(legalBody).toHaveCSS("padding-top", "48px");
-    await expect(legalBody).toHaveCSS("padding-bottom", "96px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "48px");
   });
 
   test("desktop page heroes share one vertical rhythm", async ({ page }) => {
@@ -298,7 +298,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(footer.locator(".footer-links")).toHaveCSS("grid-template-columns", "358px");
     const legalBody = page.locator(".legal-body");
     await expect(legalBody).toHaveCSS("padding-top", "48px");
-    await expect(legalBody).toHaveCSS("padding-bottom", "72px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "48px");
   });
 
   test("mobile page heroes share one vertical rhythm", { tag: "@mobile" }, async ({ page }) => {

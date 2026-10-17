@@ -138,7 +138,7 @@ Keep Prettier last in the ESLint configuration. It owns formatting; import order
 
 ## Presentation and style loading
 
-`SiteDocument` composes a small client `ThemeProvider` from `next-themes` around server-rendered children. It initializes `data-theme` before hydration and persists the preference in local storage. `ThemeSelect` is the only theme control; CSS semantic aliases and the SVG Logo module own appearance. Provider/business workflows do not depend on theme state.
+`SiteHeader` composes a small client `ThemeProvider` from `next-themes` around its desktop and mobile controls. The document and page content stay outside this provider, limiting theme-context updates to the consumers. It initializes `data-theme` before hydration and persists the preference in local storage. `ThemeSelect` is the only theme control; CSS semantic aliases and the SVG Logo module own appearance. Provider/business workflows do not depend on theme state.
 
 The root layout imports `src/app/globals.css` once. PostCSS compiles Tailwind themes and utilities. Tokens feed both Tailwind and CSS Modules; `base` provides the only reset and document defaults. Preflight and component-specific global selectors are not used.
 
