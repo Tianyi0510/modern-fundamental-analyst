@@ -4,14 +4,23 @@ const mocks = vi.hoisted(() => ({
   init: vi.fn(),
   captureException: vi.fn<(error: unknown, context?: unknown) => void>(),
 }));
-const scheduler = vi.hoisted(() => ({ gate: Promise.resolve(), release: () => {} }));
+const scheduler = vi.hoisted(() => ({
+  gate: Promise.resolve(),
+  initGate: Promise.resolve(),
+  calls: 0,
+  release: () => {},
+}));
 vi.mock("./sentry-client-sdk", () => mocks);
-vi.mock("./yield-to-main", () => ({ yieldToMain: () => scheduler.gate }));
+vi.mock("./yield-to-main", () => ({
+  yieldToMain: () => (++scheduler.calls === 2 ? scheduler.initGate : scheduler.gate),
+}));
 
 beforeEach(() => {
   vi.resetModules();
   vi.clearAllMocks();
   vi.stubGlobal("window", new EventTarget());
+  scheduler.calls = 0;
+  scheduler.initGate = Promise.resolve();
   scheduler.gate = new Promise<void>((resolve) => {
     scheduler.release = resolve;
   });
@@ -74,4 +83,22 @@ it("does not initialize the browser SDK during server rendering", async () => {
   reportClientError(new Error("No configured client"));
   await expect(startSentryClient(options)).resolves.toBeUndefined();
   expect(mocks.init).not.toHaveBeenCalled();
+});
+
+it("keeps native capture active between module loading and SDK setup", async () => {
+  let releaseSetup!: () => void;
+  scheduler.initGate = new Promise<void>((resolve) => {
+    releaseSetup = resolve;
+  });
+  const { startSentryClient } = await import("./sentry-client");
+  const ready = startSentryClient(options);
+  scheduler.release();
+  await vi.waitFor(() => expect(scheduler.calls).toBe(2));
+  const error = new Error("Between startup tasks");
+  window.dispatchEvent(Object.assign(new Event("error"), { error }));
+  expect(mocks.init).not.toHaveBeenCalled();
+  expect(mocks.captureException).not.toHaveBeenCalled();
+  releaseSetup();
+  await ready;
+  expect(mocks.captureException).toHaveBeenCalledWith(error, expect.any(Object));
 });

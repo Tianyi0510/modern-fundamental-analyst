@@ -128,6 +128,7 @@ test(
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     const trigger = page.locator(".mobile-menu-button");
+    await pauseNextMenuEntrance(page);
     await trigger.click();
     const positions = await page.locator(".mobile-menu-content").evaluate((content: HTMLDivElement) => {
       const entrance = content.getAnimations()[0];
@@ -160,6 +161,7 @@ test(
     expect(positions.dismissalMidLeft).toBeGreaterThan(positions.dismissalStartLeft);
     expect(positions.dismissalMidLeft).toBeLessThan(390);
     await expect(page.locator(".mobile-menu-layer")).toBeHidden();
+    await pauseNextMenuEntrance(page);
     await trigger.click();
     await page.locator(".mobile-menu-content").evaluate((content) => {
       const entrance = content.getAnimations()[0];

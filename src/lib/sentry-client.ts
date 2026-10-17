@@ -38,7 +38,9 @@ export function startSentryClient(options: Parameters<ClientSdk["init"]>[0]) {
   window.addEventListener("unhandledrejection", bufferRejection);
   startup = yieldToMain()
     .then(() => import("./sentry-client-sdk"))
-    .then((sdk) => {
+    .then(async (sdk) => {
+      // Module evaluation and SDK setup must not extend the same browser task.
+      await yieldToMain();
       sdk.init(options);
       client = sdk;
       removeBuffer();
