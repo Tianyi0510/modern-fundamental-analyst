@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { colorContrast } from "../../scripts/color-contrast";
 
-test.beforeEach(async ({ page, baseURL }) => {
+test.beforeEach(async ({ context, baseURL }) => {
+  // Context routing also covers recorder requests that outlive a document during navigation.
   // Credentialed keepalive requests require an explicit origin, including in WebKit mocks.
-  await page.route("https://sentry.invalid/**", (route) =>
+  await context.route("https://sentry.invalid/**", (route) =>
     route.fulfill({
       status: 200,
       body: "{}",
@@ -203,4 +204,41 @@ test("isolated monitoring transport accepts credentialed keepalive requests @mob
       return response.ok;
     }),
   ).toBe(true);
+});
+
+test("monitoring requests remain intercepted after their document navigates @mobile", async ({ page, context }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  let started = false;
+  let completed = false;
+  let release!: () => void;
+  const responseReady = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const endpoint = "https://sentry.invalid/navigation-probe";
+  await context.route(endpoint, async (route) => {
+    started = true;
+    await responseReady;
+    await route.fallback();
+    completed = true;
+  });
+  try {
+    await page.goto("/contact");
+    await page.evaluate((url) => {
+      window.addEventListener(
+        "pagehide",
+        () => {
+          void fetch(url, { method: "POST", body: "{}", credentials: "include", keepalive: true }).catch(() => {});
+        },
+        { once: true },
+      );
+    }, endpoint);
+    await page.goto("/about", { waitUntil: "domcontentloaded" });
+    await expect.poll(() => started).toBe(true);
+    release();
+    await expect.poll(() => completed).toBe(true);
+    expect(errors).toEqual([]);
+  } finally {
+    release();
+  }
 });
