@@ -1,10 +1,10 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --layer-navigation: 90;
   --layer-modal: 100;
   --layer-popover: 110;
   /* Geist light materials: one stroke/shadow composition per surface. */
-  --shadow-outline: 0 0 0 1px light-dark(#00000014, #ffffff24);
+  --shadow-outline: 0 0 0 1px #00000014;
   --shadow-background: 0 0 0 1px var(--surface-secondary);
   --shadow-surface: var(--shadow-outline), var(--shadow-background);
   --shadow-popover:
@@ -50,10 +50,10 @@
   --radius-surface: var(--radius-0);
   --radius-field: var(--radius-6);
   --radius-action: var(--radius-pill);
-  --border-subtle: light-dark(var(--gray), #333333);
+  --border-subtle: var(--gray);
   --grid-guide: var(--border-subtle);
-  --border-strong: light-dark(var(--black), var(--white));
-  --border-control: light-dark(var(--neutral-800), #a1a1a1);
+  --border-strong: var(--black);
+  --border-control: var(--neutral-800);
   /* Decorative strokes must not replace control boundaries or focus rings. */
   --border-inverse-subtle: var(--white-alpha-22);
   --border-control-inverse: var(--white-alpha-70);
@@ -61,8 +61,8 @@
   --border-error: var(--red-error);
   --surface-subtle: var(--surface-secondary);
   --surface-selected: color-mix(in srgb, var(--medium-blue) 8%, var(--surface-primary));
-  --text-return-positive: light-dark(var(--green-return), #4ade80);
-  --text-return-negative: light-dark(var(--red-return), #ff6377);
+  --text-return-positive: var(--green-return);
+  --text-return-negative: var(--red-return);
   /* Geist presets: size, line height, weight and tracking stay together. */
   --type-heading-72-size: 4.5rem;
   --type-heading-72-leading: calc(72 / 72);
@@ -213,29 +213,29 @@
   --motion-offset-summary: 4px;
   --motion-offset-sort: -1px;
   --motion-scale-press: 0.985;
-  --surface-primary: light-dark(var(--white), var(--black));
-  --surface-secondary: light-dark(var(--background-gray), #0a0a0a);
+  --surface-primary: var(--white);
+  --surface-secondary: var(--background-gray);
   --surface-inverse: var(--black);
   --surface-brand: var(--deep-blue);
   --surface-highlight: var(--bright-blue);
-  --text-primary: light-dark(var(--black), var(--white));
-  --text-secondary: light-dark(var(--neutral-900), #a1a1a1);
-  --text-tertiary: light-dark(var(--neutral-1000), #ededed);
-  --text-brand: light-dark(var(--deep-blue), var(--bright-blue));
+  --text-primary: var(--black);
+  --text-secondary: var(--neutral-900);
+  --text-tertiary: var(--neutral-1000);
+  --text-brand: var(--deep-blue);
   --text-inverse: var(--white);
   --text-inverse-secondary: var(--white-alpha-84);
   --text-inverse-tertiary: var(--white-alpha-78);
   --text-highlight: var(--bright-blue);
   --chart-benchmark: var(--medium-blue);
-  --interactive-accent: light-dark(var(--deep-blue), var(--bright-blue));
-  --chart-portfolio: light-dark(var(--deep-blue), var(--bright-blue));
+  --interactive-accent: var(--deep-blue);
+  --chart-portfolio: var(--deep-blue);
   /* Component roles inherit semantic values; brand variants remain explicit. */
-  --action-primary-surface: light-dark(var(--black), var(--white));
-  --action-primary-text: light-dark(var(--white), var(--black));
+  --action-primary-surface: var(--black);
+  --action-primary-text: var(--white);
   --action-primary-hover-text: var(--white);
   --action-primary-hover-surface: var(--surface-brand);
-  --action-contrast-surface: light-dark(var(--black), var(--white));
-  --action-contrast-text: light-dark(var(--white), var(--black));
+  --action-contrast-surface: var(--black);
+  --action-contrast-text: var(--white);
   --action-contrast-hover-surface: var(--surface-highlight);
   --action-contrast-hover-text: var(--black);
   --action-inverse-surface: var(--white);
@@ -244,8 +244,8 @@
   --action-quiet-text: var(--text-primary);
   --action-quiet-hover-surface: var(--surface-selected);
   --sidebar-text: var(--text-primary);
-  --sidebar-hover-surface: light-dark(var(--neutral-100), #171717);
-  --sidebar-pressed-surface: light-dark(var(--neutral-200), #222222);
+  --sidebar-hover-surface: var(--neutral-100);
+  --sidebar-pressed-surface: var(--neutral-200);
   --sidebar-selected-surface: var(--surface-selected);
   --sidebar-language-surface: var(--surface-subtle);
   --holding-row-hover-surface: color-mix(in srgb, var(--bright-blue) 12%, var(--surface-primary));
@@ -320,6 +320,58 @@
     --motion-offset-sort: 0px;
   }
 }
+
+/* Explicit aliases survive CSS optimization and follow the selected theme. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --shadow-outline: 0 0 0 1px #ffffff24;
+  --border-subtle: #333333;
+  --border-strong: var(--white);
+  --border-control: #a1a1a1;
+  --text-return-positive: #4ade80;
+  --text-return-negative: #ff6377;
+  --surface-primary: var(--black);
+  --surface-secondary: #0a0a0a;
+  --text-primary: var(--white);
+  --text-secondary: #a1a1a1;
+  --text-tertiary: #ededed;
+  --text-brand: var(--bright-blue);
+  --interactive-accent: var(--bright-blue);
+  --chart-portfolio: var(--bright-blue);
+  --action-primary-surface: var(--white);
+  --action-primary-text: var(--black);
+  --action-contrast-surface: var(--white);
+  --action-contrast-text: var(--black);
+  --sidebar-hover-surface: #171717;
+  --sidebar-pressed-surface: #222222;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --shadow-outline: 0 0 0 1px #ffffff24;
+    --border-subtle: #333333;
+    --border-strong: var(--white);
+    --border-control: #a1a1a1;
+    --text-return-positive: #4ade80;
+    --text-return-negative: #ff6377;
+    --surface-primary: var(--black);
+    --surface-secondary: #0a0a0a;
+    --text-primary: var(--white);
+    --text-secondary: #a1a1a1;
+    --text-tertiary: #ededed;
+    --text-brand: var(--bright-blue);
+    --interactive-accent: var(--bright-blue);
+    --chart-portfolio: var(--bright-blue);
+    --action-primary-surface: var(--white);
+    --action-primary-text: var(--black);
+    --action-contrast-surface: var(--white);
+    --action-contrast-text: var(--black);
+    --sidebar-hover-surface: #171717;
+    --sidebar-pressed-surface: #222222;
+  }
+}
+
 @theme inline {
   /* Semantic type treatments share the locale-aware Jost family from base.css. */
   --text-hero: var(--font-size-hero);

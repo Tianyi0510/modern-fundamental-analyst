@@ -36,6 +36,8 @@ for (const { prefix, label } of labels) {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     const appearance = page.getByRole("combobox", { name: label });
     await expect(appearance).toHaveValue("system");
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator("body")).toHaveCSS("color", "rgb(255, 255, 255)");
     const language = page.locator(".language-trigger");
     await language.focus();
     await page.keyboard.press("Enter");
@@ -52,6 +54,7 @@ for (const { prefix, label } of labels) {
     }
     await appearance.selectOption("light");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await page.getByRole("combobox", { name: label }).selectOption("dark");
@@ -69,6 +72,7 @@ for (const { prefix, label } of labels) {
     ]) {
       await page.goto(`${prefix}${route}` || "/");
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
       const samples = await page
         .locator("main h1, main h2, main p, .portfolio-row td, .portfolio-kpis small, .metric small")
         .evaluateAll((elements) =>

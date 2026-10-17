@@ -43,9 +43,8 @@ export async function activateConfirmedContactLocked(
     return { ok: false, message: "You've already subscribed", status: 409 };
   }
 
-  const shouldSendWelcome = !existing.data || existing.data.unsubscribed;
-  const latestMemo = shouldSendWelcome ? getWelcomeMemo(locale) : null;
-  if (shouldSendWelcome && !latestMemo) {
+  const latestMemo = getWelcomeMemo(locale);
+  if (!latestMemo) {
     console.error("Welcome automation requires at least one investment memo.");
     return unavailable(503);
   }
@@ -88,8 +87,6 @@ export async function activateConfirmedContactLocked(
     if (result?.error) console.error("Resend subscription failed", result.error.name);
     return unavailable();
   }
-
-  if (!latestMemo) return unavailable(503);
 
   await resendOperationContext.getStore()?.recordPhase?.("send-welcome-event");
   const welcome = await runResendOperation("Resend welcome automation request failed", () =>
