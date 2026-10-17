@@ -112,10 +112,12 @@ Run affected checks locally. CI owns full verification; deployment checks establ
 
 Use GitHub Actions and the Vercel Git integration. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow):
 
+During deployment, change only what is necessary to resolve a demonstrated release blocker. Validate each fix with targeted checks before running required CI. Do not expand the scope with unrelated cleanup, refactoring or additional reviews. Once required CI passes, proceed immediately to merge and deployment; confirm release identity and deployment status without adding optional checks or reviews.
+
 1. Start new changes from current `main` on a `codex/` branch; reuse an existing branch/PR for ongoing work. Target PRs at `main` and review their diff and required CI before merging. Direct pushes to `main` require an explicit request.
 2. For an authorized deployment, merge the verified PR and record the resulting release SHA. PRs run full CI; main may reuse recent full PR evidence only when `scripts/ci-plan.mjs` verifies an identical Git tree and all required jobs. Missing or uncertain evidence requires full CI.
 3. Declare deployment complete only after release CI succeeds, Vercel is `READY`, and its deployed SHA and production aliases match the intended release. Preview readiness or CI success alone is insufficient.
-4. Report completion promptly. Production smoke checks are optional unless requested or evidence indicates a failure; report incomplete diagnostics separately.
+4. Report completion promptly. Do not add production smoke checks unless requested or evidence indicates a failure; report incomplete diagnostics separately.
 5. After successful deployment, safely delete the local merged feature branch after checking for unmerged work and switching away. Preserve active branches. GitHub deletes the merged remote branch automatically.
 
 Preserve the stable `verify` and `webkit` result jobs, the required `performance` budget job, package-integrity checks, browser coverage and `vercel.json`'s exact-commit production gate. Keep the gate outside `npm run build` and runner workarounds in the workflow. Fix failed checks rather than bypassing them.
