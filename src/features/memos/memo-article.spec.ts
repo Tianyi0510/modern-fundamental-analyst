@@ -21,9 +21,23 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(hero.locator("h1")).toHaveCSS("font-size", width < 800 ? "51px" : width < 1200 ? "67px" : "90px");
       const share = hero.getByRole("button");
       await expect(share).toBeEnabled();
+      const metadataText = hero.locator(".article-meta time");
+      for (const [property, value] of [
+        ["font-size", "16px"],
+        ["line-height", "24px"],
+        ["font-weight", "400"],
+      ]) {
+        await expect(metadataText).toHaveCSS(property, value);
+        await expect(share).toHaveCSS(property, value);
+      }
       await expect(page.locator(".memo-article-body").getByRole("button")).toHaveCount(1);
       const meta = (await hero.locator(".article-meta").boundingBox())!;
       const action = (await share.boundingBox())!;
+      if (width <= 800) {
+        expect(Math.abs(action.x - meta.x)).toBeLessThan(1);
+      } else {
+        expect(Math.abs(action.x + action.width - meta.x - meta.width)).toBeLessThan(1);
+      }
       expect(action.x).toBeGreaterThanOrEqual(meta.x);
       expect(action.x + action.width).toBeLessThanOrEqual(meta.x + meta.width + 1);
       const titleBox = await page.locator(".memo-article h1").boundingBox();

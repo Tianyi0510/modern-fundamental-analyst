@@ -29,11 +29,18 @@ for (const [prefix, label] of [
       const href = await link.getAttribute("href");
       await expect(page.locator(href!)).toHaveText((await link.textContent())!.trim());
     }
-    const conclusions = nav.getByRole("link", { name: "Investment conclusion", exact: true });
-    await expect(conclusions).toHaveCount(3);
-    await conclusions.last().click();
-    await expect(page).toHaveURL(/#investment-conclusion-3$/);
-    await expect(page.locator("#investment-conclusion-3")).toBeInViewport();
+    const semanticTargets = [
+      "section-1-business-analysis",
+      ...["business-analysis", "management-analysis", "financial-analysis"].flatMap((section) => [
+        `${section}-introduction`,
+        `${section}-investment-conclusion`,
+      ]),
+    ];
+    for (const id of semanticTargets) {
+      await nav.locator(`a[href="#${id}"]`).click();
+      await expect(page).toHaveURL(new RegExp(`#${id}$`));
+      await expect(page.locator(`#${id}`)).toBeInViewport();
+    }
     await trigger.scrollIntoViewIfNeeded();
     await trigger.focus();
     await page.keyboard.press("Space");

@@ -33,7 +33,15 @@ test("memo MDX preserves the verified article text, hierarchy and source referen
     document.getElementById("framework-for-understanding-business")?.textContent,
     "Framework for understanding business",
   );
-  assert.equal(document.getElementById("investment-conclusion-3")?.textContent, "Investment conclusion");
+  assert.equal(document.getElementById("section-1-business-analysis")?.textContent, "Section 1: business analysis");
+  assert.equal(document.getElementById("business-analysis"), null);
+  for (const section of ["business-analysis", "management-analysis", "financial-analysis"]) {
+    assert.equal(document.getElementById(`${section}-introduction`)?.textContent, "Introduction");
+    assert.equal(document.getElementById(`${section}-investment-conclusion`)?.textContent, "Investment conclusion");
+  }
+  for (const base of ["introduction", "investment-conclusion"]) {
+    for (const suffix of ["", "-2", "-3"]) assert.equal(document.getElementById(base + suffix), null);
+  }
   assert.equal(document.querySelector(".memo-references h2")?.textContent, "References");
   const text = [...document.querySelectorAll("h2,h3,p,li")]
     .map((element) => element.textContent.replace(/\s+/g, " ").trim())

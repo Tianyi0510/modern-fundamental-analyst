@@ -28,6 +28,10 @@ export default function remarkMemoToc() {
     const used = new Set();
     function visit(node) {
       if (node.type === "heading" && (node.depth === 2 || node.depth === 3)) {
+        // Author-defined anchors use Markdown's trailing {#id} convention.
+        const last = node.children?.at(-1);
+        const explicit = last?.type === "text" ? last.value.match(/\s+\{#([a-z][a-z0-9-]*)\}$/) : null;
+        if (explicit) last.value = last.value.slice(0, explicit.index);
         const title = plainText(node).trim();
         const base =
           title
@@ -37,6 +41,13 @@ export default function remarkMemoToc() {
         let id = base;
         for (let suffix = 2; used.has(id); suffix++) id = base + "-" + suffix;
         used.add(id);
+        if (explicit && explicit[1] !== id) {
+          // Reserve the generated name so later duplicate headings keep their URLs.
+          const customBase = explicit[1];
+          id = customBase;
+          for (let suffix = 2; used.has(id); suffix++) id = customBase + "-" + suffix;
+          used.add(id);
+        }
         node.data = { ...node.data, hProperties: { ...node.data?.hProperties, id } };
         entries.push({ id, title, level: node.depth });
       }

@@ -23,7 +23,7 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdr
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-[var(--layer-modal)] bg-[var(--overlay-scrim)] transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-[var(--material-overlay-blur)] motion-reduce:transition-none",
+        "fixed inset-0 isolate z-[var(--layer-modal)] bg-[var(--overlay-scrim)] transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 motion-reduce:transition-none",
         className,
       )}
       {...props}
@@ -45,7 +45,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-1/2 left-1/2 z-[var(--layer-modal)] grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[var(--radius-menu)] bg-popover p-4 text-popover-foreground ring-1 ring-foreground/10 transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] outline-none data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs motion-reduce:animate-none motion-reduce:transition-none data-[size=default]:sm:max-w-sm",
+          "group/alert-dialog-content fixed top-1/2 left-1/2 z-[var(--layer-modal)] grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[var(--radius-menu)] bg-popover p-4 text-popover-foreground shadow-[var(--shadow-dialog)] ring-1 ring-foreground/10 transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] outline-none data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs motion-reduce:animate-none motion-reduce:transition-none data-[size=default]:sm:max-w-sm",
           className,
         )}
         {...props}

@@ -12,18 +12,18 @@ for (const theme of ["light", "dark"]) {
       await expect(shell).toHaveCSS("width", `${expectedWidth}px`);
       await expect(page.locator("body")).toHaveCSS(
         "background-color",
-        theme === "light" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+        theme === "light" ? "rgb(255, 255, 255)" : "rgb(41, 41, 41)",
       );
     }
     await page.locator(".language-trigger").click();
     const popup = page.locator('[data-slot="dropdown-menu-content"]');
     await expect(popup).toBeVisible();
-    await expect(popup).toHaveCSS("background-color", theme === "light" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)");
+    await expect(popup).toHaveCSS("background-color", theme === "light" ? "rgb(255, 255, 255)" : "rgb(41, 41, 41)");
     await expect(popup).toHaveCSS("border-radius", "12px");
     await expect(popup).toHaveCSS("z-index", "auto");
     const shadow = await popup.evaluate((el) => getComputedStyle(el).boxShadow);
-    expect(shadow).toContain("0px 16px 24px -8px");
-    expect(shadow).toContain("0px 4px 8px -4px");
+    expect(shadow).toContain("0px 8px 16px 0px");
+    expect(shadow).toContain("0px 0px 2px 0px");
     await page.screenshot({ path: testInfo.outputPath("foundation.png") });
     await page.evaluate(() => {
       const root = document.documentElement.style;

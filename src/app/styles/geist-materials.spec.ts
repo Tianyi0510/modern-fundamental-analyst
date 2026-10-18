@@ -4,15 +4,15 @@ import { colorContrast } from "../../../scripts/color-contrast";
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   for (const width of [390, 1440]) {
     test(
-      `${prefix || "English"} Geist surfaces and brand exceptions at ${width}px`,
+      `${prefix || "English"} Fluent Web surfaces and brand exceptions at ${width}px`,
       width === 390 ? { tag: "@mobile" } : {},
       async ({ page }) => {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`${prefix}/contact`);
-        await expect(page.locator(".page-hero-band")).toHaveCSS("background-color", "rgb(245, 247, 250)");
+        await expect(page.locator(".page-hero-band")).toHaveCSS("background-color", "rgb(250, 250, 250)");
         const field = page.locator('main input[type="email"]').first();
         await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
-        await expect(field).toHaveCSS("border-radius", "6px");
+        await expect(field).toHaveCSS("border-radius", "4px");
         const colors = await field.evaluate((element) => {
           const style = getComputedStyle(element);
           return { border: style.borderTopColor, background: style.backgroundColor };
@@ -20,28 +20,35 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         expect(colorContrast(colors.border, colors.background)).toBeGreaterThanOrEqual(3);
         await field.focus();
         await expect(field).toHaveCSS("outline-color", "rgb(13, 40, 139)");
-        await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("border-radius", "999px");
+        await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("border-radius", "10000px");
         await expect(page.locator(".site-footer")).toHaveCSS("background-color", "rgb(0, 0, 0)");
         const action = page.locator('main button[type="submit"]').first();
-        await expect(action).toHaveCSS("border-radius", "999px");
+        await expect(action).toHaveCSS("border-radius", "10000px");
 
         await page.goto(prefix || "/");
         const cards = page.locator(".metric");
         expect(await cards.count()).toBeGreaterThan(0);
         for (const card of await cards.all()) await expect(card).toHaveCSS("border-radius", "0px");
         const grid = page.locator(".memo-grid");
-        await expect(grid).toHaveCSS("border-radius", "6px");
+        await expect(grid).toHaveCSS("border-radius", "0px");
         await expect(grid).toHaveCSS("background-color", "rgb(238, 240, 242)");
-        await expect(page.locator(".memo-card > small").first()).toHaveCSS("border-top-color", "rgb(238, 240, 242)");
+        await expect(page.locator(".memo-card [data-slot=card-footer]").first()).toHaveCSS(
+          "border-top-color",
+          "rgb(238, 240, 242)",
+        );
         await expect(grid).toHaveCSS("border-top-width", "0px");
         await expect(grid).toHaveCSS("overflow", "visible");
         const memo = page.locator("a.memo-card").first();
+        await expect(memo.locator("[data-slot=card]")).toHaveCSS("border-radius", "0px");
         await page.keyboard.press("Tab");
         await memo.focus();
         await expect(memo).toHaveCSS("outline-width", "2px");
-        await expect(memo).toHaveCSS("border-radius", "6px");
+        await expect(memo).toHaveCSS("border-radius", "0px");
         await expect(grid).not.toHaveCSS("box-shadow", "none");
-        await expect(page.locator(".memo-card p").first()).toHaveCSS("color", "rgb(77, 77, 77)");
+        await expect(page.locator(".memo-card [data-slot=card-description]").first()).toHaveCSS(
+          "color",
+          "rgb(77, 77, 77)",
+        );
         const logo = page.locator(".site-header > .wordmark");
         await expect(logo.locator(".brand-logo")).toHaveText("Modern Fundamental Analyst.");
 
@@ -52,9 +59,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           await expect(popup).toHaveCSS("border-top-width", "0px");
           await expect(popup).toHaveCSS("background-color", "rgb(255, 255, 255)");
           const shadow = await popup.evaluate((element) => getComputedStyle(element).boxShadow);
-          // The menu material owns both its outline and elevation; no extra border is stacked.
-          expect(shadow).toContain("0px 16px 24px -8px");
-          expect(shadow).toContain("0px 4px 8px -4px");
+          // The menu uses the two-layer Fluent shadow16 preset.
+          expect(shadow).toContain("0px 8px 16px 0px");
+          expect(shadow).toContain("0px 0px 2px 0px");
           await page.keyboard.press("Escape");
           await expect(page.locator(".language-trigger")).toBeFocused();
         } else {

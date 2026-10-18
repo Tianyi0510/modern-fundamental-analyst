@@ -58,7 +58,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
                 <span>
                   {text.memoLabel} {memo.number}
                 </span>
-                <div className="ml-auto flex justify-end compact:basis-full">
+                <div className="ml-auto flex justify-end compact:ml-0 compact:basis-full compact:justify-start">
                   <MemoShare locale={locale} />
                 </div>
               </div>

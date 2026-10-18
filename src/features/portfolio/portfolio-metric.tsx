@@ -33,7 +33,7 @@ export function PortfolioMetric({
   return (
     <div
       data-tone={tone}
-      className={`${styles.metric} flex min-h-[200px] min-w-0 flex-col rounded-surface p-[var(--space-6)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] compact:py-[var(--space-5)] ${tones[tone]} ${className}`}
+      className={`${styles.metric} flex min-h-[200px] min-w-0 flex-col rounded-[var(--radius-data)] p-[var(--space-6)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] compact:py-[var(--space-5)] ${tones[tone]} ${className}`}
     >
       <dt id={labelId} className="text-large-label">
         {label}

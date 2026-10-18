@@ -98,7 +98,11 @@ for (const text of [
       await page.goto(`${path}?preview=1#article`);
       await page.getByRole("button", { name: text.copy, exact: true }).click();
       await expect(page.locator("html")).toHaveAttribute("data-copied-article", `${baseURL}${path}`);
-      await expect(page.getByText(text.copied, { exact: true })).toBeVisible();
+      const notification = page.getByText(text.copied, { exact: true });
+      await expect(notification).toBeVisible();
+      await expect(notification).toHaveCSS("font-size", "16px");
+      await expect(notification).toHaveCSS("line-height", "24px");
+      await expect(notification).toHaveCSS("font-weight", "400");
       await page.keyboard.press("F6");
       await page.getByRole("button", { name: text.close, exact: true }).click();
       await expect(page.getByText(text.copied, { exact: true })).toBeHidden();

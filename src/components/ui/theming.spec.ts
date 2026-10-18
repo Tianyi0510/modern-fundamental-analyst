@@ -23,7 +23,7 @@ for (const theme of ["light", "dark"]) {
     await expect(borders).toHaveCount(6);
     const notification = fixture.locator('[data-slot="toast"]');
     const notificationShadow = await notification.evaluate((element) => getComputedStyle(element).boxShadow);
-    expect(notificationShadow).toContain("0px 10px 15px -3px");
+    expect(notificationShadow).toContain("0px 4px 8px 0px");
     await fixture.evaluate((element) =>
       (element as HTMLElement).style.setProperty("--shadow-notification", "0 2px 4px rgb(0 0 0 / 0.2)"),
     );

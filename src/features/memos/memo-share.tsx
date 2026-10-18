@@ -57,7 +57,7 @@ export function MemoShare({ locale }: { locale: Locale }) {
         onClick={() => {
           void copyLink();
         }}
-        className="max-w-full gap-2 whitespace-normal"
+        className="max-w-full gap-2 text-small-body whitespace-normal"
       >
         <Copy aria-hidden="true" />
         {text.copy}

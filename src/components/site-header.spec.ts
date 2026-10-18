@@ -772,7 +772,7 @@ test.describe("mobile content and navigation QA", () => {
       "rgba(0, 0, 0, 0)",
     );
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(13, 40, 139)");
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "6px");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "4px");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "12px");
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "42px");
     const menuTop = page.locator(".mobile-menu-top");
@@ -979,7 +979,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const selectedSurface = await current.evaluate((element) => getComputedStyle(element).backgroundColor);
       for (const link of await links.all()) {
         await expect(link).toHaveCSS("font-size", "16px");
-        await expect(link).toHaveCSS("border-radius", "6px");
+        await expect(link).toHaveCSS("border-radius", "4px");
         await expect(link.locator(":scope > svg")).toHaveAttribute("aria-hidden", "true");
         const bounds = await link.boundingBox();
         expect(bounds!.height).toBeGreaterThanOrEqual(48);
@@ -996,9 +996,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]").click();
       await expect(page.locator(".mobile-menu-language")).toHaveCount(2);
       await expect
-        .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
+        .poll(() =>
+          page
+            .locator(".mobile-language-disclosure")
+            .evaluate((element) => element.getAnimations({ subtree: true }).length),
+        )
         .toBe(0);
-      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(245, 247, 250)");
+      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(250, 250, 250)");
       for (const target of await page
         .locator(
           ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > [data-slot=collapsible-trigger]",

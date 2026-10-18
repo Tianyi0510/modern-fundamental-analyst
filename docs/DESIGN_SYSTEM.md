@@ -4,21 +4,21 @@ Use this guide for visual design, component behavior, interface copy and localiz
 
 ## Architecture and reference ownership
 
-The site adopts the five layers below as its design system. Preserve its editorial identity: Jost headings, three brand blues, square financial surfaces, pill-shaped actions and generous whitespace. Apply reference principles through these owned components and tokens. Upstream defaults do not override the brand or justify unrelated features.
+The site adopts the five layers below as its design system. Preserve its editorial identity: Jost headings, three brand blues, square data blocks and Investment Memo Cards, pill-shaped actions and generous whitespace. Apply reference principles through these owned components and tokens. Upstream defaults do not override the brand or justify unrelated features.
 
-| Layer                  | Responsibility                                                                                                                                                                                                                      | Reference                                                                                                                                  |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 01: Design style       | Pentagram, PayPal and Jost guide the editorial identity, typographic character and brand composition. Preserve the site's own assets and explicit brand adaptations.                                                                | [Pentagram](https://www.pentagram.com/), [PayPal](https://www.pentagram.com/work/paypal), [Jost](https://indestructibletype.com/Jost.html) |
-| 02: Design foundations | The site owns its palette, typography, spacing, grid, geometry and motion. Fluent 2 supplies only the global/alias Design Tokens architecture.                                                                                      | [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens)                                                                   |
-| 03: UX guidelines      | Vercel guides web interaction quality; Cieden guides task analysis, information architecture and usability. The site owns its content-design rules.                                                                                 | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book)                        |
-| 04: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                       | [shadcn/ui](https://ui.shadcn.com/), [Lucide](https://lucide.dev/)                                                                         |
-| 05: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations. | [Base UI](https://base-ui.com/)                                                                                                            |
+| Layer                  | Responsibility                                                                                                                                                                                                                                           | Reference                                                                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 01: Design style       | Pentagram, PayPal and Jost guide the editorial identity, typographic character and brand composition. Preserve the site's own assets and explicit brand adaptations.                                                                                     | [Pentagram](https://www.pentagram.com/), [PayPal](https://www.pentagram.com/work/paypal), [Jost](https://indestructibletype.com/Jost.html) |
+| 02: Design foundations | The site owns its brand palette, typography, grid composition and motion choreography. Fluent 2 supplies the global/alias Design Tokens architecture and default Web spacing, radius, stroke-width, shadow, neutral material, duration and curve tokens. | [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens)                                                                   |
+| 03: UX guidelines      | Vercel guides web interaction quality; Cieden guides task analysis, information architecture and usability. The site owns its content-design rules.                                                                                                      | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book)                        |
+| 04: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                                            | [shadcn/ui](https://ui.shadcn.com/), [Lucide](https://lucide.dev/)                                                                         |
+| 05: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations.                      | [Base UI](https://base-ui.com/)                                                                                                            |
 
 React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implement these five design layers. Their dependencies, rendering boundaries and style loading belong in [Application architecture](WEB_APPLICATION_ARCHITECTURE.md#presentation-and-style-loading).
 
 WCAG 2.2 AA, responsive design, semantic HTML and Core Web Vitals are cross-layer quality targets. Automated checks cover specific requirements; they do not establish full accessibility conformance or field CWV compliance. See the [contrast policy](#contrast-policy) and [performance verification](WEB_APPLICATION_ARCHITECTURE.md#performance-regression-checks).
 
-Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The style references guide composition and typographic character; they do not supply replacement assets or font licenses. Fluent 2 is limited to token architecture; its component package and fonts are not installed. Light, dark and system appearance are supported. Search and a command palette are not implied by adoption.
+Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The style references guide composition and typographic character; they do not supply replacement assets or font licenses. Fluent 2 supplies token architecture and default Web foundation values; its component package and fonts are not installed. Light, dark and system appearance are supported. Search and a command palette are not implied by adoption.
 
 ### Design style references
 
@@ -29,7 +29,7 @@ Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The styl
 
 ### Decision authority and brand adaptations
 
-Colors, spacing, grids, shapes and elevation follow the site-owned decisions documented here. Typography follows the owned Perfect Fourth scale. Fluent 2 contributes only token architecture: global primitives, semantic aliases and component consumption. It does not determine palette values, typography, spacing, grids, breakpoints, geometry, motion or content design. The site retains its owned palette and components. This is the site's integration of these references, not an official combined standard.
+Fluent UI Web supplies default spacing, shapes, strokes, elevation, neutral materials and motion tokens. Brand and financial colors, Perfect Fourth typography, grid compositions, responsive thresholds and content design remain site-owned. Component mappings and choreography remain explicit site decisions.
 
 Apply decisions in this order:
 
@@ -42,7 +42,7 @@ Apply decisions in this order:
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Font             | Keep Jost and the locale-specific Chinese fallbacks. Financial figures use tabular numerals.                                                                                                           |
 | Palette          | Retain the approved brand, neutral and financial primitives and semantic light/dark aliases; retain black primary text and inverse surfaces.                                                           |
-| Geometry         | Retain square financial surfaces, pill actions and the editorial container.                                                                                                                            |
+| Geometry         | Retain square data blocks and Investment Memo Cards, pill actions and the editorial container.                                                                                                         |
 | Typography       | Use the owned Perfect Fourth treatments with Jost, rem units and a 1rem minimum. Tracking is 0; weights are 400/700; leading is 1.15 for Display/Headline/Title and 1.5 for Label/Body across locales. |
 | Features         | References do not imply a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                                                          |
 
@@ -52,7 +52,7 @@ A new treatment needs a reason, an owning role or component variant, and verific
 
 Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. Desktop Header and mobile Menu each expose the same single `ThemeToggle`: an owned shadcn/ui Button with Lucide Moon (switch to dark) or Sun (switch to light), a localized accessible action name and a 48px target. The Button is composed through shadcn/ui TooltipTrigger using Base UI `render`. Replace native `title` with TooltipContent and retain the English, Traditional Chinese and Simplified Chinese `aria-label` for the accessible name. The Button label and TooltipContent share the same localized string; no duplicate hidden text is needed. Base UI Tooltip is visual-only and does not generate the name; it owns hover/focus, Escape dismissal and touch suppression. The name updates to the next action after switching and remains available while the popup is closed. The next state uses `resolvedTheme`, so the first click reverses the actual system-resolved appearance. Explicit light/dark choices persist across reloads, routes and languages; there is no System option in the control. Until hydration, render a disabled, stable SunMoon placeholder labeled Appearance. `SiteDocument` owns one shared provider inside the body and sets the document theme before hydration. Suppress hydration warnings only on the root HTML attribute changed by that bootstrap.
 
-`tokens.css` owns explicit light aliases, `data-theme="dark"` overrides and `color-scheme`. A system-preference media query applies dark aliases only when no explicit theme is set, including without JavaScript. Explicit aliases avoid build-time `light-dark()` transformations that can leave manual Dark selection using light colors. Keep brand primitives unchanged. Dark page surfaces use black and `#141414`, text uses white and lighter neutral roles, and links/focus use Bright Blue. Financial return aliases use readable dark-mode variants. Test rendered colors in production builds with Chromium and WebKit; checking the theme attribute alone does not establish that the appearance changed.
+`tokens.css` owns explicit light aliases, `data-theme="dark"` overrides and `color-scheme`. A system-preference media query applies dark aliases only when no explicit theme is set, including without JavaScript. Explicit aliases avoid build-time `light-dark()` transformations that can leave manual Dark selection using light colors. Keep brand primitives unchanged. Dark page surfaces use Fluent Web `#292929` and `#1f1f1f`, text uses white and lighter neutral roles, and links/focus use Bright Blue. Financial return aliases use readable dark-mode variants. Test rendered colors in production builds with Chromium and WebKit; checking the theme attribute alone does not establish that the appearance changed.
 
 Bright Blue brand regions use the shared `brandSurface` treatment with explicit local semantic aliases and a light color context so their text, controls and focus retain the established dark lettering. The Footer stays black with white text. Footer Subscribe retains black text on its white pill. Header and Menu text wordmarks use semantic foreground colors while keeping the blue period. Logo geometry, typography, spacing and content remain independent of theme selection.
 
@@ -62,45 +62,40 @@ Verify system changes, explicit overrides, persistence, keyboard button operatio
 
 `tokens.css` remains the single source of values. Global primitives such as brand colors, spacing and motion feed semantic aliases such as `--surface-brand`, `--text-brand`, `--interactive-accent` and `--chart-benchmark`; Tailwind references the same aliases. This follows Fluent 2's global/alias separation. Raw neutral values and brand colors feed surface, border, text and interaction roles; retaining useful token names avoids unnecessary churn. Component roles may have distinct aliases even when their current values match.
 
-`--shadow-popover` and `--shadow-surface` centralize the implemented popover shadow and surface outline; upstream material presets are not design requirements. `--width-content` owns the 1312px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
-
 ### Elevation, layout, material and motion tokens
 
-Fluent 2 supplies the [global/alias architecture](https://fluent2.microsoft.design/design-tokens). Component-specific aliases belong to the alias layer, not a separate Fluent token layer. The site owns the values and appearance. The references for [elevation](https://fluent2.microsoft.design/elevation), [layout](https://fluent2.microsoft.design/layout), [material](https://fluent2.microsoft.design/material), [motion](https://fluent2.microsoft.design/motion) and [shapes](https://fluent2.microsoft.design/shapes) inform the categories and responsibilities below; they do not replace the site's palette, typography, grid, shadows or radius choices.
+Use Fluent UI Web defaults with their official camelCase names, prefixed by `--` for CSS. The Web implementation is authoritative where the general Fluent 2 shape guidance differs (for example, Web Large is 6px and XLarge is 8px). Component role selection is a site decision; these are not claims that every shadcn component matches a Fluent component preset.
 
-| Domain          | Global values                                                            | Semantic / component roles                                                                                                                           | Contract                                                                                                                                                                        |
-| --------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Elevation       | `--shadow-ramp-1…4`, retained outline and multi-shadow values            | `--shadow-notification`, `--shadow-chart-tooltip`, `--shadow-surface`, `--shadow-popover`                                                            | Preserve each existing shadow; numbers identify the site's ramp, not Fluent's shadow 2–64 presets.                                                                              |
-| Stacking        | Existing layer values 90 / 100 / 110                                     | `--layer-navigation`, `--layer-modal`, `--layer-popover`                                                                                             | Stacking order is independent of perceived elevation; local SVG/table/toast stacking remains local.                                                                             |
-| Layout          | `--width-720`, `--width-1120`, `--width-1312`, existing `--space-*` ramp | `--width-content`, `--width-content-compact`, `--width-reading`, `--width-article`, `--space-section-padding`, `--space-section-content`, `--grid-*` | Preserve 1312px shell, 720px compact shell/reading width, 1120px article, 96px primary section padding and 48px content groups. Existing responsive exceptions remain explicit. |
-| Material        | Existing palette, `--opacity-scrim: 45%`, `--blur-4: 4px`                | `--material-solid`, `--material-solid-secondary`, `--material-popup`, `--material-popup-text`, `--material-smoke`, `--material-overlay-blur`         | Solid surfaces follow light/dark mode. Dialog smoke stays translucent black, with the existing optional 4px backdrop blur; this is not an Acrylic/Mica implementation.          |
-| Motion duration | Existing 50–500ms ramp                                                   | Existing `--motion-duration-*`, plus `spin` and `reduced`                                                                                            | Keep interaction timings; spin is 1000ms and the reduced-motion safety cap is 0.01ms.                                                                                           |
-| Motion curve    | Existing `--curve-*` cubic Bézier values                                 | `--motion-ease-standard`, `emphasized`, `exit`, `linear`                                                                                             | Select by interaction purpose, independently of duration.                                                                                                                       |
-| Shape           | Existing 0 / 6 / 12 / 999px values                                       | `--radius-surface`, `control`, `field`, `menu`, `action`                                                                                             | Preserve the site's square surfaces, rounded fields and pill actions; do not adopt Fluent's default corner ramp.                                                                |
+| Foundation | Official tokens and values                                                                                                                  | Site mapping                                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Layout     | `spacingHorizontal*` and `spacingVertical*`: None 0, XXS 2, XS 4, SNudge 6, S 8, MNudge 10, M 12, L 16, XL 20, XXL 24, XXXL 32px            | Gutter/column gap 32px (phone 16px); vertical aliases derive from the vertical ramp. 48px = 2 × XXL; 96px = 3 × XXXL.   |
+| Shapes     | `borderRadius*`: None 0, Small 2, Medium 4, Large 6, XLarge 8, 2XLarge 12, 3XLarge 16, 4XLarge 24, 5XLarge 32, 6XLarge 40, Circular 10000px | Controls/fields Medium; general Cards XLarge; data blocks and Memo Cards None; menus 2XLarge; pill actions Circular.    |
+| Strokes    | `strokeWidthThin/Thick/Thicker/Thickest`: 1/2/3/4px                                                                                         | Focus ring uses Thick; existing 1px boundaries use the Thin value.                                                      |
+| Elevation  | `shadow2/4/8/16/28/64`                                                                                                                      | Surface 2; Toast 8; popover/chart tooltip 16; modal dialog 64. Layer indices 90/100/110 remain separate stacking rules. |
+| Motion     | `durationUltraFast` through `durationUltraSlow`, all nine `curve*` defaults                                                                 | See the duration/curve tables below; retain reduced-motion handling.                                                    |
 
-| Elevation alias          | Retained shadow geometry                                | Consumers                       |
-| ------------------------ | ------------------------------------------------------- | ------------------------------- |
-| `--shadow-notification`  | `0 10px 15px -3px` + `0 4px 6px -4px`, both 10% black   | Toast                           |
-| `--shadow-chart-tooltip` | `0 20px 25px -5px` + `0 8px 10px -6px`, both 10% black  | Recharts tooltip                |
-| `--shadow-surface`       | Existing theme-aware outline + background edge          | Memo grid                       |
-| `--shadow-popover`       | Existing outline + three soft shadows + background edge | Language menu and theme Tooltip |
+Shadow geometry follows Microsoft's two-layer ambient/key formulas. Ambient/key alpha is 12%/14% in light mode and 24%/28% in dark mode. No custom outline shadow is added to these presets.
 
-| Material alias               | Light                                                   | Dark                         |
-| ---------------------------- | ------------------------------------------------------- | ---------------------------- |
-| `--material-solid`           | `var(--white)`                                          | `var(--black)`               |
-| `--material-solid-secondary` | `var(--gray-bright)`                                    | `#141414`                    |
-| `--material-popup`           | `var(--surface-primary)`                                | Same role, resolves to black |
-| `--material-popup-text`      | `var(--text-primary)`                                   | Same role, resolves to white |
-| `--material-smoke`           | Black mixed with transparent at `--opacity-scrim` (45%) | Same                         |
-| `--material-overlay-blur`    | `var(--blur-4)` (4px)                                   | Same                         |
+| Material token               | Light            | Dark             | Consumer             |
+| ---------------------------- | ---------------- | ---------------- | -------------------- |
+| `colorNeutralBackground1`    | #ffffff          | #292929          | Primary solid, popup |
+| `colorNeutralBackground2`    | #fafafa          | #1f1f1f          | Secondary solid      |
+| `colorNeutralCardBackground` | #fafafa          | #333333          | shadcn Card          |
+| `colorBackgroundOverlay`     | rgba(0,0,0,0.4)  | rgba(0,0,0,0.5)  | Modal smoke          |
+| `colorNeutralShadowAmbient`  | rgba(0,0,0,0.12) | rgba(0,0,0,0.24) | Shadow ambient layer |
+| `colorNeutralShadowKey`      | rgba(0,0,0,0.14) | rgba(0,0,0,0.28) | Shadow key layer     |
 
-The material aliases feed the existing surface tokens and shadcn `popover` pair. Keep opaque menus and sheets, the black Footer and local brand-surface overrides. Do not add blur, translucency or stronger elevation to other surfaces. CSS media/container queries keep literal thresholds because CSS custom properties cannot supply query conditions; document those breakpoints instead of creating unused variables. Measured chart coordinates and animation geometry remain data.
+`--material-solid`, `--material-solid-secondary`, `--material-popup` and `--material-smoke` map these defaults to existing semantic consumers. Both explicit dark selection and the no-JavaScript system fallback use the same values. Menus and sheets remain opaque. Acrylic and Windows desktop Mica are not implemented; custom backdrop blur is removed rather than presented as a default Web material. The black Footer and blue brand surfaces retain explicit brand overrides.
 
-`src/app/styles/foundation-tokens.spec.ts` verifies rendered width, material and popover roles in light/dark themes at phone, tablet and desktop sizes. The component theming fixture checks notification elevation propagation; motion tests cover duration, curve, interrupted entry/exit and reduced motion.
+The 1312px shell, 720px reading width, 1120px article width, grid proportions and responsive thresholds are site compositions, not invented Fluent tokens. CSS query thresholds remain literals. Chart coordinates and measured animation geometry remain data.
+
+Official sources: [spacing](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/spacings.ts), [radii](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/borderRadius.ts), [strokes](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/strokeWidths.ts), [shadows](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/utils/shadows.ts), [light materials](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/lightColor.ts), [dark materials](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/darkColor.ts). Verified 18 October 2026.
+
+`foundation-tokens.spec.ts` verifies rendered widths, materials and popover shadows across phone, tablet and desktop. Component theming tests cover notification shadow propagation; motion tests cover timing, interrupted interaction and reduced motion.
 
 ### Color and stroke ownership
 
-Follow Fluent 2's [global and alias layers](https://fluent2.microsoft.design/design-tokens) for structure only. The site defines its own color roles and values. Keep raw palette and alpha values in `tokens.css`; website components consume semantic aliases. Centralize derived `color-mix()` expressions there as well. Preserve existing values and justified differences rather than assigning one tint to every interaction.
+Follow Fluent 2's [global and alias layers](https://fluent2.microsoft.design/design-tokens) for structure. Neutral material colors use Fluent Web defaults; brand, text and financial roles remain site-owned. Keep raw palette and alpha values in `tokens.css`; website components consume semantic aliases. Centralize derived `color-mix()` expressions there as well. Preserve existing values and justified differences rather than assigning one tint to every interaction.
 
 | Role                         | Tokens and use                                                                                                                                                                                                                                                               |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -149,7 +144,7 @@ Make the site easier to understand, use, change and verify. Share components whe
 
 ## CSS, layout, and visual language
 
-The site uses an editorial financial style: clear type hierarchy, generous section spacing, square data surfaces, pill-shaped primary controls and restrained motion.
+The site uses an editorial financial style: clear type hierarchy, generous section spacing, square data blocks and Investment Memo Cards, pill-shaped primary controls and restrained motion.
 
 ### Grid layout
 
@@ -214,7 +209,7 @@ Page composition uses these building blocks:
 
 - Home and the memo index use Card Header, Content, Description and Footer inside each real article link. Planned research remains a noninteractive article. The heading level follows its page placement.
 - Portfolio follows the shadcn/ui Data Table guide: a feature-owned TanStack sorted row model and a shared Table-based renderer. Holding rows and totals also use TableRow, TableHead, TableCell and TableFooter; the guide is a composition pattern, not a separately installed DataTable primitive. Native column/row headings, `aria-sort`, mobile sorting, return colors and totals remain available; sorting never changes financial calculations. Mobile sorting uses NativeSelect and Button; column sorting uses Button with the existing aria-sort state.
-- Performance groups each interactive Recharts Line Chart in a square Card, with localized Tooltip and no static chart or mode switch. The monthly table uses shadcn/ui Table, Header, Body, Row, Head, Cell and Caption inside a mounted Collapsible panel; opening the panel requires JavaScript. Table containerProps provides the single named, keyboard-focusable horizontal/vertical scroll region, preserving sticky headers and row/column scopes without nested scroll containers. Both series remain visible, with Portfolio solid and SPY dashed. There are no custom series or data-point buttons. Preserve pointer/touch/arrow-key comparison and gaps for null observations.
+- Performance groups each interactive Recharts Line Chart in a rounded Card, with localized Tooltip and no static chart or mode switch. The monthly table uses shadcn/ui Table, Header, Body, Row, Head, Cell and Caption inside a mounted Collapsible panel; opening the panel requires JavaScript. Table containerProps provides the single named, keyboard-focusable horizontal/vertical scroll region, preserving sticky headers and row/column scopes without nested scroll containers. Both series remain visible, with Portfolio solid and SPY dashed. There are no custom series or data-point buttons. Preserve pointer/touch/arrow-key comparison and gaps for null observations.
 - Contact, standard Subscribe and Support forms share a Card-based Form Panel with responsive padding. Footer Subscribe keeps its inverse surface. Field errors and asynchronous results remain inline, with each form owning its submission state. Native payment radios and POST retain the no-JavaScript path.
 - Header composes real desktop links with Navigation Menu and keeps its Base UI Dropdown Menu and Sheet, including navigation recovery parameters and the existing modal/focus lifecycle. Desktop and mobile appearance use the same Button-based light/dark toggle with Lucide icons and next-themes. Mobile language options use the shared shadcn/ui Collapsible (Base UI Root, Trigger and Panel) inside the Sheet. Base UI owns expanded state, ARIA relationships and panel visibility; CSS owns the height transition and respects reduced motion. The language group and appearance button retain a 4px gap.
 
@@ -259,7 +254,7 @@ All tracking is **0**. Weights are **400 and 700 only**. Display, Headline and T
 | `Small Headline`  | 38 / 43.7                  | 28 / 32.2                 | 1.15    | 700    | 0        | About sections, holdings section and article H2                             |
 | `Large Title`     | 28 / 32.2                  | 28 / 32.2                 | 1.15    | 700    | 0        | Memo cards and form-panel headings                                          |
 | `Medium Title`    | 21 / 24.15                 | 21 / 24.15                | 1.15    | 700    | 0        | Charts, article H3, utility-page H1, Footer headings and holdings summaries |
-| `Large Label`     | 16 / 24                    | 16 / 24                   | 1.5     | 700    | 0        | Field labels, table headings, category labels and all CTA actions           |
+| `Large Label`     | 16 / 24                    | 16 / 24                   | 1.5     | 700    | 0        | Field labels, table headings, category labels and CTA actions               |
 | `Medium Label`    | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Sidebar, navigation, selectors and secondary controls                       |
 | `Large Body`      | 21 / 31.5                  | 21 / 31.5                 | 1.5     | 400    | 0        | Hero and short editorial introductions                                      |
 | `Medium Body`     | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Article and Disclaimer prose                                                |
@@ -267,7 +262,7 @@ All tracking is **0**. Weights are **400 and 700 only**. Display, Headline and T
 
 The table lists desktop and mobile values. Below 50rem use mobile sizes. From 50rem to below 75rem use Large Display 67px; Medium Display, Large Headline and Medium Headline 51px; other roles use desktop sizes. At 75rem use desktop sizes. Breakpoints change size only; leading, weight and tracking stay fixed. Layout breakpoints remain independent.
 
-Home uses Large Display for its H1 and featured return, Large Headline for major sections, and Large Body for introductions. General page heroes use Large Headline. Memo article heroes use Large Display; Disclaimer heroes use Medium Headline; article H2 uses Small Headline and H3 uses Medium Title. Email Preferences uses Large Headline like other general page heroes. Subscription confirmation retains Medium Title through PageHero's finite title-role variant. Memo/form headings use Large Title. Support amounts use responsive Medium Display. Home, Portfolio and Performance summary KPIs use Medium Display with a fixed 51px (3.1875rem) size at every viewport, retaining 1.15 leading, weight 700 and zero tracking; ring values use Small Display; tables use Small Body and Large Label. Navigation uses Medium Label; all CTAs use Large Label (16px/24px, weight 700), including primary buttons, secondary text actions, Email Preferences and error recovery links. Ordinary navigation and prose links retain their existing roles.
+Home uses Large Display for its H1 and featured return, Large Headline for major sections, and Large Body for introductions. General page heroes use Large Headline. Memo article heroes use Large Display; Disclaimer heroes use Medium Headline; article H2 uses Small Headline and H3 uses Medium Title. Email Preferences uses Large Headline like other general page heroes. Subscription confirmation retains Medium Title through PageHero's finite title-role variant. Memo/form headings use Large Title. Support amounts use responsive Medium Display. Home, Portfolio and Performance summary KPIs use Medium Display with a fixed 51px (3.1875rem) size at every viewport, retaining 1.15 leading, weight 700 and zero tracking; ring values use Small Display; tables use Small Body and Large Label. Navigation uses Medium Label; CTAs use Large Label (16px/24px, weight 700), including primary buttons, secondary text actions, Email Preferences and error recovery links. The article metadata Copy Article Link action is an exception: it uses Small Body (16px/24px, weight 400) to match its adjacent text. Toast titles, including the localized article-copy success and failure notifications, also use Small Body (16px/24px, weight 400). Ordinary navigation and prose links retain their existing roles.
 
 Footer Quick Links use 36px minimum-height rows with no grid gap, retaining 16px/24px Medium Label text. This compact navigation treatment is independent of the 48px mobile Sidebar controls.
 
@@ -302,7 +297,6 @@ The tables inventory the current declarations in [tokens.css](../src/app/styles/
 
 | Token               | Value                       | Role            |
 | ------------------- | --------------------------- | --------------- |
-| `--shadow-outline`  | `0 0 0 1px #00000014`       | Shadow outline  |
 | `--black`           | `#000000`                   | Black           |
 | `--white`           | `#ffffff`                   | White           |
 | `--blue-deep`       | `#0d288b`                   | Blue deep       |
@@ -338,121 +332,120 @@ The tables inventory the current declarations in [tokens.css](../src/app/styles/
 
 The role column follows the token's owning surface or state. “Inherit light definition” means the same expression is used in dark mode; its referenced tokens may resolve differently.
 
-| Token / role                        | Light definition                                                                                                             | Dark definition                                                      |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `--overlay-scrim`                   | `var(--material-smoke)`                                                                                                      | Inherit light definition                                             |
-| `--text-error`                      | `var(--market-negative)`                                                                                                     | `#ff6377`                                                            |
-| `--shadow-background`               | `0 0 0 1px var(--surface-secondary)`                                                                                         | Inherit light definition                                             |
-| `--shadow-surface`                  | `var(--shadow-outline), var(--shadow-background)`                                                                            | Inherit light definition                                             |
-| `--shadow-popover`                  | `var(--shadow-outline), 0 1px 1px #00000005, 0 4px 8px -4px #0000000a, 0 16px 24px -8px #0000000f, var(--shadow-background)` | Inherit light definition                                             |
-| `--border-subtle`                   | `var(--gray-medium)`                                                                                                         | `#333333`                                                            |
-| `--grid-guide`                      | `var(--border-subtle)`                                                                                                       | Inherit light definition                                             |
-| `--border-strong`                   | `var(--black)`                                                                                                               | `var(--white)`                                                       |
-| `--border-control`                  | `var(--neutral-800)`                                                                                                         | `#a1a1a1`                                                            |
-| `--border-inverse-subtle`           | `var(--white-alpha-22)`                                                                                                      | Inherit light definition                                             |
-| `--border-control-inverse`          | `var(--white-alpha-70)`                                                                                                      | Inherit light definition                                             |
-| `--border-brand`                    | `var(--blue-medium)`                                                                                                         | Inherit light definition                                             |
-| `--border-error`                    | `var(--red-error)`                                                                                                           | Inherit light definition                                             |
-| `--surface-subtle`                  | `var(--surface-secondary)`                                                                                                   | Inherit light definition                                             |
-| `--surface-selected`                | `color-mix(in srgb, var(--blue-medium) 8%, var(--surface-primary))`                                                          | `color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary))` |
-| `--text-return-positive`            | `var(--market-positive)`                                                                                                     | `#4ade80`                                                            |
-| `--text-return-negative`            | `var(--market-negative)`                                                                                                     | `#ff6377`                                                            |
-| `--focus-ring-on-light`             | `var(--blue-deep)`                                                                                                           | Inherit light definition                                             |
-| `--focus-ring-on-dark`              | `var(--blue-bright)`                                                                                                         | Inherit light definition                                             |
-| `--focus-ring-brand`                | `var(--blue-medium)`                                                                                                         | Inherit light definition                                             |
-| `--focus-ring-color`                | `var(--interactive-accent)`                                                                                                  | Inherit light definition                                             |
-| `--surface-primary`                 | `var(--material-solid)`                                                                                                      | Inherit alias; material becomes black                                |
-| `--surface-secondary`               | `var(--material-solid-secondary)`                                                                                            | Inherit alias; material becomes #141414                              |
-| `--surface-inverse`                 | `var(--black)`                                                                                                               | Inherit light definition                                             |
-| `--surface-brand`                   | `var(--blue-deep)`                                                                                                           | Inherit light definition                                             |
-| `--surface-highlight`               | `var(--blue-bright)`                                                                                                         | Inherit light definition                                             |
-| `--text-primary`                    | `var(--black)`                                                                                                               | `var(--white)`                                                       |
-| `--text-secondary`                  | `var(--neutral-900)`                                                                                                         | `#a1a1a1`                                                            |
-| `--text-tertiary`                   | `var(--neutral-1000)`                                                                                                        | `#e4e4e4`                                                            |
-| `--text-brand`                      | `var(--blue-deep)`                                                                                                           | `var(--blue-bright)`                                                 |
-| `--text-inverse`                    | `var(--white)`                                                                                                               | Inherit light definition                                             |
-| `--text-inverse-secondary`          | `var(--white-alpha-84)`                                                                                                      | Inherit light definition                                             |
-| `--text-inverse-tertiary`           | `var(--white-alpha-78)`                                                                                                      | Inherit light definition                                             |
-| `--text-highlight`                  | `var(--blue-bright)`                                                                                                         | Inherit light definition                                             |
-| `--chart-benchmark`                 | `var(--blue-medium)`                                                                                                         | Inherit light definition                                             |
-| `--interactive-accent`              | `var(--blue-deep)`                                                                                                           | `var(--blue-bright)`                                                 |
-| `--chart-portfolio`                 | `var(--blue-deep)`                                                                                                           | `var(--blue-bright)`                                                 |
-| `--action-primary-surface`          | `var(--black)`                                                                                                               | `var(--white)`                                                       |
-| `--action-primary-text`             | `var(--white)`                                                                                                               | `var(--black)`                                                       |
-| `--action-primary-hover-text`       | `var(--white)`                                                                                                               | Inherit light definition                                             |
-| `--action-primary-hover-surface`    | `var(--surface-brand)`                                                                                                       | Inherit light definition                                             |
-| `--action-contrast-surface`         | `var(--black)`                                                                                                               | `var(--white)`                                                       |
-| `--action-contrast-text`            | `var(--white)`                                                                                                               | `var(--black)`                                                       |
-| `--action-contrast-hover-surface`   | `var(--surface-highlight)`                                                                                                   | Inherit light definition                                             |
-| `--action-contrast-hover-text`      | `var(--black)`                                                                                                               | Inherit light definition                                             |
-| `--action-inverse-surface`          | `var(--white)`                                                                                                               | Inherit light definition                                             |
-| `--action-inverse-text`             | `var(--blue-deep)`                                                                                                           | Inherit light definition                                             |
-| `--action-inverse-hover-surface`    | `var(--surface-highlight)`                                                                                                   | Inherit light definition                                             |
-| `--action-quiet-text`               | `var(--text-primary)`                                                                                                        | Inherit light definition                                             |
-| `--action-quiet-hover-surface`      | `var(--surface-selected)`                                                                                                    | Inherit light definition                                             |
-| `--sidebar-text`                    | `var(--text-primary)`                                                                                                        | Inherit light definition                                             |
-| `--sidebar-hover-surface`           | `var(--neutral-100)`                                                                                                         | `#242424`                                                            |
-| `--sidebar-pressed-surface`         | `var(--neutral-200)`                                                                                                         | `#303030`                                                            |
-| `--sidebar-selected-surface`        | `var(--surface-selected)`                                                                                                    | Inherit light definition                                             |
-| `--sidebar-language-surface`        | `var(--surface-subtle)`                                                                                                      | Inherit light definition                                             |
-| `--holding-row-hover-surface`       | `color-mix(in srgb, var(--blue-bright) 12%, var(--surface-primary))`                                                         | Inherit light definition                                             |
-| `--portfolio-row-hover-surface`     | `color-mix(in srgb, var(--blue-bright) 10%, var(--surface-primary))`                                                         | Inherit light definition                                             |
-| `--memo-disclosure-hover-surface`   | `color-mix(in srgb, var(--blue-bright) 18%, var(--surface-primary))`                                                         | Inherit light definition                                             |
-| `--memo-row-hover-surface`          | `var(--memo-disclosure-hover-surface)`                                                                                       | Inherit light definition                                             |
-| `--memo-card-hover-surface`         | `color-mix(in srgb, var(--blue-bright) 22%, var(--surface-primary))`                                                         | Inherit light definition                                             |
-| `--memo-card-pressed-surface`       | `color-mix(in srgb, var(--blue-bright) 28%, var(--surface-primary))`                                                         | Inherit light definition                                             |
-| `--memo-card-touch-pressed-surface` | `var(--memo-card-hover-surface)`                                                                                             | Inherit light definition                                             |
-| `--support-option-hover-surface`    | `color-mix(in srgb, var(--blue-bright) 24%, var(--surface-primary))`                                                         | Inherit light definition                                             |
-| `--support-option-selected-surface` | `var(--surface-brand)`                                                                                                       | Inherit light definition                                             |
-| `--support-option-selected-text`    | `var(--text-inverse)`                                                                                                        | Inherit light definition                                             |
-| `--allocation-divider`              | `var(--black-alpha-18)`                                                                                                      | Inherit light definition                                             |
-| `--allocation-swatch-border`        | `var(--black-alpha-20)`                                                                                                      | Inherit light definition                                             |
-| `--chart-axis-border`               | `var(--black-alpha-28)`                                                                                                      | `#ffffff70`                                                          |
-| `--chart-reference`                 | `var(--black)`                                                                                                               | `#cccccc`                                                            |
-| `--text-chart-secondary`            | `color-mix(in srgb, var(--text-primary) 68%, transparent)`                                                                   | Inherit light definition                                             |
-| `--field-surface`                   | `var(--surface-primary)`                                                                                                     | Inherit light definition                                             |
-| `--field-text`                      | `var(--text-primary)`                                                                                                        | Inherit light definition                                             |
-| `--field-border`                    | `var(--border-control)`                                                                                                      | Inherit light definition                                             |
-| `--field-focus-border`              | `var(--interactive-accent)`                                                                                                  | Inherit light definition                                             |
-| `--field-focus-ring`                | `var(--focus-ring-color)`                                                                                                    | Inherit light definition                                             |
-| `--field-inverse-text`              | `var(--text-inverse)`                                                                                                        | Inherit light definition                                             |
-| `--field-inverse-border`            | `var(--border-control-inverse)`                                                                                              | Inherit light definition                                             |
-| `--field-inverse-placeholder`       | `var(--white-alpha-60)`                                                                                                      | Inherit light definition                                             |
+| Token / role                        | Light definition                                                     | Dark definition                                                      |
+| ----------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `--overlay-scrim`                   | `var(--material-smoke)`                                              | Inherit light definition                                             |
+| `--text-error`                      | `var(--market-negative)`                                             | `#ff6377`                                                            |
+| `--shadow-surface`                  | `var(--shadow2)`                                                     | Inherit light definition                                             |
+| `--shadow-popover`                  | `var(--shadow16)`                                                    | Inherit light definition                                             |
+| `--border-subtle`                   | `var(--gray-medium)`                                                 | `#333333`                                                            |
+| `--grid-guide`                      | `var(--border-subtle)`                                               | Inherit light definition                                             |
+| `--border-strong`                   | `var(--black)`                                                       | `var(--white)`                                                       |
+| `--border-control`                  | `var(--neutral-800)`                                                 | `#a1a1a1`                                                            |
+| `--border-inverse-subtle`           | `var(--white-alpha-22)`                                              | Inherit light definition                                             |
+| `--border-control-inverse`          | `var(--white-alpha-70)`                                              | Inherit light definition                                             |
+| `--border-brand`                    | `var(--blue-medium)`                                                 | Inherit light definition                                             |
+| `--border-error`                    | `var(--red-error)`                                                   | Inherit light definition                                             |
+| `--surface-subtle`                  | `var(--surface-secondary)`                                           | Inherit light definition                                             |
+| `--surface-selected`                | `color-mix(in srgb, var(--blue-medium) 8%, var(--surface-primary))`  | `color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary))` |
+| `--text-return-positive`            | `var(--market-positive)`                                             | `#4ade80`                                                            |
+| `--text-return-negative`            | `var(--market-negative)`                                             | `#ff6377`                                                            |
+| `--focus-ring-on-light`             | `var(--blue-deep)`                                                   | Inherit light definition                                             |
+| `--focus-ring-on-dark`              | `var(--blue-bright)`                                                 | Inherit light definition                                             |
+| `--focus-ring-brand`                | `var(--blue-medium)`                                                 | Inherit light definition                                             |
+| `--focus-ring-color`                | `var(--interactive-accent)`                                          | Inherit light definition                                             |
+| `--surface-primary`                 | `var(--material-solid)`                                              | Inherit alias; material becomes #292929                              |
+| `--surface-secondary`               | `var(--material-solid-secondary)`                                    | Inherit alias; material becomes #1f1f1f                              |
+| `--surface-inverse`                 | `var(--black)`                                                       | Inherit light definition                                             |
+| `--surface-brand`                   | `var(--blue-deep)`                                                   | Inherit light definition                                             |
+| `--surface-highlight`               | `var(--blue-bright)`                                                 | Inherit light definition                                             |
+| `--text-primary`                    | `var(--black)`                                                       | `var(--white)`                                                       |
+| `--text-secondary`                  | `var(--neutral-900)`                                                 | `#a1a1a1`                                                            |
+| `--text-tertiary`                   | `var(--neutral-1000)`                                                | `#e4e4e4`                                                            |
+| `--text-brand`                      | `var(--blue-deep)`                                                   | `var(--blue-bright)`                                                 |
+| `--text-inverse`                    | `var(--white)`                                                       | Inherit light definition                                             |
+| `--text-inverse-secondary`          | `var(--white-alpha-84)`                                              | Inherit light definition                                             |
+| `--text-inverse-tertiary`           | `var(--white-alpha-78)`                                              | Inherit light definition                                             |
+| `--text-highlight`                  | `var(--blue-bright)`                                                 | Inherit light definition                                             |
+| `--chart-benchmark`                 | `var(--blue-medium)`                                                 | Inherit light definition                                             |
+| `--interactive-accent`              | `var(--blue-deep)`                                                   | `var(--blue-bright)`                                                 |
+| `--chart-portfolio`                 | `var(--blue-deep)`                                                   | `var(--blue-bright)`                                                 |
+| `--action-primary-surface`          | `var(--black)`                                                       | `var(--white)`                                                       |
+| `--action-primary-text`             | `var(--white)`                                                       | `var(--black)`                                                       |
+| `--action-primary-hover-text`       | `var(--white)`                                                       | Inherit light definition                                             |
+| `--action-primary-hover-surface`    | `var(--surface-brand)`                                               | Inherit light definition                                             |
+| `--action-contrast-surface`         | `var(--black)`                                                       | `var(--white)`                                                       |
+| `--action-contrast-text`            | `var(--white)`                                                       | `var(--black)`                                                       |
+| `--action-contrast-hover-surface`   | `var(--surface-highlight)`                                           | Inherit light definition                                             |
+| `--action-contrast-hover-text`      | `var(--black)`                                                       | Inherit light definition                                             |
+| `--action-inverse-surface`          | `var(--white)`                                                       | Inherit light definition                                             |
+| `--action-inverse-text`             | `var(--blue-deep)`                                                   | Inherit light definition                                             |
+| `--action-inverse-hover-surface`    | `var(--surface-highlight)`                                           | Inherit light definition                                             |
+| `--action-quiet-text`               | `var(--text-primary)`                                                | Inherit light definition                                             |
+| `--action-quiet-hover-surface`      | `var(--surface-selected)`                                            | Inherit light definition                                             |
+| `--sidebar-text`                    | `var(--text-primary)`                                                | Inherit light definition                                             |
+| `--sidebar-hover-surface`           | `var(--neutral-100)`                                                 | `#242424`                                                            |
+| `--sidebar-pressed-surface`         | `var(--neutral-200)`                                                 | `#303030`                                                            |
+| `--sidebar-selected-surface`        | `var(--surface-selected)`                                            | Inherit light definition                                             |
+| `--sidebar-language-surface`        | `var(--surface-subtle)`                                              | Inherit light definition                                             |
+| `--holding-row-hover-surface`       | `color-mix(in srgb, var(--blue-bright) 12%, var(--surface-primary))` | Inherit light definition                                             |
+| `--portfolio-row-hover-surface`     | `color-mix(in srgb, var(--blue-bright) 10%, var(--surface-primary))` | Inherit light definition                                             |
+| `--memo-disclosure-hover-surface`   | `color-mix(in srgb, var(--blue-bright) 18%, var(--surface-primary))` | Inherit light definition                                             |
+| `--memo-row-hover-surface`          | `var(--memo-disclosure-hover-surface)`                               | Inherit light definition                                             |
+| `--memo-card-hover-surface`         | `color-mix(in srgb, var(--blue-bright) 22%, var(--surface-primary))` | Inherit light definition                                             |
+| `--memo-card-pressed-surface`       | `color-mix(in srgb, var(--blue-bright) 28%, var(--surface-primary))` | Inherit light definition                                             |
+| `--memo-card-touch-pressed-surface` | `var(--memo-card-hover-surface)`                                     | Inherit light definition                                             |
+| `--support-option-hover-surface`    | `color-mix(in srgb, var(--blue-bright) 24%, var(--surface-primary))` | Inherit light definition                                             |
+| `--support-option-selected-surface` | `var(--surface-brand)`                                               | Inherit light definition                                             |
+| `--support-option-selected-text`    | `var(--text-inverse)`                                                | Inherit light definition                                             |
+| `--allocation-divider`              | `var(--black-alpha-18)`                                              | Inherit light definition                                             |
+| `--allocation-swatch-border`        | `var(--black-alpha-20)`                                              | Inherit light definition                                             |
+| `--chart-axis-border`               | `var(--black-alpha-28)`                                              | `#ffffff70`                                                          |
+| `--chart-reference`                 | `var(--black)`                                                       | `#cccccc`                                                            |
+| `--text-chart-secondary`            | `color-mix(in srgb, var(--text-primary) 68%, transparent)`           | Inherit light definition                                             |
+| `--field-surface`                   | `var(--surface-primary)`                                             | Inherit light definition                                             |
+| `--field-text`                      | `var(--text-primary)`                                                | Inherit light definition                                             |
+| `--field-border`                    | `var(--border-control)`                                              | Inherit light definition                                             |
+| `--field-focus-border`              | `var(--interactive-accent)`                                          | Inherit light definition                                             |
+| `--field-focus-ring`                | `var(--focus-ring-color)`                                            | Inherit light definition                                             |
+| `--field-inverse-text`              | `var(--text-inverse)`                                                | Inherit light definition                                             |
+| `--field-inverse-border`            | `var(--border-control-inverse)`                                      | Inherit light definition                                             |
+| `--field-inverse-placeholder`       | `var(--white-alpha-60)`                                              | Inherit light definition                                             |
 
 #### Tailwind and shadcn color aliases
 
 These aliases expose the same semantic palette to utility classes; they do not introduce additional colors.
 
-| Alias                          | Source                          |
-| ------------------------------ | ------------------------------- |
-| `--color-brand`                | `var(--text-brand)`             |
-| `--color-accent`               | `var(--interactive-accent)`     |
-| `--color-highlight`            | `var(--blue-bright)`            |
-| `--color-surface`              | `var(--surface-primary)`        |
-| `--color-ink`                  | `var(--text-primary)`           |
-| `--color-border`               | `var(--border-subtle)`          |
-| `--color-muted`                | `var(--surface-subtle)`         |
-| `--color-selected`             | `var(--surface-selected)`       |
-| `--color-background`           | `var(--surface-primary)`        |
-| `--color-foreground`           | `var(--text-primary)`           |
-| `--color-card`                 | `var(--surface-primary)`        |
-| `--color-card-foreground`      | `var(--text-primary)`           |
-| `--color-popover`              | `var(--material-popup)`         |
-| `--color-popover-foreground`   | `var(--material-popup-text)`    |
-| `--color-primary`              | `var(--action-primary-surface)` |
-| `--color-primary-foreground`   | `var(--action-primary-text)`    |
-| `--color-secondary`            | `var(--surface-secondary)`      |
-| `--color-secondary-foreground` | `var(--text-primary)`           |
-| `--color-muted-foreground`     | `var(--text-secondary)`         |
-| `--color-accent-foreground`    | `var(--surface-primary)`        |
-| `--color-destructive`          | `var(--text-error)`             |
-| `--color-input`                | `var(--border-control)`         |
-| `--color-ring`                 | `var(--focus-ring-color)`       |
-| `--color-chart-1`              | `var(--chart-portfolio)`        |
-| `--color-chart-2`              | `var(--chart-benchmark)`        |
-| `--color-chart-3`              | `var(--blue-bright)`            |
-| `--color-chart-4`              | `var(--text-secondary)`         |
-| `--color-chart-5`              | `var(--text-primary)`           |
+| Alias                          | Source                              |
+| ------------------------------ | ----------------------------------- |
+| `--color-brand`                | `var(--text-brand)`                 |
+| `--color-accent`               | `var(--interactive-accent)`         |
+| `--color-highlight`            | `var(--blue-bright)`                |
+| `--color-surface`              | `var(--surface-primary)`            |
+| `--color-ink`                  | `var(--text-primary)`               |
+| `--color-border`               | `var(--border-subtle)`              |
+| `--color-muted`                | `var(--surface-subtle)`             |
+| `--color-selected`             | `var(--surface-selected)`           |
+| `--color-background`           | `var(--surface-primary)`            |
+| `--color-foreground`           | `var(--text-primary)`               |
+| `--color-card`                 | `var(--colorNeutralCardBackground)` |
+| `--color-card-foreground`      | `var(--text-primary)`               |
+| `--color-popover`              | `var(--material-popup)`             |
+| `--color-popover-foreground`   | `var(--material-popup-text)`        |
+| `--color-primary`              | `var(--action-primary-surface)`     |
+| `--color-primary-foreground`   | `var(--action-primary-text)`        |
+| `--color-secondary`            | `var(--surface-secondary)`          |
+| `--color-secondary-foreground` | `var(--text-primary)`               |
+| `--color-muted-foreground`     | `var(--text-secondary)`             |
+| `--color-accent-foreground`    | `var(--surface-primary)`            |
+| `--color-destructive`          | `var(--text-error)`                 |
+| `--color-input`                | `var(--border-control)`             |
+| `--color-ring`                 | `var(--focus-ring-color)`           |
+| `--color-chart-1`              | `var(--chart-portfolio)`            |
+| `--color-chart-2`              | `var(--chart-benchmark)`            |
+| `--color-chart-3`              | `var(--blue-bright)`                |
+| `--color-chart-4`              | `var(--text-secondary)`             |
+| `--color-chart-5`              | `var(--text-primary)`               |
 
 #### Local surface and independent-renderer exceptions
 
@@ -470,7 +463,7 @@ Opacity modifiers and gradients derive from these sources. KPI notes use 0.8 opa
 
 The owned palette defines Brand (`--blue-deep: #0d288b`, `--blue-medium: #3d8af7`, `--blue-bright: #7dcbfa`), Neutral (`--black: #000000`, `--white: #ffffff`, `--gray-deep: #cccccc`, `--gray-medium: #eef0f2`, `--gray-bright: #f5f7fa`) and Financial (`--market-positive: #007c66`, `--market-negative: #bf2a2c`, `--market-neutral: #000000`) primitives. Light-mode secondary text uses the independent `--neutral-900` semantic source to remain readable; Gray Deep is a light neutral primitive and must not be used for small text on white. Dividers and chart grids use Gray Medium, and Hero and secondary bands use Gray Bright.
 
-Use semantic border, surface, shadow and radius aliases from `tokens.css`. Fields need a visible boundary meeting the non-text contrast target; selection, hover and focus remain independently identifiable. Square financial blocks, pill actions, the black Footer and theme-aware full-screen navigation retain their approved treatments. Component appearance is determined by site requirements, not an upstream material preset.
+Use semantic border, surface, shadow and radius aliases from `tokens.css`. Fields need a visible boundary meeting the non-text contrast target; selection, hover and focus remain independently identifiable. Financial Cards, pill actions, the black Footer and theme-aware full-screen navigation retain their approved treatments. Component aliases select the documented Fluent Web foundation tokens.
 
 Apply a complete type treatment rather than repeating its utilities. Keep color, opacity, spacing and heading semantics independent. Use Large Label for table labels; inline emphasis inherits size and leading with weight 700. Never override tracking. CSS Modules use the same source tokens.
 
@@ -504,7 +497,7 @@ Header, drawer and Footer render the shared text BrandLogo, including its blue p
 Preserve information and action priorities at every width.
 
 - Bound mobile title sizes and allow emergency wrapping for enlarged or unbreakable text. Desktop line breaks must not isolate words or split short Chinese phrases on mobile.
-- Align related form fields unless a visible container explains an inset. Contact and Preferences use the shared 6px field treatment; compact Footer fields are pill-shaped.
+- Align related form fields unless a visible container explains an inset. Contact and Preferences use the shared 4px field treatment; compact Footer fields are pill-shaped.
 - Check all three languages, root font sizes up to 200%, long translations and changed content. The text Logo must wrap within its available width without colliding with navigation.
 - Allow local values for chart geometry and optical adjustments when shared spacing tokens do not fit.
 
@@ -579,9 +572,9 @@ Choose focus tokens according to light or inverse form surfaces. Preferences ret
 
 ### Motion tokens and timing
 
-Motion is a site-owned visual decision. Movement communicates state and relationships and remains local to the interaction. Existing duration and curve values were originally selected from Fluent UI references; that historical provenance does not give Fluent 2 authority over motion. Retain the current values unless a visual change is requested. Only the global-to-semantic token structure follows Fluent 2.
+Use Fluent 2 default motion duration tokens and easing curves as the foundation. Movement communicates state and relationships and remains local to the interaction. Values were verified on 18 October 2026 against Microsoft’s [duration tokens](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/durations.ts) and [curve tokens](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/curves.ts), with [Fluent 2 motion guidance](https://fluent2.microsoft.design/motion) informing their purpose. CSS custom properties preserve the official camelCase token names with the required CSS prefix, for example `--durationNormal` and `--curveEasyEase`. Component mappings below are site choices, not prescribed Fluent component defaults. The existing foundation values already match these defaults, so this adoption does not change rendered animation timing.
 
-Global durations are 50, 100, 150, 200, 250, 300, 400 and 500ms. `--duration-*` and `--curve-*` are foundation values; components consume `--motion-*` aliases. Keep the same timing at desktop and phone breakpoints. Existing `fast`, `base`, `medium` and `slow` aliases resolve to 150, 200, 250 and 300ms.
+Global durations are 50, 100, 150, 200, 250, 300, 400 and 500ms. `--duration*` and `--curve*` are foundation values; components consume `--motion-*` aliases. Keep the same timing at desktop and phone breakpoints. Existing `fast`, `base`, `medium` and `slow` aliases resolve to 150, 200, 250 and 300ms.
 
 | Purpose                                 | Duration alias                                 | Value       | Curve                           |
 | --------------------------------------- | ---------------------------------------------- | ----------- | ------------------------------- |
@@ -593,14 +586,14 @@ Global durations are 50, 100, 150, 200, 250, 300, 400 and 500ms. `--duration-*` 
 | AnimatedDisclosure expansion / collapse | `--motion-duration-expand` / `collapse`        | 300 / 250ms | Decelerate max / Easy ease      |
 | Icon change and touch-ring release      | `--motion-duration-icon` / `feedback`          | 200ms       | Decelerate max / Easy ease      |
 
-| Semantic curve             | Global token             | Cubic Bézier         | Use                                 |
-| -------------------------- | ------------------------ | -------------------- | ----------------------------------- |
-| `--motion-ease-standard`   | `--curve-easy-ease`      | `(0.33, 0, 0.67, 1)` | Feedback and ordinary state changes |
-| `--motion-ease-emphasized` | `--curve-decelerate-max` | `(0.1, 0.9, 0.2, 1)` | Entry and expansion                 |
-| `--motion-ease-exit`       | `--curve-accelerate-max` | `(0.9, 0.1, 1, 0.2)` | Dismissal                           |
-| `--motion-ease-linear`     | `--curve-linear`         | `(0, 0, 1, 1)`       | Constant rotation                   |
+| Semantic curve             | Global token           | Cubic Bézier         | Use                                 |
+| -------------------------- | ---------------------- | -------------------- | ----------------------------------- |
+| `--motion-ease-standard`   | `--curveEasyEase`      | `(0.33, 0, 0.67, 1)` | Feedback and ordinary state changes |
+| `--motion-ease-emphasized` | `--curveDecelerateMax` | `(0.1, 0.9, 0.2, 1)` | Entry and expansion                 |
+| `--motion-ease-exit`       | `--curveAccelerateMax` | `(0.9, 0.1, 1, 0.2)` | Dismissal                           |
+| `--motion-ease-linear`     | `--curveLinear`        | `(0, 0, 1, 1)`       | Constant rotation                   |
 
-`--motion-ease-standard` uses the retained curve `(0.33, 0, 0.67, 1)`; `emphasized` uses the retained curve `(0.1, 0.9, 0.2, 1)`; `exit` uses the retained curve `(0.9, 0.1, 1, 0.2)`. `--motion-ease-linear` is reserved for constant rotation and the staged Menu/X rotation. Tailwind's default transitions also resolve to the shared fast duration and standard curve. A continuous loading spinner uses `--motion-duration-spin`: one second, derived from two ultra-slow intervals; notification lifetime and network timeouts are not animation durations. Skeletons stay static and financial lines do not animate between values.
+`--motion-ease-standard` uses the Fluent default curve `(0.33, 0, 0.67, 1)`; `emphasized` uses the Fluent default curve `(0.1, 0.9, 0.2, 1)`; `exit` uses the Fluent default curve `(0.9, 0.1, 1, 0.2)`. `--motion-ease-linear` is reserved for constant rotation and the staged Menu/X rotation. Tailwind's default transitions also resolve to the shared fast duration and standard curve. A continuous loading spinner uses `--motion-duration-spin`: one second, derived from two ultra-slow intervals; notification lifetime and network timeouts are not animation durations. Skeletons stay static and financial lines do not animate between values.
 
 Do not add route slides, list staggering, or idle decorative motion. The mobile panel keeps its directional entry/exit, with text grouped rather than staggered. Base UI owns popup presence and Collapsible state, ARIA and panel visibility. CSS owns ordinary feedback and Collapsible height transitions; AnimatedDisclosure uses the expansion/collapse aliases above, while the mobile language Collapsible uses the base duration and standard curve. Web Animations API owns the mobile Sheet’s measured panel and icon transitions. Never let both animate the same property.
 
@@ -705,7 +698,7 @@ Current Holdings owns symmetric 96px vertical padding with no added vertical mar
 
 ### Swiss Grid and editorial layout
 
-The site owns its Swiss Grid / Editorial Layout: proximity, shared alignment, content-driven reflow and a 4px spacing base. All dimensions, proportions and responsive thresholds below are site decisions. Fluent 2 is referenced only for organizing these values into global and semantic design tokens; its Layout guidance is not a visual specification for this site.
+The site owns its Swiss Grid / Editorial Layout: proximity, shared alignment, content-driven reflow and a 4px spacing base. All dimensions, proportions and responsive thresholds below are site decisions. Fluent Web horizontal and vertical spacing tokens supply the base ramp; larger section intervals are compositions of these defaults. Grid proportions and content-fit thresholds remain site decisions.
 
 | Layer               | Site rule                                                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -722,6 +715,8 @@ Use the existing content-driven stacking thresholds: 800px for phone layouts, 11
 
 Spacing belongs to one owner: section padding surrounds the complete block; a group gap separates peer groups; compact component spacing relates metadata and controls. The memo index owns 96px padding and uses exactly 48px between cards and disclosure. Memo cards have content-driven heights, with aligned footers, instead of fixed empty vertical space. Text and controls follow shared left edges; numeric table columns retain their deliberate right alignment. Preserve the approved typography rather than forcing its line boxes onto an artificial 4px baseline.
 
+Data blocks use `--radius-data`; Investment Memo Cards, their inner Card and the grid use `--radius-memo`. Both aliases map to Fluent `--borderRadiusNone` (0px), including hover/focus states. General form and chart Cards retain XLarge (8px).
+
 Memo cards use 48px outer content insets at every viewport width, including the footer bottom inset. Performance chart X-axis labels reserve a 48px axis height and a 16px tick gap to separate them from the lowest Y-axis label.
 
 Submission buttons in Contact, Subscribe and Support pair their localized pending label with Spinner. The spinner is decorative beside that label and disables rotation for reduced motion. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
@@ -734,7 +729,7 @@ Support amounts use Medium Display, (51px mobile, 67px wide desktop, weight 700)
 
 Home Hero keeps 96px vertical padding and 48px between its label, title and introduction. Home allocation cards place the holdings legend below the ring at every viewport width, with a 48px gap.
 
-Dark secondary surfaces use `#141414` to distinguish panels from the black page. Selected surfaces mix 16% Bright Blue into the primary surface; menu hover and pressed surfaces use `#242424` and `#303030`. Chart axis boundaries use translucent white in dark mode. Apply the same aliases to explicit and system dark appearance; preserve explicit light brand surfaces and the black Footer.
+Dark secondary surfaces use `#1f1f1f` alongside the `#292929` primary page material. Selected surfaces mix 16% Bright Blue into the primary surface; menu hover and pressed surfaces use `#242424` and `#303030`. Chart axis boundaries use translucent white in dark mode. Apply the same aliases to explicit and system dark appearance; preserve explicit light brand surfaces and the black Footer.
 
 Tablet Header (801–1279px) shares the page container and 32px gutters rather than a separate 720px cap. It retains Sheet navigation, with an 84px header and 48px menu controls. The Sheet top row uses the same height and gutters so the wordmark and open/close controls stay aligned. Phone and desktop navigation breakpoints remain unchanged.
 
@@ -751,7 +746,7 @@ Use [Fluent 2 Design Tokens](https://fluent2.microsoft.design/design-tokens) as 
 
 Above the stacking threshold, Portfolio summaries use `--grid-portfolio-summary` with three equal-width columns. Home, Portfolio and Performance summary grids use equal-height rows, including stacked layouts. Home performance uses `--grid-comparison` (7:5) for the chart and headline figure, preventing large percentage values from clipping on landscape tablets. The Home comparison ratio is separate from the equal-width KPI summary columns.
 
-The memo-article Hero follows the deployed editorial composition: 96px top padding, a Large Display title with 48px block margins, and a bordered metadata row at the bottom of the secondary surface, with no extra bottom padding. Metadata and the Copy Article Link action share the 1120px title/body width; the action remains right-aligned and moves to its own row on phones. The summary and language notice remain in the body, which retains 96px top padding. This Hero is an explicit exception to symmetric section padding.
+The memo-article Hero follows the deployed editorial composition: 96px top padding, a Large Display title with 48px block margins, and a bordered metadata row at the bottom of the secondary surface, with no extra bottom padding. Metadata and the Copy Article Link action share the 1120px title/body width; the action remains right-aligned above 800px and moves to its own left-aligned row at 800px and below. The summary and language notice remain in the body, which retains 96px top padding. This Hero is an explicit exception to symmetric section padding.
 
 Hero metadata (dates and About disciplines) aligns to the right edge of the introduction container at every width, including when it wraps onto a separate row. PageHero owns this rule; page-specific date classes must not override it.
 
@@ -759,6 +754,14 @@ Hero metadata (dates and About disciplines) aligns to the right edge of the intr
 
 Investment Memo articles place an initially collapsed **On This Page** outline after the summary/language notice and before the Typeset body. The control directly composes shadcn/ui Collapsible, CollapsibleTrigger and CollapsibleContent, with Lucide List and ChevronDown. React owns `open` through `useState(false)` and `onOpenChange`; Base UI owns ARIA and visibility. The mounted content reuses the shared disclosure height-transition CSS. The full-width trigger has a minimum 48px target; the chevron rotates with the expanded state and follows reduced-motion preferences.
 
+Memo Markdown headings may supply an explicit trailing `\{#id\}` anchor (braces escaped for MDX). The outline and rendered heading use the same ID, while the marker is excluded from visible copy. Generated names are reserved so later repeated headings retain their existing URLs. The Business Analysis section uses `#section-1-business-analysis`. Each Introduction and Investment conclusion uses its chapter prefix (`business-analysis`, `management-analysis` or `financial-analysis`) followed by `-introduction` or `-investment-conclusion`. Visible titles remain unchanged.
+
 The outline uses the 1120px article width and leaves 48px before the body. Its interface label follows the site locale; links retain the article language and original heading wording. H2 entries are bold and H3 entries indented. It remains outside Typeset so article prose rules do not style the control.
 
 The local `remark-memo-toc.mjs` plugin builds heading IDs and the exported outline together during MDX compilation. Heading IDs use unprefixed title slugs (for example, `framework-for-understanding-business`). Repeated headings receive unique, deterministic suffixes. Native fragment links preserve deep linking without client-side heading discovery or duplicated editorial metadata. Tests verify the unchanged research-text hash, link targets, three locales, keyboard expansion/collapse and narrow layouts.
+
+### Footer column alignment
+
+Footer title rows share `--size-footer-heading` (Medium Title line height, 24.15px at the default root size) and `--space-footer-heading` (12px). The description, first navigation link line box and subscription input top border share the second-row start in the three-column layout. Navigation links are top-aligned and use `--size-footer-link` (title row plus gap, 36.15px), so the title-to-first-link distance matches subsequent link intervals. Social icons retain vertical alignment with their 24px text lines. The Footer wordmark uses the available column width to avoid unnecessary wrapping; Tablet retains its separate subscription row and mobile retains stacked groups.
+
+Footer Email Preferences starts 12px below the input bottom edge on multi-column forms (8px grid gap plus 4px link margin). On mobile, it remains below the Subscribe button with the same 12px gap.

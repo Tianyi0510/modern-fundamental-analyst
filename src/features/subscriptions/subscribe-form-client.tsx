@@ -109,7 +109,7 @@ export function SubscribeFormClient({
       <FormPanel variant={variant}>
         <ClientForm
           locale={locale}
-          className={cn(appearance["subscribe-form"], variant === "inverse" && "mt-[var(--space-5)]")}
+          className={cn(appearance["subscribe-form"], variant === "inverse" && "mt-[var(--space-footer-heading)]")}
           onSubmit={(event) => {
             void submit(event);
           }}

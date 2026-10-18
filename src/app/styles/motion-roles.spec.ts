@@ -3,6 +3,44 @@ import { expect, test } from "@playwright/test";
 test("Fluent motion aliases and control feedback agree across breakpoints", { tag: "@mobile" }, async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/contact");
+  // Microsoft Fluent UI global tokens, verified 2026-10-18.
+  const fluentDefaults = {
+    "--durationUltraFast": "50ms",
+    "--durationFaster": "100ms",
+    "--durationFast": "150ms",
+    "--durationNormal": "200ms",
+    "--durationGentle": "250ms",
+    "--durationSlow": "300ms",
+    "--durationSlower": "400ms",
+    "--durationUltraSlow": "500ms",
+    "--curveAccelerateMax": "cubic-bezier(0.9,0.1,1,0.2)",
+    "--curveAccelerateMid": "cubic-bezier(1,0,1,1)",
+    "--curveAccelerateMin": "cubic-bezier(0.8,0,0.78,1)",
+    "--curveDecelerateMax": "cubic-bezier(0.1,0.9,0.2,1)",
+    "--curveDecelerateMid": "cubic-bezier(0,0,0,1)",
+    "--curveDecelerateMin": "cubic-bezier(0.33,0,0.1,1)",
+    "--curveEasyEaseMax": "cubic-bezier(0.8,0,0.2,1)",
+    "--curveEasyEase": "cubic-bezier(0.33,0,0.67,1)",
+    "--curveLinear": "cubic-bezier(0,0,1,1)",
+  };
+  const foundation = await page.evaluate((names) => {
+    const style = getComputedStyle(document.documentElement);
+    return Object.fromEntries(names.map((name) => [name, style.getPropertyValue(name).replace(/\s/g, "")]));
+  }, Object.keys(fluentDefaults));
+  // Compare numeric values so CSS minification and ms/s serialization do not affect the contract.
+  const normalize = (values: Record<string, string>) =>
+    Object.fromEntries(
+      Object.entries(values).map(([name, value]) => [
+        name,
+        name.startsWith("--duration")
+          ? parseFloat(value) * (value.endsWith("ms") ? 1 : 1000)
+          : value
+              .slice(value.indexOf("(") + 1, -1)
+              .split(",")
+              .map(Number),
+      ]),
+    );
+  expect(normalize(foundation)).toEqual(normalize(fluentDefaults));
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     const tokens = await page.evaluate(() => {

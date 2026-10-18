@@ -36,7 +36,7 @@ for (const { prefix } of labels) {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     const appearance = page.locator(".header-actions [data-theme-toggle]");
     await expect(appearance).toBeEnabled();
-    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(41, 41, 41)");
     await expect(page.locator("body")).toHaveCSS("color", "rgb(255, 255, 255)");
     const language = page.locator(".language-trigger");
     await language.focus();
@@ -72,7 +72,7 @@ for (const { prefix } of labels) {
     ]) {
       await page.goto(`${prefix}${route}` || "/");
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-      await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+      await expect(page.locator("body")).toHaveCSS("background-color", "rgb(41, 41, 41)");
       const samples = await page
         .locator("main h1, main h2, main p, .portfolio-row td, .portfolio-kpis small, .metric small")
         .evaluateAll((elements) =>
@@ -163,7 +163,7 @@ test("system appearance works without JavaScript @mobile", async ({ browser, bas
   try {
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(41, 41, 41)");
     await expect(page.locator("header .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
     await page.emulateMedia({ colorScheme: "light" });
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
