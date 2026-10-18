@@ -9,7 +9,7 @@ The site adopts the five layers below as its design system. Preserve its editori
 | Layer                  | Responsibility                                                                                                                                                                                                                      | Reference                                                                                                                                  |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | 01: Design style       | Pentagram, PayPal and Jost guide the editorial identity, typographic character and brand composition. Preserve the site's own assets and explicit brand adaptations.                                                                | [Pentagram](https://www.pentagram.com/), [PayPal](https://www.pentagram.com/work/paypal), [Jost](https://indestructibletype.com/Jost.html) |
-| 02: Design foundations | Geist supplies visual references; the site owns its palette, typography, spacing, grid, geometry and motion. Fluent 2 supplies only the global/alias Design Tokens architecture.                                                    | [Geist](https://vercel.com/geist), [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens)                                |
+| 02: Design foundations | The site owns its palette, typography, spacing, grid, geometry and motion. Fluent 2 supplies only the global/alias Design Tokens architecture.                                                                                      | [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens)                                                                   |
 | 03: UX guidelines      | Vercel guides web interaction quality; Cieden guides task analysis, information architecture and usability. The site owns its content-design rules.                                                                                 | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book)                        |
 | 04: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                       | [shadcn/ui](https://ui.shadcn.com/), [Lucide](https://lucide.dev/)                                                                         |
 | 05: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations. | [Base UI](https://base-ui.com/)                                                                                                            |
@@ -18,7 +18,7 @@ React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implem
 
 WCAG 2.2 AA, responsive design, semantic HTML and Core Web Vitals are cross-layer quality targets. Automated checks cover specific requirements; they do not establish full accessibility conformance or field CWV compliance. See the [contrast policy](#contrast-policy) and [performance verification](WEB_APPLICATION_ARCHITECTURE.md#performance-regression-checks).
 
-Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The style references guide composition and typographic character; they do not supply replacement assets or font licenses. Geist provides visual references; Fluent 2 is limited to token architecture. Their component packages and fonts are not installed. Light, dark and system appearance are supported. Search and a command palette are not implied by adoption.
+Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The style references guide composition and typographic character; they do not supply replacement assets or font licenses. Fluent 2 is limited to token architecture; its component package and fonts are not installed. Light, dark and system appearance are supported. Search and a command palette are not implied by adoption.
 
 ### Design style references
 
@@ -29,20 +29,20 @@ Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The styl
 
 ### Decision authority and brand adaptations
 
-Geist is the primary visual reference for colors, spacing, grids, shapes and elevation. Typography follows the owned Perfect Fourth scale. Fluent 2 contributes only token architecture: global primitives, semantic aliases and component consumption. It does not determine palette values, typography, spacing, grids, breakpoints, geometry, motion or content design. The site retains its owned palette and components. This is the site's integration of these references, not an official combined standard.
+Colors, spacing, grids, shapes and elevation follow the site-owned decisions documented here. Typography follows the owned Perfect Fourth scale. Fluent 2 contributes only token architecture: global primitives, semantic aliases and component consumption. It does not determine palette values, typography, spacing, grids, breakpoints, geometry, motion or content design. The site retains its owned palette and components. This is the site's integration of these references, not an official combined standard.
 
 Apply decisions in this order:
 
 1. Preserve verified content, service contracts and the explicitly retained brand assets; meet the relevant accessibility requirement.
-2. Use Geist to choose a coherent visual treatment for the task.
+2. Use the approved site palette, typography and editorial layout for the task.
 3. Express that treatment through the shared tokens and owned component variants, following Fluent 2's global/alias structure.
 4. Adapt shadcn defaults to those decisions. Add Base UI behavior only where an interactive primitive needs it.
 
 | Brand adaptation | Site rule and reason                                                                                                                                                                                   |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Font             | Keep Jost and the locale-specific Chinese fallbacks. Financial figures use tabular numerals; Geist Sans or Mono is not required.                                                                       |
-| Palette          | Retain all brand and financial colors, including the two original grays. Use Geist neutral roles with the documented brand overrides; retain black primary text and inverse surfaces.                  |
-| Geometry         | Retain square financial surfaces, pill actions and the editorial container. Standard fields and the memo grid use 6px corners; floating menus use 12px.                                                |
+| Font             | Keep Jost and the locale-specific Chinese fallbacks. Financial figures use tabular numerals.                                                                                                           |
+| Palette          | Retain the approved brand, neutral and financial primitives and semantic light/dark aliases; retain black primary text and inverse surfaces.                                                           |
+| Geometry         | Retain square financial surfaces, pill actions and the editorial container.                                                                                                                            |
 | Typography       | Use the owned Perfect Fourth treatments with Jost, rem units and a 1rem minimum. Tracking is 0; weights are 400/700; leading is 1.15 for Display/Headline/Title and 1.5 for Label/Body across locales. |
 | Features         | References do not imply a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                                                          |
 
@@ -50,7 +50,7 @@ A new treatment needs a reason, an owning role or component variant, and verific
 
 ### Light, dark and system appearance
 
-Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. Desktop Header and mobile Menu each expose the same single `ThemeToggle`: an owned shadcn/ui Button with Lucide Moon (switch to dark) or Sun (switch to light), a localized accessible action name and a 48px target. The next state uses `resolvedTheme`, so the first click reverses the actual system-resolved appearance. Explicit light/dark choices persist across reloads, routes and languages; there is no System option in the control. Until hydration, render a disabled, stable SunMoon placeholder labeled Appearance. `SiteDocument` owns one shared provider inside the body and sets the document theme before hydration. Suppress hydration warnings only on the root HTML attribute changed by that bootstrap.
+Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. Desktop Header and mobile Menu each expose the same single `ThemeToggle`: an owned shadcn/ui Button with Lucide Moon (switch to dark) or Sun (switch to light), a localized accessible action name and a 48px target. The Button is composed through shadcn/ui TooltipTrigger using Base UI `render`. Replace native `title` with TooltipContent and retain the English, Traditional Chinese and Simplified Chinese `aria-label` for the accessible name. The Button label and TooltipContent share the same localized string; no duplicate hidden text is needed. Base UI Tooltip is visual-only and does not generate the name; it owns hover/focus, Escape dismissal and touch suppression. The name updates to the next action after switching and remains available while the popup is closed. The next state uses `resolvedTheme`, so the first click reverses the actual system-resolved appearance. Explicit light/dark choices persist across reloads, routes and languages; there is no System option in the control. Until hydration, render a disabled, stable SunMoon placeholder labeled Appearance. `SiteDocument` owns one shared provider inside the body and sets the document theme before hydration. Suppress hydration warnings only on the root HTML attribute changed by that bootstrap.
 
 `tokens.css` owns explicit light aliases, `data-theme="dark"` overrides and `color-scheme`. A system-preference media query applies dark aliases only when no explicit theme is set, including without JavaScript. Explicit aliases avoid build-time `light-dark()` transformations that can leave manual Dark selection using light colors. Keep brand primitives unchanged. Dark page surfaces use black and `#141414`, text uses white and lighter neutral roles, and links/focus use Bright Blue. Financial return aliases use readable dark-mode variants. Test rendered colors in production builds with Chromium and WebKit; checking the theme attribute alone does not establish that the appearance changed.
 
@@ -62,7 +62,41 @@ Verify system changes, explicit overrides, persistence, keyboard button operatio
 
 `tokens.css` remains the single source of values. Global primitives such as brand colors, spacing and motion feed semantic aliases such as `--surface-brand`, `--text-brand`, `--interactive-accent` and `--chart-benchmark`; Tailwind references the same aliases. This follows Fluent 2's global/alias separation. Raw neutral values and brand colors feed surface, border, text and interaction roles; retaining useful token names avoids unnecessary churn. Component roles may have distinct aliases even when their current values match.
 
-`--shadow-popover` owns Geist's Menu material shadow; `--shadow-surface` owns its Base surface outline. `--width-content` owns the 1312px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
+`--shadow-popover` and `--shadow-surface` centralize the implemented popover shadow and surface outline; upstream material presets are not design requirements. `--width-content` owns the 1312px container maximum. Shape aliases distinguish pill actions (`--radius-action`), 6px fields (`--radius-field`), square financial surfaces (`--radius-surface`) and 12px popovers (`--radius-menu`). Do not convert chart coordinates or measured animation values into fixed design tokens.
+
+### Elevation, layout, material and motion tokens
+
+Fluent 2 supplies the [global/alias architecture](https://fluent2.microsoft.design/design-tokens). Component-specific aliases belong to the alias layer, not a separate Fluent token layer. The site owns the values and appearance. The references for [elevation](https://fluent2.microsoft.design/elevation), [layout](https://fluent2.microsoft.design/layout), [material](https://fluent2.microsoft.design/material), [motion](https://fluent2.microsoft.design/motion) and [shapes](https://fluent2.microsoft.design/shapes) inform the categories and responsibilities below; they do not replace the site's palette, typography, grid, shadows or radius choices.
+
+| Domain          | Global values                                                            | Semantic / component roles                                                                                                                           | Contract                                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Elevation       | `--shadow-ramp-1…4`, retained outline and multi-shadow values            | `--shadow-notification`, `--shadow-chart-tooltip`, `--shadow-surface`, `--shadow-popover`                                                            | Preserve each existing shadow; numbers identify the site's ramp, not Fluent's shadow 2–64 presets.                                                                              |
+| Stacking        | Existing layer values 90 / 100 / 110                                     | `--layer-navigation`, `--layer-modal`, `--layer-popover`                                                                                             | Stacking order is independent of perceived elevation; local SVG/table/toast stacking remains local.                                                                             |
+| Layout          | `--width-720`, `--width-1120`, `--width-1312`, existing `--space-*` ramp | `--width-content`, `--width-content-compact`, `--width-reading`, `--width-article`, `--space-section-padding`, `--space-section-content`, `--grid-*` | Preserve 1312px shell, 720px compact shell/reading width, 1120px article, 96px primary section padding and 48px content groups. Existing responsive exceptions remain explicit. |
+| Material        | Existing palette, `--opacity-scrim: 45%`, `--blur-4: 4px`                | `--material-solid`, `--material-solid-secondary`, `--material-popup`, `--material-popup-text`, `--material-smoke`, `--material-overlay-blur`         | Solid surfaces follow light/dark mode. Dialog smoke stays translucent black, with the existing optional 4px backdrop blur; this is not an Acrylic/Mica implementation.          |
+| Motion duration | Existing 50–500ms ramp                                                   | Existing `--motion-duration-*`, plus `spin` and `reduced`                                                                                            | Keep interaction timings; spin is 1000ms and the reduced-motion safety cap is 0.01ms.                                                                                           |
+| Motion curve    | Existing `--curve-*` cubic Bézier values                                 | `--motion-ease-standard`, `emphasized`, `exit`, `linear`                                                                                             | Select by interaction purpose, independently of duration.                                                                                                                       |
+| Shape           | Existing 0 / 6 / 12 / 999px values                                       | `--radius-surface`, `control`, `field`, `menu`, `action`                                                                                             | Preserve the site's square surfaces, rounded fields and pill actions; do not adopt Fluent's default corner ramp.                                                                |
+
+| Elevation alias          | Retained shadow geometry                                | Consumers                       |
+| ------------------------ | ------------------------------------------------------- | ------------------------------- |
+| `--shadow-notification`  | `0 10px 15px -3px` + `0 4px 6px -4px`, both 10% black   | Toast                           |
+| `--shadow-chart-tooltip` | `0 20px 25px -5px` + `0 8px 10px -6px`, both 10% black  | Recharts tooltip                |
+| `--shadow-surface`       | Existing theme-aware outline + background edge          | Memo grid                       |
+| `--shadow-popover`       | Existing outline + three soft shadows + background edge | Language menu and theme Tooltip |
+
+| Material alias               | Light                                                   | Dark                         |
+| ---------------------------- | ------------------------------------------------------- | ---------------------------- |
+| `--material-solid`           | `var(--white)`                                          | `var(--black)`               |
+| `--material-solid-secondary` | `var(--gray-bright)`                                    | `#141414`                    |
+| `--material-popup`           | `var(--surface-primary)`                                | Same role, resolves to black |
+| `--material-popup-text`      | `var(--text-primary)`                                   | Same role, resolves to white |
+| `--material-smoke`           | Black mixed with transparent at `--opacity-scrim` (45%) | Same                         |
+| `--material-overlay-blur`    | `var(--blur-4)` (4px)                                   | Same                         |
+
+The material aliases feed the existing surface tokens and shadcn `popover` pair. Keep opaque menus and sheets, the black Footer and local brand-surface overrides. Do not add blur, translucency or stronger elevation to other surfaces. CSS media/container queries keep literal thresholds because CSS custom properties cannot supply query conditions; document those breakpoints instead of creating unused variables. Measured chart coordinates and animation geometry remain data.
+
+`src/app/styles/foundation-tokens.spec.ts` verifies rendered width, material and popover roles in light/dark themes at phone, tablet and desktop sizes. The component theming fixture checks notification elevation propagation; motion tests cover duration, curve, interrupted entry/exit and reduced motion.
 
 ### Color and stroke ownership
 
@@ -87,7 +121,7 @@ React Email keeps literal inline colors for email-client compatibility. Standalo
 
 Component roles are aliases within the same token system. `--action-primary-*`, `--action-contrast-*`, `--action-inverse-*` and `--action-quiet-*` describe action appearance and feedback. Button and ButtonLink consume the same variant definition. `--field-*` describes standard input, textarea and native-select surfaces; inverse fields have their own text, border and placeholder roles.
 
-Change a shared role in `tokens.css` to update all consumers. Keep background, foreground, border and hover colors compatible as a set. Use `variant` for an existing appearance and `className` for placement or sizing, rather than overriding a shared component's colors from its caller. Preserve justified variants such as the Footer's inverse form. Light and dark aliases share the same component structure and state rules.
+Toast outlines and default Table, CardFooter and AlertDialogFooter separators explicitly use `border-border`, mapped to `--border-subtle`. The global reset retains `currentColor`; intentional strong feature borders keep their explicit roles. Change a shared role in `tokens.css` to update all consumers. Keep background, foreground, border and hover colors compatible as a set. Use `variant` for an existing appearance and `className` for placement or sizing, rather than overriding a shared component's colors from its caller. Preserve justified variants such as the Footer's inverse form. Light and dark aliases share the same component structure and state rules.
 
 `src/components/ui/input.spec.ts` verifies propagation from a native link through client navigation to form buttons, shared input/textarea roles, and the independent inverse field treatment. Existing control-state checks verify loading, disabled, failure and retry behavior.
 
@@ -119,7 +153,7 @@ The site uses an editorial financial style: clear type hierarchy, generous secti
 
 ### Grid layout
 
-Follow [Geist Grid](https://vercel.com/geist/grid) for layouts where visible guides organize cells. `Grid` in `src/components/grid.tsx` is the site's Server Component implementation, using CSS Grid and Tailwind rather than an additional component package. Keep ordinary cards, forms, KPI bands and editorial columns on plain Tailwind grids when visible guides add no meaning. `Container` continues to own page width and gutters.
+`Grid` in `src/components/grid.tsx` is the site's Server Component implementation, using CSS Grid and Tailwind rather than an additional component package. Keep ordinary cards, forms, KPI bands and editorial columns on plain Tailwind grids when visible guides add no meaning. `Container` continues to own page width and gutters.
 
 The guided grid uses one column through 800px, two from 801px, and three from 1101px when configured for three columns. Two-column grids retain two columns above 800px. Rows follow content height and DOM order; do not fix text-bearing rows to a pixel height. Tracks use `minmax(0, 1fr)` to contain long translated content.
 
@@ -146,13 +180,35 @@ Home's performance comparison uses a named inline-size container. Below 64rem of
 
 `components.json` selects the official `base-nova` registry. Existing Alert, Button, Dropdown Menu, Field, Input, Native Select, Sheet, Sidebar, Skeleton and Textarea retain their owned contracts. Added registry components use the same `cn` helper, Jost typography roles, semantic palette, focus/motion tokens and `data-theme` appearance. Registry defaults must not replace the existing page designs or Button variants.
 
-| Module                                                                          | Use                                                                                                                                                                |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `alert-dialog`, `collapsible`, `navigation-menu`, `radio-group`, `toggle-group` | Base UI interaction primitives; provide accessible names and required title/description composition.                                                               |
-| `card`, `table`                                                                 | Server-compatible structural primitives. Cards retain square surfaces; tables retain native semantics and container scrolling.                                     |
-| `chart`, `line-chart`                                                           | Recharts v3 composition with shared tooltip and legend content. Supply labels, series configuration and localized empty-state text; null observations remain gaps. |
-| `data-table`                                                                    | Render a feature-owned TanStack Table v9 instance. The feature chooses models, columns and state, and supplies its accessible name and empty-state text.           |
-| `toast`                                                                         | Base UI toast manager and optional `Toaster`. Supply localized `closeLabel` and `regionLabel`; keyboard access uses the primitive's F6 behavior.                   |
+The inventory below covers every non-test module currently under `src/components/ui`. “Used indirectly” means a live composition imports it. Data Table and Line Chart are owned compositions rather than independent interaction primitives. Subcomponents share their family row.
+
+| Component family | Local source                                                    | Status          | Current use                                                                                               |
+| ---------------- | --------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
+| Alert            | [alert.tsx](../src/components/ui/alert.tsx)                     | Used            | Inline form feedback, subscription confirmation and Support status                                        |
+| Alert Dialog     | [alert-dialog.tsx](../src/components/ui/alert-dialog.tsx)       | Used            | Contact clear-draft confirmation; cancel preserves the message                                            |
+| Button           | [button.tsx](../src/components/ui/button.tsx)                   | Used            | CTAs, form actions, theme toggle, copy link, sorting and recovery                                         |
+| Card             | [card.tsx](../src/components/ui/card.tsx)                       | Used            | Memo cards, shared FormPanel and Performance chart surface                                                |
+| Chart            | [chart.tsx](../src/components/ui/chart.tsx)                     | Used indirectly | Recharts container and tooltip primitives consumed by LineChart                                           |
+| Collapsible      | [collapsible.tsx](../src/components/ui/collapsible.tsx)         | Used            | Mobile languages and controlled article outlines; AnimatedDisclosure for memo indexes and monthly returns |
+| Data Table       | [data-table.tsx](../src/components/ui/data-table.tsx)           | Used            | Current Holdings; Table renderer for the feature-owned TanStack model                                     |
+| Dropdown Menu    | [dropdown-menu.tsx](../src/components/ui/dropdown-menu.tsx)     | Used            | Desktop Header language menu                                                                              |
+| Empty            | [empty.tsx](../src/components/ui/empty.tsx)                     | Used indirectly | No-data states in DataTable and LineChart                                                                 |
+| Field            | [field.tsx](../src/components/ui/field.tsx)                     | Used            | Field groups and shared accessible form-field composition                                                 |
+| Input            | [input.tsx](../src/components/ui/input.tsx)                     | Used            | Contact and subscription inputs; shared input styling for other controls                                  |
+| Line Chart       | [line-chart.tsx](../src/components/ui/line-chart.tsx)           | Used            | Performance explorer; owned composition of Recharts and Chart                                             |
+| Native Select    | [native-select.tsx](../src/components/ui/native-select.tsx)     | Used            | Mobile holdings sorting and subscription preferences                                                      |
+| Navigation Menu  | [navigation-menu.tsx](../src/components/ui/navigation-menu.tsx) | Used            | Desktop Header navigation links                                                                           |
+| Radio Group      | [radio-group.tsx](../src/components/ui/radio-group.tsx)         | Used            | Support amount selection after hydration; native radio fallback retained                                  |
+| Sheet            | [sheet.tsx](../src/components/ui/sheet.tsx)                     | Used            | Mobile/Tablet navigation panel and modal focus lifecycle                                                  |
+| Sidebar          | [sidebar.tsx](../src/components/ui/sidebar.tsx)                 | Used (subset)   | SidebarMenu, SidebarMenuItem and SidebarMenuButton inside Sheet; not a separate desktop sidebar           |
+| Skeleton         | [skeleton.tsx](../src/components/ui/skeleton.tsx)               | Used            | Performance explorer loading placeholder                                                                  |
+| Spinner          | [spinner.tsx](../src/components/ui/spinner.tsx)                 | Used            | Contact, Subscribe and Support submission state                                                           |
+| Table            | [table.tsx](../src/components/ui/table.tsx)                     | Used            | Monthly Performance table and Current Holdings table composition                                          |
+| Textarea         | [textarea.tsx](../src/components/ui/textarea.tsx)               | Used            | Contact message field                                                                                     |
+| Toast            | [toast.tsx](../src/components/ui/toast.tsx)                     | Used            | Memo article copy-link success/failure with instance-local manager                                        |
+| Tooltip          | [tooltip.tsx](../src/components/ui/tooltip.tsx)                 | Used            | Theme-toggle visual label on hover and keyboard focus; localized aria-label supplies its accessible name  |
+
+Tooltip is used by desktop and Sheet theme toggles through `src/components/ui/tooltip.tsx`. Each toggle has a local provider with a 600ms hover delay; keyboard focus opens the hint without that delay. The popup uses existing foreground/background, radius, popover-layer and motion aliases. No new colors or theme provider are introduced.
 
 Page composition uses these building blocks:
 
@@ -162,20 +218,20 @@ Page composition uses these building blocks:
 - Contact, standard Subscribe and Support forms share a Card-based Form Panel with responsive padding. Footer Subscribe keeps its inverse surface. Field errors and asynchronous results remain inline, with each form owning its submission state. Native payment radios and POST retain the no-JavaScript path.
 - Header composes real desktop links with Navigation Menu and keeps its Base UI Dropdown Menu and Sheet, including navigation recovery parameters and the existing modal/focus lifecycle. Desktop and mobile appearance use the same Button-based light/dark toggle with Lucide icons and next-themes. Mobile language options use the shared shadcn/ui Collapsible (Base UI Root, Trigger and Panel) inside the Sheet. Base UI owns expanded state, ARIA relationships and panel visibility; CSS owns the height transition and respects reduced motion. The language group and appearance button retain a 4px gap.
 
-Memos indexes and monthly tables use the shared AnimatedDisclosure composition over shadcn/ui Collapsible. Base UI owns state, ARIA and panel visibility; CSS owns reversible height transitions and reduced-motion behavior. Contact uses Alert Dialog before clearing an unsent message and its locale-specific saved draft; cancellation preserves both. Sending locks the clear control. Memo articles use an instance-local Toast manager for copy-link success or clipboard failure, with localized notifications and keyboard dismissal. Copying excludes query parameters and fragments. Provider results remain inline rather than being duplicated in toasts. Import Recharts and TanStack Table only from components that need them; do not introduce a global component barrel or mount a toast provider on every page. Use [Chart](https://ui.shadcn.com/docs/components/base/chart), [Data Table](https://ui.shadcn.com/docs/components/base/data-table) and [Toast](https://ui.shadcn.com/docs/components/base/toast) for upstream composition examples.
+Memo indexes and monthly tables use the shared AnimatedDisclosure composition over shadcn/ui Collapsible. Article outlines compose Collapsible, CollapsibleTrigger and CollapsibleContent directly, with React `open` state and `onOpenChange`, while reusing the disclosure height-transition styles. Base UI owns state, ARIA and panel visibility; CSS owns reversible height transitions and reduced-motion behavior. Contact uses Alert Dialog before clearing an unsent message and its locale-specific saved draft; cancellation preserves both. Sending locks the clear control. Memo articles use an instance-local Toast manager for copy-link success or clipboard failure, with localized notifications and keyboard dismissal. Copying excludes query parameters and fragments. Provider results remain inline rather than being duplicated in toasts. Import Recharts and TanStack Table only from components that need them; do not introduce a global component barrel or mount a toast provider on every page. Use [Chart](https://ui.shadcn.com/docs/components/base/chart), [Data Table](https://ui.shadcn.com/docs/components/base/data-table) and [Toast](https://ui.shadcn.com/docs/components/base/toast) for upstream composition examples.
 
 Chart configuration accepts trusted, authored color tokens; it is not a reader-input format. Map shadcn color aliases through `tokens.css`, keeping explicit/system dark mode consistent. `next-themes` remains the single appearance mechanism. Respect reduced motion and use the existing Button's `primary`, `contrast`, `inverse` and `quiet` variants when composing new primitives.
 
 Shared components provide a fixed set of variants:
 
-| Component                                        | Contract                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Container`                                      | Shared maximum width and responsive gutters; backgrounds belong to its outer section.                                                                                                                                                                                                    |
-| `PageHero`                                       | Standard, portfolio, performance or support geometry; localized content remains with the page.                                                                                                                                                                                           |
-| `Button` / `ButtonLink`                          | Primary, contrast, inverse or quiet surface; regular, small or text size. Native button and link semantics remain distinct. Button disabled feedback uses standard, muted or muted-busy variants, preserving preferences opacity without parent overrides.                               |
-| `FormField`, `Input`, `Textarea`, `NativeSelect` | Label association, visible or hidden label, standard rounded or inverse compact fields. Business validation and submission stay with the feature.                                                                                                                                        |
-| `Alert`                                          | Standard or inverse typography, reserved space and polite live feedback; an explicit alert role supports assertive announcements. Compose optional AlertTitle, AlertDescription and AlertAction without changing existing appearance. Callers associate labels/descriptions when needed. |
-| `PortfolioMetric`                                | Plain, highlight, brand or paper financial surfaces, shared typography and surface-specific note colors.                                                                                                                                                                                 |
+| Component                                        | Contract                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Container`                                      | Shared maximum width and responsive gutters; backgrounds belong to its outer section.                                                                                                                                                                                        |
+| `PageHero`                                       | Standard, portfolio, performance or support geometry; localized content remains with the page.                                                                                                                                                                               |
+| `Button` / `ButtonLink`                          | Primary, contrast, inverse or quiet surface; regular, small or text size. Native button and link semantics remain distinct. Button disabled feedback uses standard, muted or muted-busy variants, preserving preferences opacity without parent overrides.                   |
+| `FormField`, `Input`, `Textarea`, `NativeSelect` | Label association, visible or hidden label, standard rounded or inverse compact fields. Business validation and submission stay with the feature.                                                                                                                            |
+| `Alert`                                          | Standard or inverse typography, reserved space and polite live feedback; an explicit alert role supports assertive announcements. Compose optional AlertDescription and AlertAction without changing existing appearance. Callers associate labels/descriptions when needed. |
+| `PortfolioMetric`                                | Plain, highlight, brand or paper financial surfaces, shared typography and surface-specific note colors.                                                                                                                                                                     |
 
 Use Tailwind for layout and ordinary states, and CSS Modules for complex structures and motion. Both use the same tokens. References: [Next.js CSS](https://nextjs.org/docs/app/getting-started/css#recommendations), [Tailwind themes](https://tailwindcss.com/docs/theme), and [Preflight](https://tailwindcss.com/docs/preflight).
 
@@ -187,7 +243,7 @@ Choose tokens by purpose. CSS defines values and breakpoints. Keep sizing, spaci
 
 ### Typography roles
 
-The site uses the approved, production-derived Perfect Fourth scale: **16, 21, 28, 38, 51, 67 and 90px**, expressed in rem at a 16px root. Calculate each step independently from `16 × (4/3)^n` and round once. Semantic text roles use only these sizes; the shared mobile wordmark retains its documented 18px brand exception. [Typography specification](TYPOGRAPHY_PROPOSAL.md) retains measured provenance and the page assignment matrix.
+The site uses the approved, production-derived Perfect Fourth scale: **16, 21, 28, 38, 51, 67 and 90px**, expressed in rem at a 16px root. Calculate each step independently from `16 × (4/3)^n` and round once. Semantic text roles use only these sizes; the shared mobile wordmark retains its documented 18px brand exception. This section is the canonical typography specification.
 
 Use size-first names: Large / Medium / Small + Display / Headline / Title / Label / Body. Utilities such as `text-large-display` and tokens such as `--font-size-large-display` live in `tokens.css`. Only 13 treatments are needed; Small Title and Small Label are not defined. Medium Body and Small Body intentionally share metrics while identifying different uses.
 
@@ -217,24 +273,204 @@ Footer Quick Links use 36px minimum-height rows with no grid gap, retaining 16px
 
 Financial values use tabular numerals and can exceed nearby headings. Do not impose a smaller-than-heading invariant. Keep complete values and unchanged colors, signs, units and precision. Home and Performance summaries stack below 72rem of their financial-summary container; Portfolio stacks below 72rem of its inner Hero summary. Reflow columns first. If a full value still cannot fit at enlarged text sizes, its named, keyboard-focusable region scrolls horizontally without shrinking, truncating or wrapping the number. Show a localized horizontal-scroll hint only while a summary value overflows, associate it with the scroll region, and make only overflowing regions keyboard-focusable. The page itself must not overflow. Typography does not alter document heading semantics.
 
-Preserve the existing component surfaces, page grids and CTA placement; apply the vertical rhythm defined below. Investment memo article prose, summary, language notice and disclaimer share the title’s 1120px maximum width and left alignment within the page container; on smaller screens they fill the available container width. Controls retain touch-target padding independently of the shorter text line box. Chart axis labels use Small Body; the CSS axis wrapper compensates for the line height to keep labels centered on SVG ticks.
+Preserve the existing component surfaces, page grids and CTA placement; apply the vertical rhythm defined below. Investment memo article prose, summary, language notice and disclaimer share the title’s centered 1120px maximum-width container with equal left and right outer margins; text remains left-aligned; on smaller screens they fill the available container width. Controls retain touch-target padding independently of the shorter text line box. Chart axis labels use Small Body; the CSS axis wrapper compensates for the line height to keep labels centered on SVG ticks.
 
 `typography-roles.spec.ts` verifies computed role metrics, scale membership, locales, colors, focus and reflow. `financial-type-hierarchy.spec.ts` checks full financial values at regular and enlarged text sizes without the former subordinate-value rule. Test against the specification, not implementation class strings.
 
+### Memo article Typeset
+
+Investment Memo Article MDX body uses [shadcn/ui Typeset](https://ui.shadcn.com/docs/typeset). The owned CSS is vendored in `src/app/styles/typeset.css` from shadcn-ui/ui commit `d2fba50ee5b9113008b5bb908563527b7efd2f27`, with its MIT notice retained. `typeset-memo.css` supplies the site preset after the upstream components-layer rules. No package dependency or client runtime is added.
+
+| Element                              | Site treatment                                                            | Scope / spacing                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Body, paragraphs and reference lists | Jost, 16px / 24px, weight 400, tracking 0                                 | Fixed 1rem base at all breakpoints; adjacent paragraphs use 1.35em spacing   |
+| H2                                   | Small Headline: 28px phone / 38px wider screens, leading 1.15, weight 700 | Retains 34px below the heading                                               |
+| H3                                   | Medium Title: 21px, leading 1.15, weight 700                              | Retains 18px below the heading                                               |
+| Blockquote                           | Medium Title: 21px, leading 1.15, weight 700                              | Retains editorial horizontal borders, 64px margins and 34px vertical padding |
+| Links / emphasis                     | Inherited link metrics; emphasis weight 700                               | Underlines and visible keyboard focus; reference numbering remains native    |
+| Article wrapper                      | Centered 1120px maximum; left-aligned text                                | Layout owns width, section rhythm and reference panel; Typeset owns prose    |
+
+Override upstream automatic mobile enlargement, heading scale, 500/600 weights and tracking in the memo preset. Use semantic theme aliases for colors, including marks; dark mode does not change type metrics. Superscripts and subscripts retain inline notation behavior. Hero, metadata, Copy Article Link, summary, language notice, article outline and closing disclaimer remain outside the Typeset wrapper. Embedded UI must use `not-typeset` or `data-not-typeset`; registry elements with `data-slot` are excluded by upstream selectors. This is a prose styling system, not an additional `src/components/ui` component family.
+
+`memo-article.spec.ts` checks three locale routes, responsive type, both themes, enlarged text and scope. `memo-mdx.test.mjs` retains the verified research text hash, headings and source-reference assertions.
+
+### Color inventory
+
+The tables inventory the current declarations in [tokens.css](../src/app/styles/tokens.css), including compatibility aliases. They describe the implementation, not an upstream visual preset. `var(...)` references resolve through the palette below; mixed colors retain their exact formula rather than an approximate hex conversion. A declared token is not proof that a page currently renders it. Dark-mode entries apply to explicit dark appearance and the system-dark fallback. Component-local overrides are listed separately.
+
+#### Palette and alpha primitives
+
+| Token               | Value                       | Role            |
+| ------------------- | --------------------------- | --------------- |
+| `--shadow-outline`  | `0 0 0 1px #00000014`       | Shadow outline  |
+| `--black`           | `#000000`                   | Black           |
+| `--white`           | `#ffffff`                   | White           |
+| `--blue-deep`       | `#0d288b`                   | Blue deep       |
+| `--blue-medium`     | `#3d8af7`                   | Blue medium     |
+| `--blue-bright`     | `#7dcbfa`                   | Blue bright     |
+| `--neutral-100`     | `hsl(0 0% 95%)`             | Neutral 100     |
+| `--neutral-200`     | `hsl(0 0% 92%)`             | Neutral 200     |
+| `--neutral-300`     | `hsl(0 0% 90%)`             | Neutral 300     |
+| `--neutral-400`     | `hsl(0 0% 92%)`             | Neutral 400     |
+| `--neutral-500`     | `hsl(0 0% 79%)`             | Neutral 500     |
+| `--neutral-600`     | `hsl(0 0% 66%)`             | Neutral 600     |
+| `--neutral-700`     | `hsl(0 0% 56%)`             | Neutral 700     |
+| `--neutral-800`     | `hsl(0 0% 49%)`             | Neutral 800     |
+| `--neutral-900`     | `hsl(0 0% 30%)`             | Neutral 900     |
+| `--neutral-1000`    | `hsl(0 0% 9%)`              | Neutral 1000    |
+| `--gray-deep`       | `#cccccc`                   | Gray deep       |
+| `--gray-medium`     | `#eef0f2`                   | Gray medium     |
+| `--gray-bright`     | `#f5f7fa`                   | Gray bright     |
+| `--black-alpha-18`  | `rgba(0, 0, 0, 0.18)`       | Black alpha 18  |
+| `--black-alpha-20`  | `rgba(0, 0, 0, 0.2)`        | Black alpha 20  |
+| `--black-alpha-28`  | `rgba(0, 0, 0, 0.28)`       | Black alpha 28  |
+| `--white-alpha-22`  | `rgba(255, 255, 255, 0.22)` | White alpha 22  |
+| `--white-alpha-60`  | `rgba(255, 255, 255, 0.6)`  | White alpha 60  |
+| `--white-alpha-70`  | `rgba(255, 255, 255, 0.7)`  | White alpha 70  |
+| `--white-alpha-78`  | `rgba(255, 255, 255, 0.78)` | White alpha 78  |
+| `--white-alpha-84`  | `rgba(255, 255, 255, 0.84)` | White alpha 84  |
+| `--red-error`       | `#ff0000`                   | Red error       |
+| `--market-positive` | `#007c66`                   | Market positive |
+| `--market-negative` | `#bf2a2c`                   | Market negative |
+| `--market-neutral`  | `#000000`                   | Market neutral  |
+
+#### Semantic, interaction and shadow colors
+
+The role column follows the token's owning surface or state. “Inherit light definition” means the same expression is used in dark mode; its referenced tokens may resolve differently.
+
+| Token / role                        | Light definition                                                                                                             | Dark definition                                                      |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `--overlay-scrim`                   | `var(--material-smoke)`                                                                                                      | Inherit light definition                                             |
+| `--text-error`                      | `var(--market-negative)`                                                                                                     | `#ff6377`                                                            |
+| `--shadow-background`               | `0 0 0 1px var(--surface-secondary)`                                                                                         | Inherit light definition                                             |
+| `--shadow-surface`                  | `var(--shadow-outline), var(--shadow-background)`                                                                            | Inherit light definition                                             |
+| `--shadow-popover`                  | `var(--shadow-outline), 0 1px 1px #00000005, 0 4px 8px -4px #0000000a, 0 16px 24px -8px #0000000f, var(--shadow-background)` | Inherit light definition                                             |
+| `--border-subtle`                   | `var(--gray-medium)`                                                                                                         | `#333333`                                                            |
+| `--grid-guide`                      | `var(--border-subtle)`                                                                                                       | Inherit light definition                                             |
+| `--border-strong`                   | `var(--black)`                                                                                                               | `var(--white)`                                                       |
+| `--border-control`                  | `var(--neutral-800)`                                                                                                         | `#a1a1a1`                                                            |
+| `--border-inverse-subtle`           | `var(--white-alpha-22)`                                                                                                      | Inherit light definition                                             |
+| `--border-control-inverse`          | `var(--white-alpha-70)`                                                                                                      | Inherit light definition                                             |
+| `--border-brand`                    | `var(--blue-medium)`                                                                                                         | Inherit light definition                                             |
+| `--border-error`                    | `var(--red-error)`                                                                                                           | Inherit light definition                                             |
+| `--surface-subtle`                  | `var(--surface-secondary)`                                                                                                   | Inherit light definition                                             |
+| `--surface-selected`                | `color-mix(in srgb, var(--blue-medium) 8%, var(--surface-primary))`                                                          | `color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary))` |
+| `--text-return-positive`            | `var(--market-positive)`                                                                                                     | `#4ade80`                                                            |
+| `--text-return-negative`            | `var(--market-negative)`                                                                                                     | `#ff6377`                                                            |
+| `--focus-ring-on-light`             | `var(--blue-deep)`                                                                                                           | Inherit light definition                                             |
+| `--focus-ring-on-dark`              | `var(--blue-bright)`                                                                                                         | Inherit light definition                                             |
+| `--focus-ring-brand`                | `var(--blue-medium)`                                                                                                         | Inherit light definition                                             |
+| `--focus-ring-color`                | `var(--interactive-accent)`                                                                                                  | Inherit light definition                                             |
+| `--surface-primary`                 | `var(--material-solid)`                                                                                                      | Inherit alias; material becomes black                                |
+| `--surface-secondary`               | `var(--material-solid-secondary)`                                                                                            | Inherit alias; material becomes #141414                              |
+| `--surface-inverse`                 | `var(--black)`                                                                                                               | Inherit light definition                                             |
+| `--surface-brand`                   | `var(--blue-deep)`                                                                                                           | Inherit light definition                                             |
+| `--surface-highlight`               | `var(--blue-bright)`                                                                                                         | Inherit light definition                                             |
+| `--text-primary`                    | `var(--black)`                                                                                                               | `var(--white)`                                                       |
+| `--text-secondary`                  | `var(--neutral-900)`                                                                                                         | `#a1a1a1`                                                            |
+| `--text-tertiary`                   | `var(--neutral-1000)`                                                                                                        | `#e4e4e4`                                                            |
+| `--text-brand`                      | `var(--blue-deep)`                                                                                                           | `var(--blue-bright)`                                                 |
+| `--text-inverse`                    | `var(--white)`                                                                                                               | Inherit light definition                                             |
+| `--text-inverse-secondary`          | `var(--white-alpha-84)`                                                                                                      | Inherit light definition                                             |
+| `--text-inverse-tertiary`           | `var(--white-alpha-78)`                                                                                                      | Inherit light definition                                             |
+| `--text-highlight`                  | `var(--blue-bright)`                                                                                                         | Inherit light definition                                             |
+| `--chart-benchmark`                 | `var(--blue-medium)`                                                                                                         | Inherit light definition                                             |
+| `--interactive-accent`              | `var(--blue-deep)`                                                                                                           | `var(--blue-bright)`                                                 |
+| `--chart-portfolio`                 | `var(--blue-deep)`                                                                                                           | `var(--blue-bright)`                                                 |
+| `--action-primary-surface`          | `var(--black)`                                                                                                               | `var(--white)`                                                       |
+| `--action-primary-text`             | `var(--white)`                                                                                                               | `var(--black)`                                                       |
+| `--action-primary-hover-text`       | `var(--white)`                                                                                                               | Inherit light definition                                             |
+| `--action-primary-hover-surface`    | `var(--surface-brand)`                                                                                                       | Inherit light definition                                             |
+| `--action-contrast-surface`         | `var(--black)`                                                                                                               | `var(--white)`                                                       |
+| `--action-contrast-text`            | `var(--white)`                                                                                                               | `var(--black)`                                                       |
+| `--action-contrast-hover-surface`   | `var(--surface-highlight)`                                                                                                   | Inherit light definition                                             |
+| `--action-contrast-hover-text`      | `var(--black)`                                                                                                               | Inherit light definition                                             |
+| `--action-inverse-surface`          | `var(--white)`                                                                                                               | Inherit light definition                                             |
+| `--action-inverse-text`             | `var(--blue-deep)`                                                                                                           | Inherit light definition                                             |
+| `--action-inverse-hover-surface`    | `var(--surface-highlight)`                                                                                                   | Inherit light definition                                             |
+| `--action-quiet-text`               | `var(--text-primary)`                                                                                                        | Inherit light definition                                             |
+| `--action-quiet-hover-surface`      | `var(--surface-selected)`                                                                                                    | Inherit light definition                                             |
+| `--sidebar-text`                    | `var(--text-primary)`                                                                                                        | Inherit light definition                                             |
+| `--sidebar-hover-surface`           | `var(--neutral-100)`                                                                                                         | `#242424`                                                            |
+| `--sidebar-pressed-surface`         | `var(--neutral-200)`                                                                                                         | `#303030`                                                            |
+| `--sidebar-selected-surface`        | `var(--surface-selected)`                                                                                                    | Inherit light definition                                             |
+| `--sidebar-language-surface`        | `var(--surface-subtle)`                                                                                                      | Inherit light definition                                             |
+| `--holding-row-hover-surface`       | `color-mix(in srgb, var(--blue-bright) 12%, var(--surface-primary))`                                                         | Inherit light definition                                             |
+| `--portfolio-row-hover-surface`     | `color-mix(in srgb, var(--blue-bright) 10%, var(--surface-primary))`                                                         | Inherit light definition                                             |
+| `--memo-disclosure-hover-surface`   | `color-mix(in srgb, var(--blue-bright) 18%, var(--surface-primary))`                                                         | Inherit light definition                                             |
+| `--memo-row-hover-surface`          | `var(--memo-disclosure-hover-surface)`                                                                                       | Inherit light definition                                             |
+| `--memo-card-hover-surface`         | `color-mix(in srgb, var(--blue-bright) 22%, var(--surface-primary))`                                                         | Inherit light definition                                             |
+| `--memo-card-pressed-surface`       | `color-mix(in srgb, var(--blue-bright) 28%, var(--surface-primary))`                                                         | Inherit light definition                                             |
+| `--memo-card-touch-pressed-surface` | `var(--memo-card-hover-surface)`                                                                                             | Inherit light definition                                             |
+| `--support-option-hover-surface`    | `color-mix(in srgb, var(--blue-bright) 24%, var(--surface-primary))`                                                         | Inherit light definition                                             |
+| `--support-option-selected-surface` | `var(--surface-brand)`                                                                                                       | Inherit light definition                                             |
+| `--support-option-selected-text`    | `var(--text-inverse)`                                                                                                        | Inherit light definition                                             |
+| `--allocation-divider`              | `var(--black-alpha-18)`                                                                                                      | Inherit light definition                                             |
+| `--allocation-swatch-border`        | `var(--black-alpha-20)`                                                                                                      | Inherit light definition                                             |
+| `--chart-axis-border`               | `var(--black-alpha-28)`                                                                                                      | `#ffffff70`                                                          |
+| `--chart-reference`                 | `var(--black)`                                                                                                               | `#cccccc`                                                            |
+| `--text-chart-secondary`            | `color-mix(in srgb, var(--text-primary) 68%, transparent)`                                                                   | Inherit light definition                                             |
+| `--field-surface`                   | `var(--surface-primary)`                                                                                                     | Inherit light definition                                             |
+| `--field-text`                      | `var(--text-primary)`                                                                                                        | Inherit light definition                                             |
+| `--field-border`                    | `var(--border-control)`                                                                                                      | Inherit light definition                                             |
+| `--field-focus-border`              | `var(--interactive-accent)`                                                                                                  | Inherit light definition                                             |
+| `--field-focus-ring`                | `var(--focus-ring-color)`                                                                                                    | Inherit light definition                                             |
+| `--field-inverse-text`              | `var(--text-inverse)`                                                                                                        | Inherit light definition                                             |
+| `--field-inverse-border`            | `var(--border-control-inverse)`                                                                                              | Inherit light definition                                             |
+| `--field-inverse-placeholder`       | `var(--white-alpha-60)`                                                                                                      | Inherit light definition                                             |
+
+#### Tailwind and shadcn color aliases
+
+These aliases expose the same semantic palette to utility classes; they do not introduce additional colors.
+
+| Alias                          | Source                          |
+| ------------------------------ | ------------------------------- |
+| `--color-brand`                | `var(--text-brand)`             |
+| `--color-accent`               | `var(--interactive-accent)`     |
+| `--color-highlight`            | `var(--blue-bright)`            |
+| `--color-surface`              | `var(--surface-primary)`        |
+| `--color-ink`                  | `var(--text-primary)`           |
+| `--color-border`               | `var(--border-subtle)`          |
+| `--color-muted`                | `var(--surface-subtle)`         |
+| `--color-selected`             | `var(--surface-selected)`       |
+| `--color-background`           | `var(--surface-primary)`        |
+| `--color-foreground`           | `var(--text-primary)`           |
+| `--color-card`                 | `var(--surface-primary)`        |
+| `--color-card-foreground`      | `var(--text-primary)`           |
+| `--color-popover`              | `var(--material-popup)`         |
+| `--color-popover-foreground`   | `var(--material-popup-text)`    |
+| `--color-primary`              | `var(--action-primary-surface)` |
+| `--color-primary-foreground`   | `var(--action-primary-text)`    |
+| `--color-secondary`            | `var(--surface-secondary)`      |
+| `--color-secondary-foreground` | `var(--text-primary)`           |
+| `--color-muted-foreground`     | `var(--text-secondary)`         |
+| `--color-accent-foreground`    | `var(--surface-primary)`        |
+| `--color-destructive`          | `var(--text-error)`             |
+| `--color-input`                | `var(--border-control)`         |
+| `--color-ring`                 | `var(--focus-ring-color)`       |
+| `--color-chart-1`              | `var(--chart-portfolio)`        |
+| `--color-chart-2`              | `var(--chart-benchmark)`        |
+| `--color-chart-3`              | `var(--blue-bright)`            |
+| `--color-chart-4`              | `var(--text-secondary)`         |
+| `--color-chart-5`              | `var(--text-primary)`           |
+
+#### Local surface and independent-renderer exceptions
+
+| Surface / source                                    | Colors or overrides                                                                                                                                                   | Purpose                                                                                                    |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `brandSurface` in `src/components/brand-surface.ts` | White fields; Black text; Neutral 800 borders; Neutral 900/1000 secondary text; Deep Blue text, interaction and focus; Black primary/contrast buttons with White text | Explicit light color context inside highlighted brand regions, including dark appearance                   |
+| Footer subscription action                          | `--action-inverse-text: var(--black)`                                                                                                                                 | Black text on the inverse Subscribe action                                                                 |
+| React Email (`src/components/email-layout.tsx`)     | `#ededed`, `#ffffff`, `#000000`, `#002991`, `#008cff`, `#5fcdfd`                                                                                                      | Inline email background, content, brand band, wordmark accent and CTA colors; independent of website theme |
+| App icon (`src/app/icon.svg`)                       | `#002991`, `#ffffff`, `#5fcdfd`                                                                                                                                       | Retained vector artwork; independent of CSS theme                                                          |
+| Transparent / inherited colors                      | `transparent`, `currentColor`                                                                                                                                         | Unfilled surfaces and strokes/icons inheriting their text color; no independent palette value              |
+
+Opacity modifiers and gradients derive from these sources. KPI notes use 0.8 opacity; disabled states and chart/grid utility opacity do not create new primitive colors. Preserve the existing accessibility checks when changing any source or mix.
+
 ### Neutral colors and materials
 
-The owned palette defines Brand (`--blue-deep: #0d288b`, `--blue-medium: #3d8af7`, `--blue-bright: #7dcbfa`), Neutral (`--black: #000000`, `--white: #ffffff`, `--gray-deep: #cccccc`, `--gray-medium: #eef0f2`, `--gray-bright: #f5f7fa`) and Financial (`--market-positive: #007c66`, `--market-negative: #bf2a2c`, `--market-neutral: #000000`) primitives. Light-mode secondary text uses the independent `--neutral-900` semantic source to remain readable; Gray Deep is a light neutral primitive and must not be used for small text on white. Dividers and chart grids use Gray Medium, and Hero and secondary bands use Gray Bright. The existing ten-step Geist component neutral scale and dark-mode semantic overrides remain separate from these owned primitives.
+The owned palette defines Brand (`--blue-deep: #0d288b`, `--blue-medium: #3d8af7`, `--blue-bright: #7dcbfa`), Neutral (`--black: #000000`, `--white: #ffffff`, `--gray-deep: #cccccc`, `--gray-medium: #eef0f2`, `--gray-bright: #f5f7fa`) and Financial (`--market-positive: #007c66`, `--market-negative: #bf2a2c`, `--market-neutral: #000000`) primitives. Light-mode secondary text uses the independent `--neutral-900` semantic source to remain readable; Gray Deep is a light neutral primitive and must not be used for small text on white. Dividers and chart grids use Gray Medium, and Hero and secondary bands use Gray Bright.
 
-Use solid gray for borders and translucent black for material shadows. Standard fields use white, 6px corners and Gray 800 borders to meet the non-text contrast target; do not use a faint decorative surface outline as their only boundary. Brand-colored selection, hover and focus states remain independent of the neutral palette. Black primary text, the two original grays, all existing brand/financial colors and the black Footer are explicit exceptions.
-
-[Geist Materials](https://vercel.com/geist/materials) combine fill, outline, shadow and radius:
-
-- The memo grid uses the Base surface: white cards, 6px corners and the single shared outline. Interior separators use solid gray. Corners are applied to the cards without clipping the grid, preserving keyboard focus outlines. It has no extra CSS border or raised shadow.
-- The language popup uses Menu material: white fill, 12px corners and the official outline plus three neutral elevation layers. Its Positioner owns stacking. Do not add a second border around the material's shadow stroke.
-- Standard form fields use the accessible border adaptation above. Footer fields remain inverse pills.
-- Financial blocks remain square and flat. Full-screen mobile navigation remains edge-to-edge on its theme-aware primary surface, without a rounded floating frame. Pill CTAs and the black Footer preserve their brand treatment.
-
-Values were checked against the official Geist stylesheets on 2026-10-15. `tokens.css` owns the implementation; no Geist font or component package is required. Do not add unused tooltip or modal materials for components the site does not render.
+Use semantic border, surface, shadow and radius aliases from `tokens.css`. Fields need a visible boundary meeting the non-text contrast target; selection, hover and focus remain independently identifiable. Square financial blocks, pill actions, the black Footer and theme-aware full-screen navigation retain their approved treatments. Component appearance is determined by site requirements, not an upstream material preset.
 
 Apply a complete type treatment rather than repeating its utilities. Keep color, opacity, spacing and heading semantics independent. Use Large Label for table labels; inline emphasis inherits size and leading with weight 700. Never override tracking. CSS Modules use the same source tokens.
 
@@ -357,17 +593,24 @@ Global durations are 50, 100, 150, 200, 250, 300, 400 and 500ms. `--duration-*` 
 | AnimatedDisclosure expansion / collapse | `--motion-duration-expand` / `collapse`        | 300 / 250ms | Decelerate max / Easy ease      |
 | Icon change and touch-ring release      | `--motion-duration-icon` / `feedback`          | 200ms       | Decelerate max / Easy ease      |
 
-`--motion-ease-standard` uses the retained curve `(0.33, 0, 0.67, 1)`; `emphasized` uses the retained curve `(0.1, 0.9, 0.2, 1)`; `exit` uses the retained curve `(0.9, 0.1, 1, 0.2)`. `--motion-ease-linear` is reserved for constant rotation and the staged Menu/X rotation. Tailwind's default transitions also resolve to the shared fast duration and standard curve. A continuous loading spinner takes one second, derived from two ultra-slow intervals; notification lifetime and network timeouts are not animation durations. Skeletons stay static and financial lines do not animate between values.
+| Semantic curve             | Global token             | Cubic Bézier         | Use                                 |
+| -------------------------- | ------------------------ | -------------------- | ----------------------------------- |
+| `--motion-ease-standard`   | `--curve-easy-ease`      | `(0.33, 0, 0.67, 1)` | Feedback and ordinary state changes |
+| `--motion-ease-emphasized` | `--curve-decelerate-max` | `(0.1, 0.9, 0.2, 1)` | Entry and expansion                 |
+| `--motion-ease-exit`       | `--curve-accelerate-max` | `(0.9, 0.1, 1, 0.2)` | Dismissal                           |
+| `--motion-ease-linear`     | `--curve-linear`         | `(0, 0, 1, 1)`       | Constant rotation                   |
+
+`--motion-ease-standard` uses the retained curve `(0.33, 0, 0.67, 1)`; `emphasized` uses the retained curve `(0.1, 0.9, 0.2, 1)`; `exit` uses the retained curve `(0.9, 0.1, 1, 0.2)`. `--motion-ease-linear` is reserved for constant rotation and the staged Menu/X rotation. Tailwind's default transitions also resolve to the shared fast duration and standard curve. A continuous loading spinner uses `--motion-duration-spin`: one second, derived from two ultra-slow intervals; notification lifetime and network timeouts are not animation durations. Skeletons stay static and financial lines do not animate between values.
 
 Do not add route slides, list staggering, or idle decorative motion. The mobile panel keeps its directional entry/exit, with text grouped rather than staggered. Base UI owns popup presence and Collapsible state, ARIA and panel visibility. CSS owns ordinary feedback and Collapsible height transitions; AnimatedDisclosure uses the expansion/collapse aliases above, while the mobile language Collapsible uses the base duration and standard curve. Web Animations API owns the mobile Sheet’s measured panel and icon transitions. Never let both animate the same property.
 
-Reduced motion completes JavaScript layout transitions immediately, cancels running effects, removes press scaling and retains textual status/focus feedback. The existing CSS safety rule caps transitions and animations at 0.01ms with one iteration; components may disable their transitions entirely. This near-zero duration preserves lifecycle cleanup. Verify real browser timing, intermediate reversal, focus/scroll recovery and a live preference change; do not infer behavior from token definitions alone.
+Reduced motion completes JavaScript layout transitions immediately, cancels running effects, removes press scaling and retains textual status/focus feedback. The existing CSS safety rule caps transitions and animations through `--motion-duration-reduced` at 0.01ms with one iteration and `--motion-delay-none` at zero; components may disable their transitions entirely. This near-zero duration preserves lifecycle cleanup. Verify real browser timing, intermediate reversal, focus/scroll recovery and a live preference change; do not infer behavior from token definitions alone.
 
 ### Menu behavior
 
 - The mobile panel slides left to open and right to close. Navigation fades early during closing; the icon rotates from X back to Menu.
 - The language disclosure starts collapsed, shows the current language as its label, and lists only the other languages.
-- Mobile Sidebar uses Geist-style compact rows: 16px Medium Label typography, minimum touch targets from `--size-touch-target` (48px by default), 4px row gaps, 6px corners and 18px decorative Lucide icons. Selected links use `--sidebar-selected-surface` and `--interactive-accent`: pale brand blue with Deep Blue text in light mode, and a darker blue-tinted surface with Bright Blue text in dark mode. Hover and pressed feedback use `--sidebar-hover-surface` and `--sidebar-pressed-surface` (Gray 100/200 in light mode and `#242424`/`#303030` in dark mode); transitions change color and background without shifting geometry. Idle touch hover resets clear the language summary background whether expanded or collapsed, preserving expanded text color, selection and keyboard focus. Keep the full-screen panel on `--surface-primary` (white in light mode, black in dark mode), the shared text wordmark, round close control and existing opening/closing animation.
+- Mobile Sidebar uses compact rows: 16px Medium Label typography, minimum touch targets from `--size-touch-target` (48px by default), 4px row gaps, 6px corners and 18px decorative Lucide icons. Selected links use `--sidebar-selected-surface` and `--interactive-accent`: pale brand blue with Deep Blue text in light mode, and a darker blue-tinted surface with Bright Blue text in dark mode. Hover and pressed feedback use `--sidebar-hover-surface` and `--sidebar-pressed-surface` (Gray 100/200 in light mode and `#242424`/`#303030` in dark mode); transitions change color and background without shifting geometry. Idle touch hover resets clear the language summary background whether expanded or collapsed, preserving expanded text color, selection and keyboard focus. Keep the full-screen panel on `--surface-primary` (white in light mode, black in dark mode), the shared text wordmark, round close control and existing opening/closing animation.
 - Mobile Sidebar links, language options and the disclosure summary share `--focus-ring-width` (2px by default) for the theme-aware interaction outline (Deep Blue in light mode, Bright Blue in dark mode) and its matching inset offset, distinct from the persistent selected surface. The bottom language group uses `--sidebar-language-surface`, 12px outer corners and the same theme-aware row feedback. Its Collapsible opens upward above a stationary trigger without moving the appearance toggle, and excludes the current language and retains keyboard operation and animated reversal. Header stays fixed inside the modal while navigation and language content share one scroll region. No extra navigation labels, separators or features are introduced. The desktop language menu supports Enter, Space, arrows, Escape and Tab; the mobile disclosure supports Enter, Space and Tab.
 - The open close-button keeps Bright Blue fill and a black icon in both themes. Its `--border-strong` border is black in light mode and white in dark mode. Its keyboard ring stays visible under `:focus-visible`. Touch uses a separate blue ring and slight scale reduction; release and cancellation fade it, including short taps. The effect transfers from trigger to close control during opening.
 - Reduced motion keeps the held touch ring, omits scaling and release animation, and may complete state changes immediately.
@@ -473,7 +716,7 @@ The site owns its Swiss Grid / Editorial Layout: proximity, shared alignment, co
 | Column gutter       | `--grid-column-gap`: 32px desktop, 16px mobile; stacked major regions use a 48px row gap                                 |
 | Editorial regions   | 5:7 (`--grid-editorial`), 4:8 (`--grid-sidebar`), or 8:4 (`--grid-feature`), subdivisions of a conceptual 12-column grid |
 | Repeated modules    | Memo cards reflow 3/2/1 columns at 1101px/801px; 1px guide lines remain a deliberate modular-grid separator              |
-| Manuscript          | Article title and body share a left-aligned 1120px maximum width                                                         |
+| Manuscript          | Article title and body share a centered 1120px maximum-width container with equal outer margins and left-aligned text    |
 
 Use the existing content-driven stacking thresholds: 800px for phone layouts, 1100px for editorial/sidebar regions and the intermediate Footer composition, and container queries for About, KPI and chart regions. A 12-column concept does not require twelve DOM wrappers. Regions use `minmax(0, ...)` so text can reflow. Keep source order meaningful when columns stack. Do not shrink typography to preserve columns. Header navigation retains its separate 1280px breakpoint.
 
@@ -511,3 +754,11 @@ Above the stacking threshold, Portfolio summaries use `--grid-portfolio-summary`
 The memo-article Hero follows the deployed editorial composition: 96px top padding, a Large Display title with 48px block margins, and a bordered metadata row at the bottom of the secondary surface, with no extra bottom padding. Metadata and the Copy Article Link action share the 1120px title/body width; the action remains right-aligned and moves to its own row on phones. The summary and language notice remain in the body, which retains 96px top padding. This Hero is an explicit exception to symmetric section padding.
 
 Hero metadata (dates and About disciplines) aligns to the right edge of the introduction container at every width, including when it wraps onto a separate row. PageHero owns this rule; page-specific date classes must not override it.
+
+### Memo article outline
+
+Investment Memo articles place an initially collapsed **On This Page** outline after the summary/language notice and before the Typeset body. The control directly composes shadcn/ui Collapsible, CollapsibleTrigger and CollapsibleContent, with Lucide List and ChevronDown. React owns `open` through `useState(false)` and `onOpenChange`; Base UI owns ARIA and visibility. The mounted content reuses the shared disclosure height-transition CSS. The full-width trigger has a minimum 48px target; the chevron rotates with the expanded state and follows reduced-motion preferences.
+
+The outline uses the 1120px article width and leaves 48px before the body. Its interface label follows the site locale; links retain the article language and original heading wording. H2 entries are bold and H3 entries indented. It remains outside Typeset so article prose rules do not style the control.
+
+The local `remark-memo-toc.mjs` plugin builds heading IDs and the exported outline together during MDX compilation. Heading IDs use unprefixed title slugs (for example, `framework-for-understanding-business`). Repeated headings receive unique, deterministic suffixes. Native fragment links preserve deep linking without client-side heading discovery or duplicated editorial metadata. Tests verify the unchanged research-text hash, link targets, three locales, keyboard expansion/collapse and narrow layouts.

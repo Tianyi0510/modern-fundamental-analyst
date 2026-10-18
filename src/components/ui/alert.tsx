@@ -28,10 +28,6 @@ export function Alert({
   );
 }
 
-export function AlertTitle({ className, ...props }: ComponentProps<"div">) {
-  return <div data-slot="alert-title" className={cn("font-bold", className)} {...props} />;
-}
-
 export function AlertDescription({ className, ...props }: ComponentProps<"div">) {
   return <div data-slot="alert-description" className={cn("min-w-0", className)} {...props} />;
 }

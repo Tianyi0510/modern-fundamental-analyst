@@ -174,10 +174,10 @@ button {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: var(--motion-duration-reduced) !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0s !important;
+    transition-duration: var(--motion-duration-reduced) !important;
+    transition-delay: var(--motion-delay-none) !important;
   }
 }
 @media (forced-colors: active) {

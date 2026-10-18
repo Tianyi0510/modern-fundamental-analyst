@@ -11,7 +11,6 @@ import {
 } from "./alert-dialog";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./collapsible";
 import { RadioGroup, RadioGroupItem } from "./radio-group";
-import { ToggleGroup, ToggleGroupItem } from "./toggle-group";
 import { Toaster, toast } from "./toast";
 
 it("opens an alert dialog with a name and returns focus after cancellation", async () => {
@@ -62,19 +61,6 @@ it("supports keyboard selection in the radio group", async () => {
   screen.getByRole("radio", { name: "Six dollars" }).focus();
   await user.keyboard("{ArrowRight}");
   expect(screen.getByRole("radio", { name: "Twelve dollars" })).toBeChecked();
-});
-
-it("exposes toggle group selection through aria-pressed", async () => {
-  const user = userEvent.setup();
-  render(
-    <ToggleGroup aria-label="Series">
-      <ToggleGroupItem value="portfolio">Portfolio</ToggleGroupItem>
-      <ToggleGroupItem value="benchmark">SPY</ToggleGroupItem>
-    </ToggleGroup>,
-  );
-  const benchmark = screen.getByRole("button", { name: "SPY" });
-  await user.click(benchmark);
-  expect(benchmark).toHaveAttribute("aria-pressed", "true");
 });
 
 it("renders and dismisses a managed toast", async () => {

@@ -1,8 +1,9 @@
+import { resolve } from "node:path";
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs/config";
 import createMDX from "@next/mdx";
 
-const withMDX = createMDX();
+const withMDX = createMDX({ options: { remarkPlugins: [resolve("scripts/remark-memo-toc.mjs")] } });
 
 // Static App Router pages need inline bootstrap scripts. This is an origin policy, not a nonce-based strict CSP.
 const contentSecurityPolicy = [

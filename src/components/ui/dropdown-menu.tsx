@@ -33,7 +33,7 @@ export function DropdownMenuContent({
         <Primitive.Popup
           data-slot="dropdown-menu-content"
           className={cn(
-            "max-h-[var(--available-height)] w-40 overflow-y-auto rounded-[var(--radius-menu)] bg-surface p-[var(--space-2)] text-ink shadow-[var(--shadow-popover)] transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] outline-none data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 motion-reduce:transition-none",
+            "max-h-[var(--available-height)] w-40 overflow-y-auto rounded-[var(--radius-menu)] bg-popover p-[var(--space-2)] text-popover-foreground shadow-[var(--shadow-popover)] transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] outline-none data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 motion-reduce:transition-none",
             className,
           )}
           {...props}

@@ -17,7 +17,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(figures).toHaveCount(2);
         for (const figure of await figures.all()) {
           await showInteractivePerformanceChart(figure);
-          await expect(figure.getByRole("button")).toHaveCount(0);
+          await expect(figure.getByRole("button")).toHaveCount(1);
+          await expect(figure.locator('[data-slot="collapsible-trigger"]')).toHaveCount(1);
+          await expect(figure.locator('[data-slot="chart"]').getByRole("button")).toHaveCount(0);
           const curves = figure.locator(".recharts-line-curve");
           const dashes = await curves.evaluateAll((lines) =>
             lines.map((line) => line.getAttribute("stroke-dasharray")),

@@ -7,20 +7,41 @@ import { createElement } from "react";
 import * as runtime from "react/jsx-runtime";
 import { renderToStaticMarkup } from "react-dom/server";
 import { JSDOM } from "jsdom";
+import remarkMemoToc from "../../../scripts/remark-memo-toc.mjs";
 import { memoMdxComponents } from "./memo-mdx-components.tsx";
 
 test("memo MDX preserves the verified article text, hierarchy and source references", async () => {
   const source = await readFile(new URL("./articles/microsoft-stock-analysis-fiscal-year-2024.mdx", import.meta.url));
-  const { default: Article } = await evaluate(source, { ...runtime });
+  const { default: Article, memoTableOfContents } = await evaluate(source, {
+    ...runtime,
+    remarkPlugins: [remarkMemoToc],
+  });
   const document = new JSDOM(renderToStaticMarkup(createElement(Article, { components: memoMdxComponents }))).window
     .document;
+  const headings = [...document.querySelectorAll("h2, h3")];
+  assert.deepEqual(
+    memoTableOfContents,
+    headings.map((heading) => ({
+      id: heading.id,
+      title: heading.textContent,
+      level: Number(heading.tagName[1]),
+    })),
+  );
+  assert.equal(new Set(headings.map((heading) => heading.id)).size, headings.length);
+  assert.ok(headings.every((heading) => !heading.id.startsWith("memo-")));
+  assert.equal(
+    document.getElementById("framework-for-understanding-business")?.textContent,
+    "Framework for understanding business",
+  );
+  assert.equal(document.getElementById("investment-conclusion-3")?.textContent, "Investment conclusion");
+  assert.equal(document.querySelector(".memo-references h2")?.textContent, "References");
   const text = [...document.querySelectorAll("h2,h3,p,li")]
     .map((element) => element.textContent.replace(/\s+/g, " ").trim())
     .join("\n");
-  // Recorded from the rendered article before migrating its source format.
+  // Original rendered research text, with the approved References heading punctuation update.
   assert.equal(
     createHash("sha256").update(text).digest("hex"),
-    "e03de3a955c39c9ac9e933b2be2484af41117e64c49724108db2b6eff3c76912",
+    "627fe4d7b066ac1d1ba126271a682f06bc17478e7f5099e0d3a60178f0afa78a",
   );
   assert.equal(document.querySelectorAll(".memo-section").length, 3);
   assert.equal(document.querySelectorAll("p").length, 40);

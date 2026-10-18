@@ -28,29 +28,9 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-title"
-      className={cn("text-medium-title group-data-[size=sm]/card:text-small-body", className)}
-      {...props}
-    />
-  );
-}
-
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div data-slot="card-description" className={cn("text-small-body text-muted-foreground", className)} {...props} />
-  );
-}
-
-function CardAction({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-action"
-      className={cn("col-start-2 row-span-2 row-start-1 self-start justify-self-end", className)}
-      {...props}
-    />
   );
 }
 
@@ -62,10 +42,13 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center rounded-b-none border-t bg-muted/50 p-(--card-spacing)", className)}
+      className={cn(
+        "flex items-center rounded-b-none border-t border-border bg-muted/50 p-(--card-spacing)",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+export { Card, CardHeader, CardFooter, CardDescription, CardContent };

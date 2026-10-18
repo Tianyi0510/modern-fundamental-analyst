@@ -3,9 +3,25 @@
   --layer-navigation: 90;
   --layer-modal: 100;
   --layer-popover: 110;
-  --overlay-scrim: color-mix(in srgb, var(--black) 45%, transparent);
+  /* Material primitives and aliases: retain the site's solid surfaces and smoke. */
+  --opacity-scrim: 45%;
+  --blur-4: 4px;
+  --material-overlay-blur: var(--blur-4);
+  --material-smoke: color-mix(in srgb, var(--black) var(--opacity-scrim), transparent);
+  --overlay-scrim: var(--material-smoke);
+  --material-solid: var(--white);
+  --material-solid-secondary: var(--gray-bright);
+  --material-popup: var(--surface-primary);
+  --material-popup-text: var(--text-primary);
   --text-error: var(--market-negative);
-  /* Geist light materials: one stroke/shadow composition per surface. */
+  /* Site-owned elevation primitives; values preserve the existing rendered shadows.
+     Layer tokens above control stacking, not perceived elevation. */
+  --shadow-ramp-1: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-ramp-2: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-ramp-3: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-ramp-4: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-notification: var(--shadow-ramp-3);
+  --shadow-chart-tooltip: var(--shadow-ramp-4);
   --shadow-outline: 0 0 0 1px #00000014;
   --shadow-background: 0 0 0 1px var(--surface-secondary);
   --shadow-surface: var(--shadow-outline), var(--shadow-background);
@@ -45,7 +61,14 @@
   --market-positive: #007c66;
   --market-negative: #bf2a2c;
   --market-neutral: #000000;
-  --width-content: 1312px;
+  /* Layout primitives feed independent semantic widths even when values match. */
+  --width-720: 720px;
+  --width-1120: 1120px;
+  --width-1312: 1312px;
+  --width-content: var(--width-1312);
+  --width-content-compact: var(--width-720);
+  --width-reading: var(--width-720);
+  --width-article: var(--width-1120);
   --radius-0: 0px;
   --radius-6: 6px;
   --radius-12: 12px;
@@ -150,6 +173,9 @@
   --curve-easy-ease-max: cubic-bezier(0.8, 0, 0.2, 1);
   --curve-easy-ease: cubic-bezier(0.33, 0, 0.67, 1);
   --curve-linear: cubic-bezier(0, 0, 1, 1);
+  --motion-duration-reduced: 0.01ms;
+  --motion-delay-none: 0s;
+  --motion-duration-spin: calc(var(--duration-ultra-slow) * 2);
   --motion-duration-press: var(--duration-faster);
   --motion-duration-fast: var(--duration-fast);
   --motion-duration-base: var(--duration-normal);
@@ -171,8 +197,8 @@
   --motion-offset-summary: 4px;
   --motion-offset-sort: -1px;
   --motion-scale-press: 0.985;
-  --surface-primary: var(--white);
-  --surface-secondary: var(--gray-bright);
+  --surface-primary: var(--material-solid);
+  --surface-secondary: var(--material-solid-secondary);
   --surface-inverse: var(--black);
   --surface-brand: var(--blue-deep);
   --surface-highlight: var(--blue-bright);
@@ -284,8 +310,8 @@
   --text-return-positive: #4ade80;
   --text-return-negative: #ff6377;
   --text-error: #ff6377;
-  --surface-primary: var(--black);
-  --surface-secondary: #141414;
+  --material-solid: var(--black);
+  --material-solid-secondary: #141414;
   --surface-selected: color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary));
   --chart-axis-border: #ffffff70;
   --chart-reference: #cccccc;
@@ -313,8 +339,8 @@
     --text-return-positive: #4ade80;
     --text-return-negative: #ff6377;
     --text-error: #ff6377;
-    --surface-primary: var(--black);
-    --surface-secondary: #141414;
+    --material-solid: var(--black);
+    --material-solid-secondary: #141414;
     --surface-selected: color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary));
     --chart-axis-border: #ffffff70;
     --chart-reference: #cccccc;
@@ -336,7 +362,7 @@
 @theme inline {
   --default-transition-duration: var(--motion-duration-fast);
   --default-transition-timing-function: var(--motion-ease-standard);
-  --animate-spin: spin calc(var(--duration-ultra-slow) * 2) var(--motion-ease-linear) infinite;
+  --animate-spin: spin var(--motion-duration-spin) var(--motion-ease-linear) infinite;
   /* Each utility sets the entire treatment; language never changes metrics. */
   --font-weight-normal: 400;
   --font-weight-bold: 700;
@@ -412,8 +438,8 @@
   --color-foreground: var(--text-primary);
   --color-card: var(--surface-primary);
   --color-card-foreground: var(--text-primary);
-  --color-popover: var(--surface-primary);
-  --color-popover-foreground: var(--text-primary);
+  --color-popover: var(--material-popup);
+  --color-popover-foreground: var(--material-popup-text);
   --color-primary: var(--action-primary-surface);
   --color-primary-foreground: var(--action-primary-text);
   --color-secondary: var(--surface-secondary);

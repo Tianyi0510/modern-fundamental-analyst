@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
-import { Alert, AlertTitle, AlertDescription, AlertAction } from "./alert";
+import { Alert, AlertDescription, AlertAction } from "./alert";
 
 it("keeps concise status messages polite and keyboard focusable", () => {
   render(<Alert tabIndex={-1}>Saved.</Alert>);
@@ -15,8 +15,7 @@ it("keeps concise status messages polite and keyboard focusable", () => {
 it("composes a named recovery message with an operable action", async () => {
   const retry = vi.fn();
   render(
-    <Alert role="alert" aria-labelledby="title" aria-describedby="details">
-      <AlertTitle id="title">Unable to save</AlertTitle>
+    <Alert role="alert" aria-label="Unable to save" aria-describedby="details">
       <AlertDescription id="details">Your draft is preserved.</AlertDescription>
       <AlertAction>
         <button onClick={retry}>Retry</button>

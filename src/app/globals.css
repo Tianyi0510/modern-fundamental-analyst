@@ -5,6 +5,8 @@
 @source not "../**/*.test.{ts,tsx,mjs}";
 @import "./styles/tokens.css";
 @import "./styles/base.css" layer(base);
+@import "./styles/typeset.css";
+@import "./styles/typeset-memo.css";
 
 @custom-variant nav-compact (@media (max-width: 1279px));
 @custom-variant compact (@media (max-width: 800px));

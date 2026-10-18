@@ -1,18 +1,23 @@
 import { appearance } from "./memo-article-content.styles";
-import MicrosoftArticle from "./articles/microsoft-stock-analysis-fiscal-year-2024.mdx";
+import { MemoTableOfContents } from "./memo-table-of-contents";
+import MicrosoftArticle, { memoTableOfContents } from "./articles/microsoft-stock-analysis-fiscal-year-2024.mdx";
 import { memoMdxComponents } from "./memo-mdx-components";
 import type { Locale } from "@/lib/i18n";
 
 const articles = {
-  "microsoft-stock-analysis-fiscal-year-2024": MicrosoftArticle,
+  "microsoft-stock-analysis-fiscal-year-2024": { Article: MicrosoftArticle, toc: memoTableOfContents },
 };
 
-export function MemoArticleContent({ slug, language }: { slug: string; language: Locale }) {
-  const Article = articles[slug as keyof typeof articles];
-  if (!Article) return null;
+export function MemoArticleContent({ slug, language, locale }: { slug: string; language: Locale; locale: Locale }) {
+  const entry = articles[slug as keyof typeof articles];
+  if (!entry) return null;
+  const { Article, toc } = entry;
   return (
-    <div className={appearance["article-body"]} lang={language}>
-      <Article components={memoMdxComponents} />
-    </div>
+    <>
+      <MemoTableOfContents entries={toc} locale={locale} language={language} />
+      <div className={appearance["article-body"]} lang={language}>
+        <Article components={memoMdxComponents} />
+      </div>
+    </>
   );
 }

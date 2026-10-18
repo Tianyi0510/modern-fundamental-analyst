@@ -23,7 +23,7 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdr
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-[var(--layer-modal)] bg-[var(--overlay-scrim)] transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs motion-reduce:transition-none",
+        "fixed inset-0 isolate z-[var(--layer-modal)] bg-[var(--overlay-scrim)] transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-[var(--material-overlay-blur)] motion-reduce:transition-none",
         className,
       )}
       {...props}
@@ -72,20 +72,7 @@ function AlertDialogFooter({ className, ...props }: React.ComponentProps<"div">)
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-[var(--radius-menu)] border-t bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function AlertDialogMedia({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="alert-dialog-media"
-      className={cn(
-        "mb-2 inline-flex size-10 items-center justify-center rounded-control bg-muted sm:group-data-[size=default]/alert-dialog-content:row-span-2 *:[svg:not([class*='size-'])]:size-6",
+        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-[var(--radius-menu)] border-t border-border bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}
@@ -150,7 +137,6 @@ export {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
   AlertDialogOverlay,
   AlertDialogPortal,
   AlertDialogTitle,

@@ -746,6 +746,12 @@ test.describe("mobile content and navigation QA", () => {
       "Contact",
     ]);
     await expect(page.locator(".mobile-menu-drawer nav svg[aria-hidden=true]")).toHaveCount(6);
+    const languageTrigger = page.locator(".mobile-language-links [data-slot=collapsible-trigger]");
+    await expect(languageTrigger).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator(".mobile-language-links a")).toHaveCount(0);
+    await languageTrigger.tap();
+    await expect(languageTrigger).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator(".mobile-language-links a").first()).toBeVisible();
     await expect(page.locator(".mobile-language-links a")).toHaveCount(2);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("color", "rgb(0, 0, 0)");
     await expect(page.locator(".mobile-language-links a").nth(1)).toHaveCSS("color", "rgb(0, 0, 0)");
