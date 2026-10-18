@@ -1,10 +1,45 @@
 import { expect, test } from "@playwright/test";
 
-for (const { prefix, action, success } of [
-  { prefix: "", action: "Confirm Subscription", success: "Your subscription is confirmed." },
-  { prefix: "/zh-tw", action: "確認訂閱", success: "你的訂閱已確認。" },
-  { prefix: "/zh-cn", action: "确认订阅", success: "你的订阅已确认。" },
+for (const { prefix, action, success, unavailable } of [
+  {
+    prefix: "",
+    action: "Confirm Subscription",
+    success: "Your subscription is confirmed.",
+    unavailable: "Enable JavaScript to use this form. Your information has not been sent.",
+  },
+  {
+    prefix: "/zh-tw",
+    action: "確認訂閱",
+    success: "你的訂閱已確認。",
+    unavailable: "請啟用 JavaScript 以使用此表單。你的資料尚未送出。",
+  },
+  {
+    prefix: "/zh-cn",
+    action: "确认订阅",
+    success: "你的订阅已确认。",
+    unavailable: "请启用 JavaScript 以使用此表单。你的资料尚未发送。",
+  },
 ]) {
+  test(`${prefix || "English"} confirmation cannot discard the token without JavaScript @mobile`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
+    try {
+      const page = await context.newPage();
+      const confirmationToken = "a".repeat(43);
+      await page.goto(`${prefix}/subscription-confirmation?token=${confirmationToken}`);
+      const form = page.locator("main form");
+      await expect(form).toHaveAttribute("method", "post");
+      await expect(form.getByRole("button", { name: action, exact: true })).toBeDisabled();
+      await expect(form.locator("noscript p")).toHaveText(unavailable);
+      await expect(form.locator("noscript p")).toBeVisible();
+      expect(new URL(page.url()).searchParams.get("token")).toBe(confirmationToken);
+    } finally {
+      await context.close();
+    }
+  });
+
   for (const width of [390, 1440]) {
     test(
       `${prefix || "English"} confirmation requires explicit action and recovers at ${width}px`,

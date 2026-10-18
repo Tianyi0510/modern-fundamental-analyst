@@ -15,6 +15,7 @@ import { isValidEmail } from "@/lib/email-validation";
 import type { Locale } from "@/lib/i18n";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 import { useSubmissionId } from "@/components/use-submission-id";
+import { ClientForm } from "@/components/client-form";
 
 export type PreferencesRequestCopy = {
   email: string;
@@ -60,7 +61,8 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
 
   const message = status === "sent" ? copy.sent : status === "error" ? copy.error : "";
   return (
-    <form
+    <ClientForm
+      locale={locale}
       className={appearance["preferences-form"]}
       onSubmit={(event) => {
         void submit(event);
@@ -96,6 +98,6 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
         </div>
         <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
       </FieldGroup>
-    </form>
+    </ClientForm>
   );
 }

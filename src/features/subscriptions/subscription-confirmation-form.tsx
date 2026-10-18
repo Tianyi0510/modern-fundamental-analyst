@@ -6,13 +6,15 @@ import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 import { confirmSubscription } from "./subscription-api";
 import type { Locale } from "@/lib/i18n";
 import { confirmationCopy } from "./confirmation-copy";
+import { ClientForm } from "@/components/client-form";
 
 export function SubscriptionConfirmationForm({ token, locale }: { token: string; locale: Locale }) {
   const copy = confirmationCopy[locale];
   const [status, setStatus] = useState<"idle" | "busy" | "success" | "error">("idle");
   const runExclusive = useExclusiveSubmit();
   return (
-    <form
+    <ClientForm
+      locale={locale}
       aria-busy={status === "busy"}
       onSubmit={(event) => {
         event.preventDefault();
@@ -31,6 +33,6 @@ export function SubscriptionConfirmationForm({ token, locale }: { token: string;
         {status === "busy" ? copy.busy : locale === "en" ? "Confirm Subscription" : copy.action}
       </Button>
       <Alert>{status === "success" ? copy.success : status === "error" || !token ? copy.error : ""}</Alert>
-    </form>
+    </ClientForm>
   );
 }

@@ -19,6 +19,7 @@ import type { Locale } from "@/lib/i18n";
 import { HoneypotField } from "@/components/honeypot-field";
 import { useSubmissionId } from "@/components/use-submission-id";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
+import { ClientForm } from "@/components/client-form";
 
 export type SubscribeFormCopy = {
   title: string;
@@ -103,7 +104,8 @@ export function SubscribeFormClient({
         <h2 id={titleId}>{copy.title}</h2>
         {intro ? <p className={appearance.intro}>{intro}</p> : null}
       </header>
-      <form
+      <ClientForm
+        locale={locale}
         className={cn(appearance["subscribe-form"], variant === "inverse" && "mt-[var(--space-5)]")}
         onSubmit={(event) => {
           void submit(event);
@@ -158,7 +160,7 @@ export function SubscribeFormClient({
                   : ""}
           </Alert>
         </FieldGroup>
-      </form>
+      </ClientForm>
     </section>
   );
 }

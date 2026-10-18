@@ -173,8 +173,9 @@ test("system appearance works without JavaScript @mobile", async ({ browser, bas
   }
 });
 
-test("a native appearance choice made before hydration persists", async ({ page }) => {
+test("saved appearance is not misrepresented before hydration", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => localStorage.setItem("mfa:theme:v1", "dark"));
   let release!: () => void;
   const scriptsReady = new Promise<void>((resolve) => {
     release = resolve;
@@ -185,13 +186,16 @@ test("a native appearance choice made before hydration persists", async ({ page 
   });
   try {
     await page.goto("/contact", { waitUntil: "domcontentloaded" });
-    await page.getByRole("combobox", { name: "Appearance" }).selectOption("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    const appearance = page.getByRole("combobox", { name: "Appearance" });
+    await expect(appearance).toHaveValue("");
+    await expect(appearance).toBeDisabled();
   } finally {
     release();
   }
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.reload();
   await expect(page.getByRole("combobox", { name: "Appearance" })).toHaveValue("dark");
+  await expect(page.getByRole("combobox", { name: "Appearance" })).toBeEnabled();
 });
 
 test("isolated monitoring transport accepts credentialed keepalive requests @mobile", async ({ page }) => {

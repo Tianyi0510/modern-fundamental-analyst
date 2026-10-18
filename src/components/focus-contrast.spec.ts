@@ -2,6 +2,33 @@ import { expect, test } from "@playwright/test";
 import { colorContrast } from "../../scripts/color-contrast";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} dark chart disclosure and table have contrasting keyboard focus @mobile`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${prefix}/performance`);
+    await page.locator("header select").selectOption("dark");
+    await page.keyboard.press("Tab");
+    const summary = page.locator("main details summary").first();
+    await summary.focus();
+    for (const target of [summary, page.locator('main details [role="region"]').first()]) {
+      if (target !== summary) {
+        await summary.press("Enter");
+        await page.keyboard.press("Tab");
+      }
+      await expect(target).toBeFocused();
+      const colors = await target.evaluate((element) => ({
+        ring: getComputedStyle(element).outlineColor,
+        background: getComputedStyle(document.body).backgroundColor,
+        visible: element.matches(":focus-visible"),
+      }));
+      expect(colors.visible).toBe(true);
+      expect(colorContrast(colors.ring, colors.background)).toBeGreaterThanOrEqual(3);
+    }
+  });
+}
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(
     `${prefix || "English"} focus rings contrast on brand and inverse surfaces`,
     { tag: "@mobile" },

@@ -1,11 +1,45 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, expect, it, vi } from "vitest";
 import { server } from "../../../scripts/test-server";
 import { ContactForm } from "./contact-form";
+import { renderToString } from "react-dom/server";
+import { readContactDraft, saveContactDraft } from "./contact-draft";
 
 beforeEach(() => sessionStorage.clear());
+
+it("preserves browser-restored input during hydration without reusing an older draft identity", async () => {
+  const oldId = "550e8400-e29b-41d4-a716-446655440000";
+  saveContactDraft("en", {
+    name: "Reader",
+    email: "reader@example.com",
+    subject: "Research",
+    message: "An older saved message.",
+    submissionId: oldId,
+  });
+  const element = <ContactForm locale="en" />;
+  const container = document.createElement("div");
+  container.innerHTML = renderToString(element);
+  document.body.append(container);
+  within(container).getByRole<HTMLTextAreaElement>("textbox", { name: "Message" }).value =
+    "A newer browser-restored message.";
+  render(element, { container, hydrate: true });
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("A newer browser-restored message.");
+  expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Reader");
+  expect(readContactDraft("en")?.submissionId).toBeUndefined();
+  let key: string | null = null;
+  server.use(
+    http.post("http://localhost:3210/api/contact", ({ request }) => {
+      key = request.headers.get("idempotency-key");
+      return HttpResponse.json({ error: "Unavailable" }, { status: 503 });
+    }),
+  );
+  await userEvent.setup().click(screen.getByRole("button", { name: "Send Message" }));
+  expect(await screen.findByText("Your message couldn't be sent. Please try again later.")).toBeVisible();
+  expect(key).toBeTruthy();
+  expect(key).not.toBe(oldId);
+});
 
 async function fillMessage() {
   const user = userEvent.setup();

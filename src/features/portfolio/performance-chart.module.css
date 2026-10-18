@@ -139,7 +139,7 @@
 }
 .details summary:focus-visible,
 .tableScroll:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-on-light);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
 }
 .tableScroll {

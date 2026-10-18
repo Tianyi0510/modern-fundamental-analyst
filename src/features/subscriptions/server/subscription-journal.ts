@@ -10,6 +10,32 @@ type JournalRecord = {
   locale: string;
   operation?: "subscribe" | "preferences";
 };
+
+function parseJournalRecord(raw: string): JournalRecord {
+  let value: unknown;
+  try {
+    value = JSON.parse(raw) as unknown;
+  } catch {
+    throw new Error("Invalid subscription journal record");
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("Invalid subscription journal record");
+  const record = value as Record<string, unknown>;
+  const { id, startedAt, phase, locale, operation } = record;
+  if (
+    typeof id !== "string" ||
+    !id.trim() ||
+    typeof startedAt !== "string" ||
+    !Number.isFinite(Date.parse(startedAt)) ||
+    typeof phase !== "string" ||
+    !phase.trim() ||
+    typeof locale !== "string" ||
+    !locale.trim() ||
+    (operation !== undefined && operation !== "subscribe" && operation !== "preferences")
+  )
+    throw new Error("Invalid subscription journal record");
+  return { id, startedAt, phase, locale, ...(operation === undefined ? {} : { operation }) };
+}
 function keyFor(email: string) {
   const secret = process.env.SUBSCRIPTION_PREFERENCES_SECRET;
   if (!secret) throw new Error("SUBSCRIPTION_PREFERENCES_SECRET is required for subscription journals");
@@ -88,7 +114,7 @@ export async function readSubscriptionJournal(email: string): Promise<JournalRec
   const key = keyFor(email);
   const redis = client();
   const value = await executeRedisCommand(redis, () => redis.get<string>(key));
-  return value ? (JSON.parse(value) as JournalRecord) : null;
+  return value === null ? null : parseJournalRecord(value);
 }
 
 // Call under the subscriber lock only after the operator has reconciled the
@@ -97,7 +123,7 @@ export async function resolveSubscriptionJournal(email: string, expectedId: stri
   const key = keyFor(email);
   const redis = client();
   const value = await executeRedisCommand(redis, () => redis.get<string>(key));
-  if (!value || (JSON.parse(value) as JournalRecord).id !== expectedId) throw new Error("Journal ID does not match");
+  if (value === null || parseJournalRecord(value).id !== expectedId) throw new Error("Journal ID does not match");
   const cleared = await executeRedisCommand(redis, () =>
     redis.eval(
       "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end",

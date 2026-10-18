@@ -14,6 +14,7 @@ import { getFormText } from "@/lib/form-data";
 import type { PreferencesAction } from "./subscription-contract";
 import { localeConfig, locales, type Locale } from "@/lib/i18n";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
+import { ClientForm } from "@/components/client-form";
 
 export type PreferencesCopy = {
   email: string;
@@ -35,11 +36,13 @@ export function SubscriptionPreferencesForm({
   email,
   initialLocale,
   token,
+  locale,
 }: {
   copy: PreferencesCopy;
   email: string;
   initialLocale: Locale | null;
   token: string;
+  locale: Locale;
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const runExclusive = useExclusiveSubmit();
@@ -75,7 +78,8 @@ export function SubscriptionPreferencesForm({
           : "";
 
   return (
-    <form
+    <ClientForm
+      locale={locale}
       className={appearance["preferences-form"]}
       aria-busy={busy}
       onSubmit={(event: SubmitEvent<HTMLFormElement>) => {
@@ -131,6 +135,6 @@ export function SubscriptionPreferencesForm({
         </div>
         <Alert className="[overflow-wrap:anywhere]">{message}</Alert>
       </FieldGroup>
-    </form>
+    </ClientForm>
   );
 }

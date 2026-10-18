@@ -12,11 +12,50 @@ function token() {
   return Buffer.concat([iv, cipher.getAuthTag(), data]).toString("base64url");
 }
 
-for (const { prefix, saved, unsubscribed } of [
-  { prefix: "", saved: "Your preferred language has been updated.", unsubscribed: "You have been unsubscribed." },
-  { prefix: "/zh-tw", saved: "你的偏好語言已更新。", unsubscribed: "你已取消訂閱。" },
-  { prefix: "/zh-cn", saved: "你的偏好语言已更新。", unsubscribed: "你已取消订阅。" },
+for (const { prefix, saved, unsubscribed, unavailable } of [
+  {
+    prefix: "",
+    saved: "Your preferred language has been updated.",
+    unsubscribed: "You have been unsubscribed.",
+    unavailable: "Enable JavaScript to use this form. Your information has not been sent.",
+  },
+  {
+    prefix: "/zh-tw",
+    saved: "你的偏好語言已更新。",
+    unsubscribed: "你已取消訂閱。",
+    unavailable: "請啟用 JavaScript 以使用此表單。你的資料尚未送出。",
+  },
+  {
+    prefix: "/zh-cn",
+    saved: "你的偏好语言已更新。",
+    unsubscribed: "你已取消订阅。",
+    unavailable: "请启用 JavaScript 以使用此表单。你的资料尚未发送。",
+  },
 ]) {
+  test(`${prefix || "English"} saved preferences cannot discard the token without JavaScript @mobile`, async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
+    try {
+      const page = await context.newPage();
+      const preferenceToken = token();
+      await page.goto(`${prefix}/subscription-preferences?token=${preferenceToken}`);
+      // Streaming may leave completed content outside main until JavaScript moves it.
+      const form = page.locator("form.preferences-form");
+      await expect(form).toHaveAttribute("method", "post");
+      await expect(form.locator("select")).toBeDisabled();
+      await expect(form.locator("button")).toHaveCount(2);
+      for (const button of await form.locator("button").all()) await expect(button).toBeDisabled();
+      await expect(page.locator("main noscript p")).toHaveText(unavailable);
+      await expect(page.locator("main noscript p")).toBeVisible();
+      expect(await form.evaluate((element) => [...new FormData(element as HTMLFormElement).keys()])).toEqual([]);
+      expect(new URL(page.url()).searchParams.get("token")).toBe(preferenceToken);
+    } finally {
+      await context.close();
+    }
+  });
+
   test(
     `${prefix || "English"} preferences require a selection and clear stale success`,
     { tag: "@mobile" },

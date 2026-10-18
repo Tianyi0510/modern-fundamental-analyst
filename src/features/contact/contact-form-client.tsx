@@ -20,6 +20,7 @@ import { HoneypotField } from "@/components/honeypot-field";
 import { useExclusiveSubmit } from "@/components/use-exclusive-submit";
 import { useSubmissionId } from "@/components/use-submission-id";
 import { clearContactDraft, contactFieldLimits, readContactDraft, saveContactDraft } from "./contact-draft";
+import { ClientForm } from "@/components/client-form";
 
 export type ContactFormCopy = {
   title: string;
@@ -55,10 +56,19 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
 
   useEffect(() => {
     const draft = readContactDraft(locale);
-    if (!draft) return;
+    const form = formRef.current;
+    if (!draft || !form) return;
+    const restored = { ...draft };
     for (const field of Object.keys(contactFieldLimits) as Array<keyof typeof contactFieldLimits>) {
-      const input = formRef.current?.elements.namedItem(field);
-      if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) input.value = draft[field];
+      const input = form.elements.namedItem(field);
+      if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) continue;
+      if (input.value === input.defaultValue) input.value = draft[field];
+      restored[field] = input.value;
+    }
+    if ((Object.keys(contactFieldLimits) as ContactField[]).some((field) => restored[field] !== draft[field])) {
+      // Autofill or restored browser input belongs to a different submission.
+      delete restored.submissionId;
+      saveContactDraft(locale, restored);
     }
   }, [locale]);
 
@@ -137,7 +147,8 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
           <h2 id="contact-form-title">{copy.title}</h2>
           <p className={appearance["contact-headingIntro"]}>{copy.intro}</p>
         </div>
-        <form
+        <ClientForm
+          locale={locale}
           ref={formRef}
           className={appearance["contact-form"]}
           onSubmit={(event) => {
@@ -226,7 +237,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
               </Alert>
             </div>
           </FieldGroup>
-        </form>
+        </ClientForm>
       </Container>
     </div>
   );

@@ -14,6 +14,7 @@ import {
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 import { readPreferenceToken } from "@/features/subscriptions/server/subscription-preferences";
+import { ClientFormNotice } from "@/components/client-form-notice";
 
 const copy = {
   en: {
@@ -114,13 +115,47 @@ export async function SubscriptionPreferencesPage({
         />
         <Container as="section" className={appearance["preferences-panel"]}>
           {payload ? (
-            <Suspense key={token} fallback={<ServiceLoading locale={locale} />}>
-              <SavedPreferences copy={text} email={payload.email} token={token} />
+            <Suspense
+              key={token}
+              fallback={
+                <>
+                  <ServiceLoading locale={locale} />
+                  <ClientFormNotice locale={locale} />
+                </>
+              }
+            >
+              <SavedPreferences
+                copy={{
+                  email: text.email,
+                  language: text.language,
+                  chooseLanguage: text.chooseLanguage,
+                  save: text.save,
+                  saving: text.saving,
+                  saved: text.saved,
+                  unsubscribe: text.unsubscribe,
+                  unsubscribing: text.unsubscribing,
+                  unsubscribed: text.unsubscribed,
+                  error: text.error,
+                }}
+                email={payload.email}
+                token={token}
+                locale={locale}
+              />
             </Suspense>
           ) : (
             <div className={appearance["preferences-request"]}>
               <p className={appearance["preferences-invalid"]}>{text.invalid}</p>
-              <SubscriptionPreferencesRequestForm copy={text} locale={locale} />
+              <SubscriptionPreferencesRequestForm
+                copy={{
+                  email: text.email,
+                  request: text.request,
+                  requesting: text.requesting,
+                  sent: text.sent,
+                  error: text.error,
+                  invalidEmail: text.invalidEmail,
+                }}
+                locale={locale}
+              />
             </div>
           )}
         </Container>
