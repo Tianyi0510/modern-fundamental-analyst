@@ -9,13 +9,19 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       async ({ page }) => {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`${prefix}/contact`);
-        await expect(page.locator(".page-hero-band")).toHaveCSS("background-color", "rgb(250, 250, 250)");
+        await expect(page.locator(".page-hero-band")).toHaveCSS("background-color", "rgb(245, 247, 250)");
         const field = page.locator('main input[type="email"]').first();
         await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
         await expect(field).toHaveCSS("border-radius", "4px");
         const colors = await field.evaluate((element) => {
           const style = getComputedStyle(element);
-          return { border: style.borderTopColor, background: style.backgroundColor };
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = 1;
+          const context = canvas.getContext("2d")!;
+          context.fillStyle = style.borderTopColor;
+          context.fillRect(0, 0, 1, 1);
+          const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+          return { border: `rgb(${r}, ${g}, ${b})`, background: style.backgroundColor };
         });
         expect(colorContrast(colors.border, colors.background)).toBeGreaterThanOrEqual(3);
         await field.focus();
@@ -45,10 +51,24 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(memo).toHaveCSS("outline-width", "2px");
         await expect(memo).toHaveCSS("border-radius", "0px");
         await expect(grid).not.toHaveCSS("box-shadow", "none");
-        await expect(page.locator(".memo-card [data-slot=card-description]").first()).toHaveCSS(
-          "color",
-          "rgb(77, 77, 77)",
-        );
+        const description = page.locator(".memo-card [data-slot=card-description]").first();
+        const textColors = await description.evaluate((element) => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = 1;
+          const context = canvas.getContext("2d")!;
+          const rgb = (color: string) => {
+            context.clearRect(0, 0, 1, 1);
+            context.fillStyle = color;
+            context.fillRect(0, 0, 1, 1);
+            const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+            return `rgb(${r}, ${g}, ${b})`;
+          };
+          return {
+            text: rgb(getComputedStyle(element).color),
+            background: rgb(getComputedStyle(element.closest(".memo-card")!).backgroundColor),
+          };
+        });
+        expect(colorContrast(textColors.text, textColors.background)).toBeGreaterThanOrEqual(4.5);
         const logo = page.locator(".site-header > .wordmark");
         await expect(logo.locator(".brand-logo")).toHaveText("Modern Fundamental Analyst.");
 

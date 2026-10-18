@@ -1,42 +1,91 @@
-# Design system
+# Design System
 
 Use this guide for visual design, component behavior, interface copy and localization. Preserve Jost, brand assets and intentional language variants. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) covers code conventions, rendering, style loading and tooling. [README](../README.md#documentation) maps the documents.
 
 ## Architecture and reference ownership
 
-The site adopts the five layers below as its design system. Preserve its editorial identity: Jost headings, three brand blues, square data blocks and Investment Memo Cards, pill-shaped actions and generous whitespace. Apply reference principles through these owned components and tokens. Upstream defaults do not override the brand or justify unrelated features.
+**Layer 01 owns the visual system. Layer 02 systematizes it. Layer 04 implements it.** Layer 03 governs UX within its assigned scope; Layer 05 supplies interaction primitives. Cross-layer web standards take precedence over every layer.
 
-| Layer                  | Responsibility                                                                                                                                                                                                                                           | Reference                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 01: Design style       | Pentagram, PayPal and Jost guide the editorial identity, typographic character and brand composition. Preserve the site's own assets and explicit brand adaptations.                                                                                     | [Pentagram](https://www.pentagram.com/), [PayPal](https://www.pentagram.com/work/paypal), [Jost](https://indestructibletype.com/Jost.html) |
-| 02: Design foundations | The site owns its brand palette, typography, grid composition and motion choreography. Fluent 2 supplies the global/alias Design Tokens architecture and default Web spacing, radius, stroke-width, shadow, neutral material, duration and curve tokens. | [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens)                                                                   |
-| 03: UX guidelines      | Vercel guides web interaction quality; Cieden guides task analysis, information architecture and usability. The site owns its content-design rules.                                                                                                      | [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Cieden Handbook](https://cieden.com/book)                        |
-| 04: Components         | Maintain customized shadcn/ui source and Lucide interface icons. Native HTML remains appropriate for static content and native form controls.                                                                                                            | [shadcn/ui](https://ui.shadcn.com/), [Lucide](https://lucide.dev/)                                                                         |
-| 05: Interaction engine | Base UI underpins shadcn interactive primitives: menus, positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations.                      | [Base UI](https://base-ui.com/)                                                                                                            |
+| Layer                      | References in priority order                                                    | Assigned responsibility                                                                                                                                                                                                                                                                                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01: Design style           | Pentagram → PayPal → Swiss Themes → Bauer Types → Lineto → Jost → Yahoo Finance | Pentagram, Swiss Themes, Bauer Types and Lineto guide visual composition and typographic character. Primitive Colors comprise eight PayPal-inspired brand/neutrals and two Yahoo Finance-inspired financial colors, listed below. Google Fonts supplies Jost, Noto Sans TC and Noto Sans SC. Typography uses Perfect Fourth (4/3, approximately 1.33), a 16px (1rem) base, weights 400/700, leading 1.15/1.5 and tracking 0. |
+| 02: Design foundations     | Fluent 2                                                                        | Global Tokens and Alias Tokens; Color, Elevation, Layout, Material, Motion and Shapes. Functional Colors cover Neutral Colors, Brand Colors, Semantic Colors, Interaction States and Accessibility Best Practices. Motion comprises Duration and Easing. Preserve documented defaults and explicit site mappings within their assigned responsibilities.                                                                     |
+| 03: UX guidelines          | Web Interface Guidelines → Fluent 2 → Cieden Handbook                           | Web Interface Guidelines governs Interactions, Forms, Performance and Copywriting. Fluent 2 governs Accessibility, Content Design, Handoffs, Onboarding and Wait UX. Cieden is a supporting reference. Copywriting and Content Design apply exclusively to UX Writing.                                                                                                                                                       |
+| 04: Components             | shadcn/ui → Lucide                                                              | shadcn/ui Theming, Typeset and Components; Lucide interface icons. Owned component source maps the upper-layer decisions into implementation. Native HTML remains appropriate for static content and native form controls.                                                                                                                                                                                                   |
+| 05: Interaction primitives | Base UI                                                                         | Interactive mechanics, including positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations.                                                                                                                                                                                                                 |
 
-React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implement these five design layers. Their dependencies, rendering boundaries and style loading belong in [Application architecture](WEB_APPLICATION_ARCHITECTURE.md#presentation-and-style-loading).
+React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implement these layers. Dependencies, rendering boundaries and style loading belong in [Application architecture](WEB_APPLICATION_ARCHITECTURE.md#presentation-and-style-loading).
 
-WCAG 2.2 AA, responsive design, semantic HTML and Core Web Vitals are cross-layer quality targets. Automated checks cover specific requirements; they do not establish full accessibility conformance or field CWV compliance. See the [contrast policy](#contrast-policy) and [performance verification](WEB_APPLICATION_ARCHITECTURE.md#performance-regression-checks).
+### Cross-layer web standards
 
-Preserve Jost, Noto Sans language fallbacks, all brand colors and Logo. The style references guide composition and typographic character; they do not supply replacement assets or font licenses. Fluent 2 supplies token architecture and default Web foundation values; its component package and fonts are not installed. Light, dark and system appearance are supported. Search and a command palette are not implied by adoption.
+- HTML Living Standard: [complete specification](https://html.spec.whatwg.org/) and [developer edition](https://html.spec.whatwg.org/dev/) govern HTML semantics and native behavior.
+- [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/) is the accessibility target across all layers.
+- [Responsive Web Design](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Responsive_Design) guides adaptation across viewport sizes and user settings.
+- [Core Web Vitals](https://web.dev/explore/learn-core-web-vitals) provides field performance targets.
+
+Automated checks cover specific requirements; they do not establish full accessibility conformance or field CWV compliance. See the [contrast policy](#contrast-policy) and [performance verification](WEB_APPLICATION_ARCHITECTURE.md#performance-regression-checks).
 
 ### Design style references
 
-- [Pentagram](https://www.pentagram.com/) and its [PayPal identity](https://www.pentagram.com/work/paypal): brand composition and typographic direction.
-- [Swiss Themes](https://swissthemes.design/) and [Bauer Types](https://bauertypes.com/): supplementary layout and type references.
+- [Pentagram](https://www.pentagram.com/) and its [PayPal identity](https://www.pentagram.com/work/paypal): visual composition and typographic direction.
+- [PayPal](https://www.paypal.com/us/home): inspiration for the eight brand and neutral primitive colors.
+- [Swiss Themes](https://swissthemes.design/): visual layout reference.
+- [Bauer Types](https://bauertypes.com/): typographic character reference.
 - Lineto's [Supreme](https://lineto.com/typefaces/supreme) and [PayPal typography](https://lineto.com/bespoke/paypal): type and wordmark references.
-- [Jost](https://indestructibletype.com/Jost.html): the site's retained typeface.
+- [Jost](https://indestructibletype.com/Jost.html): the site's retained Latin typeface. Google Fonts sources: [Jost](https://fonts.google.com/specimen/Jost), [Noto Sans TC](https://fonts.google.com/noto/specimen/Noto+Sans+TC?preview.script=Hant) and [Noto Sans SC](https://fonts.google.com/noto/specimen/Noto+Sans+SC?preview.script=Hant).
+- [Yahoo Finance](https://finance.yahoo.com/): inspiration for Positive and Negative financial primitives. The approved values below are site decisions, not a claim about Yahoo Finance’s current stylesheet.
+
+These references do not supply replacement assets or font licenses. Keep the documented Typography roles and responsive exceptions; the ratio does not require replacing every approved size with an unrounded mathematical value.
+
+Color Tokens consist of **10 Primitive Colors + Fluent 2 Functional Colors**. Layer 01 defines the ten primitive values; Layer 02 defines their functional roles, theme/state application and accessibility guidance. Functional aliases reference only those ten values or exact Fluent defaults; custom mixed shades are prohibited.
+
+See the ten values in the [Primitive Colors inventory](#primitive-colors).
+
+Neutral financial values reuse Black (or the readable foreground alias in dark mode); Neutral is a semantic role, not an eleventh primitive. Deep Gray must not be used for normal text on White. No Geist Design System preset or neutral scale is adopted; Web Interface Guidelines remains an independent UX reference.
+
+### Functional color ownership
+
+Use two color categories: **10 Primitive Colors** and **Fluent 2 Functional Colors**. Prefer primitives. Add an exact Fluent default only when needed for contrast or dark surface hierarchy. Do not generate tints, mix colors or import unused palettes.
+
+Fluent organizes neutral, brand and shared semantic roles. “Functional Colors” is this project's umbrella term, not a separate official Fluent palette.
+
+| Functional responsibility    | Site application                                                                                                                  |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Neutral Colors               | Surface hierarchy, readable text, borders and material aliases in light/dark themes                                               |
+| Brand Colors                 | Brand-linked actions, selection and focus roles using the approved visual identity                                                |
+| Semantic Colors              | Error, success and other meaningful status feedback, paired with text or other indicators; financial return roles remain distinct |
+| Interaction States           | Rest, hover, pressed, selected, disabled and keyboard-focus treatments                                                            |
+| Accessibility Best Practices | Contrast, theme adaptability and information conveyed by more than color alone, subject to cross-layer WCAG 2.2 AA                |
+
+The [color inventory](#color-inventory) records active mappings. Brand identity belongs to Layer 01; Fluent supplies role structure, theme/state guidance and necessary default values. Semantic status and financial returns remain separate roles even when they share a value.
+
+### Design foundation references
+
+Fluent 2 supplies [Design Tokens](https://fluent2.microsoft.design/design-tokens), [Color](https://fluent2.microsoft.design/color), [Elevation](https://fluent2.microsoft.design/elevation), [Layout](https://fluent2.microsoft.design/layout), [Material](https://fluent2.microsoft.design/material), [Motion](https://fluent2.microsoft.design/motion) and [Shapes](https://fluent2.microsoft.design/shapes). Use Global Tokens and Alias Tokens, with Duration and Easing for motion. Easing is implemented by the official `curve*` tokens; those identifiers remain unchanged. The tables below document the adopted Web defaults and site mappings. Fluent's component package and fonts are not installed.
+
+### UX guideline references
+
+- [Web Interface Guidelines](https://vercel.com/design/guidelines): Interactions, Forms, Performance and Copywriting.
+- Fluent 2: [Accessibility](https://fluent2.microsoft.design/accessibility), [Content Design](https://fluent2.microsoft.design/content-design), [Handoffs](https://fluent2.microsoft.design/handoffs), [Onboarding](https://fluent2.microsoft.design/onboarding) and [Wait UX](https://fluent2.microsoft.design/wait-ux).
+- [Cieden Handbook](https://cieden.com/book): supporting reference for task analysis, information architecture and usability.
+
+Web Interface Guidelines Copywriting and Fluent 2 Content Design apply exclusively to UX Writing: navigation, controls, forms, instructions, status, errors and recovery. Research prose, biography, marketing and editorial content retain the site's editorial rules and verified source meaning. Handoffs concerns transitions between user workflows or applications; apply relevant principles to existing flows without assuming Copilot or other new features. Onboarding and Wait UX apply where the site has an actual first-use, setup or waiting task.
+
+### Component and interaction references
+
+[shadcn/ui Theming](https://ui.shadcn.com/docs/theming), [Typeset](https://ui.shadcn.com/docs/typeset) and [Components](https://ui.shadcn.com/docs/components) implement the upper layers. [Lucide](https://lucide.dev/) supplies icons. [Base UI](https://base-ui.com/) owns interactive primitives; features own business state and provider outcomes.
+
+The adopted component families are Alert, Alert Dialog, Button, Card, Chart, Collapsible, Data Table, Dropdown Menu, Empty, Field, Input, Native Select, Navigation Menu, Radio Group, Sheet, Sidebar, Skeleton, Spinner, Table, Textarea, Toast and Tooltip. See [current consumers](#available-shadcn-components). LineChart is a local Chart composition, not an additional prescribed component family.
 
 ### Decision authority and brand adaptations
 
-Fluent UI Web supplies default spacing, shapes, strokes, elevation, neutral materials and motion tokens. Brand and financial colors, Perfect Fourth typography, grid compositions, responsive thresholds and content design remain site-owned. Component mappings and choreography remain explicit site decisions.
+Apply priority in this order:
 
-Apply decisions in this order:
+1. Cross-layer web standards.
+2. Layers 01 through 05, within their assigned responsibilities.
+3. References from left to right within the same layer and domain.
 
-1. Preserve verified content, service contracts and the explicitly retained brand assets; meet the relevant accessibility requirement.
-2. Use the approved site palette, typography and editorial layout for the task.
-3. Express that treatment through the shared tokens and owned component variants, following Fluent 2's global/alias structure.
-4. Adapt shadcn defaults to those decisions. Add Base UI behavior only where an interactive primitive needs it.
+A reference cannot govern a domain assigned elsewhere. For example, Fluent organizes color roles without replacing the approved palette; shadcn/ui implements typography without selecting a new scale. Web Interface Guidelines takes precedence over Fluent Content Design for conflicting UX Writing guidance.
 
 | Brand adaptation | Site rule and reason                                                                                                                                                                                   |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -46,17 +95,15 @@ Apply decisions in this order:
 | Typography       | Use the owned Perfect Fourth treatments with Jost, rem units and a 1rem minimum. Tracking is 0; weights are 400/700; leading is 1.15 for Display/Headline/Title and 1.5 for Label/Body across locales. |
 | Features         | References do not imply a dashboard, authentication, search or a command palette. Add a feature only for a defined user need.                                                                          |
 
-A new treatment needs a reason, an owning role or component variant, and verification in its real context. Do not import another visual preset to solve an isolated component problem.
+Distinguish requirements from implementation status. An existing behavior is not an approved exception merely because it is deployed. Record unresolved differences as review findings; do not weaken a rule to describe the current code.
 
 ### Light, dark and system appearance
 
-Use `next-themes` with `data-theme`, the `mfa:theme:v1` preference key and system appearance by default. Desktop Header and mobile Menu each expose the same single `ThemeToggle`: an owned shadcn/ui Button with Lucide Moon (switch to dark) or Sun (switch to light), a localized accessible action name and a 48px target. The Button is composed through shadcn/ui TooltipTrigger using Base UI `render`. Replace native `title` with TooltipContent and retain the English, Traditional Chinese and Simplified Chinese `aria-label` for the accessible name. The Button label and TooltipContent share the same localized string; no duplicate hidden text is needed. Base UI Tooltip is visual-only and does not generate the name; it owns hover/focus, Escape dismissal and touch suppression. The name updates to the next action after switching and remains available while the popup is closed. The next state uses `resolvedTheme`, so the first click reverses the actual system-resolved appearance. Explicit light/dark choices persist across reloads, routes and languages; there is no System option in the control. Until hydration, render a disabled, stable SunMoon placeholder labeled Appearance. `SiteDocument` owns one shared provider inside the body and sets the document theme before hydration. Suppress hydration warnings only on the root HTML attribute changed by that bootstrap.
+`next-themes` owns appearance through `data-theme` and the `mfa:theme:v1` storage key. System appearance is the initial default. Explicit choices persist across routes, locales and reloads. There is no separate System control.
 
-`tokens.css` owns explicit light aliases, `data-theme="dark"` overrides and `color-scheme`. A system-preference media query applies dark aliases only when no explicit theme is set, including without JavaScript. Explicit aliases avoid build-time `light-dark()` transformations that can leave manual Dark selection using light colors. Keep brand primitives unchanged. Dark page surfaces use Fluent Web `#292929` and `#1f1f1f`, text uses white and lighter neutral roles, and links/focus use Bright Blue. Financial return aliases use readable dark-mode variants. Test rendered colors in production builds with Chromium and WebKit; checking the theme attribute alone does not establish that the appearance changed.
+Header and Sheet share `ThemeToggle`: shadcn/ui Button + Lucide Sun/Moon + localized `aria-label` + Tooltip. The 48px control names the next action. Tooltip is visual help; it does not replace the accessible name. Before hydration, show a disabled SunMoon control labeled Appearance. `SiteDocument` owns the provider and theme bootstrap.
 
-Bright Blue brand regions use the shared `brandSurface` treatment with explicit local semantic aliases and a light color context so their text, controls and focus retain the established dark lettering. The Footer stays black with white text. Footer Subscribe retains black text on its white pill. Header and Menu text wordmarks use semantic foreground colors while keeping the blue period. Logo geometry, typography, spacing and content remain independent of theme selection.
-
-Verify system changes, explicit overrides, persistence, keyboard button operation, Menu focus/scroll behavior, three languages, 320/390px phones, desktop and 200% text. Check text contrast at 4.5:1 and control/focus boundaries at 3:1 on actual surfaces, including hover and selected states. No theme transition animation is added. Full desktop navigation starts at 1280px so the Appearance control fits without overlapping the Logo; narrower layouts expose it in the Menu.
+`tokens.css` defines explicit light/dark aliases and a matching no-JavaScript system fallback. Test computed colors, not only the theme attribute. Keep the black Footer and fixed light brand regions independent of the page theme. `brandSurface` provides Black text, White fields, Bright Gray cards and Medium Gray quiet-action feedback inside Bright Blue regions.
 
 ### Token structure
 
@@ -64,7 +111,7 @@ Verify system changes, explicit overrides, persistence, keyboard button operatio
 
 ### Elevation, layout, material and motion tokens
 
-Use Fluent UI Web defaults with their official camelCase names, prefixed by `--` for CSS. The Web implementation is authoritative where the general Fluent 2 shape guidance differs (for example, Web Large is 6px and XLarge is 8px). Component role selection is a site decision; these are not claims that every shadcn component matches a Fluent component preset.
+Use Fluent UI Web geometry and motion defaults with their official camelCase names, prefixed by `--` for CSS. Material roles prioritize the ten primitives; Fluent dark surface values remain justified hierarchy exceptions. The Web implementation is authoritative where the general Fluent 2 shape guidance differs (for example, Web Large is 6px and XLarge is 8px). Component role selection is a site decision; these are not claims that every shadcn component matches a Fluent component preset.
 
 | Foundation | Official tokens and values                                                                                                                  | Site mapping                                                                                                            |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -76,65 +123,40 @@ Use Fluent UI Web defaults with their official camelCase names, prefixed by `--`
 
 Shadow geometry follows Microsoft's two-layer ambient/key formulas. Ambient/key alpha is 12%/14% in light mode and 24%/28% in dark mode. No custom outline shadow is added to these presets.
 
-| Material token               | Light            | Dark             | Consumer             |
-| ---------------------------- | ---------------- | ---------------- | -------------------- |
-| `colorNeutralBackground1`    | #ffffff          | #292929          | Primary solid, popup |
-| `colorNeutralBackground2`    | #fafafa          | #1f1f1f          | Secondary solid      |
-| `colorNeutralCardBackground` | #fafafa          | #333333          | shadcn Card          |
-| `colorBackgroundOverlay`     | rgba(0,0,0,0.4)  | rgba(0,0,0,0.5)  | Modal smoke          |
-| `colorNeutralShadowAmbient`  | rgba(0,0,0,0.12) | rgba(0,0,0,0.24) | Shadow ambient layer |
-| `colorNeutralShadowKey`      | rgba(0,0,0,0.14) | rgba(0,0,0,0.28) | Shadow key layer     |
-
-`--material-solid`, `--material-solid-secondary`, `--material-popup` and `--material-smoke` map these defaults to existing semantic consumers. Both explicit dark selection and the no-JavaScript system fallback use the same values. Menus and sheets remain opaque. Acrylic and Windows desktop Mica are not implemented; custom backdrop blur is removed rather than presented as a default Web material. The black Footer and blue brand surfaces retain explicit brand overrides.
+Neutral material and state values are listed in the [color inventory](#color-inventory). `--material-solid`, `--material-solid-secondary`, `--material-popup` and `--material-smoke` adapt those roles to their consumers. Explicit dark selection and the no-JavaScript system fallback share identical overrides. Menus and sheets remain opaque; Acrylic and Windows desktop Mica are not implemented. The black Footer and blue brand surfaces retain explicit brand overrides.
 
 The 1312px shell, 720px reading width, 1120px article width, grid proportions and responsive thresholds are site compositions, not invented Fluent tokens. CSS query thresholds remain literals. Chart coordinates and measured animation geometry remain data.
 
 Official sources: [spacing](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/spacings.ts), [radii](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/borderRadius.ts), [strokes](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/strokeWidths.ts), [shadows](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/utils/shadows.ts), [light materials](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/lightColor.ts), [dark materials](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/darkColor.ts). Verified 18 October 2026.
 
-`foundation-tokens.spec.ts` verifies rendered widths, materials and popover shadows across phone, tablet and desktop. Component theming tests cover notification shadow propagation; motion tests cover timing, interrupted interaction and reduced motion.
+`design-foundations.spec.ts` verifies rendered widths, materials and popover shadows across phone, tablet and desktop. Component theming tests cover notification shadow propagation; motion tests cover timing, interrupted interaction and reduced motion.
 
 ### Color and stroke ownership
 
-Follow Fluent 2's [global and alias layers](https://fluent2.microsoft.design/design-tokens) for structure. Neutral material colors use Fluent Web defaults; brand, text and financial roles remain site-owned. Keep raw palette and alpha values in `tokens.css`; website components consume semantic aliases. Centralize derived `color-mix()` expressions there as well. Preserve existing values and justified differences rather than assigning one tint to every interaction.
+Define approved raw values only in `tokens.css`; component roles reference them. Do not use `color-mix()`, color utility alpha modifiers or steady-state opacity to manufacture colors. Independent email and SVG renderers may use literal Primitive Colors. Tailwind's default color namespace is reset; only the owned semantic aliases are exported. Browser forced-colors system keywords remain an accessibility exception, not a third authored palette.
 
-| Role                         | Tokens and use                                                                                                                                                                                                                                                               |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Decorative separators        | `--border-subtle`, `--border-strong`, `--border-inverse-subtle`; section, table and Footer dividers. They do not identify inputs or keyboard focus.                                                                                                                          |
-| Control boundaries           | `--border-control`, `--border-control-inverse`, consumed through `--field-*`; identify editable controls on light and inverse surfaces.                                                                                                                                      |
-| Brand and validation strokes | `--border-brand` for editorial/status accents; `--border-error` for the existing error stroke. Financial return colors remain separate from validation status.                                                                                                               |
-| Focus and touch feedback     | `--focus-ring-on-light`, `--focus-ring-on-dark`, and the existing Medium Blue `--focus-ring-brand` treatment for Menu/Support. `--focus-ring-color` inherits the surrounding surface's focus treatment. Touch feedback and persistent keyboard focus remain separate states. |
-| Data decoration              | `--allocation-divider`, `--allocation-swatch-border`, `--chart-axis-border` and `--text-chart-secondary` preserve the existing alpha treatments.                                                                                                                             |
-| Interaction surfaces         | `--holding-row-hover-surface`, `--portfolio-row-hover-surface`, `--memo-*-hover-surface`, `--memo-card-pressed-surface`, `--memo-card-touch-pressed-surface` and `--support-option-*` preserve component-specific hover, press and selection treatments.                     |
+Decorative dividers use `--border-subtle`; editable boundaries use `--border-control`; errors use `--border-error`. Focus uses the contextual `--focus-ring-color` and remains separate from hover and selection. Financial returns use `--text-return-positive`/`--text-return-negative`, never interface danger colors.
 
-Equal current values do not imply equal responsibilities. Memo cards retain their existing 22% tint while hovered and pressed together; the separate pressed alias does not change selector precedence. Selection persists independently of hover; focus remains visible independently of selection. Disabled controls retain their existing opacity/cursor/border treatment; do not invent unused state colors or change their behavior during token maintenance. These aliases do not certify every existing contrast combination as WCAG AA.
+Holding rows, portfolio rows, memo disclosures/cards and Support options share the neutral hover role. Desktop memo press uses the stronger pressed role; touch press retains the hover surface to preserve existing touch choreography. Sidebar hover/press use Fluent neutral states; selected navigation uses Medium Gray in light mode and the Fluent Card surface in dark mode. No component owns a one-off hover mixture. Disabled controls retain disabled semantics, cursor and applicable dashed-border/loading feedback, at full color opacity; no unused disabled palette is installed.
 
-React Email keeps literal inline colors for email-client compatibility. Standalone error documents and metadata/brand artwork also keep their independently rendered color values. These exceptions must not become a reason to hardcode website component colors.
-
-`src/app/styles/color-roles.spec.ts` checks rendered colors and stroke roles across all three languages, including component hover/press/selection and touch variants. Existing material and focus tests cover control boundaries, modal behavior and focus contrast.
+Component aliases with distinct responsibilities remain even when their values match. Remove unused roles, intermediate alpha variables and duplicate literal values, not meaningful semantic boundaries. The required ten primitives remain the approved source inventory; Bright Gray supplies website secondary surfaces, light hover states and email backgrounds.
 
 ### Component token contract
 
-Component roles are aliases within the same token system. `--action-primary-*`, `--action-contrast-*`, `--action-inverse-*` and `--action-quiet-*` describe action appearance and feedback. Button and ButtonLink consume the same variant definition. `--field-*` describes standard input, textarea and native-select surfaces; inverse fields have their own text, border and placeholder roles.
+Components consume semantic aliases from `tokens.css`:
 
-Toast outlines and default Table, CardFooter and AlertDialogFooter separators explicitly use `border-border`, mapped to `--border-subtle`. The global reset retains `currentColor`; intentional strong feature borders keep their explicit roles. Change a shared role in `tokens.css` to update all consumers. Keep background, foreground, border and hover colors compatible as a set. Use `variant` for an existing appearance and `className` for placement or sizing, rather than overriding a shared component's colors from its caller. Preserve justified variants such as the Footer's inverse form. Light and dark aliases share the same component structure and state rules.
+- `--action-*`: Button and ButtonLink surfaces, text and feedback.
+- `--field-*`: standard and inverse inputs, textareas and native selects. Standard placeholders use `--field-text` at full opacity; inverse fields have a separate placeholder role.
+- `--color-*`: consumed Tailwind/shadcn aliases. Do not register unused defaults.
+- `--layer-*`: navigation, modal and popover stacking, separate from shadows.
 
-`src/components/ui/input.spec.ts` verifies propagation from a native link through client navigation to form buttons, shared input/textarea roles, and the independent inverse field treatment. Existing control-state checks verify loading, disabled, failure and retry behavior.
+`brandSurface` maps the Card background to Bright Gray and text to Black, including quiet actions. Quiet-action feedback uses Medium Gray. These local mappings use existing primitives.
+
+Use component variants for appearance and caller classes for placement. Keep foreground, background, border and interactive states compatible as a set. The reset retains `currentColor`; separators that need a subtle border explicitly use `border-border`.
 
 ## Purpose and design principles
 
-| Principle                             | Practical meaning                                                                                |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Design for readers and users          | Make code understandable, documentation easy to find, and interfaces easy to use.                |
-| Keep the same meaning consistent      | Use consistent names for the same responsibilities and consistent feedback for the same actions. |
-| Make intent explicit                  | Clearly show types, responsibilities, states, constraints, and outcomes.                         |
-| Choose a sufficiently simple solution | Avoid unnecessary abstraction and configuration while retaining meaningful differences.          |
-| Lower the cost of change              | Maintain shared information in one place and make the impact of changes traceable.               |
-| Give rules a reason                   | Rules should solve real problems; exceptions should be explainable and verifiable.               |
-| Automate mechanical work              | Let tools handle formatting and static checks; use human judgment for intent and experience.     |
-
-When principles conflict, protect correctness, accessibility, and user understanding before formal consistency or code brevity.
-
-Make the site easier to understand, use, change and verify. Share components when responsibilities match; keep justified language, form and service variants.
+Make research, financial data and reader actions easy to understand. Use consistent terms and feedback, native semantics, readable contrast and content-driven layouts. Share components when their responsibilities match; retain justified language and workflow variants. Prefer one source for each rule and verify exceptions in context.
 
 ## Using this system
 
@@ -203,19 +225,18 @@ The inventory below covers every non-test module currently under `src/components
 | Toast            | [toast.tsx](../src/components/ui/toast.tsx)                     | Used            | Memo article copy-link success/failure with instance-local manager                                        |
 | Tooltip          | [tooltip.tsx](../src/components/ui/tooltip.tsx)                 | Used            | Theme-toggle visual label on hover and keyboard focus; localized aria-label supplies its accessible name  |
 
-Tooltip is used by desktop and Sheet theme toggles through `src/components/ui/tooltip.tsx`. Each toggle has a local provider with a 600ms hover delay; keyboard focus opens the hint without that delay. The popup uses existing foreground/background, radius, popover-layer and motion aliases. No new colors or theme provider are introduced.
+Use these composition boundaries:
 
-Page composition uses these building blocks:
+- **Header:** Navigation Menu for desktop links, Dropdown Menu for desktop languages, Sheet for mobile/Tablet navigation. Sidebar is only the menu subset inside Sheet.
+- **Language disclosure:** Collapsible opens upward above its fixed trigger. It keeps a 4px gap to the theme toggle.
+- **Theme toggle:** a local Tooltip provider delays pointer entry by 600ms; keyboard focus opens immediately. Its localized `aria-label` supplies the accessible name.
+- **Holdings:** the feature owns TanStack sorting and calculations; DataTable renders native Table semantics, headings, totals and `aria-sort`. Mobile sorting uses Native Select and Button.
+- **Performance:** one interactive Recharts composition in Card, with solid Portfolio and dashed SPY. Keep keyboard/touch comparison, missing-data gaps and the monthly Table alternative. No static chart or custom series buttons.
+- **Memos:** linked Cards represent published articles; planned research stays noninteractive. H2/H3 semantics depend on placement. Article outlines compose Collapsible directly; indexes and monthly tables use AnimatedDisclosure.
+- **Forms:** standard forms use FormPanel; Footer Subscribe retains its inverse treatment. Field feedback and provider results stay inline. Support enhances native payment radios after hydration.
+- **Feedback:** Alert Dialog confirms draft clearing. Memo copy-link success/failure uses an instance-local Toast manager; copying omits query and fragment. Empty represents no data, Skeleton represents loading, and Spinner accompanies pending actions.
 
-- Home and the memo index use Card Header, Content, Description and Footer inside each real article link. Planned research remains a noninteractive article. The heading level follows its page placement.
-- Portfolio follows the shadcn/ui Data Table guide: a feature-owned TanStack sorted row model and a shared Table-based renderer. Holding rows and totals also use TableRow, TableHead, TableCell and TableFooter; the guide is a composition pattern, not a separately installed DataTable primitive. Native column/row headings, `aria-sort`, mobile sorting, return colors and totals remain available; sorting never changes financial calculations. Mobile sorting uses NativeSelect and Button; column sorting uses Button with the existing aria-sort state.
-- Performance groups each interactive Recharts Line Chart in a rounded Card, with localized Tooltip and no static chart or mode switch. The monthly table uses shadcn/ui Table, Header, Body, Row, Head, Cell and Caption inside a mounted Collapsible panel; opening the panel requires JavaScript. Table containerProps provides the single named, keyboard-focusable horizontal/vertical scroll region, preserving sticky headers and row/column scopes without nested scroll containers. Both series remain visible, with Portfolio solid and SPY dashed. There are no custom series or data-point buttons. Preserve pointer/touch/arrow-key comparison and gaps for null observations.
-- Contact, standard Subscribe and Support forms share a Card-based Form Panel with responsive padding. Footer Subscribe keeps its inverse surface. Field errors and asynchronous results remain inline, with each form owning its submission state. Native payment radios and POST retain the no-JavaScript path.
-- Header composes real desktop links with Navigation Menu and keeps its Base UI Dropdown Menu and Sheet, including navigation recovery parameters and the existing modal/focus lifecycle. Desktop and mobile appearance use the same Button-based light/dark toggle with Lucide icons and next-themes. Mobile language options use the shared shadcn/ui Collapsible (Base UI Root, Trigger and Panel) inside the Sheet. Base UI owns expanded state, ARIA relationships and panel visibility; CSS owns the height transition and respects reduced motion. The language group and appearance button retain a 4px gap.
-
-Memo indexes and monthly tables use the shared AnimatedDisclosure composition over shadcn/ui Collapsible. Article outlines compose Collapsible, CollapsibleTrigger and CollapsibleContent directly, with React `open` state and `onOpenChange`, while reusing the disclosure height-transition styles. Base UI owns state, ARIA and panel visibility; CSS owns reversible height transitions and reduced-motion behavior. Contact uses Alert Dialog before clearing an unsent message and its locale-specific saved draft; cancellation preserves both. Sending locks the clear control. Memo articles use an instance-local Toast manager for copy-link success or clipboard failure, with localized notifications and keyboard dismissal. Copying excludes query parameters and fragments. Provider results remain inline rather than being duplicated in toasts. Import Recharts and TanStack Table only from components that need them; do not introduce a global component barrel or mount a toast provider on every page. Use [Chart](https://ui.shadcn.com/docs/components/base/chart), [Data Table](https://ui.shadcn.com/docs/components/base/data-table) and [Toast](https://ui.shadcn.com/docs/components/base/toast) for upstream composition examples.
-
-Chart configuration accepts trusted, authored color tokens; it is not a reader-input format. Map shadcn color aliases through `tokens.css`, keeping explicit/system dark mode consistent. `next-themes` remains the single appearance mechanism. Respect reduced motion and use the existing Button's `primary`, `contrast`, `inverse` and `quiet` variants when composing new primitives.
+Base UI synchronizes primitive ARIA and visibility; React owns controlled application state. Keep server-rendered disclosure content mounted while closed. A single named, focusable Table scroll region owns overflow and sticky headers. Import Recharts and TanStack only where needed; do not add a global component barrel or application-wide Toast provider.
 
 Shared components provide a fixed set of variants:
 
@@ -223,7 +244,7 @@ Shared components provide a fixed set of variants:
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Container`                                      | Shared maximum width and responsive gutters; backgrounds belong to its outer section.                                                                                                                                                                                        |
 | `PageHero`                                       | Standard, portfolio, performance or support geometry; localized content remains with the page.                                                                                                                                                                               |
-| `Button` / `ButtonLink`                          | Primary, contrast, inverse or quiet surface; regular, small or text size. Native button and link semantics remain distinct. Button disabled feedback uses standard, muted or muted-busy variants, preserving preferences opacity without parent overrides.                   |
+| `Button` / `ButtonLink`                          | Primary, contrast, inverse or quiet surface; regular, small, text or icon size. Native button and link semantics remain distinct. Button disabled feedback uses standard, muted or muted-busy variants, preserving preferences opacity without parent overrides.             |
 | `FormField`, `Input`, `Textarea`, `NativeSelect` | Label association, visible or hidden label, standard rounded or inverse compact fields. Business validation and submission stay with the feature.                                                                                                                            |
 | `Alert`                                          | Standard or inverse typography, reserved space and polite live feedback; an explicit alert role supports assertive announcements. Compose optional AlertDescription and AlertAction without changing existing appearance. Callers associate labels/descriptions when needed. |
 | `PortfolioMetric`                                | Plain, highlight, brand or paper financial surfaces, shared typography and surface-specific note colors.                                                                                                                                                                     |
@@ -244,33 +265,37 @@ Use size-first names: Large / Medium / Small + Display / Headline / Title / Labe
 
 All tracking is **0**. Weights are **400 and 700 only**. Display, Headline and Title use **1.15** leading; Label and Body use **1.5**. These rules apply to English, Traditional Chinese, Simplified Chinese, every viewport and every interaction state. Inline emphasis uses 700 and inherits its surrounding size and leading. Keep Jost before the locale-specific Noto Sans fallback; English routes must not load Chinese fonts. The shared text wordmark uses Jost 700, zero tracking and 1.15 leading, with 21px desktop and 18px mobile as a brand exception.
 
-| Role              | Desktop size / line height | Mobile size / line height | Leading | Weight | Tracking | Use                                                                         |
-| ----------------- | -------------------------- | ------------------------- | ------- | ------ | -------- | --------------------------------------------------------------------------- |
-| `Large Display`   | 90 / 103.5                 | 51 / 58.65                | 1.15    | 700    | 0        | Home and memo-article H1; featured return                                   |
-| `Medium Display`  | 67 / 77.05                 | 51 / 58.65                | 1.15    | 700    | 0        | Summary market value, returns and Support amounts                           |
-| `Small Display`   | 38 / 43.7                  | 38 / 43.7                 | 1.15    | 700    | 0        | Chart-ring figures                                                          |
-| `Large Headline`  | 67 / 77.05                 | 38 / 43.7                 | 1.15    | 700    | 0        | General page H1 and major Home sections                                     |
-| `Medium Headline` | 51 / 58.65                 | 38 / 43.7                 | 1.15    | 700    | 0        | Disclaimer H1                                                               |
-| `Small Headline`  | 38 / 43.7                  | 28 / 32.2                 | 1.15    | 700    | 0        | About sections, holdings section and article H2                             |
-| `Large Title`     | 28 / 32.2                  | 28 / 32.2                 | 1.15    | 700    | 0        | Memo cards and form-panel headings                                          |
-| `Medium Title`    | 21 / 24.15                 | 21 / 24.15                | 1.15    | 700    | 0        | Charts, article H3, utility-page H1, Footer headings and holdings summaries |
-| `Large Label`     | 16 / 24                    | 16 / 24                   | 1.5     | 700    | 0        | Field labels, table headings, category labels and CTA actions               |
-| `Medium Label`    | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Sidebar, navigation, selectors and secondary controls                       |
-| `Large Body`      | 21 / 31.5                  | 21 / 31.5                 | 1.5     | 400    | 0        | Hero and short editorial introductions                                      |
-| `Medium Body`     | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Article and Disclaimer prose                                                |
-| `Small Body`      | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Card copy, instructions, table figures, dates, notes and feedback           |
+| Role              | Desktop size / line height | Mobile size / line height | Leading | Weight | Tracking | Use                                                               |
+| ----------------- | -------------------------- | ------------------------- | ------- | ------ | -------- | ----------------------------------------------------------------- |
+| `Large Display`   | 90 / 103.5                 | 51 / 58.65                | 1.15    | 700    | 0        | All page Hero H1s; featured return                                |
+| `Medium Display`  | 67 / 77.05                 | 51 / 58.65                | 1.15    | 700    | 0        | Support amounts; summary KPIs fixed at 51px                       |
+| `Small Display`   | 38 / 43.7                  | 38 / 43.7                 | 1.15    | 700    | 0        | Chart-ring figures                                                |
+| `Large Headline`  | 67 / 77.05                 | 38 / 43.7                 | 1.15    | 700    | 0        | Major Home sections                                               |
+| `Medium Headline` | 51 / 58.65                 | 38 / 43.7                 | 1.15    | 700    | 0        | Reserved intermediate headline role                               |
+| `Small Headline`  | 38 / 43.7                  | 28 / 32.2                 | 1.15    | 700    | 0        | About sections, holdings section and article H2                   |
+| `Large Title`     | 28 / 32.2                  | 28 / 32.2                 | 1.15    | 700    | 0        | Memo cards and form-panel headings                                |
+| `Medium Title`    | 21 / 24.15                 | 21 / 24.15                | 1.15    | 700    | 0        | Charts, article H3, Footer headings and holdings summaries        |
+| `Large Label`     | 16 / 24                    | 16 / 24                   | 1.5     | 700    | 0        | Field labels, table headings, category labels and CTA actions     |
+| `Medium Label`    | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Sidebar, navigation, selectors and secondary controls             |
+| `Large Body`      | 21 / 31.5                  | 21 / 31.5                 | 1.5     | 400    | 0        | Hero and short editorial introductions                            |
+| `Medium Body`     | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Article and Disclaimer prose                                      |
+| `Small Body`      | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Card copy, instructions, table figures, dates, notes and feedback |
 
 The table lists desktop and mobile values. Below 50rem use mobile sizes. From 50rem to below 75rem use Large Display 67px; Medium Display, Large Headline and Medium Headline 51px; other roles use desktop sizes. At 75rem use desktop sizes. Breakpoints change size only; leading, weight and tracking stay fixed. Layout breakpoints remain independent.
 
-Home uses Large Display for its H1 and featured return, Large Headline for major sections, and Large Body for introductions. General page heroes use Large Headline. Memo article heroes use Large Display; Disclaimer heroes use Medium Headline; article H2 uses Small Headline and H3 uses Medium Title. Email Preferences uses Large Headline like other general page heroes. Subscription confirmation retains Medium Title through PageHero's finite title-role variant. Memo/form headings use Large Title. Support amounts use responsive Medium Display. Home, Portfolio and Performance summary KPIs use Medium Display with a fixed 51px (3.1875rem) size at every viewport, retaining 1.15 leading, weight 700 and zero tracking; ring values use Small Display; tables use Small Body and Large Label. Navigation uses Medium Label; CTAs use Large Label (16px/24px, weight 700), including primary buttons, secondary text actions, Email Preferences and error recovery links. The article metadata Copy Article Link action is an exception: it uses Small Body (16px/24px, weight 400) to match its adjacent text. Toast titles, including the localized article-copy success and failure notifications, also use Small Body (16px/24px, weight 400). Ordinary navigation and prose links retain their existing roles.
+Apply these role assignments and exceptions:
 
-Footer Quick Links use 36px minimum-height rows with no grid gap, retaining 16px/24px Medium Label text. This compact navigation treatment is independent of the 48px mobile Sidebar controls.
+- Every page Hero H1 uses Large Display, including memo articles, preferences and confirmation pages.
+- Home section headings use Large Headline; memo/form headings use Large Title. Article H2/H3 use Small Headline/Medium Title.
+- Summary KPIs remain 51px at every width. Support amounts use responsive Medium Display; ring values use Small Display. Financial figures use tabular numerals.
+- CTAs use Large Label. Copy Article Link and Toast titles use Small Body, matching article metadata. Ordinary navigation uses Medium Label.
+- Footer links use 36.15px minimum-height rows: the 24.15px heading row plus a 12px gap. Mobile Sidebar controls retain 48px targets.
 
-Financial values use tabular numerals and can exceed nearby headings. Do not impose a smaller-than-heading invariant. Keep complete values and unchanged colors, signs, units and precision. Home and Performance summaries stack below 72rem of their financial-summary container; Portfolio stacks below 72rem of its inner Hero summary. Reflow columns first. If a full value still cannot fit at enlarged text sizes, its named, keyboard-focusable region scrolls horizontally without shrinking, truncating or wrapping the number. Show a localized horizontal-scroll hint only while a summary value overflows, associate it with the scroll region, and make only overflowing regions keyboard-focusable. The page itself must not overflow. Typography does not alter document heading semantics.
+Reflow financial summaries below 72rem of container width. Preserve signs, units, precision and complete values. If enlarged text still overflows, use a named local horizontal-scroll region with a localized hint; make it focusable only while overflowing. Never shrink or truncate values to preserve columns.
 
-Preserve the existing component surfaces, page grids and CTA placement; apply the vertical rhythm defined below. Investment memo article prose, summary, language notice and disclaimer share the title’s centered 1120px maximum-width container with equal left and right outer margins; text remains left-aligned; on smaller screens they fill the available container width. Controls retain touch-target padding independently of the shorter text line box. Chart axis labels use Small Body; the CSS axis wrapper compensates for the line height to keep labels centered on SVG ticks.
+Article title, summary, notice, body and disclaimer share the centered 1120px container. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation.
 
-`typography-roles.spec.ts` verifies computed role metrics, scale membership, locales, colors, focus and reflow. `financial-type-hierarchy.spec.ts` checks full financial values at regular and enlarged text sizes without the former subordinate-value rule. Test against the specification, not implementation class strings.
+`typography-roles.spec.ts` checks computed metrics and reflow. `financial-type-hierarchy.spec.ts` checks complete values at regular and enlarged text sizes. Assert rendered behavior, not class strings.
 
 ### Memo article Typeset
 
@@ -291,185 +316,183 @@ Override upstream automatic mobile enlargement, heading scale, 500/600 weights a
 
 ### Color inventory
 
-The tables inventory the current declarations in [tokens.css](../src/app/styles/tokens.css), including compatibility aliases. They describe the implementation, not an upstream visual preset. `var(...)` references resolve through the palette below; mixed colors retain their exact formula rather than an approximate hex conversion. A declared token is not proof that a page currently renders it. Dark-mode entries apply to explicit dark appearance and the system-dark fallback. Component-local overrides are listed separately.
+Two source categories feed semantic component aliases and shadcn/Tailwind bindings. Aliases are mappings, not additional palette colors. Dark entries apply to both explicit and system-dark appearance. Official values were checked against [Fluent Web light colors](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/lightColor.ts), [dark colors](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/alias/darkColor.ts) and [status colors](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/colors.ts) on 2026-10-18.
 
-#### Palette and alpha primitives
+#### Primitive Colors
 
-| Token               | Value                       | Role            |
-| ------------------- | --------------------------- | --------------- |
-| `--black`           | `#000000`                   | Black           |
-| `--white`           | `#ffffff`                   | White           |
-| `--blue-deep`       | `#0d288b`                   | Blue deep       |
-| `--blue-medium`     | `#3d8af7`                   | Blue medium     |
-| `--blue-bright`     | `#7dcbfa`                   | Blue bright     |
-| `--neutral-100`     | `hsl(0 0% 95%)`             | Neutral 100     |
-| `--neutral-200`     | `hsl(0 0% 92%)`             | Neutral 200     |
-| `--neutral-300`     | `hsl(0 0% 90%)`             | Neutral 300     |
-| `--neutral-400`     | `hsl(0 0% 92%)`             | Neutral 400     |
-| `--neutral-500`     | `hsl(0 0% 79%)`             | Neutral 500     |
-| `--neutral-600`     | `hsl(0 0% 66%)`             | Neutral 600     |
-| `--neutral-700`     | `hsl(0 0% 56%)`             | Neutral 700     |
-| `--neutral-800`     | `hsl(0 0% 49%)`             | Neutral 800     |
-| `--neutral-900`     | `hsl(0 0% 30%)`             | Neutral 900     |
-| `--neutral-1000`    | `hsl(0 0% 9%)`              | Neutral 1000    |
-| `--gray-deep`       | `#cccccc`                   | Gray deep       |
-| `--gray-medium`     | `#eef0f2`                   | Gray medium     |
-| `--gray-bright`     | `#f5f7fa`                   | Gray bright     |
-| `--black-alpha-18`  | `rgba(0, 0, 0, 0.18)`       | Black alpha 18  |
-| `--black-alpha-20`  | `rgba(0, 0, 0, 0.2)`        | Black alpha 20  |
-| `--black-alpha-28`  | `rgba(0, 0, 0, 0.28)`       | Black alpha 28  |
-| `--white-alpha-22`  | `rgba(255, 255, 255, 0.22)` | White alpha 22  |
-| `--white-alpha-60`  | `rgba(255, 255, 255, 0.6)`  | White alpha 60  |
-| `--white-alpha-70`  | `rgba(255, 255, 255, 0.7)`  | White alpha 70  |
-| `--white-alpha-78`  | `rgba(255, 255, 255, 0.78)` | White alpha 78  |
-| `--white-alpha-84`  | `rgba(255, 255, 255, 0.84)` | White alpha 84  |
-| `--red-error`       | `#ff0000`                   | Red error       |
-| `--market-positive` | `#007c66`                   | Market positive |
-| `--market-negative` | `#bf2a2c`                   | Market negative |
-| `--market-neutral`  | `#000000`                   | Market neutral  |
+| Token               | Light     | Dark      |
+| ------------------- | --------- | --------- |
+| `--black`           | `#000000` | `#000000` |
+| `--white`           | `#ffffff` | `#ffffff` |
+| `--blue-deep`       | `#0d288b` | `#0d288b` |
+| `--blue-medium`     | `#3d8af7` | `#3d8af7` |
+| `--blue-bright`     | `#7dcbfa` | `#7dcbfa` |
+| `--gray-deep`       | `#cccccc` | `#cccccc` |
+| `--gray-medium`     | `#eef0f2` | `#eef0f2` |
+| `--gray-bright`     | `#f5f7fa` | `#f5f7fa` |
+| `--market-positive` | `#007c66` | `#007c66` |
+| `--market-negative` | `#bf2a2c` | `#bf2a2c` |
+
+These are the only Layer 01 primitives. Black also represents neutral financial values; there is no duplicate `market-neutral` primitive. App icons, wordmarks and email templates use this inventory.
+
+#### Fluent 2 Functional Colors
+
+Primitive values take precedence over Fluent defaults. Fluent provides the functional role structure; only dark surface hierarchy, readable dark financial/status text and official overlay/shadow alpha roles retain additional Fluent values. `colorBrandForeground1` maps directly to the owned deep/bright blues; no custom brand ramp is generated. Only the consumed dark success role is declared; no unused warning, persona or extra chart palette is installed.
+
+| Token                              | Light                            | Dark                             |
+| ---------------------------------- | -------------------------------- | -------------------------------- |
+| `--colorNeutralForeground2`        | `var(--black)`                   | `var(--gray-deep)`               |
+| `--colorNeutralForeground3`        | `var(--black)`                   | `var(--gray-deep)`               |
+| `--colorNeutralBackground1Hover`   | `var(--gray-bright)`             | `#3d3d3d`                        |
+| `--colorNeutralBackground1Pressed` | `var(--gray-medium)`             | `var(--colorNeutralBackground2)` |
+| `--colorNeutralStrokeAccessible`   | `var(--colorNeutralForeground3)` | `var(--colorNeutralForeground3)` |
+| `--colorStatusDangerForeground2`   | `var(--market-negative)`         | `#eeacb2`                        |
+| `--colorBrandForeground1`          | `var(--blue-deep)`               | `var(--blue-bright)`             |
+| `--colorNeutralBackground1`        | `var(--white)`                   | `#292929`                        |
+| `--colorNeutralBackground2`        | `var(--gray-bright)`             | `#1f1f1f`                        |
+| `--colorNeutralCardBackground`     | `var(--colorNeutralBackground2)` | `#333333`                        |
+| `--colorBackgroundOverlay`         | `rgba(0, 0, 0, 0.4)`             | `rgba(0, 0, 0, 0.5)`             |
+| `--colorNeutralShadowAmbient`      | `rgba(0, 0, 0, 0.12)`            | `rgba(0, 0, 0, 0.24)`            |
+| `--colorNeutralShadowKey`          | `rgba(0, 0, 0, 0.14)`            | `rgba(0, 0, 0, 0.28)`            |
+
+`--colorStatusSuccessForeground2` is defined only in dark mode as `#9fd89f`, the default Fluent dark success foreground. Light financial gains use the Positive primitive.
 
 #### Semantic, interaction and shadow colors
 
-The role column follows the token's owning surface or state. “Inherit light definition” means the same expression is used in dark mode; its referenced tokens may resolve differently.
+These component-facing aliases consume the two source categories directly. Inverse text, controls and chart decoration are opaque primitives. Dark financial text uses Fluent Success/Danger Foreground 2. Official overlay/shadow alpha colors retain their exact default RGBA values.
 
-| Token / role                        | Light definition                                                     | Dark definition                                                      |
-| ----------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `--overlay-scrim`                   | `var(--material-smoke)`                                              | Inherit light definition                                             |
-| `--text-error`                      | `var(--market-negative)`                                             | `#ff6377`                                                            |
-| `--shadow-surface`                  | `var(--shadow2)`                                                     | Inherit light definition                                             |
-| `--shadow-popover`                  | `var(--shadow16)`                                                    | Inherit light definition                                             |
-| `--border-subtle`                   | `var(--gray-medium)`                                                 | `#333333`                                                            |
-| `--grid-guide`                      | `var(--border-subtle)`                                               | Inherit light definition                                             |
-| `--border-strong`                   | `var(--black)`                                                       | `var(--white)`                                                       |
-| `--border-control`                  | `var(--neutral-800)`                                                 | `#a1a1a1`                                                            |
-| `--border-inverse-subtle`           | `var(--white-alpha-22)`                                              | Inherit light definition                                             |
-| `--border-control-inverse`          | `var(--white-alpha-70)`                                              | Inherit light definition                                             |
-| `--border-brand`                    | `var(--blue-medium)`                                                 | Inherit light definition                                             |
-| `--border-error`                    | `var(--red-error)`                                                   | Inherit light definition                                             |
-| `--surface-subtle`                  | `var(--surface-secondary)`                                           | Inherit light definition                                             |
-| `--surface-selected`                | `color-mix(in srgb, var(--blue-medium) 8%, var(--surface-primary))`  | `color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary))` |
-| `--text-return-positive`            | `var(--market-positive)`                                             | `#4ade80`                                                            |
-| `--text-return-negative`            | `var(--market-negative)`                                             | `#ff6377`                                                            |
-| `--focus-ring-on-light`             | `var(--blue-deep)`                                                   | Inherit light definition                                             |
-| `--focus-ring-on-dark`              | `var(--blue-bright)`                                                 | Inherit light definition                                             |
-| `--focus-ring-brand`                | `var(--blue-medium)`                                                 | Inherit light definition                                             |
-| `--focus-ring-color`                | `var(--interactive-accent)`                                          | Inherit light definition                                             |
-| `--surface-primary`                 | `var(--material-solid)`                                              | Inherit alias; material becomes #292929                              |
-| `--surface-secondary`               | `var(--material-solid-secondary)`                                    | Inherit alias; material becomes #1f1f1f                              |
-| `--surface-inverse`                 | `var(--black)`                                                       | Inherit light definition                                             |
-| `--surface-brand`                   | `var(--blue-deep)`                                                   | Inherit light definition                                             |
-| `--surface-highlight`               | `var(--blue-bright)`                                                 | Inherit light definition                                             |
-| `--text-primary`                    | `var(--black)`                                                       | `var(--white)`                                                       |
-| `--text-secondary`                  | `var(--neutral-900)`                                                 | `#a1a1a1`                                                            |
-| `--text-tertiary`                   | `var(--neutral-1000)`                                                | `#e4e4e4`                                                            |
-| `--text-brand`                      | `var(--blue-deep)`                                                   | `var(--blue-bright)`                                                 |
-| `--text-inverse`                    | `var(--white)`                                                       | Inherit light definition                                             |
-| `--text-inverse-secondary`          | `var(--white-alpha-84)`                                              | Inherit light definition                                             |
-| `--text-inverse-tertiary`           | `var(--white-alpha-78)`                                              | Inherit light definition                                             |
-| `--text-highlight`                  | `var(--blue-bright)`                                                 | Inherit light definition                                             |
-| `--chart-benchmark`                 | `var(--blue-medium)`                                                 | Inherit light definition                                             |
-| `--interactive-accent`              | `var(--blue-deep)`                                                   | `var(--blue-bright)`                                                 |
-| `--chart-portfolio`                 | `var(--blue-deep)`                                                   | `var(--blue-bright)`                                                 |
-| `--action-primary-surface`          | `var(--black)`                                                       | `var(--white)`                                                       |
-| `--action-primary-text`             | `var(--white)`                                                       | `var(--black)`                                                       |
-| `--action-primary-hover-text`       | `var(--white)`                                                       | Inherit light definition                                             |
-| `--action-primary-hover-surface`    | `var(--surface-brand)`                                               | Inherit light definition                                             |
-| `--action-contrast-surface`         | `var(--black)`                                                       | `var(--white)`                                                       |
-| `--action-contrast-text`            | `var(--white)`                                                       | `var(--black)`                                                       |
-| `--action-contrast-hover-surface`   | `var(--surface-highlight)`                                           | Inherit light definition                                             |
-| `--action-contrast-hover-text`      | `var(--black)`                                                       | Inherit light definition                                             |
-| `--action-inverse-surface`          | `var(--white)`                                                       | Inherit light definition                                             |
-| `--action-inverse-text`             | `var(--blue-deep)`                                                   | Inherit light definition                                             |
-| `--action-inverse-hover-surface`    | `var(--surface-highlight)`                                           | Inherit light definition                                             |
-| `--action-quiet-text`               | `var(--text-primary)`                                                | Inherit light definition                                             |
-| `--action-quiet-hover-surface`      | `var(--surface-selected)`                                            | Inherit light definition                                             |
-| `--sidebar-text`                    | `var(--text-primary)`                                                | Inherit light definition                                             |
-| `--sidebar-hover-surface`           | `var(--neutral-100)`                                                 | `#242424`                                                            |
-| `--sidebar-pressed-surface`         | `var(--neutral-200)`                                                 | `#303030`                                                            |
-| `--sidebar-selected-surface`        | `var(--surface-selected)`                                            | Inherit light definition                                             |
-| `--sidebar-language-surface`        | `var(--surface-subtle)`                                              | Inherit light definition                                             |
-| `--holding-row-hover-surface`       | `color-mix(in srgb, var(--blue-bright) 12%, var(--surface-primary))` | Inherit light definition                                             |
-| `--portfolio-row-hover-surface`     | `color-mix(in srgb, var(--blue-bright) 10%, var(--surface-primary))` | Inherit light definition                                             |
-| `--memo-disclosure-hover-surface`   | `color-mix(in srgb, var(--blue-bright) 18%, var(--surface-primary))` | Inherit light definition                                             |
-| `--memo-row-hover-surface`          | `var(--memo-disclosure-hover-surface)`                               | Inherit light definition                                             |
-| `--memo-card-hover-surface`         | `color-mix(in srgb, var(--blue-bright) 22%, var(--surface-primary))` | Inherit light definition                                             |
-| `--memo-card-pressed-surface`       | `color-mix(in srgb, var(--blue-bright) 28%, var(--surface-primary))` | Inherit light definition                                             |
-| `--memo-card-touch-pressed-surface` | `var(--memo-card-hover-surface)`                                     | Inherit light definition                                             |
-| `--support-option-hover-surface`    | `color-mix(in srgb, var(--blue-bright) 24%, var(--surface-primary))` | Inherit light definition                                             |
-| `--support-option-selected-surface` | `var(--surface-brand)`                                               | Inherit light definition                                             |
-| `--support-option-selected-text`    | `var(--text-inverse)`                                                | Inherit light definition                                             |
-| `--allocation-divider`              | `var(--black-alpha-18)`                                              | Inherit light definition                                             |
-| `--allocation-swatch-border`        | `var(--black-alpha-20)`                                              | Inherit light definition                                             |
-| `--chart-axis-border`               | `var(--black-alpha-28)`                                              | `#ffffff70`                                                          |
-| `--chart-reference`                 | `var(--black)`                                                       | `#cccccc`                                                            |
-| `--text-chart-secondary`            | `color-mix(in srgb, var(--text-primary) 68%, transparent)`           | Inherit light definition                                             |
-| `--field-surface`                   | `var(--surface-primary)`                                             | Inherit light definition                                             |
-| `--field-text`                      | `var(--text-primary)`                                                | Inherit light definition                                             |
-| `--field-border`                    | `var(--border-control)`                                              | Inherit light definition                                             |
-| `--field-focus-border`              | `var(--interactive-accent)`                                          | Inherit light definition                                             |
-| `--field-focus-ring`                | `var(--focus-ring-color)`                                            | Inherit light definition                                             |
-| `--field-inverse-text`              | `var(--text-inverse)`                                                | Inherit light definition                                             |
-| `--field-inverse-border`            | `var(--border-control-inverse)`                                      | Inherit light definition                                             |
-| `--field-inverse-placeholder`       | `var(--white-alpha-60)`                                              | Inherit light definition                                             |
+| Token                               | Light                                   | Dark                                    |
+| ----------------------------------- | --------------------------------------- | --------------------------------------- |
+| `--material-smoke`                  | `var(--colorBackgroundOverlay)`         | `var(--colorBackgroundOverlay)`         |
+| `--overlay-scrim`                   | `var(--material-smoke)`                 | `var(--material-smoke)`                 |
+| `--material-solid`                  | `var(--colorNeutralBackground1)`        | `var(--colorNeutralBackground1)`        |
+| `--material-solid-secondary`        | `var(--colorNeutralBackground2)`        | `var(--colorNeutralBackground2)`        |
+| `--material-popup`                  | `var(--surface-primary)`                | `var(--surface-primary)`                |
+| `--material-popup-text`             | `var(--text-primary)`                   | `var(--text-primary)`                   |
+| `--text-error`                      | `var(--colorStatusDangerForeground2)`   | `var(--colorStatusDangerForeground2)`   |
+| `--border-subtle`                   | `var(--gray-medium)`                    | `var(--colorNeutralCardBackground)`     |
+| `--border-strong`                   | `var(--black)`                          | `var(--white)`                          |
+| `--border-control`                  | `var(--colorNeutralStrokeAccessible)`   | `var(--colorNeutralStrokeAccessible)`   |
+| `--border-inverse-subtle`           | `var(--gray-deep)`                      | `var(--gray-deep)`                      |
+| `--border-control-inverse`          | `var(--white)`                          | `var(--white)`                          |
+| `--border-brand`                    | `var(--blue-medium)`                    | `var(--blue-medium)`                    |
+| `--border-error`                    | `var(--text-error)`                     | `var(--text-error)`                     |
+| `--surface-subtle`                  | `var(--surface-secondary)`              | `var(--surface-secondary)`              |
+| `--surface-selected`                | `var(--gray-medium)`                    | `var(--colorNeutralCardBackground)`     |
+| `--text-return-positive`            | `var(--market-positive)`                | `var(--colorStatusSuccessForeground2)`  |
+| `--text-return-negative`            | `var(--market-negative)`                | `var(--colorStatusDangerForeground2)`   |
+| `--focus-ring-on-dark`              | `var(--blue-bright)`                    | `var(--blue-bright)`                    |
+| `--focus-ring-brand`                | `var(--blue-medium)`                    | `var(--blue-medium)`                    |
+| `--focus-ring-color`                | `var(--interactive-accent)`             | `var(--interactive-accent)`             |
+| `--surface-primary`                 | `var(--material-solid)`                 | `var(--material-solid)`                 |
+| `--surface-secondary`               | `var(--material-solid-secondary)`       | `var(--material-solid-secondary)`       |
+| `--surface-inverse`                 | `var(--black)`                          | `var(--black)`                          |
+| `--surface-brand`                   | `var(--blue-deep)`                      | `var(--blue-deep)`                      |
+| `--surface-highlight`               | `var(--blue-bright)`                    | `var(--blue-bright)`                    |
+| `--text-primary`                    | `var(--black)`                          | `var(--white)`                          |
+| `--text-secondary`                  | `var(--colorNeutralForeground2)`        | `var(--colorNeutralForeground2)`        |
+| `--text-tertiary`                   | `var(--colorNeutralForeground3)`        | `var(--colorNeutralForeground3)`        |
+| `--text-brand`                      | `var(--colorBrandForeground1)`          | `var(--colorBrandForeground1)`          |
+| `--text-inverse`                    | `var(--white)`                          | `var(--white)`                          |
+| `--text-inverse-secondary`          | `var(--gray-medium)`                    | `var(--gray-medium)`                    |
+| `--text-inverse-tertiary`           | `var(--gray-deep)`                      | `var(--gray-deep)`                      |
+| `--text-highlight`                  | `var(--blue-bright)`                    | `var(--blue-bright)`                    |
+| `--chart-benchmark`                 | `var(--blue-medium)`                    | `var(--blue-medium)`                    |
+| `--interactive-accent`              | `var(--colorBrandForeground1)`          | `var(--colorBrandForeground1)`          |
+| `--chart-portfolio`                 | `var(--colorBrandForeground1)`          | `var(--colorBrandForeground1)`          |
+| `--action-primary-surface`          | `var(--black)`                          | `var(--white)`                          |
+| `--action-primary-text`             | `var(--white)`                          | `var(--black)`                          |
+| `--action-primary-hover-text`       | `var(--white)`                          | `var(--white)`                          |
+| `--action-primary-hover-surface`    | `var(--surface-brand)`                  | `var(--surface-brand)`                  |
+| `--action-contrast-surface`         | `var(--black)`                          | `var(--white)`                          |
+| `--action-contrast-text`            | `var(--white)`                          | `var(--black)`                          |
+| `--action-contrast-hover-surface`   | `var(--surface-highlight)`              | `var(--surface-highlight)`              |
+| `--action-contrast-hover-text`      | `var(--black)`                          | `var(--black)`                          |
+| `--action-inverse-surface`          | `var(--white)`                          | `var(--white)`                          |
+| `--action-inverse-text`             | `var(--blue-deep)`                      | `var(--blue-deep)`                      |
+| `--action-inverse-hover-surface`    | `var(--surface-highlight)`              | `var(--surface-highlight)`              |
+| `--action-quiet-text`               | `var(--text-primary)`                   | `var(--text-primary)`                   |
+| `--action-quiet-hover-surface`      | `var(--surface-selected)`               | `var(--surface-selected)`               |
+| `--sidebar-text`                    | `var(--text-primary)`                   | `var(--text-primary)`                   |
+| `--sidebar-hover-surface`           | `var(--colorNeutralBackground1Hover)`   | `var(--colorNeutralBackground1Hover)`   |
+| `--sidebar-pressed-surface`         | `var(--colorNeutralBackground1Pressed)` | `var(--colorNeutralBackground1Pressed)` |
+| `--sidebar-selected-surface`        | `var(--surface-selected)`               | `var(--surface-selected)`               |
+| `--sidebar-language-surface`        | `var(--surface-subtle)`                 | `var(--surface-subtle)`                 |
+| `--holding-row-hover-surface`       | `var(--colorNeutralBackground1Hover)`   | `var(--colorNeutralBackground1Hover)`   |
+| `--portfolio-row-hover-surface`     | `var(--colorNeutralBackground1Hover)`   | `var(--colorNeutralBackground1Hover)`   |
+| `--memo-disclosure-hover-surface`   | `var(--colorNeutralBackground1Hover)`   | `var(--colorNeutralBackground1Hover)`   |
+| `--memo-row-hover-surface`          | `var(--memo-disclosure-hover-surface)`  | `var(--memo-disclosure-hover-surface)`  |
+| `--memo-card-hover-surface`         | `var(--colorNeutralBackground1Hover)`   | `var(--colorNeutralBackground1Hover)`   |
+| `--memo-card-pressed-surface`       | `var(--colorNeutralBackground1Pressed)` | `var(--colorNeutralBackground1Pressed)` |
+| `--memo-card-touch-pressed-surface` | `var(--memo-card-hover-surface)`        | `var(--memo-card-hover-surface)`        |
+| `--support-option-hover-surface`    | `var(--colorNeutralBackground1Hover)`   | `var(--colorNeutralBackground1Hover)`   |
+| `--support-option-selected-surface` | `var(--surface-brand)`                  | `var(--surface-brand)`                  |
+| `--support-option-selected-text`    | `var(--text-inverse)`                   | `var(--text-inverse)`                   |
+| `--allocation-divider`              | `var(--gray-deep)`                      | `var(--gray-deep)`                      |
+| `--allocation-swatch-border`        | `var(--gray-deep)`                      | `var(--gray-deep)`                      |
+| `--chart-axis-border`               | `var(--gray-deep)`                      | `var(--gray-deep)`                      |
+| `--chart-reference`                 | `var(--black)`                          | `var(--gray-deep)`                      |
+| `--text-chart-secondary`            | `var(--text-secondary)`                 | `var(--text-secondary)`                 |
+| `--field-surface`                   | `var(--surface-primary)`                | `var(--surface-primary)`                |
+| `--field-text`                      | `var(--text-primary)`                   | `var(--text-primary)`                   |
+| `--field-border`                    | `var(--border-control)`                 | `var(--border-control)`                 |
+| `--field-focus-border`              | `var(--interactive-accent)`             | `var(--interactive-accent)`             |
+| `--field-focus-ring`                | `var(--focus-ring-color)`               | `var(--focus-ring-color)`               |
+| `--field-inverse-text`              | `var(--text-inverse)`                   | `var(--text-inverse)`                   |
+| `--field-inverse-border`            | `var(--border-control-inverse)`         | `var(--border-control-inverse)`         |
+| `--field-inverse-placeholder`       | `var(--gray-deep)`                      | `var(--gray-deep)`                      |
 
 #### Tailwind and shadcn color aliases
 
-These aliases expose the same semantic palette to utility classes; they do not introduce additional colors.
+The default Tailwind color palette is disabled with `--color-*: initial`. Only consumed semantic aliases are registered for the shadcn component contract; they do not introduce color values. Unused secondary, secondary-foreground and accent-foreground aliases are omitted. Unused numbered chart colors are removed; the chart consumes `--chart-portfolio` and `--chart-benchmark` directly.
 
-| Alias                          | Source                              |
-| ------------------------------ | ----------------------------------- |
-| `--color-brand`                | `var(--text-brand)`                 |
-| `--color-accent`               | `var(--interactive-accent)`         |
-| `--color-highlight`            | `var(--blue-bright)`                |
-| `--color-surface`              | `var(--surface-primary)`            |
-| `--color-ink`                  | `var(--text-primary)`               |
-| `--color-border`               | `var(--border-subtle)`              |
-| `--color-muted`                | `var(--surface-subtle)`             |
-| `--color-selected`             | `var(--surface-selected)`           |
-| `--color-background`           | `var(--surface-primary)`            |
-| `--color-foreground`           | `var(--text-primary)`               |
-| `--color-card`                 | `var(--colorNeutralCardBackground)` |
-| `--color-card-foreground`      | `var(--text-primary)`               |
-| `--color-popover`              | `var(--material-popup)`             |
-| `--color-popover-foreground`   | `var(--material-popup-text)`        |
-| `--color-primary`              | `var(--action-primary-surface)`     |
-| `--color-primary-foreground`   | `var(--action-primary-text)`        |
-| `--color-secondary`            | `var(--surface-secondary)`          |
-| `--color-secondary-foreground` | `var(--text-primary)`               |
-| `--color-muted-foreground`     | `var(--text-secondary)`             |
-| `--color-accent-foreground`    | `var(--surface-primary)`            |
-| `--color-destructive`          | `var(--text-error)`                 |
-| `--color-input`                | `var(--border-control)`             |
-| `--color-ring`                 | `var(--focus-ring-color)`           |
-| `--color-chart-1`              | `var(--chart-portfolio)`            |
-| `--color-chart-2`              | `var(--chart-benchmark)`            |
-| `--color-chart-3`              | `var(--blue-bright)`                |
-| `--color-chart-4`              | `var(--text-secondary)`             |
-| `--color-chart-5`              | `var(--text-primary)`               |
+| Alias                        | Mapping                             |
+| ---------------------------- | ----------------------------------- |
+| `--color-brand`              | `var(--text-brand)`                 |
+| `--color-accent`             | `var(--interactive-accent)`         |
+| `--color-highlight`          | `var(--blue-bright)`                |
+| `--color-surface`            | `var(--surface-primary)`            |
+| `--color-ink`                | `var(--text-primary)`               |
+| `--color-border`             | `var(--border-subtle)`              |
+| `--color-muted`              | `var(--surface-subtle)`             |
+| `--color-selected`           | `var(--surface-selected)`           |
+| `--color-background`         | `var(--surface-primary)`            |
+| `--color-foreground`         | `var(--text-primary)`               |
+| `--color-card`               | `var(--colorNeutralCardBackground)` |
+| `--color-card-foreground`    | `var(--text-primary)`               |
+| `--color-popover`            | `var(--material-popup)`             |
+| `--color-popover-foreground` | `var(--material-popup-text)`        |
+| `--color-primary`            | `var(--action-primary-surface)`     |
+| `--color-primary-foreground` | `var(--action-primary-text)`        |
+| `--color-muted-foreground`   | `var(--text-secondary)`             |
+| `--color-destructive`        | `var(--text-error)`                 |
+| `--color-input`              | `var(--border-control)`             |
+| `--color-ring`               | `var(--focus-ring-color)`           |
 
 #### Local surface and independent-renderer exceptions
 
-| Surface / source                                    | Colors or overrides                                                                                                                                                   | Purpose                                                                                                    |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `brandSurface` in `src/components/brand-surface.ts` | White fields; Black text; Neutral 800 borders; Neutral 900/1000 secondary text; Deep Blue text, interaction and focus; Black primary/contrast buttons with White text | Explicit light color context inside highlighted brand regions, including dark appearance                   |
-| Footer subscription action                          | `--action-inverse-text: var(--black)`                                                                                                                                 | Black text on the inverse Subscribe action                                                                 |
-| React Email (`src/components/email-layout.tsx`)     | `#ededed`, `#ffffff`, `#000000`, `#002991`, `#008cff`, `#5fcdfd`                                                                                                      | Inline email background, content, brand band, wordmark accent and CTA colors; independent of website theme |
-| App icon (`src/app/icon.svg`)                       | `#002991`, `#ffffff`, `#5fcdfd`                                                                                                                                       | Retained vector artwork; independent of CSS theme                                                          |
-| Transparent / inherited colors                      | `transparent`, `currentColor`                                                                                                                                         | Unfilled surfaces and strokes/icons inheriting their text color; no independent palette value              |
+| Renderer                       | Color ownership                                                                                                                                             |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `brandSurface`                 | White fields, Black text/borders and Deep Blue interaction/focus inside Bright Blue sections; all local values reference primitives, with no local mixtures |
+| Footer                         | Black surface, White text, opaque Medium/Deep Gray secondary text; Footer Subscribe overrides inverse text to Black                                         |
+| React Email                    | Literal approved primitive values for client compatibility; White on Deep Blue header, Black on Bright Blue CTA, Bright Gray background                     |
+| SVG / PNG assets               | Primitive fills from `public/icon.svg` and `public/logo.svg`; raster edge pixels derive from antialiasing these fills                                       |
+| Transparent / inherited colors | `transparent` and `currentColor`; allocation sectors use hard gradient stops with approved fills                                                            |
+| Forced colors                  | User-agent system colors such as `Highlight` preserve accessible OS contrast                                                                                |
 
-Opacity modifiers and gradients derive from these sources. KPI notes use 0.8 opacity; disabled states and chart/grid utility opacity do not create new primitive colors. Preserve the existing accessibility checks when changing any source or mix.
+### Derived color formulas and verification
+
+Use the ten primitives first. Where a primitive cannot serve the required contrast or dark surface hierarchy, choose an exact Fluent default functional value. Never generate a custom tint, blend or alpha color. The only alpha colors are Fluent's default overlay (Black 40%/50%) and shadow ambient/key (12%/14% light, 24%/28% dark), written as their exact RGBA values. Component color opacity modifiers and steady-state text/disabled opacity are removed. Animation opacity still controls visibility during transitions, not a resting color palette.
+
+Normal text requires 4.5:1; large text and necessary control/chart/focus indicators require 3:1. KPI notes use their approved foreground at full opacity. Financial signs, labels and solid/dashed lines supplement color. Browser and email checks establish the tested combinations, not full-site WCAG certification.
+
+`palette.test.mjs` restricts raw functional values to the adopted Fluent roles, preserves exactly ten primitive definitions, checks theme fallback parity and rejects unrelated source colors. Theme browser tests check real rendered role pairs, surfaces and interaction states.
 
 ### Neutral colors and materials
 
-The owned palette defines Brand (`--blue-deep: #0d288b`, `--blue-medium: #3d8af7`, `--blue-bright: #7dcbfa`), Neutral (`--black: #000000`, `--white: #ffffff`, `--gray-deep: #cccccc`, `--gray-medium: #eef0f2`, `--gray-bright: #f5f7fa`) and Financial (`--market-positive: #007c66`, `--market-negative: #bf2a2c`, `--market-neutral: #000000`) primitives. Light-mode secondary text uses the independent `--neutral-900` semantic source to remain readable; Gray Deep is a light neutral primitive and must not be used for small text on white. Dividers and chart grids use Gray Medium, and Hero and secondary bands use Gray Bright.
+Use the [color inventory](#color-inventory) for exact values. Light/dark surfaces, readable text, control boundaries and interaction states are semantic roles. Fixed brand regions and the black Footer retain their own complete foreground/background pairs.
 
-Use semantic border, surface, shadow and radius aliases from `tokens.css`. Fields need a visible boundary meeting the non-text contrast target; selection, hover and focus remain independently identifiable. Financial Cards, pill actions, the black Footer and theme-aware full-screen navigation retain their approved treatments. Component aliases select the documented Fluent Web foundation tokens.
-
-Apply a complete type treatment rather than repeating its utilities. Keep color, opacity, spacing and heading semantics independent. Use Large Label for table labels; inline emphasis inherits size and leading with weight 700. Never override tracking. CSS Modules use the same source tokens.
-
-Register new size names in `src/lib/utils.ts` so class merging distinguishes sizes from colors. Test computed styles and reflow rather than class strings. Logo checks remain in `brand-logo.spec.ts`.
-
-A KPI's `tone` determines its colors, independent of card order:
+KPI tones are deliberate Layer 01 treatments:
 
 | Tone        | Surface     | Text        |
 | ----------- | ----------- | ----------- |
@@ -478,70 +501,38 @@ A KPI's `tone` determines its colors, independent of card order:
 | `brand`     | Deep Blue   | Bright Blue |
 | `paper`     | White       | Deep Blue   |
 
-KPI notes use their value's text color at 0.8 opacity on every tone. Check at least 4.5:1 contrast after compositing over the surface; highlight is close to the threshold.
+KPI notes use the value's foreground at full opacity and meet 4.5:1 contrast. Financial signs and solid/dashed chart lines supplement color. The SPY line uses Medium Blue and meets 3:1 on its chart surface. Dark financial and danger text use the documented Fluent defaults.
 
-Benchmark lines and legend keys use `--chart-benchmark` (Medium Blue), with at least 3:1 contrast on white. Keep the dashed pattern and monthly table alternative.
+Header, Sheet and Footer use the text `BrandLogo`. SVG/PNG files serve icons, sharing and downloadable assets. The masters are [`icon.svg`](../public/icon.svg) and [`logo.svg`](../public/logo.svg); App Router icons and raster copies must stay aligned with them. `/images/` legacy URLs redirect to root assets.
 
-Preserve text colors and opacity in normal, hover, active, disabled and inverse states unless a change is authorized. Pair positive and negative colors with numbers or symbols.
-
-Portfolio return text uses `--text-return-positive` (`--market-positive`, `#007c66`) and `--text-return-negative` (`--market-negative`, `#bf2a2c`). These are the user-approved financial colors, superseding the previously sampled Yahoo Finance colors. Neutral financial values use the normal text role, black in light mode; dark mode retains accessible light text and its existing positive/negative overrides.
-
-Support error feedback uses `--border-error` (`#FF0000`) for its left border. This non-text error role is independent of financial returns; error message text retains its existing color.
-
-Known normal-text contrast gaps are recorded in the [contrast policy](#contrast-policy).
-
-Use Jost for Latin text and numbers, Noto Sans TC for Traditional Chinese, and Noto Sans SC for Simplified Chinese.
-
-Header, drawer and Footer render the shared text BrandLogo, including its blue period. SVG/PNG files remain for icons, sharing and downloadable brand assets; they are not used for the navigation wordmark. Brand masters are [`public/icon.svg`](../public/icon.svg) and [`logo.svg`](../public/logo.svg), with PNG copies beside them. Preserve the square icon, single-line wordmark and colored period. Generate icons and social images from these masters. Keep App Router icon and Apple icon files aligned with the icon master; sharing metadata uses [`public/og-logo.png`](../public/og-logo.png). Old `/images/` URLs permanently redirect to root assets.
-
-Preserve information and action priorities at every width.
-
-- Bound mobile title sizes and allow emergency wrapping for enlarged or unbreakable text. Desktop line breaks must not isolate words or split short Chinese phrases on mobile.
-- Align related form fields unless a visible container explains an inset. Contact and Preferences use the shared 4px field treatment; compact Footer fields are pill-shaped.
-- Check all three languages, root font sizes up to 200%, long translations and changed content. The text Logo must wrap within its available width without colliding with navigation.
-- Allow local values for chart geometry and optical adjustments when shared spacing tokens do not fit.
+Use complete typography roles. Register new role names in `src/lib/utils.ts` so class merging distinguishes size from color. Verify all three locales, narrow layouts and 200% root text. Reflow before shrinking or clipping content.
 
 ### Contrast policy
 
-Use `--interactive-accent` (Deep Blue) for normal-size interactive text. Medium Blue remains a brand primitive for decorative details, surface-appropriate non-text indicators and the dashed benchmark line; it is not a normal-text color on white. `--surface-selected` provides a pale blue surface for desktop navigation and language states. Use Deep Blue text on that surface.
+Use `--interactive-accent` (Deep Blue) for normal-size interactive text. Medium Blue remains a brand primitive for decorative details, surface-appropriate non-text indicators and the dashed benchmark line; it is not a normal-text color on white. `--surface-selected` provides a Medium Gray surface in light mode for desktop navigation and language states. Use Deep Blue text on that surface.
 
 Chart disclosures and scrollable monthly-data regions use the same theme-aware focus alias as other controls. The baseline focus outline consumes `--focus-ring-color`, which follows `--interactive-accent`: Deep Blue in light mode and Bright Blue in dark mode. The black Footer sets the inherited role to `--focus-ring-on-dark` (Bright Blue). Inputs retain their explicit surface variants. Check the outline against its adjacent surface at a minimum of 3:1: Medium Blue on Bright Blue is insufficient. Forced-colors mode continues to use the system Highlight color.
 
-Validate normal-size text at 4.5:1 after compositing opacity and non-text indicators at 3:1 where required. KPI notes retain their value's color at 0.8 opacity. Footer secondary text uses dedicated inverse aliases, with 0.84 and 0.78 white opacity on black. Disabled controls have separate feedback and must not acquire enabled hover states.
+Validate normal-size text at 4.5:1 after compositing opacity and non-text indicators at 3:1 where required. KPI notes retain their value's color at full opacity. Footer secondary text uses Medium Gray and Deep Gray on Black. Disabled controls have separate feedback and must not acquire enabled hover states.
 
 Tests cover these specific combinations and input states. They do not establish full WCAG 2.2 AA conformance. Maintain keyboard and forced-colors focus indicators and verify actual surfaces when introducing a variant.
 
 ### shadcn/ui components
 
-The project owns its customized [shadcn/ui](https://ui.shadcn.com/docs) source. `components.json` targets the `base-nova` registry, Tailwind v4, `@/*` imports and `src/components/ui/`. The registry selects Base UI source for additions. Owned tokens, component variants and brand adaptations define the rendered design; a registry preset is not a second visual system. `cn` in `src/lib/utils.ts` merges classes; Button variants use `class-variance-authority`. Import primitives directly. `ButtonLink` shares Button styles and preserves link semantics without introducing a client boundary for ordinary links.
+The project owns customized shadcn/ui source. `components.json` selects `base-nova`, Tailwind v4, `@/*` imports and `src/components/ui`. The registry supplies source patterns; Layers 01–03 govern the result. `cn` merges classes and `class-variance-authority` defines Button variants. Import components directly. Native controls and ordinary links remain server-compatible.
 
-Use the Button variants and sizes listed above. The quiet text variant preserves the Preferences unsubscribe treatment. Fields keep `standard` and `inverse` styles; Textarea and NativeSelect share the input appearance. Disabled fields retain text colors and use a dashed border with a not-allowed cursor. Native controls keep refs, labels, validation and submission without a client boundary.
+Before adding a component, inspect its source and dependencies. Add only the needed family, review the diff, map its colors/typography/motion to site tokens, and verify rendered states. Preserve the single reset and existing variants.
 
-`FormField` accepts a feature-owned error message, preserves existing descriptions and associates the error through `aria-describedby` and `aria-invalid`. Features own validation rules and focus decisions; ordinary fields retain their native behavior and appearance.
+- **Fields:** FormField associates labels, descriptions and errors through native IDs, `aria-describedby` and `aria-invalid`. Features own validation. FieldGroup uses `contents` where a form already owns the grid; `stack` supplies a vertical layout. Disabled fields retain readable text and a dashed boundary.
+- **Dropdown Menu:** use grouped, real locale links with `hrefLang`, current-language hints and validated recovery parameters. Base UI owns item navigation and dismissal; preserve Tab/outside-focus exit and viewport-aware positioning.
+- **Sheet:** Base UI Dialog owns focus containment, background isolation and scrolling locks. Keep it open through the application's closing phase. Use its initial/final focus APIs and SheetClose; do not add a second trap or lock.
+- **Sidebar subset:** SidebarMenu, SidebarMenuItem and SidebarMenuButton compose real links through Base UI `useRender`. Preserve list semantics, wrapping, `aria-current`, Tab order and route dismissal. This subset has no separate provider, collapse state or shortcut.
 
-To add a primitive:
-
-1. Inspect its source and dependencies with `npx shadcn@latest view <component>`.
-2. Add only what is needed with `npx shadcn@latest add <component>`.
-3. Review the full diff. Map colors, focus, disabled and motion states to semantic tokens; `accent` means the accessible Deep Blue interaction role.
-4. Preserve Jost, the reset and customized primitives. Add a client boundary or dependency only when the component needs it.
-5. Verify rendered states, native forms and navigation. Upstream defaults do not define this site's design.
-
-Desktop language selection uses shadcn/ui composition over Base UI `Menu`. Put linked locale items in `DropdownMenuGroup`, preserving `hrefLang`, current-language hints and validated recovery parameters. Base UI owns keyboard entry, item navigation and dismissal; the header preserves explicit Tab and outside-focus exits without moving focus away from the destination control. `render={<Link ... />}` keeps each item a real link. The positioner preserves viewport-fixed anchoring and owns popup stacking; the popup uses Base UI's available-height variable.
-
-Mobile navigation uses `Sheet` over Base UI `Dialog` for naming, focus containment, background isolation and scroll locking. The existing `closed → opening → open → closing` phase remains the only application state source: keep the modal open through the closing animation. Use Base UI's `initialFocus` and `finalFocus` for the existing close-control entry and route-aware return behavior. Render the visible close button through `SheetClose`; the replaced opening trigger is inert until the modal closes. Do not add a second focus trap, body lock or background `inert` controller. The language disclosure uses shadcn/ui Collapsible.
-
-Inside the Sheet, compose primary links with `SidebarMenu`, `SidebarMenuItem` and `SidebarMenuButton render={<Link ... />}`. These are a menu-only shadcn/ui composition using Base UI `useRender`, customized for this site's full-width mobile navigation. `SidebarMenu` retains an explicit list role for Safari when the reset removes list markers. Pass one route-derived active value to `isActive` and the link's `aria-current`; preserve real Next.js links, wrapping, Tab order and navigation dismissal. Sheet remains the state owner; the menu subset has no provider, collapse state, shortcut or tooltip. It does not implement the full upstream Sidebar API.
-
-`FieldGroup` groups controls. Contact, subscription and Preferences forms use `contents` to preserve the native form's grid, event target, validation and control placement; ordinary vertical groups can use `stack`.
-
-`FormField` connects `Field` and `FieldLabel`. `NativeSelect` keeps the platform picker. `Alert` provides shared result styling and live feedback. `ServiceLoading` pairs localized busy text with static, decorative `Skeleton` placeholders hidden from assistive technology.
-
-UI primitives own stacking through `--layer-navigation`, `--layer-modal` and `--layer-popover`. Header composition controls responsive visibility without duplicating Sheet positioning or stacking.
+See [Menu behavior](#menu-behavior) and [Disclosure and animation ownership](#disclosure-and-animation-ownership) for lifecycle rules.
 
 ## UX tasks and acceptance
 
-Identify the reader, their task and the information needed at each decision using the site’s content-design rules. Use Vercel's interface guidelines for input behavior, focus, loading and errors. Use Cieden as a reference for task analysis, information architecture and usability checks. The tasks below describe the site's current intent; they are working assumptions, not findings from a user-research study.
+Identify the reader, their task and the information needed at each decision. Use Web Interface Guidelines for interactions, forms, performance and UX Copywriting; Fluent 2 for Accessibility, UX Content Design, Handoffs, Onboarding and Wait UX; and Cieden as a supporting reference for task analysis, information architecture and usability checks. The tasks below describe the site's current intent; they are working assumptions, not findings from a user-research study.
 
 | Reader task                            | Interface contract                                                                                            | Acceptance evidence                                                                |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -568,11 +559,11 @@ Subscription forms retain standard Contact and inverse Footer treatments. Their 
 
 Contact draft and retry recovery belong to the [Contact workflow](INTEGRATIONS.md#contact-draft-recovery).
 
-Choose focus tokens according to light or inverse form surfaces. Preferences retain their own disabled opacity. Reserve space for status messages and allow long errors to wrap. After a programmatic field reset, keep the success message visible until the user edits again.
+Choose focus tokens according to light or inverse form surfaces. Preferences retain their disabled behavior at full color opacity. Reserve space for status messages and allow long errors to wrap. After a programmatic field reset, keep the success message visible until the user edits again.
 
 ### Motion tokens and timing
 
-Use Fluent 2 default motion duration tokens and easing curves as the foundation. Movement communicates state and relationships and remains local to the interaction. Values were verified on 18 October 2026 against Microsoft’s [duration tokens](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/durations.ts) and [curve tokens](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/curves.ts), with [Fluent 2 motion guidance](https://fluent2.microsoft.design/motion) informing their purpose. CSS custom properties preserve the official camelCase token names with the required CSS prefix, for example `--durationNormal` and `--curveEasyEase`. Component mappings below are site choices, not prescribed Fluent component defaults. The existing foundation values already match these defaults, so this adoption does not change rendered animation timing.
+Use Fluent 2 default motion duration tokens and easing curves as the foundation. Movement communicates state and relationships and remains local to the interaction. Values were verified on 18 October 2026 against Microsoft’s [duration tokens](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/durations.ts) and [curve tokens](https://github.com/microsoft/fluentui/blob/master/packages/tokens/src/global/curves.ts), with [Fluent 2 motion guidance](https://fluent2.microsoft.design/motion) informing their purpose. CSS custom properties preserve the official camelCase token names with the required CSS prefix, for example `--durationNormal` and `--curveEasyEase`. Component mappings below are site choices, not prescribed Fluent component defaults.
 
 Global durations are 50, 100, 150, 200, 250, 300, 400 and 500ms. `--duration*` and `--curve*` are foundation values; components consume `--motion-*` aliases. Keep the same timing at desktop and phone breakpoints. Existing `fast`, `base`, `medium` and `slow` aliases resolve to 150, 200, 250 and 300ms.
 
@@ -603,7 +594,7 @@ Reduced motion completes JavaScript layout transitions immediately, cancels runn
 
 - The mobile panel slides left to open and right to close. Navigation fades early during closing; the icon rotates from X back to Menu.
 - The language disclosure starts collapsed, shows the current language as its label, and lists only the other languages.
-- Mobile Sidebar uses compact rows: 16px Medium Label typography, minimum touch targets from `--size-touch-target` (48px by default), 4px row gaps, 6px corners and 18px decorative Lucide icons. Selected links use `--sidebar-selected-surface` and `--interactive-accent`: pale brand blue with Deep Blue text in light mode, and a darker blue-tinted surface with Bright Blue text in dark mode. Hover and pressed feedback use `--sidebar-hover-surface` and `--sidebar-pressed-surface` (Gray 100/200 in light mode and `#242424`/`#303030` in dark mode); transitions change color and background without shifting geometry. Idle touch hover resets clear the language summary background whether expanded or collapsed, preserving expanded text color, selection and keyboard focus. Keep the full-screen panel on `--surface-primary` (white in light mode, black in dark mode), the shared text wordmark, round close control and existing opening/closing animation.
+- Mobile Sidebar uses compact rows: 16px Medium Label typography, minimum touch targets from `--size-touch-target` (48px by default), 4px row gaps, 6px corners and 18px decorative Lucide icons. Selected links use `--sidebar-selected-surface` and `--interactive-accent`: Medium Gray with Deep Blue text in light mode, and Fluent Card Background with Bright Blue text in dark mode. Hover and pressed feedback use `--sidebar-hover-surface` and `--sidebar-pressed-surface` (Bright Gray/Medium Gray in light mode and Fluent `#3d3d3d`/`#1f1f1f` in dark mode); transitions change color and background without shifting geometry. Idle touch hover resets clear the language summary background whether expanded or collapsed, preserving expanded text color, selection and keyboard focus. Keep the full-screen panel on `--surface-primary` (White in light mode, Fluent `#292929` in dark mode), the shared text wordmark, round close control and existing opening/closing animation.
 - Mobile Sidebar links, language options and the disclosure summary share `--focus-ring-width` (2px by default) for the theme-aware interaction outline (Deep Blue in light mode, Bright Blue in dark mode) and its matching inset offset, distinct from the persistent selected surface. The bottom language group uses `--sidebar-language-surface`, 12px outer corners and the same theme-aware row feedback. Its Collapsible opens upward above a stationary trigger without moving the appearance toggle, and excludes the current language and retains keyboard operation and animated reversal. Header stays fixed inside the modal while navigation and language content share one scroll region. No extra navigation labels, separators or features are introduced. The desktop language menu supports Enter, Space, arrows, Escape and Tab; the mobile disclosure supports Enter, Space and Tab.
 - The open close-button keeps Bright Blue fill and a black icon in both themes. Its `--border-strong` border is black in light mode and white in dark mode. Its keyboard ring stays visible under `:focus-visible`. Touch uses a separate blue ring and slight scale reduction; release and cancellation fade it, including short taps. The effect transfers from trigger to close control during opening.
 - Reduced motion keeps the held touch ring, omits scaling and release animation, and may complete state changes immediately.
@@ -624,11 +615,11 @@ Describe verified outcomes and give a clear next step. A confirmation request is
 
 Keep meaning, tone and action intent equivalent across languages; line counts and layout may differ.
 
-The site’s content-design rules favor plain language, concise headings, descriptive links and clear next steps. Adapt tone to the reader's task and emotional context. Prefer active voice and address the reader directly in operational guidance. Use second person for reader tasks and named third person for author background. Preserve verified financial and legal meaning when simplifying copy.
+For UX Writing, Web Interface Guidelines and Fluent 2 Content Design guide plain language, concise headings, descriptive links and clear next steps. Adapt tone to the reader's task and emotional context. Prefer active voice and address the reader directly in operational guidance. Use second person for reader tasks. Named third person for author background is a separate site editorial convention. Preserve verified financial and legal meaning when simplifying copy.
 
 ### Content design workflow
 
-Before writing, identify the reader, the task they want to complete and the information they need at that step. For an error or uncertain outcome, consider what may worry them and make the next safe action clear. Keep copy with the page or feature that owns the behavior.
+Identify the reader, task, known state and next action before writing. Keep copy with its owning page or feature. External Copywriting and Content Design rules apply only to UX Writing; research and marketing retain editorial rules.
 
 | Context                | Content responsibility                                                                                                                                                 |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -638,21 +629,19 @@ Before writing, identify the reader, the task they want to complete and the info
 | Preferences            | Explain the secure-link step and keep the same confirmation for every address. Do not reveal subscriber status or promise delivery that the response cannot establish. |
 | Errors and payments    | State what is known, explain any necessary wait and give a safe next step. A failed request or return navigation does not prove a provider operation failed.           |
 
-Use short sentences, familiar words and active voice. Prefer present tense for current states; use past or future tense when it accurately describes an event or next step. Keep a neutral, reassuring tone for errors. Avoid filler, blame, unsupported response-time promises and celebratory punctuation in routine feedback. Use headings and lists to support scanning. Decorative icons remain hidden from assistive technology; informative visuals need meaningful alternatives.
-
-Review each change in all three languages. Check content against actual consent, privacy, financial and legal states. If a content decision requires a behavior change, implement and verify that behavior before publishing the promise. Search for the previous wording in tests and fixtures, update affected assertions, then verify the visible message, accessible name, next action and mobile wrapping. Provider writes stay mocked during routine verification.
+Use short sentences, familiar words and active voice. Avoid blame, filler and unsupported outcome or timing promises. Verify translations against the same consent, privacy and payment states. Search tests and fixtures for replaced wording, then check visible copy, accessible names and mobile wrapping. Mock provider writes during routine verification.
 
 ### Capitalization and editorial conventions
 
-The site owns content design: reader needs, plain language, tone, active voice and clear next steps. [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines#copywriting) owns capitalization: interface headings and buttons use Chicago Title Case; marketing pages use sentence case. This is an explicit project choice from Vercel's brand-specific guidance, not a universal accessibility rule.
+For UX Writing, [Web Interface Guidelines](https://vercel.com/design/guidelines#copywriting) takes precedence over Fluent 2 Content Design: functional interface headings and buttons use Chicago Title Case as adopted by this project. Sentence case for marketing and editorial content is a separate site editorial decision. The context matrix below preserves current copy conventions; neither external UX Writing reference governs research prose or marketing content. Capitalization is not a universal accessibility rule.
 
-| Context                                                                                      | Capitalization                                                                                                                                                                                     |
-| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home, About, memo index and articles, Disclaimer; Contact and Support introduction/Hero copy | Sentence case for editorial headings and page-specific links/actions. Capitalize the first word, proper nouns and acronyms.                                                                        |
-| Portfolio and Performance; preferences, confirmation and recovery screens                    | Chicago Title Case for interface headings and buttons. Use the same treatment for short field labels and table column headings. Explanations, status messages and data notes remain sentence case. |
-| Contact, subscription and payment forms, including forms embedded in introduction pages      | Chicago Title Case for form headings, labels and buttons. Instructions and error/success messages remain sentence case.                                                                            |
-| Shared Header, Menu and Footer                                                               | Consistent Title Case for visible navigation/control labels and section headings across routes. Accessible instructions such as “Open menu” remain sentence case.                                  |
-| Transactional emails and source material                                                     | Email copy uses the site’s sentence-case convention. Preserve source quotations, names, technical identifiers and published source titles.                                                         |
+| Context                                                                                      | Capitalization                                                                                                                                                                                                               |
+| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home, About, memo index and articles, Disclaimer; Contact and Support introduction/Hero copy | Sentence case for editorial headings and editorial navigation links. Embedded functional controls, such as Copy Article Link and On This Page, use Chicago Title Case. Capitalize the first word, proper nouns and acronyms. |
+| Portfolio and Performance; preferences, confirmation and recovery screens                    | Chicago Title Case for interface headings and buttons. Use the same treatment for short field labels and table column headings. Explanations, status messages and data notes remain sentence case.                           |
+| Contact, subscription and payment forms, including forms embedded in introduction pages      | Chicago Title Case for form headings, labels and buttons. Instructions and error/success messages remain sentence case.                                                                                                      |
+| Shared Header, Menu and Footer                                                               | Consistent Title Case for visible navigation/control labels and section headings across routes. Accessible instructions such as “Open menu” remain sentence case.                                                            |
+| Transactional emails and source material                                                     | Email copy uses the site’s sentence-case convention. Preserve source quotations, names, technical identifiers and published source titles.                                                                                   |
 
 Use Chicago's 18th-edition rules: capitalize the first and last words, nouns, pronouns, verbs, adjectives and adverbs. Lowercase internal articles (`a`, `an`, `the`), coordinating conjunctions (`and`, `but`, `for`, `or`, `nor`), `to` in infinitives and short prepositions used as prepositions. Capitalize prepositions of five or more letters; for example, `Get Help with a Payment` and `Connect Through Research`. [Chicago's capitalization clarification](https://www.chicagomanualofstyle.org/qanda/data/faq/topics/CapitalizationTitles/faq0035.html) explains the edition change.
 
@@ -662,7 +651,7 @@ Maintain capitalization in owned copy; do not use CSS `text-transform: capitaliz
 - Remove terminal periods from headings, buttons, labels and fragment lists in all languages. Keep punctuation in complete explanatory sentences, source quotations and actual questions.
 - Use descriptive action and destination labels. Instructions must work without references such as “below”, “on the right” or “the blue button”.
 - Express a failed or uncertain operation accurately and give the next safe action. A request, redirect or provider acknowledgment alone does not establish delivery, consent or payment completion.
-- The content design rules govern wording and interaction decisions. Existing capitalization, voice, punctuation or workflow contracts are not exceptions by themselves. A changed workflow needs corresponding implementation and focused verification.
+- UX Writing guidance governs interface wording and interaction decisions within its assigned scope. Editorial conventions govern other content. A changed workflow needs corresponding implementation and focused verification.
 - Present dates, currency, percentages, and data timestamps clearly and consistently. Portfolio and performance data are timestamped snapshots and must not imply live quotes; see [portfolio data](WEB_APPLICATION_ARCHITECTURE.md#portfolio-data) for definitions.
 - Preserve meaning, tone, and action intent in translation rather than matching words or line counts literally. Language differences may justify layout and content variants.
 
@@ -676,7 +665,7 @@ For field Core Web Vitals, target the 75th percentile separately for mobile and 
 
 Compare direct loads, client navigation and browser return in the same browser and viewport. Check computed styles, wrapping, focus and animation states. Do not bind behavior tests to class strings. WebKit emulation does not replace physical iPhone testing.
 
-`src/app/_components/semantic-content.spec.ts` checks KPI note/value color equality, 0.8 opacity and at least 4.5:1 composited contrast across locales and desktop/mobile widths. `src/features/portfolio/performance-chart.spec.ts` checks benchmark contrast. `scripts/color-contrast.ts` composites transparency before calculating WCAG luminance.
+`src/app/_components/semantic-content.spec.ts` checks KPI note/value color equality, full opacity and at least 4.5:1 composited contrast across locales and desktop/mobile widths. `src/features/portfolio/performance-chart.spec.ts` checks benchmark contrast. `scripts/color-contrast.ts` composites transparency before calculating WCAG luminance.
 
 Typography and layout tests stay beside their owners. Use [AGENTS.md](../AGENTS.md#verification-and-review) to select affected checks and the [test workflow](WEB_APPLICATION_ARCHITECTURE.md#test-workflow) for runner and CI details.
 
@@ -690,7 +679,7 @@ Page-level blocks use `--space-section-padding: 96px` for both top and bottom pa
 
 This rule covers page heroes, Home content bands, About sections, Portfolio holdings, Performance charts and methodology, the memo index and article header/body, Contact Subscribe and message sections, Support and subscription preference/confirmation content. Header, Footer, dialogs, cards, form fields, KPI cells and article subsections retain their component-specific spacing; they are not independent page blocks.
 
-Home, Portfolio and Performance contain their KPI summaries inside the Hero content container, aligned to the title edges rather than the viewport. Keep 48px between the introduction/actions and summary. Portfolio shows three summary cells (market value, total return and holdings), in one desktop row or stacked when the Hero summary is narrower than 72rem. Net Cost Basis remains in the underlying data and holdings calculations, not as a summary cell. Current Holdings uses the white primary surface. When its Hero summary is narrower than 10rem (for example, 320px with 200% root text), reduce cell inline padding to 4px; locally scroll a value that still exceeds the available width. Keep form status-message reserve space inside the form. About content and closing columns stack through 800px using their phone rules and at 801–1100px through the shared `--grid-editorial` override. Their named `about-page` container query also stacks them below 56rem of available page width, including when enlarged root text raises that threshold. Above 1100px, the 5:7 layout returns only when the container query does not require stacking. Footer text Logo uses a minimum 32px alignment box.
+Home, Portfolio and Performance contain their KPI summaries inside the Hero content container, aligned to the title edges rather than the viewport. Keep 48px between the introduction/actions and summary. Portfolio shows three summary cells (market value, total return and holdings), in one desktop row or stacked when the Hero summary is narrower than 72rem. Net Cost Basis remains in the underlying data and holdings calculations, not as a summary cell. Current Holdings uses the white primary surface. When its Hero summary is narrower than 10rem (for example, 320px with 200% root text), reduce cell inline padding to 4px; locally scroll a value that still exceeds the available width. Keep form status-message reserve space inside the form. About content and closing columns stack through 800px using their phone rules and at 801–1100px through the shared `--grid-editorial` override. Their named `about-page` container query also stacks them below 56rem of available page width, including when enlarged root text raises that threshold. Above 1100px, the 5:7 layout returns only when the container query does not require stacking. Footer text Logo shares `--size-footer-heading` with column headings (24.15px at the default root size), followed by the shared 12px gap.
 
 Footer subscription buttons use black text through a local `--action-inverse-text` override. Keep that color for idle, hover, keyboard focus and submitting states; other inverse buttons retain their existing treatment.
 
@@ -719,7 +708,7 @@ Data blocks use `--radius-data`; Investment Memo Cards, their inner Card and the
 
 Memo cards use 48px outer content insets at every viewport width, including the footer bottom inset. Performance chart X-axis labels reserve a 48px axis height and a 16px tick gap to separate them from the lowest Y-axis label.
 
-Submission buttons in Contact, Subscribe and Support pair their localized pending label with Spinner. The spinner is decorative beside that label and disables rotation for reduced motion. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
+Contact, Subscribe and Support retain their action label and add the shared shadcn/ui Spinner while pending. The decorative spinner is hidden from assistive technology; a separate live status announces the localized pending message. The spinner is decorative beside that label and disables rotation for reduced motion. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
 
 Support amount cards progressively enhance native radio inputs to shadcn/ui RadioGroup after hydration. The group submits product_id, retains the server-selected product, and uses the existing fieldset lock and frozen retry payload. Native radios remain the no-JavaScript fallback; keyboard focus is visible on the full amount card.
 
@@ -729,7 +718,7 @@ Support amounts use Medium Display, (51px mobile, 67px wide desktop, weight 700)
 
 Home Hero keeps 96px vertical padding and 48px between its label, title and introduction. Home allocation cards place the holdings legend below the ring at every viewport width, with a 48px gap.
 
-Dark secondary surfaces use `#1f1f1f` alongside the `#292929` primary page material. Selected surfaces mix 16% Bright Blue into the primary surface; menu hover and pressed surfaces use `#242424` and `#303030`. Chart axis boundaries use translucent white in dark mode. Apply the same aliases to explicit and system dark appearance; preserve explicit light brand surfaces and the black Footer.
+Dark secondary/primary surfaces use Fluent `#1f1f1f`/`#292929`. Selected surfaces use Fluent Card Background (`#333333`); menu hover and pressed surfaces use Fluent `#3d3d3d`/`#1f1f1f`. Chart axis boundaries use Deep Gray in both modes. Apply the same aliases to explicit and system dark appearance; preserve explicit light brand surfaces and the black Footer.
 
 Tablet Header (801–1279px) shares the page container and 32px gutters rather than a separate 720px cap. It retains Sheet navigation, with an 84px header and 48px menu controls. The Sheet top row uses the same height and gutters so the wordmark and open/close controls stay aligned. Phone and desktop navigation breakpoints remain unchanged.
 
@@ -765,3 +754,11 @@ The local `remark-memo-toc.mjs` plugin builds heading IDs and the exported outli
 Footer title rows share `--size-footer-heading` (Medium Title line height, 24.15px at the default root size) and `--space-footer-heading` (12px). The description, first navigation link line box and subscription input top border share the second-row start in the three-column layout. Navigation links are top-aligned and use `--size-footer-link` (title row plus gap, 36.15px), so the title-to-first-link distance matches subsequent link intervals. Social icons retain vertical alignment with their 24px text lines. The Footer wordmark uses the available column width to avoid unnecessary wrapping; Tablet retains its separate subscription row and mobile retains stacked groups.
 
 Footer Email Preferences starts 12px below the input bottom edge on multi-column forms (8px grid gap plus 4px link margin). On mobile, it remains below the Subscribe button with the same 12px gap.
+
+## Implementation status
+
+Current Holdings uses validated `sort` and `direction` query parameters. Supported keys match the table columns; direction is `asc` or `desc`. Missing or invalid pairs use market value descending. Native history updates preserve other parameters and the fragment, support reload and Back/Forward, and avoid fetching portfolio data again. A local Suspense boundary retains the default server-rendered table with disabled sorting controls while URL state becomes available. Consecutive sorting actions read the latest URL before updating it.
+
+Contact, Subscribe and Support keep the action label while pending, display the shared Spinner and announce progress separately. Existing request locks, idempotency keys and recovery payloads remain unchanged.
+
+These contracts follow the assigned [Web Interface Guidelines](https://vercel.com/design/guidelines#interactions). Automated checks cover URL sorting and pending form states. They do not establish full WCAG conformance, physical-device behavior or field Core Web Vitals compliance.

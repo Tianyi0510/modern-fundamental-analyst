@@ -46,7 +46,7 @@ export function PortfolioMetric({
         </FinancialValueScroll>
       </dd>
       <dd className="kpi-note mt-[var(--space-3)]">
-        <small className={`block text-small-body opacity-[0.8] compact:max-w-[32ch] ${noteClassName}`}>{note}</small>
+        <small className={`block text-small-body opacity-100 compact:max-w-[32ch] ${noteClassName}`}>{note}</small>
       </dd>
     </div>
   );

@@ -90,12 +90,13 @@ export function SupportCheckoutForm({
         value={submittedChoice ?? ""}
       />
       <SupportChoiceLock value={isSubmitting || recovering}>{children}</SupportChoiceLock>
-      <Button className={appearance["support-submit"]} type="submit" disabled={isSubmitting} aria-live="polite">
+      <Button className={appearance["support-submit"]} type="submit" disabled={isSubmitting}>
         {isSubmitting && <Spinner aria-hidden="true" data-icon="inline-start" />}
-        {isSubmitting ? submitting : submit}
+        {submit}
       </Button>
       {isSubmitting ? (
         <div className={appearance["support-status"]} role="status">
+          <p>{submitting}</p>
           <p>{recovery}</p>
           <Button className={appearance["support-submit"]} type="submit" name="checkout_resume" value="1">
             {resume}

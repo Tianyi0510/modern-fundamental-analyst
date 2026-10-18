@@ -24,5 +24,5 @@ export const appearance = {
   "reference-note":
     "reference-note [color:var(--text-primary)] text-medium-body [text-wrap:pretty] [&_>_span]:font-bold",
   "source-link":
-    "source-link [color:var(--interactive-accent)] font-normal [text-decoration:underline] [text-decoration-thickness:1px] [text-underline-offset:3px] [transition:color_var(--motion-duration-base)_var(--motion-ease-standard)] [&:focus-visible]:[outline:var(--focus-ring-width)_solid_var(--blue-deep)] [&:focus-visible]:[outline-offset:var(--focus-ring-offset)] [&:focus-visible]:[color:var(--interactive-accent)] [&:hover]:[color:var(--interactive-accent)]",
+    "source-link [color:var(--interactive-accent)] font-normal [text-decoration:underline] [text-decoration-thickness:1px] [text-underline-offset:3px] [transition:color_var(--motion-duration-base)_var(--motion-ease-standard)] [&:focus-visible]:[outline:var(--focus-ring-width)_solid_var(--focus-ring-color)] [&:focus-visible]:[outline-offset:var(--focus-ring-offset)] [&:focus-visible]:[color:var(--interactive-accent)] [&:hover]:[color:var(--interactive-accent)]",
 } as const;

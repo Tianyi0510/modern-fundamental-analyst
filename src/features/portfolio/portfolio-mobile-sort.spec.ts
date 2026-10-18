@@ -140,3 +140,30 @@ test("mobile sorting controls share dimensions and use one press transform", asy
   await expect(direction).toHaveCSS("transform", "none");
   await page.mouse.up();
 });
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} URL sorting survives reload and browser history @mobile`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${prefix}/portfolio?source=test&sort=symbol&direction=asc#holdings`);
+    const select = page.locator(".portfolio-mobile-sort select");
+    const headers = page.getByRole("columnheader");
+    await expect(select).toHaveValue("symbol");
+    await expect(headers.nth(0)).toHaveAttribute("aria-sort", "ascending");
+    await select.selectOption("shares");
+    await expect(page).toHaveURL(/source=test&sort=shares&direction=desc#holdings$/);
+    await page.reload();
+    await expect(select).toHaveValue("shares");
+    await expect(headers.nth(1)).toHaveAttribute("aria-sort", "descending");
+    await page.locator(".portfolio-mobile-sort button").click();
+    await expect(page).toHaveURL(/direction=asc#holdings$/);
+    await page.goBack();
+    await expect(headers.nth(1)).toHaveAttribute("aria-sort", "descending");
+    await page.goBack();
+    await expect(select).toHaveValue("symbol");
+    await page.goForward();
+    await expect(select).toHaveValue("shares");
+    await page.goto(`${prefix}/portfolio?sort=invalid&direction=sideways`);
+    await expect(select).toHaveValue("marketValue");
+    await expect(headers.nth(4)).toHaveAttribute("aria-sort", "descending");
+  });
+}

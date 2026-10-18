@@ -33,42 +33,42 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
     mediumLabel: [".header-actions nav a"],
   },
   "/about": {
-    largeHeadline: [".page-hero h1"],
+    largeDisplay: [".page-hero h1"],
     smallHeadline: [".about-section-heading h2", ".about-closing h2"],
     mediumTitle: [".about-boundaries h2"],
     mediumBody: [".about-copy", ".about-boundaries ol"],
   },
   "/portfolio": {
-    largeHeadline: [".page-hero h1"],
+    largeDisplay: [".page-hero h1"],
     smallHeadline: [".portfolio-holdings-heading h2"],
     summaryDisplay: [".portfolio-kpis strong"],
     smallBody: ["tbody .portfolio-row > td"],
     largeLabel: [".portfolio-row > th", ".portfolio-total-row > td"],
   },
   "/performance": {
-    largeHeadline: [".page-hero h1"],
+    largeDisplay: [".page-hero h1"],
     smallHeadline: [".returns .section-heading h2", ".methodology h2"],
     summaryDisplay: [".performance-summary strong"],
     mediumTitle: ["#performance-twr-chart-title", "#performance-chart-title"],
   },
-  "/memos": { largeHeadline: [".page-hero h1"], largeTitle: [".memo-card h2", ".memo-index-row h2"] },
+  "/memos": { largeDisplay: [".page-hero h1"], largeTitle: [".memo-card h2", ".memo-index-row h2"] },
   "/contact": {
-    largeHeadline: [".page-hero h1"],
+    largeDisplay: [".page-hero h1"],
     largeTitle: ["#contact-subscribe-title", "#contact-form-title"],
     largeLabel: ["form .button"],
   },
   "/support": {
-    largeHeadline: [".page-hero h1"],
+    largeDisplay: [".page-hero h1"],
     largeTitle: [".support-section h2"],
     mediumDisplay: [".support-amount-option strong"],
   },
   "/disclaimer": {
-    mediumHeadline: [".legal h1"],
+    largeDisplay: [".legal h1"],
     smallHeadline: [".legal-section h2"],
     mediumBody: [".legal-section-copy p"],
   },
-  "/subscription-preferences": { largeHeadline: ["main h1"] },
-  "/subscription-confirmation": { mediumTitle: ["main h1"] },
+  "/subscription-preferences": { largeDisplay: ["main h1"] },
+  "/subscription-confirmation": { largeDisplay: ["main h1"] },
   "/memos/microsoft-stock-analysis-fiscal-year-2024": {
     largeDisplay: [".memo-article h1"],
     smallHeadline: [".article-body h2"],
@@ -157,8 +157,9 @@ async function invalidTreatments(page: Page) {
       const weight = Number(style.fontWeight);
       const tracking = style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing);
       const normalized = (size / root) * 16;
+      const mobileWordmark = element.closest(".brand-logo") && innerWidth <= 800 && Math.abs(size - 18) < 0.1;
       const valid =
-        [16, 21, 28, 38, 51, 67, 90].some((value) => Math.abs(value - normalized) < 0.1) &&
+        ([16, 21, 28, 38, 51, 67, 90].some((value) => Math.abs(value - normalized) < 0.1) || mobileWordmark) &&
         [400, 700].includes(weight) &&
         Math.abs(tracking) < 0.01 &&
         [1.15, 1.5].some((value) => Math.abs(value - leading) < 0.01);

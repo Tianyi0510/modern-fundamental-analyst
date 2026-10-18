@@ -157,8 +157,9 @@ it("disables editing and duplicate submission until the pending request complete
   const user = await fillMessage();
   try {
     await user.click(screen.getByRole("button", { name: "Send Message" }));
-    const sending = await screen.findByRole("button", { name: "Sending…" });
+    const sending = await screen.findByRole("button", { name: "Send Message" });
     expect(sending).toBeDisabled();
+    expect(screen.getByText("Sending…")).toBeVisible();
     expect(within(sending).getByRole("status", { hidden: true })).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("textbox", { name: "Message" })).toBeDisabled();
     await user.click(sending);

@@ -52,8 +52,8 @@ SOFTWARE.
       font-size: var(--typeset-size);
     }
 
-    --typeset-muted: var(--color-muted-foreground, color-mix(in oklab, currentColor 60%, transparent));
-    --typeset-rule: var(--color-border, color-mix(in oklab, currentColor 20%, transparent));
+    --typeset-muted: var(--color-muted-foreground);
+    --typeset-rule: var(--color-border);
   }
 
   .typeset
@@ -134,7 +134,7 @@ SOFTWARE.
       color: inherit;
       font-weight: 500;
       text-decoration-line: underline;
-      text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+      text-decoration-color: var(--border-control);
     }
     &:where(a:hover) {
       text-decoration-color: currentColor;
@@ -156,7 +156,7 @@ SOFTWARE.
       font-weight: 600;
     }
     &:where(mark) {
-      background-color: color-mix(in oklab, oklch(0.86 0.17 95) 40%, transparent);
+      background-color: var(--surface-selected);
       color: inherit;
       padding: 0.05em 0.15em;
       border-radius: 0.2em;
@@ -288,7 +288,7 @@ SOFTWARE.
 
     /* Inline code. */
     &:where(:not(pre) > code) {
-      background-color: var(--color-muted, color-mix(in oklab, currentColor 8%, transparent));
+      background-color: var(--color-muted);
       font-family: var(--typeset-font-mono);
       font-size: 0.85em;
       border-radius: min(calc(var(--radius, 0.5em) * 0.6), 0.35em);
@@ -297,7 +297,7 @@ SOFTWARE.
 
     /* Code blocks. */
     &:where(pre) {
-      background-color: var(--color-muted, color-mix(in oklab, currentColor 8%, transparent));
+      background-color: var(--color-muted);
       font-family: var(--typeset-font-mono);
       font-size: 0.875em;
       line-height: 1.5;

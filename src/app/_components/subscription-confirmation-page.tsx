@@ -33,7 +33,6 @@ export async function SubscriptionConfirmationPage({
       />
       <main id="main-content" tabIndex={-1}>
         <PageHero
-          titleRole="title"
           variant="standard"
           label={locale === "en" ? title : copy.subject}
           title={title}

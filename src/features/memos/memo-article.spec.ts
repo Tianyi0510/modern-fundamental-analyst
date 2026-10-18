@@ -26,7 +26,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         ["font-size", "16px"],
         ["line-height", "24px"],
         ["font-weight", "400"],
-      ]) {
+      ] as const) {
         await expect(metadataText).toHaveCSS(property, value);
         await expect(share).toHaveCSS(property, value);
       }

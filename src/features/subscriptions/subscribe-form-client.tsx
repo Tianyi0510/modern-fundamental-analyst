@@ -149,19 +149,21 @@ export function SubscribeFormClient({
               disabled={status === "submitting"}
             >
               {status === "submitting" && <Spinner aria-hidden="true" data-icon="inline-start" />}
-              {status === "submitting" ? copy.submitting : copy.submit}
+              {copy.submit}
             </Button>
             <a className={appearance.preferences[variant]} href={preferencesHref}>
               {copy.preferences}
             </a>
             <Alert tone={variant} className="col-span-full max-w-[390px] compact:col-auto">
-              {status === "success"
-                ? copy.success
-                : status === "alreadySubscribed"
-                  ? copy.alreadySubscribed
-                  : status === "error"
-                    ? copy.error
-                    : ""}
+              {status === "submitting"
+                ? copy.submitting
+                : status === "success"
+                  ? copy.success
+                  : status === "alreadySubscribed"
+                    ? copy.alreadySubscribed
+                    : status === "error"
+                      ? copy.error
+                      : ""}
             </Alert>
           </FieldGroup>
         </ClientForm>

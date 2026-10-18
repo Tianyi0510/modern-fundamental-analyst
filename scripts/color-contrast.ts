@@ -1,4 +1,6 @@
 function rgba(value: string) {
+  const srgb = value.match(/^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)$/);
+  if (srgb) return [Number(srgb[1]) * 255, Number(srgb[2]) * 255, Number(srgb[3]) * 255, Number(srgb[4] ?? 1)];
   if (!/^rgba?\(/.test(value)) throw new Error(`Unsupported computed color: ${value}`);
   const components = value.match(/[\d.]+/g)?.map(Number);
   if (!components || (components.length !== 3 && components.length !== 4)) {

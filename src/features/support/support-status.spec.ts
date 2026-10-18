@@ -144,7 +144,14 @@ for (const copy of supportLocales) {
       .filter({ has: page.locator('input[value="support-6-v1"]') })
       .click();
     const submit = page.locator(".support-submit");
-    type SubmissionState = { text: string | null; disabled: boolean; busy: string | null };
+    const originalLabel = await submit.textContent();
+    type SubmissionState = {
+      text: string | null;
+      disabled: boolean;
+      busy: string | null;
+      spinner: boolean;
+      status: string | null;
+    };
     let submissionState: SubmissionState | undefined;
     await page.exposeFunction("recordSupportSubmission", (state: SubmissionState) => {
       submissionState = state;
@@ -160,11 +167,15 @@ for (const copy of supportLocales) {
           text: button.textContent,
           disabled: button.disabled,
           busy: form.getAttribute("aria-busy"),
+          spinner: !!button.querySelector('[data-slot="spinner"][aria-hidden="true"]'),
+          status: form.querySelector('[role="status"] p')?.textContent ?? null,
         });
       }).observe(form, { attributes: true, childList: true, subtree: true });
     });
     await submit.click({ noWaitAfter: true });
-    await expect.poll(() => submissionState).toEqual({ text: copy.submitting, disabled: true, busy: "true" });
+    await expect
+      .poll(() => submissionState)
+      .toEqual({ text: originalLabel, disabled: true, busy: "true", spinner: true, status: copy.submitting });
     await expect.poll(() => requests).toBe(1);
     expect(requests).toBe(1);
     release();

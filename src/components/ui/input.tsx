@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export type FieldVariant = "standard" | "inverse";
 const variants: Record<FieldVariant, string> = {
   standard:
-    "border-[var(--field-border)] rounded-field bg-[var(--field-surface)] text-[var(--field-text)] focus-visible:outline-[var(--field-focus-ring)] focus-visible:border-[var(--field-focus-border)]",
+    "border-[var(--field-border)] rounded-field bg-[var(--field-surface)] text-[var(--field-text)] placeholder:text-[var(--field-text)] placeholder:opacity-100 focus-visible:outline-[var(--field-focus-ring)] focus-visible:border-[var(--field-focus-border)]",
   inverse:
     "border-[var(--field-inverse-border)] rounded-action bg-transparent text-[var(--field-inverse-text)] placeholder:text-[var(--field-inverse-placeholder)] focus-visible:outline-[var(--focus-ring-on-dark)]",
 };

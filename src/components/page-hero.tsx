@@ -17,14 +17,12 @@ export function PageHero({
   intro,
   children,
   variant = "standard",
-  titleRole = "headline",
 }: {
   label: ReactNode;
   title: ReactNode;
   intro: ReactNode;
   children?: ReactNode;
   variant?: HeroVariant;
-  titleRole?: "headline" | "title";
 }) {
   return (
     <div className="page-hero-band bg-[var(--surface-secondary)]">
@@ -33,7 +31,7 @@ export function PageHero({
           <span className="size-[9px] rounded-full bg-accent" /> {label}
         </p>
         <h1
-          className={`mt-[var(--space-section-content)] ${titleRole === "title" ? "text-medium-title" : "text-large-headline"} text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+          className={`mt-[var(--space-section-content)] text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
         >
           {title}
         </h1>

@@ -258,7 +258,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                     disabled={status === "sending"}
                   >
                     {status === "sending" && <Spinner aria-hidden="true" data-icon="inline-start" />}
-                    {status === "sending" ? copy.sending : copy.send}
+                    {copy.send}
                   </Button>
                   <AlertDialogTrigger
                     render={<Button variant="quiet" size="text" disabled={!hasContent || status === "sending"} />}
@@ -266,13 +266,15 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                     {copy.clear}
                   </AlertDialogTrigger>
                   <Alert ref={feedbackRef} tabIndex={-1} className="max-w-[420px] basis-full">
-                    {status === "success"
-                      ? copy.success
-                      : status === "error"
-                        ? copy.error
-                        : status === "invalid"
-                          ? copy.validation.summary
-                          : ""}
+                    {status === "sending"
+                      ? copy.sending
+                      : status === "success"
+                        ? copy.success
+                        : status === "error"
+                          ? copy.error
+                          : status === "invalid"
+                            ? copy.validation.summary
+                            : ""}
                   </Alert>
                 </div>
               </FieldGroup>

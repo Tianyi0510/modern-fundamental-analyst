@@ -45,7 +45,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-1/2 left-1/2 z-[var(--layer-modal)] grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[var(--radius-menu)] bg-popover p-4 text-popover-foreground shadow-[var(--shadow-dialog)] ring-1 ring-foreground/10 transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] outline-none data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs motion-reduce:animate-none motion-reduce:transition-none data-[size=default]:sm:max-w-sm",
+          "group/alert-dialog-content fixed top-1/2 left-1/2 z-[var(--layer-modal)] grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[var(--radius-menu)] bg-popover p-4 text-popover-foreground shadow-[var(--shadow-dialog)] ring-1 ring-foreground transition-opacity duration-[var(--motion-duration-enter)] ease-[var(--motion-ease-emphasized)] outline-none data-ending-style:opacity-0 data-ending-style:duration-[var(--motion-duration-exit)] data-ending-style:ease-[var(--motion-ease-exit)] data-starting-style:opacity-0 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs motion-reduce:animate-none motion-reduce:transition-none data-[size=default]:sm:max-w-sm",
           className,
         )}
         {...props}
@@ -72,7 +72,7 @@ function AlertDialogFooter({ className, ...props }: React.ComponentProps<"div">)
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-[var(--radius-menu)] border-t border-border bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
+        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-[var(--radius-menu)] border-t border-border bg-muted p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}

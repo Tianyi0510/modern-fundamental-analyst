@@ -47,7 +47,7 @@ export function ContactEmail({ name, email, subject, message, locale }: ContactM
       <Text>
         <strong>{labels.subject}:</strong> {subject}
       </Text>
-      <Hr style={{ borderStyle: "solid" }} />
+      <Hr style={{ borderTop: "1px solid #eef0f2" }} />
       <Text style={{ fontSize: "17px", lineHeight: "28px" }}>
         {message.split("\n").map((line, index) => (
           <Fragment key={index}>

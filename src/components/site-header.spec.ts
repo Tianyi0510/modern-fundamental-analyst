@@ -988,7 +988,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(home).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       if (await page.evaluate(() => matchMedia("(hover: hover)").matches)) {
         await home.hover();
-        await expect(home).toHaveCSS("background-color", "rgb(242, 242, 242)");
+        await expect(home).toHaveCSS("background-color", "rgb(245, 247, 250)");
         await expect(home).toHaveCSS("color", "rgb(13, 40, 139)");
         await page.mouse.move(0, 0);
         await expect(home).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -1002,7 +1002,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             .evaluate((element) => element.getAnimations({ subtree: true }).length),
         )
         .toBe(0);
-      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(250, 250, 250)");
+      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(245, 247, 250)");
       for (const target of await page
         .locator(
           ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > [data-slot=collapsible-trigger]",
@@ -1136,7 +1136,7 @@ test.describe("language disclosure touch hover recovery", () => {
         await page.keyboard.press("Shift+Tab");
         await page.keyboard.press("Tab");
         await expect(summary).toBeFocused();
-        await expect(summary).toHaveCSS("background-color", "rgb(242, 242, 242)");
+        await expect(summary).toHaveCSS("background-color", "rgb(245, 247, 250)");
         await expect(summary).toHaveCSS("outline-style", "solid");
         await page.keyboard.press("Escape");
         await expect(page.locator(".mobile-menu-button")).toBeFocused();

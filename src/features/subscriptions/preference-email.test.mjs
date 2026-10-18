@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { JSDOM } from "jsdom";
+import { colorContrast } from "../../../scripts/color-contrast.ts";
 import { renderPreferenceEmail } from "./preference-email.tsx";
 
 test("preference email preserves the brand and escapes interpolated content", async () => {
@@ -14,7 +15,7 @@ test("preference email preserves the brand and escapes interpolated content", as
     "https://example.com/preferences?token=a&locale=en",
   );
 
-  assert.match(html, /Modern Fundamental Analyst<span style="color:#008cff">\.<\/span>/);
+  assert.match(html, /Modern Fundamental Analyst<span style="color:#7dcbfa">\.<\/span>/);
   assert.match(html, /Manage &lt;Preferences&gt;/);
   assert.match(html, /Research &amp; updates/);
   assert.match(html, /Open &quot;settings&quot;/);
@@ -40,6 +41,33 @@ for (const [locale, lang] of [
       const text = await render(element, { plainText: true });
       assert.match(html, new RegExp(`lang="${lang}"`));
       const document = new JSDOM(html).window.document;
+      const palette = new Set([
+        "#0d288b",
+        "#3d8af7",
+        "#7dcbfa",
+        "#000000",
+        "#ffffff",
+        "#cccccc",
+        "#eef0f2",
+        "#f5f7fa",
+        "#007c66",
+        "#bf2a2c",
+      ]);
+      for (const color of html.match(/#[0-9a-f]{6}\b/gi) ?? []) {
+        assert.ok(palette.has(color.toLowerCase()), `Unexpected email color ${color}`);
+      }
+      const inheritedStyle = (element, property) => {
+        for (let parent = element; parent; parent = parent.parentElement) {
+          if (parent.style[property]) return parent.style[property];
+        }
+        throw new Error(`Missing explicit ${property}`);
+      };
+      for (const element of document.querySelectorAll("h1, p, a")) {
+        assert.ok(
+          colorContrast(inheritedStyle(element, "color"), inheritedStyle(element, "backgroundColor")) >= 4.5,
+          `Email text contrast: ${kind} ${locale} ${element.textContent.slice(0, 30)}`,
+        );
+      }
       assert.equal(document.documentElement.lang, lang);
       assert.equal(document.documentElement.dir, "ltr");
       for (const child of document.body.children) {

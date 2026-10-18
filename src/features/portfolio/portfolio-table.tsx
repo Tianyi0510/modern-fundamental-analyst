@@ -1,9 +1,11 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { appearance } from "./portfolio-table.styles";
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, type Dispatch, type SetStateAction } from "react";
 import {
   createColumnHelper,
   createSortedRowModel,
@@ -53,8 +55,55 @@ type HoldingRow = {
 const features = tableFeatures({ rowSortingFeature, sortedRowModel: createSortedRowModel() });
 const columnHelper = createColumnHelper<typeof features, HoldingRow>();
 
-export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: "marketValue", desc: true }]);
+const defaultSorting: SortingState = [{ id: "marketValue", desc: true }];
+const ignoreSorting = () => {};
+
+export function PortfolioTable(props: PortfolioTableProps) {
+  return (
+    <Suspense
+      fallback={
+        <fieldset disabled className="contents">
+          <PortfolioTableView {...props} sorting={defaultSorting} setSorting={ignoreSorting} />
+        </fieldset>
+      }
+    >
+      <UrlPortfolioTable {...props} />
+    </Suspense>
+  );
+}
+
+function readSorting(params: Pick<URLSearchParams, "get">): SortingState {
+  const key = params.get("sort");
+  const direction = params.get("direction");
+  return columns.includes(key as SortKey) && (direction === "asc" || direction === "desc")
+    ? [{ id: key!, desc: direction === "desc" }]
+    : defaultSorting;
+}
+
+function UrlPortfolioTable(props: PortfolioTableProps) {
+  const params = useSearchParams();
+  const sorting = readSorting(params);
+  const setSorting = useCallback<Dispatch<SetStateAction<SortingState>>>((update) => {
+    const url = new URL(window.location.href);
+    // Read the current URL at activation, including consecutive inputs before React rerenders.
+    const next = typeof update === "function" ? update(readSorting(url.searchParams)) : update;
+    url.searchParams.set("sort", next[0]!.id);
+    url.searchParams.set("direction", next[0]!.desc ? "desc" : "asc");
+    if (url.href !== window.location.href) window.history.pushState(null, "", url);
+  }, []);
+  return <PortfolioTableView {...props} sorting={sorting} setSorting={setSorting} />;
+}
+
+function PortfolioTableView({
+  copy,
+  holdings,
+  income,
+  sorting,
+  setSorting,
+}: PortfolioTableProps & {
+  sorting: SortingState;
+  setSorting: Dispatch<SetStateAction<SortingState>>;
+}) {
   const sortKey = sorting[0]!.id as SortKey;
   const sortDirection = sorting[0]!.desc ? "desc" : "asc";
   const totals = useMemo(() => getPortfolioTotals(holdings, income), [holdings, income]);
@@ -70,7 +119,9 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
   );
 
   const changeSort = (nextKey: SortKey) => {
-    setSorting([{ id: nextKey, desc: nextKey === sortKey ? sortDirection === "asc" : nextKey !== "symbol" }]);
+    setSorting((previous) => [
+      { id: nextKey, desc: nextKey === previous[0]!.id ? !previous[0]!.desc : nextKey !== "symbol" },
+    ]);
   };
   const tableColumns = useMemo(
     () =>
@@ -97,8 +148,8 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
                       className={`min-h-0 justify-start rounded-none px-0 ${appearance["sort-button"]} ${column !== "symbol" ? appearance.sortAlignment : ""} ${active ? appearance["is-active"] : ""}`}
                       type="button"
                       onClick={() =>
-                        setSorting([
-                          { id: column, desc: column === sortKey ? sortDirection === "asc" : column !== "symbol" },
+                        setSorting((previous) => [
+                          { id: column, desc: column === previous[0]!.id ? !previous[0]!.desc : column !== "symbol" },
                         ])
                       }
                       aria-label={`${copy.sortBy} ${copy[column]}`}
@@ -117,14 +168,13 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
           ),
         ),
       ),
-    [copy, sortKey, sortDirection],
+    [copy, sortKey, sortDirection, setSorting],
   );
   const table = useTable({
     features,
     columns: tableColumns,
     data: rows,
     state: { sorting },
-    onSortingChange: setSorting,
     enableSortingRemoval: false,
     enableMultiSort: false,
     getRowId: (row) => row.holding.symbol,
@@ -152,7 +202,7 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
           size="text"
           className={appearance.mobileDirection}
           type="button"
-          onClick={() => changeSort(sortKey)}
+          onClick={() => setSorting((previous) => [{ ...previous[0]!, desc: !previous[0]!.desc }])}
           aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}
         >
           <span>{sortDirection === "asc" ? copy.ascending : copy.descending}</span>

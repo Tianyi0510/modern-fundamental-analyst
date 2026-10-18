@@ -80,20 +80,22 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           }),
         };
       });
+      expect(geometry.heading.height).toBeCloseTo(24.15, 1);
       expect(Math.abs(geometry.logo.height - geometry.heading.height)).toBeLessThan(1);
       expect(Math.abs(geometry.subscription.height - geometry.heading.height)).toBeLessThan(1);
       const precedingControl = width <= 800 ? geometry.submit : geometry.input;
       expect(Math.abs(geometry.preferences.top - precedingControl.bottom - 12)).toBeLessThan(1);
-      const step = geometry.links[1].top - geometry.links[0].top;
-      expect(Math.abs(geometry.links[0].top - geometry.heading.top - step)).toBeLessThan(1);
+      expect(geometry.links).toHaveLength(6);
+      const step = geometry.links[1]!.top - geometry.links[0]!.top;
+      expect(Math.abs(geometry.links[0]!.top - geometry.heading.top - step)).toBeLessThan(1);
       for (let index = 1; index < geometry.links.length; index++) {
-        expect(Math.abs(geometry.links[index].top - geometry.links[index - 1].top - step)).toBeLessThan(1);
+        expect(Math.abs(geometry.links[index]!.top - geometry.links[index - 1]!.top - step)).toBeLessThan(1);
       }
       expect(Math.abs(geometry.description.top - geometry.logo.bottom - 12)).toBeLessThan(1);
       expect(Math.abs(geometry.input.top - geometry.subscription.bottom - 12)).toBeLessThan(1);
       if (width > 800) {
-        expect(Math.abs(geometry.description.top - geometry.links[0].top)).toBeLessThan(1);
-        expect(Math.abs(geometry.descriptionTextTop - geometry.links[0].textTop)).toBeLessThan(1);
+        expect(Math.abs(geometry.description.top - geometry.links[0]!.top)).toBeLessThan(1);
+        expect(Math.abs(geometry.descriptionTextTop - geometry.links[0]!.textTop)).toBeLessThan(1);
       }
       if (width > 1100) {
         expect(Math.abs(geometry.description.top - geometry.input.top)).toBeLessThan(1);

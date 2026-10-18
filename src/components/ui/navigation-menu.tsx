@@ -41,7 +41,7 @@ function NavigationMenuLink({
       data-slot="navigation-menu-link"
       className={cn(
         variant === "default" &&
-          "flex items-center gap-2 rounded-control p-2 text-small-body transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-muted focus:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-1 in-data-[slot=navigation-menu-content]:rounded-control data-active:bg-muted/50 data-active:hover:bg-muted data-active:focus:bg-muted motion-reduce:animate-none motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
+          "flex items-center gap-2 rounded-control p-2 text-small-body transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-muted focus:bg-muted focus-visible:ring-3 focus-visible:ring-ring focus-visible:outline-1 in-data-[slot=navigation-menu-content]:rounded-control data-active:bg-muted data-active:hover:bg-muted data-active:focus:bg-muted motion-reduce:animate-none motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}

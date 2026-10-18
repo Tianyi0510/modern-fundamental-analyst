@@ -1,9 +1,20 @@
 :root {
   color-scheme: light;
+  /* Primitive Colors: the ten owned Layer 01 values. */
+  --black: #000000;
+  --white: #ffffff;
+  --blue-deep: #0d288b;
+  --blue-medium: #3d8af7;
+  --blue-bright: #7dcbfa;
+  --gray-deep: #cccccc;
+  --gray-medium: #eef0f2;
+  --gray-bright: #f5f7fa;
+  --market-positive: #007c66;
+  --market-negative: #bf2a2c;
   --layer-navigation: 90;
   --layer-modal: 100;
   --layer-popover: 110;
-  /* Fluent UI Web defaults; official names retain their camelCase spelling. */
+  /* Fluent Web geometry and motion defaults; material colors map to the Layer 01 palette. */
   --spacingHorizontalNone: 0px;
   --spacingHorizontalXXS: 2px;
   --spacingHorizontalXS: 4px;
@@ -41,9 +52,21 @@
   --strokeWidthThick: 2px;
   --strokeWidthThicker: 3px;
   --strokeWidthThickest: 4px;
-  --colorNeutralBackground1: #ffffff;
-  --colorNeutralBackground2: #fafafa;
-  --colorNeutralCardBackground: #fafafa;
+  /* Fluent 2 Functional Colors: only roles consumed by this site.
+   * Prefer direct owned primitives for every role. Fluent dark surfaces and
+   * readable dark danger feedback remain where primitives cannot serve the role.
+   */
+  --colorNeutralForeground2: var(--black);
+  --colorNeutralForeground3: var(--black);
+  --colorNeutralBackground1Hover: var(--gray-bright);
+  --colorNeutralBackground1Pressed: var(--gray-medium);
+  --colorNeutralStrokeAccessible: var(--colorNeutralForeground3);
+  --colorStatusDangerForeground2: var(--market-negative);
+  --colorBrandForeground1: var(--blue-deep);
+
+  --colorNeutralBackground1: var(--white);
+  --colorNeutralBackground2: var(--gray-bright);
+  --colorNeutralCardBackground: var(--colorNeutralBackground2);
   --colorBackgroundOverlay: rgba(0, 0, 0, 0.4);
   --colorNeutralShadowAmbient: rgba(0, 0, 0, 0.12);
   --colorNeutralShadowKey: rgba(0, 0, 0, 0.14);
@@ -59,45 +82,12 @@
   --material-solid-secondary: var(--colorNeutralBackground2);
   --material-popup: var(--surface-primary);
   --material-popup-text: var(--text-primary);
-  --text-error: var(--market-negative);
+  --text-error: var(--colorStatusDangerForeground2);
   --shadow-notification: var(--shadow8);
   --shadow-chart-tooltip: var(--shadow16);
   --shadow-surface: var(--shadow2);
   --shadow-popover: var(--shadow16);
   --shadow-dialog: var(--shadow64);
-  --black: #000000;
-  --white: #ffffff;
-  --blue-deep: #0d288b;
-  --blue-medium: #3d8af7;
-  --blue-bright: #7dcbfa;
-  /* Geist light sRGB scale, verified against the official Colors stylesheet. */
-  --neutral-100: hsl(0 0% 95%);
-  --neutral-200: hsl(0 0% 92%);
-  --neutral-300: hsl(0 0% 90%);
-  --neutral-400: hsl(0 0% 92%);
-  --neutral-500: hsl(0 0% 79%);
-  --neutral-600: hsl(0 0% 66%);
-  --neutral-700: hsl(0 0% 56%);
-  --neutral-800: hsl(0 0% 49%);
-  --neutral-900: hsl(0 0% 30%);
-  --neutral-1000: hsl(0 0% 9%);
-  /* Owned neutral palette alongside the component neutral scale. */
-  --gray-deep: #cccccc;
-  --gray-medium: #eef0f2;
-  --gray-bright: #f5f7fa;
-  /* Global color values; semantic aliases below own their use. */
-  --black-alpha-18: rgba(0, 0, 0, 0.18);
-  --black-alpha-20: rgba(0, 0, 0, 0.2);
-  --black-alpha-28: rgba(0, 0, 0, 0.28);
-  --white-alpha-22: rgba(255, 255, 255, 0.22);
-  --white-alpha-60: rgba(255, 255, 255, 0.6);
-  --white-alpha-70: rgba(255, 255, 255, 0.7);
-  --white-alpha-78: rgba(255, 255, 255, 0.78);
-  --white-alpha-84: rgba(255, 255, 255, 0.84);
-  --red-error: #ff0000;
-  --market-positive: #007c66;
-  --market-negative: #bf2a2c;
-  --market-neutral: #000000;
   /* Layout primitives feed independent semantic widths even when values match. */
   --width-720: 720px;
   --width-1120: 1120px;
@@ -115,14 +105,14 @@
   --border-subtle: var(--gray-medium);
   --grid-guide: var(--border-subtle);
   --border-strong: var(--black);
-  --border-control: var(--neutral-800);
+  --border-control: var(--colorNeutralStrokeAccessible);
   /* Decorative strokes must not replace control boundaries or focus rings. */
-  --border-inverse-subtle: var(--white-alpha-22);
-  --border-control-inverse: var(--white-alpha-70);
+  --border-inverse-subtle: var(--gray-deep);
+  --border-control-inverse: var(--white);
   --border-brand: var(--blue-medium);
-  --border-error: var(--red-error);
+  --border-error: var(--text-error);
   --surface-subtle: var(--surface-secondary);
-  --surface-selected: color-mix(in srgb, var(--blue-medium) 8%, var(--surface-primary));
+  --surface-selected: var(--gray-medium);
   --text-return-positive: var(--market-positive);
   --text-return-negative: var(--market-negative);
   /* Rounded Perfect Fourth: shared size-first treatments. */
@@ -181,7 +171,6 @@
   --radius-pill: var(--borderRadiusCircular);
   --focus-ring-width: var(--strokeWidthThick);
   --focus-ring-offset: var(--spacingHorizontalXS);
-  --focus-ring-on-light: var(--blue-deep);
   --focus-ring-on-dark: var(--blue-bright);
   --focus-ring-brand: var(--blue-medium);
   --focus-ring-color: var(--interactive-accent);
@@ -191,8 +180,8 @@
   --space-field-block: var(--space-3);
   --space-field-inline: var(--space-4);
   --size-status-reserve: 1.65em;
-  --opacity-disabled: 0.64;
-  --opacity-disabled-preferences: 0.55;
+  --opacity-disabled: 1;
+  --opacity-disabled-preferences: 1;
   /* Fluent 2 default motion foundation, verified 2026-10-18.
    * microsoft/fluentui: packages/tokens/src/global/{durations,curves}.ts
    * Site-owned semantic aliases below select defaults by interaction purpose.
@@ -244,16 +233,16 @@
   --surface-brand: var(--blue-deep);
   --surface-highlight: var(--blue-bright);
   --text-primary: var(--black);
-  --text-secondary: var(--neutral-900);
-  --text-tertiary: var(--neutral-1000);
-  --text-brand: var(--blue-deep);
+  --text-secondary: var(--colorNeutralForeground2);
+  --text-tertiary: var(--colorNeutralForeground3);
+  --text-brand: var(--colorBrandForeground1);
   --text-inverse: var(--white);
-  --text-inverse-secondary: var(--white-alpha-84);
-  --text-inverse-tertiary: var(--white-alpha-78);
+  --text-inverse-secondary: var(--gray-medium);
+  --text-inverse-tertiary: var(--gray-deep);
   --text-highlight: var(--blue-bright);
   --chart-benchmark: var(--blue-medium);
-  --interactive-accent: var(--blue-deep);
-  --chart-portfolio: var(--blue-deep);
+  --interactive-accent: var(--colorBrandForeground1);
+  --chart-portfolio: var(--colorBrandForeground1);
   /* Component roles inherit semantic values; brand variants remain explicit. */
   --action-primary-surface: var(--black);
   --action-primary-text: var(--white);
@@ -269,27 +258,27 @@
   --action-quiet-text: var(--text-primary);
   --action-quiet-hover-surface: var(--surface-selected);
   --sidebar-text: var(--text-primary);
-  --sidebar-hover-surface: var(--neutral-100);
-  --sidebar-pressed-surface: var(--neutral-200);
+  --sidebar-hover-surface: var(--colorNeutralBackground1Hover);
+  --sidebar-pressed-surface: var(--colorNeutralBackground1Pressed);
   --sidebar-selected-surface: var(--surface-selected);
   --sidebar-language-surface: var(--surface-subtle);
-  --holding-row-hover-surface: color-mix(in srgb, var(--blue-bright) 12%, var(--surface-primary));
-  --portfolio-row-hover-surface: color-mix(in srgb, var(--blue-bright) 10%, var(--surface-primary));
-  --memo-disclosure-hover-surface: color-mix(in srgb, var(--blue-bright) 18%, var(--surface-primary));
+  --holding-row-hover-surface: var(--colorNeutralBackground1Hover);
+  --portfolio-row-hover-surface: var(--colorNeutralBackground1Hover);
+  --memo-disclosure-hover-surface: var(--colorNeutralBackground1Hover);
   --memo-row-hover-surface: var(--memo-disclosure-hover-surface);
-  --memo-card-hover-surface: color-mix(in srgb, var(--blue-bright) 22%, var(--surface-primary));
+  --memo-card-hover-surface: var(--colorNeutralBackground1Hover);
   /* Preserve hover/focus precedence when those states coexist with :active. */
-  --memo-card-pressed-surface: color-mix(in srgb, var(--blue-bright) 28%, var(--surface-primary));
-  /* Touch cards retain the existing softer pressed treatment. */
+  --memo-card-pressed-surface: var(--colorNeutralBackground1Pressed);
+  /* Touch press shares the hovered surface; desktop press retains a stronger state. */
   --memo-card-touch-pressed-surface: var(--memo-card-hover-surface);
-  --support-option-hover-surface: color-mix(in srgb, var(--blue-bright) 24%, var(--surface-primary));
+  --support-option-hover-surface: var(--colorNeutralBackground1Hover);
   --support-option-selected-surface: var(--surface-brand);
   --support-option-selected-text: var(--text-inverse);
-  --allocation-divider: var(--black-alpha-18);
-  --allocation-swatch-border: var(--black-alpha-20);
-  --chart-axis-border: var(--black-alpha-28);
+  --allocation-divider: var(--gray-deep);
+  --allocation-swatch-border: var(--gray-deep);
+  --chart-axis-border: var(--gray-deep);
   --chart-reference: var(--black);
-  --text-chart-secondary: color-mix(in srgb, var(--text-primary) 68%, transparent);
+  --text-chart-secondary: var(--text-secondary);
   --field-surface: var(--surface-primary);
   --field-text: var(--text-primary);
   --field-border: var(--border-control);
@@ -297,7 +286,7 @@
   --field-focus-ring: var(--focus-ring-color);
   --field-inverse-text: var(--text-inverse);
   --field-inverse-border: var(--border-control-inverse);
-  --field-inverse-placeholder: var(--white-alpha-60);
+  --field-inverse-placeholder: var(--gray-deep);
 }
 @media (min-width: 50rem) {
   :root {
@@ -341,72 +330,73 @@
   }
 }
 
-/* Explicit aliases survive CSS optimization and follow the selected theme. */
+/* Explicit and no-JavaScript system dark use identical functional overrides.
+ * Keep these blocks synchronized; avoid build-time light-dark() rewriting. */
 :root[data-theme="dark"] {
   color-scheme: dark;
+  --colorNeutralForeground2: var(--gray-deep);
+  --colorNeutralForeground3: var(--gray-deep);
   --colorNeutralBackground1: #292929;
   --colorNeutralBackground2: #1f1f1f;
   --colorNeutralCardBackground: #333333;
+  --colorNeutralBackground1Hover: #3d3d3d;
+  --colorNeutralBackground1Pressed: var(--colorNeutralBackground2);
+  --colorStatusDangerForeground2: #eeacb2;
+  --colorBrandForeground1: var(--blue-bright);
+
   --colorBackgroundOverlay: rgba(0, 0, 0, 0.5);
   --colorNeutralShadowAmbient: rgba(0, 0, 0, 0.24);
   --colorNeutralShadowKey: rgba(0, 0, 0, 0.28);
-  --border-subtle: #333333;
+  --surface-selected: var(--colorNeutralCardBackground);
+  --border-subtle: var(--colorNeutralCardBackground);
   --border-strong: var(--white);
-  --border-control: #a1a1a1;
-  --text-return-positive: #4ade80;
-  --text-return-negative: #ff6377;
-  --text-error: #ff6377;
-  --surface-selected: color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary));
-  --chart-axis-border: #ffffff70;
-  --chart-reference: #cccccc;
+  --colorStatusSuccessForeground2: #9fd89f;
+  --text-return-positive: var(--colorStatusSuccessForeground2);
+  --text-return-negative: var(--colorStatusDangerForeground2);
+  --chart-axis-border: var(--gray-deep);
+  --chart-reference: var(--gray-deep);
   --text-primary: var(--white);
-  --text-secondary: #a1a1a1;
-  --text-tertiary: #e4e4e4;
-  --text-brand: var(--blue-bright);
-  --interactive-accent: var(--blue-bright);
-  --chart-portfolio: var(--blue-bright);
   --action-primary-surface: var(--white);
   --action-primary-text: var(--black);
   --action-contrast-surface: var(--white);
   --action-contrast-text: var(--black);
-  --sidebar-hover-surface: #242424;
-  --sidebar-pressed-surface: #303030;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
+    --colorNeutralForeground2: var(--gray-deep);
+    --colorNeutralForeground3: var(--gray-deep);
     --colorNeutralBackground1: #292929;
     --colorNeutralBackground2: #1f1f1f;
     --colorNeutralCardBackground: #333333;
+    --colorNeutralBackground1Hover: #3d3d3d;
+    --colorNeutralBackground1Pressed: var(--colorNeutralBackground2);
+    --colorStatusDangerForeground2: #eeacb2;
+    --colorBrandForeground1: var(--blue-bright);
+
     --colorBackgroundOverlay: rgba(0, 0, 0, 0.5);
     --colorNeutralShadowAmbient: rgba(0, 0, 0, 0.24);
     --colorNeutralShadowKey: rgba(0, 0, 0, 0.28);
-    --border-subtle: #333333;
+    --surface-selected: var(--colorNeutralCardBackground);
+    --border-subtle: var(--colorNeutralCardBackground);
     --border-strong: var(--white);
-    --border-control: #a1a1a1;
-    --text-return-positive: #4ade80;
-    --text-return-negative: #ff6377;
-    --text-error: #ff6377;
-    --surface-selected: color-mix(in srgb, var(--blue-bright) 16%, var(--surface-primary));
-    --chart-axis-border: #ffffff70;
-    --chart-reference: #cccccc;
+    --colorStatusSuccessForeground2: #9fd89f;
+    --text-return-positive: var(--colorStatusSuccessForeground2);
+    --text-return-negative: var(--colorStatusDangerForeground2);
+    --chart-axis-border: var(--gray-deep);
+    --chart-reference: var(--gray-deep);
     --text-primary: var(--white);
-    --text-secondary: #a1a1a1;
-    --text-tertiary: #e4e4e4;
-    --text-brand: var(--blue-bright);
-    --interactive-accent: var(--blue-bright);
-    --chart-portfolio: var(--blue-bright);
     --action-primary-surface: var(--white);
     --action-primary-text: var(--black);
     --action-contrast-surface: var(--white);
     --action-contrast-text: var(--black);
-    --sidebar-hover-surface: #242424;
-    --sidebar-pressed-surface: #303030;
   }
 }
 
 @theme inline {
+  /* Disable Tailwind's unrelated default palettes; publish only owned colors. */
+  --color-*: initial;
   --default-transition-duration: var(--motion-duration-fast);
   --default-transition-timing-function: var(--motion-ease-standard);
   --animate-spin: spin var(--motion-duration-spin) var(--motion-ease-linear) infinite;
@@ -489,16 +479,8 @@
   --color-popover-foreground: var(--material-popup-text);
   --color-primary: var(--action-primary-surface);
   --color-primary-foreground: var(--action-primary-text);
-  --color-secondary: var(--surface-secondary);
-  --color-secondary-foreground: var(--text-primary);
   --color-muted-foreground: var(--text-secondary);
-  --color-accent-foreground: var(--surface-primary);
   --color-destructive: var(--text-error);
   --color-input: var(--border-control);
   --color-ring: var(--focus-ring-color);
-  --color-chart-1: var(--chart-portfolio);
-  --color-chart-2: var(--chart-benchmark);
-  --color-chart-3: var(--blue-bright);
-  --color-chart-4: var(--text-secondary);
-  --color-chart-5: var(--text-primary);
 }

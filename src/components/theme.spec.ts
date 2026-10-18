@@ -244,3 +244,201 @@ test("monitoring requests remain intercepted after their document navigates @mob
     release();
   }
 });
+
+for (const { prefix } of labels) {
+  test(`${prefix || "English"} About reference links retain visible keyboard focus in both themes`, async ({
+    page,
+  }) => {
+    for (const colorScheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme });
+      await page.goto(`${prefix}/about`);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
+      await page.keyboard.press("Tab");
+      for (const link of await page.locator(".source-link").all()) {
+        await link.focus();
+        const sample = await link.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            focused: element.matches(":focus-visible"),
+            outline: style.outlineColor,
+            width: parseFloat(style.outlineWidth),
+            outlineStyle: style.outlineStyle,
+            text: style.color,
+            background: getComputedStyle(document.body).backgroundColor,
+          };
+        });
+        expect(sample.focused).toBe(true);
+        expect(sample.outlineStyle).toBe("solid");
+        expect(sample.width).toBeGreaterThanOrEqual(2);
+        expect(colorContrast(sample.outline, sample.background)).toBeGreaterThanOrEqual(3);
+        expect(colorContrast(sample.text, sample.background)).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+}
+
+test("approved neutral palette keeps secondary text and field boundaries readable", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/contact");
+  const field = page.locator('main input[name="email"]').first();
+  await expect(field).toBeVisible();
+  const sample = await field.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext("2d")!;
+    const rgb = (color: string) => {
+      context.clearRect(0, 0, 1, 1);
+      context.fillStyle = color;
+      context.fillRect(0, 0, 1, 1);
+      const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+      return `rgb(${r}, ${g}, ${b})`;
+    };
+    return { border: rgb(style.borderTopColor), background: rgb(style.backgroundColor), text: rgb(style.color) };
+  });
+  expect(colorContrast(sample.border, sample.background)).toBeGreaterThanOrEqual(3);
+  expect(colorContrast(sample.text, sample.background)).toBeGreaterThanOrEqual(4.5);
+  const introduction = page.locator(".page-intro p").first();
+  await expect(introduction).toBeVisible();
+  const text = await introduction.evaluate((element) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext("2d")!;
+    context.fillStyle = getComputedStyle(element).color;
+    context.fillRect(0, 0, 1, 1);
+    const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+    return `rgb(${r}, ${g}, ${b})`;
+  });
+  expect(colorContrast(text, "rgb(245, 247, 250)")).toBeGreaterThanOrEqual(4.5);
+});
+
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`palette role pairs meet contrast thresholds in ${colorScheme} mode`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/portfolio");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
+    const samples = await page.evaluate(() => {
+      const textPairs = [
+        ["--text-primary", "--surface-primary"],
+        ["--text-secondary", "--surface-primary"],
+        ["--text-tertiary", "--surface-secondary"],
+        ["--text-return-positive", "--surface-primary"],
+        ["--text-return-negative", "--surface-primary"],
+        ["--text-error", "--surface-primary"],
+        ["--text-error", "--surface-secondary"],
+        ["--text-return-positive", "--portfolio-row-hover-surface"],
+        ["--text-return-negative", "--portfolio-row-hover-surface"],
+        ["--text-tertiary", "--portfolio-row-hover-surface"],
+        ["--text-secondary", "--memo-card-hover-surface"],
+        ["--text-secondary", "--memo-card-pressed-surface"],
+        ["--interactive-accent", "--sidebar-hover-surface"],
+        ["--interactive-accent", "--sidebar-pressed-surface"],
+        ["--text-inverse-secondary", "--surface-inverse"],
+        ["--text-inverse-tertiary", "--surface-inverse"],
+        ["--interactive-accent", "--surface-selected"],
+        ["--sidebar-text", "--sidebar-hover-surface"],
+        ["--sidebar-text", "--sidebar-pressed-surface"],
+        ["--action-primary-text", "--action-primary-surface"],
+        ["--action-primary-hover-text", "--action-primary-hover-surface"],
+        ["--action-contrast-hover-text", "--action-contrast-hover-surface"],
+        ["--action-inverse-text", "--action-inverse-hover-surface"],
+        ["--support-option-selected-text", "--support-option-selected-surface"],
+      ];
+      const boundaryPairs = [
+        ["--border-control", "--surface-primary"],
+        ["--border-error", "--surface-primary"],
+        ["--focus-ring-color", "--surface-primary"],
+        ["--focus-ring-color", "--surface-secondary"],
+        ["--chart-benchmark", "--surface-primary"],
+        ["--chart-portfolio", "--surface-primary"],
+        ["--focus-ring-brand", "--support-option-selected-surface"],
+      ];
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 1;
+      const context = canvas.getContext("2d")!;
+      const normalize = (color: string) => {
+        context.clearRect(0, 0, 1, 1);
+        context.fillStyle = color;
+        context.fillRect(0, 0, 1, 1);
+        const [r, g, b, a] = context.getImageData(0, 0, 1, 1).data;
+        return `rgba(${r}, ${g}, ${b}, ${a! / 255})`;
+      };
+      return [
+        ...textPairs.map((pair) => ({ pair, minimum: 4.5 })),
+        ...boundaryPairs.map((pair) => ({ pair, minimum: 3 })),
+      ].map(({ pair: [foreground, background], minimum }) => {
+        const element = document.createElement("span");
+        element.style.color = `var(${foreground})`;
+        element.style.backgroundColor = `var(${background})`;
+        document.body.append(element);
+        const style = getComputedStyle(element);
+        const result = {
+          foreground,
+          background,
+          minimum,
+          text: normalize(style.color),
+          surface: normalize(style.backgroundColor),
+        };
+        element.remove();
+        return result;
+      });
+    });
+    for (const sample of samples) {
+      expect(
+        colorContrast(sample.text, sample.surface),
+        `${sample.foreground} on ${sample.background}`,
+      ).toBeGreaterThanOrEqual(sample.minimum);
+    }
+  });
+}
+
+for (const { prefix } of labels) {
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`${prefix || "English"} contact labels and subscription placeholders retain contrast in ${colorScheme} @mobile`, async ({
+      page,
+      browserName,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await page.goto(`${prefix}/contact`);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
+      await page.locator('.contact-band input[name="name"]').fill("Contrast check");
+      await expect(page.locator('.contact-band label:not([aria-hidden="true"])')).toHaveCount(4);
+      for (const width of browserName === "webkit" ? [390] : [390, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.locator(".contact-band button").last().focus();
+        await expect(page.locator(".contact-band button").last()).toHaveCSS("background-color", "rgb(238, 240, 242)");
+        const fields = page.locator(
+          '.contact-band label:not([aria-hidden="true"]), .contact-band button, input[placeholder]',
+        );
+        const samples = await fields.evaluateAll((elements) =>
+          elements
+            .filter((e) => e.checkVisibility())
+            .map((e) => {
+              const placeholder = e.matches("input");
+              const style = getComputedStyle(e, placeholder ? "::placeholder" : null);
+              let ancestor: Element | null = e;
+              let background = "transparent";
+              while (ancestor) {
+                background = getComputedStyle(ancestor).backgroundColor;
+                if (background !== "rgba(0, 0, 0, 0)" && background !== "transparent") break;
+                ancestor = ancestor.parentElement;
+              }
+              return {
+                text: placeholder ? e.getAttribute("placeholder") : e.textContent,
+                color: style.color,
+                opacity: Number(style.opacity),
+                background,
+              };
+            }),
+        );
+        expect(samples.length).toBeGreaterThanOrEqual(8);
+        for (const sample of samples) {
+          expect(
+            colorContrast(sample.color, sample.background, sample.opacity),
+            JSON.stringify(sample),
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+  }
+}
