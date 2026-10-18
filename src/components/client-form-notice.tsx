@@ -9,7 +9,7 @@ const notice = {
 export function ClientFormNotice({ locale }: { locale: Locale }) {
   return (
     <noscript>
-      <p className="col-span-full m-0 text-body">{notice[locale]}</p>
+      <p className="col-span-full m-0 text-small-body">{notice[locale]}</p>
     </noscript>
   );
 }

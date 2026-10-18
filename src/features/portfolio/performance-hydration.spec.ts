@@ -1,3 +1,7 @@
+import {
+  showInteractivePerformanceChart,
+  showLatestPerformanceTooltip,
+} from "../../../scripts/performance-chart-helpers";
 import { expect, test } from "@playwright/test";
 
 for (const { prefix, date } of [
@@ -19,8 +23,9 @@ for (const { prefix, date } of [
       page.on("pageerror", (error) => errors.push(error.message));
       await page.goto(path);
       const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
-      await expect(chart.getByRole("img")).toHaveAccessibleName(new RegExp(date));
-      const summary = chart.locator("summary");
+      await showInteractivePerformanceChart(chart);
+      await expect(await showLatestPerformanceTooltip(chart)).toContainText(date);
+      const summary = chart.locator("[data-slot=collapsible-trigger]");
       await summary.click();
       await expect(summary).toHaveAttribute("aria-expanded", "true");
       await expect(chart.getByRole("table")).toBeVisible();

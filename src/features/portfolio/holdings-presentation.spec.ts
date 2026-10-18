@@ -21,10 +21,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const symbol = page.locator("tbody th[scope=row]").first();
       const value = page.locator("tbody td").first();
       await expect(symbol).toHaveCSS("font-size", "16px");
-      await expect(symbol).toHaveCSS("line-height", "20px");
-      await expect(symbol).toHaveCSS("font-weight", "500");
+      await expect(symbol).toHaveCSS("line-height", "19.2px");
+      await expect(symbol).toHaveCSS("font-weight", "700");
       await expect(value).toHaveCSS("font-size", "16px");
-      await expect(value).toHaveCSS("line-height", "24px");
+      await expect(value).toHaveCSS("line-height", "19.2px");
       const column = page.locator("thead th").first();
       if (width <= 800) {
         await page.locator(".portfolio-mobile-sort select").selectOption("symbol");

@@ -4,15 +4,15 @@
 }
 .figure h3 {
   margin: 0;
-  font-size: var(--font-size-card-title);
-  line-height: var(--leading-card-title);
-  letter-spacing: var(--tracking-title);
-  font-weight: var(--weight-semibold);
+  font-size: var(--font-size-medium-title);
+  line-height: var(--leading-heading-text);
+  letter-spacing: var(--tracking-zero);
+  font-weight: var(--weight-bold);
 }
 .figure p {
   margin: var(--space-3) 0;
-  font-size: var(--font-size-body);
-  line-height: var(--leading-body);
+  font-size: var(--font-size-small-body);
+  line-height: var(--leading-body-text);
 }
 .legend {
   display: flex;
@@ -21,7 +21,7 @@
   list-style: none;
   padding: 0;
   margin: var(--space-5) 0;
-  font-size: var(--font-size-control);
+  font-size: var(--font-size-medium-label);
 }
 .legend li {
   display: flex;
@@ -37,69 +37,11 @@
   border-color: var(--chart-benchmark);
   border-top-style: dashed;
 }
-.plot {
-  display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
-  height: 300px;
-}
-.plot svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: visible;
-}
-.ticks {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* Keep label centers on the SVG's 12px inset as text scales. */
-  margin-block: calc(12px - var(--font-size-caption) * var(--leading-body) / 2);
-  font-size: var(--font-size-caption);
-  font-variant-numeric: tabular-nums;
-}
-.ticks span {
-  line-height: var(--leading-body);
-}
-.grid {
-  stroke: var(--border-subtle);
-  vector-effect: non-scaling-stroke;
-}
-.zeroLine {
-  stroke: var(--border-strong);
-  stroke-width: 1;
-  stroke-dasharray: 3 3;
-  vector-effect: non-scaling-stroke;
-}
-.portfolioLine,
-.benchmarkLine {
-  fill: none;
-  stroke-width: 3;
-  vector-effect: non-scaling-stroke;
-  stroke-linejoin: round;
-}
-.portfolioLine {
-  stroke: var(--chart-portfolio);
-}
-.benchmarkLine {
-  stroke: var(--chart-benchmark);
-  stroke-dasharray: 8 5;
-}
-.dates {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  padding-left: 4.5rem;
-  margin-top: var(--space-4);
-  font-size: var(--font-size-caption);
-}
 .details {
   margin-top: var(--space-5);
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-small-body);
 }
-.details summary {
+.details [data-slot="collapsible-trigger"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -107,12 +49,18 @@
   min-height: var(--size-control);
   cursor: pointer;
   padding: var(--space-4) 0;
-  list-style: none;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  border-left: 0;
+  border-right: 0;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
   touch-action: manipulation;
 }
-.details summary::-webkit-details-marker {
+.details [data-slot="collapsible-trigger"]::-webkit-details-marker {
   display: none;
 }
 .chevron {
@@ -122,22 +70,22 @@
   stroke-width: 2;
   transition: transform var(--motion-duration-base) var(--motion-ease-standard);
 }
-.details[open]:not([data-closing]) .chevron {
+.details[data-open] .chevron {
   transform: rotate(180deg);
 }
-.details summary:active .chevron {
+.details [data-slot="collapsible-trigger"]:active .chevron {
   transform: scale(var(--motion-scale-press));
   transition-duration: var(--motion-duration-press);
 }
-.details[open]:not([data-closing]) summary:active .chevron {
+.details[data-open] summary:active .chevron {
   transform: rotate(180deg) scale(var(--motion-scale-press));
 }
 .figure .scrollHint {
-  font-size: var(--font-size-caption);
-  line-height: var(--leading-body);
+  font-size: var(--font-size-small-body);
+  line-height: var(--leading-body-text);
   margin: var(--space-3) 0;
 }
-.details summary:focus-visible,
+.details [data-slot="collapsible-trigger"]:focus-visible,
 .tableScroll:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
@@ -172,12 +120,6 @@
   text-align: left;
 }
 @media (forced-colors: active) {
-  .portfolioLine,
-  .benchmarkLine,
-  .grid,
-  .zeroLine {
-    stroke: CanvasText;
-  }
   .portfolioKey,
   .benchmarkKey {
     border-color: CanvasText;
@@ -193,10 +135,5 @@
 @media (prefers-reduced-motion: reduce) {
   .chevron {
     transition: none;
-  }
-}
-@media (max-width: 800px) {
-  .midpoint {
-    display: none;
   }
 }

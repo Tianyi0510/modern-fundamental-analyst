@@ -6,8 +6,9 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ colorScheme: "light" });
     await page.goto(`${prefix}/performance`);
-    await page.locator("header select").selectOption("dark");
+    await page.locator(".header-actions [data-theme-toggle]").click();
     await page.keyboard.press("Tab");
     const summary = page.locator("main details summary").first();
     await summary.focus();

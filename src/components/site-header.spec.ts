@@ -547,7 +547,7 @@ test.describe("mobile menu touch ring", () => {
           }
           await expect(close.locator(".mobile-menu-touch-ring")).toHaveCSS("opacity", "0");
           await expect(close).toHaveCSS("border-color", "rgb(0, 0, 0)");
-          await expect(close).toHaveCSS("background-color", "rgb(95, 205, 253)");
+          await expect(close).toHaveCSS("background-color", "rgb(125, 203, 250)");
           await expect(close).toHaveCSS("outline-style", "none");
           await close.tap();
           await expect(trigger).toHaveAttribute("aria-expanded", "false");
@@ -570,7 +570,7 @@ test.describe("mobile menu touch ring", () => {
           expect(await close.evaluate((e) => e.matches(":focus-visible"))).toBe(false);
           await expect(close).toHaveCSS("outline-style", "none");
           await expect(close).toHaveCSS("border-color", "rgb(0, 0, 0)");
-          await expect(close).toHaveCSS("background-color", "rgb(95, 205, 253)");
+          await expect(close).toHaveCSS("background-color", "rgb(125, 203, 250)");
           await expect(close).toHaveCSS("color", "rgb(0, 0, 0)");
           const path = route === "/" ? prefix || "/" : `${prefix}${route}`;
           await page.locator(`.mobile-menu-layer nav a[href="${path}"]`).tap();
@@ -587,13 +587,15 @@ test.describe("mobile menu touch ring", () => {
         await page.goto(`${prefix}/portfolio`);
         await page.locator(".mobile-menu-button").tap();
         const drawer = page.locator(".mobile-language-disclosure");
-        await drawer.locator("summary").tap();
+        await drawer.locator("[data-slot=collapsible-trigger]").tap();
         await expect
-          .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+          .poll(() => drawer.evaluate((element) => element.getAnimations({ subtree: true }).length), {
+            intervals: [50, 100],
+          })
           .toBe(0);
         await expect(drawer.locator("a").last()).toBeVisible();
-        await drawer.locator("summary").tap();
-        await expect(drawer).not.toHaveAttribute("open");
+        await drawer.locator("[data-slot=collapsible-trigger]").tap();
+        await expect(drawer).not.toHaveAttribute("data-open");
         await expect(drawer.locator("a").last()).not.toBeVisible();
       },
     );
@@ -695,7 +697,7 @@ test.describe("mobile content and navigation QA", () => {
       const header = page.locator(".site-header").first();
       await expect(header).toHaveCSS("position", "relative");
       await expect(header).toHaveCSS("height", "70px");
-      await expect(header.locator(":scope > .wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
+      await expect(header.locator(":scope > .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
       expect(wordmarkBox).not.toBeNull();
       expect(wordmarkBox!.height).toBeLessThanOrEqual(25);
@@ -747,7 +749,9 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-language-links a")).toHaveCount(2);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("color", "rgb(0, 0, 0)");
     await expect(page.locator(".mobile-language-links a").nth(1)).toHaveCSS("color", "rgb(0, 0, 0)");
-    await expect(page.locator(".mobile-language-links summary svg[aria-hidden=true]")).toHaveCount(2);
+    await expect(
+      page.locator(".mobile-language-links [data-slot=collapsible-trigger] svg[aria-hidden=true]"),
+    ).toHaveCount(2);
     await expect(page.locator(".mobile-language-links a").first()).toHaveCSS("border-top-width", "0px");
     const drawer = page.locator(".mobile-menu-drawer");
     await expect(drawer).toHaveCSS("transform", "none");
@@ -761,7 +765,7 @@ test.describe("mobile content and navigation QA", () => {
       "background-color",
       "rgba(0, 0, 0, 0)",
     );
-    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(0, 41, 145)");
+    await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(13, 40, 139)");
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "6px");
     await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "12px");
     await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "42px");
@@ -776,7 +780,7 @@ test.describe("mobile content and navigation QA", () => {
     await expect(page.locator(".mobile-menu-content")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(drawer).toHaveCSS("padding-top", "0px");
     await expect(page.locator(".mobile-menu-wordmark")).toHaveCSS("transition-duration", "0s");
-    await expect(page.locator(".mobile-menu-wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
+    await expect(page.locator(".mobile-menu-wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
     await page.setViewportSize({ width: 390, height: 620 });
     await page
       .locator(".mobile-menu-content")
@@ -888,55 +892,57 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await close.hover();
         await expect(close).toHaveCSS("border-color", "rgb(0, 0, 0)");
         const drawer = page.locator(".mobile-language-disclosure");
-        const summary = drawer.locator("summary");
+        const summary = drawer.locator("[data-slot=collapsible-trigger]");
         const options = drawer.locator("a");
-        await expect(drawer).not.toHaveAttribute("open");
+        await expect(drawer).not.toHaveAttribute("data-open");
         await expect(options.first()).not.toBeVisible();
         await summary.focus();
         await page.keyboard.press("Tab");
-        await expect(page.locator(".mobile-menu-content select")).toBeFocused();
+        await expect(page.locator(".mobile-menu-content [data-theme-toggle]")).toBeFocused();
         await page.keyboard.press("Tab");
         await expect(page.locator(".mobile-menu-wordmark")).toBeFocused();
         await page.keyboard.press("Shift+Tab");
-        await expect(page.locator(".mobile-menu-content select")).toBeFocused();
+        await expect(page.locator(".mobile-menu-content [data-theme-toggle]")).toBeFocused();
         await page.keyboard.press("Shift+Tab");
         await expect(summary).toBeFocused();
         const collapsedHeight = await drawer.evaluate((element) => element.getBoundingClientRect().height);
         await summary.focus();
         await page.keyboard.press("Enter");
-        await expect(drawer).toHaveAttribute("open", "");
+        await expect(drawer).toHaveAttribute("data-open", "");
         await expect
-          .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+          .poll(() => drawer.evaluate((element) => element.getAnimations({ subtree: true }).length), {
+            intervals: [50, 100],
+          })
           .toBe(0);
         await expect(options).toHaveCount(2);
         await expect(drawer.locator(`a[href="${prefix}/portfolio"]`)).toHaveCount(0);
         await expect(options.first()).toBeVisible();
-        expect(await drawer.evaluate((element) => element.getBoundingClientRect().height)).toBeGreaterThan(
-          collapsedHeight,
-        );
+        await expect
+          .poll(() => drawer.evaluate((element) => element.getBoundingClientRect().height))
+          .toBeGreaterThan(collapsedHeight);
         await page.keyboard.press("Tab");
         await expect(options.first()).toBeFocused();
         await summary.evaluate((element: HTMLElement) => element.click());
-        await expect(drawer).not.toHaveAttribute("open");
+        await expect(drawer).not.toHaveAttribute("data-open");
         await expect(summary).toBeFocused();
         await expect(options.first()).not.toBeVisible();
         await page.keyboard.press("Space");
-        await expect(drawer).toHaveAttribute("open", "");
+        await expect(drawer).toHaveAttribute("data-open", "");
         await expect
-          .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+          .poll(() => drawer.evaluate((element) => element.getAnimations({ subtree: true }).length), {
+            intervals: [50, 100],
+          })
           .toBe(0);
         if (reducedMotion === "no-preference") {
-          await summary.evaluate((element: HTMLElement) => {
-            element.click();
-            const animation = element.parentElement!.getAnimations()[0]!;
-            animation.pause();
-            animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-            element.click();
-          });
+          await summary.click();
+          await expect(summary).toHaveAttribute("aria-expanded", "false");
+          await summary.click();
           await expect
-            .poll(() => drawer.evaluate((element) => element.getAnimations().length), { intervals: [50, 100] })
+            .poll(() => drawer.evaluate((element) => element.getAnimations({ subtree: true }).length), {
+              intervals: [50, 100],
+            })
             .toBe(0);
-          await expect(drawer).toHaveAttribute("open", "");
+          await expect(drawer).toHaveAttribute("data-open", "");
         }
         await page.evaluate(() => (document.documentElement.style.fontSize = "200%"));
         await expect(options.last()).toBeVisible();
@@ -962,7 +968,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const current = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
       await expect(current).toHaveCount(1);
       await expect(current).toHaveAttribute("href", `${prefix}/portfolio`);
-      await expect(current).toHaveCSS("color", "rgb(0, 41, 145)");
+      await expect(current).toHaveCSS("color", "rgb(13, 40, 139)");
       await expect(current).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       const selectedSurface = await current.evaluate((element) => getComputedStyle(element).backgroundColor);
       for (const link of await links.all()) {
@@ -977,18 +983,20 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       if (await page.evaluate(() => matchMedia("(hover: hover)").matches)) {
         await home.hover();
         await expect(home).toHaveCSS("background-color", "rgb(242, 242, 242)");
-        await expect(home).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(home).toHaveCSS("color", "rgb(13, 40, 139)");
         await page.mouse.move(0, 0);
         await expect(home).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       }
-      await page.locator(".mobile-language-disclosure > summary").click();
+      await page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]").click();
       await expect(page.locator(".mobile-menu-language")).toHaveCount(2);
       await expect
         .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
         .toBe(0);
-      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(248, 249, 251)");
+      await expect(page.locator(".mobile-language-links")).toHaveCSS("background-color", "rgb(245, 247, 250)");
       for (const target of await page
-        .locator(".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > summary")
+        .locator(
+          ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > [data-slot=collapsible-trigger]",
+        )
         .all()) {
         const before = await target.boundingBox();
         await page.keyboard.press("Tab");
@@ -996,7 +1004,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(target).toBeFocused();
         await expect(target).toHaveCSS("outline-style", "solid");
         await expect(target).toHaveCSS("outline-width", "2px");
-        await expect(target).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        await expect(target).toHaveCSS("outline-color", "rgb(13, 40, 139)");
         await expect(target).toHaveCSS("transform", "none");
         expect(await target.boundingBox()).toEqual(before);
       }
@@ -1034,8 +1042,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         expect(await close.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
         await expect(close).toHaveCSS("outline-style", "solid");
         await expect(close).toHaveCSS("outline-width", "2px");
-        await expect(close).toHaveCSS("outline-color", "rgb(0, 140, 255)");
-        await expect(close).toHaveCSS("background-color", "rgb(95, 205, 253)");
+        await expect(close).toHaveCSS("outline-color", "rgb(61, 138, 247)");
+        await expect(close).toHaveCSS("background-color", "rgb(125, 203, 250)");
         await page.keyboard.press("Escape");
         await expect(page.locator(".mobile-menu-button")).toBeFocused();
       },
@@ -1054,13 +1062,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.locator(".mobile-menu-button").click();
       await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
       await expect(page.locator(".mobile-menu-close")).toBeFocused();
-      const summary = page.locator(".mobile-language-disclosure > summary");
+      const summary = page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]");
       await summary.click();
       await expect
         .poll(() => page.locator(".mobile-language-disclosure").evaluate((element) => element.getAnimations().length))
         .toBe(0);
       const targets = page.locator(
-        ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > summary",
+        ".mobile-menu-drawer nav a, .mobile-menu-language, .mobile-language-disclosure > [data-slot=collapsible-trigger]",
       );
       await expect(targets).toHaveCount(9);
       for (const [height, width] of [
@@ -1083,7 +1091,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           await expect(target).toHaveCSS("outline-style", "solid");
           await expect(target).toHaveCSS("outline-width", `${width}px`);
           await expect(target).toHaveCSS("outline-offset", `-${width}px`);
-          await expect(target).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+          await expect(target).toHaveCSS("outline-color", "rgb(13, 40, 139)");
         }
       }
       await page.keyboard.press("Escape");
@@ -1104,14 +1112,14 @@ test.describe("language disclosure touch hover recovery", () => {
         await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
         await expect(page.locator(".mobile-menu-close")).toBeFocused();
         const disclosure = page.locator(".mobile-language-disclosure");
-        const summary = disclosure.locator("summary");
+        const summary = disclosure.locator("[data-slot=collapsible-trigger]");
         await summary.tap();
-        await expect(disclosure).toHaveAttribute("open", "");
+        await expect(disclosure).toHaveAttribute("data-open", "");
         await expect.poll(() => summary.evaluate((element) => element.matches(":active, :focus-visible"))).toBe(false);
         await expect(summary).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(summary).toHaveCSS("color", "rgb(13, 40, 139)");
         await summary.tap();
-        await expect(disclosure).not.toHaveAttribute("open");
+        await expect(disclosure).not.toHaveAttribute("data-open");
         await expect(summary).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
         await expect(summary).toHaveCSS("color", "rgb(0, 0, 0)");
         await summary.focus();
@@ -1138,23 +1146,23 @@ test.describe("touch CTA recovery", () => {
         await page.goto(`${prefix}/portfolio`);
         await page.locator(".mobile-menu-button").tap();
         const current = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
-        const summary = page.locator(".mobile-language-disclosure > summary");
+        const summary = page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]");
         await expect(current).toHaveCSS("outline-style", "none");
         await page.keyboard.press("Tab");
         await current.focus();
-        await expect(current).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(current).toHaveCSS("color", "rgb(13, 40, 139)");
         await expect(current).toHaveCSS("outline-style", "solid");
         await summary.focus();
         await expect(current).toHaveCSS("outline-style", "none");
         await page.keyboard.press("Enter");
-        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(summary).toHaveCSS("color", "rgb(13, 40, 139)");
         await expect(summary).toHaveCSS("outline-style", "solid");
         await page.keyboard.press("Tab");
         const option = page.locator(".mobile-menu-language").first();
         await expect(option).toBeFocused();
         await expect(option).toHaveCSS("outline-style", "solid");
         await expect(summary).toHaveCSS("outline-style", "none");
-        await expect(summary).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(summary).toHaveCSS("color", "rgb(13, 40, 139)");
         await page.emulateMedia({ reducedMotion: "reduce" });
         await expect(option).toHaveCSS("outline-style", "solid");
         await page.keyboard.press("Escape");
@@ -1197,7 +1205,11 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           await page.keyboard.press(key);
           await expect(close).toBeFocused();
         }
-        for (const selector of ["nav a", ".mobile-language-disclosure > summary", ".mobile-menu-wordmark"]) {
+        for (const selector of [
+          "nav a",
+          ".mobile-language-disclosure > [data-slot=collapsible-trigger]",
+          ".mobile-menu-wordmark",
+        ]) {
           await close.focus();
           const target = drawer.locator(selector).first();
           await target.evaluate((element: HTMLElement) => element.focus());
@@ -1258,3 +1270,45 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
   });
 }
+
+test("mobile appearance control shares the menu row gap", { tag: "@mobile" }, async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.locator(".mobile-menu-button").click();
+  await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
+  const group = page.locator(".mobile-menu-preferences");
+  await expect(group).toHaveCSS("row-gap", "4px");
+  const measure = () =>
+    group.evaluate((element) => {
+      const language = element.querySelector(".mobile-language-links")!.getBoundingClientRect();
+      const toggle = element.querySelector("[data-theme-toggle]")!.getBoundingClientRect();
+      return toggle.top - language.bottom;
+    });
+  const trigger = page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]");
+  const before = await trigger.boundingBox();
+  await expect.poll(measure).toBe(4);
+  await page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]").click();
+  await expect(page.locator(".mobile-language-disclosure")).toHaveAttribute("data-open", "");
+  await expect.poll(measure).toBe(4);
+  await expect.poll(async () => (await trigger.boundingBox())!.y).toBe(before!.y);
+  const panel = page.locator(".mobile-language-disclosure > [data-slot=collapsible-content]");
+  await expect(panel).toBeVisible();
+  await expect(panel).toHaveCSS("border-bottom-left-radius", "0px");
+  await expect(panel).toHaveCSS("border-bottom-right-radius", "0px");
+  await expect
+    .poll(async () => {
+      const panelBounds = (await panel.boundingBox())!;
+      const optionBounds = (await panel.getByRole("link").first().boundingBox())!;
+      return optionBounds.y - panelBounds.y;
+    })
+    .toBe(8);
+  const languageBounds = (await page.locator(".mobile-language-links").boundingBox())!;
+  await expect.poll(async () => (await panel.boundingBox())!.width).toBe(languageBounds.width);
+  await expect.poll(async () => (await panel.boundingBox())!.x).toBe(languageBounds.x);
+  await expect
+    .poll(async () => {
+      const bounds = (await panel.boundingBox())!;
+      return bounds.y + bounds.height;
+    })
+    .toBe(before!.y);
+});

@@ -32,7 +32,7 @@ export function useMenuTouchFeedback(
       if (remaining > 0)
         ring.animate([{ opacity: getComputedStyle(source).opacity }, { opacity: 0 }], {
           duration: remaining,
-          easing: "linear",
+          easing: getComputedStyle(button).getPropertyValue("--motion-ease-standard").trim(),
         });
     },
     [closeRef, triggerRef],
@@ -56,10 +56,13 @@ export function useMenuTouchFeedback(
       delete button.dataset.touchPressed;
       const ring = button.querySelector(".mobile-menu-touch-ring");
       if (!ring || window.matchMedia("(prefers-reduced-motion: reduce)").matches) continue;
-      const token = getComputedStyle(button).getPropertyValue("--motion-duration-medium").trim();
+      const token = getComputedStyle(button).getPropertyValue("--motion-duration-feedback").trim();
       const duration = Number.parseFloat(token) * (token.endsWith("ms") ? 1 : 1000);
       // Explicit keyframes keep a quick tap visible even when down/up occur before a paint.
-      ring.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing: "linear" });
+      ring.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration,
+        easing: getComputedStyle(button).getPropertyValue("--motion-ease-standard").trim(),
+      });
     }
   };
   useEffect(() => {

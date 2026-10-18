@@ -1,6 +1,19 @@
 "use client";
 
+import { FormPanel } from "@/components/form-panel";
 import { appearance } from "./contact-form-client.styles";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/container";
 import { FieldGroup } from "@/components/ui/field";
@@ -24,6 +37,10 @@ import { ClientForm } from "@/components/client-form";
 
 export type ContactFormCopy = {
   title: string;
+  clear: string;
+  clearTitle: string;
+  clearDescription: string;
+  keep: string;
   intro: string;
   name: string;
   email: string;
@@ -38,6 +55,8 @@ export type ContactFormCopy = {
 
 export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; locale: Locale }) {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error" | "invalid">("idle");
+  const [hasContent, setHasContent] = useState(false);
+  const [discardOpen, setDiscardOpen] = useState(false);
   const [invalidFields, setInvalidFields] = useState<ContactField[]>([]);
   const feedbackRef = useRef<HTMLDivElement>(null);
   const runExclusive = useExclusiveSubmit();
@@ -57,7 +76,9 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
   useEffect(() => {
     const draft = readContactDraft(locale);
     const form = formRef.current;
-    if (!draft || !form) return;
+    if (!form) return;
+    setHasContent(hasMessageContent(new FormData(form)) || Boolean(draft));
+    if (!draft) return;
     const restored = { ...draft };
     for (const field of Object.keys(contactFieldLimits) as Array<keyof typeof contactFieldLimits>) {
       const input = form.elements.namedItem(field);
@@ -80,7 +101,12 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
     else feedbackRef.current?.focus();
   }, [status, invalidFields]);
 
+  function hasMessageContent(formData: FormData) {
+    return Object.keys(contactFieldLimits).some((field) => getFormText(formData, field) !== "");
+  }
+
   function saveDraft(formData: FormData, submissionId?: string) {
+    setHasContent(hasMessageContent(formData));
     saveContactDraft(locale, {
       name: getFormText(formData, "name"),
       email: getFormText(formData, "email"),
@@ -132,6 +158,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
         );
         clearContactDraft(locale, submissionId);
         form.reset();
+        setHasContent(false);
         resetSubmissionId();
         setStatus("success");
       } catch (error) {
@@ -141,104 +168,146 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
   }
 
   return (
-    <div className={appearance["contact-band"]}>
-      <Container as="section" className={appearance["contact-section"]} aria-labelledby="contact-form-title">
-        <div className={appearance["contact-heading"]}>
-          <h2 id="contact-form-title">{copy.title}</h2>
-          <p className={appearance["contact-headingIntro"]}>{copy.intro}</p>
-        </div>
-        <ClientForm
-          locale={locale}
-          ref={formRef}
-          className={appearance["contact-form"]}
-          onSubmit={(event) => {
-            void submit(event);
-          }}
-          onChange={(event) => {
-            resetSubmissionId();
-            saveDraft(new FormData(event.currentTarget));
-            const control = event.target;
-            if (control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) {
-              setInvalidFields((fields) => fields.filter((field) => field !== control.name));
-            }
-            setStatus("idle");
-          }}
-          onInvalid={(event) => {
-            event.preventDefault();
-            validate(event.currentTarget, new FormData(event.currentTarget));
-          }}
-          aria-busy={status === "sending"}
-        >
-          <FieldGroup layout="contents">
-            <FormField error={invalidFields.includes("name") ? copy.validation.name : undefined} label={copy.name}>
-              <Input
-                disabled={status === "sending"}
-                name="name"
-                type="text"
-                autoComplete="name"
-                maxLength={contactFieldLimits.name}
-                required
-              />
-            </FormField>
-            <FormField error={invalidFields.includes("email") ? copy.validation.email : undefined} label={copy.email}>
-              <Input
-                disabled={status === "sending"}
-                name="email"
-                type="email"
-                autoComplete="email"
-                maxLength={contactFieldLimits.email}
-                required
-              />
-            </FormField>
-            <FormField
-              error={invalidFields.includes("subject") ? copy.validation.subject : undefined}
-              label={copy.subject}
-              className="col-span-full compact:col-auto"
+    <AlertDialog open={discardOpen} onOpenChange={setDiscardOpen}>
+      <div className={appearance["contact-band"]}>
+        <Container as="section" className={appearance["contact-section"]} aria-labelledby="contact-form-title">
+          <div className={appearance["contact-heading"]}>
+            <h2 id="contact-form-title">{copy.title}</h2>
+            <p className={appearance["contact-headingIntro"]}>{copy.intro}</p>
+          </div>
+          <FormPanel>
+            <ClientForm
+              locale={locale}
+              ref={formRef}
+              className={appearance["contact-form"]}
+              onSubmit={(event) => {
+                void submit(event);
+              }}
+              onInput={(event) => setHasContent(hasMessageContent(new FormData(event.currentTarget)))}
+              onChange={(event) => {
+                resetSubmissionId();
+                saveDraft(new FormData(event.currentTarget));
+                const control = event.target;
+                if (control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) {
+                  setInvalidFields((fields) => fields.filter((field) => field !== control.name));
+                }
+                setStatus("idle");
+              }}
+              onInvalid={(event) => {
+                event.preventDefault();
+                validate(event.currentTarget, new FormData(event.currentTarget));
+              }}
+              aria-busy={status === "sending"}
             >
-              <Input
-                disabled={status === "sending"}
-                name="subject"
-                type="text"
-                maxLength={contactFieldLimits.subject}
-                required
-              />
-            </FormField>
-            <FormField
-              error={invalidFields.includes("message") ? copy.validation.message : undefined}
-              label={copy.message}
-              className="col-span-full compact:col-auto"
-            >
-              <Textarea
-                disabled={status === "sending"}
-                name="message"
-                rows={7}
-                minLength={10}
-                maxLength={contactFieldLimits.message}
-                required
-              />
-            </FormField>
-            <HoneypotField />
-            <div className={appearance["contact-actions"]}>
-              <Button
-                className="contact-submit shrink-0 max-[801px]:w-full"
-                type="submit"
-                disabled={status === "sending"}
-              >
-                {status === "sending" ? copy.sending : copy.send}
-              </Button>
-              <Alert ref={feedbackRef} tabIndex={-1} className="max-w-[420px]">
-                {status === "success"
-                  ? copy.success
-                  : status === "error"
-                    ? copy.error
-                    : status === "invalid"
-                      ? copy.validation.summary
-                      : ""}
-              </Alert>
-            </div>
-          </FieldGroup>
-        </ClientForm>
-      </Container>
-    </div>
+              <FieldGroup layout="contents">
+                <FormField error={invalidFields.includes("name") ? copy.validation.name : undefined} label={copy.name}>
+                  <Input
+                    disabled={status === "sending"}
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    maxLength={contactFieldLimits.name}
+                    required
+                  />
+                </FormField>
+                <FormField
+                  error={invalidFields.includes("email") ? copy.validation.email : undefined}
+                  label={copy.email}
+                >
+                  <Input
+                    disabled={status === "sending"}
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    maxLength={contactFieldLimits.email}
+                    required
+                  />
+                </FormField>
+                <FormField
+                  error={invalidFields.includes("subject") ? copy.validation.subject : undefined}
+                  label={copy.subject}
+                  className="col-span-full compact:col-auto"
+                >
+                  <Input
+                    disabled={status === "sending"}
+                    name="subject"
+                    type="text"
+                    maxLength={contactFieldLimits.subject}
+                    required
+                  />
+                </FormField>
+                <FormField
+                  error={invalidFields.includes("message") ? copy.validation.message : undefined}
+                  label={copy.message}
+                  className="col-span-full compact:col-auto"
+                >
+                  <Textarea
+                    disabled={status === "sending"}
+                    name="message"
+                    rows={7}
+                    minLength={10}
+                    maxLength={contactFieldLimits.message}
+                    required
+                  />
+                </FormField>
+                <HoneypotField />
+                <div className={appearance["contact-actions"]}>
+                  <Button
+                    className="contact-submit shrink-0 max-[801px]:w-full"
+                    type="submit"
+                    disabled={status === "sending"}
+                  >
+                    {status === "sending" && <Spinner aria-hidden="true" data-icon="inline-start" />}
+                    {status === "sending" ? copy.sending : copy.send}
+                  </Button>
+                  <AlertDialogTrigger
+                    render={<Button variant="quiet" size="text" disabled={!hasContent || status === "sending"} />}
+                  >
+                    {copy.clear}
+                  </AlertDialogTrigger>
+                  <Alert ref={feedbackRef} tabIndex={-1} className="max-w-[420px] basis-full">
+                    {status === "success"
+                      ? copy.success
+                      : status === "error"
+                        ? copy.error
+                        : status === "invalid"
+                          ? copy.validation.summary
+                          : ""}
+                  </Alert>
+                </div>
+              </FieldGroup>
+            </ClientForm>
+          </FormPanel>
+        </Container>
+      </div>
+      <AlertDialogContent
+        finalFocus={() => {
+          if (hasContent) return true;
+          const message = formRef.current?.elements.namedItem("message");
+          return message instanceof HTMLTextAreaElement ? message : true;
+        }}
+      >
+        <AlertDialogHeader>
+          <AlertDialogTitle>{copy.clearTitle}</AlertDialogTitle>
+          <AlertDialogDescription>{copy.clearDescription}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{copy.keep}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              formRef.current?.reset();
+              setHasContent(false);
+              saveContactDraft(locale, { name: "", email: "", subject: "", message: "" });
+              resetSubmissionId();
+              setInvalidFields([]);
+              setStatus("idle");
+              setDiscardOpen(false);
+            }}
+          >
+            {copy.clear}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { ThemeProvider } from "./theme-provider";
-import { ThemeSelect } from "./theme-select";
+import { ThemeToggle } from "./theme-toggle";
 import { BrandLogo } from "./brand-logo";
 import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
@@ -24,7 +23,7 @@ import { useRef, type MouseEvent } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 import { usePathname } from "next/navigation";
-import { AnimatedDisclosure } from "@/components/animated-disclosure";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./ui/collapsible";
 import { useMobileMenu } from "./use-site-header";
 import { useMenuTouchFeedback } from "./use-menu-touch-feedback";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
@@ -36,16 +35,10 @@ type SiteHeaderProps = {
   languageQuery?: string;
 };
 
-export function SiteHeader(props: SiteHeaderProps) {
-  return (
-    <ThemeProvider>
-      <HeaderContent {...props} />
-    </ThemeProvider>
-  );
-}
-
-function HeaderContent({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
+export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
   const pathname = usePathname();
+  const languageRootRef = useRef<HTMLDivElement>(null);
+  const languageTriggerRef = useRef<HTMLButtonElement>(null);
   const {
     close: closeMenu,
     closeImmediately: closeMenuForNavigation,
@@ -140,7 +133,7 @@ function HeaderContent({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
           onPointerDown={handleMenuPointerDown}
           onPointerUp={handleMenuPointerUp}
         >
-          <SheetTitle className="sr-only text-title">{copy.siteMenu}</SheetTitle>
+          <SheetTitle className="sr-only text-medium-title">{copy.siteMenu}</SheetTitle>
           <div className={appearance["mobile-menu-top"]}>
             <Link
               className={appearance["wordmark"] + " " + appearance["mobile-menu-wordmark"]}
@@ -194,38 +187,46 @@ function HeaderContent({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
                 })}
               </SidebarMenu>
             </nav>
-            <div className={appearance["mobile-language-links"]}>
-              <AnimatedDisclosure
-                className={appearance["mobile-language-disclosure"]}
-                summary={
-                  <>
+            <div className="mobile-menu-preferences mt-auto grid shrink-0 justify-items-start gap-[calc(var(--space-2)/2)]">
+              <div className={appearance["mobile-language-links"]}>
+                <Collapsible
+                  ref={languageRootRef}
+                  className={appearance["mobile-language-disclosure"]}
+                  onOpenChange={(open) => {
+                    if (!open && languageRootRef.current?.contains(document.activeElement)) {
+                      languageTriggerRef.current?.focus({ preventScroll: true });
+                    }
+                  }}
+                >
+                  <CollapsibleTrigger ref={languageTriggerRef}>
                     <span className="inline-flex min-w-0 items-center gap-[var(--space-3)]">
                       <Globe aria-hidden="true" strokeWidth={1.75} />
                       <span>{localeConfig[locale].label}</span>
                     </span>
                     <ChevronDown aria-hidden="true" strokeWidth={2.75} />
-                  </>
-                }
-              >
-                <div className={appearance["mobile-language-options"]}>
-                  {locales
-                    .filter((targetLocale) => targetLocale !== locale)
-                    .map((targetLocale) => (
-                      <Link
-                        className={appearance["mobile-menu-language"]}
-                        href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
-                        hrefLang={localeConfig[targetLocale].hrefLang}
-                        onClick={closeForNavigation}
-                        tabIndex={isMenuOpen ? 0 : -1}
-                        key={targetLocale}
-                      >
-                        {localeConfig[targetLocale].label}
-                      </Link>
-                    ))}
-                </div>
-              </AnimatedDisclosure>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className={appearance["mobile-language-options"]}>
+                      {locales
+                        .filter((targetLocale) => targetLocale !== locale)
+                        .map((targetLocale) => (
+                          <Link
+                            className={appearance["mobile-menu-language"]}
+                            href={`${getLocalizedPath(pathname, targetLocale)}${languageQuery ? `?${languageQuery}` : ""}`}
+                            hrefLang={localeConfig[targetLocale].hrefLang}
+                            onClick={closeForNavigation}
+                            tabIndex={isMenuOpen ? 0 : -1}
+                            key={targetLocale}
+                          >
+                            {localeConfig[targetLocale].label}
+                          </Link>
+                        ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+              <ThemeToggle locale={locale} />
             </div>
-            <ThemeSelect locale={locale} />
           </div>
         </SheetContent>
       </header>

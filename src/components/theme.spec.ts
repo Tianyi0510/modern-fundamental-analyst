@@ -23,8 +23,8 @@ const labels = [
   { prefix: "/zh-tw", label: "外觀" },
   { prefix: "/zh-cn", label: "外观" },
 ];
-for (const { prefix, label } of labels) {
-  test(`${prefix || "English"} theme persists and follows system preference @mobile`, async ({
+for (const { prefix } of labels) {
+  test(`${prefix || "English"} theme toggle persists and overrides the initial system preference @mobile`, async ({
     page,
     browserName,
   }, testInfo) => {
@@ -34,8 +34,8 @@ for (const { prefix, label } of labels) {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${prefix}/contact`);
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    const appearance = page.getByRole("combobox", { name: label });
-    await expect(appearance).toHaveValue("system");
+    const appearance = page.locator(".header-actions [data-theme-toggle]");
+    await expect(appearance).toBeEnabled();
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
     await expect(page.locator("body")).toHaveCSS("color", "rgb(255, 255, 255)");
     const language = page.locator(".language-trigger");
@@ -52,12 +52,12 @@ for (const { prefix, label } of labels) {
       expect(actions).not.toBeNull();
       expect(actions!.x, `Header overlap at ${width}px`).toBeGreaterThanOrEqual(logo!.x + logo!.width);
     }
-    await appearance.selectOption("light");
+    await appearance.press("Space");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-    await page.getByRole("combobox", { name: label }).selectOption("dark");
+    await page.locator(".header-actions [data-theme-toggle]").click();
     for (const route of [
       "",
       "/about",
@@ -112,13 +112,13 @@ for (const { prefix, label } of labels) {
           colorContrast(sample.color, sample.background, sample.opacity),
           JSON.stringify(sample),
         ).toBeGreaterThanOrEqual(4.5);
-      await expect(page.locator("header .wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark-inverse.svg");
+      await expect(page.locator("header .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       if (!prefix && !route && browserName === "chromium") {
         await page.screenshot({ path: testInfo.outputPath("home-dark.png"), fullPage: true });
-        await page.getByRole("combobox", { name: label }).selectOption("light");
+        await page.locator(".header-actions [data-theme-toggle]").click();
         await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
         await page.screenshot({ path: testInfo.outputPath("home-light.png"), fullPage: true });
-        await page.getByRole("combobox", { name: label }).selectOption("dark");
+        await page.locator(".header-actions [data-theme-toggle]").click();
       }
       for (const width of [320, 390, 1440]) {
         await page.setViewportSize({ width, height: 1000 });
@@ -133,7 +133,7 @@ for (const { prefix, label } of labels) {
     if (!prefix) {
       await page.goto("/zh-tw/contact");
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-      await expect(page.getByRole("combobox", { name: "外觀" })).toHaveValue("dark");
+      await expect(page.locator(".header-actions [data-theme-toggle]")).toHaveAccessibleName("切換至淺色模式");
     }
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${prefix}/contact`);
@@ -143,17 +143,17 @@ for (const { prefix, label } of labels) {
     await expect(page.locator(".mobile-menu-layer")).toHaveAttribute("data-menu-phase", "open");
     await expect(page.locator(".mobile-menu-close")).toHaveCSS("color", "rgb(0, 0, 0)");
     if (!prefix && browserName === "chromium") await page.screenshot({ path: testInfo.outputPath("menu-dark.png") });
-    await dialog.getByRole("combobox", { name: label }).selectOption("system");
+    await dialog.locator("[data-theme-toggle]").click();
     await page.emulateMedia({ colorScheme: "light" });
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await page.emulateMedia({ colorScheme: "dark" });
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await page.keyboard.press("Escape");
     await expect(dialog).not.toBeVisible();
     await expect(page.locator(".mobile-menu-button")).toBeFocused();
     await page.reload();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    await expect(page.getByRole("combobox", { name: label })).toHaveCount(0);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(page.locator(".header-actions [data-theme-toggle]")).toBeHidden();
     expect(pageErrors).toEqual([]);
   });
 }
@@ -164,10 +164,10 @@ test("system appearance works without JavaScript @mobile", async ({ browser, bas
     const page = await context.newPage();
     await page.goto("/");
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    await expect(page.locator("header .wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark-inverse.svg");
+    await expect(page.locator("header .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
     await page.emulateMedia({ colorScheme: "light" });
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(page.locator("header .wordmark img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
+    await expect(page.locator("header .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
   } finally {
     await context.close();
   }
@@ -187,15 +187,15 @@ test("saved appearance is not misrepresented before hydration", async ({ page })
   try {
     await page.goto("/contact", { waitUntil: "domcontentloaded" });
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    const appearance = page.getByRole("combobox", { name: "Appearance" });
-    await expect(appearance).toHaveValue("");
+    const appearance = page.locator(".header-actions [data-theme-toggle]");
+    await expect(appearance).toHaveAccessibleName("Appearance");
     await expect(appearance).toBeDisabled();
   } finally {
     release();
   }
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("combobox", { name: "Appearance" })).toHaveValue("dark");
-  await expect(page.getByRole("combobox", { name: "Appearance" })).toBeEnabled();
+  await expect(page.locator(".header-actions [data-theme-toggle]")).toHaveAccessibleName("Switch to Light Mode");
+  await expect(page.locator(".header-actions [data-theme-toggle]")).toBeEnabled();
 });
 
 test("isolated monitoring transport accepts credentialed keepalive requests @mobile", async ({ page }) => {

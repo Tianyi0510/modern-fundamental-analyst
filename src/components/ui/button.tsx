@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export type ButtonVariant = "primary" | "contrast" | "inverse" | "quiet";
 export type ButtonDisabledFeedback = "standard" | "muted" | "muted-busy";
-export type ButtonSize = "regular" | "small" | "text";
+export type ButtonSize = "regular" | "small" | "text" | "icon";
 
 const variants: Record<ButtonVariant, string> = {
   quiet:
@@ -17,6 +17,7 @@ const variants: Record<ButtonVariant, string> = {
     "border border-[var(--action-inverse-surface)] bg-[var(--action-inverse-surface)] text-[var(--action-inverse-text)] [&:hover:not(:disabled)]:bg-[var(--action-inverse-hover-surface)] [&:hover:not(:disabled)]:border-[var(--action-inverse-hover-surface)] [&:focus-visible:not(:disabled)]:bg-[var(--action-inverse-hover-surface)] [&:focus-visible:not(:disabled)]:border-[var(--action-inverse-hover-surface)] touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:bg-[var(--action-inverse-surface)] touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:border-[var(--action-inverse-surface)] touch:[&:is(:active,[data-touch-pressed=true]):not(:disabled)]:bg-[var(--action-inverse-hover-surface)]",
 };
 const sizes: Record<ButtonSize, string> = {
+  icon: "size-[var(--size-touch-target)] shrink-0 p-0 [&_svg]:size-5",
   text: "min-h-[var(--size-touch-target)] px-[var(--space-3)]",
   regular: "min-h-[var(--size-control)] px-[1.6em] gap-[1.333em]",
   small: "button-small min-h-[var(--size-control-small)] px-[1.333em] gap-[1.333em]",
@@ -31,7 +32,7 @@ const disabledFeedback: Record<ButtonDisabledFeedback, string> = {
 const interaction =
   "origin-center transition-[transform,background-color,border-color,color] duration-[var(--motion-duration-base)] ease-[var(--motion-ease-standard)] [&:hover:not(:is(:active,[data-touch-pressed=true])):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:focus-visible:not(:is(:active,[data-touch-pressed=true])):not(:disabled)]:[transform:scale(var(--motion-scale-hover))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:[transform:scale(var(--motion-scale-press))] [&:is(:active,[data-touch-pressed=true]):not(:disabled)]:duration-[var(--motion-duration-press)] disabled:transform-none touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:transform-none motion-reduce:transform-none!";
 
-const buttonVariants = cva(`button inline-flex items-center justify-center text-control ${interaction}`, {
+const buttonVariants = cva(`button inline-flex items-center justify-center text-large-label ${interaction}`, {
   variants: { variant: variants, size: sizes, disabledFeedback },
   compoundVariants: [{ variant: ["primary", "contrast", "inverse"], className: "rounded-action" }],
   defaultVariants: { variant: "primary", size: "regular", disabledFeedback: "standard" },

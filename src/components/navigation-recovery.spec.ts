@@ -217,7 +217,7 @@ for (const mobile of [false, true]) {
         await page.goto(`${entry.path}?${entry.query}`);
         if (mobile) {
           await page.locator(".mobile-menu-button").click();
-          await page.locator(".mobile-language-disclosure summary").click();
+          await page.locator(".mobile-language-disclosure [data-slot=collapsible-trigger]").click();
         } else {
           await page.locator(".language-trigger").click();
         }

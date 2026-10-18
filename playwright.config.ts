@@ -38,6 +38,7 @@ export default defineConfig({
     url: "http://127.0.0.1:3210",
     // Always start an isolated server: browser tests must not use local provider credentials.
     env: {
+      PLAYWRIGHT_ISOLATED_DEV: useProductionBuild ? "0" : "1",
       SUBSCRIPTION_PREFERENCES_SECRET: "playwright-preferences-only",
       RESEND_API_KEY: "",
       RESEND_WEBHOOK_SECRET: "",

@@ -10,6 +10,8 @@ export const confirmationCopy = {
     busy: "Confirming…",
     success: "Your subscription is confirmed.",
     error: "Unable to confirm your subscription. Try again.",
+    missingLink: "This confirmation link is missing or invalid. Subscribe again to request a new link.",
+    newLink: "Request a New Link",
   },
   "zh-tw": {
     subject: "確認你的訂閱",
@@ -20,6 +22,8 @@ export const confirmationCopy = {
     busy: "確認中…",
     success: "你的訂閱已確認。",
     error: "無法確認你的訂閱。請再試一次。",
+    missingLink: "此確認連結缺失或無效。請重新訂閱以取得新連結。",
+    newLink: "取得新連結",
   },
   "zh-cn": {
     subject: "确认你的订阅",
@@ -30,6 +34,8 @@ export const confirmationCopy = {
     busy: "确认中…",
     success: "你的订阅已确认。",
     error: "无法确认你的订阅。请重试。",
+    missingLink: "此确认链接缺失或无效。请重新订阅以获取新链接。",
+    newLink: "获取新链接",
   },
 } satisfies Record<
   Locale,
@@ -42,5 +48,7 @@ export const confirmationCopy = {
     busy: string;
     success: string;
     error: string;
+    missingLink: string;
+    newLink: string;
   }
 >;

@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs/config";
+import createMDX from "@next/mdx";
+
+const withMDX = createMDX();
 
 // Static App Router pages need inline bootstrap scripts. This is an origin policy, not a nonce-based strict CSP.
 const contentSecurityPolicy = [
@@ -29,6 +32,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  devIndicators: process.env.PLAYWRIGHT_ISOLATED_DEV === "1" ? false : undefined,
+  // Keep isolated browser tests from contending with the interactive dev server.
+  distDir: process.env.PLAYWRIGHT_ISOLATED_DEV === "1" ? "node_modules/.cache/next-playwright" : ".next",
+  pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
   // Remove SDK diagnostics at build time without disabling errors, tracing, Logs or Replay.
   compiler: { define: { __SENTRY_DEBUG__: process.env.NODE_ENV !== "production" } },
   // Next's CLI selects the bundler before loading this configuration.
@@ -59,7 +66,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withMDX(nextConfig), {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,

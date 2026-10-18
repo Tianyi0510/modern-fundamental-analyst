@@ -1,99 +1,59 @@
 import { expect, test } from "@playwright/test";
 
-for (const route of ["memos", "performance"]) {
-  for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-    test(`${prefix || "English"} ${route} disclosure settles on resize and restores focus from closing content`, async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 390, height: 844 });
-      await page.emulateMedia({ reducedMotion: "no-preference" });
-      await page.goto(`${prefix}/${route}`);
-      const details = page.locator(
-        route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
-      );
-      const summary = details.locator("summary");
-      // A real click hydrates streamed content before synchronous animation inspection.
-      await summary.click();
-      await expect(summary).toHaveAttribute("aria-expanded", "true");
-      await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
-      await summary.click();
-      await expect(summary).toHaveAttribute("aria-expanded", "false");
-      await expect(details).not.toHaveAttribute("open");
-      await summary.evaluate((summary: HTMLElement) => {
-        summary.click();
-        const animation = summary.parentElement!.getAnimations()[0]!;
-        animation.pause();
-        animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-      });
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
-      await expect(details).toHaveAttribute("open", "");
-      await expect(details).not.toHaveAttribute("data-closing");
-      const contentFocus = details.locator('a, [tabindex="0"]').first();
-      await expect(contentFocus).toBeVisible();
-      await contentFocus.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
-      await details.locator("summary").evaluate((summary: HTMLElement) => {
-        summary.click();
-        const details = summary.parentElement!;
-        const animation = details.getAnimations()[0]!;
-        animation.pause();
-        animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-        details.querySelector<HTMLElement>('a, [tabindex="0"]')!.focus();
-      });
-      await expect(details.locator("summary")).toBeFocused();
-      await expect(details.locator("summary")).toHaveAttribute("aria-expanded", "false");
-      await page.setViewportSize({ width: 390, height: 844 });
-      await expect(details).not.toHaveAttribute("open");
-      await expect(details.locator("summary")).toBeFocused();
-      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
-      await expect(details).not.toHaveAttribute("data-closing");
-      await details.locator("summary").click();
-      await expect(details).toHaveAttribute("open", "");
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
-      await details.locator("summary").click();
-      await expect(details).not.toHaveAttribute("open");
-    });
-  }
-}
-
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   for (const route of ["memos", "performance"]) {
     for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       test(
-        `${prefix || "English"} ${route} closing restores content focus without scrolling under ${reducedMotion}`,
+        `${prefix || "English"} ${route} Collapsible reflows and restores focus under ${reducedMotion}`,
         { tag: "@mobile" },
         async ({ page }) => {
           await page.setViewportSize({ width: 390, height: 844 });
           await page.emulateMedia({ reducedMotion });
           await page.goto(`${prefix}/${route}`);
-          const details = page.locator(
-            route === "memos" ? ".memo-disclosure" : `[aria-labelledby="performance-twr-chart-title"] details`,
+          const root = page.locator(
+            route === "memos"
+              ? ".memo-disclosure"
+              : '[aria-labelledby="performance-twr-chart-title"] [data-slot="collapsible"]',
           );
-          const summary = details.locator("summary");
-          await summary.click();
-          await expect(details).toHaveAttribute("open", "");
-          await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
-          const contentFocus = details.locator('a, [tabindex="0"]').first();
-          await contentFocus.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
-          await expect(contentFocus).toBeFocused();
-          const scrollPosition = await page.evaluate(() => window.scrollY);
-          // Programmatic activation preserves content focus until the disclosure handles dismissal.
-          await summary.evaluate((element: HTMLElement) => element.click());
-          await expect(details).not.toHaveAttribute("open");
-          await expect(summary).toBeFocused();
-          expect(await page.evaluate(() => window.scrollY)).toBe(scrollPosition);
-          await expect(details).not.toHaveAttribute("data-closing");
-          await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
-
-          await summary.click();
-          await expect(details).toHaveAttribute("open", "");
-          await expect.poll(() => details.evaluate((element) => element.getAnimations().length)).toBe(0);
-          const outsideLink = page.locator(".site-footer a").first();
-          await outsideLink.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
-          await summary.evaluate((element: HTMLElement) => element.click());
-          await expect(details).not.toHaveAttribute("open");
-          await expect(outsideLink).toBeFocused();
+          const trigger = root.locator('[data-slot="collapsible-trigger"]');
+          const panel = root.locator('[data-slot="collapsible-content"]');
+          await expect(trigger).toHaveAttribute("aria-expanded", "false");
+          await expect(panel).toBeHidden();
+          await trigger.focus();
+          await page.keyboard.press("Enter");
+          await expect(trigger).toHaveAttribute("aria-expanded", "true");
+          await expect(panel).toBeVisible();
+          await page.setViewportSize({ width: 801, height: 900 });
+          await expect.poll(() => panel.evaluate((element) => element.getAnimations().length)).toBe(0);
+          expect(await panel.evaluate((element) => element.clientHeight >= element.scrollHeight - 1)).toBe(true);
+          await trigger.evaluate((element) => {
+            document.documentElement.style.scrollBehavior = "auto";
+            window.scrollTo({ top: element.getBoundingClientRect().top + scrollY - 200, behavior: "instant" });
+          });
+          const target = panel.locator('a, [tabindex="0"]').first();
+          await target.evaluate((element: HTMLElement) => element.focus({ preventScroll: true }));
+          const focusScroll = await trigger.evaluate((element: HTMLElement) => {
+            const before = scrollY;
+            element.click();
+            return scrollY - before;
+          });
+          expect(focusScroll).toBe(0);
+          await expect(trigger).toBeFocused();
+          await expect(trigger).toHaveAttribute("aria-expanded", "false");
+          await expect(panel).toBeHidden();
+          await page.keyboard.press("Space");
+          await expect(panel).toBeVisible();
+          await trigger.click();
+          await trigger.click();
+          await expect(trigger).toHaveAttribute("aria-expanded", "true");
+          await page.setViewportSize({ width: 390, height: 844 });
+          await expect.poll(() => panel.evaluate((element) => element.getAnimations().length)).toBe(0);
+          await expect(target).toBeVisible();
+          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+          await page.emulateMedia({ reducedMotion: "reduce" });
+          await trigger.click();
+          await expect(panel).toBeHidden();
+          expect(await panel.evaluate((element) => element.getAnimations().length)).toBe(0);
         },
       );
     }

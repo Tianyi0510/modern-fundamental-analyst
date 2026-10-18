@@ -324,7 +324,10 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
         {text.sections.map((section, index) => {
           const [number, sectionName] = section.label.split(" · ");
           return (
-            <div className={index % 2 === 1 ? appearance["section-gray"] : undefined} key={section.label}>
+            <div
+              className={"about-section-band " + (index % 2 === 1 ? appearance["section-gray"] : "")}
+              key={section.label}
+            >
               <section
                 data-after-hero={index === 0 ? "" : undefined}
                 className={appearance["about-section"] + " " + appearance["shell"]}

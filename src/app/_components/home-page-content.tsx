@@ -4,7 +4,7 @@ import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
 import { IntentLink } from "@/components/intent-link";
-import { MoveRight, MoveUpRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -150,7 +150,7 @@ const allocationStops = [...featuredWeights, otherWeight].reduce<number[]>((stop
   return stops;
 }, []);
 const [firstStop = 0, secondStop = firstStop, thirdStop = secondStop, fourthStop = thirdStop] = allocationStops;
-const allocationGradient = `conic-gradient(var(--deep-blue) 0 ${firstStop}%, var(--medium-blue) ${firstStop}% ${secondStop}%, var(--black) ${secondStop}% ${thirdStop}%, var(--white) ${thirdStop}% ${fourthStop}%, var(--gray) ${fourthStop}% 100%)`;
+const allocationGradient = `conic-gradient(var(--blue-deep) 0 ${firstStop}%, var(--blue-medium) ${firstStop}% ${secondStop}%, var(--black) ${secondStop}% ${thirdStop}%, var(--white) ${thirdStop}% ${fourthStop}%, var(--gray-medium) ${fourthStop}% 100%)`;
 
 export function HomePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
@@ -167,7 +167,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
       <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <div className={appearance["home-opening"]}>
           <div className={appearance["hero-band"]}>
-            <section className={appearance["hero"] + " " + appearance["shell"]}>
+            <section className={appearance["hero"] + " @container/financial-summary " + appearance["shell"]}>
               <p className={appearance["eyebrow"]}>
                 <span /> {text.researchLabel}
               </p>
@@ -190,6 +190,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               </div>
               <dl className={appearance["metric-band"]} aria-label={text.portfolioSnapshot}>
                 <PortfolioMetric
+                  locale={locale}
                   tone="highlight"
                   className="metric compact:overflow-hidden"
                   label={<>{text.timeWeightedReturn}</>}
@@ -197,6 +198,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   note={<>{text.twrNote}</>}
                 />
                 <PortfolioMetric
+                  locale={locale}
                   tone="brand"
                   className="metric compact:overflow-hidden"
                   label={<>{text.marketValue}</>}
@@ -208,6 +210,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   }
                 />
                 <PortfolioMetric
+                  locale={locale}
                   tone="paper"
                   className="metric compact:overflow-hidden"
                   label={<>{text.portfolioXirr}</>}
@@ -245,20 +248,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <br />
               {text.portfolioTitle[1]}
             </h2>
-            <Link
-              data-touch-feedback=""
-              className={appearance["round-link"]}
-              href={getLocalizedPath("/portfolio", locale)}
-              aria-label={text.viewPortfolio}
-            >
-              <MoveUpRight
-                className={appearance["arrow-icon"] + " " + appearance["round-link-arrow"]}
-                aria-hidden="true"
-                strokeWidth={3}
-              />
-            </Link>
-          </section>
-          <section className={appearance["holdings-preview"] + " " + appearance["shell"]}>
+
             {/* Safari needs an explicit list role when markers are removed outside navigation. */}
             {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
             <ol className={appearance["holdings-list"]} role="list">
@@ -339,7 +329,17 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </div>
               </div>
               <div className={appearance["performance-copy"]}>
-                <strong>{formatPercent(portfolioSnapshot.xirr)}</strong>
+                <div
+                  className="performance-value financial-value-scroll max-w-full overflow-x-auto overflow-y-hidden"
+                  role="region"
+                  aria-label="XIRR"
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Native scroll regions need keyboard focus.
+                  tabIndex={0}
+                >
+                  <strong className="block w-max min-w-full whitespace-nowrap">
+                    {formatPercent(portfolioSnapshot.xirr)}
+                  </strong>
+                </div>
                 <p>{text.performanceCopy(benchmarkReturn)}</p>
                 <small className={appearance["date-text"]}>
                   {text.verified} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time>
@@ -382,9 +382,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
 
         <div className={appearance["cta-band"]}>
           <section className={appearance["cta"] + " " + appearance["shell"]}>
-            <p className={appearance["eyebrow"]}>
-              <span /> {text.contactLabel}
-            </p>
+            <p className={appearance["eyebrow"]}>{text.contactLabel}</p>
             <h2>
               {text.contactTitle[0]}
               {locale === "en" ? " " : null}

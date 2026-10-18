@@ -1,17 +1,21 @@
-.dark {
-  display: none;
-}
-:global(html[data-theme="dark"]) .light {
-  display: none;
-}
-:global(html[data-theme="dark"]) .dark {
+.wordmark {
   display: block;
+  font-family: var(--font-ui);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
 }
-@media (prefers-color-scheme: dark) {
-  :global(html:not([data-theme])) .light {
-    display: none;
-  }
-  :global(html:not([data-theme])) .dark {
-    display: block;
+.inverse {
+  color: var(--white);
+}
+.period {
+  color: var(--blue-medium);
+}
+@media (max-width: 800px) {
+  .wordmark {
+    font-size: 18px;
   }
 }

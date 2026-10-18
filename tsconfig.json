@@ -25,6 +25,15 @@
     ],
     "allowJs": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts",
+    "node_modules/.cache/next-playwright/types/**/*.ts",
+    "node_modules/.cache/next-playwright/dev/types/**/*.ts"
+  ],
   "exclude": ["node_modules", ".next", "coverage", "dist"]
 }

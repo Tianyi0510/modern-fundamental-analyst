@@ -54,7 +54,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             }
             if (route === "/performance") {
               await expect(page.locator("#performance-twr-chart-title")).toHaveText("Cumulative Reconstructed TWRR");
-              await expect(page.locator("summary").filter({ hasText: "View Monthly Data" })).toHaveCount(2);
+              await expect(page.getByRole("button", { name: "View Monthly Data", exact: true })).toHaveCount(2);
             }
             if (route === "/contact") {
               await expect(page.locator("main h1")).toHaveText(/Connect through research,\s*ideas, and opportunities/);

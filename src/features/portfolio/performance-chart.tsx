@@ -20,7 +20,7 @@ export function PerformanceChart({ locale, measure = "twr" }: { locale: Locale; 
           benchmarkReturn: row.benchmarkXirr,
         }));
   return (
-    <ChartBoundary key={`${locale}-${measure}`} locale={locale} measure={measure}>
+    <ChartBoundary key={`${locale}-${measure}`} locale={locale} measure={measure} streaming={false}>
       <PerformanceChartView locale={locale} measure={measure} observations={observations} />
     </ChartBoundary>
   );

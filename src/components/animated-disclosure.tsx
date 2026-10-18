@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type MouseEvent, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./ui/collapsible";
+import styles from "./animated-disclosure.module.css";
 
 export function AnimatedDisclosure({
   summary,
@@ -11,96 +13,22 @@ export function AnimatedDisclosure({
   children: ReactNode;
   className?: string;
 }) {
-  const ref = useRef<HTMLDetailsElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<Animation | null>(null);
-  const phaseRef = useRef<"closed" | "opening" | "open" | "closing">("closed");
-
-  const settle = useCallback(() => {
-    const details = ref.current;
-    const animation = animationRef.current;
-    if (!details) return;
-    const summary = details.querySelector("summary");
-    const open = phaseRef.current === "opening" || phaseRef.current === "open";
-    if (!open && details.contains(document.activeElement) && !summary?.contains(document.activeElement)) {
-      summary?.focus({ preventScroll: true });
-    }
-    details.open = open;
-    phaseRef.current = open ? "open" : "closed";
-    details.dataset.state = phaseRef.current;
-    summary?.setAttribute("aria-expanded", String(open));
-    if (contentRef.current) contentRef.current.inert = !open;
-    details.removeAttribute("data-closing");
-    animationRef.current = null;
-    animation?.cancel();
-  }, []);
-
-  useEffect(() => {
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const finish = () => {
-      if (motion.matches && animationRef.current) settle();
-    };
-    const finishOnResize = () => {
-      if (animationRef.current) settle();
-    };
-    motion.addEventListener("change", finish);
-    // Let the new layout choose its natural height instead of keeping a stale pixel target.
-    window.addEventListener("resize", finishOnResize);
-    return () => {
-      motion.removeEventListener("change", finish);
-      window.removeEventListener("resize", finishOnResize);
-      animationRef.current?.cancel();
-      animationRef.current = null;
-    };
-  }, [settle]);
-
-  const toggle = (event: MouseEvent<HTMLElement>) => {
-    const details = ref.current;
-    if (!details) return;
-    const summary = event.currentTarget;
-    event.preventDefault();
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const startHeight = reducedMotion ? 0 : details.getBoundingClientRect().height;
-    const open = animationRef.current ? phaseRef.current === "closing" : !details.open;
-    phaseRef.current = open ? "opening" : "closing";
-    details.dataset.state = phaseRef.current;
-    summary.setAttribute("aria-expanded", String(open));
-    if (!open && contentRef.current?.contains(document.activeElement)) summary.focus({ preventScroll: true });
-    if (contentRef.current) contentRef.current.inert = !open;
-    animationRef.current?.cancel();
-    animationRef.current = null;
-    details.removeAttribute("data-closing");
-
-    if (reducedMotion) {
-      settle();
-      return;
-    }
-
-    details.open = true;
-    details.toggleAttribute("data-closing", !open);
-    const styles = getComputedStyle(details);
-    const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
-    const endHeight = open ? details.getBoundingClientRect().height : summary.offsetHeight + borderHeight;
-    const durationToken = styles.getPropertyValue("--motion-duration-slow").trim();
-    const duration = parseFloat(durationToken) * (durationToken.endsWith("ms") ? 1 : 1000);
-    const animation = details.animate(
-      [
-        { height: `${startHeight}px`, overflow: "clip" },
-        { height: `${endHeight}px`, overflow: "clip" },
-      ],
-      { duration, easing: styles.getPropertyValue("--motion-ease-emphasized").trim(), fill: "forwards" },
-    );
-    animationRef.current = animation;
-    animation.onfinish = () => {
-      if (animationRef.current !== animation) return;
-      settle();
-    };
-  };
-
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   return (
-    <details ref={ref} className={className}>
-      <summary onClick={toggle}>{summary}</summary>
-      <div ref={contentRef}>{children}</div>
-    </details>
+    <Collapsible
+      ref={rootRef}
+      className={className}
+      onOpenChange={(open) => {
+        if (!open && rootRef.current?.contains(document.activeElement)) {
+          triggerRef.current?.focus({ preventScroll: true });
+        }
+      }}
+    >
+      <CollapsibleTrigger ref={triggerRef}>{summary}</CollapsibleTrigger>
+      <CollapsibleContent keepMounted className={styles.panel}>
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

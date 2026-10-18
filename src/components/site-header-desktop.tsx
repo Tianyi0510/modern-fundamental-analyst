@@ -1,6 +1,7 @@
 "use client";
 
-import { ThemeSelect } from "./theme-select";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "./ui/navigation-menu";
+import { ThemeToggle } from "./theme-toggle";
 import { IntentLink as Link } from "./intent-link";
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -30,7 +31,7 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
   const [isLanguageOpen, setLanguageOpen] = useState(false);
   const languageTriggerRef = useRef<HTMLButtonElement>(null);
-  const appearanceRef = useRef<HTMLSelectElement>(null);
+  const appearanceRef = useRef<HTMLButtonElement>(null);
   const skipLanguageReturnFocusRef = useRef(false);
   useEffect(() => {
     const compact = window.matchMedia("(max-width: 1279px)");
@@ -43,18 +44,22 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
 
   return (
     <div className={appearance["header-actions"]}>
-      <nav className="flex gap-[8px] min-[1280px]:gap-[12px]" aria-label={copy.primary}>
-        {navigation.map(({ href, label }) => (
-          <Link
-            className={desktopNavigationLink}
-            href={href}
-            aria-current={isCurrentPath(href) ? "page" : undefined}
-            key={href}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <NavigationMenu aria-label={copy.primary}>
+        <NavigationMenuList className="gap-[8px] min-[1280px]:gap-[12px]">
+          {navigation.map(({ href, label }) => (
+            <NavigationMenuItem key={href}>
+              <NavigationMenuLink
+                variant="plain"
+                active={isCurrentPath(href)}
+                className={`${desktopNavigationLink} text-medium-label`}
+                render={<Link href={href} aria-current={isCurrentPath(href) ? "page" : undefined} />}
+              >
+                {label}
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          ))}
+        </NavigationMenuList>
+      </NavigationMenu>
       <div
         className={appearance["language-menu"]}
         onKeyDownCapture={(event) => {
@@ -118,7 +123,7 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <ThemeSelect locale={locale} compact selectRef={appearanceRef} />
+      <ThemeToggle locale={locale} buttonRef={appearanceRef} />
       <ButtonLink
         variant="contrast"
         size="small"

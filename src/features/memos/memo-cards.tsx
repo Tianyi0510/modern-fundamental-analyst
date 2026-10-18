@@ -1,5 +1,6 @@
 import { appearance } from "./memo-cards.styles";
 import Link from "next/link";
+import { Card, CardHeader, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Grid } from "@/components/grid";
 import type { MemoSummary } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
@@ -40,7 +41,7 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
 
   return (
     <Grid
-      className={`${appearance["memo-grid"]} ${placement === "featured" ? "memo-index-featured mt-0 mb-[var(--space-section)]" : "mt-[var(--space-heading-content)]"}`}
+      className={`${appearance["memo-grid"]} ${placement === "featured" ? "memo-index-featured mt-0 mb-[var(--space-section-content)]" : "mt-[var(--space-heading-content)]"}`}
     >
       {slotIndexes.map((index) => {
         const memo = memos[index];
@@ -49,13 +50,17 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
         if (!memo)
           return (
             <article className={appearance["memo-card"] + " " + appearance["memo-card-placeholder"]} key={cardNumber}>
-              <div>
-                <span>{cardNumber}</span>
-                <span>{placeholder.status}</span>
-              </div>
-              <Heading>{placeholder.title(cardNumber)}</Heading>
-              <p>{placeholder.summary}</p>
-              <small>{placeholder.availability}</small>
+              <Card className={appearance.body}>
+                <CardHeader className={appearance.header}>
+                  <span>{cardNumber}</span>
+                  <span>{placeholder.status}</span>
+                </CardHeader>
+                <CardContent className={appearance.content}>
+                  <Heading className={appearance.title}>{placeholder.title(cardNumber)}</Heading>
+                  <CardDescription className={appearance.description}>{placeholder.summary}</CardDescription>
+                </CardContent>
+                <CardFooter className={appearance.footer}>{placeholder.availability}</CardFooter>
+              </Card>
             </article>
           );
 
@@ -65,16 +70,20 @@ export function MemoCards({ memos, locale, placement = "section" }: MemoCardsPro
             href={getLocalizedPath(`/memos/${memo.slug}`, locale)}
             key={memo.slug}
           >
-            <div>
-              <span>{memo.number}</span>
-              <span>{memo.category.label}</span>
-            </div>
-            <Heading>{memo.title}</Heading>
-            <p>{memo.summary}</p>
-            <small className={appearance["date-text"]}>
-              <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time> ·{" "}
-              {memo.readTime}
-            </small>
+            <Card className={appearance.body}>
+              <CardHeader className={appearance.header}>
+                <span>{memo.number}</span>
+                <span>{memo.category.label}</span>
+              </CardHeader>
+              <CardContent className={appearance.content}>
+                <Heading className={appearance.title}>{memo.title}</Heading>
+                <CardDescription className={appearance.description}>{memo.summary}</CardDescription>
+              </CardContent>
+              <CardFooter className={`${appearance.footer} ${appearance["date-text"]}`}>
+                <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time> ·{" "}
+                {memo.readTime}
+              </CardFooter>
+            </Card>
           </Link>
         );
       })}

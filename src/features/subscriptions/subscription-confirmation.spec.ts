@@ -60,6 +60,7 @@ for (const { prefix, action, success, unavailable } of [
         await page.goto(`${prefix}/subscription-confirmation?token=${"a".repeat(43)}`);
         const button = page.getByRole("button", { name: action, exact: true });
         await expect(button).toBeVisible();
+        await expect(button).toBeEnabled();
         expect(calls).toBe(0);
         await button.focus();
         await page.keyboard.press("Enter");
@@ -78,7 +79,31 @@ for (const { prefix, action, success, unavailable } of [
   }
 }
 
-test("a missing confirmation token cannot submit", async ({ page }) => {
-  await page.goto("/subscription-confirmation");
-  await expect(page.getByRole("button", { name: "Confirm Subscription", exact: true })).toBeDisabled();
-});
+for (const { prefix, message, action } of [
+  {
+    prefix: "",
+    message: "This confirmation link is missing or invalid. Subscribe again to request a new link.",
+    action: "Request a New Link",
+  },
+  { prefix: "/zh-tw", message: "此確認連結缺失或無效。請重新訂閱以取得新連結。", action: "取得新連結" },
+  { prefix: "/zh-cn", message: "此确认链接缺失或无效。请重新订阅以获取新链接。", action: "获取新链接" },
+]) {
+  test(`${prefix || "English"} missing and malformed confirmation links offer recovery @mobile`, async ({ page }) => {
+    let calls = 0;
+    await page.route("**/api/subscription-confirmation", async (route) => {
+      calls++;
+      await route.fulfill({ json: { ok: true } });
+    });
+    for (const suffix of ["", "?token=invalid"]) {
+      await page.goto(`${prefix}/subscription-confirmation${suffix}`);
+      await expect(page.getByRole("main").getByRole("status").getByText(message, { exact: true })).toBeVisible();
+      await expect(page.locator("main form")).toHaveCount(0);
+      const recovery = page.getByRole("link", { name: action, exact: true });
+      await expect(recovery).toHaveAttribute("href", `${prefix || "/"}#subscribe`);
+      await recovery.click();
+      await expect(page).toHaveURL(new RegExp(`${prefix || "/"}#subscribe$`));
+      await expect(page.locator("#subscribe")).toBeVisible();
+    }
+    expect(calls).toBe(0);
+  });
+}

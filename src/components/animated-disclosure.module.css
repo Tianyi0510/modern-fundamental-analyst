@@ -1,0 +1,18 @@
+.panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height var(--motion-duration-expand) var(--motion-ease-emphasized);
+}
+.panel[data-ending-style] {
+  transition-duration: var(--motion-duration-collapse);
+  transition-timing-function: var(--motion-ease-standard);
+}
+.panel[data-starting-style],
+.panel[data-ending-style] {
+  height: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+}

@@ -9,7 +9,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       async ({ page }) => {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`${prefix}/contact`);
-        await expect(page.locator(".page-hero-band")).toHaveCSS("background-color", "rgb(248, 249, 251)");
+        await expect(page.locator(".page-hero-band")).toHaveCSS("background-color", "rgb(245, 247, 250)");
         const field = page.locator('main input[type="email"]').first();
         await expect(field).toHaveCSS("background-color", "rgb(255, 255, 255)");
         await expect(field).toHaveCSS("border-radius", "6px");
@@ -19,7 +19,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         });
         expect(colorContrast(colors.border, colors.background)).toBeGreaterThanOrEqual(3);
         await field.focus();
-        await expect(field).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        await expect(field).toHaveCSS("outline-color", "rgb(13, 40, 139)");
         await expect(page.locator('.site-footer input[type="email"]')).toHaveCSS("border-radius", "999px");
         await expect(page.locator(".site-footer")).toHaveCSS("background-color", "rgb(0, 0, 0)");
         const action = page.locator('main button[type="submit"]').first();
@@ -31,8 +31,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         for (const card of await cards.all()) await expect(card).toHaveCSS("border-radius", "0px");
         const grid = page.locator(".memo-grid");
         await expect(grid).toHaveCSS("border-radius", "6px");
-        await expect(grid).toHaveCSS("background-color", "rgb(237, 237, 237)");
-        await expect(page.locator(".memo-card > small").first()).toHaveCSS("border-top-color", "rgb(237, 237, 237)");
+        await expect(grid).toHaveCSS("background-color", "rgb(238, 240, 242)");
+        await expect(page.locator(".memo-card > small").first()).toHaveCSS("border-top-color", "rgb(238, 240, 242)");
         await expect(grid).toHaveCSS("border-top-width", "0px");
         await expect(grid).toHaveCSS("overflow", "visible");
         const memo = page.locator("a.memo-card").first();
@@ -43,7 +43,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(grid).not.toHaveCSS("box-shadow", "none");
         await expect(page.locator(".memo-card p").first()).toHaveCSS("color", "rgb(77, 77, 77)");
         const logo = page.locator(".site-header > .wordmark");
-        await expect(logo.locator("img:visible")).toHaveAttribute("src", "/logo-wordmark.svg");
+        await expect(logo.locator(".brand-logo")).toHaveText("Modern Fundamental Analyst.");
 
         if (width === 1440) {
           await page.locator(".language-trigger").click();

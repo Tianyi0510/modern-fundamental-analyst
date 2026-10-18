@@ -1,41 +1,18 @@
 import { appearance } from "./memo-article-content.styles";
-import type { MemoContent } from "@/features/memos/memo-content";
+import MicrosoftArticle from "./articles/microsoft-stock-analysis-fiscal-year-2024.mdx";
+import { memoMdxComponents } from "./memo-mdx-components";
+import type { Locale } from "@/lib/i18n";
 
-export function MemoArticleContent({ content }: { content: MemoContent }) {
+const articles = {
+  "microsoft-stock-analysis-fiscal-year-2024": MicrosoftArticle,
+};
+
+export function MemoArticleContent({ slug, language }: { slug: string; language: Locale }) {
+  const Article = articles[slug as keyof typeof articles];
+  if (!Article) return null;
   return (
-    <div className={appearance["article-body"]} lang={content.language}>
-      {content.sections.map((section) => (
-        <section className={appearance["memo-section"]} key={section.title}>
-          <h2>{section.title}</h2>
-          {section.introduction?.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          {section.subsections.map((subsection) => (
-            <section className={appearance["memo-subsection"]} key={subsection.title}>
-              <h3>{subsection.title}</h3>
-              {subsection.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </section>
-          ))}
-        </section>
-      ))}
-      <section className={appearance["memo-references"]}>
-        <h2>{content.referencesTitle}</h2>
-        <ol>
-          {content.references.map((reference) => (
-            <li key={reference.citation}>
-              {reference.citation}{" "}
-              <a
-                className="underline underline-offset-[3px] focus-visible:outline-2 focus-visible:outline-offset-4"
-                href={reference.href}
-              >
-                {reference.linkLabel ?? "Read source"}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
+    <div className={appearance["article-body"]} lang={language}>
+      <Article components={memoMdxComponents} />
     </div>
   );
 }

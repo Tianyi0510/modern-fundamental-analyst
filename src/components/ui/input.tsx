@@ -15,7 +15,7 @@ export function inputAppearance(variant: FieldVariant, className = "", multiline
       ? "min-h-[var(--size-control)]"
       : "min-h-[var(--size-field)]";
   return cn(
-    `block w-full min-w-0 border px-[var(--space-field-inline)] py-[var(--space-field-block)] text-body transition-[border-color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] disabled:cursor-not-allowed disabled:border-dashed ${height} ${variants[variant]}`,
+    `block w-full min-w-0 border px-[var(--space-field-inline)] py-[var(--space-field-block)] text-small-body transition-[border-color,box-shadow] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] disabled:cursor-not-allowed disabled:border-dashed ${height} ${variants[variant]}`,
     className,
   );
 }

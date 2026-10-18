@@ -33,12 +33,13 @@ export async function SubscriptionConfirmationPage({
       />
       <main id="main-content" tabIndex={-1}>
         <PageHero
+          titleRole="title"
           variant="standard"
           label={locale === "en" ? title : copy.subject}
           title={title}
           intro={<p>{pageBody[locale]}</p>}
         />
-        <Container className="grid gap-6 [padding-block:var(--space-section)]">
+        <Container className="confirmation-panel grid gap-6 py-[var(--space-section-padding)]">
           <SubscriptionConfirmationForm token={token} locale={locale} />
           <a href={`${getLocalizedPath("/", locale)}#subscribe`}>{getNavigationCopy(locale).home}</a>
         </Container>

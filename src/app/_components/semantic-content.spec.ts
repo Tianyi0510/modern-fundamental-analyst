@@ -83,7 +83,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     const publication = memo.locator("time");
     const date = await publication.getAttribute("datetime");
     const displayed = await publication.innerText();
-    await page.locator(".memo-disclosure > summary").click();
+    await page.locator(".memo-disclosure > [data-slot=collapsible-trigger]").click();
     const indexDate = page.locator(".memo-meta time").first();
     await expect(indexDate).toBeVisible();
     await expect(indexDate).toHaveAttribute("datetime", date!);
@@ -110,7 +110,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const headings = page.locator(".memo-card").getByRole("heading", { level: 2, includeHidden: true });
       await expect(headings).toHaveCount(3);
       await expect(page.locator(".memo-card").getByRole("heading", { level: 3, includeHidden: true })).toHaveCount(0);
-      await page.locator(".memo-disclosure > summary").click();
+      await page.locator(".memo-disclosure > [data-slot=collapsible-trigger]").click();
       await expect(page.locator(".memo-index-row").first().getByRole("heading", { level: 2 })).toHaveText(
         await headings.first().innerText(),
       );
