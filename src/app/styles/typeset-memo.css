@@ -1,0 +1,80 @@
+/* Site-owned preset: retain the approved article typography and editorial rhythm. */
+@layer components {
+  .typeset.typeset-memo {
+    --typeset-font-body: var(--font-ui);
+    --typeset-font-heading: var(--font-ui);
+    --typeset-font-mono: var(--font-ui);
+    --typeset-size: var(--font-size-medium-body);
+    --typeset-leading: var(--leading-body-text);
+    --typeset-flow: 1.35em;
+    font-size: var(--typeset-size);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-zero);
+    text-wrap: pretty;
+  }
+
+  .typeset-memo
+    *:not(:where(.not-typeset, [data-not-typeset], .not-typeset *, [data-not-typeset] *, [data-slot], [data-slot] *)) {
+    &:where(h1, h2, h3, h4, h5, h6) {
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-heading-text);
+      letter-spacing: var(--tracking-zero);
+      text-transform: none;
+      text-wrap: balance;
+      color: inherit;
+    }
+    &:where(h1) {
+      font-size: var(--font-size-large-headline);
+    }
+    &:where(h2) {
+      font-size: var(--font-size-small-headline);
+      margin: 0 0 34px;
+    }
+    &:where(h3, h4) {
+      font-size: var(--font-size-medium-title);
+    }
+    &:where(h3) {
+      margin: 0 0 18px;
+    }
+    &:where(h5, h6) {
+      font-size: var(--font-size-large-label);
+    }
+    &:where(p) {
+      margin: 0;
+    }
+    &:where(p + p) {
+      margin-block-start: var(--typeset-flow);
+    }
+    &:where(a, sup a) {
+      font-weight: inherit;
+      text-decoration-color: currentColor;
+    }
+    &:where(strong, b, :is(h1, h2, h3, h4) :is(strong, b), summary, dt, th, kbd) {
+      font-weight: var(--weight-bold);
+    }
+    &:where(blockquote) {
+      margin: 64px 0;
+      padding: 34px 0;
+      border-inline-start: 0;
+      border-top: 3px solid var(--border-brand);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--font-size-medium-title);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-heading-text);
+      text-wrap: balance;
+    }
+    &:where(pre, :not(pre) > code, kbd, figcaption, caption, .footnotes, [data-footnotes]) {
+      font-size: var(--font-size-small-body);
+      line-height: var(--leading-body-text);
+    }
+    &:where(mark) {
+      background-color: var(--surface-selected);
+    }
+    &:where(.memo-references li) {
+      padding-inline-start: 0;
+    }
+    &:where(.memo-references li:first-child) {
+      margin-block-start: 0;
+    }
+  }
+}

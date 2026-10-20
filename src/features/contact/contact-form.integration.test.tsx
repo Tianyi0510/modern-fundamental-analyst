@@ -1,11 +1,45 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, expect, it, vi } from "vitest";
 import { server } from "../../../scripts/test-server";
 import { ContactForm } from "./contact-form";
+import { renderToString } from "react-dom/server";
+import { readContactDraft, saveContactDraft } from "./contact-draft";
 
 beforeEach(() => sessionStorage.clear());
+
+it("preserves browser-restored input during hydration without reusing an older draft identity", async () => {
+  const oldId = "550e8400-e29b-41d4-a716-446655440000";
+  saveContactDraft("en", {
+    name: "Reader",
+    email: "reader@example.com",
+    subject: "Research",
+    message: "An older saved message.",
+    submissionId: oldId,
+  });
+  const element = <ContactForm locale="en" />;
+  const container = document.createElement("div");
+  container.innerHTML = renderToString(element);
+  document.body.append(container);
+  within(container).getByRole<HTMLTextAreaElement>("textbox", { name: "Message" }).value =
+    "A newer browser-restored message.";
+  render(element, { container, hydrate: true });
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("A newer browser-restored message.");
+  expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Reader");
+  expect(readContactDraft("en")?.submissionId).toBeUndefined();
+  let key: string | null = null;
+  server.use(
+    http.post("http://localhost:3210/api/contact", ({ request }) => {
+      key = request.headers.get("idempotency-key");
+      return HttpResponse.json({ error: "Unavailable" }, { status: 503 });
+    }),
+  );
+  await userEvent.setup().click(screen.getByRole("button", { name: "Send Message" }));
+  expect(await screen.findByText("Your message couldn't be sent. Please try again later.")).toBeVisible();
+  expect(key).toBeTruthy();
+  expect(key).not.toBe(oldId);
+});
 
 async function fillMessage() {
   const user = userEvent.setup();
@@ -123,8 +157,10 @@ it("disables editing and duplicate submission until the pending request complete
   const user = await fillMessage();
   try {
     await user.click(screen.getByRole("button", { name: "Send Message" }));
-    const sending = await screen.findByRole("button", { name: "Sending…" });
+    const sending = await screen.findByRole("button", { name: "Send Message" });
     expect(sending).toBeDisabled();
+    expect(screen.getByText("Sending…")).toBeVisible();
+    expect(within(sending).getByRole("status", { hidden: true })).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("textbox", { name: "Message" })).toBeDisabled();
     await user.click(sending);
     expect(calls).toBe(1);
@@ -173,4 +209,44 @@ it("explains HTTP 400 as an input problem while preserving a valid draft", async
   expect(feedback).toHaveFocus();
   expect(screen.getByRole("textbox", { name: "Name" })).toHaveValue("Reader");
   expect(screen.queryByText("Your message couldn't be sent. Please try again later.")).not.toBeInTheDocument();
+});
+
+it("requires confirmation before clearing the message and saved draft", async () => {
+  render(<ContactForm locale="en" />);
+  const user = await fillMessage();
+  const before = readContactDraft("en");
+  await user.click(screen.getByRole("button", { name: "Clear Message" }));
+  let dialog = screen.getByRole("alertdialog", { name: "Clear This Message?" });
+  await user.click(within(dialog).getByRole("button", { name: "Keep Editing" }));
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Please explain the portfolio returns.");
+  expect(readContactDraft("en")).toEqual(before);
+  await user.click(screen.getByRole("button", { name: "Clear Message" }));
+  dialog = screen.getByRole("alertdialog");
+  await user.click(within(dialog).getByRole("button", { name: "Clear Message" }));
+  expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("");
+  expect(readContactDraft("en")).toBeUndefined();
+  expect(screen.getByRole("button", { name: "Clear Message" })).toBeDisabled();
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveFocus();
+});
+
+it("only enables draft deletion while an owned field contains content", async () => {
+  render(<ContactForm locale="en" />);
+  const user = userEvent.setup();
+  const clear = screen.getByRole("button", { name: "Clear Message" });
+  expect(clear).toBeDisabled();
+  await user.click(clear);
+  expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  const name = screen.getByRole("textbox", { name: "Name" });
+  await user.type(name, "Reader");
+  expect(clear).toBeEnabled();
+  await user.clear(name);
+  expect(clear).toBeDisabled();
+});
+
+it("enables deletion for a restored draft", () => {
+  saveContactDraft("en", { name: "", email: "", subject: "", message: "Restored unsent message." });
+  render(<ContactForm locale="en" />);
+  expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Restored unsent message.");
+  expect(screen.getByRole("button", { name: "Clear Message" })).toBeEnabled();
 });

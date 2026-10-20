@@ -508,6 +508,25 @@ test("active subscriptions reject repeats in every locale without provider write
   assert.equal(globalThis.fetch.mock.callCount(), 3);
 });
 
+for (const existingContact of [false, true]) {
+  test(`missing welcome memo blocks ${existingContact ? "reactivation" : "new activation"} before provider writes`, async (context) => {
+    context.mock.method(console, "error", () => {});
+    const fetch = context.mock.method(globalThis, "fetch", async (_url, options) => {
+      assert.equal(options.method, "GET");
+      return existingContact
+        ? Response.json({ id: "contact-id", unsubscribed: true })
+        : Response.json({ name: "not_found", message: "Not found", statusCode: 404 }, { status: 404 });
+    });
+    for (const missingMemo of [null, undefined]) {
+      const email = "missing-memo@example.com";
+      const result = await activateContactInTest(email, "en", () => missingMemo);
+      assert.deepEqual(result, { ok: false, message: "Subscription could not be completed.", status: 503 });
+      assert.equal(await readSubscriptionJournal(email), null);
+    }
+    assert.equal(fetch.mock.callCount(), 2);
+  });
+}
+
 test("a rejected welcome retains consent and a durable pending journal", async (context) => {
   const english = getPreferredLanguageSegmentId("en");
   const target = getPreferredLanguageSegmentId("zh-tw");

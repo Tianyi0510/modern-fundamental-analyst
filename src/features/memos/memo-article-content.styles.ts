@@ -1,10 +1,11 @@
 export const appearance = {
   "article-body":
-    "article-body [--memo-conclusion-space-before:58px] [--memo-conclusion-space-after:60px] [width:min(65ch,_100%)] [margin-inline:auto] text-body-large [text-wrap:pretty] [&_h2]:[margin:0_0_34px] [&_h2]:text-editorial-title [&_h2]:[text-transform:none] [&_h2]:[text-wrap:balance] [&_p]:[margin:0] [&_p_+_p]:[margin-top:1.35em] [&_blockquote]:[margin:64px_0] [&_blockquote]:[padding:34px_0] [&_blockquote]:[border-top:3px_solid_var(--border-brand)] [&_blockquote]:[border-bottom:1px_solid_var(--border-subtle)] [&_blockquote]:text-title [&_blockquote]:[text-transform:none] [&_blockquote]:[text-wrap:balance] [@media((max-width:_800px))]:[--memo-conclusion-space-before:49px] [@media((max-width:_800px))]:[--memo-conclusion-space-after:50px] [@media((max-width:_800px))]:[margin-left:0] [@media((max-width:_800px))]:[overflow-wrap:anywhere]",
+    "article-body typeset typeset-memo [--memo-conclusion-space-before:58px] [--memo-conclusion-space-after:60px] [width:min(var(--width-article),_100%)] [margin-inline:0] [@media((max-width:_800px))]:[--memo-conclusion-space-before:49px] [@media((max-width:_800px))]:[--memo-conclusion-space-after:50px] compact:wrap-anywhere",
+
   "memo-section":
     "memo-section [.memo-section_+_&]:[margin-top:var(--space-section)] [.memo-section_+_&]:[padding-top:var(--space-section-compact)] [.memo-section_+_&]:[border-top:1px_solid_var(--border-strong)] [@media((max-width:_800px))]:[.memo-section_+_&]:[margin-top:var(--space-section)] [@media((max-width:_800px))]:[.memo-section_+_&]:[padding-top:var(--space-section-compact)]",
   "memo-subsection":
-    "memo-subsection [margin-top:var(--space-heading-content)] [&_h3]:[margin:0_0_18px] [&_h3]:text-title-small [&_h3]:[text-wrap:balance] [.memo-section:has(+_.memo-references)_>_&:last-child]:[margin-top:var(--memo-conclusion-space-before)]",
+    "memo-subsection [margin-top:var(--space-heading-content)] [.memo-section:has(+_.memo-references)_>_&:last-child]:[margin-top:var(--memo-conclusion-space-before)]",
   "memo-references":
     "memo-references [margin-top:var(--memo-conclusion-space-after)] [padding:var(--space-section-compact)_48px] [background:var(--surface-secondary)] [&_ol]:[margin:0] [&_ol]:[padding-left:22px] [&_li_+_li]:[margin-top:14px] [@media((max-width:_800px))]:[padding-top:var(--space-section-compact)] [@media((max-width:_800px))]:[padding-inline:var(--space-5)]",
 } as const;

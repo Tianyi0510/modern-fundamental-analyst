@@ -6,31 +6,24 @@ test("memo disclosure animates both directions and respects reduced motion", { t
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto(`${prefix}/memos`);
     const disclosure = page.locator(".memo-disclosure");
-    const summary = disclosure.locator("summary");
-    const closed = await disclosure.evaluate((e) => e.getBoundingClientRect().height);
-    const midpoint = await summary.evaluate((element: HTMLElement) => {
-      element.click();
-      const details = element.closest("details")!;
-      const animation = details.getAnimations()[0];
-      if (!animation) throw new Error("Expected disclosure height animation");
-      animation.pause();
-      animation.currentTime = Number(animation.effect!.getTiming().duration) / 2;
-      return { height: details.getBoundingClientRect().height, full: details.scrollHeight };
-    });
-    expect(midpoint.height).toBeGreaterThan(closed);
-    expect(midpoint.height).toBeLessThan(midpoint.full);
-    // Reverse an unfinished opening without waiting for the element to settle.
-    await summary.evaluate((e: HTMLElement) => e.click());
-    await expect(disclosure).toHaveAttribute("data-closing", "");
-    await expect(disclosure).not.toHaveAttribute("open", "");
-    expect(await disclosure.evaluate((e) => e.getBoundingClientRect().height)).toBeCloseTo(closed, 0);
+    const summary = disclosure.locator("[data-slot=collapsible-trigger]");
+    const panel = disclosure.locator("[data-slot=collapsible-content]");
+    await summary.click();
+    await expect(summary).toHaveAttribute("aria-expanded", "true");
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveCSS("transition-property", "height");
+    await summary.click();
+    await summary.click();
+    await expect(summary).toHaveAttribute("aria-expanded", "true");
+    await summary.click();
+    await expect(panel).toBeHidden();
     await page.emulateMedia({ reducedMotion: "reduce" });
     await summary.focus();
     await page.keyboard.press("Enter");
-    await expect(disclosure).toHaveAttribute("open", "");
-    expect(await disclosure.evaluate((e) => e.getAnimations().length)).toBe(0);
+    await expect(disclosure).toHaveAttribute("data-open", "");
+    expect(await panel.evaluate((e) => e.getAnimations().length)).toBe(0);
     await page.keyboard.press("Space");
-    await expect(disclosure).not.toHaveAttribute("open", "");
+    await expect(disclosure).not.toHaveAttribute("data-open", "");
   }
 });
 
@@ -57,8 +50,8 @@ test.describe("mobile content and navigation QA", () => {
       expect(Math.abs(countBox!.y + countBox!.height / 2 - (arrowBox!.y + arrowBox!.height / 2))).toBeLessThan(2);
 
       const disclosure = page.locator(".memo-disclosure");
-      await disclosure.locator("summary").tap();
-      await expect(disclosure).toHaveAttribute("open", "");
+      await disclosure.locator("[data-slot=collapsible-trigger]").tap();
+      await expect(disclosure).toHaveAttribute("data-open", "");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     },
   );

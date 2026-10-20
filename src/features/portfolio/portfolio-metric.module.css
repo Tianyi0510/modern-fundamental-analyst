@@ -1,0 +1,31 @@
+/* Tablet summary rows keep the value beside its label and explanation. */
+@container (min-width: 40rem) and (max-width: 71.999rem) {
+  .metric {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    column-gap: var(--space-6);
+    row-gap: var(--space-3);
+    align-content: center;
+    min-height: 136px;
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .metric > dt {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .metric > dd:first-of-type {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    margin-top: 0;
+    text-align: right;
+  }
+
+  .metric > dd:last-of-type {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 0;
+  }
+}

@@ -28,7 +28,7 @@
   transition-duration: var(--motion-duration-press);
 }
 .languageTrigger > svg {
-  transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized);
+  transition: transform var(--motion-duration-icon) var(--motion-ease-emphasized);
 }
 .languageTrigger[aria-expanded="true"] > svg {
   transform: rotate(180deg);
@@ -42,7 +42,7 @@
     color var(--motion-duration-base) var(--motion-ease-standard);
 }
 .openButton:hover {
-  background: var(--bright-blue);
+  background: var(--blue-bright);
   color: var(--black);
   transform: scale(var(--motion-scale-hover));
 }
@@ -55,13 +55,13 @@
 .iconButton:focus-visible {
   outline: 2px solid var(--focus-ring-brand);
   outline-offset: 3px;
-  background: var(--bright-blue);
+  background: var(--blue-bright);
   color: var(--black);
   transform: scale(var(--motion-scale-hover));
 }
 .iconButton:active,
 .iconButton[data-touch-pressed="true"] {
-  background: var(--bright-blue);
+  background: var(--blue-bright);
   color: var(--black);
   transform: scale(var(--motion-scale-press));
   transition-duration: var(--motion-duration-press);
@@ -78,13 +78,16 @@
 .returnIcon {
   transform: scale(0.85);
 }
+.languageDisclosure {
+  position: relative;
+}
 .mobileLink,
-.languageDisclosure > summary {
+.languageDisclosure > [data-slot="collapsible-trigger"] {
   transition:
     color var(--motion-duration-fast) var(--motion-ease-standard),
     background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
-.languageDisclosure > summary {
+.languageDisclosure > [data-slot="collapsible-trigger"] {
   min-height: var(--size-touch-target);
   padding: var(--space-3);
   border-radius: var(--radius-control);
@@ -93,33 +96,37 @@
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  list-style: none;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
 }
-.languageDisclosure > summary::-webkit-details-marker {
-  display: none;
-}
-.languageDisclosure > summary > svg {
+
+.languageDisclosure > [data-slot="collapsible-trigger"] > svg {
   width: 18px;
   height: 18px;
-  transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized);
-}
-.languageDisclosure[open]:not([data-closing]) > summary > svg {
   transform: rotate(180deg);
+  transition: transform var(--motion-duration-icon) var(--motion-ease-emphasized);
 }
-.languageDisclosure > summary:hover,
-.languageDisclosure > summary:focus-visible,
-.languageDisclosure > summary:active,
-.languageDisclosure[open]:not([data-closing]) > summary {
+.languageDisclosure[data-open] > [data-slot="collapsible-trigger"] > svg {
+  transform: rotate(0deg);
+}
+.languageDisclosure > [data-slot="collapsible-trigger"]:hover,
+.languageDisclosure > [data-slot="collapsible-trigger"]:focus-visible,
+.languageDisclosure > [data-slot="collapsible-trigger"]:active,
+.languageDisclosure[data-open] > [data-slot="collapsible-trigger"] {
   color: var(--interactive-accent);
 }
-.languageDisclosure > summary:hover,
-.languageDisclosure > summary:focus-visible {
+.languageDisclosure > [data-slot="collapsible-trigger"]:hover,
+.languageDisclosure > [data-slot="collapsible-trigger"]:focus-visible {
   background: var(--sidebar-hover-surface);
 }
-.languageDisclosure > summary:active {
+.languageDisclosure > [data-slot="collapsible-trigger"]:active {
   background: var(--sidebar-pressed-surface);
 }
-.languageDisclosure > summary:focus-visible {
+.languageDisclosure > [data-slot="collapsible-trigger"]:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: calc(var(--focus-ring-width) * -1);
 }
@@ -133,11 +140,11 @@
     transform: none;
   }
   .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
-  .languageDisclosure > summary:hover:not(:active):not(:focus-visible) {
+  .languageDisclosure > [data-slot="collapsible-trigger"]:hover:not(:active):not(:focus-visible) {
     background: transparent;
   }
   .mobileLink:hover:not([aria-current="page"]):not(:active):not(:focus-visible),
-  .languageDisclosure:not([open]) > summary:hover:not(:active):not(:focus-visible) {
+  .languageDisclosure:not([data-open]) > [data-slot="collapsible-trigger"]:hover:not(:active):not(:focus-visible) {
     color: var(--text-primary);
   }
 }
@@ -150,5 +157,30 @@
 @media (forced-colors: active) {
   .touchRing {
     border-color: Highlight;
+  }
+}
+
+.languageDisclosure > [data-slot="collapsible-content"] {
+  height: var(--collapsible-panel-height);
+  position: absolute;
+  bottom: 100%;
+  inset-inline: calc(-1 * var(--space-2));
+  z-index: 2;
+  border-radius: var(--radius-menu) var(--radius-menu) 0 0;
+  background: var(--sidebar-language-surface);
+  overflow: hidden;
+  transition: height var(--motion-duration-base) var(--motion-ease-standard);
+}
+.languageDisclosure > [data-slot="collapsible-content"] > div {
+  padding-top: var(--space-2);
+  padding-inline: var(--space-2);
+}
+.languageDisclosure > [data-slot="collapsible-content"][data-starting-style],
+.languageDisclosure > [data-slot="collapsible-content"][data-ending-style] {
+  height: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .languageDisclosure > [data-slot="collapsible-content"] {
+    transition: none;
   }
 }

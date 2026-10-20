@@ -1,5 +1,8 @@
+import { FinancialValueScroll } from "./financial-value-scroll";
+import styles from "./portfolio-metric.module.css";
+import type { Locale } from "@/lib/i18n";
 import { brandSurface } from "@/components/brand-surface";
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 type MetricTone = "plain" | "highlight" | "brand" | "paper";
 const tones: Record<MetricTone, string> = {
@@ -10,6 +13,7 @@ const tones: Record<MetricTone, string> = {
 };
 
 export function PortfolioMetric({
+  locale,
   label,
   value,
   note,
@@ -17,6 +21,7 @@ export function PortfolioMetric({
   className = "",
   noteClassName = "",
 }: {
+  locale: Locale;
   label: ReactNode;
   value: ReactNode;
   note: ReactNode;
@@ -24,17 +29,24 @@ export function PortfolioMetric({
   className?: string;
   noteClassName?: string;
 }) {
+  const labelId = useId();
   return (
     <div
       data-tone={tone}
-      className={`flex min-h-[200px] min-w-0 flex-col rounded-surface p-[var(--space-6)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] compact:py-[var(--space-5)] ${tones[tone]} ${className}`}
+      className={`${styles.metric} flex min-h-[200px] min-w-0 flex-col rounded-[var(--radius-data)] p-[var(--space-6)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] compact:py-[var(--space-5)] ${tones[tone]} ${className}`}
     >
-      <dt className="text-label">{label}</dt>
-      <dd className="kpi-value mt-[var(--space-4)]">
-        <strong className="block text-data-kpi tabular-nums">{value}</strong>
+      <dt id={labelId} className="text-large-label">
+        {label}
+      </dt>
+      <dd className="kpi-value mt-[var(--space-4)] min-w-0">
+        <FinancialValueScroll labelId={labelId} locale={locale}>
+          <strong className="block w-max min-w-full text-medium-display whitespace-nowrap tabular-nums [--font-size-medium-display:3.1875rem]">
+            {value}
+          </strong>
+        </FinancialValueScroll>
       </dd>
       <dd className="kpi-note mt-[var(--space-3)]">
-        <small className={`block text-caption opacity-[0.8] compact:max-w-[32ch] ${noteClassName}`}>{note}</small>
+        <small className={`block text-small-body opacity-100 compact:max-w-[32ch] ${noteClassName}`}>{note}</small>
       </dd>
     </div>
   );

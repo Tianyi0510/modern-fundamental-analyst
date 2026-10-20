@@ -1,6 +1,7 @@
 import { appearance } from "./memo-detail-page.styles";
 import { createMemoBreadcrumbStructuredData, createMemoStructuredData } from "@/features/memos/memo-pages";
 import { notFound } from "next/navigation";
+import { MemoShare } from "@/features/memos/memo-share";
 import { MemoArticleContent } from "@/features/memos/memo-article-content";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -57,17 +58,20 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
                 <span>
                   {text.memoLabel} {memo.number}
                 </span>
+                <div className="ml-auto flex justify-end compact:ml-0 compact:basis-full compact:justify-start">
+                  <MemoShare locale={locale} />
+                </div>
               </div>
             </header>
           </div>
-          <div className={appearance["shell"]}>
+          <div className={appearance["shell"] + " memo-article-body py-[var(--space-section-padding)]"}>
             <p className={appearance["article-lead"]}>{memo.summary}</p>
             {content.language !== locale ? (
               <p className={appearance["article-notes"] + " memo-language-notice"}>{text.languageNotice}</p>
             ) : null}
-            <MemoArticleContent content={content} />
+            <MemoArticleContent slug={slug} language={content.language} locale={locale} />
             <aside className={appearance["article-disclaimer"]} aria-labelledby="memo-disclaimer-title">
-              <h2 id="memo-disclaimer-title" className="mb-[var(--space-3)] text-title-small">
+              <h2 id="memo-disclaimer-title" className="mb-[var(--space-3)] text-medium-title">
                 {text.disclaimerTitle}
               </h2>
               <p>{memo.scopeNote}</p>

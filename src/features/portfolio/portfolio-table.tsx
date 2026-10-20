@@ -1,9 +1,23 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { appearance } from "./portfolio-table.styles";
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, type Dispatch, type SetStateAction } from "react";
+import {
+  createColumnHelper,
+  createSortedRowModel,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
+  type SortingState,
+} from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { NativeSelect } from "@/components/ui/native-select";
+import { DataTable } from "@/components/ui/data-table";
+import { TableCell, TableFooter, TableHead, TableRow } from "@/components/ui/table";
 import { formatPercent, formatShares, formatUsd } from "@/lib/format";
 import {
   getHoldingCostPerShare,
@@ -14,7 +28,6 @@ import {
 } from "@/features/portfolio/portfolio-calculations";
 
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
-type SortDirection = "asc" | "desc";
 
 type PortfolioTableProps = {
   copy: PortfolioTableCopy;
@@ -24,6 +37,7 @@ type PortfolioTableProps = {
 
 export type PortfolioTableCopy = Record<SortKey, string> & {
   ariaLabel: string;
+  empty: string;
   ascending: string;
   descending: string;
   sortBy: string;
@@ -32,9 +46,66 @@ export type PortfolioTableCopy = Record<SortKey, string> & {
 
 const columns: SortKey[] = ["symbol", "shares", "price", "costBasis", "marketValue", "returnPct", "weight"];
 
-export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) {
-  const [sortKey, setSortKey] = useState<SortKey>("marketValue");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+type HoldingRow = {
+  holding: PortfolioHolding;
+  returnPct: number;
+  costPerShare: number;
+  weight: number;
+};
+const features = tableFeatures({ rowSortingFeature, sortedRowModel: createSortedRowModel() });
+const columnHelper = createColumnHelper<typeof features, HoldingRow>();
+
+const defaultSorting: SortingState = [{ id: "marketValue", desc: true }];
+const ignoreSorting = () => {};
+
+export function PortfolioTable(props: PortfolioTableProps) {
+  return (
+    <Suspense
+      fallback={
+        <fieldset disabled className="contents">
+          <PortfolioTableView {...props} sorting={defaultSorting} setSorting={ignoreSorting} />
+        </fieldset>
+      }
+    >
+      <UrlPortfolioTable {...props} />
+    </Suspense>
+  );
+}
+
+function readSorting(params: Pick<URLSearchParams, "get"> | null): SortingState {
+  const key = params?.get("sort");
+  const direction = params?.get("direction");
+  return columns.includes(key as SortKey) && (direction === "asc" || direction === "desc")
+    ? [{ id: key!, desc: direction === "desc" }]
+    : defaultSorting;
+}
+
+function UrlPortfolioTable(props: PortfolioTableProps) {
+  const params = useSearchParams();
+  const sorting = readSorting(params);
+  const setSorting = useCallback<Dispatch<SetStateAction<SortingState>>>((update) => {
+    const url = new URL(window.location.href);
+    // Read the current URL at activation, including consecutive inputs before React rerenders.
+    const next = typeof update === "function" ? update(readSorting(url.searchParams)) : update;
+    url.searchParams.set("sort", next[0]!.id);
+    url.searchParams.set("direction", next[0]!.desc ? "desc" : "asc");
+    if (url.href !== window.location.href) window.history.pushState(null, "", url);
+  }, []);
+  return <PortfolioTableView {...props} sorting={sorting} setSorting={setSorting} />;
+}
+
+function PortfolioTableView({
+  copy,
+  holdings,
+  income,
+  sorting,
+  setSorting,
+}: PortfolioTableProps & {
+  sorting: SortingState;
+  setSorting: Dispatch<SetStateAction<SortingState>>;
+}) {
+  const sortKey = sorting[0]!.id as SortKey;
+  const sortDirection = sorting[0]!.desc ? "desc" : "asc";
   const totals = useMemo(() => getPortfolioTotals(holdings, income), [holdings, income]);
   const rows = useMemo(
     () =>
@@ -47,38 +118,74 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
     [holdings, totals.marketValue],
   );
 
-  const sortedRows = useMemo(() => {
-    const getSortValue = (row: (typeof rows)[number]) => {
-      if (sortKey === "weight") return row.weight;
-      if (sortKey === "returnPct") return row.returnPct;
-      if (sortKey === "costBasis") return row.costPerShare;
-      return row.holding[sortKey];
-    };
-
-    return rows.toSorted((a, b) => {
-      const first = getSortValue(a);
-      const second = getSortValue(b);
-      const comparison = typeof first === "string" ? first.localeCompare(String(second)) : first - Number(second);
-      return sortDirection === "asc" ? comparison : -comparison;
-    });
-  }, [rows, sortDirection, sortKey]);
-
   const changeSort = (nextKey: SortKey) => {
-    if (nextKey === sortKey) {
-      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
-      return;
-    }
-
-    setSortKey(nextKey);
-    setSortDirection(nextKey === "symbol" ? "asc" : "desc");
+    setSorting((previous) => [
+      { id: nextKey, desc: nextKey === previous[0]!.id ? !previous[0]!.desc : nextKey !== "symbol" },
+    ]);
   };
+  const tableColumns = useMemo(
+    () =>
+      columnHelper.columns(
+        columns.map((column) =>
+          columnHelper.accessor(
+            (row) => {
+              if (column === "weight") return row.weight;
+              if (column === "returnPct") return row.returnPct;
+              if (column === "costBasis") return row.costPerShare;
+              return row.holding[column];
+            },
+            {
+              id: column,
+              header: () => {
+                const active = sortKey === column;
+                const Icon = !active ? ArrowUpDown : sortDirection === "asc" ? ArrowUp : ArrowDown;
+                return (
+                  <>
+                    <span className={appearance["portfolio-column-label"]}>{copy[column]}</span>
+                    <Button
+                      variant="quiet"
+                      size="text"
+                      className={`min-h-0 justify-start rounded-none px-0 ${appearance["sort-button"]} ${column !== "symbol" ? appearance.sortAlignment : ""} ${active ? appearance["is-active"] : ""}`}
+                      type="button"
+                      onClick={() =>
+                        setSorting((previous) => [
+                          { id: column, desc: column === previous[0]!.id ? !previous[0]!.desc : column !== "symbol" },
+                        ])
+                      }
+                      aria-label={`${copy.sortBy} ${copy[column]}`}
+                    >
+                      {copy[column]} <Icon aria-hidden="true" />
+                    </Button>
+                  </>
+                );
+              },
+              sortFn: (a, b) => {
+                const first = a.getValue<string | number>(column);
+                const second = b.getValue<string | number>(column);
+                return typeof first === "string" ? first.localeCompare(String(second)) : first - Number(second);
+              },
+            },
+          ),
+        ),
+      ),
+    [copy, sortKey, sortDirection, setSorting],
+  );
+  const table = useTable({
+    features,
+    columns: tableColumns,
+    data: rows,
+    state: { sorting },
+    enableSortingRemoval: false,
+    enableMultiSort: false,
+    getRowId: (row) => row.holding.symbol,
+  });
 
   return (
     <>
       <div className={appearance["portfolio-mobile-sort"]}>
         <label className={appearance.mobileLabel}>
           <span className={appearance.mobileHeading}>{copy.sortBy}</span>
-          <select
+          <NativeSelect
             className={appearance.mobileSelect}
             value={sortKey}
             onChange={(event) => changeSort(event.target.value as SortKey)}
@@ -88,12 +195,14 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
                 {copy[column]}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </label>
-        <button
+        <Button
+          variant="quiet"
+          size="text"
           className={appearance.mobileDirection}
           type="button"
-          onClick={() => setSortDirection((current) => (current === "asc" ? "desc" : "asc"))}
+          onClick={() => setSorting((previous) => [{ ...previous[0]!, desc: !previous[0]!.desc }])}
           aria-label={`${copy.sortBy}: ${sortDirection === "asc" ? copy.ascending : copy.descending}`}
         >
           <span>{sortDirection === "asc" ? copy.ascending : copy.descending}</span>
@@ -102,73 +211,72 @@ export function PortfolioTable({ copy, holdings, income }: PortfolioTableProps) 
           ) : (
             <ArrowDown className={appearance.mobileArrow} aria-hidden="true" />
           )}
-        </button>
+        </Button>
       </div>
-      <table className={appearance["portfolio-table"]} aria-label={copy.ariaLabel}>
-        <thead>
-          <tr className={appearance["table-head"]}>
-            {columns.map((column) => {
-              const isActive = sortKey === column;
-              const ariaSort = isActive ? (sortDirection === "asc" ? "ascending" : "descending") : "none";
-              const Icon = !isActive ? ArrowUpDown : sortDirection === "asc" ? ArrowUp : ArrowDown;
-
-              return (
-                <th scope="col" aria-sort={ariaSort} key={column}>
-                  <span className={appearance["portfolio-column-label"]}>{copy[column]}</span>
-                  <button
-                    className={`${appearance["sort-button"]} ${column !== "symbol" ? appearance.sortAlignment : ""} ${isActive ? appearance["is-active"] : ""}`}
-                    type="button"
-                    onClick={() => changeSort(column)}
-                    aria-label={`${copy.sortBy} ${copy[column]}`}
-                  >
-                    {copy[column]} <Icon aria-hidden="true" />
-                  </button>
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedRows.map(({ holding, costPerShare, returnPct, weight }) => (
-            <tr className={appearance["portfolio-row"]} key={holding.symbol}>
-              <th scope="row" data-label={copy.symbol}>
-                {holding.symbol}
-              </th>
-              <td data-label={copy.shares}>{formatShares(holding.shares)}</td>
-              <td data-label={copy.price}>{formatUsd(holding.price)}</td>
-              <td data-label={copy.costBasis}>{formatUsd(costPerShare)}</td>
-              <td data-label={copy.marketValue}>{formatUsd(holding.marketValue)}</td>
-              <td
-                data-label={copy.returnPct}
-                className={`data-value ${returnPct < 0 ? appearance["negative"] : appearance["positive"]}`}
-              >
-                {formatPercent(returnPct, 1)}
-              </td>
-              <td data-label={copy.weight}>{weight.toFixed(1)}%</td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className={appearance["portfolio-total-row"]}>
-            <th scope="row" data-label={copy.symbol}>
-              {copy.total}
-            </th>
-            <td />
-            <td />
-            <td />
-            <td className={appearance["portfolio-total-market"]} data-label={copy.marketValue}>
-              {formatUsd(totals.marketValue)}
-            </td>
-            <td
+      <DataTable
+        table={table}
+        className={appearance["portfolio-table"]}
+        aria-label={copy.ariaLabel}
+        emptyMessage={copy.empty}
+        headerRowClassName={appearance["table-head"]}
+        headerProps={(header) => ({
+          className: "text-inherit",
+          "aria-sort": sortKey === header.column.id ? (sortDirection === "asc" ? "ascending" : "descending") : "none",
+        })}
+        renderRow={({ original: { holding, costPerShare, returnPct, weight } }) => (
+          <TableRow className={`${appearance["portfolio-row"]} border-b-0`} key={holding.symbol}>
+            <TableHead className="h-auto whitespace-normal text-inherit" scope="row" data-label={copy.symbol}>
+              {holding.symbol}
+            </TableHead>
+            <TableCell className="whitespace-normal" data-label={copy.shares}>
+              {formatShares(holding.shares)}
+            </TableCell>
+            <TableCell className="whitespace-normal" data-label={copy.price}>
+              {formatUsd(holding.price)}
+            </TableCell>
+            <TableCell className="whitespace-normal" data-label={copy.costBasis}>
+              {formatUsd(costPerShare)}
+            </TableCell>
+            <TableCell className="whitespace-normal" data-label={copy.marketValue}>
+              {formatUsd(holding.marketValue)}
+            </TableCell>
+            <TableCell
               data-label={copy.returnPct}
-              className={`${appearance["portfolio-total-return"]} data-value ${totals.totalReturn < 0 ? appearance["negative"] : appearance["positive"]}`}
+              className={`data-value whitespace-normal ${returnPct < 0 ? appearance["negative"] : appearance["positive"]}`}
             >
-              {formatPercent(totals.totalReturn)}
-            </td>
-            <td />
-          </tr>
-        </tfoot>
-      </table>
+              {formatPercent(returnPct, 1)}
+            </TableCell>
+            <TableCell className="whitespace-normal" data-label={copy.weight}>
+              {weight.toFixed(1)}%
+            </TableCell>
+          </TableRow>
+        )}
+        footer={
+          <TableFooter className="border-0 bg-transparent">
+            <TableRow className={`${appearance["portfolio-total-row"]} border-b-0 hover:bg-transparent`}>
+              <TableHead className="h-auto whitespace-normal text-inherit" scope="row" data-label={copy.symbol}>
+                {copy.total}
+              </TableHead>
+              <TableCell />
+              <TableCell />
+              <TableCell />
+              <TableCell
+                className={`${appearance["portfolio-total-market"]} whitespace-normal`}
+                data-label={copy.marketValue}
+              >
+                {formatUsd(totals.marketValue)}
+              </TableCell>
+              <TableCell
+                data-label={copy.returnPct}
+                className={`whitespace-normal ${appearance["portfolio-total-return"]} data-value ${totals.totalReturn < 0 ? appearance["negative"] : appearance["positive"]}`}
+              >
+                {formatPercent(totals.totalReturn)}
+              </TableCell>
+              <TableCell />
+            </TableRow>
+          </TableFooter>
+        }
+      />
     </>
   );
 }

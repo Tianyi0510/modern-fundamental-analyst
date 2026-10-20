@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
@@ -79,5 +79,36 @@ for (const { name, form, endpoint } of cases) {
     expect(keys).toHaveLength(2);
     expect(keys[0]).toBeTruthy();
     expect(keys[1]).toBe(keys[0]);
+  });
+}
+
+for (const variant of ["standard", "inverse"] as const) {
+  it(`${variant} subscription retains its action label and announces pending status`, async () => {
+    const pending = Promise.withResolvers<void>();
+    let calls = 0;
+    server.use(
+      http.post("http://localhost:3210/api/subscribe", async () => {
+        calls++;
+        await pending.promise;
+        return HttpResponse.json({ ok: true });
+      }),
+    );
+    render(<SubscribeForm locale="en" variant={variant} />);
+    const user = userEvent.setup();
+    await user.type(screen.getByRole("textbox", { name: "Email Address" }), "reader@example.com");
+    const button = screen.getByRole("button", { name: "Subscribe" });
+    try {
+      await user.click(button);
+      expect(button).toHaveAccessibleName("Subscribe");
+      expect(button).toBeDisabled();
+      expect(within(button).queryByRole("status", { hidden: true })).toHaveAttribute("aria-hidden", "true");
+      expect(screen.getByRole("status")).toHaveTextContent("Subscribing…");
+      await user.click(button);
+      expect(calls).toBe(1);
+    } finally {
+      pending.resolve();
+    }
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(within(button).queryByRole("status", { hidden: true })).not.toBeInTheDocument();
   });
 }

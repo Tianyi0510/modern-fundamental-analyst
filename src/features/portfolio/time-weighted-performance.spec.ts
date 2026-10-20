@@ -1,3 +1,7 @@
+import {
+  showInteractivePerformanceChart,
+  showLatestPerformanceTooltip,
+} from "../../../scripts/performance-chart-helpers";
 import { expect, test } from "@playwright/test";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
@@ -9,7 +13,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       prefix === "/zh-tw" ? "負債餘額" : prefix === "/zh-cn" ? "负债余额" : "liability balances",
     );
     await expect(page.locator("main figure")).toHaveCount(2);
-    await expect(page.locator('main svg[role="img"]')).toHaveCount(2);
+    await expect(page.locator('main svg[role="application"]')).toHaveCount(2);
+    for (const figure of await page.locator("main figure").all()) await showInteractivePerformanceChart(figure);
     const xirr = page.locator('figure[aria-labelledby="performance-chart-title"]');
     await expect(xirr.getByRole("heading")).toHaveText(prefix ? "年化 XIRR" : "Annualized XIRR");
     await expect(
@@ -18,12 +23,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         exact: true,
       }),
     ).toBeVisible();
-    await expect(xirr.getByRole("img")).toHaveAccessibleName(/24\.43%.*19\.26%/);
-    await expect(xirr.locator("polyline")).toHaveCount(2);
-    for (const line of await xirr.locator("polyline").all()) {
-      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(21);
+    await expect(await showLatestPerformanceTooltip(xirr)).toContainText("24.43%");
+    await expect(await showLatestPerformanceTooltip(xirr)).toContainText("19.26%");
+    await expect(xirr.locator(".recharts-line-curve")).toHaveCount(2);
+    for (const line of await xirr.locator(".recharts-line-curve").all()) {
+      expect((await line.getAttribute("d"))!.match(/[-\d.]+,[-\d.]+/g)).toHaveLength(21);
     }
-    await xirr.locator("summary").click();
+    await xirr.locator("[data-slot=collapsible-trigger]").click();
     await expect(xirr.getByRole("table")).toBeVisible();
     await expect(xirr.locator("tbody tr")).toHaveCount(22);
     await expect(xirr.locator("tbody tr").first()).toContainText("+24.43%");
@@ -36,9 +42,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.getByRole("heading")).toHaveText(
       prefix === "/zh-tw" ? "累積重建 TWRR" : prefix === "/zh-cn" ? "累计重建 TWRR" : "Cumulative Reconstructed TWRR",
     );
-    await expect(chart.getByRole("img")).toHaveAccessibleName(/38\.27%.*32\.20%/);
-    await expect(chart.locator("polyline")).toHaveCount(2);
-    const summaryButton = chart.locator("summary");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("38.27%");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("32.20%");
+    await expect(chart.locator(".recharts-line-curve")).toHaveCount(2);
+    const summaryButton = chart.locator("[data-slot=collapsible-trigger]");
     await summaryButton.focus();
     await page.keyboard.press("Enter");
     await expect(chart.getByRole("table")).toBeVisible();
@@ -55,8 +62,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       });
       await page.evaluate(() => document.fonts.ready);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-      await expect(chart.getByRole("img")).toBeVisible();
-      await expect(xirr.getByRole("img")).toBeVisible();
+      await expect(chart.getByRole("application")).toBeVisible();
+      await expect(xirr.getByRole("application")).toBeVisible();
     }
   });
 }

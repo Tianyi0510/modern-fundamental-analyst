@@ -1,5 +1,7 @@
 # Design QA
 
+> Historical audit only. Superseded by [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md); its former presets are not current implementation requirements.
+
 Date: 2026-10-17. Scope: implement the first selected typography direction as a visible composition redesign, using complete Geist presets with Jost and the existing brand colors, except for the preserved original Logo wordmark. Workspace verification only.
 
 ## Target and Evidence

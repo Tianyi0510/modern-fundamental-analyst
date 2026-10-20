@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("narrow English heroes keep ordinary words intact", { tag: "@mobile" }, async ({ page }) => {
+test("narrow English heroes keep fitting words intact without overflow", { tag: "@mobile" }, async ({ page }) => {
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
     for (const path of ["/contact", "/memos"]) {
@@ -9,7 +9,7 @@ test("narrow English heroes keep ordinary words intact", { tag: "@mobile" }, asy
       await page.evaluate(() => document.fonts.ready);
       const words = await page.locator("h1").evaluate((heading) => {
         const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
-        const words: { text: string; lines: number }[] = [];
+        const words: { text: string; lines: number; fits: boolean }[] = [];
         while (walker.nextNode()) {
           const node = walker.currentNode;
           for (const match of node.textContent!.matchAll(/\S+/g)) {
@@ -17,13 +17,28 @@ test("narrow English heroes keep ordinary words intact", { tag: "@mobile" }, asy
             range.setStart(node, match.index);
             range.setEnd(node, match.index + match[0].length);
             const lines = new Set([...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => rect.y));
-            words.push({ text: match[0], lines: lines.size });
+            const measure = document.createElement("span");
+            measure.textContent = match[0];
+            measure.style.cssText = "position:fixed;visibility:hidden;white-space:nowrap";
+            const style = getComputedStyle(node.parentElement!);
+            measure.style.fontFamily = style.fontFamily;
+            measure.style.fontSize = style.fontSize;
+            measure.style.fontWeight = style.fontWeight;
+            measure.style.fontStyle = style.fontStyle;
+            measure.style.letterSpacing = style.letterSpacing;
+            document.body.append(measure);
+            const fits = measure.getBoundingClientRect().width <= heading.getBoundingClientRect().width;
+            measure.remove();
+            words.push({ text: match[0], lines: lines.size, fits });
           }
         }
         return words;
       });
       expect(words.length).toBeGreaterThan(0);
-      for (const word of words) expect(word.lines, `${path} ${word.text} at ${width}px`).toBe(1);
+      for (const word of words) {
+        if (word.fits) expect(word.lines, `${path} ${word.text} at ${width}px`).toBe(1);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.addStyleTag({ content: "html { font-size: 200%; }" });
       const overflow = await page.locator("body").evaluate((body) =>
         [...body.querySelectorAll("*")]

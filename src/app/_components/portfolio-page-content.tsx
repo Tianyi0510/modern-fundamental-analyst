@@ -79,6 +79,7 @@ const copy = {
 const tableCopy = {
   en: {
     ariaLabel: "Portfolio holdings",
+    empty: "No holdings to display.",
     symbol: "Position",
     shares: "Shares",
     costBasis: "Cost Basis",
@@ -93,6 +94,7 @@ const tableCopy = {
   },
   "zh-tw": {
     ariaLabel: "投資組合持股",
+    empty: "目前沒有可顯示的持股。",
     symbol: "部位",
     shares: "股數",
     costBasis: "成本基礎",
@@ -107,6 +109,7 @@ const tableCopy = {
   },
   "zh-cn": {
     ariaLabel: "投资组合持仓",
+    empty: "目前没有可显示的持仓。",
     symbol: "持仓",
     shares: "股数",
     costBasis: "成本基础",
@@ -147,18 +150,21 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
         >
           <dl className={appearance["portfolio-kpis"]} aria-label={text.summaryLabel}>
             <PortfolioMetric
+              locale={locale}
               tone="plain"
               label={<>{text.marketValue}</>}
               value={<>{formatUsd(portfolioSnapshot.marketValue)}</>}
               note={<>{text.currency}</>}
             />
             <PortfolioMetric
+              locale={locale}
               tone="brand"
               label={<>{text.totalReturn}</>}
               value={<>{formatPercent(portfolioSnapshot.totalReturn)}</>}
               note={<>{text.returnSummaryNote}</>}
             />
             <PortfolioMetric
+              locale={locale}
               tone="paper"
               label={<>{text.holdings}</>}
               value={<>{portfolioSnapshot.holdingsCount}</>}

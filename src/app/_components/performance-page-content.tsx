@@ -190,6 +190,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
         >
           <dl className={appearance["performance-summary"]}>
             <PortfolioMetric
+              locale={locale}
               tone="highlight"
               className=""
               label={<>{text.timeWeightedReturn}</>}
@@ -197,6 +198,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
               note={<>{text.twrNote}</>}
             />
             <PortfolioMetric
+              locale={locale}
               tone="brand"
               className=""
               label={<>{text.portfolioXirr}</>}
@@ -204,6 +206,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
               note={<>{text.portfolioNote}</>}
             />
             <PortfolioMetric
+              locale={locale}
               tone="paper"
               className=""
               label={<>{portfolioSnapshot.benchmark} XIRR</>}
@@ -226,7 +229,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <div className={appearance["methodology-content"]}>
               <div className={appearance["methodology-explanation"]}>{text.methodologyCopy}</div>
               <aside className={appearance["methodology-source"]}>
-                <h3 className="mb-[var(--space-3)] text-title-small">{text.dataSources}</h3>
+                <h3 className="mb-[var(--space-3)] text-medium-title">{text.dataSources}</h3>
                 {text.snapshotCopy(asOf)}
               </aside>
             </div>

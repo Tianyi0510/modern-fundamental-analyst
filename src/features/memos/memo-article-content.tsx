@@ -1,41 +1,23 @@
 import { appearance } from "./memo-article-content.styles";
-import type { MemoContent } from "@/features/memos/memo-content";
+import { MemoTableOfContents } from "./memo-table-of-contents";
+import MicrosoftArticle, { memoTableOfContents } from "./articles/microsoft-stock-analysis-fiscal-year-2024.mdx";
+import { memoMdxComponents } from "./memo-mdx-components";
+import type { Locale } from "@/lib/i18n";
 
-export function MemoArticleContent({ content }: { content: MemoContent }) {
+const articles = {
+  "microsoft-stock-analysis-fiscal-year-2024": { Article: MicrosoftArticle, toc: memoTableOfContents },
+};
+
+export function MemoArticleContent({ slug, language, locale }: { slug: string; language: Locale; locale: Locale }) {
+  const entry = articles[slug as keyof typeof articles];
+  if (!entry) return null;
+  const { Article, toc } = entry;
   return (
-    <div className={appearance["article-body"]} lang={content.language}>
-      {content.sections.map((section) => (
-        <section className={appearance["memo-section"]} key={section.title}>
-          <h2>{section.title}</h2>
-          {section.introduction?.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          {section.subsections.map((subsection) => (
-            <section className={appearance["memo-subsection"]} key={subsection.title}>
-              <h3>{subsection.title}</h3>
-              {subsection.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </section>
-          ))}
-        </section>
-      ))}
-      <section className={appearance["memo-references"]}>
-        <h2>{content.referencesTitle}</h2>
-        <ol>
-          {content.references.map((reference) => (
-            <li key={reference.citation}>
-              {reference.citation}{" "}
-              <a
-                className="underline underline-offset-[3px] focus-visible:outline-2 focus-visible:outline-offset-4"
-                href={reference.href}
-              >
-                {reference.linkLabel ?? "Read source"}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
-    </div>
+    <>
+      <MemoTableOfContents entries={toc} locale={locale} language={language} />
+      <div className={appearance["article-body"]} lang={language}>
+        <Article components={memoMdxComponents} />
+      </div>
+    </>
   );
 }

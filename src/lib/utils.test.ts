@@ -3,23 +3,23 @@ import { cn } from "./utils";
 
 describe("semantic typography class composition", () => {
   it("keeps type treatments separate from text colors and alignment", () => {
-    expect(cn("text-control text-white", "text-center text-brand").split(" ").sort()).toEqual([
+    expect(cn("text-white text-medium-label", "text-center text-brand").split(" ").sort()).toEqual([
       "text-brand",
       "text-center",
-      "text-control",
+      "text-medium-label",
     ]);
-    expect(cn("text-caption text-[var(--text-secondary)]")).toBe("text-caption text-[var(--text-secondary)]");
+    expect(cn("text-small-body text-[var(--text-secondary)]")).toBe("text-small-body text-[var(--text-secondary)]");
   });
 
   it("replaces a type treatment without removing its color or responsive variant", () => {
-    expect(cn("text-display text-brand compact:text-title", "text-headline")).toBe(
-      "text-brand compact:text-title text-headline",
+    expect(cn("text-large-headline text-brand compact:text-medium-title", "text-small-headline")).toBe(
+      "text-brand compact:text-medium-title text-small-headline",
     );
-    expect(cn("text-[length:var(--font-size-body)]", "text-body-large")).toBe("text-body-large");
-    expect(cn("text-body text-brand", "text-body-strong")).toBe("text-brand text-body-strong");
-    expect(cn("text-body-large text-ink", "text-body-large-strong")).toBe("text-ink text-body-large-strong");
-    expect(cn("text-display text-brand", "text-hero")).toBe("text-brand text-hero");
-    expect(cn("text-lead text-ink", "text-hero-copy")).toBe("text-ink text-hero-copy");
-    expect(cn("text-title text-ink", "text-editorial-title")).toBe("text-ink text-editorial-title");
+    expect(cn("text-[length:var(--font-size-small-body)]", "text-medium-body")).toBe("text-medium-body");
+    expect(cn("text-small-body text-brand", "font-bold")).toBe("text-small-body text-brand font-bold");
+    expect(cn("text-medium-body text-ink", "font-bold")).toBe("text-medium-body text-ink font-bold");
+    expect(cn("text-large-headline text-brand", "text-large-display")).toBe("text-brand text-large-display");
+    expect(cn("text-large-body text-ink", "text-large-body")).toBe("text-ink text-large-body");
+    expect(cn("text-medium-title text-ink", "text-large-title")).toBe("text-ink text-large-title");
   });
 });

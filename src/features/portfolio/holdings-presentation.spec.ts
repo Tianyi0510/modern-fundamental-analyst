@@ -8,21 +8,21 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}/portfolio`);
       const section = page.locator(".portfolio-holdings-section");
-      await expect(section).toHaveCSS("padding-top", "48px");
-      await expect(section).toHaveCSS("padding-bottom", "48px");
+      await expect(section).toHaveCSS("padding-top", "96px");
+      await expect(section).toHaveCSS("padding-bottom", "96px");
       const gaps = await section.evaluate((element) => {
         const bounds = element.getBoundingClientRect();
         const heading = element.querySelector(".portfolio-holdings-heading")!.getBoundingClientRect();
         const note = element.querySelector(".portfolio-return-note p")!.getBoundingClientRect();
         return { top: heading.top - bounds.top, bottom: bounds.bottom - note.bottom };
       });
-      expect(gaps.top).toBeCloseTo(48, 0);
-      expect(gaps.bottom).toBeCloseTo(48, 0);
+      expect(gaps.top).toBeCloseTo(96, 0);
+      expect(gaps.bottom).toBeCloseTo(96, 0);
       const symbol = page.locator("tbody th[scope=row]").first();
       const value = page.locator("tbody td").first();
       await expect(symbol).toHaveCSS("font-size", "16px");
-      await expect(symbol).toHaveCSS("line-height", "20px");
-      await expect(symbol).toHaveCSS("font-weight", "500");
+      await expect(symbol).toHaveCSS("line-height", "24px");
+      await expect(symbol).toHaveCSS("font-weight", "700");
       await expect(value).toHaveCSS("font-size", "16px");
       await expect(value).toHaveCSS("line-height", "24px");
       const column = page.locator("thead th").first();

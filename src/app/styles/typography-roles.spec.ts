@@ -1,130 +1,79 @@
 import { expect, test, type Page } from "@playwright/test";
 import { colorContrast } from "../../../scripts/color-contrast";
 
-type Role = keyof typeof roleScale;
-
-// Expected Geist treatments are independent of the CSS token implementation.
-const roleScale = {
-  heroTitle: 72,
-  heroCopy: 24,
-  editorialTitle: 32,
-  pageTitle: 64,
-  sectionTitle: 48,
-  cardTitle: 24,
-  compactTitle: 20,
-  lead: 20,
-  bodyLarge: 18,
-  body: 16,
-  label: 16,
-  control: 16,
-  caption: 16,
-  dataDisplay: 40,
-  dataKpi: 40,
-  dataRing: 40,
-  dataRow: 20,
+// Independent expectations from the approved Perfect Fourth specification.
+const treatments = {
+  largeDisplay: [51, 67, 90, 1.15, 700],
+  mediumDisplay: [51, 51, 67, 1.15, 700],
+  summaryDisplay: [51, 51, 51, 1.15, 700],
+  smallDisplay: [38, 38, 38, 1.15, 700],
+  largeHeadline: [38, 51, 67, 1.15, 700],
+  mediumHeadline: [38, 51, 51, 1.15, 700],
+  smallHeadline: [28, 38, 38, 1.15, 700],
+  largeTitle: [28, 28, 28, 1.15, 700],
+  mediumTitle: [21, 21, 21, 1.15, 700],
+  largeLabel: [16, 16, 16, 1.5, 700],
+  mediumLabel: [16, 16, 16, 1.5, 400],
+  largeBody: [21, 21, 21, 1.5, 400],
+  mediumBody: [16, 16, 16, 1.5, 400],
+  smallBody: [16, 16, 16, 1.5, 400],
 } as const;
-
+type Role = keyof typeof treatments;
 const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   "/": {
-    heroTitle: [".hero h1"],
-    sectionTitle: [".home-about h2", ".intro h2", ".section-heading h2", ".cta h2"],
-    editorialTitle: [".memo-card h3"],
-    cardTitle: [".footer-heading"],
-    compactTitle: [".holding-row strong"],
-    heroCopy: [".hero-bottom > p"],
-    lead: [".home-about > div:last-child p", ".performance-copy p"],
-    body: [".memo-card p", ".holding-row small"],
-    label: [".eyebrow", ".section-number", ".metric > dt", ".memo-card > div"],
-    control: [".header-actions nav a", ".button", ".text-link"],
-    caption: [".metric small", ".memo-card > small", ".footer-bottom small"],
-    dataDisplay: [".performance-copy > strong"],
-    dataKpi: [".metric strong"],
-    dataRing: [".allocation-ring > span"],
-    dataRow: [".holding-row b"],
+    largeDisplay: [".hero h1", ".performance-value strong"],
+    summaryDisplay: [".metric strong"],
+    smallDisplay: [".allocation-ring > span"],
+    largeHeadline: [".home-about h2", ".intro h2", ".section-heading h2", ".cta h2"],
+    largeTitle: [".memo-card h3"],
+    mediumTitle: [".footer-heading", ".holding-row strong", ".holding-row b"],
+    largeBody: [".hero-bottom > p", ".home-about > div:last-child p", ".performance-copy p"],
+    smallBody: [".memo-card [data-slot=card-description]", ".metric small", ".footer-bottom small"],
+    largeLabel: [".eyebrow", ".metric > dt", ".hero-actions .button", ".text-link"],
+    mediumLabel: [".header-actions nav a"],
   },
   "/about": {
-    pageTitle: [".page-hero h1"],
-    sectionTitle: [".about-section-heading h2", ".about-closing h2"],
-    compactTitle: [".about-boundaries h2"],
-    cardTitle: [".footer-heading"],
-    lead: [".page-intro p"],
-    bodyLarge: [".about-copy", ".about-boundaries ol", ".about-closing > div"],
-    label: [".eyebrow", ".about-section-label"],
-    caption: [".page-intro small", ".footer-bottom small"],
+    largeDisplay: [".page-hero h1"],
+    smallHeadline: [".about-section-heading h2", ".about-closing h2"],
+    mediumTitle: [".about-boundaries h2"],
+    mediumBody: [".about-copy", ".about-boundaries ol"],
   },
   "/portfolio": {
-    pageTitle: [".page-hero h1"],
-    sectionTitle: [".portfolio-holdings-heading h2"],
-    lead: [".page-intro p"],
-    label: [
-      ".eyebrow",
-      ".portfolio-kpis dt",
-      ".portfolio-holdings-heading > div > span",
-      ".portfolio-mobile-sort label > span",
-      ".portfolio-row > th",
-      ".portfolio-total-row > td",
-    ],
-    control: [".portfolio-mobile-sort button"],
-    caption: [".page-intro small", ".portfolio-kpis small"],
-    dataKpi: [".portfolio-kpis strong"],
-    body: ["tbody .portfolio-row > td"],
+    largeDisplay: [".page-hero h1"],
+    smallHeadline: [".portfolio-holdings-heading h2"],
+    summaryDisplay: [".portfolio-kpis strong"],
+    smallBody: ["tbody .portfolio-row > td"],
+    largeLabel: [".portfolio-row > th", ".portfolio-total-row > td"],
   },
   "/performance": {
-    pageTitle: [".page-hero h1"],
-    sectionTitle: [".returns .section-heading h2", ".methodology h2"],
-    cardTitle: ["#performance-twr-chart-title", "#performance-chart-title"],
-    lead: [".page-intro p"],
-    bodyLarge: [".methodology-content"],
-    label: [".eyebrow", ".performance-summary dt", ".returns .section-number"],
-    caption: [".page-intro small", ".performance-summary small"],
-    dataKpi: [".performance-summary strong"],
+    largeDisplay: [".page-hero h1"],
+    smallHeadline: [".returns .section-heading h2", ".methodology h2"],
+    summaryDisplay: [".performance-summary strong"],
+    mediumTitle: ["#performance-twr-chart-title", "#performance-chart-title"],
   },
-  "/memos": {
-    pageTitle: [".page-hero h1"],
-    editorialTitle: [".memo-card h2", ".memo-index-row h2"],
-    compactTitle: [".memo-disclosure > summary"],
-    lead: [".page-intro p"],
-    body: [".memo-card p", ".memo-index-row p"],
-    label: [".eyebrow", ".memo-card > div"],
-    caption: [".page-intro small", ".memo-meta"],
-  },
+  "/memos": { largeDisplay: [".page-hero h1"], largeTitle: [".memo-card h2", ".memo-index-row h2"] },
   "/contact": {
-    pageTitle: [".page-hero h1"],
-    editorialTitle: ["#contact-subscribe-title", "#contact-form-title"],
-    lead: [".contact-note"],
-    body: ["#contact-subscribe > header > p", ".contact-headingIntro"],
-    label: [".eyebrow"],
-    control: ["form .button"],
+    largeDisplay: [".page-hero h1"],
+    largeTitle: ["#contact-subscribe-title", "#contact-form-title"],
+    largeLabel: ["form .button"],
   },
   "/support": {
-    pageTitle: [".page-hero h1"],
-    sectionTitle: [".support-section h2"],
-    lead: [".page-intro p"],
-    bodyLarge: [".support-copy p", ".support-note"],
-    label: [".eyebrow", ".support-form legend", ".support-amount-option > span"],
-    control: [".support-submit"],
-    dataKpi: [".support-amount-option strong"],
+    largeDisplay: [".page-hero h1"],
+    largeTitle: [".support-section h2"],
+    mediumDisplay: [".support-amount-option strong"],
   },
   "/disclaimer": {
-    pageTitle: [".legal h1"],
-    sectionTitle: [".legal-section h2"],
-    lead: [".legal-subtitle"],
-    bodyLarge: [".legal-section-copy p"],
-    label: [".eyebrow", ".legal-section-label"],
+    largeDisplay: [".legal h1"],
+    smallHeadline: [".legal-section h2"],
+    mediumBody: [".legal-section-copy p"],
   },
-  "/subscription-preferences": {
-    pageTitle: ["main h1"],
-    lead: [".page-intro p"],
-    label: [".eyebrow"],
-  },
+  "/subscription-preferences": { largeDisplay: ["main h1"] },
+  "/subscription-confirmation": { largeDisplay: ["main h1"] },
   "/memos/microsoft-stock-analysis-fiscal-year-2024": {
-    pageTitle: [".memo-article h1"],
-    editorialTitle: [".article-body h2"],
-    compactTitle: [".memo-subsection h3"],
-    heroCopy: [".article-lead"],
-    bodyLarge: [".article-body"],
-    label: [".memo-article .eyebrow"],
-    caption: [".article-meta"],
+    largeDisplay: [".memo-article h1"],
+    smallHeadline: [".article-body h2"],
+    mediumTitle: [".memo-subsection h3"],
+    mediumBody: [".article-body"],
   },
 };
 
@@ -171,12 +120,12 @@ for (const viewport of [viewports[0], viewports[2]]) {
       await expect(page.locator(".about-boundaries > section").first()).toHaveCSS("color", "rgb(255, 255, 255)");
       await expect(page.locator(".about-boundaries > section").last()).toHaveCSS(
         "background-color",
-        "rgb(95, 205, 253)",
+        "rgb(125, 203, 250)",
       );
       await expect(page.locator(".about-boundaries > section").last()).toHaveCSS("color", "rgb(0, 0, 0)");
 
       await page.goto("/contact");
-      await expect(page.locator(".contact-band")).toHaveCSS("background-color", "rgb(95, 205, 253)");
+      await expect(page.locator(".contact-band")).toHaveCSS("background-color", "rgb(125, 203, 250)");
       await expect(page.locator(".contact-section")).toHaveCSS("color", "rgb(0, 0, 0)");
       await expect(page.locator("#contact-subscribe")).toHaveCSS("color", "rgb(0, 0, 0)");
       await expect(page.locator("#contact-subscribe-title")).toBeVisible();
@@ -185,67 +134,14 @@ for (const viewport of [viewports[0], viewports[2]]) {
 }
 
 function expectedSize(role: Role, width: number) {
-  if ((role === "pageTitle" || role === "heroTitle") && width <= 800) return 40;
-  if (role === "sectionTitle" && width <= 800) return 32;
-  if (role === "editorialTitle" && width <= 800) return 24;
-  if (role === "heroCopy" && width <= 800) return 20;
-  if ((role === "dataDisplay" || role === "dataKpi") && width > 800 && width <= 1100) return 32;
-  if ((role === "dataDisplay" || role === "dataKpi") && width <= 800) return 24;
-  return roleScale[role];
+  return treatments[role][width < 800 ? 0 : width < 1200 ? 1 : 2];
 }
-
-const dataRoles = new Set<Role>(["dataDisplay", "dataKpi", "dataRing", "dataRow"]);
-
-function expectedRhythm(role: Role, width: number) {
-  if (role === "pageTitle" || role === "heroTitle") return { lineHeight: width <= 800 ? 1.2 : 1, trackingEm: -0.06 };
-  if (role === "sectionTitle")
-    return { lineHeight: width <= 800 ? 40 / 32 : 56 / 48, trackingEm: width <= 800 ? -0.04 : -0.06 };
-  if (role === "dataRing") return { lineHeight: 1.2, trackingEm: -0.06 };
-  if (role === "editorialTitle") return { lineHeight: width <= 800 ? 32 / 24 : 40 / 32, trackingEm: -0.04 };
-  if (role === "heroCopy") return { lineHeight: width <= 800 ? 36 / 20 : 36 / 24, trackingEm: 0 };
-  if (role === "cardTitle") return { lineHeight: 32 / 24, trackingEm: -0.04 };
-  if (role === "dataRow") return { lineHeight: 1.6, trackingEm: 0 };
-  if (role === "compactTitle") return { lineHeight: 1.3, trackingEm: -0.02 };
-  if (role === "dataDisplay" || role === "dataKpi") {
-    return {
-      lineHeight: width <= 800 ? 32 / 24 : width <= 1100 ? 40 / 32 : 48 / 40,
-      trackingEm: width <= 1100 ? -0.04 : -0.06,
-    };
-  }
-  if (role === "label" || role === "control") return { lineHeight: 1.25, trackingEm: 0 };
-  if (role === "lead") return { lineHeight: 1.8, trackingEm: 0 };
-  if (role === "bodyLarge") return { lineHeight: 28 / 18, trackingEm: 0 };
-  return { lineHeight: 1.5, trackingEm: 0 };
+function expectedRhythm(role: Role) {
+  return { lineHeight: treatments[role][3], trackingEm: 0 };
 }
-
-// Numeric tuples from the public Geist stylesheet, retrieved 2026-10-17.
-// Order: font size, line height, weight, tracking in em. Brand family/color are separate.
-const geistTreatments = [
-  [72, 72, 600, -0.06],
-  [64, 64, 600, -0.06],
-  [56, 56, 600, -0.06],
-  [48, 56, 600, -0.06],
-  [40, 48, 600, -0.06],
-  [32, 40, 600, -0.04],
-  [24, 32, 600, -0.04],
-  [20, 26, 600, -0.02],
-  [16, 24, 600, -0.02],
-  [24, 36, 400, 0],
-  [20, 36, 400, 0],
-  [18, 28, 400, 0],
-  [16, 24, 400, 0],
-  [24, 36, 550, 0],
-  [20, 36, 550, 0],
-  [18, 28, 550, 0],
-  [16, 24, 550, 0],
-  [20, 32, 400, 0],
-  [18, 20, 400, 0],
-  [16, 20, 400, 0],
-  [16, 20, 500, 0],
-];
 
 async function invalidTreatments(page: Page) {
-  return page.locator("body").evaluate((body, presets) => {
+  return page.locator("body").evaluate((body) => {
     const root = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
     return [...body.querySelectorAll("*")].flatMap((element) => {
       const rect = element.getBoundingClientRect();
@@ -257,18 +153,21 @@ async function invalidTreatments(page: Page) {
         return [];
       const style = getComputedStyle(element);
       const size = Number.parseFloat(style.fontSize);
-      const actual = [
-        (size / root) * 16,
-        (Number.parseFloat(style.lineHeight) / root) * 16,
-        Number(style.fontWeight),
-        style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing) / size,
-      ];
-      const matches = presets.some((preset) =>
-        preset.every((value, index) => Math.abs(value - actual[index]!) < (index === 3 ? 0.001 : 0.1)),
-      );
-      return matches ? [] : [{ text: element.textContent?.trim().slice(0, 60), tag: element.tagName, actual }];
+      const leading = Number.parseFloat(style.lineHeight) / size;
+      const weight = Number(style.fontWeight);
+      const tracking = style.letterSpacing === "normal" ? 0 : Number.parseFloat(style.letterSpacing);
+      const normalized = (size / root) * 16;
+      const mobileWordmark = element.closest(".brand-logo") && innerWidth <= 800 && Math.abs(size - 18) < 0.1;
+      const valid =
+        ([16, 21, 28, 38, 51, 67, 90].some((value) => Math.abs(value - normalized) < 0.1) || mobileWordmark) &&
+        [400, 700].includes(weight) &&
+        Math.abs(tracking) < 0.01 &&
+        [1.15, 1.5].some((value) => Math.abs(value - leading) < 0.01);
+      return valid
+        ? []
+        : [{ text: element.textContent?.trim().slice(0, 60), tag: element.tagName, size, leading, weight, tracking }];
     });
-  }, geistTreatments);
+  });
 }
 
 type TypographySample = {
@@ -330,7 +229,10 @@ for (const viewport of viewports) {
               await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
               `${route} has horizontal overflow at ${viewport.width}px`,
             ).toBe(true);
-            expect(await invalidTreatments(page), `${prefix}${route} must use a complete Geist preset`).toEqual([]);
+            expect(
+              await invalidTreatments(page),
+              `${prefix}${route} must use the approved Perfect Fourth scale`,
+            ).toEqual([]);
             for (const { role, values } of await readTypography(page, roles)) {
               observed.set(role, [...(observed.get(role) ?? []), ...values]);
             }
@@ -340,11 +242,7 @@ for (const viewport of viewports) {
             const expectedFontSize = expectedSize(role, viewport.width);
 
             for (const sample of values) {
-              const rhythm = expectedRhythm(role, viewport.width);
-              if (role === "dataRow" && sample.weight === 600) {
-                rhythm.lineHeight = 26 / 20;
-                rhythm.trackingEm = -0.02;
-              }
+              const rhythm = expectedRhythm(role);
               expect
                 .soft(
                   Math.abs(sample.fontSize - expectedFontSize),
@@ -364,28 +262,7 @@ for (const viewport of viewports) {
                 )
                 .toBeLessThan(0.2);
               expect.soft(sample.family.split(",")[0]!.replaceAll('"', "").trim()).toBe("Jost");
-              const headingRoles = [
-                "heroTitle",
-                "pageTitle",
-                "sectionTitle",
-                "cardTitle",
-                "compactTitle",
-                "editorialTitle",
-              ];
-              if (role === "dataRow") {
-                // Position headings and totals retain their deliberate emphasis.
-                expect.soft([400, 600]).toContain(sample.weight);
-              } else {
-                expect
-                  .soft(sample.weight, `${role} sample ${sample.selector} weight`)
-                  .toBe(
-                    ["label", "control"].includes(role)
-                      ? 500
-                      : headingRoles.includes(role) || dataRoles.has(role)
-                        ? 600
-                        : 400,
-                  );
-              }
+              expect.soft(sample.weight, `${role} sample ${sample.selector} weight`).toBe(treatments[role][4]);
             }
             expect
               .soft(
@@ -412,14 +289,16 @@ test.describe("form accessibility and preserved text colors", () => {
           .locator("form[action], form")
           .filter({ has: page.locator("textarea") })
           .locator('input[name="email"]');
-        await contactEmail.focus();
+        await contactEmail.click();
+        await expect(contactEmail).toBeFocused();
         await expect(contactEmail).toHaveCSS("color", "rgb(0, 0, 0)");
         await expect(contactEmail).toHaveCSS("outline-style", "solid");
-        await expect(contactEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        await expect(contactEmail).toHaveCSS("outline-color", "rgb(13, 40, 139)");
         const footerEmail = page.locator('.site-footer input[name="email"]');
-        await footerEmail.focus();
+        await footerEmail.click();
+        await expect(footerEmail).toBeFocused();
         await expect(footerEmail).toHaveCSS("color", "rgb(255, 255, 255)");
-        await expect(footerEmail).toHaveCSS("outline-color", "rgb(95, 205, 253)");
+        await expect(footerEmail).toHaveCSS("outline-color", "rgb(125, 203, 250)");
         await page.evaluate(() => {
           document.documentElement.style.fontSize = "200%";
         });
@@ -446,9 +325,10 @@ test.describe("form accessibility and preserved text colors", () => {
         }
         await page.goto(`${prefix}/subscription-preferences`);
         const preferenceEmail = page.locator('main input[name="email"]').first();
-        await preferenceEmail.focus();
+        await preferenceEmail.click();
+        await expect(preferenceEmail).toBeFocused();
         await expect(preferenceEmail).toHaveCSS("color", "rgb(0, 0, 0)");
-        await expect(preferenceEmail).toHaveCSS("outline-color", "rgb(0, 41, 145)");
+        await expect(preferenceEmail).toHaveCSS("outline-color", "rgb(13, 40, 139)");
       },
     );
   }
@@ -466,9 +346,9 @@ test.describe("form accessibility and preserved text colors", () => {
       );
       const expected: Record<string, [string, string]> = {
         plain: ["rgb(0, 0, 0)", "rgb(255, 255, 255)"],
-        highlight: ["rgb(0, 41, 145)", "rgb(95, 205, 253)"],
-        brand: ["rgb(95, 205, 253)", "rgb(0, 41, 145)"],
-        paper: ["rgb(0, 41, 145)", "rgb(255, 255, 255)"],
+        highlight: ["rgb(13, 40, 139)", "rgb(125, 203, 250)"],
+        brand: ["rgb(125, 203, 250)", "rgb(13, 40, 139)"],
+        paper: ["rgb(13, 40, 139)", "rgb(255, 255, 255)"],
       };
       for (const sample of before) expect([sample.color, sample.background]).toEqual(expected[sample.tone!]);
       const after = await cards.evaluateAll((elements) => {
@@ -520,7 +400,8 @@ test.describe("form accessibility and preserved text colors", () => {
     await page.emulateMedia({ forcedColors: "active" });
     await page.goto("/contact");
     const field = page.locator('input[name="email"]').first();
-    await field.focus();
+    await field.click();
+    await expect(field).toBeFocused();
     await expect(field).toHaveCSS("outline-style", "solid");
     await expect(field).toHaveCSS("outline-width", "2px");
     const colors = await field.evaluate((element) => ({
@@ -555,7 +436,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           await page.evaluate(() => document.fonts.ready);
           await page.addStyleTag({ content: "html { font-size: 200%; }" });
           if (route === "/memos") {
-            await page.locator(".memo-disclosure > summary").click();
+            await page.locator(".memo-disclosure > [data-slot=collapsible-trigger]").click();
             await expect(page.locator(".memo-index-row").first()).toBeVisible();
           }
           const overflow = await page.locator("body").evaluate((body) =>
@@ -575,7 +456,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           ).toBeLessThanOrEqual(width);
           if (route === "/") {
             const clipped = await page
-              .locator(".metric strong, .performance-copy > strong, .holding-row")
+              .locator(".metric strong, .performance-value strong, .holding-row")
               .evaluateAll((elements) =>
                 elements
                   .filter((element) => element.scrollWidth > element.clientWidth + 1)
@@ -605,13 +486,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         if (width === 390) {
           await page.locator(".mobile-menu-button").click();
           await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
-          const logo = page.locator(".mobile-menu-wordmark img:visible");
-          await expect(logo).toHaveAttribute("src", "/logo-wordmark.svg");
+          const logo = page.locator(".mobile-menu-wordmark .brand-logo");
+          await expect(logo).toHaveText("Modern Fundamental Analyst.");
           controls = page.locator('.mobile-menu-drawer nav a[aria-current="page"]');
         } else {
           controls = page.locator('.header-actions nav a[aria-current="page"]');
         }
-        await expect(controls).toHaveCSS("color", "rgb(0, 41, 145)");
+        await expect(controls).toHaveCSS("color", "rgb(13, 40, 139)");
         const readContrast = () =>
           controls.evaluate((element) => {
             const canvas = document.createElement("canvas");
@@ -662,7 +543,7 @@ for (const mobile of [false, true]) {
       await page.goto("/");
       await page.evaluate(() => document.fonts.ready);
       const heading = page.locator(".hero h1");
-      await expect(heading).toHaveCSS("font-weight", "600");
+      await expect(heading).toHaveCSS("font-weight", "700");
       const intro = await page.locator(".hero-bottom > p").boundingBox();
       const actions = await page.locator(".hero-actions").boundingBox();
       expect(actions!.x).toBeCloseTo(intro!.x, 0);
@@ -684,18 +565,18 @@ for (const mobile of [false, true]) {
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(
-    `${prefix || "English"} drawer and mobile table labels use complete presets`,
+    `${prefix || "English"} drawer and mobile table labels use approved treatments`,
     { tag: "@mobile" },
     async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(prefix || "/");
       await page.locator(".mobile-menu-button").click();
       await expect(page.locator('[data-menu-phase="open"]')).toBeVisible();
-      const logo = page.locator(".mobile-menu-wordmark img:visible");
-      await expect(logo).toHaveAttribute("src", "/logo-wordmark.svg");
+      const logo = page.locator(".mobile-menu-wordmark .brand-logo");
+      await expect(logo).toHaveText("Modern Fundamental Analyst.");
       expect(await invalidTreatments(page)).toEqual([]);
-      await page.locator(".mobile-language-disclosure > summary").click();
-      await expect(page.locator(".mobile-language-disclosure")).toHaveAttribute("open", "");
+      await page.locator(".mobile-language-disclosure > [data-slot=collapsible-trigger]").click();
+      await expect(page.locator(".mobile-language-disclosure")).toHaveAttribute("data-open", "");
       expect(await invalidTreatments(page)).toEqual([]);
       await page.keyboard.press("Escape");
       await expect(page.locator(".mobile-menu-button")).toBeFocused();
@@ -712,7 +593,36 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         }),
       );
       expect(labels.length).toBeGreaterThan(0);
-      for (const label of labels) expect(label).toEqual([16, 20, 500, 0]);
+      for (const label of labels) {
+        expect(label[0]).toBe(16);
+        expect(label[1]).toBeCloseTo(24, 1);
+        expect(label.slice(2)).toEqual([700, 0]);
+      }
     },
   );
+}
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} type breakpoints and dark appearance preserve the role contract`, async ({ page }) => {
+    for (const width of [799, 800, 1199, 1200]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(prefix || "/");
+      const heading = page.locator(".hero h1");
+      await expect(heading).toHaveCSS("font-size", `${width < 800 ? 51 : width < 1200 ? 67 : 90}px`);
+      await expect(page.locator(".metric strong").first()).toHaveCSS("font-size", "51px");
+      const before = await heading.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return [style.fontSize, style.lineHeight, style.fontWeight, style.letterSpacing];
+      });
+      await page.emulateMedia({ colorScheme: "dark" });
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      expect(
+        await heading.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return [style.fontSize, style.lineHeight, style.fontWeight, style.letterSpacing];
+        }),
+      ).toEqual(before);
+      await page.emulateMedia({ colorScheme: "light" });
+    }
+  });
 }

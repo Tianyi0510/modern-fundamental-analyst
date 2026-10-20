@@ -139,11 +139,15 @@ Receiving alone provides neither an application inbox nor automatic forwarding. 
 
 Receiving does not change the Contact recipient, senders or webhook secret. Provider-only receiving needs no new environment variable. This repository update did not verify inbound delivery.
 
+### JavaScript form availability
+
+Contact, subscription signup, preference-link request, preference update and subscription confirmation forms use `ClientForm`. Their native fieldsets stay disabled until hydration attaches the submission handler. Without JavaScript, a localized notice explains that the information has not been sent. The forms explicitly use POST as a fallback safeguard; no personal fields are submitted through a default GET, and native GET submission cannot discard preference or confirmation tokens. Notices use the page language, independently of the saved subscription language. The preference lookup also includes the notice in its streaming fallback, so readers without JavaScript receive instructions while the completed form remains outside the main content. Their existing JSON API contracts remain unchanged. Support retains its independent native POST workflow.
+
 ### Contact draft recovery
 
 Contact's client and API share field validation. Whitespace-only names and subjects, invalid email addresses and messages shorter than ten characters after trimming are rejected before delivery. The client associates localized inline errors with each field and focuses the first invalid field. An HTTP 400 response focuses a validation summary; service failures retain separate retry guidance. Neither failure clears the draft or a valid attempt's retry identity.
 
-Contact stores unsent fields and the failed attempt's retry ID in versioned, locale-specific `sessionStorage`. This supports reload and navigation recovery within the tab. Editing starts a new attempt; confirmed success clears only the matching draft, preserving newer edits. Never store the honeypot or share drafts across locales or form types. Submission must work without storage.
+Contact stores unsent fields and the failed attempt's retry ID in versioned, locale-specific `sessionStorage`. This supports reload and navigation recovery within the tab. Editing starts a new attempt; confirmed success clears only the matching draft, preserving newer edits. Never store the honeypot or share drafts across locales or form types. Submission must work without storage. Draft restoration fills only unchanged default fields; browser-restored or autofilled values take precedence. A merged draft that differs from the saved attempt loses that attempt ID.
 
 ### Subscription entry points
 
@@ -169,7 +173,7 @@ Consent, suppression and completed webhook records do not expire automatically. 
 
 Welcome delivery is independent of consent. A rejected or uncertain welcome event leaves the contact subscribed and retains a `send-welcome-event` journal. There is no automatic replay worker. A successful API event response does not prove automation delivery. Reconcile before clearing a journal; never replay an unknown event blindly.
 
-The `confirmation-en`, `confirmation-zh-tw` and `confirmation-zh-cn` previews run with `npm run email:preferences`. Existing preference links and secrets remain unchanged. No key migration or seamless secret rotation is provided.
+The `confirmation-en`, `confirmation-zh-tw` and `confirmation-zh-cn` previews run with `npm run email:preferences`. Existing preference links and secrets remain unchanged. No key migration or seamless secret rotation is provided. Journal and confirmation records are parsed as unknown data and validated before use. Invalid journals block reconciliation and remain untouched; legacy journals without an operation field remain readable. Invalid confirmations cannot activate a subscription.
 
 ### Preference display
 

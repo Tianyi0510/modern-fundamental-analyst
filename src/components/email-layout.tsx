@@ -13,12 +13,13 @@ import {
 } from "react-email";
 import { localeConfig, type Locale } from "@/lib/i18n";
 
+// Email clients receive literal Layer 01 colors; no CSS variable or color-mix support is required.
 export function EmailLayout({ locale, heading, children }: { locale: Locale; heading: string; children: ReactNode }) {
   return (
     <Html lang={localeConfig[locale].htmlLang} dir="ltr">
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Head />
-        <body lang={localeConfig[locale].htmlLang} dir="ltr" style={{ backgroundColor: "#ededed", margin: 0 }}>
+        <body lang={localeConfig[locale].htmlLang} dir="ltr" style={{ backgroundColor: "#f5f7fa", margin: 0 }}>
           <table
             lang={localeConfig[locale].htmlLang}
             dir="ltr"
@@ -27,13 +28,13 @@ export function EmailLayout({ locale, heading, children }: { locale: Locale; hea
             cellSpacing="0"
             border={0}
             role="presentation"
-            style={{ backgroundColor: "#ededed" }}
+            style={{ backgroundColor: "#f5f7fa" }}
           >
             <tbody>
               <tr>
                 <td
                   style={{
-                    backgroundColor: "#ededed",
+                    backgroundColor: "#f5f7fa",
                     padding: "32px 16px",
                     fontFamily: "Inter,Arial,Helvetica,sans-serif",
                   }}
@@ -44,9 +45,9 @@ export function EmailLayout({ locale, heading, children }: { locale: Locale; hea
                     dir="ltr"
                     style={{ backgroundColor: "#ffffff", color: "#000000", maxWidth: "600px", margin: "0 auto" }}
                   >
-                    <Section style={{ backgroundColor: "#002991", padding: "28px 32px" }}>
+                    <Section style={{ backgroundColor: "#0d288b", padding: "28px 32px" }}>
                       <Text style={{ color: "#ffffff", fontSize: "14px", fontWeight: 700, margin: "0 0 8px" }}>
-                        Modern Fundamental Analyst<span style={{ color: "#008cff" }}>.</span>
+                        Modern Fundamental Analyst<span style={{ color: "#7dcbfa" }}>.</span>
                       </Text>
                       <Heading as="h1" style={{ color: "#ffffff", fontSize: "28px", lineHeight: "36px", margin: 0 }}>
                         {heading}
@@ -70,7 +71,7 @@ export function EmailButton({ href, children }: { href: string; children: ReactN
       href={href}
       className="box-border"
       style={{
-        backgroundColor: "#5fcdfd",
+        backgroundColor: "#7dcbfa",
         color: "#000000",
         fontSize: "15px",
         fontWeight: 700,

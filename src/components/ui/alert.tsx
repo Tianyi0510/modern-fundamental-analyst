@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 const alertVariants = cva("m-0 min-h-[var(--size-status-reserve)]", {
   variants: {
     tone: {
-      standard: "text-body",
-      inverse: "text-body-strong text-[var(--text-inverse)]",
+      standard: "text-small-body",
+      inverse: "font-bold text-[var(--text-inverse)]",
     },
   },
   defaultVariants: { tone: "standard" },
@@ -26,4 +26,12 @@ export function Alert({
       {...props}
     />
   );
+}
+
+export function AlertDescription({ className, ...props }: ComponentProps<"div">) {
+  return <div data-slot="alert-description" className={cn("min-w-0", className)} {...props} />;
+}
+
+export function AlertAction({ className, ...props }: ComponentProps<"div">) {
+  return <div data-slot="alert-action" className={cn("min-w-0", className)} {...props} />;
 }

@@ -37,16 +37,27 @@ async function readConfirmation(token: string): Promise<Confirmation | null> {
   const redis = client();
   const raw = await executeRedisCommand(redis, () => redis.get<string>(tokenKey(token)));
   if (!raw) return null;
-  const value = JSON.parse(raw) as Confirmation;
+  let value: unknown;
+  try {
+    value = JSON.parse(raw) as unknown;
+  } catch {
+    return null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  const { email, expiresAt, status } = record;
+  const locale = locales.find((locale) => locale === record.locale);
   if (
-    typeof value.email !== "string" ||
-    !locales.includes(value.locale) ||
-    !Number.isSafeInteger(value.expiresAt) ||
-    value.expiresAt <= Date.now() ||
-    !["pending", "processing", "confirmed"].includes(value.status)
+    typeof email !== "string" ||
+    !email.trim() ||
+    !locale ||
+    typeof expiresAt !== "number" ||
+    !Number.isSafeInteger(expiresAt) ||
+    expiresAt <= Date.now() ||
+    (status !== "pending" && status !== "processing" && status !== "confirmed")
   )
     return null;
-  return value;
+  return { email, locale, expiresAt, status };
 }
 
 export async function requestSubscriptionConfirmation(email: string, locale: Locale, requestId: string) {

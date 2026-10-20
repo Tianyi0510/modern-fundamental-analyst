@@ -1,11 +1,11 @@
 import { ChevronDown } from "lucide-react";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
+import { PerformanceChartExplorer } from "./performance-chart-explorer";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
 import styles from "./performance-chart.module.css";
-
-// The horizontally scrollable data region needs keyboard focus.
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 
 const copy = {
   en: {
@@ -91,115 +91,68 @@ export function PerformanceChartView({
 }) {
   const text = { ...copy[locale], ...(measure === "twr" ? twrCopy[locale] : xirrCopy[locale]) };
   const titleId = measure === "twr" ? "performance-twr-chart-title" : "performance-chart-title";
-  const points = observations.filter(
-    (row): row is typeof row & { portfolioReturn: number; benchmarkReturn: number } =>
-      row.portfolioReturn !== null && row.benchmarkReturn !== null,
-  );
   const returnLabel = measure === "twr" ? "TWRR" : "XIRR";
   const formatReturn = (value: number | null) => (value === null ? xirrCopy[locale].unavailable : formatPercent(value));
-  const values = points.flatMap((row) => [row.portfolioReturn, row.benchmarkReturn]);
-  const lower = Math.floor(Math.min(...values) / 20) * 20;
-  const upper = Math.max(lower + 20, Math.ceil(Math.max(...values) / 20) * 20);
-  const y = (value: number) => 12 + (276 * (upper - value)) / (upper - lower);
-  const latest = points[points.length - 1]!;
-  const line = (key: "portfolioReturn" | "benchmarkReturn") =>
-    points.map((row, index) => `${(index * 800) / (points.length - 1)},${y(row[key])}`).join(" ");
-  const ticks = Array.from({ length: (upper - lower) / 20 + 1 }, (_, index) => upper - index * 20);
   return (
-    <figure className={styles.figure} aria-labelledby={titleId}>
-      <figcaption>
-        <h3 id={titleId}>{text.title}</h3>
-        <p>{text.note}</p>
-      </figcaption>
-      <ul className={styles.legend} aria-label={text.title}>
-        <li>
-          <span className={styles.portfolioKey} />
-          {text.portfolio}
-        </li>
-        <li>
-          <span className={styles.benchmarkKey} />
-          SPY
-        </li>
-      </ul>
-      <p>{text.axis}</p>
-      <div className={styles.plot}>
-        <div className={styles.ticks} aria-hidden="true">
-          {ticks.map((tick) => (
-            <span key={tick}>{tick}%</span>
-          ))}
-        </div>
-        <svg
-          viewBox="0 0 800 300"
-          preserveAspectRatio="none"
-          role="img"
-          aria-label={`${text.title}. ${text.note} ${formatDate(latest.date, locale, true)}: ${text.portfolio} ${formatPercent(latest.portfolioReturn)}, SPY ${formatPercent(latest.benchmarkReturn)}.`}
+    <Card className="gap-0 p-[var(--space-5)] compact:p-[var(--space-4)]">
+      <figure className={styles.figure} aria-labelledby={titleId}>
+        <figcaption>
+          <h3 id={titleId}>{text.title}</h3>
+          <p>{text.note}</p>
+        </figcaption>
+        <PerformanceChartExplorer
+          observations={observations}
+          locale={locale}
+          measure={measure}
+          title={text.title}
+          portfolio={text.portfolio}
+        />
+        <AnimatedDisclosure
+          className={styles.details}
+          summary={
+            <>
+              <span>{text.data}</span>
+              <ChevronDown className={styles.chevron} size={20} strokeWidth={2} aria-hidden="true" />
+            </>
+          }
         >
-          {ticks.map((tick) => (
-            <line
-              key={tick}
-              x1="0"
-              x2="800"
-              y1={y(tick)}
-              y2={y(tick)}
-              className={tick === 0 ? styles.zeroLine : styles.grid}
-            />
-          ))}
-          <polyline points={line("benchmarkReturn")} className={styles.benchmarkLine} />
-          <polyline points={line("portfolioReturn")} className={styles.portfolioLine} />
-        </svg>
-      </div>
-      <div className={styles.dates}>
-        <span>{formatDate(points[0]!.date, locale, true)}</span>
-        <span className={styles.midpoint}>
-          {formatDate(points[Math.floor((points.length - 1) / 2)]!.date, locale, true)}
-        </span>
-        <span>{formatDate(latest.date, locale, true)}</span>
-      </div>
-      <AnimatedDisclosure
-        className={styles.details}
-        summary={
-          <>
-            <span>{text.data}</span>
-            <ChevronDown className={styles.chevron} size={20} strokeWidth={2} aria-hidden="true" />
-          </>
-        }
-      >
-        <p className={styles.scrollHint} id={`${titleId}-hint`}>
-          {text.scroll}
-        </p>
-        {/* Keyboard focus allows horizontal scrolling of the monthly table. */}
-        <div
-          className={styles.tableScroll}
-          tabIndex={0}
-          role="region"
-          aria-label={text.data}
-          aria-describedby={`${titleId}-hint`}
-        >
-          <table>
-            <caption>{text.caption}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{text.month}</th>
-                <th scope="col">{text.value}</th>
-                <th scope="col">
+          <p className={styles.scrollHint} id={`${titleId}-hint`}>
+            {text.scroll}
+          </p>
+          {/* Keyboard focus allows horizontal scrolling of the monthly table. */}
+          <Table
+            containerProps={{
+              className: styles.tableScroll,
+              tabIndex: 0,
+              role: "region",
+              "aria-label": text.data,
+              "aria-describedby": `${titleId}-hint`,
+            }}
+          >
+            <TableCaption className="mt-0 text-inherit">{text.caption}</TableCaption>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead scope="col">{text.month}</TableHead>
+                <TableHead scope="col">{text.value}</TableHead>
+                <TableHead scope="col">
                   {text.portfolio} {returnLabel}
-                </th>
-                <th scope="col">SPY {returnLabel}</th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableHead>
+                <TableHead scope="col">SPY {returnLabel}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {observations.toReversed().map((row) => (
-                <tr key={row.date}>
-                  <th scope="row">{formatDate(row.date, locale, true)}</th>
-                  <td>{formatUsd(row.marketValue)}</td>
-                  <td>{formatReturn(row.portfolioReturn)}</td>
-                  <td>{formatReturn(row.benchmarkReturn)}</td>
-                </tr>
+                <TableRow className="hover:bg-transparent" key={row.date}>
+                  <TableHead scope="row">{formatDate(row.date, locale, true)}</TableHead>
+                  <TableCell>{formatUsd(row.marketValue)}</TableCell>
+                  <TableCell>{formatReturn(row.portfolioReturn)}</TableCell>
+                  <TableCell>{formatReturn(row.benchmarkReturn)}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </AnimatedDisclosure>
-    </figure>
+            </TableBody>
+          </Table>
+        </AnimatedDisclosure>
+      </figure>
+    </Card>
   );
 }

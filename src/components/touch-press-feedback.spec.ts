@@ -27,7 +27,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       await page.emulateMedia({ reducedMotion });
       const session = await page.context().newCDPSession(page);
       for (const [route, selectors] of [
-        ["", [".hero .button", ".round-link", ".performance-home .button-white", "#subscribe button[type=submit]"]],
+        ["", [".hero .button", ".performance-home .button-white", "#subscribe button[type=submit]"]],
         ["/contact", [".contact-submit"]],
         ["/support", [".support-submit"]],
       ] as const) {

@@ -1,3 +1,7 @@
+import {
+  showInteractivePerformanceChart,
+  showLatestPerformanceTooltip,
+} from "../../../scripts/performance-chart-helpers";
 import { expect, test } from "@playwright/test";
 import { colorContrast } from "../../../scripts/color-contrast";
 
@@ -18,25 +22,28 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       prefix === "/zh-tw" ? "並非即時報價" : prefix === "/zh-cn" ? "并非实时报价" : "not live quotes",
     );
     const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
-    await expect(chart.getByRole("img")).toBeVisible();
-    await expect(chart.getByRole("img")).toHaveAccessibleName(/38\.27%.*32\.20%/);
-    await expect(chart.locator("polyline")).toHaveCount(2);
+    await showInteractivePerformanceChart(chart);
+    await expect(chart.getByRole("application")).toBeVisible();
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("38.27%");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("32.20%");
+    await expect(chart.locator(".recharts-line-curve")).toHaveCount(2);
     const strokes = await chart
-      .locator("polyline")
+      .locator(".recharts-line-curve")
       .evaluateAll((lines) => lines.map((line) => getComputedStyle(line).stroke));
     for (const stroke of strokes) expect(colorContrast(stroke, "rgb(255, 255, 255)")).toBeGreaterThanOrEqual(3);
-    for (const line of await chart.locator("polyline").all()) {
-      expect((await line.getAttribute("points"))!.split(" ")).toHaveLength(22);
-      for (const point of (await line.getAttribute("points"))!.split(" ")) {
+    for (const line of await chart.locator(".recharts-line-curve").all()) {
+      const points = (await line.getAttribute("d"))!.match(/[-\d.]+,[-\d.]+/g)!;
+      expect(points).toHaveLength(22);
+      for (const point of points) {
         const y = Number(point.split(",")[1]);
-        expect(y).toBeGreaterThanOrEqual(12);
-        expect(y).toBeLessThanOrEqual(288);
+        expect(y).toBeGreaterThanOrEqual(0);
+        expect(y).toBeLessThanOrEqual(300);
       }
     }
     await expect(page.locator(".performance-summary")).toContainText("+24.43%");
     await expect(page.locator(".performance-summary")).toContainText("+19.26%");
     if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText("As of 30 Sep 2026");
-    const summary = chart.locator("summary");
+    const summary = chart.locator("[data-slot=collapsible-trigger]");
     await expect(summary.locator("svg.lucide-chevron-down")).toBeVisible();
     expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await summary.focus();
@@ -47,6 +54,17 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(chart.locator("tbody tr").first()).toContainText("127,533.11");
     await expect(chart.locator("tbody tr").first()).toContainText("+38.27%");
     const region = chart.getByRole("region");
+    await expect(chart.locator('[data-slot="table-container"]')).toHaveCount(1);
+    await expect(region).toHaveAttribute("data-slot", "table-container");
+    await expect(region).toHaveAttribute("tabindex", "0");
+    await expect(chart.getByRole("table")).toHaveAttribute("data-slot", "table");
+    await expect(chart.locator('thead th[scope="col"]')).toHaveCount(4);
+    await expect(chart.locator('tbody th[scope="row"]')).toHaveCount(22);
+    await expect(chart.locator("caption")).toHaveAttribute("data-slot", "table-caption");
+    await expect(chart.locator("thead th").first()).toHaveCSS("position", "sticky");
+    await region.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(() => region.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
     expect(await region.evaluate((e) => e.scrollWidth > e.clientWidth && e.scrollHeight > e.clientHeight)).toBe(true);
     await region.evaluate((e) => {
       e.scrollLeft = e.scrollWidth;
@@ -61,7 +79,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await expect(summary.locator("svg")).toHaveCSS("transition-property", "transform");
     for (let index = 0; index < 4; index++) await summary.tap();
-    await expect(chart.locator("details")).toHaveAttribute("open", "");
+    await expect(chart.locator("[data-slot=collapsible]")).toHaveAttribute("data-open", "");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.evaluate(() => document.fonts.ready);
@@ -85,8 +103,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect
         .poll(() => page.evaluate(() => document.documentElement.scrollWidth), `Page overflow at ${width}px`)
         .toBeLessThanOrEqual(width);
-      await expect(chart.getByRole("img")).toBeVisible();
-      await expect(chart.getByRole("img")).toHaveCSS("height", "300px");
+      await expect(chart.getByRole("application")).toBeVisible();
+      await expect(chart.getByRole("application")).toHaveCSS("height", "300px");
     }
   });
 }
@@ -100,8 +118,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await page.setViewportSize({ width, height: 844 });
         await page.emulateMedia({ reducedMotion: "no-preference" });
         await page.goto(`${prefix}/performance`);
-        const details = page.locator('figure[aria-labelledby="performance-twr-chart-title"] details');
-        const summary = details.locator("summary");
+        const details = page.locator('figure[aria-labelledby="performance-twr-chart-title"] [data-slot=collapsible]');
+        const summary = details.locator("[data-slot=collapsible-trigger]");
         // Suspense may replace the SSR node during hydration; sample visibility and height together.
         let collapsed = 0;
         await expect
@@ -111,37 +129,24 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           })
           .toBeGreaterThan(0);
         await summary.click();
-        await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+        await expect.poll(() => details.evaluate((e) => e.getAnimations({ subtree: true }).length)).toBe(0);
         const expanded = (await details.boundingBox())!.height;
         expect(expanded).toBeGreaterThan(collapsed + 100);
-        const heights = await details.evaluate((element) => {
-          const summary = element.querySelector("summary")!;
-          summary.click();
-          const closing = element.getAnimations()[0]!;
-          closing.pause();
-          closing.currentTime = Number(closing.effect!.getTiming().duration) / 2;
-          const before = element.getBoundingClientRect().height;
-          summary.click();
-          const opening = element.getAnimations()[0]!;
-          opening.pause();
-          opening.currentTime = 0;
-          const after = element.getBoundingClientRect().height;
-          opening.play();
-          return { before, after };
-        });
-        expect(heights.before).toBeGreaterThan(collapsed);
-        expect(heights.before).toBeLessThan(expanded);
-        expect(Math.abs(heights.before - heights.after)).toBeLessThan(1);
-        await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+        const panel = details.locator("[data-slot=collapsible-content]");
+        await expect(panel).toHaveCSS("transition-property", "height");
+        await summary.click();
+        await summary.click();
+        await expect(summary).toHaveAttribute("aria-expanded", "true");
+        await expect.poll(() => panel.evaluate((element) => element.getAnimations().length)).toBe(0);
         await summary.focus();
         await page.keyboard.press("Space");
-        await expect(details).not.toHaveAttribute("open");
-        expect(Math.abs((await details.boundingBox())!.height - collapsed)).toBeLessThan(1);
+        await expect(details).not.toHaveAttribute("data-open");
+        await expect.poll(async () => Math.abs((await details.boundingBox())!.height - collapsed)).toBeLessThan(1);
         await summary.click();
         await page.emulateMedia({ reducedMotion: "reduce" });
-        await expect.poll(() => details.evaluate((e) => e.getAnimations().length)).toBe(0);
+        await expect.poll(() => details.evaluate((e) => e.getAnimations({ subtree: true }).length)).toBe(0);
         await summary.click();
-        await expect(details).not.toHaveAttribute("open");
+        await expect(details).not.toHaveAttribute("data-open");
       },
     );
   }
@@ -149,13 +154,14 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
 
 for (const width of [390, 1440]) {
   test(
-    `chart tick labels retain Geist Copy 16 and grid alignment at ${width}px`,
+    `chart tick labels retain Small Body and grid alignment at ${width}px`,
     width === 390 ? { tag: "@mobile" } : {},
     async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await page.goto(`${prefix}/performance`);
-        const charts = page.locator('figure svg[role="img"]');
+        for (const figure of await page.locator("figure").all()) await showInteractivePerformanceChart(figure);
+        const charts = page.locator('figure svg[role="application"]');
         await expect(charts).toHaveCount(2);
         for (const scale of [1, 2]) {
           await page.addStyleTag({ content: `html { font-size: ${scale * 100}% !important; }` });
@@ -165,15 +171,17 @@ for (const width of [390, 1440]) {
             await expect(chart).toBeInViewport();
             const ticks = await chart.evaluate((chart) => {
               const svg = chart as SVGSVGElement;
-              const labels = [...chart.parentElement!.querySelectorAll('[aria-hidden="true"] > span')];
-              const lines = [...svg.querySelectorAll("line")];
-              return labels.map((label, index) => {
+              const labels = [...chart.querySelectorAll(".recharts-cartesian-axis-tick-value")].filter((label) =>
+                label.textContent?.endsWith("%"),
+              );
+              const lines = [...svg.querySelectorAll(".recharts-cartesian-grid-horizontal line")];
+              return labels.map((label) => {
                 const box = label.getBoundingClientRect();
-                const line = lines[index]!;
-                const point = new DOMPoint(0, Number(line.getAttribute("y1"))).matrixTransform(svg.getScreenCTM()!);
+                const center = Number(label.getAttribute("y"));
+                const offset = Math.min(...lines.map((line) => Math.abs(center - Number(line.getAttribute("y1")))));
                 const style = getComputedStyle(label);
                 return {
-                  offset: box.y + box.height / 2 - point.y,
+                  offset,
                   size: style.fontSize,
                   leading: style.lineHeight,
                   weight: style.fontWeight,
@@ -185,9 +193,10 @@ for (const width of [390, 1440]) {
             for (const tick of ticks) {
               expect(tick.height).toBeGreaterThan(0);
               expect(tick.size).toBe(`${16 * scale}px`);
-              expect(tick.leading).toBe(`${24 * scale}px`);
+              expect(Number.parseFloat(tick.leading)).toBeCloseTo(24 * scale, 1);
               expect(tick.weight).toBe("400");
-              expect(Math.abs(tick.offset), `${prefix} at ${width}px / ${scale}x`).toBeLessThan(1);
+              // Recharts nudges endpoint labels inward to avoid clipping the text.
+              expect(Math.abs(tick.offset), `${prefix} at ${width}px / ${scale}x`).toBeLessThanOrEqual(16 * scale);
             }
           }
         }

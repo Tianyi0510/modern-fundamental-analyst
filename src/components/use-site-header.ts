@@ -12,11 +12,11 @@ function animateMenuDismissal(
   startingTransform: string,
 ) {
   const style = getComputedStyle(content);
-  const duration = style.getPropertyValue("--motion-duration-slow").trim();
+  const duration = style.getPropertyValue("--motion-duration-panel-exit").trim();
   const panelDuration = Number.parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
   const feedbackToken = style.getPropertyValue("--motion-duration-fast").trim();
   const feedbackDuration = Number.parseFloat(feedbackToken) * (feedbackToken.endsWith("ms") ? 1 : 1000);
-  const iconToken = style.getPropertyValue("--motion-duration-medium").trim();
+  const iconToken = style.getPropertyValue("--motion-duration-icon").trim();
   const iconDuration = Number.parseFloat(iconToken) * (iconToken.endsWith("ms") ? 1 : 1000);
   const supportingAnimations: Animation[] = [];
   const closeIcon = closeButton?.querySelector<SVGElement>(".mobile-menu-close-icon");
@@ -29,7 +29,7 @@ function animateMenuDismissal(
       { transform: "rotate(-90deg)", opacity: 0, offset: 0.75 },
       { transform: "rotate(-90deg)", opacity: 0, offset: 1 },
     ],
-    { duration: iconDuration, easing: "linear", fill: "forwards" },
+    { duration: iconDuration, easing: style.getPropertyValue("--motion-ease-linear").trim(), fill: "forwards" },
   );
   if (iconAnimation) supportingAnimations.push(iconAnimation);
   if (returnIcon) {
@@ -43,7 +43,7 @@ function animateMenuDismissal(
         ],
         {
           duration: iconDuration,
-          easing: "linear",
+          easing: style.getPropertyValue("--motion-ease-linear").trim(),
           fill: "forwards",
         },
       ),
@@ -113,6 +113,7 @@ function animateMenuDismissal(
         ],
         {
           duration: panelDuration,
+          easing: style.getPropertyValue("--motion-ease-standard").trim(),
           fill: "forwards",
         },
       ),
@@ -161,7 +162,7 @@ export function useMobileMenu() {
     const content = contentRef.current;
     if (!content) return;
     const style = getComputedStyle(content);
-    const token = style.getPropertyValue("--motion-duration-slow").trim();
+    const token = style.getPropertyValue("--motion-duration-panel-enter").trim();
     const duration = Number.parseFloat(token) * (token.endsWith("ms") ? 1 : 1000);
     const start = openingStartRef.current;
     openingStartRef.current = null;
@@ -172,7 +173,7 @@ export function useMobileMenu() {
     openingAnimationRef.current = animation;
     const icon = closeButtonRef.current?.querySelector(".mobile-menu-close-icon");
     if (icon) {
-      const iconToken = style.getPropertyValue("--motion-duration-medium").trim();
+      const iconToken = style.getPropertyValue("--motion-duration-icon").trim();
       const iconDuration = Number.parseFloat(iconToken) * (iconToken.endsWith("ms") ? 1 : 1000);
       const iconAnimation = icon.animate(
         [

@@ -13,8 +13,15 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
 
       const mobileSort = page.locator(".portfolio-mobile-sort");
       await expect(mobileSort).toBeVisible();
+      await expect(mobileSort.locator("select")).toHaveAttribute("data-slot", "native-select");
+      await expect(mobileSort.getByRole("button")).toHaveAttribute("data-slot", "button");
       const table = page.getByRole("table");
       await expect(table).toHaveJSProperty("tagName", "TABLE");
+      await expect(table).toHaveAttribute("data-slot", "table");
+      await expect(table.locator("tbody tr").first()).toHaveAttribute("data-slot", "table-row");
+      await expect(table.locator("tbody th").first()).toHaveAttribute("data-slot", "table-head");
+      await expect(table.locator("tbody td").first()).toHaveAttribute("data-slot", "table-cell");
+      await expect(table.locator("tfoot")).toHaveAttribute("data-slot", "table-footer");
       const holdingRows = table.locator("tbody").getByRole("row");
       await expect(table.getByRole("rowheader")).toHaveCount((await holdingRows.count()) + 1);
       await expect(table.locator("tfoot").getByRole("row")).toHaveCount(1);
@@ -92,14 +99,74 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => b - a));
     await expect(holdingRows.first().getByRole("rowheader")).toHaveCSS("text-align", "left");
     await expect(holdingRows.first().getByRole("cell").first()).toHaveCSS("text-align", "right");
-    await expect(table.locator(".portfolio-total-market")).toHaveCSS("font-weight", "500");
+    await expect(table.locator(".portfolio-total-market")).toHaveCSS("font-weight", "700");
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(mobileSort).toBeVisible();
+    await expect(mobileSort.locator("select")).toHaveAttribute("data-slot", "native-select");
+    await expect(mobileSort.getByRole("button")).toHaveAttribute("data-slot", "button");
     await expect(mobileSort.locator("select")).toHaveValue("shares");
     await expect(sharesButton).toBeHidden();
     await expect(sharesHeader).toHaveAttribute("aria-sort", "descending");
     await expect.poll(shares).toEqual((await shares()).toSorted((a, b) => b - a));
     await page.addStyleTag({ content: "html { font-size: 200%; }" });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+}
+
+test("mobile sorting controls share dimensions and use one press transform", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/portfolio");
+  const group = page.locator(".portfolio-mobile-sort");
+  const select = group.locator("select");
+  const direction = group.getByRole("button");
+  // The Suspense fallback renders the controls inside a disabled fieldset until
+  // the URL-aware table streams in; wait for the interactive button first.
+  await expect(direction).toBeEnabled();
+  await direction.scrollIntoViewIfNeeded();
+  const selectBounds = (await select.boundingBox())!;
+  const buttonBounds = (await direction.boundingBox())!;
+  expect(buttonBounds.height).toBeCloseTo(selectBounds.height, 0);
+  expect(buttonBounds.width).toBeCloseTo(selectBounds.width, 0);
+  await direction.hover();
+  await page.mouse.down();
+  await expect(direction).toHaveCSS("scale", "none");
+  const pressScale = await direction.evaluate((element) =>
+    Number(getComputedStyle(element).getPropertyValue("--motion-scale-press").trim()),
+  );
+  await expect(direction).toHaveCSS("transform", `matrix(${pressScale}, 0, 0, ${pressScale}, 0, 0)`);
+  await expect(direction.locator("svg")).toHaveCSS("transform", "none");
+  await page.mouse.up();
+  await page.mouse.move(0, 0);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await direction.hover();
+  await page.mouse.down();
+  await expect(direction).toHaveCSS("transform", "none");
+  await page.mouse.up();
+});
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} URL sorting survives reload and browser history @mobile`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${prefix}/portfolio?source=test&sort=symbol&direction=asc#holdings`);
+    const select = page.locator(".portfolio-mobile-sort select");
+    const headers = page.getByRole("columnheader");
+    await expect(select).toHaveValue("symbol");
+    await expect(headers.nth(0)).toHaveAttribute("aria-sort", "ascending");
+    await select.selectOption("shares");
+    await expect(page).toHaveURL(/source=test&sort=shares&direction=desc#holdings$/);
+    await page.reload();
+    await expect(select).toHaveValue("shares");
+    await expect(headers.nth(1)).toHaveAttribute("aria-sort", "descending");
+    await page.locator(".portfolio-mobile-sort button").click();
+    await expect(page).toHaveURL(/direction=asc#holdings$/);
+    await page.goBack();
+    await expect(headers.nth(1)).toHaveAttribute("aria-sort", "descending");
+    await page.goBack();
+    await expect(select).toHaveValue("symbol");
+    await page.goForward();
+    await expect(select).toHaveValue("shares");
+    await page.goto(`${prefix}/portfolio?sort=invalid&direction=sideways`);
+    await expect(select).toHaveValue("marketValue");
+    await expect(headers.nth(4)).toHaveAttribute("aria-sort", "descending");
   });
 }

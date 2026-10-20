@@ -42,8 +42,8 @@ test.describe("header interaction QA", () => {
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "24px");
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "24px");
     const legalBody = page.locator(".legal-body");
-    await expect(legalBody).toHaveCSS("padding-top", "48px");
-    await expect(legalBody).toHaveCSS("padding-bottom", "48px");
+    await expect(legalBody).toHaveCSS("padding-top", "96px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "96px");
   });
 
   test("desktop page heroes share one vertical rhythm", async ({ page }) => {
@@ -60,15 +60,14 @@ test.describe("header interaction QA", () => {
     ]) {
       await page.goto(path);
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
-      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "48px");
-      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "48px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
     }
   });
 
   test("CTA focus uses shared scale without lift or shadow", async ({ page }) => {
     for (const [path, selector] of [
       ["/", ".hero .button"],
-      ["/", ".round-link"],
       ["/support", ".support-submit"],
       ["/subscription-preferences", "main form .button"],
       ["/contact", "form .button"],
@@ -93,7 +92,7 @@ test.describe("header interaction QA", () => {
           .toBe(true);
         await expect(control, `${path} ${selector} uses the press duration`).toHaveCSS(
           "transition-duration",
-          /^(?:0\.08s)(?:,\s*0\.08s)*$/,
+          /^(?:0\.1s)(?:,\s*0\.1s)*$/,
         );
       } finally {
         await page.mouse.up();
@@ -142,20 +141,20 @@ test.describe("header interaction QA", () => {
         const note = page.locator(".reference-note");
         if (path === "/about") {
           await expect(note).toHaveCount(1);
-          await expect(note).toHaveCSS("font-size", "18px");
-          await expect(note).toHaveCSS("line-height", "28px");
+          await expect(note).toHaveCSS("font-size", "16px");
+          await expect(note).toHaveCSS("line-height", "24px");
           await expect(note).toHaveCSS("font-weight", "400");
           await expect(note).toHaveCSS("color", "rgb(0, 0, 0)");
           for (const link of await note.locator("a").all()) {
             await expect(link).toHaveCSS("font-weight", "400");
-            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
+            await expect(link).toHaveCSS("color", "rgb(13, 40, 139)");
             await expect(link).toHaveCSS("text-decoration-line", "underline");
             await expect(link).toHaveCSS("text-underline-offset", "3px");
             await link.hover();
-            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
+            await expect(link).toHaveCSS("color", "rgb(13, 40, 139)");
             await page.keyboard.press("Shift");
             await link.focus();
-            await expect(link).toHaveCSS("color", "rgb(0, 41, 145)");
+            await expect(link).toHaveCSS("color", "rgb(13, 40, 139)");
           }
         }
         if (path.startsWith("/memos/")) {
@@ -224,12 +223,14 @@ test.describe("header interaction QA", () => {
           );
           expect(Number.isFinite(visibleGaps.above) && Number.isFinite(visibleGaps.below)).toBe(true);
           // Ink edges can round differently across macOS/Linux and browser
-          // rasterizers. Keep exact line-box assertions above, allowing only
-          // two pixels of variation in this thresholded screenshot scan.
+          // rasterizers, and the last line's glyphs shift the measured ink
+          // edge as text wraps at each width. Keep exact line-box assertions
+          // above, allowing four pixels of variation in this thresholded
+          // screenshot scan.
           expect(
             Math.abs(visibleGaps.above - visibleGaps.below),
             `Optical gaps at ${width}px: ${JSON.stringify(visibleGaps)}`,
-          ).toBeLessThanOrEqual(2);
+          ).toBeLessThanOrEqual(4);
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
@@ -269,10 +270,11 @@ test.describe("mobile content and navigation QA", () => {
       }),
     );
     for (const box of boxes) {
+      expect(box.height).toBeCloseTo(boxes[0]!.height, 0);
       expect(box.left).toBe(16);
       expect(box.width).toBe(358);
-      // Preserve the compact single-line budget while allowing complete multiline explanations.
-      expect(box.height - box.extraNoteHeight).toBeLessThanOrEqual(190);
+      // 48px padding + 28px gaps + 58.65px KPI + two 24px text lines = 182.65px.
+      expect(box.height - Math.max(...boxes.map((item) => item.extraNoteHeight))).toBeLessThanOrEqual(192);
       expect(box.noteFits).toBe(true);
       expect(box.contentFits).toBe(true);
     }
@@ -297,8 +299,8 @@ test.describe("mobile content and navigation QA", () => {
     await expect(upperBlock).toHaveCSS("row-gap", "32px");
     await expect(footer.locator(".footer-links")).toHaveCSS("grid-template-columns", "358px");
     const legalBody = page.locator(".legal-body");
-    await expect(legalBody).toHaveCSS("padding-top", "48px");
-    await expect(legalBody).toHaveCSS("padding-bottom", "48px");
+    await expect(legalBody).toHaveCSS("padding-top", "96px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "96px");
   });
 
   test("mobile page heroes share one vertical rhythm", { tag: "@mobile" }, async ({ page }) => {
@@ -315,8 +317,8 @@ test.describe("mobile content and navigation QA", () => {
     ]) {
       await page.goto(path);
       const hero = page.locator(".hero, .page-hero, .legal-hero").first();
-      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "48px");
-      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "48px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
+      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
     }
   });
 
@@ -330,7 +332,7 @@ test.describe("mobile content and navigation QA", () => {
     expect(aboutBoundaryBox!.x).toBe(0);
     expect(aboutBoundaryBox!.width).toBe(390);
     expect(aboutHeadingBox!.x).toBe(16);
-    await expect(page.locator(".about-section").first()).toHaveCSS("gap", "40px");
+    await expect(page.locator(".about-section").first()).toHaveCSS("gap", "48px");
 
     await page.goto("/contact");
     const contactHeadingBox = await page.locator("#contact-form-title").boundingBox();
@@ -338,8 +340,9 @@ test.describe("mobile content and navigation QA", () => {
     expect(contactHeadingBox).not.toBeNull();
     expect(firstControlBox).not.toBeNull();
     expect(contactHeadingBox!.x).toBe(16);
-    expect(firstControlBox!.x).toBe(16);
-    expect(firstControlBox!.width).toBe(358);
+    // The shared FormPanel adds a 16px inset inside the 16px page gutter.
+    expect(firstControlBox!.x).toBe(32);
+    expect(firstControlBox!.width).toBe(326);
   });
 
   test("touch buttons share press scale and footer links stay legible", { tag: "@mobile" }, async ({ page }) => {
@@ -403,12 +406,7 @@ test.describe("touch CTA recovery", () => {
           // This test checks control states; settle programmatic scrolling before pointer input.
           document.documentElement.style.scrollBehavior = "auto";
         });
-        for (const selector of [
-          ".hero .button-dark",
-          ".performance-home .button-white",
-          ".cta .button-dark",
-          ".round-link",
-        ]) {
+        for (const selector of [".hero .button-dark", ".performance-home .button-white", ".cta .button-dark"]) {
           const control = page.locator(selector).first();
           // Keep the page available while exercising real press/release and touch gestures on links.
           await control.evaluate((element) =>
@@ -434,7 +432,7 @@ test.describe("touch CTA recovery", () => {
           await expect(control).toHaveCSS("outline-style", "solid");
           await expect(control).toHaveCSS(
             "background-color",
-            selector === ".cta .button-dark" ? "rgb(0, 41, 145)" : "rgb(95, 205, 253)",
+            selector === ".cta .button-dark" ? "rgb(13, 40, 139)" : "rgb(125, 203, 250)",
           );
           await expect(control).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
           await control.evaluate((element: HTMLElement) => element.blur());

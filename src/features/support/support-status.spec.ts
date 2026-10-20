@@ -38,7 +38,8 @@ for (const copy of supportLocales) {
       const status = page.locator(".support-status-error");
       await expect(status).toBeVisible();
       await expect(status).toHaveAttribute("role", "status");
-      await expect(status).toHaveCSS("border-left-color", "rgb(255, 0, 0)");
+      // --border-error resolves to --text-error (--colorStatusDangerForeground2).
+      await expect(status).toHaveCSS("border-left-color", "rgb(191, 42, 44)");
       await expect(status).toHaveCSS("border-left-width", "4px");
       await expect(status).toHaveCSS("border-left-style", "solid");
       await expect(status).toHaveCSS("color", "rgb(0, 0, 0)");
@@ -90,6 +91,7 @@ for (const copy of supportLocales) {
     await expect(resume).toBeVisible();
     await expect(resume).toBeEnabled();
     for (const radio of await page.locator('input[type="radio"]').all()) await expect(radio).toBeDisabled();
+    for (const radio of await page.getByRole("radio").all()) await expect(radio).toBeDisabled();
     await resume.click({ noWaitAfter: true });
     await expect(page).toHaveURL(new RegExp(`${copy.prefix}/support\\?status=rate-limited(?:&.*)?$`));
     expect(bodies.length).toBe(2);
@@ -103,6 +105,7 @@ for (const copy of supportLocales) {
     await expect(page.locator('input[name="checkout_attempt"]')).toHaveValue(first.get("checkout_attempt")!);
     await expect(page.locator('input[type="hidden"][name="product_id"]')).toHaveValue("support-6-v1");
     for (const radio of await page.locator('input[type="radio"]').all()) await expect(radio).toBeDisabled();
+    for (const radio of await page.getByRole("radio").all()) await expect(radio).toBeDisabled();
   });
 
   test(`${copy.locale} Support locks native submissions and returns to localized retry feedback`, async ({
@@ -142,7 +145,14 @@ for (const copy of supportLocales) {
       .filter({ has: page.locator('input[value="support-6-v1"]') })
       .click();
     const submit = page.locator(".support-submit");
-    type SubmissionState = { text: string | null; disabled: boolean; busy: string | null };
+    const originalLabel = await submit.textContent();
+    type SubmissionState = {
+      text: string | null;
+      disabled: boolean;
+      busy: string | null;
+      spinner: boolean;
+      status: string | null;
+    };
     let submissionState: SubmissionState | undefined;
     await page.exposeFunction("recordSupportSubmission", (state: SubmissionState) => {
       submissionState = state;
@@ -158,11 +168,15 @@ for (const copy of supportLocales) {
           text: button.textContent,
           disabled: button.disabled,
           busy: form.getAttribute("aria-busy"),
+          spinner: !!button.querySelector('[data-slot="spinner"][aria-hidden="true"]'),
+          status: form.querySelector('[role="status"] p')?.textContent ?? null,
         });
       }).observe(form, { attributes: true, childList: true, subtree: true });
     });
     await submit.click({ noWaitAfter: true });
-    await expect.poll(() => submissionState).toEqual({ text: copy.submitting, disabled: true, busy: "true" });
+    await expect
+      .poll(() => submissionState)
+      .toEqual({ text: originalLabel, disabled: true, busy: "true", spinner: true, status: copy.submitting });
     await expect.poll(() => requests).toBe(1);
     expect(requests).toBe(1);
     release();
@@ -256,3 +270,21 @@ for (const copy of supportLocales) {
     }
   });
 }
+
+test("Support amount options use thin separators and KPI typography", async ({ page }) => {
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/support");
+    const group = page.getByRole("radiogroup");
+    await expect(group).toHaveCSS("row-gap", "1px");
+    await expect(group).toHaveCSS("column-gap", "1px");
+    await expect(group).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    const amount = page.getByText("$12", { exact: true });
+    await expect(amount).toHaveCSS("font-size", width === 390 ? "51px" : "67px");
+    await expect(amount).toHaveCSS("font-weight", "700");
+    await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
+    await expect(group).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await page.getByText("$6", { exact: true }).click();
+    await expect(page.getByRole("radio", { name: "USD 6" })).toBeChecked();
+  }
+});

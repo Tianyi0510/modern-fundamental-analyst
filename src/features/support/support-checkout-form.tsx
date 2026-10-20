@@ -1,9 +1,12 @@
 "use client";
 
 import { appearance } from "./support-checkout-form.styles";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useEffect, useRef, useState, type ReactNode } from "react";
+
+export const SupportChoiceLock = createContext(false);
 
 export function SupportCheckoutForm({
   children,
@@ -86,12 +89,14 @@ export function SupportCheckoutForm({
         disabled={submittedChoice === null}
         value={submittedChoice ?? ""}
       />
-      {children}
-      <Button className={appearance["support-submit"]} type="submit" disabled={isSubmitting} aria-live="polite">
-        {isSubmitting ? submitting : submit}
+      <SupportChoiceLock value={isSubmitting || recovering}>{children}</SupportChoiceLock>
+      <Button className={appearance["support-submit"]} type="submit" disabled={isSubmitting}>
+        {isSubmitting && <Spinner aria-hidden="true" data-icon="inline-start" />}
+        {submit}
       </Button>
       {isSubmitting ? (
         <div className={appearance["support-status"]} role="status">
+          <p>{submitting}</p>
           <p>{recovery}</p>
           <Button className={appearance["support-submit"]} type="submit" name="checkout_resume" value="1">
             {resume}

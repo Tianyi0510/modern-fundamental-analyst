@@ -8,15 +8,8 @@ const titleWidths: Record<HeroVariant, string> = {
   performance: "max-w-[1230px] [overflow-wrap:anywhere]",
   support: "max-w-[1050px]",
 };
-const introLayouts: Record<HeroVariant, string> = {
-  standard:
-    "grid grid-cols-[1fr_auto] items-end max-[801px]:grid-cols-1 max-[801px]:gap-[var(--space-related-content)]",
-  portfolio:
-    "grid grid-cols-[1fr_auto] items-end max-[801px]:grid-cols-1 max-[801px]:gap-[var(--space-related-content)]",
-  support: "grid grid-cols-[1fr_auto] items-end max-[801px]:grid-cols-1 max-[801px]:gap-[var(--space-related-content)]",
-  performance:
-    "flex flex-wrap items-end gap-[var(--space-related-content)] [&>p]:flex-[1_1_30rem] [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]",
-};
+const introLayout =
+  "flex flex-wrap items-end gap-[var(--space-related-content)] [&>p]:flex-[1_1_30rem] [&>small]:ml-auto [&>small]:max-w-full [&>small]:text-right [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]";
 
 export function PageHero({
   label,
@@ -33,21 +26,23 @@ export function PageHero({
 }) {
   return (
     <div className="page-hero-band bg-[var(--surface-secondary)]">
-      <Container as="section" className="page-hero py-[var(--space-8)]">
-        <p className="eyebrow flex items-center gap-[10px] text-label">
+      <Container as="section" className="page-hero @container/financial-summary py-[var(--space-section-padding)]">
+        <p className="eyebrow flex items-center gap-[10px] text-large-label">
           <span className="size-[9px] rounded-full bg-accent" /> {label}
         </p>
         <h1
-          className={`mt-[var(--space-6)] text-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+          className={`mt-[var(--space-section-content)] text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
         >
           {title}
         </h1>
         <div
-          className={`page-intro mt-[var(--space-6)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-lead [&_p]:text-pretty [&_small]:text-caption [&_small]:text-[var(--text-secondary)] ${introLayouts[variant]}`}
+          className={`page-intro mt-[var(--space-section-content)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-large-body [&_p]:text-pretty [&_small]:text-small-body [&_small]:text-[var(--text-secondary)] ${introLayout}`}
         >
           {intro}
         </div>
-        {children ? <div className="hero-summary @container/hero-summary mt-[var(--space-8)]">{children}</div> : null}
+        {children ? (
+          <div className="hero-summary @container/hero-summary mt-[var(--space-section-content)]">{children}</div>
+        ) : null}
       </Container>
     </div>
   );

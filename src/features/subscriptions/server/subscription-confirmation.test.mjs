@@ -183,6 +183,28 @@ test("expired and malformed tokens never mutate providers", async () => {
   assert.equal(writes.length, 0);
 });
 
+test("invalid stored confirmation shapes fail closed without provider writes", async () => {
+  await requestSubscriptionConfirmation("reader@example.com", "en", "subscribe/a");
+  const value = token();
+  const key = [...records.keys()].find((key) => key.startsWith("mfa:subscription-confirmation:"));
+  const valid = JSON.parse(read(key));
+  for (const raw of [
+    "{",
+    "null",
+    "[]",
+    "1",
+    JSON.stringify({ ...valid, email: null }),
+    JSON.stringify({ ...valid, expiresAt: String(valid.expiresAt) }),
+    JSON.stringify({ ...valid, locale: "unknown" }),
+    JSON.stringify({ ...valid, status: "unknown" }),
+  ]) {
+    records.set(key, { value: raw, until: Infinity });
+    await assert.rejects(confirmSubscription(value, memo), { status: 400 });
+    assert.equal(read(key), raw);
+    assert.equal(writes.length, 0);
+  }
+});
+
 test("confirmation rejects cross-origin posts", async () => {
   const incoming = request("/api/subscription-confirmation", { token: "a".repeat(43) });
   incoming.headers.set("origin", "https://other.example.com");

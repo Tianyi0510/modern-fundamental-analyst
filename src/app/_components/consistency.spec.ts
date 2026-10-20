@@ -41,7 +41,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
 test("reduced motion keeps memo summary text stationary during keyboard focus", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/memos");
-  const summary = page.locator(".memo-disclosure > summary");
+  const summary = page.locator(".memo-disclosure > [data-slot=collapsible-trigger]");
   await summary.focus();
   await expect(summary.locator("span").first()).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
 });
@@ -50,7 +50,7 @@ test.describe("touch and keyboard state consistency", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 800 } });
   test("memo focus feedback survives a simultaneous hover state", { tag: "@mobile" }, async ({ page }) => {
     await page.goto("/memos");
-    const summary = page.locator(".memo-disclosure > summary");
+    const summary = page.locator(".memo-disclosure > [data-slot=collapsible-trigger]");
     await summary.focus();
     await expect(summary.locator("span").first()).toHaveCSS("transform", "matrix(1, 0, 0, 1, 4, 0)");
     const background = await summary.evaluate((element) => getComputedStyle(element).backgroundColor);

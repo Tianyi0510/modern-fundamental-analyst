@@ -4,6 +4,10 @@ import { ContactFormClient, type ContactFormCopy } from "./contact-form-client";
 const copy = {
   en: {
     title: "Send a Message",
+    clear: "Clear Message",
+    clearTitle: "Clear This Message?",
+    clearDescription: "This removes your unsent message and its saved draft from this browser. It cannot be undone.",
+    keep: "Keep Editing",
     intro: "Send your question or proposal to receive a reply by email.",
     name: "Name",
     email: "Email",
@@ -23,6 +27,10 @@ const copy = {
   },
   "zh-tw": {
     title: "傳送訊息",
+    clear: "清除訊息",
+    clearTitle: "要清除這則訊息嗎？",
+    clearDescription: "這會移除此瀏覽器中尚未送出的訊息與已儲存草稿，且無法復原。",
+    keep: "繼續編輯",
     intro: "傳送你的問題或合作提案，透過電子郵件取得回覆。",
     name: "姓名",
     email: "電子郵件",
@@ -42,6 +50,10 @@ const copy = {
   },
   "zh-cn": {
     title: "发送信息",
+    clear: "清除信息",
+    clearTitle: "要清除这条信息吗？",
+    clearDescription: "这会移除此浏览器中尚未发送的信息与已保存草稿，且无法恢复。",
+    keep: "继续编辑",
     intro: "发送你的问题或合作提案，通过电子邮件获取回复。",
     name: "姓名",
     email: "电子邮件",

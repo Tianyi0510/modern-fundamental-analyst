@@ -11,7 +11,7 @@ const copy = {
   "zh-cn": { unavailable: "此图表暂时无法显示。", retry: "重试" },
 };
 
-type Props = { children: ReactNode; locale: Locale; measure: "twr" | "xirr" };
+type Props = { children: ReactNode; locale: Locale; measure: "twr" | "xirr"; streaming?: boolean };
 
 export class ChartBoundary extends Component<Props, { failed: boolean }> {
   state = { failed: false };
@@ -42,7 +42,8 @@ export class ChartBoundary extends Component<Props, { failed: boolean }> {
         ) : null}
       </div>
     );
-    // Streaming SSR uses this fallback; client failures are caught by this boundary.
-    return this.state.failed ? fallback : <Suspense fallback={fallback}>{children}</Suspense>;
+    if (this.state.failed) return fallback;
+    // Monthly tables must not depend on a streamed reveal script to remain visible without JavaScript.
+    return this.props.streaming === false ? children : <Suspense fallback={fallback}>{children}</Suspense>;
   }
 }
