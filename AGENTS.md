@@ -124,6 +124,6 @@ Preserve the stable `verify` and `webkit` result jobs, the required `performance
 
 ## Maintaining this file
 
-Keep durable constraints, verified commands and task references here. Put detailed procedures in their domain guide. Add nested instructions only for real subtree differences. Check paths, commands, anchors and instruction-file discovery after edits. Preserve historical evidence; editing docs does not verify production or publish a release. Preserve referenced anchors. Automatic loading of changed instructions requires confirmation in a fresh Codex session.
+Keep durable constraints, verified commands and task references here. Put detailed procedures in their domain guide. Add nested instructions only for real subtree differences. Check paths, commands, anchors and instruction-file discovery after edits. Preserve historical evidence; editing docs does not verify production or publish a release. Describe the current checkout in active guides, keep dated audits and release-preparation records explicitly historical, and distinguish local validation from CI and deployed evidence. Preserve referenced anchors. Automatic loading of changed instructions requires confirmation in a fresh Codex session.
 
 Format reference: [AGENTS.md](https://agents.md/).

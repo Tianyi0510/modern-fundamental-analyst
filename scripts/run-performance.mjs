@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { performanceRoutes, evaluateReports } from "./performance-budgets.mjs";
 import { chromium } from "@playwright/test";
-import { calibrateCpu, validateCpuCalibration } from "./performance-cpu.mjs";
+import { calibrateCpuWithRetry, validateCpuCalibration } from "./performance-cpu.mjs";
 
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -84,8 +84,8 @@ try {
   try {
     const page = await browser.newPage();
     calibration = {
-      ...(await calibrateCpu(page, (stage, samples) =>
-        writeFile(new URL(`cpu-${stage}-samples.json`, output), JSON.stringify(samples) + "\n"),
+      ...(await calibrateCpuWithRetry(page, (stage, samples, attempt) =>
+        writeFile(new URL(`cpu-attempt-${attempt}-${stage}-samples.json`, output), JSON.stringify(samples) + "\n"),
       )),
       browserVersion: browser.version(),
       executablePath: env.CHROME_PATH,

@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { calibrateCpu, createCpuCalibration, validateCpuCalibration } from "./performance-cpu.mjs";
+import {
+  calibrateCpu,
+  calibrateCpuWithRetry,
+  createCpuCalibration,
+  validateCpuCalibration,
+} from "./performance-cpu.mjs";
 
 test("CPU slowdown targets the same reference on faster and slower hosts", () => {
   for (const host of [2000, 4000, 8000]) {
@@ -105,4 +110,59 @@ test("each report must prove stable host performance and the actual applied slow
   ]) {
     assert.throws(() => validateCpuCalibration({ ...report, configSettings }, calibration));
   }
+});
+
+test("transient pre-audit instability retries with fresh samples and keeps all evidence", async () => {
+  const { page, commands } = benchmarkPage([2500, 2500, 2500, 1400, 1400, 1400, 2000, 2000, 2000, 1000, 1000, 1000]);
+  const evidence = [];
+  const result = await calibrateCpuWithRetry(page, (stage, samples, attempt) =>
+    evidence.push({ stage, samples, attempt }),
+  );
+  assert.equal(result.attempt, 2);
+  assert.equal(result.cpuSlowdownMultiplier, 2);
+  assert.deepEqual(
+    evidence.map(({ stage, attempt }) => [stage, attempt]),
+    [
+      ["host", 1],
+      ["effective", 1],
+      ["host", 2],
+      ["effective", 2],
+    ],
+  );
+  assert.equal(commands.filter(([method]) => method === "detach").length, 2);
+});
+
+test("persistent instability stops after three attempts", async () => {
+  const { page, commands } = benchmarkPage(
+    Array.from({ length: 3 }, () => [2500, 2500, 2500, 1400, 1400, 1400]).flat(),
+  );
+  await assert.rejects(calibrateCpuWithRetry(page), /did not reproduce/);
+  assert.equal(commands.filter(([method]) => method === "detach").length, 3);
+});
+
+test("invalid samples, slow hosts, browser errors and evidence write errors are not retried", async () => {
+  for (const samples of [[900, 900, 900], [NaN, 2000, 2000], [new Error("Browser disconnected")]]) {
+    const { page } = benchmarkPage(samples);
+    const attempts = [];
+    await assert.rejects(calibrateCpuWithRetry(page, (_stage, _samples, attempt) => attempts.push(attempt)));
+    assert.ok(attempts.every((attempt) => attempt === 1));
+  }
+  const { page } = benchmarkPage([2000, 2000, 2000]);
+  await assert.rejects(
+    calibrateCpuWithRetry(page, () => {
+      throw new Error("Disk full");
+    }),
+    /Disk full/,
+  );
+});
+
+test("unstable host samples are retried before applying throttling", async () => {
+  const { page } = benchmarkPage([2000, 4000, 4000, 2000, 2000, 2000, 1000, 1000, 1000]);
+  assert.equal((await calibrateCpuWithRetry(page)).attempt, 2);
+});
+
+test("invalid effective samples stop immediately even when later samples could pass", async () => {
+  const { page, commands } = benchmarkPage([2000, 2000, 2000, NaN, 1000, 1000, 2000, 2000, 2000, 1000, 1000, 1000]);
+  await assert.rejects(calibrateCpuWithRetry(page), /valid effective/);
+  assert.equal(commands.filter(([method]) => method === "detach").length, 1);
 });

@@ -231,7 +231,7 @@ Use these composition boundaries:
 - **Language disclosure:** Collapsible opens upward above its fixed trigger. It keeps a 4px gap to the theme toggle.
 - **Theme toggle:** a local Tooltip provider delays pointer entry by 600ms; keyboard focus opens immediately. Its localized `aria-label` supplies the accessible name. The hydrated button explicitly uses `tabIndex={0}` so WebKit includes it in the keyboard sequence.
 - **Holdings:** the feature owns TanStack sorting and calculations; DataTable renders native Table semantics, headings, totals and `aria-sort`. Mobile sorting uses Native Select and Button.
-- **Performance:** one interactive Recharts composition in Card, with solid Portfolio and dashed SPY. Keep keyboard/touch comparison, missing-data gaps and the monthly Table alternative. No static chart or custom series buttons.
+- **Performance:** two measures, cumulative reconstructed TWRR and annualized XIRR, each with one interactive Recharts composition in Card, with solid Portfolio and dashed SPY. Keep keyboard/touch comparison, missing-data gaps and the monthly Table alternative. No static chart or custom series buttons.
 - **Memos:** linked Cards represent published articles; planned research stays noninteractive. H2/H3 semantics depend on placement. Article outlines compose Collapsible directly; indexes and monthly tables use AnimatedDisclosure.
 - **Forms:** standard forms use FormPanel; Footer Subscribe retains its inverse treatment. Field feedback and provider results stay inline. Support enhances native payment radios after hydration.
 - **Feedback:** Alert Dialog confirms draft clearing. Memo copy-link success/failure uses an instance-local Toast manager; copying omits query and fragment. Empty represents no data, Skeleton represents loading, and Spinner accompanies pending actions.
@@ -708,13 +708,13 @@ Data blocks use `--radius-data`; Investment Memo Cards, their inner Card and the
 
 Memo cards use 48px outer content insets at every viewport width, including the footer bottom inset. Performance chart X-axis labels reserve a 48px axis height and a 16px tick gap to separate them from the lowest Y-axis label.
 
-Contact, Subscribe and Support retain their action label and add the shared shadcn/ui Spinner while pending. The decorative spinner is hidden from assistive technology; a separate live status announces the localized pending message. The spinner is decorative beside that label and disables rotation for reduced motion. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
+Contact, Subscribe and Support retain their action label and add the shared shadcn/ui Spinner while pending. The decorative spinner is hidden from assistive technology and disables rotation for reduced motion; a separate live status announces the localized pending message. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
 
 Support amount cards progressively enhance native radio inputs to shadcn/ui RadioGroup after hydration. The group submits product_id, retains the server-selected product, and uses the existing fieldset lock and frozen retry payload. Native radios remain the no-JavaScript fallback; keyboard focus is visible on the full amount card.
 
-Performance charts reserve a 300px Skeleton and load the interactive chart when its container is within 200px of the viewport. Once loaded, the chart stays mounted; monthly tables remain available independently.
+Each Performance chart reserves a 300px Skeleton and loads within 200px of the viewport. It stays mounted after loading. Monthly tables remain independent of chart loading and rendering.
 
-Performance charts include a black 1px dashed reference line at 0% (6px dash, 4px gap), using `--chart-reference`: black in light mode and `#cccccc` in dark mode. The reference extends the Y-axis domain when needed and does not change the return data or series styles.
+Performance charts include a 1px dashed reference line at 0% (6px dash, 4px gap), using `--chart-reference`: black in light mode and `#cccccc` in dark mode. The reference extends the Y-axis domain when needed and does not change the return data or series styles.
 
 Support amounts use Medium Display, (51px mobile, 67px wide desktop, weight 700); summary KPIs instead remain 51px at every viewport. Amount cards retain 1px internal separators using `--border-strong`: black in light mode and white in dark mode.
 

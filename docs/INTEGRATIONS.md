@@ -141,7 +141,9 @@ Receiving does not change the Contact recipient, senders or webhook secret. Prov
 
 ### JavaScript form availability
 
-Contact, subscription signup, preference-link request, preference update and subscription confirmation forms use `ClientForm`. Their native fieldsets stay disabled until hydration attaches the submission handler. Without JavaScript, a localized notice explains that the information has not been sent. The forms explicitly use POST as a fallback safeguard; no personal fields are submitted through a default GET, and native GET submission cannot discard preference or confirmation tokens. Notices use the page language, independently of the saved subscription language. The preference lookup also includes the notice in its streaming fallback, so readers without JavaScript receive instructions while the completed form remains outside the main content. Their existing JSON API contracts remain unchanged. Support retains its independent native POST workflow.
+Contact, signup, preference-link, preference-update and confirmation forms use `ClientForm`. Fieldsets remain disabled until submission handlers attach and a React transition enables the hydration flag. Without JavaScript, a localized notice explains that nothing has been sent. The preference lookup includes this notice in its streaming fallback.
+
+Forms explicitly use POST to prevent default GET submissions from exposing personal fields or discarding tokens. Notices follow the page language, not the saved subscription language. JSON API contracts remain unchanged. Support uses its own native POST workflow.
 
 ### Contact draft recovery
 
@@ -433,7 +435,7 @@ Prefer integration-managed values. Never expose the upload token with `NEXT_PUBL
 
 ### Errors and source maps
 
-`src/instrumentation-client.ts` initializes browser monitoring before hydration. `src/instrumentation.ts` loads Node/Edge configuration and exposes request-error reporting. Localized and global boundaries report errors while preserving retry and navigation UI.
+`src/instrumentation-client.ts` starts the browser monitoring bridge before hydration. The bridge buffers early errors immediately and loads the SDK asynchronously after yielding to the browser. `src/instrumentation.ts` loads Node/Edge configuration and exposes request-error reporting. Localized and global boundaries report errors while preserving retry and navigation UI.
 
 `next.config.ts` wraps Next.js with Sentry, uploads maps only with complete upload settings, then deletes uploaded generated maps from output. Runtime reporting needs no upload token.
 

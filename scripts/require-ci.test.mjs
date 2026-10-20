@@ -64,7 +64,7 @@ test("preview and local builds do not require production CI", async () => {
   await requireSuccessfulCI({ env: {}, fetcher: () => assert.fail("must not fetch") });
 });
 
-test("normal polling stays within thirty unauthenticated requests", async () => {
+test("adaptive polling stays within thirty-three unauthenticated requests", async () => {
   let clock = 0,
     calls = 0;
   await assert.rejects(
@@ -81,7 +81,7 @@ test("normal polling stays within thirty unauthenticated requests", async () => 
     }),
     /30 minutes/,
   );
-  assert.equal(calls, 30);
+  assert.equal(calls, 33);
 });
 test("transient failures back off and rate-limit headers delay the next request", async () => {
   let clock = 0,
@@ -196,4 +196,51 @@ test("unreadable or malformed CI evidence cannot authorize deployment", async ()
     assert.deepEqual(delays.slice(0, 4), [60_000, 120_000, 240_000, 240_000]);
     assert.equal(clock, 30 * 60_000);
   }
+});
+
+test("reused evidence completing after 21 seconds releases the gate at 30 seconds", async () => {
+  let clock = 0;
+  const times = [];
+  await requireSuccessfulCI({
+    env,
+    now: () => clock,
+    sleep: async (ms) => {
+      clock += ms;
+    },
+    fetcher: async () => {
+      times.push(clock);
+      return Response.json({
+        workflow_runs: clock < 21_000 ? [{ ...run, status: "in_progress", conclusion: null }] : [run],
+      });
+    },
+  });
+  assert.deepEqual(times, [0, 15_000, 30_000]);
+});
+
+test("fast polling cannot use another SHA or an older successful run", async () => {
+  let clock = 0;
+  await assert.rejects(
+    requireSuccessfulCI({
+      env,
+      now: () => clock,
+      sleep: async (ms) => {
+        clock += ms;
+      },
+      fetcher: async () =>
+        Response.json({
+          workflow_runs: [
+            run,
+            {
+              ...run,
+              id: 2,
+              status: clock < 15_000 ? "queued" : "completed",
+              conclusion: clock < 15_000 ? null : "cancelled",
+            },
+            { ...run, id: 3, head_sha: "b".repeat(40) },
+          ],
+        }),
+    }),
+    /CI concluded cancelled/,
+  );
+  assert.equal(clock, 15_000);
 });

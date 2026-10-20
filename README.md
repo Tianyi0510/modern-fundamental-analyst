@@ -62,13 +62,15 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
 | `public/`         | Public icons, logos, and the social sharing image                                      |
 | `.github/`        | GitHub Actions workflows                                                               |
-| `docs/`           | Quality, design system, architecture, and integration documentation                    |
+| `docs/`           | Design system, architecture, integrations and historical release preparation           |
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
 Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component and follows the [content design workflow](docs/DESIGN_SYSTEM.md#content-design-workflow).
 
-The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) defines five layers: Design Style (Pentagram, PayPal, Swiss Themes, Bauer Types, Lineto, Jost and Yahoo Finance), Design Foundations (Fluent 2), UX Guidelines (Web Interface Guidelines, Fluent 2 and Cieden Handbook), Components (shadcn/ui and Lucide), and Interaction Primitives (Base UI). HTML Living Standard, WCAG 2.2 AA, Responsive Web Design and Core Web Vitals take precedence across all layers. Reference priority runs top to bottom and left to right only within assigned responsibilities. The site retains its approved palette, Perfect Fourth typography and Swiss Grid / Editorial Layout; Color Tokens comprise 10 Primitive Colors (eight PayPal-inspired brand/neutrals and two Yahoo Finance-inspired financial colors) plus Fluent 2 Functional Colors. Fluent governs neutral, brand, semantic and interaction roles, accessibility guidance, Global/Alias Tokens, and the documented foundation mappings. Functional roles prioritize the ten Primitive Colors. Only the ten primitives and exact Fluent default functional values are permitted; custom mixtures and color opacity modifiers are prohibited. Unrelated Tailwind palettes are disabled. shadcn/ui owns Theming, Typeset and Components; Motion uses Duration and Easing (`curve*` tokens). Web Interface Guidelines Copywriting and Fluent Content Design apply exclusively to UX Writing. Marketing and research retain site editorial conventions. The Design System records component mappings, responsive exceptions and the capitalization context matrix; application and provider guides cover implementation, data, security and operations.
+The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) assigns responsibilities to five layers: visual style, Fluent 2 foundations, UX guidance, shadcn/ui components and Base UI primitives. Web standards take precedence. Each reference governs only its assigned domain.
+
+The site retains its approved colors, Perfect Fourth typography and Swiss Grid / Editorial Layout. Use the ten Primitive Colors first; add only necessary Fluent default functional values. The Design System defines tokens, component mappings, responsive exceptions and copy conventions.
 
 Investment Memo Articles are authored in local MDX and rendered as Server Components. See [memo content](docs/WEB_APPLICATION_ARCHITECTURE.md#investment-memo-content) for publishing and validation, and [available shadcn components](docs/DESIGN_SYSTEM.md#available-shadcn-components) for reusable UI modules.
 
@@ -81,6 +83,8 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | [Integrations](docs/INTEGRATIONS.md)                                 | Provider setup, secrets, email/consent, Redis recovery, payment verification and monitoring.                |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
 | [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Historical release-preparation evidence and checklist, not current deployment status.                       |
+
+The root [Design QA](design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
 
 ### Documentation maintenance
 
