@@ -25,6 +25,11 @@ export function FinancialValueScroll({
     const region = ref.current;
     if (!region) return;
     const measure = () => setOverflow(region.scrollWidth > region.clientWidth + 1);
+    // ResizeObserver is unavailable in some test environments; measure once and skip live updates there.
+    if (typeof ResizeObserver === "undefined") {
+      measure();
+      return;
+    }
     const observer = new ResizeObserver(measure);
     observer.observe(region);
     if (region.firstElementChild) observer.observe(region.firstElementChild);

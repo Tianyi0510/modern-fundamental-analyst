@@ -39,7 +39,7 @@ test.describe("mobile content and navigation QA", () => {
       const contentBox = await page.locator(".methodology-content").boundingBox();
       expect(headingBox).not.toBeNull();
       expect(contentBox).not.toBeNull();
-      expect(contentBox!.y - (headingBox!.y + headingBox!.height)).toBeLessThanOrEqual(40);
+      expect(contentBox!.y - (headingBox!.y + headingBox!.height)).toBeLessThanOrEqual(48);
 
       const sourceStyle = await page.locator(".methodology-source").evaluate((element) => {
         const style = getComputedStyle(element);

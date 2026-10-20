@@ -4,13 +4,18 @@ import { renderToString } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { reportClientError } from "@/lib/sentry-client";
 import { ChartBoundary } from "./chart-boundary";
-import { PerformanceChartView } from "./performance-chart-view";
 
 vi.mock("@/lib/sentry-client", () => ({ reportClientError: vi.fn() }));
 beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   vi.mocked(reportClientError).mockClear();
 });
+
+const renderError = new TypeError("private rendering detail");
+
+function UnavailableChart(): never {
+  throw renderError;
+}
 
 it.each([
   ["en", "This chart is temporarily unavailable."],
@@ -21,7 +26,7 @@ it.each([
     <>
       <nav aria-label="Site navigation">Home</nav>
       <ChartBoundary locale={locale} measure="twr">
-        <PerformanceChartView locale={locale} measure="twr" observations={[]} />
+        <UnavailableChart />
       </ChartBoundary>
       <section aria-label="Methodology">Methodology remains available</section>
     </>,
@@ -33,12 +38,6 @@ it.each([
     tags: { feature: "performance-chart", measure: "twr" },
   });
 });
-
-const renderError = new TypeError("private rendering detail");
-
-function UnavailableChart(): never {
-  throw renderError;
-}
 
 it("reports the original rendering error for SDK stack parsing", () => {
   render(
