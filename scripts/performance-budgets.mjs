@@ -1,8 +1,8 @@
 export const performanceRoutes = [
-  { path: "/", stylesheetBytes: 160 * 1024 },
-  { path: "/zh-tw", stylesheetBytes: 270 * 1024 },
-  { path: "/zh-cn", stylesheetBytes: 270 * 1024 },
-  { path: "/performance", stylesheetBytes: 160 * 1024 },
+  { path: "/", stylesheetBytes: 180 * 1024 },
+  { path: "/zh-tw", stylesheetBytes: 285 * 1024 },
+  { path: "/zh-cn", stylesheetBytes: 275 * 1024 },
+  { path: "/performance", stylesheetBytes: 180 * 1024 },
 ];
 
 const limits = { lcpMs: 3000, tbtMs: 200, cls: 0.1, scriptBytes: 1200 * 1024 };

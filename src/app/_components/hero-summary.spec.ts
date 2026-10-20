@@ -18,7 +18,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
               const following = page.locator(
                 route === "" ? ".home-about" : route === "/portfolio" ? ".portfolio-holdings-section" : ".returns",
               );
-              await expect(following).toHaveCSS("padding-top", "48px");
+              await expect(following).toHaveCSS("padding-top", "96px");
               await expect(summary).toBeVisible();
               if (route === "/portfolio") {
                 await expect(summary.getByRole("term")).toHaveCount(3);
@@ -59,7 +59,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
               expect(geometry.dlRight).toBeCloseTo(geometry.right, 0);
               expect(geometry.left).toBeGreaterThan(0);
               expect(geometry.gap).toBeCloseTo(48, 0);
-              expect(geometry.bottom - geometry.dlBottom).toBeCloseTo(48, 0);
+              expect(geometry.bottom - geometry.dlBottom).toBeCloseTo(96, 0);
               for (const card of await summary.locator("[data-tone]").all()) {
                 expect(
                   await card.evaluate((e) => e.scrollWidth <= e.clientWidth && e.scrollHeight <= e.clientHeight),

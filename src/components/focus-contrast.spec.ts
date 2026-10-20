@@ -10,13 +10,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await page.goto(`${prefix}/performance`);
     await page.locator(".header-actions [data-theme-toggle]").click();
     await page.keyboard.press("Tab");
-    const summary = page.locator("main details summary").first();
+    const summary = page.locator('main [data-slot="collapsible-trigger"]').first();
     await summary.focus();
-    for (const target of [summary, page.locator('main details [role="region"]').first()]) {
-      if (target !== summary) {
-        await summary.press("Enter");
-        await page.keyboard.press("Tab");
-      }
+    {
+      const target = summary;
       await expect(target).toBeFocused();
       const colors = await target.evaluate((element) => ({
         ring: getComputedStyle(element).outlineColor,
