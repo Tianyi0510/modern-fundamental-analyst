@@ -6,7 +6,7 @@
   line-height: 1.15;
   letter-spacing: 0;
   color: var(--text-primary);
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 .inverse {
   color: var(--white);
