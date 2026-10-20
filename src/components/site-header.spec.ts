@@ -912,6 +912,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await page.keyboard.press("Shift+Tab");
         await expect(summary).toBeFocused();
         const collapsedHeight = await drawer.evaluate((element) => element.getBoundingClientRect().height);
+        const panel = drawer.locator('[data-slot="collapsible-content"]');
         await summary.focus();
         await page.keyboard.press("Enter");
         await expect(drawer).toHaveAttribute("data-open", "");
@@ -923,9 +924,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(options).toHaveCount(2);
         await expect(drawer.locator(`a[href="${prefix}/portfolio"]`)).toHaveCount(0);
         await expect(options.first()).toBeVisible();
-        await expect
-          .poll(() => drawer.evaluate((element) => element.getBoundingClientRect().height))
-          .toBeGreaterThan(collapsedHeight);
+        // The panel opens upward above the stationary trigger, so the trigger
+        // keeps its collapsed height while the panel itself expands.
+        await expect.poll(() => panel.evaluate((element) => element.getBoundingClientRect().height)).toBeGreaterThan(0);
+        expect(await drawer.evaluate((element) => element.getBoundingClientRect().height)).toBe(collapsedHeight);
         await page.keyboard.press("Tab");
         await expect(options.first()).toBeFocused();
         await summary.evaluate((element: HTMLElement) => element.click());
