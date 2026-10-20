@@ -33,6 +33,7 @@ export function ThemeToggle({ locale, buttonRef }: { locale: Locale; buttonRef?:
               size="icon"
               data-theme-toggle=""
               aria-label={label}
+              tabIndex={hydrated ? 0 : -1}
               disabled={!hydrated}
               disabledFeedback="muted"
               onClick={() => setTheme(isDark ? "light" : "dark")}

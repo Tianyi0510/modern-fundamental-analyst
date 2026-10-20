@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatPercent } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
@@ -43,6 +43,27 @@ export function PerformanceChartExplorer({
   portfolio: string;
 }) {
   const text = copy[locale];
+  const [visible, setVisible] = useState(false);
+  const attachViewport = useCallback((container: HTMLDivElement | null) => {
+    if (!container) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+  const placeholder = (
+    <div role="status">
+      <span className="sr-only">{text.loading}</span>
+      <Skeleton className="h-[300px] w-full" />
+    </div>
+  );
   return (
     <>
       <ul className={styles.legend} aria-label={title}>
@@ -59,32 +80,31 @@ export function PerformanceChartExplorer({
         <p>{text.hint}</p>
         <p>{title}</p>
         <ChartBoundary locale={locale} measure={measure}>
-          <Suspense
-            fallback={
-              <div role="status">
-                <span className="sr-only">{text.loading}</span>
-                <Skeleton className="h-[300px] w-full" />
-              </div>
-            }
-          >
-            <InteractiveLineChart
-              data={observations.map((row) => ({ ...row }))}
-              config={{
-                portfolioReturn: { label: portfolio, color: "var(--chart-portfolio)" },
-                benchmarkReturn: { label: "SPY", color: "var(--chart-benchmark)" },
-              }}
-              series={["portfolioReturn", "benchmarkReturn"]}
-              showPoints={false}
-              referenceValue={0}
-              dashedSeries={["benchmarkReturn"]}
-              xKey="date"
-              label={title}
-              emptyMessage={text.empty}
-              formatX={(value) => formatDate(String(value), locale, true)}
-              formatY={(value) => formatPercent(Number(value), 0)}
-              formatValue={(value) => formatPercent(Number(value))}
-            />
-          </Suspense>
+          <div ref={attachViewport} data-chart-viewport="">
+            {visible ? (
+              <Suspense fallback={placeholder}>
+                <InteractiveLineChart
+                  data={observations.map((row) => ({ ...row }))}
+                  config={{
+                    portfolioReturn: { label: portfolio, color: "var(--chart-portfolio)" },
+                    benchmarkReturn: { label: "SPY", color: "var(--chart-benchmark)" },
+                  }}
+                  series={["portfolioReturn", "benchmarkReturn"]}
+                  showPoints={false}
+                  referenceValue={0}
+                  dashedSeries={["benchmarkReturn"]}
+                  xKey="date"
+                  label={title}
+                  emptyMessage={text.empty}
+                  formatX={(value) => formatDate(String(value), locale, true)}
+                  formatY={(value) => formatPercent(Number(value), 0)}
+                  formatValue={(value) => formatPercent(Number(value))}
+                />
+              </Suspense>
+            ) : (
+              placeholder
+            )}
+          </div>
         </ChartBoundary>
       </div>
     </>

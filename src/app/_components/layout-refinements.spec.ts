@@ -4,6 +4,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} chart axis labels do not intersect`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${prefix}/performance`);
+    await page.locator("[data-chart-viewport]").first().scrollIntoViewIfNeeded();
     const chart = page.locator(".recharts-wrapper").first();
     await expect(chart.locator(".recharts-xAxis-tick-labels text").first()).toBeVisible();
     const baseline = chart.locator(".chart-baseline line");

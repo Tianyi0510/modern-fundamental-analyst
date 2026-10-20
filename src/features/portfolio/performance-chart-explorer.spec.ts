@@ -35,3 +35,19 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     );
   }
 }
+
+test(
+  "below-fold charts reserve space and stay mounted after entering the viewport",
+  { tag: "@mobile" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/performance");
+    const figure = page.locator("main figure").first();
+    const viewport = figure.locator("[data-chart-viewport]");
+    await expect(viewport.locator('[data-slot="skeleton"]')).toHaveCSS("height", "300px");
+    await expect(figure.getByRole("application")).toHaveCount(0);
+    await showInteractivePerformanceChart(figure);
+    await page.locator("h1").scrollIntoViewIfNeeded();
+    await expect(figure.getByRole("application")).toHaveCount(1);
+  },
+);
