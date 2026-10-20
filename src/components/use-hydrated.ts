@@ -1,11 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-
-const subscribe = () => () => {};
-const clientSnapshot = () => true;
-const serverSnapshot = () => false;
+import { startTransition, useEffect, useState } from "react";
 
 export function useHydrated() {
-  return useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    // Enabling hydrated controls must not force the remaining page into synchronous hydration.
+    startTransition(() => setHydrated(true));
+  }, []);
+  return hydrated;
 }

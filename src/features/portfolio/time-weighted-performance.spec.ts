@@ -13,8 +13,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       prefix === "/zh-tw" ? "負債餘額" : prefix === "/zh-cn" ? "负债余额" : "liability balances",
     );
     await expect(page.locator("main figure")).toHaveCount(2);
-    await expect(page.locator('main svg[role="application"]')).toHaveCount(2);
     for (const figure of await page.locator("main figure").all()) await showInteractivePerformanceChart(figure);
+    await expect(page.locator('main svg[role="application"]')).toHaveCount(2);
     const xirr = page.locator('figure[aria-labelledby="performance-chart-title"]');
     await expect(xirr.getByRole("heading")).toHaveText(prefix ? "年化 XIRR" : "Annualized XIRR");
     await expect(
