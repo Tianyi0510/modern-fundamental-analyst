@@ -3,7 +3,7 @@ import { cn } from "./utils";
 
 describe("semantic typography class composition", () => {
   it("keeps type treatments separate from text colors and alignment", () => {
-    expect(cn("text-medium-label text-white", "text-center text-brand").split(" ").sort()).toEqual([
+    expect(cn("text-white text-medium-label", "text-center text-brand").split(" ").sort()).toEqual([
       "text-brand",
       "text-center",
       "text-medium-label",

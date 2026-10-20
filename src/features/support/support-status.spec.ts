@@ -38,7 +38,8 @@ for (const copy of supportLocales) {
       const status = page.locator(".support-status-error");
       await expect(status).toBeVisible();
       await expect(status).toHaveAttribute("role", "status");
-      await expect(status).toHaveCSS("border-left-color", "rgb(255, 0, 0)");
+      // --border-error resolves to --text-error (--colorStatusDangerForeground2).
+      await expect(status).toHaveCSS("border-left-color", "rgb(191, 42, 44)");
       await expect(status).toHaveCSS("border-left-width", "4px");
       await expect(status).toHaveCSS("border-left-style", "solid");
       await expect(status).toHaveCSS("color", "rgb(0, 0, 0)");

@@ -119,6 +119,9 @@ test("mobile sorting controls share dimensions and use one press transform", asy
   const group = page.locator(".portfolio-mobile-sort");
   const select = group.locator("select");
   const direction = group.getByRole("button");
+  // The Suspense fallback renders the controls inside a disabled fieldset until
+  // the URL-aware table streams in; wait for the interactive button first.
+  await expect(direction).toBeEnabled();
   await direction.scrollIntoViewIfNeeded();
   const selectBounds = (await select.boundingBox())!;
   const buttonBounds = (await direction.boundingBox())!;

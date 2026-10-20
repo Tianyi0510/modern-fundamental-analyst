@@ -72,9 +72,9 @@ export function PortfolioTable(props: PortfolioTableProps) {
   );
 }
 
-function readSorting(params: Pick<URLSearchParams, "get">): SortingState {
-  const key = params.get("sort");
-  const direction = params.get("direction");
+function readSorting(params: Pick<URLSearchParams, "get"> | null): SortingState {
+  const key = params?.get("sort");
+  const direction = params?.get("direction");
   return columns.includes(key as SortKey) && (direction === "asc" || direction === "desc")
     ? [{ id: key!, desc: direction === "desc" }]
     : defaultSorting;
