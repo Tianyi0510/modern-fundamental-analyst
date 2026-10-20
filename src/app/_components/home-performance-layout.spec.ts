@@ -13,7 +13,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const originalSize = await value.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
       const normalChart = await chart.boundingBox();
       const normalCopy = await copy.boundingBox();
-      expect(normalCopy!.x).toBeGreaterThan(normalChart!.x + normalChart!.width);
+      if (width === 900) {
+        // The comparison stacks below 64rem of container width (see
+        // DESIGN_SYSTEM.md); at a 900px viewport the copy sits below the chart.
+        expect(normalCopy!.y).toBeGreaterThanOrEqual(normalChart!.y + normalChart!.height);
+      } else {
+        expect(normalCopy!.x).toBeGreaterThan(normalChart!.x + normalChart!.width);
+      }
       await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
       const chartBox = await chart.boundingBox();
       const valueBox = await value.boundingBox();

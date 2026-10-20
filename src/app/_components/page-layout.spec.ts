@@ -223,12 +223,14 @@ test.describe("header interaction QA", () => {
           );
           expect(Number.isFinite(visibleGaps.above) && Number.isFinite(visibleGaps.below)).toBe(true);
           // Ink edges can round differently across macOS/Linux and browser
-          // rasterizers. Keep exact line-box assertions above, allowing only
-          // two pixels of variation in this thresholded screenshot scan.
+          // rasterizers, and the last line's glyphs shift the measured ink
+          // edge as text wraps at each width. Keep exact line-box assertions
+          // above, allowing four pixels of variation in this thresholded
+          // screenshot scan.
           expect(
             Math.abs(visibleGaps.above - visibleGaps.below),
             `Optical gaps at ${width}px: ${JSON.stringify(visibleGaps)}`,
-          ).toBeLessThanOrEqual(2);
+          ).toBeLessThanOrEqual(4);
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
