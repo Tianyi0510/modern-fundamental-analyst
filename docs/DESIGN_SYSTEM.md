@@ -229,7 +229,7 @@ Use these composition boundaries:
 
 - **Header:** Navigation Menu for desktop links, Dropdown Menu for desktop languages, Sheet for mobile/Tablet navigation. Sidebar is only the menu subset inside Sheet.
 - **Language disclosure:** Collapsible opens upward above its fixed trigger. It keeps a 4px gap to the theme toggle.
-- **Theme toggle:** a local Tooltip provider delays pointer entry by 600ms; keyboard focus opens immediately. Its localized `aria-label` supplies the accessible name.
+- **Theme toggle:** a local Tooltip provider delays pointer entry by 600ms; keyboard focus opens immediately. Its localized `aria-label` supplies the accessible name. The hydrated button explicitly uses `tabIndex={0}` so WebKit includes it in the keyboard sequence.
 - **Holdings:** the feature owns TanStack sorting and calculations; DataTable renders native Table semantics, headings, totals and `aria-sort`. Mobile sorting uses Native Select and Button.
 - **Performance:** one interactive Recharts composition in Card, with solid Portfolio and dashed SPY. Keep keyboard/touch comparison, missing-data gaps and the monthly Table alternative. No static chart or custom series buttons.
 - **Memos:** linked Cards represent published articles; planned research stays noninteractive. H2/H3 semantics depend on placement. Article outlines compose Collapsible directly; indexes and monthly tables use AnimatedDisclosure.
@@ -711,6 +711,8 @@ Memo cards use 48px outer content insets at every viewport width, including the 
 Contact, Subscribe and Support retain their action label and add the shared shadcn/ui Spinner while pending. The decorative spinner is hidden from assistive technology; a separate live status announces the localized pending message. The spinner is decorative beside that label and disables rotation for reduced motion. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
 
 Support amount cards progressively enhance native radio inputs to shadcn/ui RadioGroup after hydration. The group submits product_id, retains the server-selected product, and uses the existing fieldset lock and frozen retry payload. Native radios remain the no-JavaScript fallback; keyboard focus is visible on the full amount card.
+
+Performance charts reserve a 300px Skeleton and load the interactive chart when its container is within 200px of the viewport. Once loaded, the chart stays mounted; monthly tables remain available independently.
 
 Performance charts include a black 1px dashed reference line at 0% (6px dash, 4px gap), using `--chart-reference`: black in light mode and `#cccccc` in dark mode. The reference extends the Y-axis domain when needed and does not change the return data or series styles.
 

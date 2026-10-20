@@ -51,6 +51,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           await expect(target).toBeVisible();
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           await page.emulateMedia({ reducedMotion: "reduce" });
+          // Settle the resized mobile viewport before resolving pointer coordinates.
+          await trigger.evaluate((element) => element.scrollIntoView({ behavior: "instant", block: "center" }));
+          await expect
+            .poll(() =>
+              trigger.evaluate((element) => {
+                const rect = element.getBoundingClientRect();
+                return Math.abs(rect.top + rect.height / 2 - innerHeight / 2);
+              }),
+            )
+            .toBeLessThan(2);
           await trigger.click();
           await expect(panel).toBeHidden();
           expect(await panel.evaluate((element) => element.getAnimations().length)).toBe(0);

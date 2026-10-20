@@ -1,6 +1,7 @@
 import { expect, type Locator } from "@playwright/test";
 
 export async function showInteractivePerformanceChart(figure: Locator) {
+  await figure.locator("[data-chart-viewport]").scrollIntoViewIfNeeded();
   const chart = figure.getByRole("application");
   await chart.scrollIntoViewIfNeeded();
   await expect(chart).toBeVisible();
