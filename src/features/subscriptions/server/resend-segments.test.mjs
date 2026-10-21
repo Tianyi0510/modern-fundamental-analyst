@@ -21,7 +21,7 @@ function createResendSegmentMock(initialIds, failRemoveId) {
           async remove({ segmentId }) {
             if (segmentId === failRemoveId) return { error: { name: "SegmentRemovalError" } };
             segmentIds.delete(segmentId);
-            return { data: { id: segmentId } };
+            return { data: { id: segmentId, deleted: true } };
           },
         },
       },

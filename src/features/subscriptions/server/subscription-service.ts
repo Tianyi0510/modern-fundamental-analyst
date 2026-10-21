@@ -1,5 +1,5 @@
 import "server-only";
-import { hasProviderId } from "./resend-contracts";
+import { hasProviderId, isResendWriteAcknowledged } from "@/lib/resend-contracts";
 import { getLocalizedPath, localeConfig, type Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
 import {
@@ -118,7 +118,20 @@ export async function activateConfirmedContactLocked(
     }),
   );
 
-  if (!welcome || welcome.error) {
+  if (
+    !welcome ||
+    welcome.error ||
+    !isResendWriteAcknowledged(welcome.data, (value) =>
+      Boolean(
+        value &&
+        typeof value === "object" &&
+        "object" in value &&
+        value.object === "event" &&
+        "event" in value &&
+        value.event === "subscriber.created",
+      ),
+    )
+  ) {
     // Subscription consent survives delivery failure. Keep the durable journal
     // for operator reconciliation; never blindly replay an ambiguous event.
     const context = resendOperationContext.getStore();

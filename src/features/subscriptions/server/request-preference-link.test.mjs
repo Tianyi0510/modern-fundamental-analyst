@@ -177,3 +177,16 @@ test("missing email configuration retains the HTTP unavailable response", async 
   assert.deepEqual(await response.json(), { error: "Email service is temporarily unavailable." });
   assert.equal(sends.length, 0);
 });
+
+test("malformed email acknowledgement preserves the exact preference-link retry payload", async () => {
+  const sent = [];
+  let acknowledged = false;
+  interceptResendRequests(["POST /emails"], async (_url, options) => {
+    sent.push({ body: options.body, key: new Headers(options.headers).get("idempotency-key") });
+    return Response.json(acknowledged ? { id: "accepted" } : {});
+  });
+  assert.equal((await requestPreferenceLink("reader@example.com", "en", "preferences/retry-ack")).ok, false);
+  acknowledged = true;
+  assert.deepEqual(await requestPreferenceLink("reader@example.com", "en", "preferences/retry-ack"), { ok: true });
+  assert.deepEqual(sent[1], sent[0]);
+});

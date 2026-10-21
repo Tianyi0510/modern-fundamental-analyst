@@ -488,6 +488,8 @@ Production builds replace `__SENTRY_DEBUG__` with `false` through Next.js `compi
 
 `src/lib/sentry-server.ts` reports Checkout failures, missing Contact configuration and Resend failures using fixed operation names and failure classes. It attaches no provider messages or request values. `runResendOperation` reports both thrown exceptions and returned SDK errors once, preserving the original result and retry behavior. All subscription segment requests, including rollback, use this boundary. Contact does not report the same provider rejection again.
 
+`isResendWriteAcknowledged` validates successful SDK payloads and reports malformed acknowledgements without including their contents. These are uncertain writes, not confirmed rejections. Subscriber leases and journals remain available for reconciliation; no further mutation or compensating rollback should follow an uncertain result. A malformed feedback unsubscribe response must not create a completed webhook marker. Provider retries can resume after the lease expires; local suppression remains in place. Contact, confirmation and preference-link retries reuse their original email payload and idempotency key. See [architecture boundaries](WEB_APPLICATION_ARCHITECTURE.md#framework-and-module-ownership) for the shared validation contracts.
+
 Callers explicitly allow expected statuses: contact lookups and feedback-driven unsubscribe updates accept 404. Other returned errors, including provider 5xx responses, remain reportable. Public input validation and application rate limits do not call this reporting boundary. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.
 
 ### Traces, logs and metrics

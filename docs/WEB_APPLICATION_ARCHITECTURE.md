@@ -14,26 +14,58 @@ Apply these principles before choosing an implementation. Distinguish a source r
 
 ### Architecture references
 
-References have the following responsibilities, in priority order:
+Use the categories below within their assigned responsibilities. Official documentation governs supported behavior. Within a category, prefer earlier references when guidance conflicts in the same domain and context. CI/CD and SEO references govern their own domains; templates provide examples only. Web standards, accessibility requirements and supported framework behavior constrain every choice.
 
-| Reference                                                                                                               | Responsibility                                                                                             |
-| ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)                                         | React props, events, hooks, context, refs and reusable type contracts.                                     |
-| [Bulletproof React](https://github.com/alan2207/bulletproof-react) · [Demo](https://bulletproof-react-app.netlify.app/) | Feature organization, dependency boundaries, API access, state ownership, testing, errors and performance. |
-| [Josh W. Comeau](https://www.joshwcomeau.com/)                                                                          | Rendering, hydration, React performance and CSS implementation mechanics.                                  |
-| [Robin Wieruch](https://www.robinwieruch.de/)                                                                           | Component composition, forms, mutations and client/server data-fetching workflows.                         |
+#### Official Documentation
 
-For conflicting guidance within the same responsibility and context, prefer the earlier reference. A typing example does not override a feature-boundary rule. A client-cache recommendation does not automatically govern server-side data access.
+| Reference                                                                      | Responsibility                                                                                  |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html) | Type-system behavior, narrowing, generics and language constructs.                              |
+| [React](https://react.dev/learn)                                               | Component behavior, rendering, state, hooks and React APIs.                                     |
+| [Next.js](https://nextjs.org/docs)                                             | App Router conventions, server/client execution, caching, routing, metadata and framework APIs. |
+| [MDN Web Docs](https://developer.mozilla.org/)                                 | HTML, CSS, JavaScript, browser APIs and compatibility.                                          |
+| [web.dev](https://web.dev/)                                                    | Web performance, Core Web Vitals, accessibility and browser-facing implementation guidance.     |
 
-HTML standards, accessibility requirements and supported framework behavior constrain every choice. Check API examples against the target framework version. Older tutorials do not override supported APIs. The [Design System](DESIGN_SYSTEM.md) owns visual rules; [Integrations](INTEGRATIONS.md) owns provider configuration and recovery.
+MDN and web.dev explain web-platform practice; normative web standards take precedence. Check APIs against the installed framework version. Use the bundled Next.js documentation when available. A general React example does not override a Next.js routing contract.
 
-Installed Agent Skills and Build Web Apps supplement these references within their assigned responsibilities. They do not change the priority order. Apply each skill only to its stated task and framework context. Treat examples and tool defaults as conditional guidance, not universal requirements. Agent execution rules remain in [AGENTS.md](../AGENTS.md).
+#### Best Practices
 
-Cite the specific section supporting an adopted rule. Label conditional recommendations and project choices. Record a departure's requirement, alternatives, trade-off, verification and review trigger. Existing code, migration effort or a passing build alone is not sufficient justification.
+| Reference                                                                                                                 | Responsibility                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)                                           | Practical React typing for props, events, hooks, context and refs.                                         |
+| [Bulletproof React](https://bulletproof-react-app.netlify.app/) · [Source](https://github.com/alan2207/bulletproof-react) | Feature organization, dependency boundaries, API access, state ownership, testing, errors and performance. |
+| [Josh W. Comeau](https://www.joshwcomeau.com/)                                                                            | Rendering, hydration, React performance and CSS implementation mechanics.                                  |
+| [Robin Wieruch](https://www.robinwieruch.de/)                                                                             | Composition, forms, mutations and client/server data-fetching workflows.                                   |
+| [vercel-labs](https://www.skills.sh/vercel-labs)                                                                          | Task-specific React/Next.js optimization, composition, interface review and writing guidance.              |
+| [Build Web Apps](https://www.codex-marketplace.com/plugins/build-web-apps)                                                | Applicable frontend implementation, testing, debugging and component workflows.                            |
+
+The selected vercel-labs skills are `vercel-react-best-practices`, `vercel-composition-patterns`, `web-design-guidelines`, `writing-guidelines` and `next-best-practices`. Their installed paths and provenance are recorded under [Installed Agent Skills](#installed-agent-skills). A directory listing is not an instruction to install every skill. The linked Build Web Apps marketplace is a third-party catalog; use the installed plugin's actual skill instructions to determine capabilities and execution requirements.
+
+Apply each skill only to its stated task and framework context. Examples and defaults are conditional guidance, not universal requirements. These references do not redefine the visual system or override official API behavior. Agent execution rules remain in [AGENTS.md](../AGENTS.md).
+
+#### SEO
+
+| Reference                                                     | Responsibility                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [Google Search Central](https://developers.google.com/search) | Google crawling, indexing, canonicalization, localized pages, structured data and search policies. |
+| [Semrush Blog](https://www.semrush.com/blog/)                 | Supporting SEO research, content planning and practical audit techniques.                          |
+
+Google's documentation takes precedence for Google Search behavior and eligibility. Semrush advice does not establish a ranking requirement or require a paid subscription. Verify changes against served pages and search-provider evidence; local tests do not prove indexing or ranking improvements.
+
+#### Templates
+
+| Reference                                                                                   | Responsibility                                        |
+| ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [Next.js Portfolio Starter Kit](https://vercel.com/templates/next.js/portfolio-starter-kit) | Portfolio and publishing implementation examples.     |
+| [Next.js App Router Playground](https://vercel.com/templates/next.js/app-directory)         | Examples of App Router features and routing behavior. |
+
+Templates illustrate implementation options. They do not prescribe this project's dependencies, visual design or architecture. Check source versions and adopt only examples that satisfy the principles above.
+
+The [Design System](DESIGN_SYSTEM.md) owns visual rules; [Integrations](INTEGRATIONS.md) owns provider configuration and recovery. Cite the specific section supporting an adopted rule. Label conditional recommendations and project choices. Record a departure's requirement, alternatives, trade-off, verification and review trigger. Existing code, migration effort or a passing build alone is not sufficient justification.
 
 ### CI/CD references and principles
 
-These references govern workflow execution and release controls. They do not replace the four application-architecture references or change their responsibilities.
+These references govern workflow execution and release controls. They complement the official documentation and best-practice references above without changing their responsibilities.
 
 | Priority | Reference                                                                                                                                              | Responsibility                                                                                     |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
@@ -197,6 +229,10 @@ Use Next.js App Router and TypeScript for localized research pages and server-si
 | `src/components` and `src/lib`      | Shared UI, utilities and service clients without feature dependencies. |
 
 ESLint enforces import boundaries and runtime cycles, including aliases and literal dynamic imports. Type-only cycles are excluded. Shared modules and features must not import application modules. Peer features communicate through application composition.
+
+Shared Resend acknowledgement checks live in `src/lib/resend-contracts.ts`; Contact and Subscriptions import them without crossing feature boundaries. Email sends and contact/segment writes require a nonempty provider ID. Segment removals also require `deleted: true`; welcome events require the expected event name and object type. A successful HTTP status alone does not establish a completed operation.
+
+Malformed write acknowledgements mark subscriber operations uncertain. Preserve leases and journals for reconciliation, stop subsequent mutations and avoid compensating an unknown outcome. Webhook completion is recorded only after a valid unsubscribe acknowledgement or the explicitly accepted missing-contact response. Email retries retain their original payload and idempotency key; an acknowledged subscription remains valid when its welcome event needs reconciliation.
 
 Provider and token modules use `server-only`. Next.js enforces the server/client boundary during builds. The Node test loader bypasses that marker for server tests and does not type-check; run TypeScript separately. See [verification responsibilities](#verification-responsibilities).
 

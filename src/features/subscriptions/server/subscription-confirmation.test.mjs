@@ -117,8 +117,10 @@ test.beforeEach((t) => {
       writes.push({ path, body: JSON.parse(options.body ?? "{}") });
       if (path.includes("/events")) {
         if (eventOutcome === "unknown") return HttpResponse.error();
+        if (eventOutcome === "malformed") return Response.json({});
         if (eventOutcome === "rejected")
           return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
+        return Response.json({ object: "event", event: "subscriber.created" });
       } else if (path.startsWith("/contacts") && !path.includes("/segments"))
         active = !JSON.parse(options.body).unsubscribed;
       return Response.json({ id: "contact" });
@@ -226,7 +228,7 @@ test("confirmation rejects cross-origin posts", async () => {
   assert.equal(writes.length, 0);
 });
 
-for (const outcome of ["rejected", "unknown"])
+for (const outcome of ["rejected", "unknown", "malformed"])
   test(`${outcome} welcome retains confirmed consent and journal without rollback`, async () => {
     eventOutcome = outcome;
     await requestSubscriptionConfirmation("reader@example.com", "en", "subscribe/a");
@@ -320,4 +322,17 @@ test("expired request identity returns a recovery error rather than duplicate su
   now += 25 * 60 * 1000;
   assert.equal((await subscribe(request("/api/subscribe", body))).status, 422);
   assert.equal(sends.length, 1);
+});
+
+test("confirmation email retries preserve payload after a missing acknowledgement", async () => {
+  const payloads = [];
+  let acknowledged = false;
+  interceptResendRequests(["POST /emails"], async (_url, options) => {
+    payloads.push({ body: options.body, key: new Headers(options.headers).get("idempotency-key") });
+    return Response.json(acknowledged ? { id: "mail" } : {});
+  });
+  await assert.rejects(requestSubscriptionConfirmation("reader@example.com", "en", "subscribe/missing-ack"));
+  acknowledged = true;
+  await requestSubscriptionConfirmation("reader@example.com", "en", "subscribe/missing-ack");
+  assert.deepEqual(payloads[1], payloads[0]);
 });

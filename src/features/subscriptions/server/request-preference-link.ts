@@ -1,4 +1,5 @@
 import "server-only";
+import { hasProviderId, isResendWriteAcknowledged } from "@/lib/resend-contracts";
 import type { Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation, UPDATES_FROM_EMAIL } from "@/lib/resend";
 import { renderPreferenceEmail } from "../preference-email";
@@ -35,11 +36,11 @@ export async function requestPreferenceLink(email: string, locale: Locale, idemp
       { expectedStatuses: [404] },
     );
     if (!existing) throw new ResendCoordinationError();
-    if (existing.data) {
+    if (!existing.error && hasProviderId(existing.data)) {
       const result = await runResendOperation("Preference link email request failed", () =>
         resend.emails.send(emailPayload, { idempotencyKey }),
       );
-      if (!result || result.error) throw new ResendCoordinationError();
+      if (!result || result.error || !isResendWriteAcknowledged(result.data)) throw new ResendCoordinationError();
     } else if (existing.error?.statusCode !== 404) {
       console.error("Preference link contact lookup failed", existing.error?.name ?? "UnknownError");
       throw new ResendCoordinationError();

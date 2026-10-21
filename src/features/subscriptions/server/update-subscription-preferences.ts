@@ -1,5 +1,5 @@
 import "server-only";
-import { hasProviderId } from "./resend-contracts";
+import { hasProviderId } from "@/lib/resend-contracts";
 import { localeConfig, type Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
 import { syncPreferredLanguageSegment } from "./resend-segments";

@@ -62,3 +62,24 @@ test("provider rejection reports one safe error and retains the Contact failure 
   assert.equal(events[0].tags.failure_kind, "provider-error");
   assert.doesNotMatch(JSON.stringify(events), /private message|reader@example.com|re_test_contact_only/);
 });
+
+test("malformed send acknowledgements fail without losing retry identity", async (t) => {
+  const previousKey = process.env.RESEND_API_KEY;
+  process.env.RESEND_API_KEY = "re_test_contact_only";
+  t.after(() => {
+    if (previousKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = previousKey;
+  });
+  const keys = [];
+  let acknowledgement = {};
+  interceptResendRequests(["POST /emails"], async (_url, options) => {
+    keys.push(new Headers(options.headers).get("idempotency-key"));
+    return Response.json(acknowledgement);
+  });
+  for (acknowledgement of [{}, null, { id: " " }, { id: 1 }]) {
+    assert.equal((await sendContactMessage(input, "contact/retry")).ok, false);
+  }
+  acknowledgement = { id: "accepted" };
+  assert.deepEqual(await sendContactMessage(input, "contact/retry"), { ok: true });
+  assert.deepEqual(keys, Array(5).fill("contact/retry"));
+});

@@ -114,7 +114,9 @@ test("confirmed preference update failures restore previous language segments an
           { status: 422 },
         );
       }
-      return Response.json({ id: "contact-id", unsubscribed: false });
+      return Response.json(
+        options.method === "DELETE" ? { id: "contact-id", deleted: true } : { id: "contact-id", unsubscribed: false },
+      );
     },
   );
   const email = "rollback-preferences@example.com";
@@ -571,7 +573,7 @@ test("a rejected welcome retains consent and a durable pending journal", async (
         const id = path.split("/").at(-1);
         if (options.method === "POST") memberships.add(id);
         if (options.method === "DELETE") memberships.delete(id);
-        return Response.json({ id });
+        return Response.json(options.method === "DELETE" ? { id, deleted: true } : { id });
       }
       if (path.includes("/events"))
         return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
@@ -826,3 +828,70 @@ test("malformed unsubscribe acknowledgements preserve an existing journal and al
   assert.deepEqual(await readSubscriptionJournal(email), original);
   assert.equal(await withSubscriberLock(email, async () => "released"), "released");
 });
+
+test("unacknowledged complaint update remains replayable and retains its lease", async () => {
+  const { processDeliveryFeedback } = await import("./resend-webhook.ts");
+  const { subscriptionKey } = await import("./resend-coordination.ts");
+  const email = "unacknowledged-webhook@example.com";
+  let acknowledged = false;
+  let writes = 0;
+  interceptResendRequests(["PATCH /contacts/:contact"], async () => {
+    writes++;
+    return Response.json(acknowledged ? { id: "contact-id" } : {});
+  });
+  const event = { type: "email.complained", data: { to: [email] } };
+  await assert.rejects(processDeliveryFeedback(event, "unacknowledged-event"));
+  assert.equal(values.get(subscriptionKey("suppression", email)), "email.complained");
+  assert.ok(values.has(subscriptionKey("subscriber", email)));
+  await assert.rejects(processDeliveryFeedback(event, "unacknowledged-event"));
+  assert.equal(writes, 1);
+  values.delete(subscriptionKey("subscriber", email)); // Simulate lease expiry before provider retry.
+  acknowledged = true;
+  await processDeliveryFeedback(event, "unacknowledged-event");
+  await processDeliveryFeedback(event, "unacknowledged-event");
+  assert.equal(writes, 2);
+});
+
+for (const operation of ["add", "remove", "rollback"]) {
+  test(`malformed segment ${operation} acknowledgement retains the journal and lease`, async (t) => {
+    t.mock.method(console, "error", () => {});
+    const { subscriptionKey } = await import("./resend-coordination.ts");
+    const email = `segment-ack-${operation}@example.com`;
+    const previous = getPreferredLanguageSegmentId("en");
+    const target = getPreferredLanguageSegmentId("zh-tw");
+    const writes = [];
+    interceptResendRequests(
+      [
+        "GET /contacts/:contact",
+        "GET /contacts/:contact/segments",
+        "POST /contacts/:contact/segments/:segment",
+        "DELETE /contacts/:contact/segments/:segment",
+        "PATCH /contacts/:contact",
+      ],
+      async (url, options) => {
+        const path = new URL(url).pathname;
+        if (options.method === "GET")
+          return Response.json(
+            path.endsWith("/segments")
+              ? { data: [{ id: previous }], has_more: false }
+              : { id: "contact-id", unsubscribed: false },
+          );
+        writes.push(options.method);
+        if (options.method === "PATCH")
+          return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
+        if (
+          (operation === "add" && options.method === "POST") ||
+          (operation === "remove" && options.method === "DELETE") ||
+          (operation === "rollback" && path.endsWith(previous) && options.method === "POST")
+        )
+          return Response.json({});
+        return Response.json(options.method === "DELETE" ? { id: target, deleted: true } : { id: target });
+      },
+    );
+    assert.equal((await updateSubscriptionPreferences({ email }, "zh-tw", "save")).ok, false);
+    assert.ok(await readSubscriptionJournal(email));
+    assert.ok(values.has(subscriptionKey("subscriber", email)));
+    if (operation === "add") assert.deepEqual(writes, ["POST"]);
+    if (operation === "remove") assert.deepEqual(writes, ["POST", "DELETE"]);
+  });
+}
