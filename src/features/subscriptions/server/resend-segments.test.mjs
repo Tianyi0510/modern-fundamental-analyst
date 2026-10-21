@@ -12,7 +12,7 @@ function createResendSegmentMock(initialIds, failRemoveId) {
       contacts: {
         segments: {
           async list() {
-            return { data: { data: [...segmentIds].map((id) => ({ id })) } };
+            return { data: { data: [...segmentIds].map((id) => ({ id })), has_more: false } };
           },
           async add({ segmentId }) {
             segmentIds.add(segmentId);

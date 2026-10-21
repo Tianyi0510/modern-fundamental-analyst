@@ -131,6 +131,7 @@ export function SubscribeFormClient({
                 variant={variant}
                 name="email"
                 type="email"
+                spellCheck={false}
                 autoComplete="email"
                 inputMode="email"
                 placeholder={copy.placeholder}

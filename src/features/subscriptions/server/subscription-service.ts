@@ -1,4 +1,5 @@
 import "server-only";
+import { hasProviderId } from "./resend-contracts";
 import { getLocalizedPath, localeConfig, type Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
 import {
@@ -7,6 +8,10 @@ import {
 } from "@/features/subscriptions/server/resend-segments";
 import { SITE_URL } from "@/lib/site-config";
 import { createPreferenceUrl } from "@/features/subscriptions/server/subscription-preferences";
+
+function isContact(value: unknown): value is { id: string; unsubscribed: boolean } {
+  return hasProviderId(value) && "unsubscribed" in value && typeof value.unsubscribed === "boolean";
+}
 
 type SubscriptionResult = { ok: true } | { ok: false; message: string; status: 409 | 502 | 503 };
 
@@ -38,6 +43,8 @@ export async function activateConfirmedContactLocked(
     expectedStatuses: [404],
   });
   if (!existing || (existing.error && existing.error.statusCode !== 404)) return unavailable();
+
+  if (!existing.error && !isContact(existing.data)) return unavailable();
 
   if (existing.data && !existing.data.unsubscribed) {
     return { ok: false, message: "You've already subscribed", status: 409 };
@@ -79,12 +86,20 @@ export async function activateConfirmedContactLocked(
       }),
     );
   } else {
-    result = existing;
+    return unavailable();
   }
 
   if (!result || result.error) {
     if (rollbackLanguageSegments) await rollbackLanguageSegments().catch(() => undefined);
     if (result?.error) console.error("Resend subscription failed", result.error.name);
+    return unavailable();
+  }
+
+  if (!hasProviderId(result.data)) {
+    // A dispatched write without a valid acknowledgement has an unknown outcome.
+    // Retain coordination records and stop before sending the welcome event.
+    const context = resendOperationContext.getStore();
+    if (context) context.uncertain = true;
     return unavailable();
   }
 

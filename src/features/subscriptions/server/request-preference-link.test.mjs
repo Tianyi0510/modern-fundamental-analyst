@@ -1,3 +1,4 @@
+import { interceptResendRequests } from "../../../../scripts/resend-test-server.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
@@ -63,7 +64,7 @@ test.beforeEach((t) => {
   globalThis.__mfaRedisStateV6.client = redis;
   globalThis.__mfaRedisStateV6.unavailableUntil = 0;
   t.mock.method(console, "error", () => {});
-  t.mock.method(globalThis, "fetch", async (url, options) => {
+  interceptResendRequests(["GET /contacts/:contact", "POST /emails"], async (url, options) => {
     assert.equal(new URL(url).origin, "https://api.resend.com");
     if (options.method === "GET")
       return contactStatus === 200

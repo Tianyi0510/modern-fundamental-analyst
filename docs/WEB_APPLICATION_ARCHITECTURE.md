@@ -1,54 +1,281 @@
 # Web application architecture
 
-Use this guide for code conventions, application and data boundaries, portfolio updates, testing and releases. Implementation descriptions follow the current checkout; deployment status requires separate release evidence. [Design System](DESIGN_SYSTEM.md) covers visual and editorial rules. [Integrations](INTEGRATIONS.md) covers provider setup, credentials and recovery.
+Use this guide to design, review and operate the application. Architecture principles define the standard. Project decisions explain selected approaches and their limits. Operational procedures define verification, data updates and releases. A working implementation does not establish compliance or justify an exception.
 
 ## Navigation
 
-- [Application boundaries](#application-boundaries), [code conventions](#code-and-components) and [presentation loading](#presentation-and-style-loading): ownership, routing, rendering and style delivery.
-- [Portfolio data](#portfolio-data): source policy, financial measurement boundary, reconciliation and monthly updates.
-- [Test workflow](#test-workflow), [release workflow](#release-workflow) and [production gate](#production-gate): verification and publication.
-- [Review evidence](#review-evidence): local and CI evidence retention.
+- [Architecture principles](#architecture-principles): references, types, boundaries, state, data, rendering, forms and verification.
+- [Project decisions](#project-decisions): selected technologies, domain contracts and conditions for reconsideration.
+- [Operational procedures](#operational-procedures): tests, portfolio updates, performance checks and releases.
 
-## Application boundaries
+## Architecture principles
 
-The five-layer [Design System](DESIGN_SYSTEM.md#architecture-and-reference-ownership) separates Design Style, Design Foundations, UX Guidelines, Components and Interaction Primitives under cross-layer web standards. Reference priorities apply only within assigned design responsibilities. This guide separately owns application and data architecture: routing, server/client boundaries, validation, caching, feature state, security, testing and monitoring. Provider credentials and operational recovery belong in Integrations. Base UI manages interactive component mechanics; it does not own portfolio calculations, API calls, payment outcomes, subscription consent or provider retries. Public research pages do not require an account system; do not infer authentication requirements from dashboard examples in a design reference.
+Apply these principles before choosing an implementation. Distinguish a source recommendation from a project requirement or an example.
 
-Pages render localized Server Components. Add small Client Components for interactive controls. Provider and preference-token modules declare `server-only`; shared support IDs, legacy amounts and types live in `src/features/support/support-config.ts`.
+### Architecture references
 
-Node tests and the operator CLI use `scripts/register-server.mjs` to load TypeScript and TSX. The loader bypasses `server-only` for these entry points and does not type-check. TypeScript and Next.js separately enforce types and build boundaries.
+References have the following responsibilities, in priority order:
 
-Dependencies flow from app composition to features to shared modules:
+| Reference                                                                                                               | Responsibility                                                                                             |
+| ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)                                         | React props, events, hooks, context, refs and reusable type contracts.                                     |
+| [Bulletproof React](https://github.com/alan2207/bulletproof-react) · [Demo](https://bulletproof-react-app.netlify.app/) | Feature organization, dependency boundaries, API access, state ownership, testing, errors and performance. |
+| [Josh W. Comeau](https://www.joshwcomeau.com/)                                                                          | Rendering, hydration, React performance and CSS implementation mechanics.                                  |
+| [Robin Wieruch](https://www.robinwieruch.de/)                                                                           | Component composition, forms, mutations and client/server data-fetching workflows.                         |
 
-| Layer                          | Responsibility                                                                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `src/app/_components`          | Compose page chrome and feature content, including Home's portfolio and memo sections.                        |
-| `src/features`                 | Own portfolio, memos, subscriptions, contact and support: data, types, controls, styles and server workflows. |
-| `src/components` and `src/lib` | Provide shared UI, utilities and service clients.                                                             |
+For conflicting guidance within the same responsibility and context, prefer the earlier reference. A typing example does not override a feature-boundary rule. A client-cache recommendation does not automatically govern server-side data access.
 
-Features cannot import other features or `app`; shared modules cannot import either layer.
+HTML standards, accessibility requirements and supported framework behavior constrain every choice. Check API examples against the target framework version. Older tutorials do not override supported APIs. The [Design System](DESIGN_SYSTEM.md) owns visual rules; [Integrations](INTEGRATIONS.md) owns provider configuration and recovery.
 
-Email templates and fictional previews stay in their owning features and share `src/components/email-layout.tsx`. Preview modules import templates without service modules. Server delivery paths render production emails; retries keep the stored HTML and plain text. See [email templates](INTEGRATIONS.md#email-templates-and-local-preview).
+Installed Agent Skills and Build Web Apps supplement these references within their assigned responsibilities. They do not change the priority order. Apply each skill only to its stated task and framework context. Treat examples and tool defaults as conditional guidance, not universal requirements. Agent execution rules remain in [AGENTS.md](../AGENTS.md).
 
-ESLint checks static and dynamic import boundaries and runtime cycles, including `@/` aliases. Type-only cycles are excluded. Features and shared modules use literal dynamic-import paths; app composition can lazy-load features. Use direct imports; avoid barrels that mix server and client code.
+Cite the specific section supporting an adopted rule. Label conditional recommendations and project choices. Record a departure's requirement, alternatives, trade-off, verification and review trigger. Existing code, migration effort or a passing build alone is not sufficient justification.
 
-App composition supplies the Footer subscription slot and injects the welcome memo provider into subscription orchestration. The provider runs only after the contact is confirmed not to be subscribed.
+### CI/CD references and principles
 
-Feature API functions in `contact-api.ts` and `subscription-api.ts` define endpoints and input types. Shared `postJson` handles request deadlines, HTTP errors and idempotency headers. Success does not assert an unvalidated JSON type. Confirmation uses the same typed API for its token-only POST.
+These references govern workflow execution and release controls. They do not replace the four application-architecture references or change their responsibilities.
 
-Routes validate untrusted HTTP input and map service results to responses. Subscription workflows live in:
+| Priority | Reference                                                                                                                                              | Responsibility                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| 1        | [GitHub Actions documentation](https://docs.github.com/en/actions)                                                                                     | Supported syntax, event behavior, permissions, runners, caching, security and deployment controls. |
+| 2        | [Awesome Copilot CI/CD guidance](https://github.com/github/awesome-copilot/blob/main/instructions/github-actions-ci-cd-best-practices.instructions.md) | Practical workflow organization, efficiency, testing, diagnostics and release-review checklists.   |
 
-- `server/request-preference-link.ts`: recipient limits, immutable retry payloads, contact lookup, rendering and delivery. Missing contacts receive the same public success response as existing contacts.
-- `server/update-subscription-preferences.ts`: locks, journals, language synchronization, rollback and unsubscribe.
+Official platform behavior takes precedence over conflicting checklist advice. Awesome Copilot is supporting instruction material, not a platform specification or an installed Agent Skill. Verify example versions and applicability before adoption. Container signing, self-hosted runners, broad runtime matrices and additional deployment tools require a demonstrated need.
+
+Apply the following requirements when reviewing CI/CD:
+
+- Grant only the permissions each job needs. Keep PR code separate from privileged deployment contexts. Pass untrusted values through quoted environment variables rather than interpolating them into shell programs. Never expose provider credentials in test artifacts.
+- Lock action dependencies using a [workflow dependency lockfile](https://docs.github.com/en/actions/concepts/security/workflow-dependency-lockfiles) where supported, or verified full commit SHAs. The lockfile feature is in public preview; verify availability before adoption. Review dependency updates; mutable version tags alone do not provide immutable execution inputs. Follow GitHub's [secure use reference](https://docs.github.com/en/actions/reference/security/secure-use).
+- Declare meaningful triggers, job dependencies, timeouts and concurrency. Cancellation must not leave an uncontrolled deployment. Required result jobs must reject missing, failed or unexpectedly skipped prerequisites.
+- Install from the package lock. Treat caches as disposable acceleration, not verification evidence. Restrict cache reuse to compatible inputs and trust boundaries.
+- Test the release candidate and retain diagnostic evidence with bounded retention. Reusing results requires verified source identity, complete coverage, compatible configuration and a freshness limit. A matching source tree does not prove identical runner images or rebuilt artifacts.
+- Measure queue, setup, build and test time separately before changing parallelism. Balance elapsed time, runner usage and complete coverage. Consolidate builds only when platform and environment compatibility are established.
+- Bind release authorization to the intended commit and destination. Verify the deployed revision and live alias after publication. Use environment protections when Actions performs deployment; when another platform deploys, verify its equivalent controls. GitHub environments alone do not protect an external deployment. See [deployment controls](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/control-deployments).
+
+Project decisions and operational procedures below record implementation choices, not exceptions to these requirements. Repository files cannot establish live branch protection, secret access or provider settings; verify those separately and report inaccessible settings as unverified.
+
+### Type and component contracts
+
+Use types to describe valid inputs and states without concealing uncertainty:
+
+- Prefer inference for initialized values and inline handlers. Declare types at public boundaries and where inference loses meaning.
+- Model absent values with explicit unions. Use discriminated unions for mutually exclusive states and reducer actions.
+- Inherit native element props with React's component-prop utilities. Preserve native attributes, events and refs in wrappers.
+- Use specific DOM element types for refs. In React 19+, prefer refs as props; use older patterns only for version compatibility.
+- Give Context a meaningful default or use a nullable value with a checked consumer hook. Prefer a clear missing-provider error over an unsupported assertion.
+- Define custom-hook return contracts. Use tuples when positions convey meaning; use objects for larger named interfaces.
+- Treat external data as unknown until runtime validation succeeds. Type assertions do not validate JSON, FormData, storage or provider responses.
+
+The Cheatsheet permits assertions in justified cases; it does not support using them to bypass an unverified boundary. Sources: [props](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/basic_type_example/), [hooks](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/hooks/), [events](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/forms_and_events/), [context](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/context/) and [refs](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/forward_and_create_ref/).
+
+### Application boundaries
+
+Organize domain behavior by feature. Keep feature components, API declarations, types, state, tests and styles near their consumers. Add directories when they clarify ownership, not to reproduce a template.
+
+Dependencies point from application composition to features and shared modules. Shared modules must not depend on features or application code. Compose peer features at the application layer; pass data or behavior through explicit contracts. Prefer direct imports over barrels that obscure boundaries or combine server and client modules.
+
+Keep credentials and privileged operations behind server-only boundaries. Separate transport validation, domain workflows and provider adapters. A component library owns presentation and interaction mechanics, not business outcomes.
+
+Source: [Bulletproof React project structure](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md).
+
+### Code and components
+
+Give each component a cohesive responsibility. Extract independent UI units from large components rather than accumulating nested rendering functions. Use children or slots when composition reduces an overloaded prop interface. Render callbacks remain appropriate when a consumer needs supplied data.
+
+Create shared abstractions after identifying repeated responsibilities. Wrap third-party components when doing so establishes a stable application contract. Avoid speculative wrappers and abstractions that erase meaningful differences.
+
+Use consistent naming, explicit side-effect boundaries and automated formatting. Comments explain constraints and trade-offs. They should not repeat the implementation.
+
+Sources: [Bulletproof React components](https://github.com/alan2207/bulletproof-react/blob/master/docs/components-and-styling.md) and [project standards](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-standards.md).
+
+### State ownership
+
+Choose state ownership by lifetime and consumers:
+
+| State        | Ownership rule                                                                                                             |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Component    | Keep transient interaction state with its consumers. Lift it to the nearest shared owner when required.                    |
+| Application  | Share genuinely application-wide state through a scoped provider or store. Consider update frequency and subscriber scope. |
+| Server cache | Keep remote resource identity, freshness, invalidation and mutation reconciliation separate from local UI state.           |
+| Form         | Own field values, validation, pending state and submission results within the form workflow.                               |
+| URL          | Store navigation state that must survive reloads, history navigation or sharing in validated route/search parameters.      |
+
+Compute values from authoritative inputs when they need no independent lifetime. Do not duplicate the same state across stores without an explicit synchronization contract. Consider composition and lifting state before Context or a global store.
+
+Use a dedicated client-cache library when remote data needs browser-side caching and revalidation. Select a global store or form library for demonstrated requirements, not because an example imports it.
+
+Server module scope is shared across requests. Keep request-specific and user-specific mutable data in request-local scope, explicit arguments or request-scoped context. Shared service clients and immutable configuration may live at module scope if they do not retain mutable request data.
+
+Distinguish request deduplication from cross-request caching. Use framework-supported request memoization where repeated reads justify it. For cross-request caches, define identity, access scope, lifetime, size bounds and invalidation. Include every input that changes the result in the cache key. Never reuse private results across authorization boundaries.
+
+Supporting rules: installed [server request isolation](../.agents/skills/vercel-react-best-practices/rules/server-no-shared-module-state.md) and [request deduplication](../.agents/skills/vercel-react-best-practices/rules/server-cache-react.md).
+
+Source: [Bulletproof React state management](https://github.com/alan2207/bulletproof-react/blob/master/docs/state-management.md).
+
+### API contracts and data fetching
+
+Use a configured API client for shared transport behavior. Export feature-owned request declarations instead of embedding endpoint logic in rendering code. Define request and consumed-response types, runtime validation, a fetcher and failure behavior.
+
+Bulletproof React recommends a fetching/cache hook alongside client request declarations. Apply that recommendation to client-managed remote resources. For server-owned reads, define server functions and explicit caching and revalidation behavior instead. Do not introduce a browser cache for data that never needs client-side fetching.
+
+Start independent requests concurrently. Sequence requests only when data dependencies or workflow guarantees require it. Place loading and error boundaries around independently useful content. Define mutation effects on cached data, retry safety and pending UI.
+
+Sources: [Bulletproof React API layer](https://github.com/alan2207/bulletproof-react/blob/master/docs/api-layer.md) and [Robin Wieruch's data-fetching patterns](https://www.robinwieruch.de/react-data-fetching-patterns/).
+
+### Rendering and hydration
+
+Distinguish React Server Components, server-side rendering and hydration. Server Components execute on the server. Client Components can still contribute server-rendered HTML before becoming interactive in the browser.
+
+Place client boundaries where state, effects or browser APIs require them. The module dependency graph determines the boundary. Passing server-rendered children through a client wrapper does not convert those children into client modules.
+
+Keep the initial server and client render consistent. Defer browser-only decisions until mounting when they cannot be resolved consistently on the server. Do not hide avoidable mismatches with hydration-warning suppression. Two-pass rendering is a targeted technique with rendering and layout costs, not a universal loading strategy.
+
+Sources: [Josh W. Comeau on Server Components](https://www.joshwcomeau.com/react/server-components/) and [hydration](https://www.joshwcomeau.com/react/the-perils-of-rehydration/).
+
+### Forms and mutations
+
+Choose controlled inputs, uncontrolled inputs or Actions according to validation and workflow needs. Specify field errors, submission errors, pending state and success behavior. Client validation improves feedback; the server must validate inputs before changing data.
+
+Input validation does not establish permission. Treat Route Handlers and Server Actions as directly callable endpoints. At each protected mutation boundary, authenticate the caller and authorize the requested operation and resource. Do not rely solely on middleware, layouts or page guards. Validate capability tokens where they grant authority.
+
+For anonymous endpoints, define the permitted operation, accepted inputs, abuse controls and retry behavior. Public access is an explicit contract; it does not remove server validation or permit unrelated mutations.
+
+Supporting rule: installed [Server Action authorization](../.agents/skills/vercel-react-best-practices/rules/server-auth-actions.md).
+
+For Action-based forms, use `useActionState` when the result belongs in UI state. Use `useFormStatus` inside the relevant form subtree for pending feedback. For event-driven forms, define equivalent lifecycle and failure contracts. Do not assume Action hooks track arbitrary fetch calls.
+
+Prevent duplicate submissions while work is pending. Preserve recoverable input after failure. Reset only when the outcome warrants it. Where native submission is supported, preserve it before hydration. Where JavaScript is required, prevent unintended native submission and explain the unavailable state.
+
+Sources: [Bulletproof React form state](https://github.com/alan2207/bulletproof-react/blob/master/docs/state-management.md#form-state), [Robin Wieruch's validation](https://www.robinwieruch.de/react-form-validation/) and [pending actions](https://www.robinwieruch.de/react-form-loading-pending-action/).
+
+### Errors and observability
+
+Distinguish expected validation failures, transport failures and unexpected rendering errors. Report actionable feedback without exposing credentials, private payloads or raw provider errors.
+
+Place error boundaries around independently recoverable UI. A root fallback alone should not remove unrelated navigation and content. Handle request and event-handler errors within their workflows; rendering boundaries do not cover every failure source.
+
+Track unexpected production errors with sufficient context and readable source maps. Monitoring delivery and source-map resolution require separate verification from local error handling.
+
+Source: [Bulletproof React error handling](https://github.com/alan2207/bulletproof-react/blob/master/docs/error-handling.md).
+
+### Testing and performance principles
+
+Prioritize integration tests for feature behavior, focused unit tests for isolated logic and end-to-end tests for critical journeys. Assert observable outcomes rather than internal state or implementation names. Prefer network interception to replacing fetch so request behavior remains under test.
+
+Optimize state placement and composition before adding memoization. Use memoization for expensive calculations or reference stability that affects consumers. Split code at useful route or feature boundaries; excessive fragmentation can increase request overhead.
+
+Use styling compatible with the rendering environment. Build-time CSS avoids runtime style generation; dynamic values can use CSS custom properties. Measure assets, rendering and user-facing performance before claiming an improvement.
+
+Sources: [Bulletproof React testing](https://github.com/alan2207/bulletproof-react/blob/master/docs/testing.md), [performance](https://github.com/alan2207/bulletproof-react/blob/master/docs/performance.md), [Josh W. Comeau on memoization](https://www.joshwcomeau.com/react/usememo-and-usecallback/) and [CSS in Server Components](https://www.joshwcomeau.com/react/css-in-rsc/).
+
+## Project decisions
+
+These decisions select approaches for this application's requirements. They do not modify the principles above or certify implementation compliance. Reconsider a decision when its stated assumptions change. Provider procedures belong in [Integrations](INTEGRATIONS.md); visual specifications belong in [Design System](DESIGN_SYSTEM.md).
+
+### Installed Agent Skills
+
+Use project skills as supporting guidance within the reference priorities above:
+
+| Skill                                                                                 | Scope                                                                                     |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [next-best-practices](../.agents/skills/next-best-practices/SKILL.md)                 | Next.js routes, Server Component boundaries, data access, metadata, assets and hydration. |
+| [vercel-react-best-practices](../.agents/skills/vercel-react-best-practices/SKILL.md) | React and Next.js performance.                                                            |
+| [vercel-composition-patterns](../.agents/skills/vercel-composition-patterns/SKILL.md) | Component composition and reusable interfaces.                                            |
+| [web-design-guidelines](../.agents/skills/web-design-guidelines/SKILL.md)             | Web interface review.                                                                     |
+| [writing-guidelines](../.agents/skills/writing-guidelines/SKILL.md)                   | Clear technical writing.                                                                  |
+
+`next-best-practices` was installed from [vercel-labs/openreview](https://github.com/vercel-labs/openreview/tree/672deb21e70e471e0536d5ad7a67c14b8359e97e/.agents/skills/next-best-practices) at commit `672deb21e70e471e0536d5ad7a67c14b8359e97e`. [skills-lock.json](../skills-lock.json) records its source and content hash. Check examples against the installed Next.js version and official documentation before applying them. Installing a skill does not establish architecture compliance.
+
+### Framework and module ownership
+
+Use Next.js App Router and TypeScript for localized research pages and server-side reader services. Server-rendered content supports readable initial responses; client islands isolate interactions. This choice trades framework dependence for integrated routing, metadata and rendering.
+
+| Location                            | Responsibility                                                         |
+| ----------------------------------- | ---------------------------------------------------------------------- |
+| `src/app` and `src/app/_components` | Routes, metadata, page composition and cross-feature integration.      |
+| `src/features`                      | Portfolio, memos, contact, subscriptions and support workflows.        |
+| `src/components` and `src/lib`      | Shared UI, utilities and service clients without feature dependencies. |
+
+ESLint enforces import boundaries and runtime cycles, including aliases and literal dynamic imports. Type-only cycles are excluded. Shared modules and features must not import application modules. Peer features communicate through application composition.
+
+Provider and token modules use `server-only`. Next.js enforces the server/client boundary during builds. The Node test loader bypasses that marker for server tests and does not type-check; run TypeScript separately. See [verification responsibilities](#verification-responsibilities).
+
+### State and request decisions
+
+The selected ownership model separates navigation, presentation and provider state:
+
+| Concern               | Decision and reason                                                                                                                                          | Reconsider when                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Appearance            | One `next-themes` provider owns theme persistence and initialization across routes.                                                                          | Appearance needs independent scopes or additional persisted modes.                                     |
+| Disclosures and menus | Feature/local state owns visibility; Base UI owns primitive interaction mechanics.                                                                           | Multiple independent consumers need the same state.                                                    |
+| Portfolio sorting     | Validated URL parameters own sorting so links, reloads and history preserve the selection.                                                                   | The table adds navigation state such as filters or pagination.                                         |
+| Reader forms          | Feature-owned API functions use shared `postJson` transport and explicit submission states. Retry identity and service outcomes remain part of the workflow. | Field dependencies, validation duplication or mutation coordination warrant a form library or Actions. |
+| Research data         | Server-owned, versioned records supply rendered pages and bounded client props.                                                                              | Data freshness requires client revalidation or live subscriptions.                                     |
+| Remote resource cache | No general client query cache is selected for these server-owned reads and command submissions.                                                              | A feature needs browser-side resource caching, invalidation or optimistic updates.                     |
+
+A transport helper is not a resource cache. If client-managed remote reads are added, use the [API contracts](#api-contracts-and-data-fetching) policy rather than extending local state into an ad hoc cache.
+
+`contact-api.ts` and `subscription-api.ts` declare feature requests. `postJson` applies deadlines, HTTP failure handling and optional idempotency headers. A successful command returns completion, not an asserted response object. Consumed response bodies require runtime validation.
+
+### Presentation and style loading
+
+Use server-compatible content components and explicit client boundaries for interactions. Pass server-rendered children through the shared theme provider. `ClientForm` disables JavaScript-dependent controls until handlers attach. Native Support submission remains available before hydration.
+
+Tailwind and CSS Modules supply build-time styles compatible with Server Components. The root imports `globals.css`; tokens serve utilities and owned styles. Use finite component variants for shared appearance and CSS Modules for complex motion. Dynamic geometry may use inline values. Reconsider styling tools only against rendering compatibility, maintainability and measured delivery costs.
+
+`next-themes` owns `data-theme` and the `mfa:theme:v1` preference. Explicit light/dark choices persist; system appearance is the initial default. The Design System owns colors, typography, layout, motion and component mappings. Do not duplicate its numeric specifications here.
+
+Base UI owns focus containment, modal isolation and primitive keyboard behavior. The mobile navigation phase keeps Sheet open through its closing animation. Preserve interruption, focus restoration and scroll restoration when changing that coordination.
 
 ### Rendering and error boundaries
 
-- Each page has one focusable main landmark; navigation and Footer sit outside it.
-- Experimental `global-not-found` renders a complete localized 404 document with recovery links, without JavaScript. The request proxy derives `x-site-locale` from the path; normal pages keep static locale layouts.
-- Memo routes use `generateStaticParams` and `dynamicParams = false` to reject unknown slugs.
-- Payment verification and saved preferences stream under local Suspense boundaries. Ordinary Support visits and retry states render the native form before streaming. Header and Hero do not wait for providers.
-- Localized error boundaries offer retry and Home actions; global errors use a minimal document. Never display raw errors or provider data.
-- Performance labels and monthly table cells render on the server; the interactive Recharts chart, Collapsible and error boundary use client code. Each performance chart has `ChartBoundary`: Suspense contains streaming SSR errors; a client boundary offers localized retry and reports the original error to Sentry. Filtering replaces chart messages and nested causes, retains types and stack locations, and removes payloads and URL queries.
-- Chart clients receive monthly observations only. Ledgers and return reconstruction stay server-side. Chart boundaries preserve sibling charts, navigation and methodology; they do not cover module initialization or shared page-data preparation.
+Public research content renders on the server. Payment verification and saved preferences use local Suspense boundaries so provider latency does not delay unrelated content. Each page has one main landmark, with navigation and Footer outside it.
+
+Memo routes generate known slugs and reject unknown ones. Localized page errors offer retry and navigation. The global fallback renders a minimal document without private error details.
+
+Performance charts isolate interactive rendering with `ChartBoundary`. Monthly tables and captions remain outside that failure boundary. The chart client receives observations, not historical ledgers. A reserved 300px region limits layout movement; loading begins within 200px of the viewport and remains mounted afterward. Treat those values as project tuning, not reference requirements; reconsider them using loading and layout measurements.
+
+Sentry receives unexpected errors with sensitive messages, payloads and URL queries filtered. Its bridge captures startup errors while the SDK loads. Source maps and live delivery require provider verification.
+
+### Navigation prefetching
+
+`IntentLink` uses Next.js Link and enables default prefetching on hover, keyboard focus or pointer press. This policy reduces speculative route payloads while retaining navigation intent as a warming signal. Caller handlers, refs and explicit prefetch choices remain authoritative.
+
+Apply it to Header navigation, the wordmark, shared ButtonLink CTAs and Home text CTAs. Other links keep their documented behavior. Reconsider the policy when navigation latency or route-payload measurements favor another strategy. Test prefetching against production builds; development behavior is not sufficient evidence.
+
+### Deterministic date rendering
+
+Render financial calendar dates from validated ISO values and UTC components. Fixed English month names and Chinese numeric dates avoid server/browser locale-data differences. Compact English uses `Sep`.
+
+This is a project serialization policy for calendar dates, not a general prohibition on `Intl`. Reconsider it when adding time zones or localized date formats. Preserve identical initial server/client output and visible hydration warnings.
+
+### Service and consent boundaries
+
+Routes validate HTTP input and map domain results to responses. Features own contact delivery, subscription coordination and payment outcomes. Provider adapters keep credentials server-side. Research data remains independent of Redis and external delivery services.
+
+Keep request-origin checks, body limits, rate limits, retry identities and provider-error handling explicit. Unknown provider outcomes must not become assumed failures or unconditional retries. Subscription activation validates contact IDs and the boolean subscription state before consuming a lookup. Only an explicit 404 permits creation. Activation, preference-save and unsubscribe writes require a nonempty ID in successful acknowledgements. Malformed acknowledgements leave the outcome unknown: stop further writes and retain the lease and any journal. Unsubscribe bypasses the journal gate without creating or clearing a journal. Before language changes, validate every segment page: an array of nonempty IDs, a boolean `has_more` and a usable, nonrepeating cursor when more pages remain. Read the complete snapshot before writing. See [Integrations](INTEGRATIONS.md) for locks, journals and recovery.
+
+### Subscription consent boundary
+
+Signup requests a confirmation link. An explicit confirmation POST activates consent under the shared lock and journal; welcome delivery is separate. GET requests must not change consent.
+
+Redis stores confirmation, consent, suppression, limits and recovery records. Resend handles delivery and provider suppression. This split supports durable coordination across retries. Reconsider it if throughput or recovery requirements need a queue; record migration and replay guarantees first.
+
+Preference tokens retain their authenticated encryption format and legacy-key fallback. Decode JSON as `unknown`; require version `1`, a valid email and a finite numeric expiry later than the current time. Authentication does not replace payload validation. Secret rotation requires an explicit migration plan.
+
+### Project standards
+
+Use kebab-case files, PascalCase components and Next.js route naming exceptions. Keep adjacent relative imports; use `@/*` across source directories. Formatting uses UTF-8, LF, two spaces and final newlines.
+
+ESLint checks types, hooks, imports and framework rules. Prettier owns formatting and Tailwind ordering. Hooks validate staged files without rewriting them. CI remains the release gate because local hooks can be bypassed.
+
+### Lint and editor conventions
+
+Scope Vitest rules to `*.test.ts` and `*.test.tsx`, Testing Library rules to component tests, and Playwright rules to `*.spec.ts`. Node tests retain JavaScript rules. Keep framework naming exceptions and justified suppressions narrow.
+
+Keep Prettier last in ESLint configuration. Import ordering is not a project requirement. EditorConfig supplies portable editor defaults; VS Code settings enable formatting and explicit lint fixes. The Tailwind formatter scans `globals.css` and recognized class expressions. Private style-map strings still need review.
+
+There is no CSS semantic linter. Browser checks and review must establish selector and property behavior; formatting cannot do so.
 
 ### Routing and metadata
 
@@ -86,79 +313,9 @@ Pages compose Header and Footer. Home owns its header background; private servic
 - Allow `unsafe-eval` only in development.
 - Enable `upgrade-insecure-requests` only in Vercel Production builds; local production and Preview retain HTTP localhost access.
 
-Other connection and style behavior remains unchanged. A strict nonce policy would require dynamic rendering; assess caching costs first. See [Next.js CSP](https://nextjs.org/docs/app/guides/content-security-policy).
+This policy retains static prerendering at the cost of allowing inline scripts. Reassess that trade-off when the threat model requires a strict policy. A nonce-based policy changes rendering and caching requirements. See [Next.js CSP](https://nextjs.org/docs/app/guides/content-security-policy).
 
-```mermaid
-flowchart LR
-    Visitor[Browser] --> Pages[Localized Next.js pages]
-    Pages --> Data[Workspace portfolio and memo data]
-    Visitor --> API[Next.js API routes]
-    API --> Redis[Upstash Redis]
-    API --> Resend[Resend]
-    API --> Stripe[Stripe Checkout]
-    Resend --> Webhook[Signed webhook route]
-    Webhook --> Redis
-```
-
-Pages read versioned portfolio and memo data from the workspace. Reader services use Resend, Redis and Stripe; their failure and recovery contracts are in [Integrations](INTEGRATIONS.md). Redis is not the research data source.
-
-## Code and components
-
-Names, types and structure should make behavior easy to follow.
-
-- Use names that express domain meaning and responsibility rather than vague abbreviations. Give functions and components clear responsibility boundaries.
-- Use types to express valid states, and still validate external data at boundaries. Make side effects, errors, and asynchronous outcomes easy to trace.
-- Share implementations when responsibilities and behavior match. Preserve justified language, form, and service variants.
-- Use comments to explain reasons, constraints, and tradeoffs rather than restating the code. Let Next.js and React rules enforce framework requirements.
-
-See [application boundaries](#application-boundaries) for module ownership and [Integrations](INTEGRATIONS.md) for service procedures.
-
-### Project standards
-
-These conventions adapt [Bulletproof React's Project Standards](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-standards.md) to this Next.js application.
-
-- Use kebab-case for application files and folders; exported React components use PascalCase. Preserve Next.js routing and metadata conventions, including `(en)`, `[slug]`, `[...unmatched]`, `_components`, and `page.tsx`. Keep established tool configuration names and document titles.
-- Use the single `@/*` alias from [`tsconfig.json`](../tsconfig.json) for imports across source directories. Relative imports are appropriate for adjacent files and root tooling. Node tests use the same alias through the explicit [loader](../scripts/register-server.mjs), retaining file extensions for `.mjs` helpers. Do not introduce barrel exports solely to shorten paths.
-- Use UTF-8, LF line endings, two-space indentation, and a final newline. [EditorConfig](../.editorconfig) applies editor defaults; [Git attributes](../.gitattributes) normalize text line endings without treating binary assets as text. Prettier remains the formatting authority; Markdown trailing spaces may express intentional line breaks.
-- Keep ESLint's flat configuration and type-aware rules. Lint commands reject warnings, and unused ESLint disable directives are errors. Scope necessary suppressions to the smallest affected code and explain their reason; remove them when the underlying exception disappears.
-- Validate external data at runtime even when its TypeScript type is declared. During refactoring, update types and callers together, then run affected checks. Tests stay beside their owning code; shared test utilities live in `scripts/` and are never imported by application entry points.
-- CI is the required verification gate for releases. Husky provides local pre-commit checks of staged files; see [README verification](../README.md#verification) for their scope and recovery steps. Hooks cannot replace CI and must not run complete browser suites on every commit. Choose focused local checks using [AGENTS](../AGENTS.md#verification-and-review).
-
-### Lint and editor conventions
-
-Test and style suffixes such as `.integration.test.tsx` and `.styles.ts` are allowed. App Router naming additionally permits dynamic/catch-all segments, route groups, parallel slots, private folders, interception prefixes and `.well-known`.
-
-Vitest recommended rules apply only to `src/**/*.test.{ts,tsx}`. Testing Library and jest-dom rules additionally apply to component tests (`*.test.tsx`); custom-render inference is disabled so React SSR's `renderToString` is not treated as a Testing Library render. Playwright's recommended error-level rules apply only to `src/**/*.spec.ts`; advisory rules about conditional assertions and skips are not enabled because browser coverage uses viewport and platform matrices. Node `*.test.mjs` files retain the general JavaScript rules.
-
-Keep Prettier last in the ESLint configuration. It owns formatting; import ordering is not enforced. VS Code settings enable format-on-save and explicit ESLint fixes; `.editorconfig` supplies other editor defaults. Verify lint scoping, naming exceptions and cycle detection with `node --test eslint.config.test.mjs`.
-
-`prettier-plugin-tailwindcss` uses `src/app/globals.css` as its Tailwind v4 entry point. It sorts recognized `className` values and calls to `cn`, `clsx` and `cva`; plain strings in private style maps are not automatically recognized. Preserve cascade order, variant meaning and interpolation boundaries.
-
-`npm run lint` runs ESLint. `npm run format:check` runs Prettier, including CSS parsing and Tailwind ordering. `eslint-config-prettier` disables conflicting rules. There is no CSS semantic linter; builds, browser checks and review must catch invalid properties and selector behavior. Hooks check files without rewriting them. Format, review and stage fixes before committing.
-
-## Presentation and style loading
-
-`SiteDocument` mounts one client `ThemeProvider` from `next-themes` around the body content. Header controls and page consumers share its context; passed server-rendered children remain Server Components. It initializes `data-theme` before hydration and persists the preference in local storage. Tailwind scans runtime files under `src/`, excluding test fixtures and documentation so unused example utilities do not enter the shipped stylesheet. `ThemeToggle` is the only theme control; CSS semantic aliases and the text wordmark module own appearance. Provider/business workflows do not depend on theme state. The shared `useHydrated` flag starts false and enables controls in a React transition after mounting. Server-rendered forms remain disabled until their handlers attach, without forcing the remaining page into synchronous hydration.
-
-The root layout imports `src/app/globals.css` once. PostCSS compiles Tailwind themes and utilities. Tokens feed both Tailwind and CSS Modules; `base` provides the only reset and document defaults. Preflight and component-specific global selectors are not used.
-
-Pages compose Server Components such as `Container`, `PageHero`, button links and feature content. Native primitives in `src/components/ui` keep forms server-compatible. Interactive DropdownMenu and Sheet use `@base-ui/react/menu` and `@base-ui/react/dialog`; Sidebar composition uses `@base-ui/react/use-render`. Only interactive components and their owners declare `use client`. Static buttons, links and native form controls retain their server-compatible implementations. The `base-nova` registry in `components.json` selects Base UI source. The [five design layers](DESIGN_SYSTEM.md#architecture-and-reference-ownership) separate Design Style, Design Foundations, UX Guidelines, Components and Interaction Primitives. React, Next.js, TypeScript, Tailwind CSS and CSS Modules implement these layers through owned components, customized styles and global-to-semantic token aliases.
-
-The owned Perfect Fourth typography scale, palette and surface treatments are expressed in shared tokens and owned components, with brand adaptations documented in [Design System](DESIGN_SYSTEM.md). Thirteen size-first typography roles use rem sizes, zero tracking, weights 400/700, and line heights 1.15 for Display/Headline/Title or 1.5 for Label/Body. Responsive roles switch approved sizes at 50rem and 75rem without interpolation or locale-specific metric overrides. The shared `BrandLogo` component renders text with the documented desktop/mobile brand exception; Menu material owns its outline and shadow without a duplicate CSS border. No additional theme provider or visual component package is introduced.
-
-Motion uses Fluent 2 default duration/curve values and site-owned semantic aliases in `tokens.css`. Fluent 2 supplies default Web spacing, shapes, strokes, elevation geometry and motion values; Fluent Functional Colors govern neutral, brand, semantic and interaction roles with primitive-first mappings and documented dark surface/danger exceptions through the global/alias token architecture; the site owns component mappings, choreography and reduced-motion behavior. Tailwind defaults, CSS Modules and Web Animations API consume that source. Popup state attributes select entry/exit timing; the mobile phase owns the panel animation through dismissal. Base UI Collapsible panels use the shared CSS expansion/collapse timing and reverse from their current height. Provider timeouts and notification lifetimes remain separate from motion timing. See [Motion tokens and timing](DESIGN_SYSTEM.md#motion-tokens-and-timing).
-
-Private `*.styles.ts` maps contain complete utility strings. Components import their own CSS Modules for chart structure and complex motion. `components.json` configures source installation. Email styling remains separate. [Design System](DESIGN_SYSTEM.md#style-ownership) defines variants and visual ownership.
-
-`Grid` is a server-compatible guided layout shared by Home and the memo index. It owns responsive tracks and decorative gaps; memo cards own their solid surfaces and the tablet spanning rule. It adds no interaction engine or client boundary. Ordinary content grids remain Tailwind utilities. See [Grid layout](DESIGN_SYSTEM.md#grid-layout) for breakpoints and accessibility rules.
-
-`site-header-desktop.tsx` owns desktop navigation and language-menu state. `use-site-header.ts` owns mobile phases and measured panel/icon animations. `use-menu-touch-feedback.ts` owns the trigger/close touch ring.
-
-The mobile phase drives Sheet's open state through the final closing frame; Base UI owns modal isolation, focus containment and scroll locking. Base UI `render` replaces Slot composition without adding interactive wrappers. Popup `initialFocus` and `finalFocus` preserve close-button entry and route-aware focus restoration. Desktop Menu uses its own non-modal positioning and keyboard model, with explicit Tab and outside-focus exits. Mobile language options, Memos indexes and monthly tables use shadcn/ui Collapsible over Base UI. Their triggers require JavaScript; monthly table and memo index content remain server-rendered in mounted panels. AnimatedDisclosure is a thin composition for content panels, focus return and CSS height transitions, not a separate state or animation engine. See [interaction contracts](DESIGN_SYSTEM.md#interaction-motion-and-accessibility) for focus, interruption and input feedback.
-
-Before a presentation migration, capture screenshots and computed styles. Compare in the same browser and viewport. Verify direct loads, client navigation and browser return against a production build; hot reload does not prove production style ordering. Measure assets before claiming a performance improvement. Test behavior independently of utility strings; physical iPhone checks remain separate.
-
-## Investment memo content
+### Investment memo content
 
 Investment Memo Articles use locally imported MDX, compiled by `@next/mdx` into Server Components. `src/mdx-components.tsx` provides the required App Router entry point. The owning feature supplies section, subsection, reference and link treatments through `memo-mdx-components.tsx`; other pages do not inherit article-specific markup.
 
@@ -168,11 +325,11 @@ The Microsoft article remains the English original on all three routes. The loca
 
 Use [Next.js MDX](https://nextjs.org/docs/app/guides/mdx) for compiler conventions. Run the affected memo Node tests and production browser checks after editing article markup; confirm the three language routes and narrow layouts.
 
-## Portfolio data
+### Portfolio data
 
 The portfolio feature owns financial data, sources, calculations and monthly acceptance. Amounts and retrieval records below are dated evidence, not live quotes. Code records remain authoritative.
 
-### Workspace data
+#### Workspace data
 
 `src/features/portfolio/portfolio-detail.ts` records 91 purchase lots with fees, SPY adjusted prices by applied trading date, 124 cash events, three corporate actions and 22 month-end position, price and XIRR snapshots.
 
@@ -199,13 +356,7 @@ Performance shows reconstructed cumulative TWR versus SPY total return and since
 
 `PortfolioTable` owns its columns, controlled single-column sorting and TanStack sorted row model. `DataTable` renders native table structure; its row-rendering extension preserves the feature's row headers, mobile labels and financial styles. The footer stays outside the sorted model. Shared UI never imports portfolio calculations. Chart interaction never alters the monthly ledger or return calculations.
 
-`MemoShare` owns an instance-local Toast manager and copies only the current origin/path to the clipboard. It does not send article data or URL parameters to a provider. Clipboard failures offer an address-bar fallback.
-
-Desktop Navigation Menu renders the existing IntentLink anchors through Base UI `render`; it preserves real hrefs, current-page state and intent-based prefetching. Mobile and desktop use one shared Button-based theme toggle with Lucide icons and the existing `next-themes` resolved state.
-
-`FormPanel` supplies Card spacing and surfaces only. Contact, subscriptions and Support continue to own validation, locks, retry identifiers and provider requests; no shared panel state couples their submissions.
-
-The September update was reviewed against the monthly brokerage statement on 2026-10-05:
+Historical evidence: the September update was reviewed against the monthly brokerage statement on 2026-10-05:
 
 | Item                                                         | Reviewed result                  |
 | ------------------------------------------------------------ | -------------------------------- |
@@ -230,7 +381,7 @@ The result is a rebased calculation price, not September's quoted close. Simulat
 
 Future extensions must use same-vintage adjusted-price ratios. Do not combine a newly adjusted endpoint with unchanged purchase prices without rebasing. This correction replaced rounded Stock Analysis inputs and increased September benchmark XIRR by about 0.00000494 percentage point. August and earlier observations, and displayed September value/XIRR (USD 121,237.01 and 19.26%), are unchanged.
 
-### Historical price sources
+#### Historical price sources
 
 Use Yahoo Finance only for new or replacement historical stock and ETF prices, including SPY. Record ticker, source URL, retrieval date, applied trading date, currency and adjustment basis. Mark missing observations unverified; do not substitute another provider.
 
@@ -238,7 +389,7 @@ Verify field definitions before use. Holdings need the share basis described bel
 
 Apply this policy to additions and explicit corrections. Preserve existing provenance: replacing a non-Yahoo input requires new Yahoo evidence, not a new label. Reconcile published corrections and run the acceptance checks below.
 
-### Calculation and updates
+#### Calculation and updates
 
 Keep source precision until display formatting.
 
@@ -249,7 +400,7 @@ Keep source precision until display formatting.
 
 Each month records the applied U.S. trading date, which precedes the calendar month-end when markets are closed. SPY is the only benchmark. Preserve previously published monthly prices and XIRRs unless the source evidence supports an explicit correction.
 
-### Reconstructed time-weighted return
+#### Reconstructed time-weighted return
 
 `portfolio-closing-marks.ts` contains 450 daily/event-date marks and 6,752 held-position prices for 2024-12-30 through 2026-09-30. Yahoo Finance chart data was retrieved on 2026-10-05.
 
@@ -294,6 +445,12 @@ Portfolio's “Total Return” and “Absolute Return” describe a percentage, 
 
 [GIPS methodology](https://www.gipsstandards.org/standards/gips-standards-for-firms/gips-standards-handbook-for-firms/) describes linked sub-period returns and flow conventions. The site claims neither GIPS compliance nor observed intraday TWR. The stocks-and-ETFs boundary matches XIRR; it is not a GIPS composite carve-out. Provision 3.A.15 requires cash and related income in composite carve-outs. Exact flow-time TWR requires actual valuations and event ordering at every external flow.
 
+## Operational procedures
+
+Use these procedures to apply the principles and verify project decisions. Commands and thresholds are project-specific. Local results, historical evidence, CI results and production state are distinct.
+
+### Update and acceptance procedure
+
 Refresh closing marks through the new month. Record source and retrieval date, verify split basis and reconcile every monthly position value. Refresh the entire SPY TWR vintage consistently; preserve the separately maintained XIRR history.
 
 ```sh
@@ -301,8 +458,6 @@ node --import ./scripts/register-server.mjs --test src/features/portfolio/portfo
 ```
 
 Tests cover linking, contributions, fees, dividends, tax, interest, transfers, splits, non-trading dates, missing inputs and month-end reconciliation.
-
-### Update and acceptance procedure
 
 1. **Identify the revision.** Record snapshot month, provider/dataset, available version or retrieval date, adjustment basis and evidence-review date. Use a non-private batch label when no public version exists. Git identifies the published revision. Keep statements, account IDs, raw files and private paths out of Git and release notes.
 2. **Update records.** Edit `src/features/portfolio/portfolio-detail.ts` for purchases, cash events, corporate actions, SPY prices and monthly valuations. Retain actual transaction dates and applied U.S. trading dates when they differ. Keep source precision. Change `src/features/portfolio/portfolio.ts` only for derivation or presentation changes.
@@ -328,9 +483,9 @@ Tests cover linking, contributions, fees, dividends, tax, interest, transfers, s
 5. **Check affected pages.** For values or chart changes, run `npx playwright test src/features/portfolio/performance-chart.spec.ts src/app/_components/portfolio-form-status.spec.ts --project=chromium` and inspect all three locales. For KPI changes, run `npx playwright test src/app/_components/semantic-content.spec.ts --project=chromium --grep "financial summaries"`; [Design System](DESIGN_SYSTEM.md#css-layout-and-visual-language) defines visual rules.
 6. **Accept and record.** Reconciliation, focused checks and affected pages must agree with the identified inputs. Document historical corrections and reasons. Before deployment, confirm release CI and identity under [AGENTS.md](../AGENTS.md#deployment-completion); do not routinely repeat the full suite locally.
 
-Node.js, TypeScript and existing tests support data updates and calculations. Python and SQL are not required. Python may help with a one-time conversion or statistical task; it is not a runtime dependency or another data source.
+Run calculations through the versioned TypeScript modules. Independent calculation tools may verify results, but must not silently replace source records or the published methodology.
 
-## Verification responsibilities
+### Verification responsibilities
 
 | Layer                                            | Responsibility and configuration source                                                                           |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
@@ -345,11 +500,11 @@ Node.js, TypeScript and existing tests support data updates and calculations. Py
 
 Change rules only for an identified problem, and check related tools, docs and tests for conflicts.
 
-## Test workflow
+### Test workflow
 
-Follow [Bulletproof React's testing guidance](https://github.com/alan2207/bulletproof-react/blob/master/docs/testing.md): test observable outcomes and service boundaries. Run real handlers and services with provider I/O mocked. Render real components through the shared loader. Check metadata, redirects, payloads and recovery state rather than implementation names. Reserve source assertions for boundaries such as `server-only` that runtime tests cannot establish. Preserve failure, interruption and retry coverage when consolidating cases.
+Apply the [testing principles](#testing-and-performance-principles) through the runners below. Keep provider writes mocked. Preserve failure, interruption and retry coverage. Source assertions are limited to explicit configuration or boundary contracts that behavioral tests do not establish.
 
-### Runners and isolation
+#### Runners and isolation
 
 | Runner                  | Files and scope                                                                 |
 | ----------------------- | ------------------------------------------------------------------------------- |
@@ -358,7 +513,11 @@ Follow [Bulletproof React's testing guidance](https://github.com/alan2207/bullet
 | Node                    | Existing colocated `*.test.mjs`, plus root configuration and `scripts/` checks  |
 | Playwright              | Colocated `src/**/*.spec.ts`; Chromium runs all cases, WebKit selects `@mobile` |
 
-`vitest.config.ts` separates unit and integration projects and resolves aliases. MSW intercepts provider HTTP, rejects unhandled requests and resets handlers after each test. `scripts/vitest-setup.ts` cleans up components and fails unexpected requests even if app code catches their errors. No MSW worker runs in production. Vitest excludes Node and Playwright files; application entry points never import tests.
+`vitest.config.ts` separates unit and integration projects and resolves aliases. MSW-backed tests intercept HTTP, reject unhandled requests and reset handlers after each test.
+
+Contact delivery and subscription service integration tests use MSW with explicit HTTP methods and provider paths. Unexpected requests fail the test even when the SDK catches transport errors. Preserve payload, failure, retry and journal assertions; concurrent rollback requests are checked as a set rather than in an arbitrary arrival order. Low-level transport unit tests may replace fetch to isolate transport behavior. Support localization and navigation are checked through rendered pages and resolved sitemap entries, not source text.
+
+`scripts/vitest-setup.ts` cleans up components and fails unexpected requests even if app code catches their errors. No MSW worker runs in production. Vitest excludes Node and Playwright files; application entry points never import tests.
 
 The loader, shared helpers, WebKit runner and production gate live in `scripts/`. The journal CLI stays with subscriptions at `src/features/subscriptions/server/subscription-journal-cli.mjs`, invoked through `npm run subscription:journal`.
 
@@ -366,18 +525,24 @@ The loader, shared helpers, WebKit runner and production gate live in `scripts/`
 
 WebKit uses the iPhone 13 viewport, touch, scale and user agent. Tag only phone-sized, mobile-compatible cases `@mobile`. Keep mouse-hover, CDP-only, desktop and cross-breakpoint cases in Chromium. Browser servers use isolated provider settings. Both engines test Contact's unavailable-service response; MSW and route tests cover success and retries. None proves live email delivery.
 
-### Coverage contracts
+#### Coverage contracts
 
 - Contact integrations check localized normalization, delivery payloads, errors and retry identity through MSW.
 - Memo checks resolve real Next.js redirects and verify localized HTTP 308 destinations and landmarks.
-- Subscription checks verify welcome payloads, preference links and expiry at the deadline.
+- Subscription checks verify welcome payloads, preference links, malformed authenticated payload rejection and expiry at the deadline.
 - Portfolio checks verify per-share cost and sorting. `portfolio-page-content.integration.test.tsx` covers all locales, table accessibility, controls, holdings and reconciled totals. Node checks retain the Server/Client boundary.
 - `semantic-content.spec.ts` checks KPI semantics, colors, opacity and composited contrast using `scripts/color-contrast.ts`. Visual rules live in [Design System](DESIGN_SYSTEM.md#typography-roles).
 - Header cases live in `components/site-header.spec.ts`; cross-page layout and CTA cases live in `app/_components/page-layout.spec.ts`. Feature journeys stay with their feature.
 
 References: [Vitest projects](https://vitest.dev/guide/projects), [Testing Library setup](https://testing-library.com/docs/react-testing-library/setup/), [MSW Node integration](https://mswjs.io/guides/integrations/node).
 
-### CI and evidence reuse
+#### CI and evidence reuse
+
+Actions are pinned to verified upstream commit SHAs, with release versions in comments. This project uses SHA pinning rather than the preview workflow lockfile feature. When updating an action, verify the commit in its source repository, review release changes, update every reference and retain the version comment. SHA pins fix direct action references; they do not freeze runner images or all transitive downloads.
+
+Workflow permissions default to `contents: read`. Only `plan` adds `actions: read` to inspect prior runs; job permissions replace workflow permissions, so `plan` explicitly retains `contents: read`. Build, test and result jobs do not receive Actions API access.
+
+`scripts/ci-workflow.test.mjs` parses the workflow and checks immutable remote action references and effective job permissions. It runs in the existing Node test suite. Evidence reuse, deployment-gate failure handling and browser shard coverage have separate tests.
 
 CI checks out the PR head SHA or exact push SHA. PRs always run full verification. The read-only `plan` job decides whether a main push may reuse complete PR evidence.
 
@@ -400,13 +565,17 @@ Each browser job uses one worker. Fail-fast is disabled so one shard does not ca
 
 Changed trees, workflows, lockfiles or test settings; stale evidence; squash/rebase merges; missing records; and API errors require full testing. The summary records the source run, tree and release SHA. Main still creates its own successful CI record for the production gate. Runner and runtime changes can occur outside Git, so reuse expires.
 
-### Performance regression checks
+#### Production optimization
+
+The optional [vercel-optimize skill](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) is not installed. Check its [provider prerequisites and readiness](INTEGRATIONS.md#vercel-optimize-readiness) before using it. Collect scoped production metrics first, preserve the evidence, and inspect code only after its candidate gates identify a relevant signal. Missing access or telemetry is not evidence of low traffic or good performance. A limited code-only review requires an explicitly agreed scope and must disclose the missing metrics. Production metrics complement local regression tests; they do not replace them.
+
+#### Performance regression checks
 
 Font instances belong to their locale layouts. `SiteDocument` receives the selected Chinese variable and shares only Jost. Global 404 rendering selects the matching locale variable. Turbopack uses `experimental.cssChunking: "graph"` because the default merging heuristic kept an unrelated Chinese font stylesheet in English routes even after imports were split. Validate generated stylesheet contents and browser behavior rather than assuming an import refactor fixes the download graph. Webpack fallback builds do not exercise this Turbopack optimization.
 
-After a production build, `npm run test:performance` starts an isolated loopback server on port 3211 with provider credentials disabled. Lighthouse 13.5.0 collects three fresh mobile samples for Home in each language and English Performance. DevTools applies CPU throttling, 150ms request latency, 1638.4 Kbps download and 750 Kbps upload directly. Do not compare these results directly with public HTTPS runs using simulated throttling.
+After a production build, `npm run test:performance` starts an isolated loopback server on port 3211 with provider credentials disabled. Lighthouse 13.5.0 collects three fresh mobile samples for Home in each language and English Performance. DevTools applies CPU throttling, 150 ms request latency, 1638.4 Kbps download and 750 Kbps upload directly. Do not compare these results directly with public HTTPS runs using simulated throttling.
 
-#### CPU calibration
+##### CPU calibration
 
 Calibration and Lighthouse explicitly use the same Playwright-installed Chrome for Testing executable. Do not calibrate with Playwright's default headless shell.
 
@@ -420,17 +589,17 @@ The reference comes from [PR #85, attempt 2](https://github.com/Tianyi0510/moder
 
 Do not change the target, discard slow Lighthouse samples or rerun an audit with a different multiplier to make a release pass. Only pre-audit calibration instability receives the bounded retries described below; each attempt recalculates its multiplier from fresh host samples against the same target. After calibration succeeds, keep that multiplier fixed for every route and sample. Drift during an audit is an infrastructure failure and stops the run. Calibration approximates CPU capacity; it does not establish equal application performance across hardware or physical-device equivalence. See [Lighthouse 13.5.0 CPU calibration](https://github.com/GoogleChrome/lighthouse/blob/v13.5.0/docs/throttling.md#cpu-throttling).
 
-#### Budgets and evidence
+##### Budgets and evidence
 
 | Metric             | Limit                          | Aggregation |
 | ------------------ | ------------------------------ | ----------- |
-| LCP                | 3000ms                         | Median      |
-| TBT                | 200ms                          | Median      |
+| LCP                | 3000 ms                        | Median      |
+| TBT                | 200 ms                         | Median      |
 | CLS                | 0.1                            | Median      |
 | Decoded JavaScript | 1200KiB                        | Maximum     |
 | Decoded CSS        | 160KiB English; 270KiB Chinese | Maximum     |
 
-The TBT limit adopts Chrome's [mobile fast range of 0–200ms](https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time), replacing the previous project-specific 400ms ceiling. Exactly 200ms passes; any excess fails. One good sample cannot hide two slow samples. Resource maxima catch even one accidental font-payload regression. Lighthouse scores are recorded but are not a gate.
+The TBT limit adopts Chrome's [mobile fast range of 0–200 ms](https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time), replacing the previous project-specific 400 ms ceiling. Exactly 200 ms passes; any excess fails. One good sample cannot hide two slow samples. Resource maxima catch even one accidental font-payload regression. Lighthouse scores are recorded but are not a gate.
 
 Budget tests cover the exact TBT boundary, median aggregation and incomplete evidence. CPU calibration allows three attempts before an audit, retaining each attempt's samples. Only host instability is retryable. Invalid samples, slow hosts, browser errors and evidence-write failures stop the run. Audit measurements, drift failures and budget failures are not retried.
 
@@ -440,7 +609,7 @@ The `performance` CI job builds with a fake Sentry DSN and Production sampling, 
 
 Field CWV still requires mobile/desktop p75 LCP, INP and CLS from Speed Insights or CrUX. A Lighthouse navigation run does not measure field INP; TBT is only a laboratory diagnostic. Query failures do not establish a pass or absence of field traffic. See [Google Web Vitals](https://web.dev/articles/vitals), [Chrome Lighthouse scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring), [Next.js CSS chunking](https://nextjs.org/docs/app/api-reference/config/next-config-js/cssChunking) and [font optimization](https://nextjs.org/docs/app/getting-started/fonts).
 
-### Local runs and shard maintenance
+#### Local runs and shard maintenance
 
 Use affected checks locally. Full `npm run verify` and `npm run test:webkit` are for diagnosis or explicit requests. If Turbopack cannot bind a worker port locally, use `npm run build -- --webpack` and report it; CI retains Turbopack. Next.js selects the bundler before loading configuration: use graph CSS chunking for Turbopack and the supported default chunking for Webpack. The configuration regression test loads both modes through Next.js's configuration loader.
 
@@ -452,7 +621,21 @@ The allocation uses [CI run 39481047586](https://github.com/Tianyi0510/modern-fu
 
 Each shard uploads per-test JSON timing reports for 14 days and separate failure/retry evidence for seven days. Compare test-step and total-job times: extra builds and installs can offset parallelism gains and increase usage. Rebalance the WebKit file list when workload changes.
 
-### Reliable browser checks
+#### Reliable browser checks
+
+Automated regression tests and interactive visual checks provide different evidence. Keep Playwright as the repository and CI regression runner. For rendered UI work using Build Web Apps, follow its installed `frontend-testing-debugging` skill, especially “Choose The Browser Path” and “Required Browser Checks.” Use the Browser plugin when available. Record its availability and the reason for any permitted Playwright fallback; a failed invocation alone does not authorize a fallback.
+
+Define the target route, action and expected result before interactive verification. Record:
+
+- The URL, page title, browser and viewport.
+- Meaningful page content and the absence of framework error overlays.
+- Relevant console errors and warnings, with an explanation for any remaining entries.
+- A screenshot supporting visual claims.
+- The target interaction and its observed result.
+
+Repeat the affected flow after changes. For visual work, check desktop and a mobile viewport when practical; record coverage limits. Compare reference-driven changes against the accepted reference. A passing build or automated suite does not replace this evidence. Documentation-only changes do not require rendered UI checks.
+
+Use these additional rules for automated browser assertions:
 
 - Reuse a test's isolated page for sequential full navigations. Navigation clears document-scoped styles; wait for fonts before geometry assertions.
 - Compare direct, client and history navigation with a separate direct-load baseline. Avoid reloading while an earlier page is prefetching.
@@ -462,7 +645,7 @@ Each shard uploads per-test JSON timing reports for 14 days and separate failure
 - Keep production durations and CI retries unchanged. Do not add arbitrary sleeps or filter page errors.
 - For copy changes, find old wording, translations and accessible names in tests and fixtures. Update affected checks without weakening behavior or meaning assertions.
 
-## Release workflow
+### Release workflow
 
 1. Push the reviewed PR and wait for full CI and the Vercel Preview for its head SHA.
 2. When release is authorized, merge the verified PR into `main` and record the resulting SHA. GitHub automatically deletes the remote PR branch. Main CI verifies reusable evidence or runs the complete suite.
@@ -472,15 +655,9 @@ Each shard uploads per-test JSON timing reports for 14 days and separate failure
 
 A PR-only request does not authorize merging. Deployment includes safe local cleanup of the released branch. Production browser smoke tests are optional follow-up checks unless evidence indicates a failure. Report deployment completion promptly once version and live-state checks pass.
 
-## Navigation prefetching
+### Production gate
 
-`IntentLink` retains Next.js Link's native anchor, client navigation, cache and invalidation behavior. It keeps speculative prefetching off until hover, keyboard focus or pointer press, then restores Next's default prefetch mode. Caller handlers and refs pass through; explicit `prefetch` settings remain authoritative. No custom router cache or click interception is introduced.
-
-Use this policy for the Header wordmark and desktop navigation, shared `ButtonLink` CTAs, and Home's text CTAs. These links previously fetched complete RSC payloads during initial rendering, including the current Home route. Other content links retain their existing behavior. Pointer press supplies intent for touch users; click and modified-click semantics remain owned by Next.js Link.
-
-`src/components/intent-link.spec.ts` checks idle prefetch traffic, focus-triggered warming and real navigation in all three languages. Component tests cover hover, focus, pointer intent, caller cancellation and forwarded refs. Production builds are required to exercise Next.js prefetching. Preserve the existing performance budgets and immediate startup error capture. The Sentry bridge buffers original errors while the SDK loads on a separate browser turn, forwards route transitions after readiness, and starts privacy-gated Replay without a fixed delay.
-
-## Production gate
+GitHub Actions supplies verification; the Vercel Git integration performs deployment. The repository gate below binds production builds to CI evidence. Live branch protection and Vercel project settings require separate verification. CI and Vercel rebuild the same source; they do not share an identical tested artifact.
 
 Vercel waits up to 30 minutes for the latest main push CI run matching `VERCEL_GIT_COMMIT_SHA`. Only `success` permits the build to proceed. Preview and local builds skip the gate.
 
@@ -492,7 +669,7 @@ The macOS job allows 20 minutes. The remaining wait covers ordinary queueing and
 - Public GitHub access needs no extra credential. Add scoped authentication before making the repository private.
 - Preserve the gate in `vercel.json`'s build command. Keep it out of `npm run build`, since CI must not wait on itself.
 
-## Review evidence
+### Review evidence
 
 Keep local screenshots and dated notes in `../local/audit/`. Legacy `audit/` remains excluded by Git and Vercel. Archive inactive caches or builds under `../local/archives/`; tools recreate their normal output paths.
 
@@ -507,11 +684,3 @@ WebKit runs fresh processes in two isolated jobs because a long-lived worker pre
 See [`playwright.config.ts`](../playwright.config.ts), [`ci.yml`](../.github/workflows/ci.yml) and [README](../README.md#verification). The [CI workflow](#ci-and-evidence-reuse) defines concurrent jobs and reuse requirements.
 
 The split follows the [Next.js testing guide](https://nextjs.org/docs/app/guides/testing): Node's isolated test runner covers service logic, while Playwright checks rendered pages and interactions against a production build. Browser project, shard and retry-trace settings follow the [Playwright projects](https://playwright.dev/docs/test-projects), [sharding](https://playwright.dev/docs/test-sharding) and [trace viewer](https://playwright.dev/docs/trace-viewer) guides.
-
-## Subscription consent boundary
-
-Signup requests send confirmation links. Explicit confirmation activates consent under the shared lock and journal; welcome delivery is separate. Redis stores confirmations, consent, limits, suppression, completed webhook identities and recovery records. Resend owns contact delivery and provider suppression. See [subscription operations](INTEGRATIONS.md#subscription-confirmation-and-delivery-feedback). No additional provider or queue is used.
-
-## Deterministic date rendering
-
-`src/lib/format.ts` validates ISO calendar dates and formats UTC components with fixed English month names or Chinese numeric dates. Compact English months use three letters, including `Sep`. This avoids Node/WebKit ICU differences and hydration mismatches. Keep hydration warnings visible. The chart regression checks server output and browser errors after interaction in all locales.

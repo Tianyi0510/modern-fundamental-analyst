@@ -1,3 +1,4 @@
+import { interceptResendRequests } from "../../../../scripts/resend-test-server.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
@@ -23,7 +24,7 @@ test("contact delivery uses the verified mailbox, escapes HTML and retains reply
     else process.env.CONTACT_TO_EMAIL = previousRecipient;
   });
   const requests = [];
-  t.mock.method(globalThis, "fetch", async (url, options) => {
+  interceptResendRequests(["POST /emails"], async (url, options) => {
     assert.equal(String(url), "https://api.resend.com/emails");
     requests.push(options);
     return Response.json({ id: "mock-email" });
@@ -51,7 +52,7 @@ test("provider rejection reports one safe error and retains the Contact failure 
   });
   const { events, flush } = monitoringCapture(t);
   t.mock.method(console, "error", () => {});
-  t.mock.method(globalThis, "fetch", async () =>
+  interceptResendRequests(["POST /emails"], async () =>
     Response.json({ name: "application_error", message: "private message reader@example.com" }, { status: 500 }),
   );
   assert.deepEqual(await sendContactMessage(input), { ok: false, error: "Message could not be sent.", status: 502 });

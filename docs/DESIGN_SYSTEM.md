@@ -101,6 +101,8 @@ Distinguish requirements from implementation status. An existing behavior is not
 
 `next-themes` owns appearance through `data-theme` and the `mfa:theme:v1` storage key. System appearance is the initial default. Explicit choices persist across routes, locales and reloads. There is no separate System control.
 
+Menu and Close controls use a 44px circle with a 20px icon on phones and tablets. Both controls retain the same dimensions through Sheet transitions.
+
 Header and Sheet share `ThemeToggle`: shadcn/ui Button + Lucide Sun/Moon + localized `aria-label` + Tooltip. The 48px control names the next action. Tooltip is visual help; it does not replace the accessible name. Before hydration, show a disabled SunMoon control labeled Appearance. `SiteDocument` owns the provider and theme bootstrap.
 
 `tokens.css` defines explicit light/dark aliases and a matching no-JavaScript system fallback. Test computed colors, not only the theme attribute. Keep the black Footer and fixed light brand regions independent of the page theme. `brandSurface` provides Black text, White fields, Bright Gray cards and Medium Gray quiet-action feedback inside Bright Blue regions.
@@ -204,7 +206,7 @@ The inventory below covers every non-test module currently under `src/components
 | Alert            | [alert.tsx](../src/components/ui/alert.tsx)                     | Used            | Inline form feedback, subscription confirmation and Support status                                        |
 | Alert Dialog     | [alert-dialog.tsx](../src/components/ui/alert-dialog.tsx)       | Used            | Contact clear-draft confirmation; cancel preserves the message                                            |
 | Button           | [button.tsx](../src/components/ui/button.tsx)                   | Used            | CTAs, form actions, theme toggle, copy link, sorting and recovery                                         |
-| Card             | [card.tsx](../src/components/ui/card.tsx)                       | Used            | Memo cards, shared FormPanel and Performance chart surface                                                |
+| Card             | [card.tsx](../src/components/ui/card.tsx)                       | Used            | Memo cards, shared FormPanel, Performance charts, Home allocation and About boundary panels               |
 | Chart            | [chart.tsx](../src/components/ui/chart.tsx)                     | Used indirectly | Recharts container and tooltip primitives consumed by LineChart                                           |
 | Collapsible      | [collapsible.tsx](../src/components/ui/collapsible.tsx)         | Used            | Mobile languages and controlled article outlines; AnimatedDisclosure for memo indexes and monthly returns |
 | Data Table       | [data-table.tsx](../src/components/ui/data-table.tsx)           | Used            | Current Holdings; Table renderer for the feature-owned TanStack model                                     |
@@ -219,11 +221,13 @@ The inventory below covers every non-test module currently under `src/components
 | Sheet            | [sheet.tsx](../src/components/ui/sheet.tsx)                     | Used            | Mobile/Tablet navigation panel and modal focus lifecycle                                                  |
 | Sidebar          | [sidebar.tsx](../src/components/ui/sidebar.tsx)                 | Used (subset)   | SidebarMenu, SidebarMenuItem and SidebarMenuButton inside Sheet; not a separate desktop sidebar           |
 | Skeleton         | [skeleton.tsx](../src/components/ui/skeleton.tsx)               | Used            | Performance explorer loading placeholder                                                                  |
-| Spinner          | [spinner.tsx](../src/components/ui/spinner.tsx)                 | Used            | Contact, Subscribe and Support submission state                                                           |
+| Spinner          | [spinner.tsx](../src/components/ui/spinner.tsx)                 | Used            | Contact, Subscribe, Support and Email Preferences pending actions                                         |
 | Table            | [table.tsx](../src/components/ui/table.tsx)                     | Used            | Monthly Performance table and Current Holdings table composition                                          |
 | Textarea         | [textarea.tsx](../src/components/ui/textarea.tsx)               | Used            | Contact message field                                                                                     |
 | Toast            | [toast.tsx](../src/components/ui/toast.tsx)                     | Used            | Memo article copy-link success/failure with instance-local manager                                        |
 | Tooltip          | [tooltip.tsx](../src/components/ui/tooltip.tsx)                 | Used            | Theme-toggle visual label on hover and keyboard focus; localized aria-label supplies its accessible name  |
+
+Card’s `plain` variant inherits its surrounding text and omits the default surface, ring, radius and outer spacing. Home allocation and About boundary panels use CardHeader and CardContent with their existing section colors and geometry. Lucide ChartPie labels holdings allocation; decorative Check/X icons distinguish the About lists without replacing their headings or text.
 
 Use these composition boundaries:
 
@@ -293,7 +297,7 @@ Apply these role assignments and exceptions:
 
 Reflow financial summaries below 72rem of container width. Preserve signs, units, precision and complete values. If enlarged text still overflows, use a named local horizontal-scroll region with a localized hint; make it focusable only while overflowing. Never shrink or truncate values to preserve columns.
 
-Article title, summary, notice, body and disclaimer share the centered 1120px container. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation.
+Article title, summary, notice, body and disclaimer share the centered 1120px container. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation. Cartesian tick labels use `muted-foreground` in both themes and must meet 4.5:1 contrast against the chart surface.
 
 `typography-roles.spec.ts` checks computed metrics and reflow. `financial-type-hierarchy.spec.ts` checks complete values at regular and enlarged text sizes. Assert rendered behavior, not class strings.
 
@@ -511,6 +515,8 @@ Use complete typography roles. Register new role names in `src/lib/utils.ts` so 
 
 Use `--interactive-accent` (Deep Blue) for normal-size interactive text. Medium Blue remains a brand primitive for decorative details, surface-appropriate non-text indicators and the dashed benchmark line; it is not a normal-text color on white. `--surface-selected` provides a Medium Gray surface in light mode for desktop navigation and language states. Use Deep Blue text on that surface.
 
+Expanded disclosure chevrons retain their rotation during press feedback; scaling must compose with rotation on the Collapsible trigger.
+
 Chart disclosures and scrollable monthly-data regions use the same theme-aware focus alias as other controls. The baseline focus outline consumes `--focus-ring-color`, which follows `--interactive-accent`: Deep Blue in light mode and Bright Blue in dark mode. The black Footer sets the inherited role to `--focus-ring-on-dark` (Bright Blue). Inputs retain their explicit surface variants. Check the outline against its adjacent surface at a minimum of 3:1: Medium Blue on Bright Blue is insufficient. Forced-colors mode continues to use the system Highlight color.
 
 Validate normal-size text at 4.5:1 after compositing opacity and non-text indicators at 3:1 where required. KPI notes retain their value's color at full opacity. Footer secondary text uses Medium Gray and Deep Gray on Black. Disabled controls have separate feedback and must not acquire enabled hover states.
@@ -708,7 +714,13 @@ Data blocks use `--radius-data`; Investment Memo Cards, their inner Card and the
 
 Memo cards use 48px outer content insets at every viewport width, including the footer bottom inset. Performance chart X-axis labels reserve a 48px axis height and a 16px tick gap to separate them from the lowest Y-axis label.
 
-Contact, Subscribe and Support retain their action label and add the shared shadcn/ui Spinner while pending. The decorative spinner is hidden from assistive technology and disables rotation for reduced motion; a separate live status announces the localized pending message. Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
+Contact, Subscribe and Support retain their action label and add the shared shadcn/ui Spinner while pending. The decorative spinner is hidden from assistive technology and disables rotation for reduced motion; a separate live status announces the localized pending message.
+
+Email Preferences adds the same decorative Spinner beside its localized requesting, saving or unsubscribing label and removes it when the request settles.
+
+Email inputs disable spellchecking while preserving email autocomplete and keyboard hints.
+
+Empty renders genuine no-data states in DataTable and LineChart; it does not replace loading Skeletons or error boundaries.
 
 Support amount cards progressively enhance native radio inputs to shadcn/ui RadioGroup after hydration. The group submits product_id, retains the server-selected product, and uses the existing fieldset lock and frozen retry payload. Native radios remain the no-JavaScript fallback; keyboard focus is visible on the full amount card.
 
@@ -722,7 +734,7 @@ Home Hero keeps 96px vertical padding and 48px between its label, title and intr
 
 Dark secondary/primary surfaces use Fluent `#1f1f1f`/`#292929`. Selected surfaces use Fluent Card Background (`#333333`); menu hover and pressed surfaces use Fluent `#3d3d3d`/`#1f1f1f`. Chart axis boundaries use Deep Gray in both modes. Apply the same aliases to explicit and system dark appearance; preserve explicit light brand surfaces and the black Footer.
 
-Tablet Header (801–1279px) shares the page container and 32px gutters rather than a separate 720px cap. It retains Sheet navigation, with an 84px header and 48px menu controls. The Sheet top row uses the same height and gutters so the wordmark and open/close controls stay aligned. Phone and desktop navigation breakpoints remain unchanged.
+Tablet Header (801–1279px) shares the page container and 32px gutters rather than a separate 720px cap. It retains Sheet navigation. Header height is 64px on phones and 72px on tablets and desktop. Phone and tablet Menu and close controls use 44px circular targets with 20px Lucide icons. The Sheet top row uses the same height and gutters so the wordmark and open/close controls stay aligned. Phone and desktop navigation breakpoints remain unchanged.
 
 ### Tablet layout contract
 

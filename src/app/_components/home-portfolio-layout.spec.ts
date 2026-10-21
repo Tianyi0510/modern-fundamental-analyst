@@ -11,9 +11,12 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(hero.getByRole("heading", { level: 1 })).toHaveCSS("margin-top", "48px");
       await expect(hero.getByRole("heading", { level: 1 })).toHaveCSS("margin-bottom", "48px");
       const section = page.locator(".home-portfolio-section");
-      const title = section.getByRole("heading");
+      const title = section.getByRole("heading", { level: 2 });
       const label = section.locator(".section-number");
       const card = section.locator(".allocation-card");
+      await expect(card).toHaveCSS("padding-top", width > 800 ? "28px" : "24px");
+      await expect(card).toHaveCSS("padding-bottom", width > 800 ? "28px" : "24px");
+      await expect(card).toHaveCSS("border-radius", "0px");
       const list = section.locator(".holdings-list");
       await expect(title).toBeVisible();
       const heading = (await title.boundingBox())!;

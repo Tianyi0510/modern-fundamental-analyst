@@ -1,10 +1,11 @@
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
 import { IntentLink } from "@/components/intent-link";
-import { MoveRight } from "lucide-react";
+import { ChartPie, MoveRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -265,9 +266,19 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </li>
               ))}
             </ol>
-            <aside className={appearance["allocation-card"]}>
-              <span>{text.holdingsAllocation}</span>
-              <div className={appearance["allocation-visual"]}>
+            <Card
+              variant="plain"
+              role="complementary"
+              aria-labelledby="home-allocation-title"
+              className={appearance["allocation-card"]}
+            >
+              <CardHeader className="flex flex-row items-center gap-3 px-0">
+                <ChartPie size={24} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+                <h3 id="home-allocation-title" className="m-0 text-large-label">
+                  {text.holdingsAllocation}
+                </h3>
+              </CardHeader>
+              <CardContent className={appearance["allocation-visual"] + " px-0"}>
                 <div
                   className={appearance["allocation-ring"]}
                   style={{ background: allocationGradient }}
@@ -291,12 +302,12 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                     <b>{otherWeight.toFixed(1)}%</b>
                   </li>
                 </ul>
-              </div>
+              </CardContent>
               <Link href={getLocalizedPath("/portfolio", locale)}>
                 <span className="link-label">{text.fullPortfolio}</span>
                 <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
               </Link>
-            </aside>
+            </Card>
           </section>
         </div>
 

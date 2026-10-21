@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -15,15 +14,18 @@ concurrency:
 
 jobs:
   plan:
+    permissions:
+      contents: read
+      actions: read
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
       reuse: ${{ steps.plan.outputs.reuse }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .nvmrc
       - id: plan
@@ -37,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -65,10 +67,10 @@ jobs:
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
       NEXT_PUBLIC_VERCEL_ENV: test
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -102,7 +104,7 @@ jobs:
 
       - name: Upload per-test timing report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: browser-timings-chromium-${{ matrix.shard }}
           path: node_modules/.cache/playwright/reports/chromium-shard-${{ matrix.shard }}.json
@@ -111,7 +113,7 @@ jobs:
 
       - name: Upload browser retry and failure evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: browser-evidence-chromium-${{ matrix.shard }}
           path: node_modules/.cache/playwright/chromium-shard-${{ matrix.shard }}/
@@ -134,10 +136,10 @@ jobs:
       matrix:
         shard: [1, 2]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -147,7 +149,7 @@ jobs:
       - run: npm run test:webkit -- --shard=${{ matrix.shard }}
       - name: Upload per-test timing report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: browser-timings-webkit-${{ matrix.shard }}
           path: node_modules/.cache/playwright/reports/webkit-shard-${{ matrix.shard }}.json
@@ -155,7 +157,7 @@ jobs:
           retention-days: 14
       - name: Upload browser retry and failure evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: browser-evidence-webkit-${{ matrix.shard }}
           path: node_modules/.cache/playwright/webkit-shard-${{ matrix.shard }}/
@@ -175,10 +177,10 @@ jobs:
       # This disposable runner audits only the isolated, provider-disabled local site.
       LIGHTHOUSE_CHROME_FLAGS: --headless=new --no-sandbox
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -189,7 +191,7 @@ jobs:
       - run: npm run test:performance
       - name: Upload performance samples and budget summary
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: performance-evidence
           path: node_modules/.cache/performance/

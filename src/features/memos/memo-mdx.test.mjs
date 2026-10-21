@@ -63,7 +63,7 @@ test("memo MDX preserves the verified article text, hierarchy and source referen
     [...document.querySelectorAll(".memo-references a")].map((link) => link.href),
     [
       "https://www.forbes.com/sites/petercohan/2024/02/13/why-microsoft-azure-could-take-the-cloud-lead-from-amazon-aws-by-2026/",
-      "https://tei.forrester.com/go/microsoft/fabric/",
+      "https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/06/03/forrester-total-economic-impact-study-microsoft-fabric-delivers-379-roi-over-three-years/",
       "https://brandfinance.com/press-releases/microsoft-chief-satya-nadella-leads-2025-list-of-top-100-ceos-elon-musk-vaults-to-6th-place-from-19th",
       "https://www.microsoft.com/investor/reports/ar24/index.html",
       "https://www.berkshirehathaway.com/letters/1987.html",

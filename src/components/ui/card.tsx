@@ -1,13 +1,21 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-function Card({ className, size = "default", ...props }: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+function Card({
+  className,
+  size = "default",
+  variant = "default",
+  ...props
+}: React.ComponentProps<"div"> & { size?: "default" | "sm"; variant?: "default" | "plain" }) {
   return (
     <div
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-surface bg-card py-(--card-spacing) text-small-body text-card-foreground ring-1 ring-foreground [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0",
+        "group/card flex flex-col overflow-hidden text-small-body [--card-spacing:--spacing(4)] data-[size=sm]:[--card-spacing:--spacing(3)]",
+        variant === "plain"
+          ? "gap-0 text-inherit"
+          : "gap-(--card-spacing) rounded-surface bg-card py-(--card-spacing) text-card-foreground ring-1 ring-foreground has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:has-data-[slot=card-footer]:pb-0",
         className,
       )}
       {...props}

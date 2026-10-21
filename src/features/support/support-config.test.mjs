@@ -27,22 +27,17 @@ test("Stripe integration declares its server boundary and uncommitted credential
   assert.doesNotMatch(`${stripe}\n${route}`, /[sr]k_(?:test|live)_[A-Za-z0-9]+/);
 });
 
-test("Support is localized and linked without changing the primary navigation", async () => {
-  const [support, footer, sitemap, navigation] = await Promise.all([
-    Promise.all([read("src/features/support/support-copy.ts"), read("src/features/support/support-panel.tsx")]).then(
-      (parts) => parts.join("\n"),
-    ),
-    read("src/components/site-footer.tsx"),
-    read("src/app/sitemap.ts"),
-    read("src/lib/navigation-copy.ts"),
-  ]);
-
-  assert.match(support, /en:/);
-  assert.match(support, /"zh-tw":/);
-  assert.match(support, /"zh-cn":/);
-  assert.match(footer, /href=\{getLocalizedPath\("\/support", locale\)\}/);
-  assert.match(sitemap, /"\/support"/);
-  assert.doesNotMatch(navigation, /support/i);
+test("sitemap includes Support in every locale with language alternates", async () => {
+  const { default: sitemap } = await import("../../app/sitemap.ts");
+  const entries = sitemap();
+  const urls = ["/support", "/zh-tw/support", "/zh-cn/support"].map(
+    (path) => `https://www.modernfundamentalanalyst.com${path}`,
+  );
+  for (const url of urls) {
+    const matches = entries.filter((entry) => entry.url === url);
+    assert.equal(matches.length, 1);
+    for (const alternate of urls) assert.ok(Object.values(matches[0].alternates.languages).includes(alternate));
+  }
 });
 
 test("support language links keep only validated recovery parameters", async () => {

@@ -86,6 +86,8 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 
 The root [Design QA](design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
 
+Project Agent Skills and their responsibilities are listed in [Installed Agent Skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills). See [vercel-optimize readiness](docs/INTEGRATIONS.md#vercel-optimize-readiness) before planning a production optimization audit.
+
 ### Documentation maintenance
 
 - Write clear, concise English. Include non-English text only for an exact runtime or provider value, with a link to its code definition.

@@ -1,3 +1,5 @@
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Check, X } from "lucide-react";
 import { brandSurface } from "@/components/brand-surface";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./about-page-content.styles";
@@ -352,17 +354,25 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
         <section className={appearance["about-boundaries"]}>
           {text.boundaries.map((boundary, index) => (
             <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>
-              <h2>{boundary.title}</h2>
-              <ol>
-                {boundary.items.map((item, index) => (
-                  <li key={item}>
-                    <span className={appearance["about-boundary-number"]} aria-hidden="true">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ol>
+              <Card variant="plain">
+                <CardHeader className="px-0">
+                  <h2>{boundary.title}</h2>
+                </CardHeader>
+                <CardContent className="px-0">
+                  {/* Safari retains list semantics when visual markers are removed. */}
+                  {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
+                  <ol role="list">
+                    {boundary.items.map((item) => (
+                      <li key={item}>
+                        <span className={appearance["about-boundary-number"]} aria-hidden="true">
+                          {index === 0 ? <Check size={24} strokeWidth={2} /> : <X size={24} strokeWidth={2} />}
+                        </span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </CardContent>
+              </Card>
             </section>
           ))}
         </section>

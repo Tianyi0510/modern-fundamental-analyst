@@ -1,4 +1,5 @@
 import "server-only";
+import { hasProviderId } from "./resend-contracts";
 import type { Resend } from "resend";
 import type { Locale } from "@/lib/i18n";
 import { reportResendRollbackFailure, runResendOperation } from "@/lib/resend";
@@ -13,6 +14,18 @@ const languageSegmentIds = new Set(Object.values(preferredLanguageSegments));
 
 export function getPreferredLanguageSegmentId(locale: Locale) {
   return preferredLanguageSegments[locale];
+}
+
+function isSegmentPage(value: unknown): value is { data: { id: string }[]; has_more: boolean } {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    "data" in value &&
+    Array.isArray(value.data) &&
+    value.data.every(hasProviderId) &&
+    "has_more" in value &&
+    typeof value.has_more === "boolean",
+  );
 }
 
 type SegmentRollback = () => Promise<void>;
@@ -55,7 +68,7 @@ export async function syncPreferredLanguageSegment(resend: Resend, email: string
     const current = await runResendOperation("Read contact language segments failed", () =>
       resend.contacts.segments.list({ email, limit: 100, ...(after ? { after } : {}) }),
     );
-    if (!current || current.error || !current.data) throw new Error("Unable to read contact segments");
+    if (!current || current.error || !isSegmentPage(current.data)) throw new Error("Unable to read contact segments");
     for (const { id } of current.data.data) if (languageSegmentIds.has(id)) found.add(id);
     if (!current.data.has_more) break;
     after = current.data.data.at(-1)?.id;

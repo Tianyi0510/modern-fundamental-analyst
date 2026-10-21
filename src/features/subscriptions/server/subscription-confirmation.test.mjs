@@ -1,3 +1,5 @@
+import { HttpResponse } from "msw";
+import { interceptResendRequests } from "../../../../scripts/resend-test-server.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { registerHooks } from "node:module";
@@ -89,27 +91,39 @@ test.beforeEach((t) => {
   globalThis.__mfaRedisStateV6.unavailableUntil = 0;
   t.mock.method(Date, "now", () => now);
   t.mock.method(console, "error", () => {});
-  t.mock.method(globalThis, "fetch", async (url, options) => {
-    const path = new URL(url).pathname;
-    if (path === "/emails") {
-      sends.push(JSON.parse(options.body));
-      return Response.json({ id: "mail" });
-    }
-    if (options.method === "GET") {
-      if (path.includes("/segments")) return Response.json({ data: [], has_more: false });
-      return active == null
-        ? Response.json({ name: "not_found", statusCode: 404 }, { status: 404 })
-        : Response.json({ id: "contact", unsubscribed: !active });
-    }
-    writes.push({ path, body: JSON.parse(options.body ?? "{}") });
-    if (path.includes("/events")) {
-      if (eventOutcome === "unknown") throw new TypeError("lost response");
-      if (eventOutcome === "rejected")
-        return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
-    } else if (path.startsWith("/contacts") && !path.includes("/segments"))
-      active = !JSON.parse(options.body).unsubscribed;
-    return Response.json({ id: "contact" });
-  });
+  interceptResendRequests(
+    [
+      "POST /emails",
+      "GET /contacts/:contact",
+      "GET /contacts/:contact/segments",
+      "POST /contacts",
+      "PATCH /contacts/:contact",
+      "POST /contacts/:contact/segments/:segment",
+      "DELETE /contacts/:contact/segments/:segment",
+      "POST /events/send",
+    ],
+    async (url, options) => {
+      const path = new URL(url).pathname;
+      if (path === "/emails") {
+        sends.push(JSON.parse(options.body));
+        return Response.json({ id: "mail" });
+      }
+      if (options.method === "GET") {
+        if (path.includes("/segments")) return Response.json({ data: [], has_more: false });
+        return active == null
+          ? Response.json({ name: "not_found", statusCode: 404 }, { status: 404 })
+          : Response.json({ id: "contact", unsubscribed: !active });
+      }
+      writes.push({ path, body: JSON.parse(options.body ?? "{}") });
+      if (path.includes("/events")) {
+        if (eventOutcome === "unknown") return HttpResponse.error();
+        if (eventOutcome === "rejected")
+          return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
+      } else if (path.startsWith("/contacts") && !path.includes("/segments"))
+        active = !JSON.parse(options.body).unsubscribed;
+      return Response.json({ id: "contact" });
+    },
+  );
 });
 
 for (const locale of ["en", "zh-tw", "zh-cn"])
@@ -269,25 +283,29 @@ test("concurrent confirmation consumes a token once", async () => {
   assert.equal(writes.filter((w) => w.path.includes("/events")).length, 1);
 });
 
-test("a read failure before activation leaves the confirmation retryable", async (t) => {
+test("a read failure before activation leaves the confirmation retryable", async () => {
   await requestSubscriptionConfirmation("reader@example.com", "en", "subscribe/a");
   const value = token();
-  const { getResendClient } = await import("@/lib/resend.ts");
-  const lookup = t.mock.method(getResendClient().contacts, "get", async () => ({ error: { statusCode: 503 } }));
+  let unavailable = true;
+  interceptResendRequests(["GET /contacts/:contact"], async () =>
+    unavailable
+      ? Response.json({ name: "application_error", statusCode: 503 }, { status: 503 })
+      : Response.json({ name: "not_found", statusCode: 404 }, { status: 404 }),
+  );
   await assert.rejects(confirmSubscription(value, memo));
   assert.equal(writes.length, 0);
-  lookup.mock.restore();
+  unavailable = false;
   await confirmSubscription(value, memo);
   assert.equal(active, true);
 });
 
-test("unknown activation outcome keeps the token and journal blocked", async (t) => {
+test("unknown activation outcome keeps the token and journal blocked", async () => {
   await requestSubscriptionConfirmation("reader@example.com", "en", "subscribe/a");
   const value = token();
-  t.mock.method(globalThis, "fetch", async (_url, options) => {
+  interceptResendRequests(["GET /contacts/:contact", "POST /contacts"], async (_url, options) => {
     if (options.method === "GET") return Response.json({ name: "not_found", statusCode: 404 }, { status: 404 });
     writes.push({ path: "ambiguous-create" });
-    throw new TypeError("lost response");
+    return HttpResponse.error();
   });
   await assert.rejects(confirmSubscription(value, memo));
   now += 120_001;

@@ -1,4 +1,5 @@
 import "server-only";
+import { hasProviderId } from "./resend-contracts";
 import { localeConfig, type Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation, resendOperationContext } from "@/lib/resend";
 import { syncPreferredLanguageSegment } from "./resend-segments";
@@ -68,6 +69,13 @@ async function updatePreferencesLocked(
         properties: { preferred_language: localeConfig[locale].label },
       }),
     );
+    if (result && !result.error && !hasProviderId(result.data)) {
+      // The provider may have accepted the write. Do not compensate or release
+      // coordination records until its outcome is reconciled.
+      const context = resendOperationContext.getStore();
+      if (context) context.uncertain = true;
+      return { ok: false, error: "Subscription preferences could not be updated.", status: 502 };
+    }
     if (!result || result.error) {
       await resendOperationContext.getStore()?.recordPhase?.("rollback-language-segments");
       if (rollbackLanguageSegments) await rollbackLanguageSegments().catch(() => undefined);
@@ -78,6 +86,13 @@ async function updatePreferencesLocked(
     const result = await runResendOperation("Resend unsubscribe request failed", () =>
       resend.contacts.update({ email: payload.email, unsubscribed: true }),
     );
+    if (result && !result.error && !hasProviderId(result.data)) {
+      // The provider may have accepted the write. Do not compensate or release
+      // coordination records until its outcome is reconciled.
+      const context = resendOperationContext.getStore();
+      if (context) context.uncertain = true;
+      return { ok: false, error: "Subscription preferences could not be updated.", status: 502 };
+    }
     if (!result || result.error) {
       if (result?.error) console.error("Resend preferences update failed", result.error.name);
       return { ok: false, error: "Subscription preferences could not be updated.", status: 502 };

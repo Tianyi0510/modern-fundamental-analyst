@@ -24,6 +24,45 @@ Preserve root and `www` website records and Resend verification, sending and rec
 
 Follow the [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for hosting and CI gating. Confirm the target environment and current provider state before changing DNS or credentials.
 
+### vercel-optimize readiness
+
+The upstream [vercel-optimize skill](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) requires Node.js 20+, Vercel CLI 53+ with `metrics`, `usage`, `contract` and `api`, an authenticated CLI session, a linked project and Observability Plus for route-level analysis. Scope every query to the verified project and owner. Recheck prerequisites before each run.
+
+Verified on October 21, 2026:
+
+| Requirement                | Observation                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node.js                    | Local version 24.12.0 meets the requirement.                                                                                                     |
+| CLI                        | Cached Vercel CLI 64.1.0 is available; `vercel` is not on PATH. Use an explicit executable or versioned invocation.                              |
+| Authentication and project | Scoped CLI project inspection succeeded for `modern-fundamental-analyst/modern-fundamental-analyst`, project `prj_7sORYYrBwZS6W9mewVEwmqCeyFz2`. |
+| Team                       | The linked owner is `team_fAq85GWIVo1h7vJCwRDjpTrR`.                                                                                             |
+| Observability Plus         | The scoped configuration API returned `Observability Plus is not enabled`. The full workflow is blocked.                                         |
+
+The generic observability schema is readable, but that does not establish Plus access. No optimization audit, subscription change or skill installation for `vercel-optimize` was performed. If Plus is enabled later, verify project coverage, metric permissions and representative traffic before running the workflow. Do not enable a paid feature merely to install or evaluate a skill.
+
+### CDN caching and edge protection
+
+Let Next.js manage route caching. Public static pages use Vercel prerender/CDN caching; versioned `/_next/static/` assets use immutable browser caching. Support and subscription-preference pages return private, no-store responses. Do not apply shared caching to token-dependent content or blanket long-lived browser caching to HTML.
+
+On October 20, 2026, the active Vercel firewall configuration was published and read back with this observation rule:
+
+| Setting         | Value                                                                     |
+| --------------- | ------------------------------------------------------------------------- |
+| Rule            | `Observe public form bursts`                                              |
+| Method          | `POST`                                                                    |
+| Exact paths     | `/api/contact`, `/api/subscribe`, `/api/subscription-preferences/request` |
+| Counter         | Combined across the three paths, per IP and Vercel region                 |
+| Window          | Fixed 600-second window                                                   |
+| Threshold       | 50 requests                                                               |
+| Exceeded action | `log`; requests are not blocked or challenged                             |
+| Rule ID         | `rule_observe_public_form_bursts_Z0oyag`                                  |
+
+This cloud-managed rule does not require a website deployment. Keep application-level Redis limits, origin checks and body-size limits in place. The edge rule observes bursts; it does not replace those checks. `/api/webhooks/resend` is excluded, and provider webhooks must not receive browser challenges.
+
+Before enabling enforcement, inspect at least 24 hours of representative traffic, including shared-IP users, retries and campaign bursts. Adjust the threshold if needed, then explicitly approve changing the exceeded action to `rate_limit` (429). Vercel counters are regional, so this is not a global quota. To roll back, disable this rule and publish only the reviewed change. Do not disable platform mitigations.
+
+Use an explicitly scoped Vercel CLI to inspect `firewall status`, `firewall rules list`, `firewall diff` and `firewall traffic list`. Review the draft before publishing and read back the active configuration afterward. The October 20 connector returned a configuration 404 even after publication; the scoped CLI API confirmed the active rule. A connector error alone does not establish that protection is absent.
+
 ## Resend
 
 ### Environment setup
@@ -66,6 +105,8 @@ These credentials are independent and must not be merged or reused:
 | `RESEND_API_KEY`                  | Resend API Keys; permits the application's email, contact, segment and event operations.             | Keep provider authentication separate from application cryptography. It remains a legacy decryption fallback for old preference links; check those links before rotation. |
 | `RESEND_WEBHOOK_SECRET`           | Signing secret of the configured Resend webhook endpoint.                                            | Must match that endpoint. The handler reads one signing secret; coordinate changes with deployment and verify delivery retries.                                           |
 | `SUBSCRIPTION_PREFERENCES_SECRET` | Application-generated secret for existing encrypted preference links and stable Redis identity keys. | Preserve the current value. Journal, consent, suppression and retry records require an explicit migration before rotation.                                                |
+
+Preference links retain their existing encryption format and legacy-key fallback. Both keys require a valid version, email and finite numeric expiry after the current time. Malformed or expired payloads are rejected even when decryption succeeds; this validation change does not require rotating secrets or reissuing valid links.
 
 Store these as sensitive, environment-scoped Vercel variables or in ignored `.env.local`. Never use `NEXT_PUBLIC_` prefixes. Confirmation tokens use digest lookup and need no additional secret; coordination still needs the stable application secret. Follow [rotation procedures](#credential-and-secret-rotation) before changing values.
 
@@ -273,6 +314,10 @@ The subscription journal has no plaintext email or preference token and retains 
 Preference and confirmation email retry records are separate: they contain the sender, recipient, subject, original encrypted preference link or opaque confirmation link, email text and HTML for up to 25 hours. The same request ID can retrieve its original payload for 25 minutes; the record remains afterward so that reusing an old ID cannot create a fresh payload during the provider's deduplication window. The request key is reused as the provider idempotency key; it is not stored in the payload. Treat these records as sensitive, restrict Redis access, and follow [Resend request reliability](#request-reliability) for retry behavior.
 
 ### Subscription reconciliation
+
+A malformed acknowledgement after activation, a preference save or unsubscribe leaves the provider outcome unknown. The service returns failure and retains the subscriber lease and any existing journal. It does not issue further writes or attempt rollback. Activation does not send a welcome event. Unsubscribe bypasses the journal gate and neither creates nor clears a journal. Reconcile provider state before clearing a record.
+
+Language changes require a fully validated segment snapshot before any mutation. Invalid page data, missing pagination flags or invalid cursors stop the operation. A failure before any provider write releases the lease and the operation’s own journal, allowing a retry.
 
 Subscription and language saves journal before provider operations. The key hashes the email with the application secret; the value records UUID, operation type, start time, locale and phase. Older records without a type remain valid. Journals contain no plaintext email or preference token.
 
