@@ -8,7 +8,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const hero = page.locator(".hero");
       await expect(hero).toHaveCSS("padding-top", "96px");
       await expect(hero).toHaveCSS("padding-bottom", "96px");
-      await expect(hero.getByRole("heading", { level: 1 })).toHaveCSS("margin-top", "48px");
+      await expect(hero.locator(".eyebrow")).toHaveCount(0);
+      await expect(hero.getByRole("heading", { level: 1 })).toHaveCSS("margin-top", "0px");
       await expect(hero.getByRole("heading", { level: 1 })).toHaveCSS("margin-bottom", "48px");
       const section = page.locator(".home-portfolio-section");
       const title = section.getByRole("heading", { level: 2 });
