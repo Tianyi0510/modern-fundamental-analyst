@@ -18,7 +18,6 @@ import { createWebsiteStructuredData } from "@/lib/site-config";
 
 const copy = {
   en: {
-    researchLabel: "Home",
     hero: ["Focus investing for a", "disruptive future"],
     heroIntro:
       "Long-term value research, financial modeling, and a fully disclosed portfolio built to empower every retail investor.",
@@ -60,7 +59,6 @@ const copy = {
     updatedMonthly: "Updated monthly",
   },
   "zh-tw": {
-    researchLabel: "首頁",
     hero: ["為顛覆性未來，", "實踐集中投資"],
     heroIntro: "透過長期價值研究、財務建模與完整揭露的投資組合，幫助每一位個人投資者建立獨立判斷。",
     viewPortfolio: "查看投資組合",
@@ -101,7 +99,6 @@ const copy = {
     updatedMonthly: "每月更新",
   },
   "zh-cn": {
-    researchLabel: "首页",
     hero: ["为颠覆性未来，", "实践集中投资"],
     heroIntro: "通过长期价值研究、财务建模与完整披露的投资组合，帮助每一位个人投资者建立独立判断。",
     viewPortfolio: "查看投资组合",
@@ -169,9 +166,6 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         <div className={appearance["home-opening"]}>
           <div className={appearance["hero-band"]}>
             <section className={appearance["hero"] + " @container/financial-summary " + appearance["shell"]}>
-              <p className={appearance["eyebrow"]}>
-                <span /> {text.researchLabel}
-              </p>
               <h1>
                 {text.hero[0]}
                 <br />

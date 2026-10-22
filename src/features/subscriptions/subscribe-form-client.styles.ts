@@ -10,8 +10,8 @@ export const appearance = {
     "subscribe-form grid [grid-template-columns:minmax(0,_1fr)_auto] [align-items:start] [column-gap:var(--space-3)] [row-gap:var(--space-2)] [@media((max-width:_800px))]:[grid-template-columns:1fr]",
   preferences: {
     inverse:
-      "subscribe-preferences [grid-column:1] [width:fit-content] [min-height:24px] [margin-top:var(--spacingVerticalXS)] [color:var(--white)] text-large-label [text-decoration:underline] [transition:color_var(--motion-duration-base)_var(--motion-ease-standard)] [&:hover]:[color:var(--blue-bright)] [&:focus-visible]:[color:var(--blue-bright)] [@media((max-width:_800px))]:[grid-column:auto]",
+      "subscribe-preferences [grid-column:1] [width:fit-content] [min-height:24px] [margin-top:var(--spacingVerticalXS)] [color:var(--white)] text-small-body [text-decoration:underline] [transition:color_var(--motion-duration-base)_var(--motion-ease-standard)] [&:hover]:[color:var(--blue-bright)] [&:focus-visible]:[color:var(--blue-bright)] [@media((max-width:_800px))]:[grid-column:auto]",
     standard:
-      "subscribe-preferences col-start-1 mt-[var(--space-2)] min-h-[24px] w-fit text-large-label text-ink underline transition-colors duration-[var(--motion-duration-base)] hover:text-brand focus-visible:text-brand max-[800px]:col-auto",
+      "subscribe-preferences col-start-1 mt-[var(--space-2)] min-h-[24px] w-fit text-small-body text-ink underline transition-colors duration-[var(--motion-duration-base)] hover:text-brand focus-visible:text-brand max-[800px]:col-auto",
   },
 } as const;

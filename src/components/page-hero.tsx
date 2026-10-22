@@ -12,13 +12,11 @@ const introLayout =
   "flex flex-wrap items-end gap-[var(--space-related-content)] [&>p]:flex-[1_1_30rem] [&>small]:ml-auto [&>small]:max-w-full [&>small]:text-right [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]";
 
 export function PageHero({
-  label,
   title,
   intro,
   children,
   variant = "standard",
 }: {
-  label: ReactNode;
   title: ReactNode;
   intro: ReactNode;
   children?: ReactNode;
@@ -27,11 +25,8 @@ export function PageHero({
   return (
     <div className="page-hero-band bg-[var(--surface-secondary)]">
       <Container as="section" className="page-hero @container/financial-summary py-[var(--space-section-padding)]">
-        <p className="eyebrow flex items-center gap-[10px] text-large-label">
-          <span className="size-[9px] rounded-full bg-accent" /> {label}
-        </p>
         <h1
-          className={`mt-[var(--space-section-content)] text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+          className={`mt-0 text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
         >
           {title}
         </h1>

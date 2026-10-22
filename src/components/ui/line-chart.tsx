@@ -69,7 +69,10 @@ export function LineChart({
           isAnimationActive={false}
           content={
             <ChartTooltipContent
-              labelFormatter={(value) => (formatX ? formatX(String(value)) : String(value))}
+              labelFormatter={(value) => {
+                const label = typeof value === "string" || typeof value === "number" ? String(value) : "";
+                return formatX ? formatX(label) : label;
+              }}
               formatter={
                 formatValue
                   ? (value, name) => (

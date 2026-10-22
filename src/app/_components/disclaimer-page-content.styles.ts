@@ -2,13 +2,11 @@ import { containerAppearance } from "@/components/container";
 
 export const appearance = {
   legalTitle:
-    "max-w-[1000px] mt-[var(--space-heading-content)] text-large-display text-balance text-ink [&_em]:not-italic [&_em]:text-brand compact:wrap-anywhere",
+    "max-w-[1000px] mt-0 text-large-display text-balance text-ink [&_em]:not-italic [&_em]:text-brand compact:wrap-anywhere",
   legal: "legal bg-surface",
   "legal-hero":
     "legal-hero [padding:var(--space-section-padding)_0] [background:var(--surface-secondary)] [@media((max-width:_800px))]:[padding:var(--space-section-padding)_0]",
   shell: containerAppearance,
-  eyebrow:
-    "eyebrow max-w-[var(--width-reading)] m-0 flex items-center gap-[10px] text-large-label [&_span]:w-[9px] [&_span]:h-[9px] [&_span]:rounded-full [&_span]:bg-accent [&_span]:text-accent",
   "legal-subtitle":
     "legal-subtitle max-w-[var(--width-reading)] mt-[var(--space-section-content)] text-ink text-large-body text-pretty",
   "legal-body":

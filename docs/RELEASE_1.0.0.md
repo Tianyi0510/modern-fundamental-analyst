@@ -8,11 +8,25 @@ The planned first stable release includes:
 
 - English, Traditional Chinese, and Simplified Chinese pages with localized navigation, metadata, and sharing previews.
 - Portfolio holdings, allocation, sorting and performance against SPY, the only benchmark. The snapshot is dated 30 September 2026. Separate cumulative reconstructed TWR and since-inception annualized XIRR charts have monthly tables. See [calculation scope and reconstruction](WEB_APPLICATION_ARCHITECTURE.md#portfolio-data).
-- Investment memos with native expandable sections, responsive layouts, and reduced-motion support.
+- Investment memos with Base UI-backed shadcn/ui collapsible sections and an expandable article table of contents, responsive layouts, and reduced-motion support.
 - Contact and subscription workflows using Resend, three-language confirmation emails, explicit double opt-in, encrypted preference links, and Redis-backed recipient limits and subscriber coordination.
 - Replay-safe confirmation and delivery feedback, persistent suppression, and confirmed consent retained when welcome delivery needs reconciliation.
 - One-time research support through Stripe Checkout with server-side payment verification.
 - Application code organized under `src/`, with TypeScript, ESLint, Prettier with Tailwind class sorting, unit tests, and production-build browser checks in GitHub Actions.
+
+## Workspace Update — 22 October 2026
+
+Status: uncommitted release preparation. This update has not been deployed or tagged.
+
+- Upgrade the project runtime target to Node 24.22.1 LTS and package manager to npm 12.2.1. Update compatible SDKs, UI packages, test tools and SHA-pinned GitHub Actions. See the [resolved inventory and upgrade constraints](WEB_APPLICATION_ARCHITECTURE.md#dependency-versions).
+- Migrate MSW 3 unhandled-network guards and pin Stripe requests to `2026-09-30.endive` for SDK 23.0.1. Preserve request validation, idempotency and payment verification.
+- Render Email Preferences links at 16px and weight 400 in standard and inverse subscription forms across all three languages.
+- Permit the exact `127.0.0.1` development origin so Codex previews hydrate with the default dev startup command. Keep unrelated origins blocked.
+- Standardize architecture document headings in Title Case and record current versions separately from deployed evidence.
+
+TypeScript 7 and ESLint 10 remain blocked by required lint-plugin peer support. Sentry Core matches the Next.js SDK version, and Node types follow the selected LTS major. The unresolved development-only braces advisory remains tracked in the architecture guide. Do not describe this preparation as an unconditional all-latest or vulnerability-free release.
+
+Local validation passed: clean npm 12 installation, type checking, lint, 325 Node tests, 23 unit tests, 62 component integration tests, 11 development-browser checks across Chromium and WebKit, and 35 production-browser checks for charts, support status and Sentry. The production-mode Turbopack build passed with Sentry uploads disabled and an isolated test DSN. Provider writes were mocked. The production dependency audit reported no known vulnerabilities; the development advisory above remains unresolved. Production CI, deployment acceptance and physical iPhone verification remain pending.
 
 ## Release preparation
 

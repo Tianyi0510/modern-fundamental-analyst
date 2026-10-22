@@ -292,7 +292,7 @@ Apply these role assignments and exceptions:
 - Every page Hero H1 uses Large Display, including memo articles, preferences and confirmation pages.
 - Home section headings use Large Headline; memo/form headings use Large Title. Article H2/H3 use Small Headline/Medium Title.
 - Summary KPIs remain 51px at every width. Support amounts use responsive Medium Display; ring values use Small Display. Financial figures use tabular numerals.
-- CTAs use Large Label. Copy Article Link and Toast titles use Small Body, matching article metadata. Ordinary navigation uses Medium Label.
+- CTAs use Large Label. Copy Article Link and Toast titles use Small Body, matching article metadata. Email Preferences links also use Small Body (16px, weight 400) in both subscription form variants. Ordinary navigation uses Medium Label.
 - Footer links use 36.15px minimum-height rows: the 24.15px heading row plus a 12px gap. Mobile Sidebar controls retain 48px targets.
 
 Reflow financial summaries below 72rem of container width. Preserve signs, units, precision and complete values. If enlarged text still overflows, use a named local horizontal-scroll region with a localized hint; make it focusable only while overflowing. Never shrink or truncate values to preserve columns.
@@ -730,7 +730,7 @@ Performance charts include a 1px dashed reference line at 0% (6px dash, 4px gap)
 
 Support amounts use Medium Display, (51px mobile, 67px wide desktop, weight 700); summary KPIs instead remain 51px at every viewport. Amount cards retain 1px internal separators using `--border-strong`: black in light mode and white in dark mode.
 
-Home Hero keeps 96px vertical padding and 48px between its label, title and introduction. Home allocation cards place the holdings legend below the ring at every viewport width, with a 48px gap.
+Page Heroes begin with the main heading; omit the decorative dot and page/category label above it in every locale. Keep 96px vertical padding and 48px between the title and introduction or article metadata. Navigation links and section labels remain unchanged. Home allocation cards place the holdings legend below the ring at every viewport width, with a 48px gap.
 
 Dark secondary/primary surfaces use Fluent `#1f1f1f`/`#292929`. Selected surfaces use Fluent Card Background (`#333333`); menu hover and pressed surfaces use Fluent `#3d3d3d`/`#1f1f1f`. Chart axis boundaries use Deep Gray in both modes. Apply the same aliases to explicit and system dark appearance; preserve explicit light brand surfaces and the black Footer.
 

@@ -48,9 +48,6 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
         <article className={appearance["memo-article"]}>
           <div className={appearance["memo-article-header-band"]}>
             <header className={appearance["memo-article-header"] + " " + appearance["shell"]}>
-              <p className={appearance["eyebrow"]}>
-                <span /> {memo.category.label}
-              </p>
               <h1>{memo.title}</h1>
               <div className={appearance["article-meta"]}>
                 <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>

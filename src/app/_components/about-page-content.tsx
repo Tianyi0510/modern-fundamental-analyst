@@ -11,7 +11,6 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 type Section = { label: string; title: string; paragraphs: string[] };
 type Copy = {
-  eyebrow: string;
   headline: [string, string | string[]];
   introduction: string;
   disciplines: string;
@@ -29,7 +28,6 @@ type Copy = {
 
 const copy: Record<Locale, Copy> = {
   en: {
-    eyebrow: "About",
     headline: ["Learn continuously", "and invest with accountability"],
     introduction:
       "Meet Tianyi (David) Li, a Rutgers University–New Brunswick Honors College student developing a transparent, long-term investment process.",
@@ -122,7 +120,6 @@ const copy: Record<Locale, Copy> = {
     legalSuffix: " pages.",
   },
   "zh-tw": {
-    eyebrow: "關於",
     headline: ["持續學習", ["以問責精神", "投資"]],
     introduction: "認識 Tianyi（David）Li：現就讀於羅格斯大學新布朗斯維克分校榮譽學院，正在建立透明、長期的投資流程。",
     disciplines: "金融 · 商業分析與資訊科技 · 哲學 · 音樂",
@@ -206,7 +203,6 @@ const copy: Record<Locale, Copy> = {
     legalSuffix: "頁面。",
   },
   "zh-cn": {
-    eyebrow: "关于",
     headline: ["持续学习", ["以问责精神", "投资"]],
     introduction: "认识 Tianyi（David）Li：现就读于罗格斯大学新布朗斯维克分校荣誉学院，正在建立透明、长期的投资流程。",
     disciplines: "金融 · 商业分析与信息技术 · 哲学 · 音乐",
@@ -299,7 +295,6 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
       <main id="main-content" tabIndex={-1} className="@container/about-page">
         <PageHero
           variant="standard"
-          label={<>{text.eyebrow}</>}
           title={
             <>
               {text.headline[0]}

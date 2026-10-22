@@ -1,18 +1,18 @@
-# Web application architecture
+# Web Application Architecture
 
 Use this guide to design, review and operate the application. Architecture principles define the standard. Project decisions explain selected approaches and their limits. Operational procedures define verification, data updates and releases. A working implementation does not establish compliance or justify an exception.
 
 ## Navigation
 
 - [Architecture principles](#architecture-principles): references, types, boundaries, state, data, rendering, forms and verification.
-- [Project decisions](#project-decisions): selected technologies, domain contracts and conditions for reconsideration.
+- [Project decisions](#project-decisions): [technology stack](#technology-stack), domain contracts and conditions for reconsideration.
 - [Operational procedures](#operational-procedures): tests, portfolio updates, performance checks and releases.
 
-## Architecture principles
+## Architecture Principles
 
 Apply these principles before choosing an implementation. Distinguish a source recommendation from a project requirement or an example.
 
-### Architecture references
+### Architecture References
 
 Use the categories below within their assigned responsibilities. Official documentation governs supported behavior. Within a category, prefer earlier references when guidance conflicts in the same domain and context. CI/CD and SEO references govern their own domains; templates provide examples only. Web standards, accessibility requirements and supported framework behavior constrain every choice.
 
@@ -63,7 +63,7 @@ Templates illustrate implementation options. They do not prescribe this project'
 
 The [Design System](DESIGN_SYSTEM.md) owns visual rules; [Integrations](INTEGRATIONS.md) owns provider configuration and recovery. Cite the specific section supporting an adopted rule. Label conditional recommendations and project choices. Record a departure's requirement, alternatives, trade-off, verification and review trigger. Existing code, migration effort or a passing build alone is not sufficient justification.
 
-### CI/CD references and principles
+### CI/CD References and Principles
 
 These references govern workflow execution and release controls. They complement the official documentation and best-practice references above without changing their responsibilities.
 
@@ -86,7 +86,7 @@ Apply the following requirements when reviewing CI/CD:
 
 Project decisions and operational procedures below record implementation choices, not exceptions to these requirements. Repository files cannot establish live branch protection, secret access or provider settings; verify those separately and report inaccessible settings as unverified.
 
-### Type and component contracts
+### Type and Component Contracts
 
 Use types to describe valid inputs and states without concealing uncertainty:
 
@@ -100,7 +100,7 @@ Use types to describe valid inputs and states without concealing uncertainty:
 
 The Cheatsheet permits assertions in justified cases; it does not support using them to bypass an unverified boundary. Sources: [props](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/basic_type_example/), [hooks](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/hooks/), [events](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/forms_and_events/), [context](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/context/) and [refs](https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/forward_and_create_ref/).
 
-### Application boundaries
+### Application Boundaries
 
 Organize domain behavior by feature. Keep feature components, API declarations, types, state, tests and styles near their consumers. Add directories when they clarify ownership, not to reproduce a template.
 
@@ -110,7 +110,7 @@ Keep credentials and privileged operations behind server-only boundaries. Separa
 
 Source: [Bulletproof React project structure](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md).
 
-### Code and components
+### Code and Components
 
 Give each component a cohesive responsibility. Extract independent UI units from large components rather than accumulating nested rendering functions. Use children or slots when composition reduces an overloaded prop interface. Render callbacks remain appropriate when a consumer needs supplied data.
 
@@ -120,7 +120,7 @@ Use consistent naming, explicit side-effect boundaries and automated formatting.
 
 Sources: [Bulletproof React components](https://github.com/alan2207/bulletproof-react/blob/master/docs/components-and-styling.md) and [project standards](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-standards.md).
 
-### State ownership
+### State Ownership
 
 Choose state ownership by lifetime and consumers:
 
@@ -144,7 +144,7 @@ Supporting rules: installed [server request isolation](../.agents/skills/vercel-
 
 Source: [Bulletproof React state management](https://github.com/alan2207/bulletproof-react/blob/master/docs/state-management.md).
 
-### API contracts and data fetching
+### API Contracts and Data Fetching
 
 Use a configured API client for shared transport behavior. Export feature-owned request declarations instead of embedding endpoint logic in rendering code. Define request and consumed-response types, runtime validation, a fetcher and failure behavior.
 
@@ -154,7 +154,7 @@ Start independent requests concurrently. Sequence requests only when data depend
 
 Sources: [Bulletproof React API layer](https://github.com/alan2207/bulletproof-react/blob/master/docs/api-layer.md) and [Robin Wieruch's data-fetching patterns](https://www.robinwieruch.de/react-data-fetching-patterns/).
 
-### Rendering and hydration
+### Rendering and Hydration
 
 Distinguish React Server Components, server-side rendering and hydration. Server Components execute on the server. Client Components can still contribute server-rendered HTML before becoming interactive in the browser.
 
@@ -164,7 +164,7 @@ Keep the initial server and client render consistent. Defer browser-only decisio
 
 Sources: [Josh W. Comeau on Server Components](https://www.joshwcomeau.com/react/server-components/) and [hydration](https://www.joshwcomeau.com/react/the-perils-of-rehydration/).
 
-### Forms and mutations
+### Forms and Mutations
 
 Choose controlled inputs, uncontrolled inputs or Actions according to validation and workflow needs. Specify field errors, submission errors, pending state and success behavior. Client validation improves feedback; the server must validate inputs before changing data.
 
@@ -180,7 +180,7 @@ Prevent duplicate submissions while work is pending. Preserve recoverable input 
 
 Sources: [Bulletproof React form state](https://github.com/alan2207/bulletproof-react/blob/master/docs/state-management.md#form-state), [Robin Wieruch's validation](https://www.robinwieruch.de/react-form-validation/) and [pending actions](https://www.robinwieruch.de/react-form-loading-pending-action/).
 
-### Errors and observability
+### Errors and Observability
 
 Distinguish expected validation failures, transport failures and unexpected rendering errors. Report actionable feedback without exposing credentials, private payloads or raw provider errors.
 
@@ -190,7 +190,7 @@ Track unexpected production errors with sufficient context and readable source m
 
 Source: [Bulletproof React error handling](https://github.com/alan2207/bulletproof-react/blob/master/docs/error-handling.md).
 
-### Testing and performance principles
+### Testing and Performance Principles
 
 Prioritize integration tests for feature behavior, focused unit tests for isolated logic and end-to-end tests for critical journeys. Assert observable outcomes rather than internal state or implementation names. Prefer network interception to replacing fetch so request behavior remains under test.
 
@@ -200,9 +200,127 @@ Use styling compatible with the rendering environment. Build-time CSS avoids run
 
 Sources: [Bulletproof React testing](https://github.com/alan2207/bulletproof-react/blob/master/docs/testing.md), [performance](https://github.com/alan2207/bulletproof-react/blob/master/docs/performance.md), [Josh W. Comeau on memoization](https://www.joshwcomeau.com/react/usememo-and-usecallback/) and [CSS in Server Components](https://www.joshwcomeau.com/react/css-in-rsc/).
 
-## Project decisions
+## Project Decisions
 
 These decisions select approaches for this application's requirements. They do not modify the principles above or certify implementation compliance. Reconsider a decision when its stated assumptions change. Provider procedures belong in [Integrations](INTEGRATIONS.md); visual specifications belong in [Design System](DESIGN_SYSTEM.md).
+
+### Technology Stack
+
+This stack defines each tool's role. Architecture principles govern how the tools work together; operational procedures define how to run and verify them. Use each tool's official documentation for its supported APIs. Listing order does not establish precedence across unrelated responsibilities.
+
+| Category                   | Technology                                                              | Resolved Version                                            | Responsibility                                                                              |
+| -------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Runtime                    | [Node.js](https://nodejs.org/)                                          | 24.22.1 LTS                                                 | Run development tools, builds and Node.js server code.                                      |
+| Language                   | [TypeScript](https://www.typescriptlang.org/)                           | 6.0.3                                                       | Check static types and define code contracts. Validate external data at runtime separately. |
+| UI                         | [React](https://react.dev/)                                             | 19.3.1                                                      | Compose components and manage rendering and interaction state.                              |
+| Framework                  | [Next.js](https://nextjs.org/)                                          | 16.4.2                                                      | Provide App Router routing, server/client rendering, metadata and builds.                   |
+| Styling                    | [Tailwind CSS](https://tailwindcss.com/)                                | 4.3.3                                                       | Apply utility classes and expose design tokens to component styles.                         |
+| Code quality               | [ESLint](https://eslint.org/)                                           | 9.39.5                                                      | Enforce static analysis, framework rules and dependency boundaries.                         |
+| Formatting                 | [Prettier](https://prettier.io/)                                        | 3.9.10                                                      | Format source files consistently, including supported Tailwind class ordering.              |
+| Git hooks                  | [Husky](https://typicode.github.io/husky/)                              | 9.1.7                                                       | Run configured local Git checks. Hooks do not replace CI.                                   |
+| Unit and integration tests | [Vitest](https://vitest.dev/)                                           | 5.0.5                                                       | Run unit and integration tests with assertions and mocks.                                   |
+| Component testing          | [Testing Library](https://testing-library.com/)                         | React 16.3.3; DOM 10.4.2; jest-dom 7.0.1; user-event 14.6.8 | Query and interact with rendered components through user-facing behavior.                   |
+| Network mocking            | [MSW](https://mswjs.io/)                                                | 3.0.3                                                       | Intercept test HTTP requests and simulate provider responses and failures.                  |
+| End-to-end tests           | [Playwright](https://playwright.dev/)                                   | 1.64.1                                                      | Automate browser journeys and verify rendered behavior.                                     |
+| Browser coverage           | [Chromium](https://www.chromium.org/) and [WebKit](https://webkit.org/) | Chromium 156.0.8078.4; WebKit 27.2                          | Exercise the application across the two configured browser engines.                         |
+
+[Chrome for Developers](https://developer.chrome.com/) provides Chrome tooling and documentation; it is not a separate application dependency or test engine. Playwright's WebKit with device emulation does not establish behavior on a physical iPhone.
+
+[package.json](../package.json) defines dependencies, scripts and the Node.js requirement; [package-lock.json](../package-lock.json) locks dependency versions. Use Node.js 24.22.1 LTS and npm 12.2.1. Versions below describe this checkout, not the deployed release. Browser versions come from the Playwright manifest; platform overrides may select a different build. Component and visual responsibilities belong in the [Design System](DESIGN_SYSTEM.md); service responsibilities and official references belong in [Integrations](INTEGRATIONS.md#service-responsibilities-and-references). Its [templates](INTEGRATIONS.md#templates) provide conditional implementation examples, not architecture requirements.
+
+Keep test responsibilities distinct: Vitest runs component integrations, Testing Library drives their UI and MSW controls their network responses. Existing Node-runner tests remain a separate suite. See [test workflow](#test-workflow) for file patterns, environments and browser scope, and [project standards](#project-standards) for linting and formatting rules.
+
+#### Dependency Versions
+
+Verified on 22 October 2026 against the lockfile and publisher metadata. These are resolved versions, not semver ranges. Update this table with dependency changes. Vite 8.3.5 belongs to the test toolchain; Next.js owns application builds. shadcn/ui components are local source files and have no single installed library version. Hosted services and fonts do not inherit their SDK version.
+
+| Package                             | Version | Scope       |
+| ----------------------------------- | ------- | ----------- |
+| `@base-ui/react`                    | 1.9.0   | Runtime     |
+| `@mdx-js/loader`                    | 3.1.1   | Runtime     |
+| `@mdx-js/react`                     | 3.1.1   | Runtime     |
+| `@next/mdx`                         | 16.4.2  | Runtime     |
+| `@sentry/core`                      | 11.8.0  | Runtime     |
+| `@sentry/nextjs`                    | 11.8.0  | Runtime     |
+| `@tanstack/react-table`             | 9.3.1   | Runtime     |
+| `@upstash/redis`                    | 1.39.0  | Runtime     |
+| `@vercel/analytics`                 | 2.0.1   | Runtime     |
+| `@vercel/speed-insights`            | 2.0.0   | Runtime     |
+| `class-variance-authority`          | 0.7.1   | Runtime     |
+| `clsx`                              | 2.1.1   | Runtime     |
+| `lucide-react`                      | 1.61.0  | Runtime     |
+| `next`                              | 16.4.2  | Runtime     |
+| `next-themes`                       | 0.4.6   | Runtime     |
+| `react`                             | 19.3.1  | Runtime     |
+| `react-dom`                         | 19.3.1  | Runtime     |
+| `react-email`                       | 6.11.3  | Runtime     |
+| `recharts`                          | 3.10.1  | Runtime     |
+| `resend`                            | 6.34.1  | Runtime     |
+| `stripe`                            | 23.0.1  | Runtime     |
+| `tailwind-merge`                    | 3.7.0   | Runtime     |
+| `@eslint/js`                        | 9.39.5  | Development |
+| `@mdx-js/mdx`                       | 3.1.1   | Development |
+| `@next/eslint-plugin-next`          | 16.4.2  | Development |
+| `@playwright/test`                  | 1.64.1  | Development |
+| `@react-email/ui`                   | 6.11.3  | Development |
+| `@tailwindcss/postcss`              | 4.3.3   | Development |
+| `@testing-library/dom`              | 10.4.2  | Development |
+| `@testing-library/jest-dom`         | 7.0.1   | Development |
+| `@testing-library/react`            | 16.3.3  | Development |
+| `@testing-library/user-event`       | 14.6.8  | Development |
+| `@types/mdx`                        | 2.0.14  | Development |
+| `@types/node`                       | 24.19.2 | Development |
+| `@types/react`                      | 19.3.0  | Development |
+| `@types/react-dom`                  | 19.3.0  | Development |
+| `@vitest/eslint-plugin`             | 1.6.28  | Development |
+| `eslint`                            | 9.39.5  | Development |
+| `eslint-config-prettier`            | 10.1.8  | Development |
+| `eslint-import-resolver-typescript` | 4.4.5   | Development |
+| `eslint-plugin-check-file`          | 3.3.2   | Development |
+| `eslint-plugin-import-x`            | 4.17.1  | Development |
+| `eslint-plugin-jest-dom`            | 5.10.1  | Development |
+| `eslint-plugin-jsx-a11y`            | 6.10.2  | Development |
+| `eslint-plugin-playwright`          | 2.12.1  | Development |
+| `eslint-plugin-react-hooks`         | 7.1.1   | Development |
+| `eslint-plugin-testing-library`     | 7.16.2  | Development |
+| `globals`                           | 17.13.0 | Development |
+| `husky`                             | 9.1.7   | Development |
+| `jsdom`                             | 30.1.3  | Development |
+| `lighthouse`                        | 13.5.0  | Development |
+| `lint-staged`                       | 17.6.0  | Development |
+| `msw`                               | 3.0.3   | Development |
+| `prettier`                          | 3.9.10  | Development |
+| `prettier-plugin-tailwindcss`       | 0.8.1   | Development |
+| `tailwindcss`                       | 4.3.3   | Development |
+| `typescript`                        | 6.0.3   | Development |
+| `typescript-eslint`                 | 8.72.0  | Development |
+| `vitest`                            | 5.0.5   | Development |
+| `yaml`                              | 2.9.1   | Development |
+
+| Tool                           | Version           |
+| ------------------------------ | ----------------- |
+| npm                            | 12.2.1            |
+| GitHub Actions checkout        | 7.0.1             |
+| GitHub Actions setup-node      | 7.1.0             |
+| GitHub Actions upload-artifact | 7.0.2             |
+| Stripe API request version     | 2026-09-30.endive |
+
+The Actions workflow pins full upstream commit SHAs. CI installs npm 12.2.1 explicitly; Vercel uses `npx --yes npm@12.2.1 ci`. npm 12 blocks dependency install scripts unless approved. `allowScripts` permits only reviewed versions of esbuild, unrs-resolver and fsevents. Review new scripts before adding an approval; do not use blanket approval.
+
+#### Upgrade Constraints
+
+- Node stays on the user-selected 24 LTS line; Node 26 Current is not the target. Node types stay on the matching 24 series.
+- TypeScript remains 6.0.3 because typescript-eslint 8.72.0 declares support below 6.1.0. TypeScript 7.0.2 is not a supported combination.
+- ESLint and `@eslint/js` remain on 9.39.5 because jsx-a11y 6.10.2 does not declare ESLint 10 support. Preserve accessibility checks instead of forcing the dependency tree. ESLint 9 is deprecated upstream; revisit this constraint when compatible tooling is available.
+- Sentry Core stays at 11.8.0 to match Sentry Next.js 11.8.0, rather than independently upgrading Core to 11.9.0.
+- MSW 3 uses `onUnhandledFrame`. The shared test callback records unexpected traffic and throws; `defaults.error()` only logs in this version. The regression test verifies that unmatched requests never reach a real local server.
+- The development dependency chain through braces has an unresolved high-severity advisory, [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). npm reports five affected packages through micromatch, fast-glob and the lint plugins. Do not downgrade Next.js tooling or remove checks to silence the report.
+
+These are explicit compatibility constraints, not a claim that every package uses its highest published version. Recheck publisher peer dependencies before removing them.
+
+### AI Agents
+
+[AGENTS.md](../AGENTS.md#ai-agents) owns AI-assisted development references and repository execution rules. ChatGPT guidance covers collaboration, OpenAI developer documentation covers supported tool and API behavior, and the AGENTS.md format organizes repository instructions. These references support development; they do not define application architecture or establish an AI product requirement.
 
 ### Installed Agent Skills
 
@@ -218,7 +336,7 @@ Use project skills as supporting guidance within the reference priorities above:
 
 `next-best-practices` was installed from [vercel-labs/openreview](https://github.com/vercel-labs/openreview/tree/672deb21e70e471e0536d5ad7a67c14b8359e97e/.agents/skills/next-best-practices) at commit `672deb21e70e471e0536d5ad7a67c14b8359e97e`. [skills-lock.json](../skills-lock.json) records its source and content hash. Check examples against the installed Next.js version and official documentation before applying them. Installing a skill does not establish architecture compliance.
 
-### Framework and module ownership
+### Framework and Module Ownership
 
 Use Next.js App Router and TypeScript for localized research pages and server-side reader services. Server-rendered content supports readable initial responses; client islands isolate interactions. This choice trades framework dependence for integrated routing, metadata and rendering.
 
@@ -232,11 +350,11 @@ ESLint enforces import boundaries and runtime cycles, including aliases and lite
 
 Shared Resend acknowledgement checks live in `src/lib/resend-contracts.ts`; Contact and Subscriptions import them without crossing feature boundaries. Email sends and contact/segment writes require a nonempty provider ID. Segment removals also require `deleted: true`; welcome events require the expected event name and object type. A successful HTTP status alone does not establish a completed operation.
 
-Malformed write acknowledgements mark subscriber operations uncertain. Preserve leases and journals for reconciliation, stop subsequent mutations and avoid compensating an unknown outcome. Webhook completion is recorded only after a valid unsubscribe acknowledgement or the explicitly accepted missing-contact response. Email retries retain their original payload and idempotency key; an acknowledged subscription remains valid when its welcome event needs reconciliation.
+Malformed write acknowledgements mark subscriber operations uncertain. Preserve leases and journals for reconciliation, stop subsequent mutations and avoid compensating an unknown outcome. Webhook completion is recorded only after a valid unsubscribe acknowledgement or the explicitly accepted missing-contact response. Email retries retain their original payload and idempotency key; an acknowledged subscription remains valid when its welcome event needs reconciliation. Follow the [webhook recovery](INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](INTEGRATIONS.md#backup-and-restore) runbooks for delivery outages and data recovery. Reconcile newer consent, suppression and uncertain operations before resuming writes.
 
 Provider and token modules use `server-only`. Next.js enforces the server/client boundary during builds. The Node test loader bypasses that marker for server tests and does not type-check; run TypeScript separately. See [verification responsibilities](#verification-responsibilities).
 
-### State and request decisions
+### State and Request Decisions
 
 The selected ownership model separates navigation, presentation and provider state:
 
@@ -253,7 +371,7 @@ A transport helper is not a resource cache. If client-managed remote reads are a
 
 `contact-api.ts` and `subscription-api.ts` declare feature requests. `postJson` applies deadlines, HTTP failure handling and optional idempotency headers. A successful command returns completion, not an asserted response object. Consumed response bodies require runtime validation.
 
-### Presentation and style loading
+### Presentation and Style Loading
 
 Use server-compatible content components and explicit client boundaries for interactions. Pass server-rendered children through the shared theme provider. `ClientForm` disables JavaScript-dependent controls until handlers attach. Native Support submission remains available before hydration.
 
@@ -263,7 +381,7 @@ Tailwind and CSS Modules supply build-time styles compatible with Server Compone
 
 Base UI owns focus containment, modal isolation and primitive keyboard behavior. The mobile navigation phase keeps Sheet open through its closing animation. Preserve interruption, focus restoration and scroll restoration when changing that coordination.
 
-### Rendering and error boundaries
+### Rendering and Error Boundaries
 
 Public research content renders on the server. Payment verification and saved preferences use local Suspense boundaries so provider latency does not delay unrelated content. Each page has one main landmark, with navigation and Footer outside it.
 
@@ -273,25 +391,25 @@ Performance charts isolate interactive rendering with `ChartBoundary`. Monthly t
 
 Sentry receives unexpected errors with sensitive messages, payloads and URL queries filtered. Its bridge captures startup errors while the SDK loads. Source maps and live delivery require provider verification.
 
-### Navigation prefetching
+### Navigation Prefetching
 
 `IntentLink` uses Next.js Link and enables default prefetching on hover, keyboard focus or pointer press. This policy reduces speculative route payloads while retaining navigation intent as a warming signal. Caller handlers, refs and explicit prefetch choices remain authoritative.
 
 Apply it to Header navigation, the wordmark, shared ButtonLink CTAs and Home text CTAs. Other links keep their documented behavior. Reconsider the policy when navigation latency or route-payload measurements favor another strategy. Test prefetching against production builds; development behavior is not sufficient evidence.
 
-### Deterministic date rendering
+### Deterministic Date Rendering
 
 Render financial calendar dates from validated ISO values and UTC components. Fixed English month names and Chinese numeric dates avoid server/browser locale-data differences. Compact English uses `Sep`.
 
 This is a project serialization policy for calendar dates, not a general prohibition on `Intl`. Reconsider it when adding time zones or localized date formats. Preserve identical initial server/client output and visible hydration warnings.
 
-### Service and consent boundaries
+### Service and Consent Boundaries
 
 Routes validate HTTP input and map domain results to responses. Features own contact delivery, subscription coordination and payment outcomes. Provider adapters keep credentials server-side. Research data remains independent of Redis and external delivery services.
 
 Keep request-origin checks, body limits, rate limits, retry identities and provider-error handling explicit. Unknown provider outcomes must not become assumed failures or unconditional retries. Subscription activation validates contact IDs and the boolean subscription state before consuming a lookup. Only an explicit 404 permits creation. Activation, preference-save and unsubscribe writes require a nonempty ID in successful acknowledgements. Malformed acknowledgements leave the outcome unknown: stop further writes and retain the lease and any journal. Unsubscribe bypasses the journal gate without creating or clearing a journal. Before language changes, validate every segment page: an array of nonempty IDs, a boolean `has_more` and a usable, nonrepeating cursor when more pages remain. Read the complete snapshot before writing. See [Integrations](INTEGRATIONS.md) for locks, journals and recovery.
 
-### Subscription consent boundary
+### Subscription Consent Boundary
 
 Signup requests a confirmation link. An explicit confirmation POST activates consent under the shared lock and journal; welcome delivery is separate. GET requests must not change consent.
 
@@ -299,13 +417,13 @@ Redis stores confirmation, consent, suppression, limits and recovery records. Re
 
 Preference tokens retain their authenticated encryption format and legacy-key fallback. Decode JSON as `unknown`; require version `1`, a valid email and a finite numeric expiry later than the current time. Authentication does not replace payload validation. Secret rotation requires an explicit migration plan.
 
-### Project standards
+### Project Standards
 
 Use kebab-case files, PascalCase components and Next.js route naming exceptions. Keep adjacent relative imports; use `@/*` across source directories. Formatting uses UTF-8, LF, two spaces and final newlines.
 
 ESLint checks types, hooks, imports and framework rules. Prettier owns formatting and Tailwind ordering. Hooks validate staged files without rewriting them. CI remains the release gate because local hooks can be bypassed.
 
-### Lint and editor conventions
+### Lint and Editor Conventions
 
 Scope Vitest rules to `*.test.ts` and `*.test.tsx`, Testing Library rules to component tests, and Playwright rules to `*.spec.ts`. Node tests retain JavaScript rules. Keep framework naming exceptions and justified suppressions narrow.
 
@@ -313,7 +431,7 @@ Keep Prettier last in ESLint configuration. Import ordering is not a project req
 
 There is no CSS semantic linter. Browser checks and review must establish selector and property behavior; formatting cannot do so.
 
-### Routing and metadata
+### Routing and Metadata
 
 Language links preserve only server-validated parameters:
 
@@ -351,7 +469,7 @@ Pages compose Header and Footer. Home owns its header background; private servic
 
 This policy retains static prerendering at the cost of allowing inline scripts. Reassess that trade-off when the threat model requires a strict policy. A nonce-based policy changes rendering and caching requirements. See [Next.js CSP](https://nextjs.org/docs/app/guides/content-security-policy).
 
-### Investment memo content
+### Investment Memo Content
 
 Investment Memo Articles use locally imported MDX, compiled by `@next/mdx` into Server Components. `src/mdx-components.tsx` provides the required App Router entry point. The owning feature supplies section, subsection, reference and link treatments through `memo-mdx-components.tsx`; other pages do not inherit article-specific markup.
 
@@ -361,11 +479,11 @@ The Microsoft article remains the English original on all three routes. The loca
 
 Use [Next.js MDX](https://nextjs.org/docs/app/guides/mdx) for compiler conventions. Run the affected memo Node tests and production browser checks after editing article markup; confirm the three language routes and narrow layouts.
 
-### Portfolio data
+### Portfolio Data
 
 The portfolio feature owns financial data, sources, calculations and monthly acceptance. Amounts and retrieval records below are dated evidence, not live quotes. Code records remain authoritative.
 
-#### Workspace data
+#### Workspace Data
 
 `src/features/portfolio/portfolio-detail.ts` records 91 purchase lots with fees, SPY adjusted prices by applied trading date, 124 cash events, three corporate actions and 22 month-end position, price and XIRR snapshots.
 
@@ -417,7 +535,7 @@ The result is a rebased calculation price, not September's quoted close. Simulat
 
 Future extensions must use same-vintage adjusted-price ratios. Do not combine a newly adjusted endpoint with unchanged purchase prices without rebasing. This correction replaced rounded Stock Analysis inputs and increased September benchmark XIRR by about 0.00000494 percentage point. August and earlier observations, and displayed September value/XIRR (USD 121,237.01 and 19.26%), are unchanged.
 
-#### Historical price sources
+#### Historical Price Sources
 
 Use Yahoo Finance only for new or replacement historical stock and ETF prices, including SPY. Record ticker, source URL, retrieval date, applied trading date, currency and adjustment basis. Mark missing observations unverified; do not substitute another provider.
 
@@ -425,7 +543,7 @@ Verify field definitions before use. Holdings need the share basis described bel
 
 Apply this policy to additions and explicit corrections. Preserve existing provenance: replacing a non-Yahoo input requires new Yahoo evidence, not a new label. Reconcile published corrections and run the acceptance checks below.
 
-#### Calculation and updates
+#### Calculation and Updates
 
 Keep source precision until display formatting.
 
@@ -436,7 +554,7 @@ Keep source precision until display formatting.
 
 Each month records the applied U.S. trading date, which precedes the calendar month-end when markets are closed. SPY is the only benchmark. Preserve previously published monthly prices and XIRRs unless the source evidence supports an explicit correction.
 
-#### Reconstructed time-weighted return
+#### Reconstructed Time-weighted Return
 
 `portfolio-closing-marks.ts` contains 450 daily/event-date marks and 6,752 held-position prices for 2024-12-30 through 2026-09-30. Yahoo Finance chart data was retrieved on 2026-10-05.
 
@@ -481,11 +599,11 @@ Portfolio's “Total Return” and “Absolute Return” describe a percentage, 
 
 [GIPS methodology](https://www.gipsstandards.org/standards/gips-standards-for-firms/gips-standards-handbook-for-firms/) describes linked sub-period returns and flow conventions. The site claims neither GIPS compliance nor observed intraday TWR. The stocks-and-ETFs boundary matches XIRR; it is not a GIPS composite carve-out. Provision 3.A.15 requires cash and related income in composite carve-outs. Exact flow-time TWR requires actual valuations and event ordering at every external flow.
 
-## Operational procedures
+## Operational Procedures
 
 Use these procedures to apply the principles and verify project decisions. Commands and thresholds are project-specific. Local results, historical evidence, CI results and production state are distinct.
 
-### Update and acceptance procedure
+### Update and Acceptance Procedure
 
 Refresh closing marks through the new month. Record source and retrieval date, verify split basis and reconcile every monthly position value. Refresh the entire SPY TWR vintage consistently; preserve the separately maintained XIRR history.
 
@@ -521,7 +639,7 @@ Tests cover linking, contributions, fees, dividends, tax, interest, transfers, s
 
 Run calculations through the versioned TypeScript modules. Independent calculation tools may verify results, but must not silently replace source records or the published methodology.
 
-### Verification responsibilities
+### Verification Responsibilities
 
 | Layer                                            | Responsibility and configuration source                                                                           |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
@@ -536,11 +654,11 @@ Run calculations through the versioned TypeScript modules. Independent calculati
 
 Change rules only for an identified problem, and check related tools, docs and tests for conflicts.
 
-### Test workflow
+### Test Workflow
 
 Apply the [testing principles](#testing-and-performance-principles) through the runners below. Keep provider writes mocked. Preserve failure, interruption and retry coverage. Source assertions are limited to explicit configuration or boundary contracts that behavioral tests do not establish.
 
-#### Runners and isolation
+#### Runners and Isolation
 
 | Runner                  | Files and scope                                                                 |
 | ----------------------- | ------------------------------------------------------------------------------- |
@@ -557,11 +675,26 @@ Contact delivery and subscription service integration tests use MSW with explici
 
 The loader, shared helpers, WebKit runner and production gate live in `scripts/`. The journal CLI stays with subscriptions at `src/features/subscriptions/server/subscription-journal-cli.mjs`, invoked through `npm run subscription:journal`.
 
-`npm test` runs Node and both Vitest projects; `verify:static` includes it. Playwright runs separately. Its development server uses `PLAYWRIGHT_ISOLATED_DEV=1` and `node_modules/.cache/next-playwright` so it can coexist with the interactive `.next` development server. Production tests retain the normal build directory. After a build, run selected production cases with `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npm run test:e2e -- <spec-files> --project=chromium` or `webkit`.
+`npm test` runs Node and both Vitest projects; `verify:static` includes it. Playwright runs separately. Its development server uses `PLAYWRIGHT_ISOLATED_DEV=1` and `node_modules/.cache/next-playwright` so it can coexist with the interactive `.next` development server. It retains the default development hostname so tests exercise the configured loopback alias rather than implicitly trusting it through `--hostname`. Production tests retain the normal build directory. After a build, run selected production cases with `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npm run test:e2e -- <spec-files> --project=chromium` or `webkit`.
+
+### Local Preview Diagnostics
+
+Use `npm run dev`, then open `http://localhost:3000` or `http://127.0.0.1:3000`. Next.js allows `localhost` by default; `next.config.ts` explicitly adds only `127.0.0.1` through [allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins). Do not use wildcard origins or disable origin protection.
+
+The October 22, 2026 reproduction established a hostname mismatch: a default dev server blocked `/_next/hmr` from `127.0.0.1`, leaving controls unhydrated. The same server worked through `localhost` without a restart or cache reset. Starting with `--hostname 127.0.0.1` masked the missing configuration. The regression checks both hostnames, reloads, menu interactions and rejection of unrelated origins.
+
+If controls stop responding:
+
+1. Record the exact URL, startup command, browser errors and `.next/dev/logs/next-development.log` before restarting. Isolated tests log under `node_modules/.cache/next-playwright/dev/logs/`.
+2. Check development-origin warnings and the HMR connection. Successful HTML or JavaScript HTTP responses alone do not establish hydration.
+3. Verify an enabled subscription control and an opening menu without submitting a form. Compare both loopback hostnames on the same running server.
+4. Run `npm run test:e2e -- src/components/local-preview.spec.ts --project=chromium --workers=1`. Run `--project=webkit` for the mobile interaction cases. Keep provider credentials isolated by the Playwright configuration.
+
+Preserve logs before investigating other failures. A cache reset or restart is recovery evidence, not proof of a root-cause fix. Configuration changes require Next.js to reload the server configuration; they do not require deleting `.next`.
 
 WebKit uses the iPhone 13 viewport, touch, scale and user agent. Tag only phone-sized, mobile-compatible cases `@mobile`. Keep mouse-hover, CDP-only, desktop and cross-breakpoint cases in Chromium. Browser servers use isolated provider settings. Both engines test Contact's unavailable-service response; MSW and route tests cover success and retries. None proves live email delivery.
 
-#### Coverage contracts
+#### Coverage Contracts
 
 - Contact integrations check localized normalization, delivery payloads, errors and retry identity through MSW.
 - Memo checks resolve real Next.js redirects and verify localized HTTP 308 destinations and landmarks.
@@ -572,7 +705,7 @@ WebKit uses the iPhone 13 viewport, touch, scale and user agent. Tag only phone-
 
 References: [Vitest projects](https://vitest.dev/guide/projects), [Testing Library setup](https://testing-library.com/docs/react-testing-library/setup/), [MSW Node integration](https://mswjs.io/guides/integrations/node).
 
-#### CI and evidence reuse
+#### CI and Evidence Reuse
 
 Actions are pinned to verified upstream commit SHAs, with release versions in comments. This project uses SHA pinning rather than the preview workflow lockfile feature. When updating an action, verify the commit in its source repository, review release changes, update every reference and retain the version comment. SHA pins fix direct action references; they do not freeze runner images or all transitive downloads.
 
@@ -601,17 +734,17 @@ Each browser job uses one worker. Fail-fast is disabled so one shard does not ca
 
 Changed trees, workflows, lockfiles or test settings; stale evidence; squash/rebase merges; missing records; and API errors require full testing. The summary records the source run, tree and release SHA. Main still creates its own successful CI record for the production gate. Runner and runtime changes can occur outside Git, so reuse expires.
 
-#### Production optimization
+#### Production Optimization
 
 The optional [vercel-optimize skill](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) is not installed. Check its [provider prerequisites and readiness](INTEGRATIONS.md#vercel-optimize-readiness) before using it. Collect scoped production metrics first, preserve the evidence, and inspect code only after its candidate gates identify a relevant signal. Missing access or telemetry is not evidence of low traffic or good performance. A limited code-only review requires an explicitly agreed scope and must disclose the missing metrics. Production metrics complement local regression tests; they do not replace them.
 
-#### Performance regression checks
+#### Performance Regression Checks
 
 Font instances belong to their locale layouts. `SiteDocument` receives the selected Chinese variable and shares only Jost. Global 404 rendering selects the matching locale variable. Turbopack uses `experimental.cssChunking: "graph"` because the default merging heuristic kept an unrelated Chinese font stylesheet in English routes even after imports were split. Validate generated stylesheet contents and browser behavior rather than assuming an import refactor fixes the download graph. Webpack fallback builds do not exercise this Turbopack optimization.
 
 After a production build, `npm run test:performance` starts an isolated loopback server on port 3211 with provider credentials disabled. Lighthouse 13.5.0 collects three fresh mobile samples for Home in each language and English Performance. DevTools applies CPU throttling, 150 ms request latency, 1638.4 Kbps download and 750 Kbps upload directly. Do not compare these results directly with public HTTPS runs using simulated throttling.
 
-##### CPU calibration
+##### CPU Calibration
 
 Calibration and Lighthouse explicitly use the same Playwright-installed Chrome for Testing executable. Do not calibrate with Playwright's default headless shell.
 
@@ -625,7 +758,7 @@ The reference comes from [PR #85, attempt 2](https://github.com/Tianyi0510/moder
 
 Do not change the target, discard slow Lighthouse samples or rerun an audit with a different multiplier to make a release pass. Only pre-audit calibration instability receives the bounded retries described below; each attempt recalculates its multiplier from fresh host samples against the same target. After calibration succeeds, keep that multiplier fixed for every route and sample. Drift during an audit is an infrastructure failure and stops the run. Calibration approximates CPU capacity; it does not establish equal application performance across hardware or physical-device equivalence. See [Lighthouse 13.5.0 CPU calibration](https://github.com/GoogleChrome/lighthouse/blob/v13.5.0/docs/throttling.md#cpu-throttling).
 
-##### Budgets and evidence
+##### Budgets and Evidence
 
 | Metric             | Limit                          | Aggregation |
 | ------------------ | ------------------------------ | ----------- |
@@ -645,7 +778,7 @@ The `performance` CI job builds with a fake Sentry DSN and Production sampling, 
 
 Field CWV still requires mobile/desktop p75 LCP, INP and CLS from Speed Insights or CrUX. A Lighthouse navigation run does not measure field INP; TBT is only a laboratory diagnostic. Query failures do not establish a pass or absence of field traffic. See [Google Web Vitals](https://web.dev/articles/vitals), [Chrome Lighthouse scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring), [Next.js CSS chunking](https://nextjs.org/docs/app/api-reference/config/next-config-js/cssChunking) and [font optimization](https://nextjs.org/docs/app/getting-started/fonts).
 
-#### Local runs and shard maintenance
+#### Local Runs and Shard Maintenance
 
 Use affected checks locally. Full `npm run verify` and `npm run test:webkit` are for diagnosis or explicit requests. If Turbopack cannot bind a worker port locally, use `npm run build -- --webpack` and report it; CI retains Turbopack. Next.js selects the bundler before loading configuration: use graph CSS chunking for Turbopack and the supported default chunking for Webpack. The configuration regression test loads both modes through Next.js's configuration loader.
 
@@ -657,7 +790,7 @@ The allocation uses [CI run 39481047586](https://github.com/Tianyi0510/modern-fu
 
 Each shard uploads per-test JSON timing reports for 14 days and separate failure/retry evidence for seven days. Compare test-step and total-job times: extra builds and installs can offset parallelism gains and increase usage. Rebalance the WebKit file list when workload changes.
 
-#### Reliable browser checks
+#### Reliable Browser Checks
 
 Automated regression tests and interactive visual checks provide different evidence. Keep Playwright as the repository and CI regression runner. For rendered UI work using Build Web Apps, follow its installed `frontend-testing-debugging` skill, especially “Choose The Browser Path” and “Required Browser Checks.” Use the Browser plugin when available. Record its availability and the reason for any permitted Playwright fallback; a failed invocation alone does not authorize a fallback.
 
@@ -681,7 +814,9 @@ Use these additional rules for automated browser assertions:
 - Keep production durations and CI retries unchanged. Do not add arbitrary sleeps or filter page errors.
 - For copy changes, find old wording, translations and accessible names in tests and fixtures. Update affected checks without weakening behavior or meaning assertions.
 
-### Release workflow
+### Release Workflow
+
+Provider recovery follows the [Resend webhook](INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](INTEGRATIONS.md#backup-and-restore) procedures. Treat successful SDK responses without valid acknowledgements as uncertain writes: retain leases and journals, stop further mutations and do not mark webhook processing complete. Production release completion does not resolve a cloud monitoring entitlement failure; record uptime activation separately in [Integrations](INTEGRATIONS.md#local-and-cloud-verification).
 
 1. Push the reviewed PR and wait for full CI and the Vercel Preview for its head SHA.
 2. When release is authorized, merge the verified PR into `main` and record the resulting SHA. GitHub automatically deletes the remote PR branch. Main CI verifies reusable evidence or runs the complete suite.
@@ -691,7 +826,7 @@ Use these additional rules for automated browser assertions:
 
 A PR-only request does not authorize merging. Deployment includes safe local cleanup of the released branch. Production browser smoke tests are optional follow-up checks unless evidence indicates a failure. Report deployment completion promptly once version and live-state checks pass.
 
-### Production gate
+### Production Gate
 
 GitHub Actions supplies verification; the Vercel Git integration performs deployment. The repository gate below binds production builds to CI evidence. Live branch protection and Vercel project settings require separate verification. CI and Vercel rebuild the same source; they do not share an identical tested artifact.
 
@@ -705,7 +840,7 @@ The macOS job allows 20 minutes. The remaining wait covers ordinary queueing and
 - Public GitHub access needs no extra credential. Add scoped authentication before making the repository private.
 - Preserve the gate in `vercel.json`'s build command. Keep it out of `npm run build`, since CI must not wait on itself.
 
-### Review evidence
+### Review Evidence
 
 Keep local screenshots and dated notes in `../local/audit/`. Legacy `audit/` remains excluded by Git and Vercel. Archive inactive caches or builds under `../local/archives/`; tools recreate their normal output paths.
 

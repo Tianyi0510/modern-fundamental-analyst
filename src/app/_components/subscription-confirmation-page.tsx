@@ -32,12 +32,7 @@ export async function SubscriptionConfirmationPage({
         languageQuery={token ? new URLSearchParams({ token }).toString() : undefined}
       />
       <main id="main-content" tabIndex={-1}>
-        <PageHero
-          variant="standard"
-          label={locale === "en" ? title : copy.subject}
-          title={title}
-          intro={<p>{pageBody[locale]}</p>}
-        />
+        <PageHero variant="standard" title={title} intro={<p>{pageBody[locale]}</p>} />
         <Container className="confirmation-panel grid gap-6 py-[var(--space-section-padding)]">
           <SubscriptionConfirmationForm token={token} locale={locale} />
           <a href={`${getLocalizedPath("/", locale)}#subscribe`}>{getNavigationCopy(locale).home}</a>

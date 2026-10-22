@@ -1,6 +1,32 @@
 # Integrations
 
-Use this guide to configure and operate Vercel/DNS, Resend, Upstash Redis, Stripe and Sentry. It describes repository behavior and dated provider observations. It does not verify current cloud settings, inbox delivery, telemetry ingestion or payment outcomes.
+Use this guide to configure and operate GitHub, Vercel/DNS, Upstash Redis, Stripe, Resend and Sentry. It describes repository behavior and dated provider observations. It does not verify current cloud settings, inbox delivery, telemetry ingestion or payment outcomes.
+
+## Service responsibilities and references
+
+Official documentation governs each service's supported APIs, security requirements and configuration. This guide defines project responsibilities, data boundaries and operating procedures. Listing a service does not enable all its features or verify its cloud configuration. Listing order does not establish precedence across unrelated domains.
+
+| Service and official documentation                     | Project responsibility                                                                            | Operating guidance                                                                                                                                           |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [GitHub](https://docs.github.com/en)                   | Version control, pull requests, code review and GitHub Actions CI/CD.                             | [CI/CD principles](WEB_APPLICATION_ARCHITECTURE.md#cicd-references-and-principles) and [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow). |
+| [Vercel](https://vercel.com/docs)                      | Hosting, deployments, environment variables, Preview environments and production releases.        | [Vercel and DNS](#vercel-and-dns).                                                                                                                           |
+| [Upstash Redis](https://upstash.com/docs/introduction) | Shared state for rate limits, subscription coordination, consent and recovery records.            | [Upstash Redis](#upstash-redis).                                                                                                                             |
+| [Stripe](https://docs.stripe.com/)                     | Checkout Sessions, Hosted Checkout and payment-status verification for one-time research support. | [Stripe](#stripe).                                                                                                                                           |
+| [Resend](https://resend.com/docs/introduction)         | Transactional email, contacts, language segments, delivery events and welcome automation.         | [Resend](#resend).                                                                                                                                           |
+| [Sentry](https://docs.sentry.io/)                      | Error and performance monitoring, logs, metrics, Session Replay and source maps.                  | [Sentry](#sentry).                                                                                                                                           |
+
+GitHub verifies changes; Vercel builds and serves deployments. A passing workflow does not prove a successful deployment. Redis coordinates application state; Resend delivers messages and maintains provider-side contacts and suppression. Stripe payment results and Sentry telemetry require provider evidence. None of these services owns published portfolio or memo data.
+
+## Templates
+
+Use these templates as implementation examples within the scopes below. They do not override official API behavior, architecture principles, security requirements or project needs. Review source code, dependencies and environment assumptions before adopting a pattern. A reference is not an adoption decision.
+
+| Template                                                                                                     | Reference scope                                        | Applicability                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [shadcn/ui Registry Starter](https://vercel.com/templates/next.js/shadcn-ui-registry-starter)                | Building and publishing a component registry.          | Use only when distributing a registry is a project requirement. Using shadcn/ui components does not require one.                    |
+| [React Email with Resend](https://vercel.com/templates/next.js/react-email-resend)                           | React email templates and Resend delivery integration. | Apply relevant patterns to the [email template workflow](#email-templates-and-local-preview); preserve consent and retry contracts. |
+| [Simple Online Store with Stripe](https://vercel.com/templates/next.js/simple-online-store-with-stripe)      | Checkout and payment integration.                      | Refer to payment patterns for research support. The template does not establish a need for a catalog, cart or store.                |
+| [Upstash Redis and Next.js](https://vercel.com/templates/next.js/get-started-with-upstash-redis-and-next-js) | Connecting Redis to a Next.js application.             | Check patterns against the [Redis runtime](#redis-runtime); connection examples do not define coordination or recovery guarantees.  |
 
 ## Operational boundaries
 
@@ -8,13 +34,14 @@ Use [.env.example](../.env.example) for variable names. Store environment-scoped
 
 Routine tests mock provider I/O. Deployment does not authorize real emails, subscriber changes, payments or unrelated cloud changes. Preserve credentials and durable records through rollback windows. When a write's outcome is unknown, reconcile it before retrying or clearing records.
 
-| Task                                        | Start here                                                                                                                   |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Domain and hosting                          | [Vercel and DNS](#vercel-and-dns); [release gate](WEB_APPLICATION_ARCHITECTURE.md#production-gate)                           |
-| Sending, receiving, consent and preferences | [Resend](#resend), [server secrets](#server-secrets), [verification](#resend-verification)                                   |
-| Redis configuration and recovery            | [Upstash Redis](#upstash-redis), [reconciliation](#subscription-reconciliation), [rotation](#credential-and-secret-rotation) |
-| Checkout and payment verification           | [Stripe](#stripe), [environment verification](#environment-verification-checklist)                                           |
-| Errors, traces, logs, metrics and Replay    | [Sentry](#sentry)                                                                                                            |
+| Task                                        | Start here                                                                                                                                                              |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository, reviews and CI/CD               | [Release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow)                                                                                                    |
+| Domain and hosting                          | [Vercel and DNS](#vercel-and-dns); [release gate](WEB_APPLICATION_ARCHITECTURE.md#production-gate)                                                                      |
+| Sending, receiving, consent and preferences | [Resend](#resend), [server secrets](#server-secrets), [verification](#resend-verification), [webhook recovery](#webhook-recovery)                                       |
+| Redis configuration and recovery            | [Upstash Redis](#upstash-redis), [reconciliation](#subscription-reconciliation), [backup and restore](#backup-and-restore), [rotation](#credential-and-secret-rotation) |
+| Checkout and payment verification           | [Stripe](#stripe), [environment verification](#environment-verification-checklist)                                                                                      |
+| Errors, traces, logs, metrics and Replay    | [Sentry](#sentry)                                                                                                                                                       |
 
 ## Vercel and DNS
 
@@ -245,7 +272,7 @@ Subscribe, preference updates and unsubscribe webhooks share a per-email lease. 
 | Browser request, including coordination overhead | 45 seconds  |
 | Subscriber lease                                 | 120 seconds |
 
-After a mutation starts, network errors, server errors or timeouts leave the outcome unknown. Stop further provider calls, including rollback, and retain the lease until expiry. Abort cannot undo an accepted write. Subscription and language saves retain durable journals; follow [reconciliation](#subscription-reconciliation). Webhook failures return 500 for provider retry.
+After a mutation starts, network errors, server errors or timeouts leave the outcome unknown. Stop further provider calls, including rollback, and retain the lease until expiry. Abort cannot undo an accepted write. Subscription and language saves retain durable journals; follow [reconciliation](#subscription-reconciliation). Webhook failures return 500 for provider retry. Automatic retries are finite; use [webhook recovery](#webhook-recovery) after an outage.
 
 A failed read before mutation is not an unknown write. Cleanup may release its owned journal and lease, even after a thrown read or expired deadline, using exact-value ownership checks. Fail closed if ownership is uncertain. Failures after writes remain conservative; never clear a pre-existing unresolved journal automatically.
 
@@ -254,6 +281,20 @@ Read all segment pages before changing membership. Preserve unrelated segments a
 Active subscriptions return 409 with "You've already subscribed" before contact, segment or welcome writes. Localized feedback keeps the email editable. Use Preferences for language changes; previously unsubscribed contacts must reconfirm, and suppressed contacts need operator review.
 
 Check welcome prerequisites before mutation. Keep rollback protection for segment failures. Welcome failure preserves consent and leaves a journal.
+
+### Webhook recovery
+
+[Resend retries and replays](https://resend.com/docs/webhooks/retries-and-replays) defines automatic delivery, endpoint disabling and manual replay. Retry delays are relative to the preceding failed attempt: immediate, 5 seconds, 5 minutes, 30 minutes, 2 hours, 5 hours, 10 hours and another 10 hours. Persistently failing endpoints can be disabled automatically; Resend emails the team. Disabled or removed endpoints receive no delivery attempts. Inspect each message's delivery history and next retry instead of assuming retries continue indefinitely.
+
+Use this procedure for incoming bounce, complaint and suppression feedback. It does not authorize resending welcome events or email.
+
+1. **Scope the incident.** Confirm the Resend account, endpoint URL, deployment and Redis database. Record the outage window, affected event IDs, delivery failures and endpoint status. Check the team's notification email. Do not record signing secrets, message bodies or recipient addresses in the incident report.
+2. **Repair the cause.** Check routing, the endpoint's signing secret, subscribed events, Redis availability and provider failures. Preserve signature verification, suppression records, completed event IDs and uncertain-write journals. An expired lease is not proof that a provider write failed.
+3. **Restore delivery.** Verify the repaired endpoint can process a valid signed delivery. If disabled, re-enable it in the Resend Webhooks dashboard. Re-enabling alone does not establish that missed events were recovered.
+4. **Recover missed feedback.** In Webhooks, select the endpoint, open each affected message and choose **Replay**. Inventory the outage window and replay failed or unprocessed feedback, preserving the original event identity through the provider's replay mechanism. Do not routinely replay successful messages. Use existing duplicate handling when a replay follows an uncertain response; investigate unresolved provider state using [subscription reconciliation](#subscription-reconciliation).
+5. **Verify completion.** For each relevant recipient, confirm a successful delivery response, durable suppression, the expected unsubscribed contact state or accepted missing-contact result, and the completed webhook record. A 2xx for an unrelated event is not evidence of suppression. Confirm a subsequent delivery succeeds without manual replay. Preserve unresolved journals and record any unavailable events or reconciliation gaps; do not declare recovery complete while these remain unexplained.
+
+When delivery history cannot cover the incident window, reconcile available Resend feedback and contact state before allowing affected recipients to receive email. Missing evidence never clears suppression or grants consent. Coordinate replay with [Redis restoration](#backup-and-restore) so completed events and suppression are not lost during cutover.
 
 ### Resend verification
 
@@ -325,7 +366,7 @@ Clear a record only after known completion, compensation, or a handled pre-mutat
 
 Unresolved records block further subscription and language writes after lease expiry. Unsubscribe still holds the lock, bypasses the journal gate and preserves the record.
 
-Use the affected deployment's environment and stable `SUBSCRIPTION_PREFERENCES_SECRET`. Journals require Redis persistence and a non-evicting database; they do not replace backups. The CLI hashes email with the current secret. Changing it first makes old journals undiscoverable through that CLI.
+Use the affected deployment's environment and stable `SUBSCRIPTION_PREFERENCES_SECRET`. Journals require Redis persistence and a non-evicting database; they do not replace the [backup and restore procedure](#backup-and-restore). The CLI hashes email with the current secret. Changing it first makes old journals undiscoverable through that CLI.
 
 1. Run `npm run subscription:journal -- status EMAIL` to inspect the operation ID and phase.
 2. Inspect the contact, language segments and welcome event in Resend. Reconcile the intended state there. A missing response is not evidence that an event was not sent. Never resend an ambiguous welcome event automatically.
@@ -333,6 +374,35 @@ Use the affected deployment's environment and stable `SUBSCRIPTION_PREFERENCES_S
 4. If activation is still needed, the reader can request a fresh confirmation after reconciliation. If already subscribed, use preferences to manage the subscription; another public signup does not retry the welcome event. Resolving a journal neither resets a consumed/processing token nor clears suppression.
 
 There is no automatic replay worker. Reconcile uncertain outcomes manually. Redis failure before mutation blocks work; mid-operation failure leaves the prewritten journal. Use deployment logs and the reader-supplied email to locate it.
+
+### Backup and restore
+
+Follow [Upstash Backup and Restore](https://upstash.com/docs/redis/features/backup) for provider operations. Backups can be restored to another database in the same account or team. **Restoring deletes all existing data in the target database.** Normal Redis commands continue during backup; a backup does not pause application writes. Persistence is not a recovery copy.
+
+The steps below are project recovery requirements, not evidence that production backups are enabled or that a restore drill has passed. Verify current plan support, backup availability and retention before relying on them.
+
+#### Establish backup coverage
+
+1. Confirm the account, team, environment and database. In the database's **Backups** tab, inspect **Daily Backup**, retained snapshots and their timestamps and sizes. Choose retention that covers the agreed recovery window; record the maximum acceptable data loss and downtime. Verify scheduled backups actually appear.
+2. Before a planned migration, use **Backup & Export → Backup** to create a manual backup and confirm it completes. Restrict access to backups as carefully as the live database: they can contain email payloads, links and subscriber state.
+3. Inventory durable consent, suppression, completed webhook IDs and unresolved journals, plus transient confirmation tokens, leases, rate limits and retry payloads. Keep the matching application version and secret configuration available through the secret manager; never copy secrets into backup reports. A backup without the correct `SUBSCRIPTION_PREFERENCES_SECRET` may leave hashed records inaccessible to application workflows.
+4. Keep destructive [eviction](https://upstash.com/docs/redis/features/eviction) disabled. Monitor capacity and rejected writes rather than enabling eviction to free space. Verify restore coverage through the isolated drill below, not only snapshot existence or size.
+
+#### Validate an isolated restore
+
+1. Obtain an authorized, separate target database in the same account or team. Verify its identity and that it contains no needed data. Keep production routes, provider jobs and email sending disconnected from this target.
+2. In the target's **Backups** tab, choose **Restore…**, select the source database and backup, review the target deletion warning, then start the restore. Record source, target, backup time and completion status without credentials.
+3. Inspect restored record families, representative values and expiry behavior with restricted access. Compare with the available backup-time inventory, allowing for elapsed expirations. Check durable records remain readable with the matching application secret. Never reset TTLs or extend expired confirmation links, leases or retry identities to make a drill pass.
+4. Exercise journal lookup, duplicate webhook handling and suppression enforcement in an isolated application with provider I/O mocked. Record the result and missing evidence. An isolated restore proves recoverability of that snapshot, not readiness to replace current production state.
+
+#### Restore service safely
+
+1. **Pause writes.** Confirm the recovery target, cutoff time and affected deployments. Establish and verify a write pause across subscription, preference, confirmation, webhook and operator entry points. Let in-flight operations settle and retain uncertain journals. Keep incoming feedback retryable; do not return success while discarding it. There is no documented one-command maintenance switch: do not restore or cut over without a verified pause.
+2. **Preserve current state.** Where accessible, retain the original database and capture a fresh backup and inventory before any destructive restore. Prefer a separate restored database so the original evidence remains available. Verify the destination again before accepting Upstash's deletion warning.
+3. **Reconcile the gap.** Account for changes between the snapshot and the write pause using preserved Redis records, Resend state and delivery history. Restore newer suppression, unsubscribe decisions, completed webhook IDs, consumed confirmation state and unresolved journals before reopening writes. Missing consent never authorizes sending; old consent must not override a later unsubscribe or suppression. Do not revive consumed tokens, extend original expirations or resend uncertain email. If records cannot be reconciled safely, keep the affected workflow closed and document the gap.
+4. **Cut over consistently.** Preserve `SUBSCRIPTION_PREFERENCES_SECRET`. If the database changed, update both `UPSTASH_KV_REST_API_URL` and `UPSTASH_KV_REST_API_TOKEN` in the affected environment and redeploy all serving instances. Verify that old deployments and operator tools cannot continue writing to the former database. Keep eviction disabled and verify backup coverage on the restored target.
+5. **Verify and resume.** Confirm Redis access, journal lookup, expiry handling, suppression and duplicate-event protection. Re-enable incoming feedback and follow [webhook recovery](#webhook-recovery) for the outage window before reopening affected subscriber writes. Use authorized live tests only when needed; mocked checks do not prove provider recovery. Record the reconciled cutoff, remaining gaps, checks and operator decision to resume.
+6. **Retain recovery evidence.** Keep the former database and snapshots for the approved retention period with restricted access. After new writes reach the restored database, switching back can lose those writes; reconcile them before any rollback. Record recovery duration and data loss against the agreed objectives.
 
 ### Credential and secret rotation
 
@@ -385,6 +455,8 @@ The preference secret derives consent, suppression and recipient identities. Pre
 Reconcile a `processing` confirmation against its journal and provider state; never reset it for replay. The reader can request a new confirmation afterward. Welcome failures retain `send-welcome-event` while preserving the subscription. Unsubscribe holds the lock and bypasses the journal gate.
 
 ## Stripe
+
+The checkout client uses Stripe SDK 23.0.1 with the explicit request API version `2026-09-30.endive`. SDK upgrades do not change account defaults or webhook endpoint versions. The upgrade regression intercepts SDK requests and checks API headers, amounts, idempotency and server-side payment verification; it does not create live payments.
 
 ### Stripe environment configuration
 
@@ -552,6 +624,8 @@ Uptime monitoring is separate from the SDK. Use one anonymous GET monitor for th
 
 On October 16, 2026, [production monitor 10662057](https://modern-fundamental-analyst.sentry.io/monitors/10662057/) was created for `GET https://www.modernfundamentalanalyst.com/` in `production`: a 60-second interval, 5-second timeout, 2xx response assertion, three failures to open an issue and one success to resolve it. The manual test passed. Existing project alerts appear on its detail page; notification delivery has not been tested.
 
-Activation remains blocked: billing shows the Developer plan with one included Uptime Monitor, usage `0 / 1` and `$0.00` additional spend, but enabling the monitor returns `You don't have enough budget available to create a new seat`. The monitor is disabled and has no scheduled checks. Resolve this entitlement discrepancy with Sentry before claiming uptime coverage. No trial, upgrade or spending increase was enabled. Recheck live status and allowance rather than treating this dated observation as current configuration.
+On October 22, 2026, activation was retried and Sentry again returned `You don't have enough budget available to create a new seat`. Billing showed the Developer plan, Uptime usage `0 / 1` and `$0.00` additional spend. The monitor remained disabled, with no recent scheduled checks. No trial, upgrade or spending increase was enabled. This is an unresolved provider entitlement discrepancy, not an application deployment failure.
+
+Ask Sentry Support to reconcile the included Uptime allowance for monitor `10662057`. Provide the organization, monitor ID, observation date and the error above through an authorized support request; exclude credentials and subscriber data. Do not delete and recreate the monitor or raise spending to bypass the error. After Sentry corrects the entitlement, enable the existing monitor, verify scheduled 2xx check-ins, and verify that the connected notification rules cover downtime and recovery. Notification delivery remains untested. A successful manual check alone does not establish scheduled coverage.
 
 References: [Next.js tracing](https://docs.sentry.io/platforms/javascript/guides/nextjs/tracing/), [Logs](https://docs.sentry.io/platforms/javascript/guides/nextjs/logs/), [Metrics](https://docs.sentry.io/platforms/javascript/guides/nextjs/metrics/), and [data collection](https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection).

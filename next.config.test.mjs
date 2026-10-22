@@ -2,6 +2,25 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 
+test("development origin configuration adds only the IPv4 loopback alias", () => {
+  const output = execFileSync(
+    process.execPath,
+    [
+      "--import",
+      "./scripts/register-server.mjs",
+      "--input-type=module",
+      "-e",
+      'import config from "./next.config.ts"; console.log(JSON.stringify(config.allowedDevOrigins));',
+    ],
+    {
+      cwd: import.meta.dirname,
+      env: { ...process.env, NODE_ENV: "development", SENTRY_AUTH_TOKEN: "" },
+      encoding: "utf8",
+    },
+  );
+  assert.deepEqual(JSON.parse(output), ["127.0.0.1"]);
+});
+
 function headersFor(environment, vercelEnvironment = "") {
   const output = execFileSync(
     process.execPath,

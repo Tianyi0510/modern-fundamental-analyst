@@ -18,7 +18,6 @@ import { ClientFormNotice } from "@/components/client-form-notice";
 
 const copy = {
   en: {
-    label: "Email Preferences",
     title: "Manage Your Subscription",
     intro: "Choose the language you prefer for research updates or unsubscribe from future emails.",
     invalid:
@@ -39,7 +38,6 @@ const copy = {
     error: "Your request couldn't be completed. Please try again.",
   },
   "zh-tw": {
-    label: "郵件偏好",
     title: "管理你的訂閱",
     intro: "選擇接收研究更新的偏好語言，或取消日後的郵件訂閱。",
     invalid: "輸入電子郵件地址，索取管理偏好設定的安全連結。為保護你的隱私，所有地址都會顯示相同的確認訊息。",
@@ -59,7 +57,6 @@ const copy = {
     error: "目前無法完成要求，請稍後再試。",
   },
   "zh-cn": {
-    label: "邮件偏好",
     title: "管理你的订阅",
     intro: "选择接收研究更新的偏好语言，或取消日后的邮件订阅。",
     invalid: "输入电子邮件地址，获取管理偏好设置的安全链接。为保护你的隐私，所有地址都会显示相同的确认信息。",
@@ -80,7 +77,7 @@ const copy = {
   },
 } satisfies Record<
   Locale,
-  PreferencesCopy & PreferencesRequestCopy & { label: string; title: string; intro: string; invalid: string }
+  PreferencesCopy & PreferencesRequestCopy & { title: string; intro: string; invalid: string }
 >;
 
 export async function SubscriptionPreferencesPage({
@@ -105,7 +102,6 @@ export async function SubscriptionPreferencesPage({
       <main id="main-content" tabIndex={-1}>
         <PageHero
           variant="standard"
-          label={<>{text.label}</>}
           title={<>{text.title}</>}
           intro={
             <>

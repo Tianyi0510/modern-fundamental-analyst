@@ -6,16 +6,29 @@ A public-equity research website in English, Traditional Chinese and Simplified 
 
 The site uses Next.js App Router, React, TypeScript, Tailwind CSS, customized shadcn/ui components with Base UI interactions, Lucide icons and CSS Modules. Resend handles email, Upstash Redis coordinates reader services, Stripe provides Hosted Checkout, Sentry monitors errors and performance, and Vercel hosts the site.
 
+## Technology Stack
+
+Node.js runs the application and tooling. TypeScript defines static types, React builds the UI, Next.js provides the App Router framework, and Tailwind CSS implements utility styles.
+
+ESLint checks code rules, Prettier formats source, and Husky runs local Git checks. Vitest runs unit and integration tests; Testing Library exercises components, MSW intercepts test HTTP requests, and Playwright verifies browser journeys in Chromium and WebKit.
+
+See [technology responsibilities](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack) for official references and boundaries. The package manifests define dependencies and versions; the [verification commands](#verification) define how to check changes.
+
+See [integration responsibilities and references](docs/INTEGRATIONS.md#service-responsibilities-and-references) for GitHub, Vercel, Upstash Redis, Stripe, Resend and Sentry, and [integration templates](docs/INTEGRATIONS.md#templates) for conditional implementation examples.
+
 ## Local Development
 
-Use Node.js 24 and npm.
+Use Node.js 24.22.1 LTS (`.nvmrc`) and npm 12.2.1 (`packageManager`). Select the Node version before installing npm.
 
 ```bash
+npm install --global npm@12.2.1
 npm ci
 npm run dev
 ```
 
 Open [localhost:3000](http://localhost:3000). Copy [.env.example](.env.example) to an ignored `.env.local` when configuring services. Never commit credentials.
+
+Codex Browser can also use [127.0.0.1:3000](http://127.0.0.1:3000). `allowedDevOrigins` explicitly permits this loopback alias for development resources and HMR. If HTML loads but controls remain inactive, follow [local preview diagnostics](docs/WEB_APPLICATION_ARCHITECTURE.md#local-preview-diagnostics) before clearing caches.
 
 Email previews need no service credentials:
 
@@ -23,6 +36,8 @@ Email previews need no service credentials:
 | ------------------------------------------ | ----------------------------------------------------------------------------- |
 | `npm run email:contact` or `npm run email` | Contact emails at [localhost:3001](http://localhost:3001)                     |
 | `npm run email:preferences`                | Preference and confirmation emails at [localhost:3002](http://localhost:3002) |
+
+For service recovery, follow [Resend webhook recovery](docs/INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](docs/INTEGRATIONS.md#backup-and-restore). These procedures do not certify current cloud settings or a completed restore drill.
 
 See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-local-preview) for all nine localized examples.
 
@@ -80,11 +95,13 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | [Design System](docs/DESIGN_SYSTEM.md)                               | Design principles, tokens, typography, components, interaction, content and localization.                   |
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
-| [Integrations](docs/INTEGRATIONS.md)                                 | Provider setup, secrets, email/consent, Redis recovery, payment verification and monitoring.                |
+| [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
 | [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Historical release-preparation evidence and checklist, not current deployment status.                       |
 
 The root [Design QA](design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
+
+See [AI Agents](AGENTS.md#ai-agents) for ChatGPT, OpenAI developer and repository-instruction reference responsibilities. These references concern development workflows, not website AI features.
 
 Project Agent Skills and their responsibilities are listed in [Installed Agent Skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills). See [vercel-optimize readiness](docs/INTEGRATIONS.md#vercel-optimize-readiness) before planning a production optimization audit.
 
