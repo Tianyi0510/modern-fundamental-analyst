@@ -1,3 +1,4 @@
+import { interceptResendRequests } from "../../../../scripts/resend-test-server.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
@@ -63,7 +64,7 @@ test.beforeEach((t) => {
   globalThis.__mfaRedisStateV6.client = redis;
   globalThis.__mfaRedisStateV6.unavailableUntil = 0;
   t.mock.method(console, "error", () => {});
-  t.mock.method(globalThis, "fetch", async (url, options) => {
+  interceptResendRequests(["GET /contacts/:contact", "POST /emails"], async (url, options) => {
     assert.equal(new URL(url).origin, "https://api.resend.com");
     if (options.method === "GET")
       return contactStatus === 200
@@ -175,4 +176,17 @@ test("missing email configuration retains the HTTP unavailable response", async 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), { error: "Email service is temporarily unavailable." });
   assert.equal(sends.length, 0);
+});
+
+test("malformed email acknowledgement preserves the exact preference-link retry payload", async () => {
+  const sent = [];
+  let acknowledged = false;
+  interceptResendRequests(["POST /emails"], async (_url, options) => {
+    sent.push({ body: options.body, key: new Headers(options.headers).get("idempotency-key") });
+    return Response.json(acknowledged ? { id: "accepted" } : {});
+  });
+  assert.equal((await requestPreferenceLink("reader@example.com", "en", "preferences/retry-ack")).ok, false);
+  acknowledged = true;
+  assert.deepEqual(await requestPreferenceLink("reader@example.com", "en", "preferences/retry-ack"), { ok: true });
+  assert.deepEqual(sent[1], sent[0]);
 });

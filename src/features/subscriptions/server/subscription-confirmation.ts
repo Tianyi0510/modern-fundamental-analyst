@@ -1,4 +1,5 @@
 import "server-only";
+import { isResendWriteAcknowledged } from "@/lib/resend-contracts";
 import { createHash, randomBytes } from "node:crypto";
 import { getLocalizedPath, locales, type Locale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site-config";
@@ -104,7 +105,7 @@ export async function requestSubscriptionConfirmation(email: string, locale: Loc
   const result = await runResendOperation("Confirmation email request failed", () =>
     resend.emails.send(payload, { idempotencyKey: requestId }),
   );
-  if (!result || result.error) throw new ResendCoordinationError();
+  if (!result || result.error || !isResendWriteAcknowledged(result.data)) throw new ResendCoordinationError();
 }
 
 // GET renders only a confirmation button. Token consumption and all provider

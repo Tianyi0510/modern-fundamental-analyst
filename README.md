@@ -100,3 +100,5 @@ Submit changes through a PR. Review CI and Vercel Preview for its head commit; m
 Production must pass CI for the exact release commit. Report success after Vercel is `READY` and its commit and production aliases match. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow) and [production gate](docs/WEB_APPLICATION_ARCHITECTURE.md#production-gate). Use environment-scoped credentials and isolated Preview resources.
 
 Keep local review evidence in `../local/audit/`; see [evidence retention](docs/WEB_APPLICATION_ARCHITECTURE.md#review-evidence).
+
+Provider recovery procedures: [Resend webhooks](docs/INTEGRATIONS.md#webhook-recovery), [Redis backups](docs/INTEGRATIONS.md#backup-and-restore), and [Sentry verification](docs/INTEGRATIONS.md#local-and-cloud-verification).
