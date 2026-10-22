@@ -3,6 +3,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { performanceRoutes, evaluateReports } from "./performance-budgets.mjs";
+import { launch } from "chrome-launcher";
 import { chromium } from "@playwright/test";
 import { calibrateCpuWithRetry, validateCpuCalibration } from "./performance-cpu.mjs";
 
@@ -76,22 +77,32 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
   if (!ready) throw new Error("Isolated production server did not become ready");
-  const browser = await chromium.launch({
-    executablePath: env.CHROME_PATH,
-    args: (process.env.LIGHTHOUSE_CHROME_FLAGS || "").split(/\s+/).filter(Boolean),
-  });
+  // Match Lighthouse CLI's launcher and flags; Playwright launch defaults differ.
+  const chromeFlags = (process.env.LIGHTHOUSE_CHROME_FLAGS || "--headless=new").split(/\s+/).filter(Boolean);
+  const chrome = await launch({ chromePath: env.CHROME_PATH, chromeFlags });
+  let browser;
   let calibration;
   try {
-    const page = await browser.newPage();
+    browser = await chromium.connectOverCDP(`http://127.0.0.1:${chrome.port}`);
+    const context = browser.contexts()[0];
     calibration = {
-      ...(await calibrateCpuWithRetry(page, (stage, samples, attempt) =>
-        writeFile(new URL(`cpu-attempt-${attempt}-${stage}-samples.json`, output), JSON.stringify(samples) + "\n"),
+      ...(await calibrateCpuWithRetry(
+        () => context.newPage(),
+        (stage, samples, attempt) =>
+          writeFile(new URL(`cpu-attempt-${attempt}-${stage}-samples.json`, output), JSON.stringify(samples) + "\n"),
       )),
       browserVersion: browser.version(),
       executablePath: env.CHROME_PATH,
+      launcher: "chrome-launcher",
+      chromeFlags,
+      sampleLifecycle: "fresh-page",
     };
   } finally {
-    await browser.close();
+    try {
+      await browser?.close();
+    } finally {
+      await chrome.kill();
+    }
   }
   await writeFile(new URL("cpu-calibration.json", output), JSON.stringify(calibration, null, 2) + "\n");
   console.log("CPU calibration:", JSON.stringify(calibration));

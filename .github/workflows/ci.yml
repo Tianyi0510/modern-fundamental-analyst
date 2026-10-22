@@ -175,7 +175,6 @@ jobs:
       - run: npm run build
       # The Ubuntu image already supplies browser libraries; use Playwright's pinned Chrome.
       - run: npx playwright install chromium
-      - run: node scripts/performance-cpu-diagnostic.mjs
       - run: npm run test:performance
       - name: Upload performance samples and budget summary
         if: always()

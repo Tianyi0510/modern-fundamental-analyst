@@ -11,42 +11,53 @@ function withinDrift(value, reference) {
   return Number.isFinite(value) && Math.abs(value - reference) <= reference * maximumDrift;
 }
 
-export async function calibrateCpu(page, recordSamples = async () => {}) {
-  const sample = async () => {
+export async function calibrateCpu(openPage, recordSamples = async () => {}) {
+  const sample = async (rate = 1) => {
     const samples = [];
-    for (let index = 0; index < 3; index++) samples.push(await page.evaluate(pageFunctions.computeBenchmarkIndex));
+    for (let index = 0; index < 3; index++) {
+      // Lighthouse benchmarks a fresh document, not a warmed calibration page.
+      const page = await openPage();
+      let session;
+      try {
+        session = await page.context().newCDPSession(page);
+        await session.send("Emulation.setCPUThrottlingRate", { rate });
+        samples.push(await page.evaluate(pageFunctions.computeBenchmarkIndex));
+      } finally {
+        try {
+          if (session) {
+            try {
+              await session.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+            } finally {
+              await session.detach();
+            }
+          }
+        } finally {
+          await page.close();
+        }
+      }
+    }
     return samples;
   };
   const samples = await sample();
   await recordSamples("host", samples);
   const calibration = createCpuCalibration(samples);
-  const session = await page.context().newCDPSession(page);
-  try {
-    await session.send("Emulation.setCPUThrottlingRate", { rate: calibration.cpuSlowdownMultiplier });
-    const effectiveSamples = await sample();
-    await recordSamples("effective", effectiveSamples);
-    if (effectiveSamples.some((value) => !Number.isFinite(value) || value <= 0)) {
-      throw new Error("Three valid effective CPU benchmark samples are required");
-    }
-    if (effectiveSamples.some((value) => !withinDrift(value, targetBenchmarkIndex))) {
-      throw new CpuCalibrationInstability("Applied CPU slowdown did not reproduce the performance reference");
-    }
-    return { ...calibration, effectiveSamples };
-  } finally {
-    try {
-      await session.send("Emulation.setCPUThrottlingRate", { rate: 1 });
-    } finally {
-      await session.detach();
-    }
+  const effectiveSamples = await sample(calibration.cpuSlowdownMultiplier);
+  await recordSamples("effective", effectiveSamples);
+  if (effectiveSamples.some((value) => !Number.isFinite(value) || value <= 0)) {
+    throw new Error("Three valid effective CPU benchmark samples are required");
   }
+  if (effectiveSamples.some((value) => !withinDrift(value, targetBenchmarkIndex))) {
+    throw new CpuCalibrationInstability("Applied CPU slowdown did not reproduce the performance reference");
+  }
+  return { ...calibration, effectiveSamples };
 }
 
 // Retry only pre-audit host instability; never retry Lighthouse samples or budget failures.
-export async function calibrateCpuWithRetry(page, recordSamples = async () => {}) {
+export async function calibrateCpuWithRetry(openPage, recordSamples = async () => {}) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       return {
-        ...(await calibrateCpu(page, (stage, samples) => recordSamples(stage, samples, attempt))),
+        ...(await calibrateCpu(openPage, (stage, samples) => recordSamples(stage, samples, attempt))),
         attempt,
       };
     } catch (error) {

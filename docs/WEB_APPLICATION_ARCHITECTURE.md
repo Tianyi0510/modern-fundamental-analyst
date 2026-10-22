@@ -273,6 +273,7 @@ Verified on 22 October 2026 against the lockfile and publisher metadata. These a
 | `@types/react`                      | 19.3.0  | Development |
 | `@types/react-dom`                  | 19.3.0  | Development |
 | `@vitest/eslint-plugin`             | 1.6.28  | Development |
+| `chrome-launcher`                   | 1.2.2   | Development |
 | `eslint`                            | 9.39.5  | Development |
 | `eslint-config-prettier`            | 10.1.8  | Development |
 | `eslint-import-resolver-typescript` | 4.4.5   | Development |
@@ -746,13 +747,15 @@ After a production build, `npm run test:performance` starts an isolated loopback
 
 ##### CPU Calibration
 
-Calibration and Lighthouse explicitly use the same Playwright-installed Chrome for Testing executable. Do not calibrate with Playwright's default headless shell.
+Calibration and Lighthouse use the same Chrome Launcher version, flags and Playwright-installed Chrome for Testing executable. Each benchmark sample uses a new blank page and one evaluation. Reusing a warmed page or Playwright launch defaults creates a different measurement environment. Do not calibrate with Playwright's default headless shell.
 
-1. Run Lighthouse's unthrottled benchmark three times on a blank page. Require finite, positive samples within 15% of their median and a median of at least 1000.
+1. Run Lighthouse's unthrottled benchmark once on each of three new blank pages. Require finite, positive samples within 15% of their median and a median of at least 1000.
 2. Select one multiplier for the entire run: `hostBenchmarkIndex / 1000`.
-3. Apply that multiplier and collect three more samples. Each must be within 15% of the fixed target of 1000. Release the temporary throttle and CDP session even on failure.
+3. Apply that multiplier and collect three more samples. Each must be within 15% of the fixed target of 1000. Reset the throttle, detach the CDP session and close each sample page even on failure.
 4. For every route report, require the chosen multiplier, DevTools throttling and a host benchmark within 15% of calibration.
-5. Save `cpu-attempt-N-host-samples.json` and `cpu-attempt-N-effective-samples.json` before validating them. Save successful calibration, browser version and executable path in `cpu-calibration.json`. Preserve the raw route reports; never rescale their LCP/TBT values.
+5. Save `cpu-attempt-N-host-samples.json` and `cpu-attempt-N-effective-samples.json` before validating them. Save successful calibration, browser version, executable path, launcher, Chrome flags and sample lifecycle in `cpu-calibration.json`. Preserve the raw route reports; never rescale their LCP/TBT values.
+
+A Linux CI diagnostic in PR #91 reproduced a measurement mismatch: warmed Playwright-launched pages produced indices around 2600, while fresh Chrome Launcher pages produced about 2050 on the same runner. The old cross-environment comparison could exceed the unchanged 15% drift allowance without establishing a host slowdown. Local macOS measurements did not reproduce the same gap. Preserve the Linux evidence in the PR workflow logs; do not infer hardware equivalence from calibration.
 
 The reference comes from [PR #85, attempt 2](https://github.com/Tianyi0510/modern-fundamental-analyst/actions/runs/38824624078/attempts/2), commit `0fce8267a0d3f48c1b762d63c987bf636e3cb2ab`, artifact `12030638016` (`performance-evidence`). Its 12 reports had a median host index of 4193.25 at 4x slowdown: an effective index of 1048.31. The fixed target of 1000 is slightly slower. Attempts 1 and 3 failed; the successful attempt does not prove that earlier releases always met the budget.
 
