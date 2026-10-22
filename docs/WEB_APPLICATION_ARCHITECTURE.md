@@ -814,6 +814,8 @@ Use these additional rules for automated browser assertions:
 - Keep production durations and CI retries unchanged. Do not add arbitrary sleeps or filter page errors.
 - For copy changes, find old wording, translations and accessible names in tests and fixtures. Update affected checks without weakening behavior or meaning assertions.
 
+The hosted Ubuntu browser jobs install Playwright's pinned Chromium without `--with-deps`, matching the performance job. The runner image supplies system libraries; browser startup still fails if a required library is absent. Avoid unrelated apt upgrades during release verification: PR #91 showed they could consume more than nine minutes of the 15-minute Chromium job budget. Test coverage and job timeouts remain unchanged.
+
 ### Release Workflow
 
 Provider recovery follows the [Resend webhook](INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](INTEGRATIONS.md#backup-and-restore) procedures. Treat successful SDK responses without valid acknowledgements as uncertain writes: retain leases and journals, stop further mutations and do not mark webhook processing complete. Production release completion does not resolve a cloud monitoring entitlement failure; record uptime activation separately in [Integrations](INTEGRATIONS.md#local-and-cloud-verification).
