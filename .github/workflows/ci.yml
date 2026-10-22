@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -15,17 +14,21 @@ concurrency:
 
 jobs:
   plan:
+    permissions:
+      contents: read
+      actions: read
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
       reuse: ${{ steps.plan.outputs.reuse }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
       - id: plan
         run: node scripts/ci-plan.mjs
         env:
@@ -37,13 +40,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm install --global npm@12.2.1
       - run: npm ci
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run verify:static
@@ -65,44 +69,27 @@ jobs:
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1
       NEXT_PUBLIC_VERCEL_ENV: test
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm install --global npm@12.2.1
       - run: npm ci
       - run: npm run build
-      # Playwright downloads its own Chromium; the runner's Chrome apt feed is unused.
-      # Exclude it so a feed sync error cannot block Ubuntu dependency installation.
-      - name: Disable unused Google Chrome apt source
-        run: |
-          sudo python3 - <<'PYTHON'
-          from pathlib import Path
-          import re
-
-          for path in Path("/etc/apt/sources.list.d").iterdir():
-              if path.suffix not in {".list", ".sources"}:
-                  continue
-              original = path.read_text()
-              separator = "\n\n" if path.suffix == ".sources" else "\n"
-              entries = re.split(r"\n\s*\n", original) if path.suffix == ".sources" else original.splitlines()
-              kept = [entry for entry in entries if not re.search(r"https?://dl\.google\.com/linux/chrome(?:-stable)?/deb", entry)]
-              if len(kept) != len(entries):
-                  path.write_text(separator.join(kept) + "\n")
-                  print(f"Disabled unused Chrome source in {path.name}")
-          PYTHON
-
+      # The hosted Ubuntu image supplies browser libraries, as in the performance job.
+      # Avoid apt upgrades consuming the browser-test time budget.
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Verify Chromium
         run: npm run test:computed-style:production -- --fully-parallel --shard=${{ matrix.shard }}/2
 
       - name: Upload per-test timing report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: browser-timings-chromium-${{ matrix.shard }}
           path: node_modules/.cache/playwright/reports/chromium-shard-${{ matrix.shard }}.json
@@ -111,7 +98,7 @@ jobs:
 
       - name: Upload browser retry and failure evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: browser-evidence-chromium-${{ matrix.shard }}
           path: node_modules/.cache/playwright/chromium-shard-${{ matrix.shard }}/
@@ -134,20 +121,21 @@ jobs:
       matrix:
         shard: [1, 2]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm install --global npm@12.2.1
       - run: npm ci
       - run: npm run build
       - run: npx playwright install webkit
       - run: npm run test:webkit -- --shard=${{ matrix.shard }}
       - name: Upload per-test timing report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: browser-timings-webkit-${{ matrix.shard }}
           path: node_modules/.cache/playwright/reports/webkit-shard-${{ matrix.shard }}.json
@@ -155,7 +143,7 @@ jobs:
           retention-days: 14
       - name: Upload browser retry and failure evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: browser-evidence-webkit-${{ matrix.shard }}
           path: node_modules/.cache/playwright/webkit-shard-${{ matrix.shard }}/
@@ -175,13 +163,14 @@ jobs:
       # This disposable runner audits only the isolated, provider-disabled local site.
       LIGHTHOUSE_CHROME_FLAGS: --headless=new --no-sandbox
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm install --global npm@12.2.1
       - run: npm ci
       - run: npm run build
       # The Ubuntu image already supplies browser libraries; use Playwright's pinned Chrome.
@@ -189,7 +178,7 @@ jobs:
       - run: npm run test:performance
       - name: Upload performance samples and budget summary
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: performance-evidence
           path: node_modules/.cache/performance/

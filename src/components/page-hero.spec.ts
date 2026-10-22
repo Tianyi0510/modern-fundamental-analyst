@@ -125,3 +125,37 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     expect(edges.right).toBeCloseTo(edges.formRight, 1);
   });
 }
+
+test("page Heroes begin with their heading without decorative labels", async ({ page }) => {
+  const routes = [
+    "",
+    "/about",
+    "/portfolio",
+    "/performance",
+    "/memos",
+    "/contact",
+    "/support",
+    "/disclaimer",
+    "/subscription-preferences",
+    "/subscription-confirmation",
+    "/memos/microsoft-stock-analysis-fiscal-year-2024",
+  ];
+  for (const width of [390, 834, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const route of routes) {
+      await page.goto(route || "/");
+      const heading = page.locator("main h1");
+      await expect(heading).toBeVisible();
+      expect(
+        await heading.evaluate((element) => ({
+          previous: element.previousElementSibling?.tagName ?? null,
+          margin: getComputedStyle(element).marginTop,
+        })),
+      ).toEqual({ previous: null, margin: "0px" });
+    }
+  }
+  for (const prefix of ["/zh-tw", "/zh-cn"]) {
+    await page.goto(prefix);
+    await expect(page.locator(".hero .eyebrow")).toHaveCount(0);
+  }
+});

@@ -1,6 +1,32 @@
 # Integrations
 
-Use this guide to configure and operate Vercel/DNS, Resend, Upstash Redis, Stripe and Sentry. It describes repository behavior and dated provider observations. It does not verify current cloud settings, inbox delivery, telemetry ingestion or payment outcomes.
+Use this guide to configure and operate GitHub, Vercel/DNS, Upstash Redis, Stripe, Resend and Sentry. It describes repository behavior and dated provider observations. It does not verify current cloud settings, inbox delivery, telemetry ingestion or payment outcomes.
+
+## Service responsibilities and references
+
+Official documentation governs each service's supported APIs, security requirements and configuration. This guide defines project responsibilities, data boundaries and operating procedures. Listing a service does not enable all its features or verify its cloud configuration. Listing order does not establish precedence across unrelated domains.
+
+| Service and official documentation                     | Project responsibility                                                                            | Operating guidance                                                                                                                                           |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [GitHub](https://docs.github.com/en)                   | Version control, pull requests, code review and GitHub Actions CI/CD.                             | [CI/CD principles](WEB_APPLICATION_ARCHITECTURE.md#cicd-references-and-principles) and [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow). |
+| [Vercel](https://vercel.com/docs)                      | Hosting, deployments, environment variables, Preview environments and production releases.        | [Vercel and DNS](#vercel-and-dns).                                                                                                                           |
+| [Upstash Redis](https://upstash.com/docs/introduction) | Shared state for rate limits, subscription coordination, consent and recovery records.            | [Upstash Redis](#upstash-redis).                                                                                                                             |
+| [Stripe](https://docs.stripe.com/)                     | Checkout Sessions, Hosted Checkout and payment-status verification for one-time research support. | [Stripe](#stripe).                                                                                                                                           |
+| [Resend](https://resend.com/docs/introduction)         | Transactional email, contacts, language segments, delivery events and welcome automation.         | [Resend](#resend).                                                                                                                                           |
+| [Sentry](https://docs.sentry.io/)                      | Error and performance monitoring, logs, metrics, Session Replay and source maps.                  | [Sentry](#sentry).                                                                                                                                           |
+
+GitHub verifies changes; Vercel builds and serves deployments. A passing workflow does not prove a successful deployment. Redis coordinates application state; Resend delivers messages and maintains provider-side contacts and suppression. Stripe payment results and Sentry telemetry require provider evidence. None of these services owns published portfolio or memo data.
+
+## Templates
+
+Use these templates as implementation examples within the scopes below. They do not override official API behavior, architecture principles, security requirements or project needs. Review source code, dependencies and environment assumptions before adopting a pattern. A reference is not an adoption decision.
+
+| Template                                                                                                     | Reference scope                                        | Applicability                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [shadcn/ui Registry Starter](https://vercel.com/templates/next.js/shadcn-ui-registry-starter)                | Building and publishing a component registry.          | Use only when distributing a registry is a project requirement. Using shadcn/ui components does not require one.                    |
+| [React Email with Resend](https://vercel.com/templates/next.js/react-email-resend)                           | React email templates and Resend delivery integration. | Apply relevant patterns to the [email template workflow](#email-templates-and-local-preview); preserve consent and retry contracts. |
+| [Simple Online Store with Stripe](https://vercel.com/templates/next.js/simple-online-store-with-stripe)      | Checkout and payment integration.                      | Refer to payment patterns for research support. The template does not establish a need for a catalog, cart or store.                |
+| [Upstash Redis and Next.js](https://vercel.com/templates/next.js/get-started-with-upstash-redis-and-next-js) | Connecting Redis to a Next.js application.             | Check patterns against the [Redis runtime](#redis-runtime); connection examples do not define coordination or recovery guarantees.  |
 
 ## Operational boundaries
 
@@ -8,13 +34,14 @@ Use [.env.example](../.env.example) for variable names. Store environment-scoped
 
 Routine tests mock provider I/O. Deployment does not authorize real emails, subscriber changes, payments or unrelated cloud changes. Preserve credentials and durable records through rollback windows. When a write's outcome is unknown, reconcile it before retrying or clearing records.
 
-| Task                                        | Start here                                                                                                                   |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Domain and hosting                          | [Vercel and DNS](#vercel-and-dns); [release gate](WEB_APPLICATION_ARCHITECTURE.md#production-gate)                           |
-| Sending, receiving, consent and preferences | [Resend](#resend), [server secrets](#server-secrets), [verification](#resend-verification)                                   |
-| Redis configuration and recovery            | [Upstash Redis](#upstash-redis), [reconciliation](#subscription-reconciliation), [rotation](#credential-and-secret-rotation) |
-| Checkout and payment verification           | [Stripe](#stripe), [environment verification](#environment-verification-checklist)                                           |
-| Errors, traces, logs, metrics and Replay    | [Sentry](#sentry)                                                                                                            |
+| Task                                        | Start here                                                                                                                                                              |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository, reviews and CI/CD               | [Release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow)                                                                                                    |
+| Domain and hosting                          | [Vercel and DNS](#vercel-and-dns); [release gate](WEB_APPLICATION_ARCHITECTURE.md#production-gate)                                                                      |
+| Sending, receiving, consent and preferences | [Resend](#resend), [server secrets](#server-secrets), [verification](#resend-verification), [webhook recovery](#webhook-recovery)                                       |
+| Redis configuration and recovery            | [Upstash Redis](#upstash-redis), [reconciliation](#subscription-reconciliation), [backup and restore](#backup-and-restore), [rotation](#credential-and-secret-rotation) |
+| Checkout and payment verification           | [Stripe](#stripe), [environment verification](#environment-verification-checklist)                                                                                      |
+| Errors, traces, logs, metrics and Replay    | [Sentry](#sentry)                                                                                                                                                       |
 
 ## Vercel and DNS
 
@@ -23,6 +50,45 @@ The owner reported the domain transfer from Wix to Vercel on 2026-09-22. Manage 
 Preserve root and `www` website records and Resend verification, sending and receiving records for `mail.modernfundamentalanalyst.com`. Obtain exact values from current dashboards. A registrar transfer does not prove a nameserver change. See [Receiving](#receiving) and [Checkout](#checkout-behavior) for separate service settings. Owner reports are not live DNS or delivery checks.
 
 Follow the [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for hosting and CI gating. Confirm the target environment and current provider state before changing DNS or credentials.
+
+### vercel-optimize readiness
+
+The upstream [vercel-optimize skill](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) requires Node.js 20+, Vercel CLI 53+ with `metrics`, `usage`, `contract` and `api`, an authenticated CLI session, a linked project and Observability Plus for route-level analysis. Scope every query to the verified project and owner. Recheck prerequisites before each run.
+
+Verified on October 21, 2026:
+
+| Requirement                | Observation                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node.js                    | Local version 24.12.0 meets the requirement.                                                                                                     |
+| CLI                        | Cached Vercel CLI 64.1.0 is available; `vercel` is not on PATH. Use an explicit executable or versioned invocation.                              |
+| Authentication and project | Scoped CLI project inspection succeeded for `modern-fundamental-analyst/modern-fundamental-analyst`, project `prj_7sORYYrBwZS6W9mewVEwmqCeyFz2`. |
+| Team                       | The linked owner is `team_fAq85GWIVo1h7vJCwRDjpTrR`.                                                                                             |
+| Observability Plus         | The scoped configuration API returned `Observability Plus is not enabled`. The full workflow is blocked.                                         |
+
+The generic observability schema is readable, but that does not establish Plus access. No optimization audit, subscription change or skill installation for `vercel-optimize` was performed. If Plus is enabled later, verify project coverage, metric permissions and representative traffic before running the workflow. Do not enable a paid feature merely to install or evaluate a skill.
+
+### CDN caching and edge protection
+
+Let Next.js manage route caching. Public static pages use Vercel prerender/CDN caching; versioned `/_next/static/` assets use immutable browser caching. Support and subscription-preference pages return private, no-store responses. Do not apply shared caching to token-dependent content or blanket long-lived browser caching to HTML.
+
+On October 20, 2026, the active Vercel firewall configuration was published and read back with this observation rule:
+
+| Setting         | Value                                                                     |
+| --------------- | ------------------------------------------------------------------------- |
+| Rule            | `Observe public form bursts`                                              |
+| Method          | `POST`                                                                    |
+| Exact paths     | `/api/contact`, `/api/subscribe`, `/api/subscription-preferences/request` |
+| Counter         | Combined across the three paths, per IP and Vercel region                 |
+| Window          | Fixed 600-second window                                                   |
+| Threshold       | 50 requests                                                               |
+| Exceeded action | `log`; requests are not blocked or challenged                             |
+| Rule ID         | `rule_observe_public_form_bursts_Z0oyag`                                  |
+
+This cloud-managed rule does not require a website deployment. Keep application-level Redis limits, origin checks and body-size limits in place. The edge rule observes bursts; it does not replace those checks. `/api/webhooks/resend` is excluded, and provider webhooks must not receive browser challenges.
+
+Before enabling enforcement, inspect at least 24 hours of representative traffic, including shared-IP users, retries and campaign bursts. Adjust the threshold if needed, then explicitly approve changing the exceeded action to `rate_limit` (429). Vercel counters are regional, so this is not a global quota. To roll back, disable this rule and publish only the reviewed change. Do not disable platform mitigations.
+
+Use an explicitly scoped Vercel CLI to inspect `firewall status`, `firewall rules list`, `firewall diff` and `firewall traffic list`. Review the draft before publishing and read back the active configuration afterward. The October 20 connector returned a configuration 404 even after publication; the scoped CLI API confirmed the active rule. A connector error alone does not establish that protection is absent.
 
 ## Resend
 
@@ -66,6 +132,8 @@ These credentials are independent and must not be merged or reused:
 | `RESEND_API_KEY`                  | Resend API Keys; permits the application's email, contact, segment and event operations.             | Keep provider authentication separate from application cryptography. It remains a legacy decryption fallback for old preference links; check those links before rotation. |
 | `RESEND_WEBHOOK_SECRET`           | Signing secret of the configured Resend webhook endpoint.                                            | Must match that endpoint. The handler reads one signing secret; coordinate changes with deployment and verify delivery retries.                                           |
 | `SUBSCRIPTION_PREFERENCES_SECRET` | Application-generated secret for existing encrypted preference links and stable Redis identity keys. | Preserve the current value. Journal, consent, suppression and retry records require an explicit migration before rotation.                                                |
+
+Preference links retain their existing encryption format and legacy-key fallback. Both keys require a valid version, email and finite numeric expiry after the current time. Malformed or expired payloads are rejected even when decryption succeeds; this validation change does not require rotating secrets or reissuing valid links.
 
 Store these as sensitive, environment-scoped Vercel variables or in ignored `.env.local`. Never use `NEXT_PUBLIC_` prefixes. Confirmation tokens use digest lookup and need no additional secret; coordination still needs the stable application secret. Follow [rotation procedures](#credential-and-secret-rotation) before changing values.
 
@@ -141,7 +209,9 @@ Receiving does not change the Contact recipient, senders or webhook secret. Prov
 
 ### JavaScript form availability
 
-Contact, subscription signup, preference-link request, preference update and subscription confirmation forms use `ClientForm`. Their native fieldsets stay disabled until hydration attaches the submission handler. Without JavaScript, a localized notice explains that the information has not been sent. The forms explicitly use POST as a fallback safeguard; no personal fields are submitted through a default GET, and native GET submission cannot discard preference or confirmation tokens. Notices use the page language, independently of the saved subscription language. The preference lookup also includes the notice in its streaming fallback, so readers without JavaScript receive instructions while the completed form remains outside the main content. Their existing JSON API contracts remain unchanged. Support retains its independent native POST workflow.
+Contact, signup, preference-link, preference-update and confirmation forms use `ClientForm`. Fieldsets remain disabled until submission handlers attach and a React transition enables the hydration flag. Without JavaScript, a localized notice explains that nothing has been sent. The preference lookup includes this notice in its streaming fallback.
+
+Forms explicitly use POST to prevent default GET submissions from exposing personal fields or discarding tokens. Notices follow the page language, not the saved subscription language. JSON API contracts remain unchanged. Support uses its own native POST workflow.
 
 ### Contact draft recovery
 
@@ -202,7 +272,7 @@ Subscribe, preference updates and unsubscribe webhooks share a per-email lease. 
 | Browser request, including coordination overhead | 45 seconds  |
 | Subscriber lease                                 | 120 seconds |
 
-After a mutation starts, network errors, server errors or timeouts leave the outcome unknown. Stop further provider calls, including rollback, and retain the lease until expiry. Abort cannot undo an accepted write. Subscription and language saves retain durable journals; follow [reconciliation](#subscription-reconciliation). Webhook failures return 500 for provider retry. Automatic retries are finite; follow [webhook recovery](#webhook-recovery).
+After a mutation starts, network errors, server errors or timeouts leave the outcome unknown. Stop further provider calls, including rollback, and retain the lease until expiry. Abort cannot undo an accepted write. Subscription and language saves retain durable journals; follow [reconciliation](#subscription-reconciliation). Webhook failures return 500 for provider retry. Automatic retries are finite; use [webhook recovery](#webhook-recovery) after an outage.
 
 A failed read before mutation is not an unknown write. Cleanup may release its owned journal and lease, even after a thrown read or expired deadline, using exact-value ownership checks. Fail closed if ownership is uncertain. Failures after writes remain conservative; never clear a pre-existing unresolved journal automatically.
 
@@ -285,6 +355,10 @@ The subscription journal has no plaintext email or preference token and retains 
 Preference and confirmation email retry records are separate: they contain the sender, recipient, subject, original encrypted preference link or opaque confirmation link, email text and HTML for up to 25 hours. The same request ID can retrieve its original payload for 25 minutes; the record remains afterward so that reusing an old ID cannot create a fresh payload during the provider's deduplication window. The request key is reused as the provider idempotency key; it is not stored in the payload. Treat these records as sensitive, restrict Redis access, and follow [Resend request reliability](#request-reliability) for retry behavior.
 
 ### Subscription reconciliation
+
+A malformed acknowledgement after activation, a preference save or unsubscribe leaves the provider outcome unknown. The service returns failure and retains the subscriber lease and any existing journal. It does not issue further writes or attempt rollback. Activation does not send a welcome event. Unsubscribe bypasses the journal gate and neither creates nor clears a journal. Reconcile provider state before clearing a record.
+
+Language changes require a fully validated segment snapshot before any mutation. Invalid page data, missing pagination flags or invalid cursors stop the operation. A failure before any provider write releases the lease and the operation’s own journal, allowing a retry.
 
 Subscription and language saves journal before provider operations. The key hashes the email with the application secret; the value records UUID, operation type, start time, locale and phase. Older records without a type remain valid. Journals contain no plaintext email or preference token.
 
@@ -382,6 +456,8 @@ Reconcile a `processing` confirmation against its journal and provider state; ne
 
 ## Stripe
 
+The checkout client uses Stripe SDK 23.0.1 with the explicit request API version `2026-09-30.endive`. SDK upgrades do not change account defaults or webhook endpoint versions. The upgrade regression intercepts SDK requests and checks API headers, amounts, idempotency and server-side payment verification; it does not create live payments.
+
 ### Stripe environment configuration
 
 Configure environment-scoped Stripe keys from [.env.example](../.env.example). Prefer `STRIPE_RESTRICTED_KEY`; `STRIPE_SECRET_KEY` is a compatibility fallback. Grant Checkout Sessions read/write and the Product/Price access needed by `price_data`. Test the actual key in a sandbox before release. Do not broaden permissions without checking the target account.
@@ -476,7 +552,7 @@ Prefer integration-managed values. Never expose the upload token with `NEXT_PUBL
 
 ### Errors and source maps
 
-`src/instrumentation-client.ts` initializes browser monitoring before hydration. `src/instrumentation.ts` loads Node/Edge configuration and exposes request-error reporting. Localized and global boundaries report errors while preserving retry and navigation UI.
+`src/instrumentation-client.ts` starts the browser monitoring bridge before hydration. The bridge buffers early errors immediately and loads the SDK asynchronously after yielding to the browser. `src/instrumentation.ts` loads Node/Edge configuration and exposes request-error reporting. Localized and global boundaries report errors while preserving retry and navigation UI.
 
 `next.config.ts` wraps Next.js with Sentry, uploads maps only with complete upload settings, then deletes uploaded generated maps from output. Runtime reporting needs no upload token.
 
@@ -484,7 +560,7 @@ Production builds replace `__SENTRY_DEBUG__` with `false` through Next.js `compi
 
 `src/lib/sentry-server.ts` reports Checkout failures, missing Contact configuration and Resend failures using fixed operation names and failure classes. It attaches no provider messages or request values. `runResendOperation` reports both thrown exceptions and returned SDK errors once, preserving the original result and retry behavior. All subscription segment requests, including rollback, use this boundary. Contact does not report the same provider rejection again.
 
-`isResendWriteAcknowledged` validates successful SDK payloads and reports malformed acknowledgements without including their contents. These are uncertain writes, not confirmed rejections. Subscriber leases and journals remain available for reconciliation; no further mutation or compensating rollback should follow an uncertain result. A malformed feedback unsubscribe response must not create a completed webhook marker. Provider retries can resume after the lease expires; local suppression remains in place. Contact, confirmation and preference-link retries reuse their original email payload and idempotency key. See [provider recovery requirements](WEB_APPLICATION_ARCHITECTURE.md#provider-recovery-verification) for the shared validation contracts.
+`isResendWriteAcknowledged` validates successful SDK payloads and reports malformed acknowledgements without including their contents. These are uncertain writes, not confirmed rejections. Subscriber leases and journals remain available for reconciliation; no further mutation or compensating rollback should follow an uncertain result. A malformed feedback unsubscribe response must not create a completed webhook marker. Provider retries can resume after the lease expires; local suppression remains in place. Contact, confirmation and preference-link retries reuse their original email payload and idempotency key. See [architecture boundaries](WEB_APPLICATION_ARCHITECTURE.md#framework-and-module-ownership) for the shared validation contracts.
 
 Callers explicitly allow expected statuses: contact lookups and feedback-driven unsubscribe updates accept 404. Other returned errors, including provider 5xx responses, remain reportable. Public input validation and application rate limits do not call this reporting boundary. Keep Sentry Core and Next.js SDK versions aligned and use the initialized client's APIs to avoid Node/CommonJS import incompatibilities.
 

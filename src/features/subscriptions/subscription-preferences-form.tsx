@@ -1,6 +1,7 @@
 "use client";
 
 import { appearance } from "./subscription-preferences-form.styles";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/form-field";
@@ -117,6 +118,7 @@ export function SubscriptionPreferencesForm({
             disabledFeedback={busy ? "muted-busy" : "muted"}
             disabled={busy || status === "unsubscribed"}
           >
+            {status === "saving" && <Spinner aria-hidden="true" data-icon="inline-start" />}
             {status === "saving" ? copy.saving : copy.save}
           </Button>
           <Button
@@ -130,6 +132,7 @@ export function SubscriptionPreferencesForm({
               if (event.currentTarget.form) void submit(event.currentTarget.form, "unsubscribe");
             }}
           >
+            {status === "unsubscribing" && <Spinner aria-hidden="true" data-icon="inline-start" />}
             {status === "unsubscribing" ? copy.unsubscribing : copy.unsubscribe}
           </Button>
         </div>

@@ -103,6 +103,9 @@ test(
     await page.setViewportSize({ width: 390, height: 800 });
     await page.goto("/");
     const trigger = page.locator(".mobile-menu-button");
+    await expect(trigger).toHaveCSS("width", "44px");
+    await expect(trigger).toHaveCSS("height", "44px");
+    await expect(trigger.locator("svg")).toHaveCSS("width", "20px");
     await trigger.click();
     await trigger.evaluate((element: HTMLButtonElement) => element.focus());
     await expect(page.locator(".mobile-menu-close")).toBeFocused();
@@ -642,15 +645,11 @@ test.describe("header interaction QA", () => {
 
   test("desktop navigation uses stable color, motion, and menu states", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".site-header").first()).toHaveCSS("height", "84px");
+    await expect(page.locator(".site-header").first()).toHaveCSS("height", "72px");
     const about = page.locator(".header-actions nav a").filter({ hasText: "About" });
     await about.hover();
-    const hoverState = await about.evaluate((element) => {
-      const style = getComputedStyle(element);
-      return { backgroundColor: style.backgroundColor, transform: style.transform };
-    });
-    expect(hoverState.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
-    expect(hoverState.transform).not.toBe("none");
+    await expect(about).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(about).not.toHaveCSS("transform", "none");
     await expect(about).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
     await about.evaluate((element) =>
       element.addEventListener("click", (event) => event.preventDefault(), { once: true }),
@@ -696,7 +695,7 @@ test.describe("mobile content and navigation QA", () => {
       const background = page.locator(".home-header");
       const header = page.locator(".site-header").first();
       await expect(header).toHaveCSS("position", "relative");
-      await expect(header).toHaveCSS("height", "70px");
+      await expect(header).toHaveCSS("height", "64px");
       await expect(header.locator(":scope > .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
       expect(wordmarkBox).not.toBeNull();

@@ -33,6 +33,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  // Codex previews use the IPv4 loopback alias; Next already permits localhost.
+  allowedDevOrigins: ["127.0.0.1"],
   devIndicators: process.env.PLAYWRIGHT_ISOLATED_DEV === "1" ? false : undefined,
   // Keep isolated browser tests from contending with the interactive dev server.
   distDir: process.env.PLAYWRIGHT_ISOLATED_DEV === "1" ? "node_modules/.cache/next-playwright" : ".next",

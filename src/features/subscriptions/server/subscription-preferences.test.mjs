@@ -1,5 +1,8 @@
+import { HttpResponse } from "msw";
+import { interceptResendRequests } from "../../../../scripts/resend-test-server.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createCipheriv, createHash, randomBytes } from "node:crypto";
 
 const { createPreferenceToken, readPreferenceToken } = await import("./subscription-preferences.ts");
 
@@ -56,13 +59,13 @@ test("preference tokens reject tampering", () => {
   }
 });
 
-test("saved language comes from the contact and unavailable values remain unknown", async (context) => {
+test("saved language comes from the contact and unavailable values remain unknown", async () => {
   const oldKey = process.env.RESEND_API_KEY;
   process.env.RESEND_API_KEY = "re_test_preferences";
   const { getSavedPreferenceLocale } = await import("./subscription-preferences.ts");
   try {
     let property;
-    context.mock.method(globalThis, "fetch", async () =>
+    interceptResendRequests(["GET /contacts/:contact"], async () =>
       Response.json({ id: "contact", properties: { preferred_language: { value: property } } }),
     );
     for (const [value, expected] of [
@@ -76,8 +79,8 @@ test("saved language comes from the contact and unavailable values remain unknow
       property = value;
       assert.equal(await getSavedPreferenceLocale("reader@example.com"), expected);
     }
-    context.mock.method(globalThis, "fetch", async () => {
-      throw new TypeError("offline");
+    interceptResendRequests(["GET /contacts/:contact"], async () => {
+      return HttpResponse.error();
     });
     assert.equal(await getSavedPreferenceLocale("reader@example.com"), null);
   } finally {
@@ -85,3 +88,48 @@ test("saved language comes from the contact and unavailable values remain unknow
     else process.env.RESEND_API_KEY = oldKey;
   }
 });
+
+function encryptPayload(json, secret) {
+  const iv = randomBytes(12);
+  const key = createHash("sha256").update(`subscription-preferences:${secret}`).digest();
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(json, "utf8"), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString("base64url");
+}
+
+for (const source of ["primary", "legacy"]) {
+  test(`preference tokens validate authenticated payloads from the ${source} key`, (t) => {
+    const previousSecret = process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+    const previousResend = process.env.RESEND_API_KEY;
+    process.env.SUBSCRIPTION_PREFERENCES_SECRET = "test-payload-primary";
+    process.env.RESEND_API_KEY = "test-payload-legacy";
+    t.after(() => {
+      if (previousSecret === undefined) delete process.env.SUBSCRIPTION_PREFERENCES_SECRET;
+      else process.env.SUBSCRIPTION_PREFERENCES_SECRET = previousSecret;
+      if (previousResend === undefined) delete process.env.RESEND_API_KEY;
+      else process.env.RESEND_API_KEY = previousResend;
+    });
+    t.mock.method(Date, "now", () => 1_000);
+    const secret = source === "primary" ? "test-payload-primary" : "test-payload-legacy";
+    const valid = { version: 1, email: "reader@example.com", expiresAt: 2_000 };
+    assert.deepEqual(readPreferenceToken(encryptPayload(JSON.stringify(valid), secret)), valid);
+    const invalid = [
+      null,
+      [],
+      "payload",
+      1,
+      { version: 1, email: valid.email },
+      ...[null, "not-a-date", "2000", {}, [], true, 1_000, 999].map((expiresAt) => ({ ...valid, expiresAt })),
+      ...[undefined, null, 1, "", "not-an-email"].map((email) => ({ ...valid, email })),
+      ...[undefined, "1", 2].map((version) => ({ ...valid, version })),
+    ];
+    for (const payload of invalid) {
+      const json = JSON.stringify(payload);
+      assert.equal(readPreferenceToken(encryptPayload(json, secret)), null, json);
+    }
+    // JSON permits this exponent, but JavaScript parses it as Infinity.
+    const overflow = '{"version":1,"email":"reader@example.com","expiresAt":1e400}';
+    assert.equal(readPreferenceToken(encryptPayload(overflow, secret)), null);
+    assert.equal(readPreferenceToken(encryptPayload("invalid JSON", secret)), null);
+  });
+}

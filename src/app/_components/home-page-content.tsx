@@ -1,10 +1,11 @@
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
 import { IntentLink } from "@/components/intent-link";
-import { MoveRight } from "lucide-react";
+import { ChartPie, MoveRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -17,7 +18,6 @@ import { createWebsiteStructuredData } from "@/lib/site-config";
 
 const copy = {
   en: {
-    researchLabel: "Home",
     hero: ["Focus investing for a", "disruptive future"],
     heroIntro:
       "Long-term value research, financial modeling, and a fully disclosed portfolio built to empower every retail investor.",
@@ -59,7 +59,6 @@ const copy = {
     updatedMonthly: "Updated monthly",
   },
   "zh-tw": {
-    researchLabel: "首頁",
     hero: ["為顛覆性未來，", "實踐集中投資"],
     heroIntro: "透過長期價值研究、財務建模與完整揭露的投資組合，幫助每一位個人投資者建立獨立判斷。",
     viewPortfolio: "查看投資組合",
@@ -100,7 +99,6 @@ const copy = {
     updatedMonthly: "每月更新",
   },
   "zh-cn": {
-    researchLabel: "首页",
     hero: ["为颠覆性未来，", "实践集中投资"],
     heroIntro: "通过长期价值研究、财务建模与完整披露的投资组合，帮助每一位个人投资者建立独立判断。",
     viewPortfolio: "查看投资组合",
@@ -168,9 +166,6 @@ export function HomePageContent({ locale }: { locale: Locale }) {
         <div className={appearance["home-opening"]}>
           <div className={appearance["hero-band"]}>
             <section className={appearance["hero"] + " @container/financial-summary " + appearance["shell"]}>
-              <p className={appearance["eyebrow"]}>
-                <span /> {text.researchLabel}
-              </p>
               <h1>
                 {text.hero[0]}
                 <br />
@@ -265,9 +260,19 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </li>
               ))}
             </ol>
-            <aside className={appearance["allocation-card"]}>
-              <span>{text.holdingsAllocation}</span>
-              <div className={appearance["allocation-visual"]}>
+            <Card
+              variant="plain"
+              role="complementary"
+              aria-labelledby="home-allocation-title"
+              className={appearance["allocation-card"]}
+            >
+              <CardHeader className="flex flex-row items-center gap-3 px-0">
+                <ChartPie size={24} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+                <h3 id="home-allocation-title" className="m-0 text-large-label">
+                  {text.holdingsAllocation}
+                </h3>
+              </CardHeader>
+              <CardContent className={appearance["allocation-visual"] + " px-0"}>
                 <div
                   className={appearance["allocation-ring"]}
                   style={{ background: allocationGradient }}
@@ -291,12 +296,12 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                     <b>{otherWeight.toFixed(1)}%</b>
                   </li>
                 </ul>
-              </div>
+              </CardContent>
               <Link href={getLocalizedPath("/portfolio", locale)}>
                 <span className="link-label">{text.fullPortfolio}</span>
                 <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
               </Link>
-            </aside>
+            </Card>
           </section>
         </div>
 

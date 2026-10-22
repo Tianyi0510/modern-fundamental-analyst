@@ -218,6 +218,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                     disabled={status === "sending"}
                     name="email"
                     type="email"
+                    spellCheck={false}
                     autoComplete="email"
                     maxLength={contactFieldLimits.email}
                     required

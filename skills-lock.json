@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "next-best-practices": {
+      "source": "vercel-labs/openreview",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/next-best-practices/SKILL.md",
+      "computedHash": "176b3c13c47e5237ae646d685aa0f064a370eae129afa59de2f5047e738b7052"
+    },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",

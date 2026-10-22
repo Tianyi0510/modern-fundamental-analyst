@@ -13,7 +13,9 @@ export async function requireSuccessfulCI({
   if (env.VERCEL_ENV !== "production") return;
   const sha = env.VERCEL_GIT_COMMIT_SHA;
   if (!/^[a-f0-9]{40}$/.test(sha ?? "")) throw new Error("Production requires an exact Git commit SHA.");
-  const deadline = now() + CI_WAIT_MS;
+  const startedAt = now();
+  const deadline = startedAt + CI_WAIT_MS;
+  let previousState;
   const endpoint = `https://api.github.com/repos/Tianyi0510/modern-fundamental-analyst/actions/workflows/ci.yml/runs?head_sha=${sha}&event=push&per_page=20`;
   let failures = 0;
   const wait = (ms) => sleep(Math.min(ms, Math.max(0, deadline - now())));
@@ -82,10 +84,16 @@ export async function requireSuccessfulCI({
       .sort((a, b) => b.id - a.id)[0];
     if (run?.status === "completed") {
       if (run.conclusion !== "success") throw new Error(`Production blocked: CI concluded ${run.conclusion}.`);
-      console.log(`CI verified for ${sha}: ${run.html_url}`);
+      console.log(`CI verified for ${sha} after ${Math.round((now() - startedAt) / 1000)}s: ${run.html_url}`);
       return;
     }
-    await wait(60_000);
+    const state = run ? `${run.id}: ${run.status}` : "waiting for the main push CI run";
+    if (state !== previousState) {
+      console.log(`Production gate for ${sha}: ${state}; elapsed ${Math.round((now() - startedAt) / 1000)}s.`);
+      previousState = state;
+    }
+    // Reused PR evidence usually finishes quickly; keep long-running CI polling modest.
+    await wait(now() - startedAt < 60_000 ? 15_000 : 60_000);
   }
   throw new Error("Production blocked: CI did not succeed within 30 minutes.");
 }

@@ -2,6 +2,20 @@
 
 Instructions for agents working on Modern Fundamental Analyst. Follow higher-priority instructions and explicit user requests. A nested `AGENTS.md` governs its subtree; `AGENTS.override.md` can replace it in the same directory.
 
+## AI Agents
+
+These references guide AI-assisted development of this repository. They do not establish a requirement to add AI features or OpenAI API dependencies to the website.
+
+| Reference                                           | Responsibility                                                                               |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [ChatGPT Learn](https://learn.chatgpt.com/docs)     | ChatGPT usage and collaboration workflows.                                                   |
+| [OpenAI Developers](https://developers.openai.com/) | Official Codex, OpenAI API and agent-development behavior for the tools and features in use. |
+| [AGENTS.md](https://agents.md/)                     | Repository instruction format, organization and nested scope conventions.                    |
+
+Apply each reference within its assigned domain. Product-specific technical documentation governs supported behavior; general workflow advice cannot override it. Follow the active agent's instruction hierarchy and the user's authorized scope. Check tool-specific discovery rules, including `AGENTS.override.md`, against that tool's documentation.
+
+Keep repository execution rules here. Link to [architecture](docs/WEB_APPLICATION_ARCHITECTURE.md), [design](docs/DESIGN_SYSTEM.md) and [integrations](docs/INTEGRATIONS.md) for their domain rules instead of copying them. Use the [installed skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills) only when applicable; a reference does not install a skill, grant access or authorize external actions.
+
 ## Project context
 
 The site uses Next.js App Router, React, TypeScript, Tailwind CSS and CSS Modules. Use Node.js 24 and npm. The package manifests define dependencies. English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`.
@@ -124,6 +138,4 @@ Preserve the stable `verify` and `webkit` result jobs, the required `performance
 
 ## Maintaining this file
 
-Keep durable constraints, verified commands and task references here. Put detailed procedures in their domain guide. Add nested instructions only for real subtree differences. Check paths, commands, anchors and instruction-file discovery after edits. Preserve historical evidence; editing docs does not verify production or publish a release. Preserve referenced anchors. Automatic loading of changed instructions requires confirmation in a fresh Codex session.
-
-Format reference: [AGENTS.md](https://agents.md/).
+Keep durable constraints, verified commands and task references here. Put detailed procedures in their domain guide. Add nested instructions only for real subtree differences. Check paths, commands, anchors and instruction-file discovery after edits. Preserve historical evidence; editing docs does not verify production or publish a release. Describe the current checkout in active guides, keep dated audits and release-preparation records explicitly historical, and distinguish local validation from CI and deployed evidence. Preserve referenced anchors. Automatic loading of changed instructions requires confirmation in a fresh Codex session.

@@ -288,3 +288,17 @@ test("Support amount options use thin separators and KPI typography", async ({ p
     await expect(page.getByRole("radio", { name: "USD 6" })).toBeChecked();
   }
 });
+
+for (const { prefix, locale } of supportLocales) {
+  test(`Support navigation and localized content ${locale}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(`${prefix}/support`);
+    const label = locale === "en" ? "Support" : "支持研究";
+    const heading = locale === "en" ? "Choose an Amount" : locale === "zh-tw" ? "選擇支持金額" : "选择支持金额";
+    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+    const footer = page.getByRole("contentinfo");
+    await expect(footer.getByRole("link", { name: label, exact: true })).toHaveAttribute("href", `${prefix}/support`);
+    const header = page.getByRole("banner");
+    await expect(header.locator(`a[href="${prefix}/support"]`)).toHaveCount(0);
+  });
+}

@@ -2,6 +2,7 @@ import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import { getResendClient, runResendOperation } from "@/lib/resend";
+import { isValidEmail } from "@/lib/email-validation";
 import { SITE_URL } from "@/lib/site-config";
 
 const TOKEN_VERSION = 1;
@@ -56,12 +57,25 @@ export function readPreferenceToken(token: string): PreferenceTokenPayload | nul
     try {
       const decipher = createDecipheriv("aes-256-gcm", getEncryptionKey(secret), value.subarray(0, 12));
       decipher.setAuthTag(value.subarray(12, 28));
-      const payload = JSON.parse(
+      const payload: unknown = JSON.parse(
         Buffer.concat([decipher.update(value.subarray(28)), decipher.final()]).toString("utf8"),
-      ) as PreferenceTokenPayload;
-      if (payload.version !== TOKEN_VERSION || payload.expiresAt <= Date.now() || typeof payload.email !== "string")
+      );
+      if (
+        !payload ||
+        typeof payload !== "object" ||
+        Array.isArray(payload) ||
+        !("version" in payload) ||
+        payload.version !== TOKEN_VERSION ||
+        !("expiresAt" in payload) ||
+        typeof payload.expiresAt !== "number" ||
+        !Number.isFinite(payload.expiresAt) ||
+        payload.expiresAt <= Date.now() ||
+        !("email" in payload) ||
+        typeof payload.email !== "string" ||
+        !isValidEmail(payload.email)
+      )
         return null;
-      return payload;
+      return { version: payload.version, expiresAt: payload.expiresAt, email: payload.email };
     } catch {
       // Try the migration fallback, if present.
     }

@@ -10,7 +10,6 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
-    eyebrow: "Investment memos",
     title: "Detailed theses for",
     emphasis: "independent investor evaluation",
     subtitle:
@@ -19,7 +18,6 @@ const copy = {
     indexLabel: "View all investment memos",
   },
   "zh-tw": {
-    eyebrow: "投資備忘錄",
     title: "供獨立投資者評估的",
     emphasis: "詳細投資論點",
     subtitle: "以基本面研究、財務分析、估值與明確界定的風險為基礎，呈現詳細投資論點",
@@ -27,7 +25,6 @@ const copy = {
     indexLabel: "查看所有投資備忘錄",
   },
   "zh-cn": {
-    eyebrow: "投资备忘录",
     title: "供独立投资者评估的",
     emphasis: "详细投资论点",
     subtitle: "以基本面研究、财务分析、估值与明确界定的风险为基础，呈现详细投资论点",
@@ -48,7 +45,6 @@ export function MemoListPage({ locale }: { locale: Locale }) {
       <main id="main-content" tabIndex={-1}>
         <PageHero
           variant="standard"
-          label={<>{text.eyebrow}</>}
           title={
             <>
               {text.title}

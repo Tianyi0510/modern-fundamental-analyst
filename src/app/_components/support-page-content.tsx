@@ -33,7 +33,6 @@ export async function SupportPageContent({
       <main id="main-content" tabIndex={-1}>
         <PageHero
           variant="support"
-          label={<>{text.label}</>}
           title={
             <>
               {text.title[0]}

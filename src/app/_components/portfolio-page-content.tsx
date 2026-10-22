@@ -11,7 +11,6 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
-    eyebrow: "Portfolio",
     title: (
       <>
         A Fully Disclosed
@@ -33,7 +32,6 @@ const copy = {
       "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
   },
   "zh-tw": {
-    eyebrow: "投資組合",
     title: (
       <>
         完整揭露的
@@ -54,7 +52,6 @@ const copy = {
     returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
   },
   "zh-cn": {
-    eyebrow: "投资组合",
     title: (
       <>
         完整披露的
@@ -135,7 +132,6 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
       <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <PageHero
           variant="portfolio"
-          label={<>{text.eyebrow}</>}
           title={<>{text.title}</>}
           intro={
             <>

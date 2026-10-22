@@ -6,16 +6,29 @@ A public-equity research website in English, Traditional Chinese and Simplified 
 
 The site uses Next.js App Router, React, TypeScript, Tailwind CSS, customized shadcn/ui components with Base UI interactions, Lucide icons and CSS Modules. Resend handles email, Upstash Redis coordinates reader services, Stripe provides Hosted Checkout, Sentry monitors errors and performance, and Vercel hosts the site.
 
+## Technology Stack
+
+Node.js runs the application and tooling. TypeScript defines static types, React builds the UI, Next.js provides the App Router framework, and Tailwind CSS implements utility styles.
+
+ESLint checks code rules, Prettier formats source, and Husky runs local Git checks. Vitest runs unit and integration tests; Testing Library exercises components, MSW intercepts test HTTP requests, and Playwright verifies browser journeys in Chromium and WebKit.
+
+See [technology responsibilities](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack) for official references and boundaries. The package manifests define dependencies and versions; the [verification commands](#verification) define how to check changes.
+
+See [integration responsibilities and references](docs/INTEGRATIONS.md#service-responsibilities-and-references) for GitHub, Vercel, Upstash Redis, Stripe, Resend and Sentry, and [integration templates](docs/INTEGRATIONS.md#templates) for conditional implementation examples.
+
 ## Local Development
 
-Use Node.js 24 and npm.
+Use Node.js 24.22.1 LTS (`.nvmrc`) and npm 12.2.1 (`packageManager`). Select the Node version before installing npm.
 
 ```bash
+npm install --global npm@12.2.1
 npm ci
 npm run dev
 ```
 
 Open [localhost:3000](http://localhost:3000). Copy [.env.example](.env.example) to an ignored `.env.local` when configuring services. Never commit credentials.
+
+Codex Browser can also use [127.0.0.1:3000](http://127.0.0.1:3000). `allowedDevOrigins` explicitly permits this loopback alias for development resources and HMR. If HTML loads but controls remain inactive, follow [local preview diagnostics](docs/WEB_APPLICATION_ARCHITECTURE.md#local-preview-diagnostics) before clearing caches.
 
 Email previews need no service credentials:
 
@@ -23,6 +36,8 @@ Email previews need no service credentials:
 | ------------------------------------------ | ----------------------------------------------------------------------------- |
 | `npm run email:contact` or `npm run email` | Contact emails at [localhost:3001](http://localhost:3001)                     |
 | `npm run email:preferences`                | Preference and confirmation emails at [localhost:3002](http://localhost:3002) |
+
+For service recovery, follow [Resend webhook recovery](docs/INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](docs/INTEGRATIONS.md#backup-and-restore). These procedures do not certify current cloud settings or a completed restore drill.
 
 See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-local-preview) for all nine localized examples.
 
@@ -62,13 +77,15 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 | `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
 | `public/`         | Public icons, logos, and the social sharing image                                      |
 | `.github/`        | GitHub Actions workflows                                                               |
-| `docs/`           | Quality, design system, architecture, and integration documentation                    |
+| `docs/`           | Design system, architecture, integrations and historical release preparation           |
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
 Portfolio and memo data live in their features. Redis coordinates reader services; it is not the published research data source. Copy stays with its page or component and follows the [content design workflow](docs/DESIGN_SYSTEM.md#content-design-workflow).
 
-The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) defines five layers: Design Style (Pentagram, PayPal, Swiss Themes, Bauer Types, Lineto, Jost and Yahoo Finance), Design Foundations (Fluent 2), UX Guidelines (Web Interface Guidelines, Fluent 2 and Cieden Handbook), Components (shadcn/ui and Lucide), and Interaction Primitives (Base UI). HTML Living Standard, WCAG 2.2 AA, Responsive Web Design and Core Web Vitals take precedence across all layers. Reference priority runs top to bottom and left to right only within assigned responsibilities. The site retains its approved palette, Perfect Fourth typography and Swiss Grid / Editorial Layout; Color Tokens comprise 10 Primitive Colors (eight PayPal-inspired brand/neutrals and two Yahoo Finance-inspired financial colors) plus Fluent 2 Functional Colors. Fluent governs neutral, brand, semantic and interaction roles, accessibility guidance, Global/Alias Tokens, and the documented foundation mappings. Functional roles prioritize the ten Primitive Colors. Only the ten primitives and exact Fluent default functional values are permitted; custom mixtures and color opacity modifiers are prohibited. Unrelated Tailwind palettes are disabled. shadcn/ui owns Theming, Typeset and Components; Motion uses Duration and Easing (`curve*` tokens). Web Interface Guidelines Copywriting and Fluent Content Design apply exclusively to UX Writing. Marketing and research retain site editorial conventions. The Design System records component mappings, responsive exceptions and the capitalization context matrix; application and provider guides cover implementation, data, security and operations.
+The [Design System](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership) assigns responsibilities to five layers: visual style, Fluent 2 foundations, UX guidance, shadcn/ui components and Base UI primitives. Web standards take precedence. Each reference governs only its assigned domain.
+
+The site retains its approved colors, Perfect Fourth typography and Swiss Grid / Editorial Layout. Use the ten Primitive Colors first; add only necessary Fluent default functional values. The Design System defines tokens, component mappings, responsive exceptions and copy conventions.
 
 Investment Memo Articles are authored in local MDX and rendered as Server Components. See [memo content](docs/WEB_APPLICATION_ARCHITECTURE.md#investment-memo-content) for publishing and validation, and [available shadcn components](docs/DESIGN_SYSTEM.md#available-shadcn-components) for reusable UI modules.
 
@@ -78,9 +95,15 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | [Design System](docs/DESIGN_SYSTEM.md)                               | Design principles, tokens, typography, components, interaction, content and localization.                   |
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
-| [Integrations](docs/INTEGRATIONS.md)                                 | Provider setup, secrets, email/consent, Redis recovery, payment verification and monitoring.                |
+| [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
 | [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Historical release-preparation evidence and checklist, not current deployment status.                       |
+
+The root [Design QA](design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
+
+See [AI Agents](AGENTS.md#ai-agents) for ChatGPT, OpenAI developer and repository-instruction reference responsibilities. These references concern development workflows, not website AI features.
+
+Project Agent Skills and their responsibilities are listed in [Installed Agent Skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills). See [vercel-optimize readiness](docs/INTEGRATIONS.md#vercel-optimize-readiness) before planning a production optimization audit.
 
 ### Documentation maintenance
 

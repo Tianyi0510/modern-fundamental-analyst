@@ -1,6 +1,7 @@
 "use client";
 
 import { appearance } from "./subscription-preferences-request-form.styles";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { FormField } from "@/components/form-field";
@@ -79,6 +80,7 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
             ref={emailRef}
             name="email"
             type="email"
+            spellCheck={false}
             autoComplete="email"
             inputMode="email"
             maxLength={254}
@@ -93,6 +95,7 @@ export function SubscriptionPreferencesRequestForm({ copy, locale }: { copy: Pre
             disabledFeedback="muted-busy"
             disabled={status === "requesting"}
           >
+            {status === "requesting" && <Spinner aria-hidden="true" data-icon="inline-start" />}
             {status === "requesting" ? copy.requesting : copy.request}
           </Button>
         </div>

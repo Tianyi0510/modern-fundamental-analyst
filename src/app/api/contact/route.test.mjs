@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { rejectUnhandledNetwork } from "../../../../scripts/unhandled-network.ts";
 import { POST } from "./route.ts";
 import { monitoringCapture } from "../../../../scripts/sentry-test-client.mjs";
 
@@ -9,10 +10,7 @@ const server = setupServer();
 const unexpectedRequests = [];
 test.before(() =>
   server.listen({
-    onUnhandledRequest(request, print) {
-      unexpectedRequests.push(request.url);
-      print.error();
-    },
+    onUnhandledFrame: rejectUnhandledNetwork((message) => unexpectedRequests.push(message)),
   }),
 );
 test.afterEach(() => {

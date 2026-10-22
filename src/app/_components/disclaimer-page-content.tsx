@@ -6,7 +6,6 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 type LegalSection = readonly [title: string, lead: string | null, paragraphs: readonly string[]];
 type LegalCopy = {
-  label: string;
   title: string;
   titleAccent: string | null;
   subtitle: string | null;
@@ -15,7 +14,6 @@ type LegalCopy = {
 
 const copy = {
   en: {
-    label: "Disclaimer",
     title: "Legal disclaimer and important",
     titleAccent: "investment risk disclosures",
     subtitle:
@@ -51,7 +49,6 @@ const copy = {
     ],
   },
   "zh-tw": {
-    label: "免責聲明",
     title: "法律免責聲明與重要",
     titleAccent: "投資風險揭露",
     subtitle: "使用本網站的研究、財務資訊、估值或績效數據前，請先閱讀這些條款。",
@@ -84,7 +81,6 @@ const copy = {
     ],
   },
   "zh-cn": {
-    label: "免责声明",
     title: "法律免责声明与重要",
     titleAccent: "投资风险披露",
     subtitle: "使用本网站的研究、财务信息、估值或业绩数据前，请先阅读这些条款。",
@@ -127,9 +123,6 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
       <main id="main-content" tabIndex={-1}>
         <section className={appearance["legal-hero"]}>
           <header className={"legal-header" + " " + appearance["shell"]}>
-            <p className={appearance["eyebrow"]}>
-              <span /> {text.label}
-            </p>
             <h1 className={appearance.legalTitle}>
               {text.title}
               {text.titleAccent ? (

@@ -12,7 +12,7 @@ import { getSupportProduct } from "./support-catalog";
 import { isValidCheckoutAttempt, RetiredCheckoutAttemptError } from "./checkout-attempt";
 
 const CHECKOUT_INTEGRATION_IDENTIFIER = "hosted_web_0001_mfaqxkpt";
-const STRIPE_API_VERSION = "2026-08-26.dahlia" as const;
+const STRIPE_API_VERSION = "2026-09-30.endive" as const;
 
 let stripeClient: Stripe | undefined;
 

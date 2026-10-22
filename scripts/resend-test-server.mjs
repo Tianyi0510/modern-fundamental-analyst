@@ -2,16 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { rejectUnhandledNetwork } from "./unhandled-network.ts";
 
 const server = setupServer();
 const failures = [];
 export const providerRequests = [];
 test.before(() =>
   server.listen({
-    onUnhandledRequest(request) {
-      failures.push(`Unhandled request: ${request.method} ${request.url}`);
-      throw new Error("Unexpected provider request");
-    },
+    onUnhandledFrame: rejectUnhandledNetwork((message) => failures.push(message)),
   }),
 );
 test.beforeEach(() => {

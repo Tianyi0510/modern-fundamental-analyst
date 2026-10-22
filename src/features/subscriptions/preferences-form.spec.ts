@@ -72,7 +72,7 @@ for (const { prefix, saved, unsubscribed, unavailable } of [
       await page.goto(`${prefix}/subscription-preferences?token=${token()}`);
       const select = page.locator('select[name="locale"]');
       const form = page.locator("form").filter({ has: select });
-      const status = form.locator('[role="status"]');
+      const status = form.getByRole("status");
       const unsubscribe = form.locator('button[type="button"]');
       for (const width of [320, 390, 800]) {
         await page.setViewportSize({ width, height: 900 });
@@ -112,3 +112,48 @@ for (const { prefix, saved, unsubscribed, unavailable } of [
     },
   );
 }
+
+for (const action of ["request", "save", "unsubscribe"] as const) {
+  test(`preferences ${action} displays pending feedback and recovers after failure @mobile`, async ({ page }) => {
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(
+      action === "request" ? "**/api/subscription-preferences/request" : "**/api/subscription-preferences",
+      async (route) => {
+        await pending;
+        await route.fulfill({ status: 503, json: { ok: false } });
+      },
+    );
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`/subscription-preferences${action === "request" ? "" : `?token=${token()}`}`);
+    const form = page.locator("main form");
+    if (action === "request") {
+      const email = form.locator('input[type="email"]');
+      await expect(email).toHaveAttribute("spellcheck", "false");
+      await email.fill("reader@example.com");
+    } else if (action === "save") {
+      await form.locator("select").selectOption("en");
+    }
+    const button = form.locator(action === "unsubscribe" ? 'button[type="button"]' : 'button[type="submit"]');
+    await button.click();
+    await expect(button).toBeDisabled();
+    const spinner = button.locator('[data-slot="spinner"]');
+    await expect(spinner).toBeVisible();
+    await expect(spinner).toHaveAttribute("aria-hidden", "true");
+    await expect(spinner).toHaveCSS("animation-name", "none");
+    release();
+    await expect(button).toBeEnabled();
+    await expect(spinner).toHaveCount(0);
+    await expect(form.getByRole("status")).not.toBeEmpty();
+  });
+}
+
+test("Contact and Subscribe email inputs disable spellchecking", async ({ page }) => {
+  await page.goto("/contact");
+  const emails = page.locator('input[type="email"]');
+  await expect(emails.first()).toBeVisible();
+  expect(await emails.count()).toBeGreaterThanOrEqual(2);
+  for (const email of await emails.all()) await expect(email).toHaveAttribute("spellcheck", "false");
+});

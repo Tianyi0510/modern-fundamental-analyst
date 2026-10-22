@@ -32,9 +32,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: useProductionBuild
-      ? "npm run start -- --hostname 127.0.0.1 --port 3210"
-      : "npm run dev -- --hostname 127.0.0.1 --port 3210",
+    command: useProductionBuild ? "npm run start -- --hostname 127.0.0.1 --port 3210" : "npm run dev -- --port 3210",
     url: "http://127.0.0.1:3210",
     // Always start an isolated server: browser tests must not use local provider credentials.
     env: {

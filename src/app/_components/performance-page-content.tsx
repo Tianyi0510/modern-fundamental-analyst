@@ -12,7 +12,6 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 const copy = {
   en: {
-    eyebrow: "Performance",
     title: (
       <>
         A Monthly Record of
@@ -67,7 +66,6 @@ const copy = {
     ),
   },
   "zh-tw": {
-    eyebrow: "績效",
     title: (
       <>
         每月記錄
@@ -115,7 +113,6 @@ const copy = {
     ),
   },
   "zh-cn": {
-    eyebrow: "业绩",
     title: (
       <>
         每月记录
@@ -175,7 +172,6 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
       <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <PageHero
           variant="performance"
-          label={<>{text.eyebrow}</>}
           title={<>{text.title}</>}
           intro={
             <>

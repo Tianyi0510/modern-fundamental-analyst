@@ -1,5 +1,18 @@
 import { expect, test } from "@playwright/test";
 
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} email preferences links use regular weight @mobile`, async ({ page }) => {
+    await page.goto(`${prefix}/contact`);
+    const links = page.locator(".subscribe-preferences");
+    await expect(links).toHaveCount(2);
+    for (const link of await links.all()) {
+      await expect(link).toHaveCSS("font-weight", "400");
+      await expect(link).toHaveCSS("font-size", "16px");
+      await expect(link).toHaveAttribute("href", `${prefix}/subscription-preferences`);
+    }
+  });
+}
+
 test.describe("footer layout and typography", () => {
   test.use({ viewport: { width: 1440, height: 1000 } });
 
