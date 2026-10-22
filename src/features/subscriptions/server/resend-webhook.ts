@@ -1,4 +1,5 @@
 import "server-only";
+import { isResendWriteAcknowledged } from "@/lib/resend-contracts";
 import { createHash } from "node:crypto";
 import { executeRedisCommand, getRedisClient } from "@/lib/redis";
 import { getResendClient, runResendOperation } from "@/lib/resend";
@@ -45,7 +46,8 @@ export async function processDeliveryFeedback(event: WebhookEventPayload, eventI
         () => resend.contacts.update({ email, unsubscribed: true }),
         { expectedStatuses: [404] },
       );
-      if (!result || (result.error && result.error.statusCode !== 404)) throw new Error("Webhook processing failed");
+      if (!result || (result.error ? result.error.statusCode !== 404 : !isResendWriteAcknowledged(result.data)))
+        throw new Error("Webhook processing failed");
       // Retain completed IDs: dashboard replays are not limited to retry windows.
       await executeRedisCommand(redis, () => redis.set(eventKey, "done"));
     });

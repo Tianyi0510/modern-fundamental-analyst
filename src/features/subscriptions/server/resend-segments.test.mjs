@@ -12,7 +12,7 @@ function createResendSegmentMock(initialIds, failRemoveId) {
       contacts: {
         segments: {
           async list() {
-            return { data: { data: [...segmentIds].map((id) => ({ id })) } };
+            return { data: { data: [...segmentIds].map((id) => ({ id })), has_more: false } };
           },
           async add({ segmentId }) {
             segmentIds.add(segmentId);
@@ -21,7 +21,7 @@ function createResendSegmentMock(initialIds, failRemoveId) {
           async remove({ segmentId }) {
             if (segmentId === failRemoveId) return { error: { name: "SegmentRemovalError" } };
             segmentIds.delete(segmentId);
-            return { data: { id: segmentId } };
+            return { data: { id: segmentId, deleted: true } };
           },
         },
       },

@@ -511,3 +511,7 @@ Signup requests send confirmation links. Explicit confirmation activates consent
 ## Deterministic date rendering
 
 `src/lib/format.ts` validates ISO calendar dates and formats UTC components with fixed English month names or Chinese numeric dates. Compact English months use three letters, including `Sep`. This avoids Node/WebKit ICU differences and hydration mismatches. Keep hydration warnings visible. The chart regression checks server output and browser errors after interaction in all locales.
+
+### Provider recovery verification
+
+Follow the [webhook recovery](INTEGRATIONS.md#webhook-recovery) and [Redis restoration](INTEGRATIONS.md#backup-and-restore) procedures. Invalid provider acknowledgements leave write outcomes uncertain: preserve leases and journals and do not mark feedback complete. Verify [Sentry uptime activation](INTEGRATIONS.md#local-and-cloud-verification) separately from deployment readiness; a successful release cannot correct a provider entitlement failure.

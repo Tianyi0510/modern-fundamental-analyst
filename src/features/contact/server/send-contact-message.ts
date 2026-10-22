@@ -1,4 +1,5 @@
 import "server-only";
+import { isResendWriteAcknowledged } from "@/lib/resend-contracts";
 import { reportServiceFailure } from "@/lib/sentry-server";
 import { CONTACT_RECIPIENT } from "./contact-config";
 import { renderContactEmail, type ContactMessage } from "../contact-email";
@@ -32,7 +33,7 @@ export async function sendContactMessage(
     ),
   );
 
-  if (!result || result.error) {
+  if (!result || result.error || !isResendWriteAcknowledged(result.data)) {
     if (result?.error) {
       console.error("Resend contact delivery failed", result.error.name);
     }

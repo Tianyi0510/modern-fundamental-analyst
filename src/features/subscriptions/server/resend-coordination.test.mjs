@@ -1,3 +1,5 @@
+import { HttpResponse } from "msw";
+import { interceptResendRequests, providerRequests } from "../../../../scripts/resend-test-server.mjs";
 import { getLatestMemo } from "@/features/memos/memos.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -72,13 +74,16 @@ function preferencesMutation(action) {
   });
 }
 
-test("confirmed preference saves clear their journal", async (t) => {
-  t.mock.method(globalThis, "fetch", async (url, options) => {
-    if (String(url).includes("/segments"))
-      return Response.json({ data: [{ id: getPreferredLanguageSegmentId("zh-tw") }], has_more: false });
-    if (options.method === "PATCH") assert.equal(JSON.parse(options.body).properties.preferred_language, "繁體中文");
-    return Response.json({ id: "contact-id", unsubscribed: false });
-  });
+test("confirmed preference saves clear their journal", async () => {
+  interceptResendRequests(
+    ["GET /contacts/:contact", "GET /contacts/:contact/segments", "PATCH /contacts/:contact"],
+    async (url, options) => {
+      if (String(url).includes("/segments"))
+        return Response.json({ data: [{ id: getPreferredLanguageSegmentId("zh-tw") }], has_more: false });
+      if (options.method === "PATCH") assert.equal(JSON.parse(options.body).properties.preferred_language, "繁體中文");
+      return Response.json({ id: "contact-id", unsubscribed: false });
+    },
+  );
   const response = await updatePreferences(preferencesMutation("save"));
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { ok: true, action: "save" });
@@ -90,19 +95,30 @@ test("confirmed preference update failures restore previous language segments an
   const writes = [];
   const previousId = getPreferredLanguageSegmentId("en");
   const targetId = getPreferredLanguageSegmentId("zh-tw");
-  t.mock.method(globalThis, "fetch", async (url, options) => {
-    if (options.method === "GET" && String(url).includes("/segments")) {
-      return Response.json({ data: [{ id: previousId }], has_more: false });
-    }
-    if (options.method !== "GET") writes.push({ method: options.method, url: String(url) });
-    if (options.method === "PATCH") {
+  interceptResendRequests(
+    [
+      "GET /contacts/:contact",
+      "GET /contacts/:contact/segments",
+      "POST /contacts/:contact/segments/:segment",
+      "DELETE /contacts/:contact/segments/:segment",
+      "PATCH /contacts/:contact",
+    ],
+    async (url, options) => {
+      if (options.method === "GET" && String(url).includes("/segments")) {
+        return Response.json({ data: [{ id: previousId }], has_more: false });
+      }
+      if (options.method !== "GET") writes.push({ method: options.method, url: String(url) });
+      if (options.method === "PATCH") {
+        return Response.json(
+          { name: "validation_error", message: "Mock provider rejection", statusCode: 422 },
+          { status: 422 },
+        );
+      }
       return Response.json(
-        { name: "validation_error", message: "Mock provider rejection", statusCode: 422 },
-        { status: 422 },
+        options.method === "DELETE" ? { id: "contact-id", deleted: true } : { id: "contact-id", unsubscribed: false },
       );
-    }
-    return Response.json({ id: "contact-id", unsubscribed: false });
-  });
+    },
+  );
   const email = "rollback-preferences@example.com";
   assert.deepEqual(await updateSubscriptionPreferences({ email }, "zh-tw", "save"), {
     ok: false,
@@ -110,26 +126,34 @@ test("confirmed preference update failures restore previous language segments an
     status: 502,
   });
   assert.deepEqual(
-    writes.map(({ method }) => method),
-    ["POST", "DELETE", "PATCH", "POST", "DELETE"],
+    writes.slice(0, 3).map(({ method }) => method),
+    ["POST", "DELETE", "PATCH"],
   );
   assert.ok(writes[0].url.endsWith(`/segments/${targetId}`));
   assert.ok(writes[1].url.endsWith(`/segments/${previousId}`));
-  assert.ok(writes[3].url.endsWith(`/segments/${previousId}`));
-  assert.ok(writes[4].url.endsWith(`/segments/${targetId}`));
+  assert.deepEqual(
+    writes
+      .slice(3)
+      .map(({ method, url }) => `${method} ${new URL(url).pathname.split("/").at(-1)}`)
+      .sort(),
+    [`POST ${previousId}`, `DELETE ${targetId}`].sort(),
+  );
   assert.equal(await readSubscriptionJournal(email), null);
 });
 
 test("ambiguous preference saves retain a journal and do not prevent later unsubscribe", async (t) => {
   t.mock.method(console, "error", () => {});
   const requests = [];
-  t.mock.method(globalThis, "fetch", async (url, options) => {
-    requests.push(String(url));
-    if (String(url).includes("/segments"))
-      return Response.json({ data: [{ id: getPreferredLanguageSegmentId("zh-tw") }], has_more: false });
-    if (options.method === "PATCH" && !JSON.parse(options.body).unsubscribed) throw new TypeError("response lost");
-    return Response.json({ id: "contact-id", unsubscribed: false });
-  });
+  interceptResendRequests(
+    ["GET /contacts/:contact", "GET /contacts/:contact/segments", "PATCH /contacts/:contact"],
+    async (url, options) => {
+      requests.push(String(url));
+      if (String(url).includes("/segments"))
+        return Response.json({ data: [{ id: getPreferredLanguageSegmentId("zh-tw") }], has_more: false });
+      if (options.method === "PATCH" && !JSON.parse(options.body).unsubscribed) return HttpResponse.error();
+      return Response.json({ id: "contact-id", unsubscribed: false });
+    },
+  );
   assert.equal((await updatePreferences(preferencesMutation("save"))).status, 502);
   const record = await readSubscriptionJournal("reader@example.com");
   assert.equal(record.operation, "preferences");
@@ -332,16 +356,16 @@ test("malformed preference email records fail closed without replacing the retry
   }
 });
 
-test("a malformed cached preference email stops before provider I/O", async (context) => {
+test("a malformed cached preference email stops before provider I/O", async () => {
   const requestId = "preferences/550e8400-e29b-41d4-a716-446655440000";
   const email = "reader@example.com";
   await getStablePreferenceEmail(requestId, JSON.stringify({ email, locale: "en" }), email, preferenceEmail);
   const [key, value] = [...values][0];
   values.set(key, JSON.stringify({ ...JSON.parse(value), payload: null }));
-  context.mock.method(globalThis, "fetch", () => assert.fail("provider must not be called"));
+  interceptResendRequests([], () => assert.fail("provider must not be called"));
 
   assert.equal((await requestPreferences(preferenceRequest())).status, 503);
-  assert.equal(globalThis.fetch.mock.callCount(), 0);
+  assert.equal(providerRequests.length, 0);
 });
 
 test("same subscriber cannot mutate concurrently; another subscriber can", async () => {
@@ -387,8 +411,8 @@ test("incomplete rollback keeps the lease and logs a reconciliation signal", asy
 });
 
 test("ambiguous provider outcomes retain the lease and prevent rollback calls", async (context) => {
-  context.mock.method(globalThis, "fetch", async () => {
-    throw new TypeError("network interrupted");
+  interceptResendRequests(["PATCH /contacts/:contact"], async () => {
+    return HttpResponse.error();
   });
   context.mock.method(console, "error", () => {});
   await withSubscriberLock("reader@example.com", async () => {
@@ -400,11 +424,11 @@ test("ambiguous provider outcomes retain the lease and prevent rollback calls", 
     );
   });
   assert.equal(values.size, 1);
-  assert.equal(globalThis.fetch.mock.callCount(), 1);
+  assert.equal(providerRequests.length, 1);
 });
 
-test("provider fetch receives an abort signal and an expired deadline prevents I/O", async (context) => {
-  context.mock.method(globalThis, "fetch", async (_url, options) => {
+test("provider fetch receives an abort signal and an expired deadline prevents I/O", async () => {
+  interceptResendRequests(["POST /emails"], async (_url, options) => {
     assert.ok(options.signal instanceof AbortSignal);
     return Response.json({ id: "email-id" });
   });
@@ -421,7 +445,7 @@ test("provider fetch receives an abort signal and an expired deadline prevents I
       getResendClient().contacts.get({ email: "reader@example.com" }),
     ),
   );
-  assert.equal(globalThis.fetch.mock.callCount(), 1);
+  assert.equal(providerRequests.length, 1);
 });
 
 test("Redis unavailability never falls back to an unprotected mutation", async () => {
@@ -444,10 +468,10 @@ test("Redis unavailability never falls back to an unprotected mutation", async (
 test("preference route preserves the exact provider payload and key after a lost response", async (context) => {
   const sends = [];
   context.mock.method(console, "error", () => {});
-  context.mock.method(globalThis, "fetch", async (url, options) => {
+  interceptResendRequests(["GET /contacts/:contact", "POST /emails"], async (url, options) => {
     if (String(url).includes("/contacts/")) return Response.json({ id: "contact-id" });
     sends.push({ body: options.body, key: options.headers.get("Idempotency-Key") });
-    if (sends.length === 1) throw new TypeError("response lost");
+    if (sends.length === 1) return HttpResponse.error();
     return Response.json({ id: "email-id" });
   });
   assert.equal((await requestPreferences(preferenceRequest())).status, 503);
@@ -458,33 +482,32 @@ test("preference route preserves the exact provider payload and key after a lost
 
 test("unknown contacts receive the generic success response without email", async (context) => {
   context.mock.method(console, "error", () => {});
-  context.mock.method(globalThis, "fetch", async () =>
+  interceptResendRequests(["GET /contacts/:contact"], async () =>
     Response.json({ name: "not_found", statusCode: 404 }, { status: 404 }),
   );
   const response = await requestPreferences(preferenceRequest());
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { ok: true });
-  assert.equal(globalThis.fetch.mock.callCount(), 1);
+  assert.equal(providerRequests.length, 1);
 });
 
 test("Resend timeout aborts the underlying fetch", async (context) => {
   const controller = new AbortController();
   context.mock.method(AbortSignal, "timeout", () => controller.signal);
   context.mock.method(console, "error", () => {});
-  context.mock.method(
-    globalThis,
-    "fetch",
+  interceptResendRequests(
+    ["GET /contacts/:contact"],
     (_url, options) =>
-      new Promise((_resolve, reject) => {
-        options.signal.addEventListener("abort", () => reject(options.signal.reason), { once: true });
+      new Promise((resolve) => {
+        options.signal.addEventListener("abort", () => resolve(HttpResponse.error()), { once: true });
         controller.abort(new DOMException("Timed out", "TimeoutError"));
       }),
   );
   await assert.rejects(getResendClient().contacts.get({ email: "reader@example.com" }), { name: "TimeoutError" });
 });
 
-test("active subscriptions reject repeats in every locale without provider writes", async (context) => {
-  context.mock.method(globalThis, "fetch", async (_url, options) => {
+test("active subscriptions reject repeats in every locale without provider writes", async () => {
+  interceptResendRequests(["GET /contacts/:contact"], async (_url, options) => {
     assert.equal(options.method, "GET");
     return Response.json({
       id: "contact-id",
@@ -505,13 +528,13 @@ test("active subscriptions reject repeats in every locale without provider write
     );
     assert.equal(await readSubscriptionJournal("reader@example.com"), null);
   }
-  assert.equal(globalThis.fetch.mock.callCount(), 3);
+  assert.equal(providerRequests.length, 3);
 });
 
 for (const existingContact of [false, true]) {
   test(`missing welcome memo blocks ${existingContact ? "reactivation" : "new activation"} before provider writes`, async (context) => {
     context.mock.method(console, "error", () => {});
-    const fetch = context.mock.method(globalThis, "fetch", async (_url, options) => {
+    interceptResendRequests(["GET /contacts/:contact"], async (_url, options) => {
       assert.equal(options.method, "GET");
       return existingContact
         ? Response.json({ id: "contact-id", unsubscribed: true })
@@ -523,7 +546,7 @@ for (const existingContact of [false, true]) {
       assert.deepEqual(result, { ok: false, message: "Subscription could not be completed.", status: 503 });
       assert.equal(await readSubscriptionJournal(email), null);
     }
-    assert.equal(fetch.mock.callCount(), 2);
+    assert.equal(providerRequests.length, 2);
   });
 }
 
@@ -533,27 +556,38 @@ test("a rejected welcome retains consent and a durable pending journal", async (
   const memberships = new Set([english]);
   const updates = [];
   context.mock.method(console, "error", () => {});
-  context.mock.method(globalThis, "fetch", async (url, options) => {
-    const path = new URL(url).pathname;
-    if (path.includes("/segments")) {
-      if (options.method === "GET")
-        return Response.json({ data: [...memberships].map((id) => ({ id })), has_more: false });
-      const id = path.split("/").at(-1);
-      if (options.method === "POST") memberships.add(id);
-      if (options.method === "DELETE") memberships.delete(id);
-      return Response.json({ id });
-    }
-    if (path.includes("/events")) return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
-    if (options.method === "PATCH") {
-      updates.push(JSON.parse(options.body));
-      return Response.json({ id: "contact-id" });
-    }
-    return Response.json({
-      id: "contact-id",
-      unsubscribed: true,
-      properties: { preferred_language: { type: "string", value: "English" } },
-    });
-  });
+  interceptResendRequests(
+    [
+      "GET /contacts/:contact",
+      "GET /contacts/:contact/segments",
+      "POST /contacts/:contact/segments/:segment",
+      "DELETE /contacts/:contact/segments/:segment",
+      "PATCH /contacts/:contact",
+      "POST /events/send",
+    ],
+    async (url, options) => {
+      const path = new URL(url).pathname;
+      if (path.includes("/segments")) {
+        if (options.method === "GET")
+          return Response.json({ data: [...memberships].map((id) => ({ id })), has_more: false });
+        const id = path.split("/").at(-1);
+        if (options.method === "POST") memberships.add(id);
+        if (options.method === "DELETE") memberships.delete(id);
+        return Response.json(options.method === "DELETE" ? { id, deleted: true } : { id });
+      }
+      if (path.includes("/events"))
+        return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
+      if (options.method === "PATCH") {
+        updates.push(JSON.parse(options.body));
+        return Response.json({ id: "contact-id" });
+      }
+      return Response.json({
+        id: "contact-id",
+        unsubscribed: true,
+        properties: { preferred_language: { type: "string", value: "English" } },
+      });
+    },
+  );
   assert.equal((await activateContactInTest("reader@example.com", "zh-tw", getLatestMemo)).ok, true);
   assert.equal(updates.length, 1);
   assert.equal(updates[0].unsubscribed, false);
@@ -565,11 +599,11 @@ test("a rejected welcome retains consent and a durable pending journal", async (
 for (const failure of ["server", "network", "deadline"]) {
   test(`read-only ${failure} failure releases its journal and permits a retry`, async (t) => {
     t.mock.method(console, "error", () => {});
-    t.mock.method(globalThis, "fetch", async () => {
+    interceptResendRequests(["GET /contacts/:contact"], async () => {
       if (failure === "server")
         return Response.json({ name: "application_error", message: "unavailable" }, { status: 503 });
       if (failure === "deadline") resendOperationContext.getStore().signal = AbortSignal.abort();
-      throw new TypeError("read unavailable");
+      return HttpResponse.error();
     });
     for (let i = 0; i < 2; i++) {
       await withSubscriberLock("read-failure@example.com", () =>
@@ -579,7 +613,7 @@ for (const failure of ["server", "network", "deadline"]) {
       );
       assert.equal(await readSubscriptionJournal("read-failure@example.com"), null);
     }
-    assert.equal(globalThis.fetch.mock.callCount(), 2);
+    assert.equal(providerRequests.length, 2);
   });
 }
 test("a thrown read-only operation clears only its owned journal", async () => {
@@ -596,7 +630,7 @@ test("a thrown read-only operation clears only its owned journal", async () => {
 
 test("failed initial subscription reads can retry without looking up or sending a welcome memo", async (t) => {
   t.mock.method(console, "error", () => {});
-  const fetch = t.mock.method(globalThis, "fetch", async (_url, options) => {
+  interceptResendRequests(["GET /contacts/:contact"], async (_url, options) => {
     assert.equal(options.method, "GET");
     return Response.json({ name: "application_error", message: "unavailable" }, { status: 503 });
   });
@@ -608,12 +642,12 @@ test("failed initial subscription reads can retry without looking up or sending 
     assert.equal(result.status, 502);
     assert.equal(await readSubscriptionJournal("initial-read@example.com"), null);
   }
-  assert.equal(fetch.mock.callCount(), 2);
+  assert.equal(providerRequests.length, 2);
 });
 
 test("a failed read after a dispatched mutation retains the journal", async (t) => {
   t.mock.method(console, "error", () => {});
-  t.mock.method(globalThis, "fetch", async (_url, options) =>
+  interceptResendRequests(["PATCH /contacts/:contact", "GET /contacts/:contact"], async (_url, options) =>
     options.method === "PATCH"
       ? Response.json({ id: "contact-id" })
       : Response.json({ name: "application_error", message: "unavailable" }, { status: 503 }),
@@ -642,3 +676,222 @@ test("failed asynchronous email rendering leaves no partial retry record", async
     preferenceEmail(),
   );
 });
+
+for (const payload of [
+  null,
+  {},
+  [],
+  { id: "contact-id" },
+  { id: "", unsubscribed: true },
+  { id: "contact-id", unsubscribed: "false" },
+]) {
+  test(`invalid contact response ${JSON.stringify(payload)} stops activation before writes`, async () => {
+    interceptResendRequests(["GET /contacts/:contact"], async () => Response.json(payload));
+    const result = await activateContactInTest("invalid-contact@example.com", "en", () =>
+      assert.fail("Invalid contact data must not reach memo lookup"),
+    );
+    assert.deepEqual(result, { ok: false, message: "Subscription could not be completed.", status: 502 });
+    assert.equal(providerRequests.length, 1);
+    assert.equal(await readSubscriptionJournal("invalid-contact@example.com"), null);
+  });
+}
+
+for (const payload of [null, {}, { id: "" }]) {
+  test(`invalid activation acknowledgement ${JSON.stringify(payload)} retains recovery journal without welcome`, async (t) => {
+    t.mock.method(console, "error", () => {});
+    interceptResendRequests(["GET /contacts/:contact"], async () =>
+      Response.json({ name: "not_found", statusCode: 404 }, { status: 404 }),
+    );
+    interceptResendRequests(["POST /contacts"], async () => Response.json(payload));
+    const result = await activateContactInTest("invalid-write@example.com", "en", getLatestMemo);
+    assert.deepEqual(result, { ok: false, message: "Subscription could not be completed.", status: 502 });
+    assert.deepEqual(
+      providerRequests.map((request) => request.method),
+      ["GET", "POST"],
+    );
+    assert.equal((await readSubscriptionJournal("invalid-write@example.com")).phase, "create-contact");
+  });
+}
+
+test("invalid reactivation acknowledgement retains its journal without rollback or welcome", async (t) => {
+  t.mock.method(console, "error", () => {});
+  interceptResendRequests(["GET /contacts/:contact"], async () =>
+    Response.json({ id: "existing-contact", unsubscribed: true }),
+  );
+  interceptResendRequests(["GET /contacts/:contact/segments"], async () =>
+    Response.json({ data: [{ id: getPreferredLanguageSegmentId("en") }], has_more: false }),
+  );
+  interceptResendRequests(["PATCH /contacts/:contact"], async () => Response.json(null));
+  assert.deepEqual(await activateContactInTest("invalid-update@example.com", "en", getLatestMemo), {
+    ok: false,
+    message: "Subscription could not be completed.",
+    status: 502,
+  });
+  assert.deepEqual(
+    providerRequests.map((request) => request.method),
+    ["GET", "GET", "PATCH"],
+  );
+  assert.equal((await readSubscriptionJournal("invalid-update@example.com")).phase, "update-contact");
+});
+
+for (const action of ["save", "unsubscribe"]) {
+  for (const acknowledgement of [null, {}, [], { id: "" }, { id: 7 }, { id: "   " }]) {
+    test(`${action} rejects malformed acknowledgement ${JSON.stringify(acknowledgement)} and retains coordination`, async (t) => {
+      t.mock.method(console, "error", () => {});
+      const email = "invalid-preferences@example.com";
+      interceptResendRequests(["GET /contacts/:contact"], async () =>
+        Response.json({ id: "contact-id", unsubscribed: false }),
+      );
+      interceptResendRequests(["GET /contacts/:contact/segments"], async () =>
+        Response.json({ data: [{ id: getPreferredLanguageSegmentId("en") }], has_more: false }),
+      );
+      interceptResendRequests(["PATCH /contacts/:contact"], async () => Response.json(acknowledgement));
+      assert.deepEqual(await updateSubscriptionPreferences({ email }, "en", action), {
+        ok: false,
+        error: "Subscription preferences could not be updated.",
+        status: 502,
+      });
+      if (action === "save") assert.equal((await readSubscriptionJournal(email)).phase, "update-preferred-language");
+      await assert.rejects(
+        withSubscriberLock(email, async () => assert.fail("uncertain write must retain its lease")),
+        { status: 503 },
+      );
+      assert.equal(providerRequests.filter((request) => request.method === "PATCH").length, 1);
+    });
+  }
+}
+
+for (const page of [
+  null,
+  {},
+  { data: [] },
+  { data: [], has_more: "false" },
+  { data: {}, has_more: false },
+  { data: [null], has_more: false },
+  { data: [{ id: "" }], has_more: false },
+  { data: [{ id: 1 }], has_more: false },
+  { data: [], has_more: true },
+]) {
+  for (const laterPage of [false, true]) {
+    test(`invalid segment page ${JSON.stringify(page)} at ${laterPage ? "later" : "first"} page prevents writes`, async (t) => {
+      t.mock.method(console, "error", () => {});
+      const email = "invalid-segments@example.com";
+      interceptResendRequests(["GET /contacts/:contact"], async () =>
+        Response.json({ id: "contact-id", unsubscribed: false }),
+      );
+      interceptResendRequests(["GET /contacts/:contact/segments"], async (url) =>
+        Response.json(
+          laterPage && !new URL(url).searchParams.has("after")
+            ? { data: [{ id: getPreferredLanguageSegmentId("en") }], has_more: true }
+            : page,
+        ),
+      );
+      assert.equal((await updateSubscriptionPreferences({ email }, "zh-tw", "save")).ok, false);
+      assert.ok(providerRequests.every((request) => request.method === "GET"));
+      assert.equal(await readSubscriptionJournal(email), null);
+      assert.equal(await withSubscriberLock(email, async () => "retryable"), "retryable");
+    });
+  }
+}
+
+test("malformed unsubscribe acknowledgements preserve an existing journal and allow a confirmed retry after lease expiry", async (t) => {
+  t.mock.method(console, "error", () => {});
+  let acknowledged = false;
+  interceptResendRequests(["GET /contacts/:contact"], async () =>
+    Response.json({ id: "contact-id", unsubscribed: false }),
+  );
+  interceptResendRequests(["GET /contacts/:contact/segments"], async () =>
+    Response.json({ data: [{ id: getPreferredLanguageSegmentId("en") }], has_more: false }),
+  );
+  interceptResendRequests(["PATCH /contacts/:contact"], async () =>
+    Response.json(acknowledged ? { id: "contact-id" } : null),
+  );
+  const email = "recovery@example.com";
+  assert.equal((await updateSubscriptionPreferences({ email }, "en", "save")).status, 502);
+  const original = await readSubscriptionJournal(email);
+  const expireLease = () => {
+    for (const key of values.keys()) if (key.startsWith("mfa:resend:subscriber:")) values.delete(key);
+  };
+  expireLease();
+  assert.equal((await updateSubscriptionPreferences({ email }, "en", "unsubscribe")).status, 502);
+  assert.deepEqual(await readSubscriptionJournal(email), original);
+  await assert.rejects(
+    withSubscriberLock(email, async () => assert.fail("lease must remain")),
+    { status: 503 },
+  );
+  expireLease();
+  acknowledged = true;
+  assert.deepEqual(await updateSubscriptionPreferences({ email }, "en", "unsubscribe"), {
+    ok: true,
+    action: "unsubscribe",
+  });
+  assert.deepEqual(await readSubscriptionJournal(email), original);
+  assert.equal(await withSubscriberLock(email, async () => "released"), "released");
+});
+
+test("unacknowledged complaint update remains replayable and retains its lease", async () => {
+  const { processDeliveryFeedback } = await import("./resend-webhook.ts");
+  const { subscriptionKey } = await import("./resend-coordination.ts");
+  const email = "unacknowledged-webhook@example.com";
+  let acknowledged = false;
+  let writes = 0;
+  interceptResendRequests(["PATCH /contacts/:contact"], async () => {
+    writes++;
+    return Response.json(acknowledged ? { id: "contact-id" } : {});
+  });
+  const event = { type: "email.complained", data: { to: [email] } };
+  await assert.rejects(processDeliveryFeedback(event, "unacknowledged-event"));
+  assert.equal(values.get(subscriptionKey("suppression", email)), "email.complained");
+  assert.ok(values.has(subscriptionKey("subscriber", email)));
+  await assert.rejects(processDeliveryFeedback(event, "unacknowledged-event"));
+  assert.equal(writes, 1);
+  values.delete(subscriptionKey("subscriber", email)); // Simulate lease expiry before provider retry.
+  acknowledged = true;
+  await processDeliveryFeedback(event, "unacknowledged-event");
+  await processDeliveryFeedback(event, "unacknowledged-event");
+  assert.equal(writes, 2);
+});
+
+for (const operation of ["add", "remove", "rollback"]) {
+  test(`malformed segment ${operation} acknowledgement retains the journal and lease`, async (t) => {
+    t.mock.method(console, "error", () => {});
+    const { subscriptionKey } = await import("./resend-coordination.ts");
+    const email = `segment-ack-${operation}@example.com`;
+    const previous = getPreferredLanguageSegmentId("en");
+    const target = getPreferredLanguageSegmentId("zh-tw");
+    const writes = [];
+    interceptResendRequests(
+      [
+        "GET /contacts/:contact",
+        "GET /contacts/:contact/segments",
+        "POST /contacts/:contact/segments/:segment",
+        "DELETE /contacts/:contact/segments/:segment",
+        "PATCH /contacts/:contact",
+      ],
+      async (url, options) => {
+        const path = new URL(url).pathname;
+        if (options.method === "GET")
+          return Response.json(
+            path.endsWith("/segments")
+              ? { data: [{ id: previous }], has_more: false }
+              : { id: "contact-id", unsubscribed: false },
+          );
+        writes.push(options.method);
+        if (options.method === "PATCH")
+          return Response.json({ name: "validation_error", statusCode: 422 }, { status: 422 });
+        if (
+          (operation === "add" && options.method === "POST") ||
+          (operation === "remove" && options.method === "DELETE") ||
+          (operation === "rollback" && path.endsWith(previous) && options.method === "POST")
+        )
+          return Response.json({});
+        return Response.json(options.method === "DELETE" ? { id: target, deleted: true } : { id: target });
+      },
+    );
+    assert.equal((await updateSubscriptionPreferences({ email }, "zh-tw", "save")).ok, false);
+    assert.ok(await readSubscriptionJournal(email));
+    assert.ok(values.has(subscriptionKey("subscriber", email)));
+    if (operation === "add") assert.deepEqual(writes, ["POST"]);
+    if (operation === "remove") assert.deepEqual(writes, ["POST", "DELETE"]);
+  });
+}
