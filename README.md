@@ -58,7 +58,9 @@ Run checks for the changed files and behavior. CI runs full verification; releas
 | Performance budgets against an existing production build | `npm run test:performance`                                        |
 | Mobile WebKit against an existing production build       | `npm run test:webkit`                                             |
 
-Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack. The configuration selects supported CSS chunking for each bundler. Both builds need access to Google Fonts when the fonts are not cached.
+For browser-feature compatibility and broader page-quality audits, follow the [Baseline and Lighthouse review](docs/WEB_APPLICATION_ARCHITECTURE.md#baseline-and-lighthouse-review). Baseline informs feature selection; Lighthouse diagnostics complement browser tests and field Core Web Vitals.
+
+Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Both browsers use timing-balanced file lists; see [browser shard allocation](docs/WEB_APPLICATION_ARCHITECTURE.md#local-runs-and-shard-maintenance) for evidence and maintenance. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack. The configuration selects supported CSS chunking for each bundler. Both builds need access to Google Fonts when the fonts are not cached.
 
 ### Commit hooks
 
@@ -97,7 +99,7 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
 | [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
-| [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Historical release-preparation evidence and checklist, not current deployment status.                       |
+| [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Features, improvements, fixes and known limitations for version 1.0.0.                                      |
 
 The root [Design QA](design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
 

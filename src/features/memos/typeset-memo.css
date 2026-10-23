@@ -1,3 +1,5 @@
+@import "../../components/ui/typeset.css";
+
 /* Site-owned preset: retain the approved article typography and editorial rhythm. */
 @layer components {
   .typeset.typeset-memo {

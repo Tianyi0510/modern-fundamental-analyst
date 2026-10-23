@@ -83,7 +83,7 @@ Read the relevant guide and update it when behavior or commands change. README i
 
 Use [README](README.md#documentation) for documentation scope and maintenance, [architecture](docs/WEB_APPLICATION_ARCHITECTURE.md#code-and-components) for code conventions, and [Design System](docs/DESIGN_SYSTEM.md#content-and-localization) for editorial rules. Keep agent execution requirements here.
 
-Before changing Next.js APIs, routing or configuration, read the installed-version guide in `node_modules/next/dist/docs/`. If unavailable, use the matching official documentation. Verify that a tool or pattern exists in this repo before using it.
+Before changing Next.js APIs, routing or configuration, read the installed-version guide in `node_modules/next/dist/docs/`. If unavailable, use the matching official documentation. Use installed Next.js workflow skills only when their prerequisites and task scope apply; general framework reference knowledge comes from the bundled docs rather than the retired `next-best-practices` skill. Verify that a tool or pattern exists in this repo before using it.
 
 ## Implementation constraints
 

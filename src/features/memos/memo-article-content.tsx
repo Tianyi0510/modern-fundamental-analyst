@@ -1,3 +1,4 @@
+import "./typeset-memo.css";
 import { appearance } from "./memo-article-content.styles";
 import { MemoTableOfContents } from "./memo-table-of-contents";
 import MicrosoftArticle, { memoTableOfContents } from "./articles/microsoft-stock-analysis-fiscal-year-2024.mdx";
