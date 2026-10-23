@@ -8,7 +8,7 @@ test("CSS preserves typography roles with scoped Typeset and wordmark exceptions
   const [tokens, globals, componentFiles] = await Promise.all([
     read("src/app/styles/tokens.css"),
     read("src/app/globals.css"),
-    readdir(new URL("../../components", import.meta.url)),
+    readdir(new URL("../../components", import.meta.url), { recursive: true }),
   ]);
   const imports = [...globals.matchAll(/@import "\.\/(.+\.css)"(?: layer\([^)]*\))?;/g)].map(
     (match) => "src/app/" + match[1],

@@ -1,7 +1,7 @@
 import { PageHero } from "@/components/page-hero";
 import { Suspense } from "react";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { ServiceLoading } from "@/components/service-loading";
 import { SupportPanel, VerifiedSupportPanel } from "@/features/support/support-panel";
 import { resolveSupportStatus } from "@/features/support/server/stripe-checkout";

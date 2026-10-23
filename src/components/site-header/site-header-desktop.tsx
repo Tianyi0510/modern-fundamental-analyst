@@ -1,19 +1,19 @@
 "use client";
 
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "./ui/navigation-menu";
-import { ThemeToggle } from "./theme-toggle";
-import { IntentLink as Link } from "./intent-link";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "../ui/navigation-menu";
+import { ThemeToggle } from "../theme-toggle";
+import { IntentLink as Link } from "../intent-link";
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ButtonLink } from "./button-link";
+import { ButtonLink } from "../button-link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import { appearance, desktopNavigationLink, languageChoice } from "./site-header.styles";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";
 import type { NavigationCopy } from "@/lib/navigation-copy";

@@ -28,6 +28,7 @@ output/
 .DS_Store
 
 # TypeScript
+next-env.d.ts
 *.tsbuildinfo
 next-env.d.ts.bak
 

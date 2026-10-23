@@ -8,7 +8,7 @@ import { IntentLink } from "@/components/intent-link";
 import { ChartPie, MoveRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { getMemos } from "@/features/memos/memos";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";

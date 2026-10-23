@@ -3,7 +3,7 @@ import { PageHero } from "@/components/page-hero";
 import { appearance } from "./portfolio-page-content.styles";
 import { PortfolioTable, type PortfolioTableCopy } from "@/features/portfolio/portfolio-table";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { portfolioHoldings, portfolioIncome, portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";

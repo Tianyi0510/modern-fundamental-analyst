@@ -4,7 +4,7 @@ import { PageHero } from "@/components/page-hero";
 import { appearance } from "./performance-page-content.styles";
 import { PerformanceChart } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";

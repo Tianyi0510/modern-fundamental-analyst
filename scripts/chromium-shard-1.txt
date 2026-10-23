@@ -17,7 +17,7 @@ components/intent-link.spec.ts
 components/local-preview.spec.ts
 components/navigation-recovery.spec.ts
 components/site-footer.spec.ts
-components/site-header.spec.ts
+components/site-header/site-header.spec.ts
 components/theme.spec.ts
 components/touch-press-feedback.spec.ts
 components/ui/input.spec.ts

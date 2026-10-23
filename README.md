@@ -70,16 +70,17 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 
 ## Project Layout
 
-| Directory         | Purpose                                                                                |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `src/app/`        | Routes, localized page composition in `_components`, metadata, and global CSS          |
-| `src/features/`   | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls |
-| `src/components/` | Shared navigation, footer, disclosure, form primitives, and email layout               |
-| `scripts/`        | Node loader, test helpers, WebKit runner, and production deployment gate               |
-| `src/lib/`        | Shared formatting, localization, request utilities, and service clients                |
-| `public/`         | Public icons, logos, and the social sharing image                                      |
-| `.github/`        | GitHub Actions workflows                                                               |
-| `docs/`           | Design system, architecture, integrations and historical release preparation           |
+| Directory                     | Purpose                                                                                |
+| ----------------------------- | -------------------------------------------------------------------------------------- |
+| `src/app/`                    | Routes, localized page composition in `_components`, metadata, and global CSS          |
+| `src/components/site-header/` | Header implementation, owned hooks, styles and browser tests.                          |
+| `src/features/`               | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls |
+| `src/components/`             | Shared navigation, footer, disclosure, form primitives, and email layout               |
+| `scripts/`                    | Node loader, test helpers, WebKit runner, and production deployment gate               |
+| `src/lib/`                    | Shared formatting, localization, request utilities, and service clients                |
+| `public/`                     | Public icons, logos, and the social sharing image                                      |
+| `.github/`                    | GitHub Actions workflows                                                               |
+| `docs/`                       | Design system, architecture, integrations and historical release preparation           |
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
@@ -99,9 +100,9 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
 | [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
-| [Release 1.0.0](docs/RELEASE_1.0.0.md)                               | Features, improvements, fixes and known limitations for version 1.0.0.                                      |
+| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | Features and known limitations of the first stable release.                                                 |
 
-The root [Design QA](design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
+[Design QA](docs/history/design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
 
 See [AI Agents](AGENTS.md#ai-agents) for ChatGPT, OpenAI developer and repository-instruction reference responsibilities. These references concern development workflows, not website AI features.
 

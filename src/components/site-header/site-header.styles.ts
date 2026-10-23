@@ -1,4 +1,4 @@
-import { containerAppearance } from "./container";
+import { containerAppearance } from "../container";
 import motion from "./site-header.module.css";
 
 const controlText = "text-medium-label";

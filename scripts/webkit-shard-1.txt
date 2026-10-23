@@ -9,7 +9,7 @@ components/focus-contrast.spec.ts
 components/intent-link.spec.ts
 components/local-preview.spec.ts
 components/site-footer.spec.ts
-components/site-header.spec.ts
+components/site-header/site-header.spec.ts
 components/theme-tooltip.spec.ts
 components/ui/input.spec.ts
 features/contact/contact-flow.spec.ts
