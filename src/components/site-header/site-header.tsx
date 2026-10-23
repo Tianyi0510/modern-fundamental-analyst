@@ -1,12 +1,12 @@
 "use client";
 
-import { ThemeToggle } from "./theme-toggle";
-import { BrandLogo } from "./brand-logo";
+import { ThemeToggle } from "../theme-toggle";
+import { BrandLogo } from "../brand-logo";
 import { appearance } from "./site-header.styles";
 import { DesktopNavigation } from "./site-header-desktop";
 
 import Link from "next/link";
-import { IntentLink } from "./intent-link";
+import { IntentLink } from "../intent-link";
 import {
   BookOpen,
   ChartNoAxesCombined,
@@ -20,10 +20,10 @@ import {
   X,
 } from "lucide-react";
 import { useRef, type MouseEvent } from "react";
-import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./ui/collapsible";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "../ui/collapsible";
 import { useMobileMenu } from "./use-site-header";
 import { useMenuTouchFeedback } from "./use-menu-touch-feedback";
 import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n";

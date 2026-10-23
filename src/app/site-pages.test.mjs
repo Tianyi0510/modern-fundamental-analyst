@@ -5,7 +5,7 @@ import { read } from "../../scripts/repository-helpers.mjs";
 
 test("shared client navigation receives only the active locale copy from server components", async () => {
   const [header, navigationCopy, home, about, portfolio] = await Promise.all([
-    read("src/components/site-header.tsx"),
+    read("src/components/site-header/site-header.tsx"),
     read("src/lib/navigation-copy.ts"),
     read("src/app/_components/home-page-content.tsx"),
     read("src/app/_components/about-page-content.tsx"),

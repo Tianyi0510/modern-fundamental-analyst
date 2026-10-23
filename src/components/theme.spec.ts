@@ -442,3 +442,27 @@ for (const { prefix } of labels) {
     });
   }
 }
+
+test("mobile navigation and theme work without optional scheduling APIs @mobile", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    for (const name of ["scheduler", "requestIdleCallback", "cancelIdleCallback"]) {
+      Object.defineProperty(window, name, { configurable: true, value: undefined });
+    }
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.locator(".mobile-menu-button").click();
+  const menu = page.getByRole("dialog");
+  await expect(menu).toBeVisible();
+  await menu.locator("[data-theme-toggle]").click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await menu.getByRole("link", { name: "Contact", exact: true }).click();
+  await expect(page).toHaveURL(/\/contact$/);
+  await expect(menu).toBeHidden();
+  await expect(page.locator("main h1")).toBeVisible();
+  expect(errors).toEqual([]);
+});

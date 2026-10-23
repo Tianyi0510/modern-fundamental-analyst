@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n";
 
 const usdFormatters = new Map<number, Intl.NumberFormat>();
 const percentFormatters = new Map<number, Intl.NumberFormat>();
-const sharesFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+let sharesFormatter: Intl.NumberFormat | undefined;
 const MAX_CACHED_FRACTION_DIGITS = 4;
 
 function shouldCacheFormatter(fractionDigits: number) {
@@ -40,7 +40,10 @@ export function formatUsd(value: number, fractionDigits = 2) {
   return formatter.format(value);
 }
 
-export const formatShares = (value: number) => sharesFormatter.format(value);
+export function formatShares(value: number) {
+  sharesFormatter ??= new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+  return sharesFormatter.format(value);
+}
 
 export function formatDate(value: string, locale: Locale, compact = false) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new RangeError(`Invalid ISO date: ${value}`);

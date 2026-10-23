@@ -303,7 +303,7 @@ Article title, summary, notice, body and disclaimer share the centered 1120px co
 
 ### Memo article Typeset
 
-Investment Memo Article MDX body uses [shadcn/ui Typeset](https://ui.shadcn.com/docs/typeset). The owned CSS is vendored in `src/app/styles/typeset.css` from shadcn-ui/ui commit `d2fba50ee5b9113008b5bb908563527b7efd2f27`, with its MIT notice retained. `typeset-memo.css` supplies the site preset after the upstream components-layer rules. No package dependency or client runtime is added.
+Investment Memo Article MDX body uses [shadcn/ui Typeset](https://ui.shadcn.com/docs/typeset). The owned CSS is vendored in `src/components/ui/typeset.css` from shadcn-ui/ui commit `d2fba50ee5b9113008b5bb908563527b7efd2f27`, with its MIT notice retained. `src/features/memos/typeset-memo.css` imports the upstream components-layer rules before the site preset. The article component imports this stylesheet; unrelated routes do not load Typeset on a fresh visit. No package dependency or client runtime is added.
 
 | Element                              | Site treatment                                                            | Scope / spacing                                                              |
 | ------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |

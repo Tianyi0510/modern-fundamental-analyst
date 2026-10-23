@@ -17,7 +17,7 @@ async function restricted(file, specifier) {
 }
 
 test("shared modules cannot import features or application composition", async () => {
-  for (const file of ["src/components/site-header.tsx", "src/lib/format.ts"]) {
+  for (const file of ["src/components/site-header/site-header.tsx", "src/lib/format.ts"]) {
     for (const specifier of [
       "@/features/support/support-config",
       "../features/support/support-config",
@@ -56,7 +56,7 @@ test("dynamic imports enforce resolved module boundaries without blocking local 
     );
   }
   for (const file of [
-    "src/components/site-header.tsx",
+    "src/components/site-header/site-header.tsx",
     "src/lib/format.ts",
     "src/features/support/support-config.ts",
   ]) {
@@ -74,7 +74,7 @@ test("dynamic imports enforce resolved module boundaries without blocking local 
     assert.equal((await errors(file, "`./${moduleName}`")).length, 1);
   }
   assert.equal((await errors("src/features/support/support-config.ts", '"@/features/support/support-copy"')).length, 0);
-  assert.equal((await errors("src/components/site-header.tsx", '"../features/memos/memos"')).length, 1);
+  assert.equal((await errors("src/components/site-header/site-header.tsx", '"../../features/memos/memos"')).length, 1);
   assert.equal((await errors("src/features/support/server/catalog.ts", '"../../memos/memos"')).length, 1);
   assert.equal((await errors("src/features/support/server/catalog.ts", '"../support-config"')).length, 0);
   const appConfig = await eslint.calculateConfigForFile("src/app/_components/home-page.tsx");

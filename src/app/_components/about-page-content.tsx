@@ -5,7 +5,7 @@ import { PageHero } from "@/components/page-hero";
 import { appearance } from "./about-page-content.styles";
 import Link from "next/link";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 

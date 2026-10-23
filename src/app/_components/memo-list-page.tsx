@@ -2,7 +2,7 @@ import { PageHero } from "@/components/page-hero";
 import { appearance } from "./memo-list-page.styles";
 import { MemoIndex } from "@/features/memos/memo-index";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { getMemos } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";
 import { type Locale } from "@/lib/i18n";

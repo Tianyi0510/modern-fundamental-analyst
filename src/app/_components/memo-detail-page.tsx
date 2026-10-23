@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { MemoShare } from "@/features/memos/memo-share";
 import { MemoArticleContent } from "@/features/memos/memo-article-content";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { getMemoContent } from "@/features/memos/memo-content";
 import { getMemo } from "@/features/memos/memos";
 import { formatDate } from "@/lib/format";

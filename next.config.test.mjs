@@ -107,3 +107,17 @@ test("production bundlers accept CSS chunking and remove only SDK debug diagnost
     assert.deepEqual(config.define, { __SENTRY_DEBUG__: false });
   }
 });
+
+test("generated Next.js declarations are ignored while remaining included in TypeScript", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const root = import.meta.dirname;
+  const config = JSON.parse(await readFile(new URL("./tsconfig.json", import.meta.url), "utf8"));
+  assert.ok(config.include.includes("next-env.d.ts"));
+  const ignored = execFileSync("git", ["check-ignore", "--no-index", "next-env.d.ts"], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  assert.equal(ignored.trim(), "next-env.d.ts");
+  const manifest = JSON.parse(await readFile(new URL("./package.json", import.meta.url), "utf8"));
+  assert.equal(manifest.scripts.typecheck, "next typegen && tsc --noEmit");
+});

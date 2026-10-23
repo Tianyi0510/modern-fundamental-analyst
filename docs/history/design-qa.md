@@ -1,6 +1,6 @@
 # Design QA
 
-> Historical audit only. Superseded by [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md); its former presets are not current implementation requirements.
+> Historical audit only. Superseded by [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md); its former presets are not current implementation requirements.
 
 Date: 2026-10-17. Scope: implement the first selected typography direction as a visible composition redesign, using complete Geist presets with Jost and the existing brand colors, except for the preserved original Logo wordmark. Workspace verification only.
 
@@ -9,7 +9,7 @@ Date: 2026-10-17. Scope: implement the first selected typography direction as a 
 - Source: `/Users/davidli/.codex/generated_images/01a0cb57-f66e-7e51-ad28-50d8e9ab792e/exec-0e66ecd5-ae41-4795-ab8d-a27601f3242a.png` (1487 × 1058).
 - Implementation: `http://127.0.0.1:3000/`, final production build, closed navigation and no focused control.
 - In-app browser CSS viewport: 1488 × 1058. Screenshot transport: 1473 × 1047. The comparison copy is normalized to the source dimensions; it establishes composition, not pixel equivalence.
-- Current evidence directory: `../local/audit/typography-composition-2026-10-17/`.
+- Current evidence directory: `../../../local/audit/typography-composition-2026-10-17/`.
 - `source-and-implementation.png` places the source on the left and implementation on the right. Both were inspected together.
 - `home-desktop.png`, `home-en-mobile.png`, `home-zh-tw-mobile.png`, `home-zh-cn-mobile.png`, `article-zh-tw-mobile.png` and `contact-desktop.png` record the rendered result. Mobile viewport: 390 × 844.
 - [Geist Typography](https://vercel.com/geist/typography) supplies the complete metrics. Official reference captures remain in the preceding `geist-type-presets-2026-10-17` audit directory.
@@ -49,7 +49,7 @@ final result: passed
 
 The user requires the Logo style to remain unchanged. Restored its original responsive size, 1.2 line height, 700 weight and -0.05em tracking in the Header, drawer and Footer. This explicit brand exception supersedes the earlier wordmark preset mapping. Other typography and composition changes remain.
 
-Correction verification: 12 focused Chromium cases passed across all three languages, desktop, 801px and mobile widths, including Header/Footer metrics and the open drawer. A development preview capture, `../local/audit/typography-composition-2026-10-17/home-logo-restored.png`, confirms the restored wordmark. Earlier production screenshots precede this Logo correction. Affected ESLint, formatting and whitespace checks passed; no new production build was needed for this token-only correction.
+Correction verification: 12 focused Chromium cases passed across all three languages, desktop, 801px and mobile widths, including Header/Footer metrics and the open drawer. A development preview capture, `../../../local/audit/typography-composition-2026-10-17/home-logo-restored.png`, confirms the restored wordmark. Earlier production screenshots precede this Logo correction. Affected ESLint, formatting and whitespace checks passed; no new production build was needed for this token-only correction.
 
 ## SVG Logo Update
 
@@ -61,13 +61,13 @@ SVG verification: 20 focused browser cases passed across Chromium (13) and WebKi
 
 The user requested a black-background, white-letter Footer Logo, inset financial summaries within the Hero, and desktop/mobile alignment and spacing checks. This direction supersedes the earlier full-width KPI composition.
 
-1. Captured the existing desktop Home before changing the composition. Evidence: `../local/audit/hero-alignment-2026-10-17/before-home-desktop.png`.
+1. Captured the existing desktop Home before changing the composition. Evidence: `../../../local/audit/hero-alignment-2026-10-17/before-home-desktop.png`.
 2. Added a black background path to the inverse SVG while preserving its white glyph paths and blue period. The Footer Logo uses a 32px alignment box matching adjacent heading line boxes.
 3. Moved Home, Portfolio and Performance summaries inside their Hero containers. Title and summary edges now align; each Hero has 48px outer padding and a 48px introduction-to-summary gap. Removed Portfolio's fixed total grid height.
 4. Reduced the following About, Holdings and Performance-section top padding to 48px, avoiding stacked section-sized gaps. At 320px and 200% root text, Portfolio reduces cell inline padding to 4px to preserve complete single-line currency amounts.
 5. Compared `before-after-desktop.png` as one combined visual input. Inspected desktop Home, Portfolio, Performance, Footer, English mobile Home and Traditional Chinese mobile summary/Footer captures. Visual evidence confirms inset cards, retained brand colors, proportional Logo artwork and balanced section transitions. Screenshot transport dimensions can differ from CSS viewport dimensions; comparisons are compositional, not pixel-equivalence claims.
 
-Current evidence is in `../local/audit/hero-alignment-2026-10-17/`: `final-home-desktop.png`, `portfolio-desktop.png`, `performance-desktop.png`, `footer-desktop.png`, `home-mobile.png`, `final-home-zh-tw-mobile.png` and `footer-mobile.png`. The last spacing revision changes the following section padding; the final Chinese mobile capture shows that revision. Earlier desktop Hero captures still show the unchanged Hero layout.
+Current evidence is in `../../../local/audit/hero-alignment-2026-10-17/`: `final-home-desktop.png`, `portfolio-desktop.png`, `performance-desktop.png`, `footer-desktop.png`, `home-mobile.png`, `final-home-zh-tw-mobile.png` and `footer-mobile.png`. The last spacing revision changes the following section padding; the final Chinese mobile capture shows that revision. Earlier desktop Hero captures still show the unchanged Hero layout.
 
 Validation: 23 unique affected cases passed across Chromium (15) and WebKit (8), covering three-language summaries, 320/390/800/801/900/1440px where applicable, 200% root text, complete financial values, inset card geometry and shared Hero padding. Initial failures identified an obsolete desktop padding expectation and the narrow enlarged Portfolio currency wrap; both were corrected and rerun. The final nine summary cases additionally verify following-section padding. TypeScript, affected ESLint, Prettier and whitespace checks passed. No full suite, production build, CI run, live-provider mutation or deployment was performed.
 
@@ -75,7 +75,7 @@ final result: passed
 
 ## Portfolio Summary Simplification
 
-Removed the Net Cost Basis summary cell and its unused three-language labels. The remaining market value, total return and holdings cells form one desktop row and stack below 48rem of Hero-summary width. Cost-basis data, calculations and table columns remain. Current Holdings now uses the white primary surface. Twelve focused Chromium/WebKit cases passed, covering three-language semantics, white background, 320/390/801/900/1440px reflow, complete currency values and 200% root text. TypeScript, affected ESLint, formatting and whitespace checks passed. Desktop and mobile captures `portfolio-three-cells-desktop.png` and `portfolio-three-cells-mobile.png` in `../local/audit/hero-alignment-2026-10-17/` were visually inspected. No commit or deployment was made.
+Removed the Net Cost Basis summary cell and its unused three-language labels. The remaining market value, total return and holdings cells form one desktop row and stack below 48rem of Hero-summary width. Cost-basis data, calculations and table columns remain. Current Holdings now uses the white primary surface. Twelve focused Chromium/WebKit cases passed, covering three-language semantics, white background, 320/390/801/900/1440px reflow, complete currency values and 200% root text. TypeScript, affected ESLint, formatting and whitespace checks passed. Desktop and mobile captures `portfolio-three-cells-desktop.png` and `portfolio-three-cells-mobile.png` in `../../../local/audit/hero-alignment-2026-10-17/` were visually inspected. No commit or deployment was made.
 
 ## General Page Transition Spacing
 
@@ -83,7 +83,7 @@ General Hero bottom padding and the first content section top padding now each e
 
 An initial 900px/200% English About check exposed overflowing two-column content. About content and closing layouts now stack below 56rem of page-container width, preserving complete typography presets. Thirteen unique focused Chromium/WebKit cases passed after repair: nine three-language transition/reflow cases, three existing Hero-padding cases and the Footer/legal-inset case. Coverage includes 320/390/900/1440px and 200% root text. TypeScript, affected ESLint, Prettier and whitespace checks passed. No full suite, production build or deployment was performed.
 
-Visual evidence: `../local/audit/section-spacing-2026-10-17/after-contact-desktop.png`, `after-contact-mobile.png` and `after-home-about-mobile.png`. `contact-mobile-comparison.png` was inspected with the old capture on the left and new capture on the right at the same viewport and scroll step; it confirms the narrower transition while retaining typography, brand colors and forms. No remaining actionable layout issue was found within this change.
+Visual evidence: `../../../local/audit/section-spacing-2026-10-17/after-contact-desktop.png`, `after-contact-mobile.png` and `after-home-about-mobile.png`. `contact-mobile-comparison.png` was inspected with the old capture on the left and new capture on the right at the same viewport and scroll step; it confirms the narrower transition while retaining typography, brand colors and forms. No remaining actionable layout issue was found within this change.
 
 final result: passed
 
@@ -93,7 +93,7 @@ All shared page heroes, the Disclaimer Hero and the memo article header now use 
 
 The Footer Subscribe button uses black text through a scoped inverse-action token override, including hover and keyboard focus. Other inverse buttons retain their existing color contract.
 
-Validation: 12 focused Chromium/WebKit cases passed across three languages, desktop/mobile and the existing 200% root-text reflow checks. TypeScript, affected ESLint, Prettier and whitespace checks passed. Inspected screenshots: `../local/audit/section-spacing-2026-10-17/hero-symmetric-desktop.png`, `hero-symmetric-mobile.png` and `footer-black-subscribe.png`. No full suite, production build, commit or deployment was performed.
+Validation: 12 focused Chromium/WebKit cases passed across three languages, desktop/mobile and the existing 200% root-text reflow checks. TypeScript, affected ESLint, Prettier and whitespace checks passed. Inspected screenshots: `../../../local/audit/section-spacing-2026-10-17/hero-symmetric-desktop.png`, `hero-symmetric-mobile.png` and `footer-black-subscribe.png`. No full suite, production build, commit or deployment was performed.
 
 final result: passed
 
@@ -101,6 +101,6 @@ final result: passed
 
 About's first section, Performance charts, the memo index, Contact Subscribe, Support, Disclaimer and Preferences now use 48px top and bottom padding. This supersedes the larger bottom padding in earlier captures. Later About sections, Contact's message form, Methodology and Footer retain their existing spacing. Form status-message reserve space remains inside each form.
 
-Validation: a regression check first reproduced About's 96px bottom padding. After correction, all nine focused Chromium/WebKit cases passed across three languages, 320/390/900/1440px and the existing 200% text checks. Assertions also preserve subsequent section spacing and the 26.4px form status reserve. TypeScript, affected ESLint, Prettier and whitespace checks passed. Three-language desktop/mobile Subscribe captures were inspected in `../local/audit/first-section-balanced-2026-10-17/`. No full suite or deployment was performed.
+Validation: a regression check first reproduced About's 96px bottom padding. After correction, all nine focused Chromium/WebKit cases passed across three languages, 320/390/900/1440px and the existing 200% text checks. Assertions also preserve subsequent section spacing and the 26.4px form status reserve. TypeScript, affected ESLint, Prettier and whitespace checks passed. Three-language desktop/mobile Subscribe captures were inspected in `../../../local/audit/first-section-balanced-2026-10-17/`. No full suite or deployment was performed.
 
 final result: passed

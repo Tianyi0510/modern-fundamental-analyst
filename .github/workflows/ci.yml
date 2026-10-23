@@ -85,7 +85,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Verify Chromium
-        run: npm run test:computed-style:production -- --fully-parallel --shard=${{ matrix.shard }}/2
+        run: npm run test:computed-style:production -- --fully-parallel ${{ matrix.shard == 1 && '--test-list' || '--test-list-invert' }}=scripts/chromium-shard-1.txt
 
       - name: Upload per-test timing report
         if: always()

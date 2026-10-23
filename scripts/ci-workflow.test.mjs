@@ -26,3 +26,13 @@ test("only the evidence planner receives Actions API permission", () => {
   }
   assert.equal(workflow.jobs.plan.steps.find((step) => step.id === "plan").env.GH_TOKEN, "${{ github.token }}");
 });
+
+test("Chromium CI uses complementary timing-based file lists without changing parallel mode", () => {
+  const job = Object.values(workflow.jobs).find((job) => job.name === "chromium-shard-${{ matrix.shard }}");
+  assert.deepEqual(job.strategy.matrix.shard, [1, 2]);
+  assert.equal(job.strategy["fail-fast"], false);
+  assert.equal(
+    job.steps.find((step) => step.name === "Verify Chromium").run,
+    "npm run test:computed-style:production -- --fully-parallel ${{ matrix.shard == 1 && '--test-list' || '--test-list-invert' }}=scripts/chromium-shard-1.txt",
+  );
+});

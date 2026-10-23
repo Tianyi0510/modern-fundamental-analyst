@@ -1,11 +1,12 @@
 {
   "version": 1,
   "skills": {
-    "next-best-practices": {
-      "source": "vercel-labs/openreview",
+    "next-dev-loop": {
+      "source": "vercel/next.js",
+      "ref": "ba182aa1a68185844738ed60529cdf6ff6aac683",
       "sourceType": "github",
-      "skillPath": ".agents/skills/next-best-practices/SKILL.md",
-      "computedHash": "176b3c13c47e5237ae646d685aa0f064a370eae129afa59de2f5047e738b7052"
+      "skillPath": "skills/next-dev-loop/SKILL.md",
+      "computedHash": "c305c83b726212e0284930c65cded2c4a4ab85f9bfccfa83b62274247fe3580e"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",

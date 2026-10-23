@@ -4,7 +4,7 @@ import { PortfolioPageContent } from "./portfolio-page-content";
 import { portfolioHoldings, portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatUsd, formatPercent } from "@/lib/format";
 
-vi.mock("@/components/site-header", () => ({ SiteHeader: () => null }));
+vi.mock("@/components/site-header/site-header", () => ({ SiteHeader: () => null }));
 vi.mock("./page-footer", () => ({ PageFooter: () => null }));
 
 it.each([

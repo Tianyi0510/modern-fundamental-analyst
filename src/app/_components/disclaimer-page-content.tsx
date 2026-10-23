@@ -1,6 +1,6 @@
 import { appearance } from "./disclaimer-page-content.styles";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import type { Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 

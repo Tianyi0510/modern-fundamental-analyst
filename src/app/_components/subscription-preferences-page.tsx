@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { ServiceLoading } from "@/components/service-loading";
 import { SavedPreferences } from "@/features/subscriptions/saved-preferences";
 import { PageFooter } from "@/app/_components/page-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import type { PreferencesCopy } from "@/features/subscriptions/subscription-preferences-form";
 import {
   SubscriptionPreferencesRequestForm,

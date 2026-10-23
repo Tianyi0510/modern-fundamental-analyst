@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
@@ -34,16 +35,37 @@ for (const project of ["chromium", "webkit"]) {
   test(`${project} shards cover the full discovered suite exactly once`, () => {
     const all = inventory(project);
     const shards = [1, 2].map((shard) =>
-      inventory(
-        project,
-        project === "chromium"
-          ? ["--fully-parallel", `--shard=${shard}/2`]
-          : [`${shard === 1 ? "--test-list" : "--test-list-invert"}=scripts/webkit-shard-1.txt`],
-      ),
+      inventory(project, [
+        ...(project === "chromium" ? ["--fully-parallel"] : []),
+        `${shard === 1 ? "--test-list" : "--test-list-invert"}=scripts/${project}-shard-1.txt`,
+      ]),
     );
     for (const shard of shards) assert.ok(shard.length > 0);
     const combined = shards.flat().sort();
     assert.equal(new Set(combined).size, combined.length, "shards must not overlap");
     assert.deepEqual(combined, all, "shards must not omit any discovered tests");
+  });
+}
+
+const timingBaseline = JSON.parse(readFileSync(new URL("./browser-shard-timings.json", import.meta.url), "utf8"));
+
+for (const project of ["chromium", "webkit"]) {
+  test(`${project} file allocation balances the recorded CI workload`, () => {
+    const selected = readFileSync(new URL(`./${project}-shard-1.txt`, import.meta.url), "utf8")
+      .trim()
+      .split("\n");
+    assert.equal(new Set(selected).size, selected.length, "list must not duplicate files");
+    const timings = timingBaseline.projects[project];
+    for (const file of selected) {
+      assert.ok(existsSync(`${root}src/${file}`), `stale shard entry: ${file}`);
+      assert.ok(Object.hasOwn(timings, file), `missing timing evidence: ${file}`);
+    }
+    const loads = [0, 0];
+    for (const [file, duration] of Object.entries(timings)) {
+      assert.ok(Number.isFinite(duration) && duration >= 0);
+      loads[selected.includes(file) ? 0 : 1] += duration;
+    }
+    assert.ok(Math.min(...loads) > 0);
+    assert.ok(Math.max(...loads) / Math.min(...loads) < 1.01, `unbalanced historical workload: ${loads}`);
   });
 }

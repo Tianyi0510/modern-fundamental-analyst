@@ -6,6 +6,7 @@ import { performanceRoutes, evaluateReports } from "./performance-budgets.mjs";
 import { launch } from "chrome-launcher";
 import { chromium } from "@playwright/test";
 import { calibrateCpuWithRetry, validateCpuCalibration } from "./performance-cpu.mjs";
+import { performanceEnvironment } from "./performance-environment.mjs";
 
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -60,6 +61,7 @@ process.once("SIGTERM", () => {
 try {
   await rm(output, { recursive: true, force: true });
   await mkdir(output, { recursive: true });
+  await writeFile(new URL("environment.json", output), JSON.stringify(performanceEnvironment(), null, 2) + "\n");
   let ready = false;
   for (let attempt = 0; attempt < 100; attempt++) {
     if (serverError || server.exitCode !== null || server.signalCode)

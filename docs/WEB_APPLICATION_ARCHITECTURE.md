@@ -26,6 +26,8 @@ Use the categories below within their assigned responsibilities. Official docume
 | [MDN Web Docs](https://developer.mozilla.org/)                                 | HTML, CSS, JavaScript, browser APIs and compatibility.                                          |
 | [web.dev](https://web.dev/)                                                    | Web performance, Core Web Vitals, accessibility and browser-facing implementation guidance.     |
 
+[Baseline](https://web.dev/baseline) governs web-feature compatibility evidence. [Lighthouse](https://developer.chrome.com/docs/lighthouse) governs automated page-quality diagnostics. Neither replaces normative standards, browser behavior tests or field measurements.
+
 MDN and web.dev explain web-platform practice; normative web standards take precedence. Check APIs against the installed framework version. Use the bundled Next.js documentation when available. A general React example does not override a Next.js routing contract.
 
 #### Best Practices
@@ -39,7 +41,7 @@ MDN and web.dev explain web-platform practice; normative web standards take prec
 | [vercel-labs](https://www.skills.sh/vercel-labs)                                                                          | Task-specific React/Next.js optimization, composition, interface review and writing guidance.              |
 | [Build Web Apps](https://www.codex-marketplace.com/plugins/build-web-apps)                                                | Applicable frontend implementation, testing, debugging and component workflows.                            |
 
-The selected vercel-labs skills are `vercel-react-best-practices`, `vercel-composition-patterns`, `web-design-guidelines`, `writing-guidelines` and `next-best-practices`. Their installed paths and provenance are recorded under [Installed Agent Skills](#installed-agent-skills). A directory listing is not an instruction to install every skill. The linked Build Web Apps marketplace is a third-party catalog; use the installed plugin's actual skill instructions to determine capabilities and execution requirements.
+The selected vercel-labs skills are `vercel-react-best-practices`, `vercel-composition-patterns`, `web-design-guidelines` and `writing-guidelines`. Their installed paths and provenance are recorded under [Installed Agent Skills](#installed-agent-skills). A directory listing is not an instruction to install every skill. The linked Build Web Apps marketplace is a third-party catalog; use the installed plugin's actual skill instructions to determine capabilities and execution requirements.
 
 Apply each skill only to its stated task and framework context. Examples and defaults are conditional guidance, not universal requirements. These references do not redefine the visual system or override official API behavior. Agent execution rules remain in [AGENTS.md](../AGENTS.md).
 
@@ -190,6 +192,14 @@ Track unexpected production errors with sufficient context and readable source m
 
 Source: [Bulletproof React error handling](https://github.com/alan2207/bulletproof-react/blob/master/docs/error-handling.md).
 
+### Browser Compatibility Principles
+
+Prefer Baseline Widely available features for essential browser behavior. This is a project selection policy, not a claim that every dependency uses only those features. Baseline Newly available means support across its core browsers; Widely available follows 30 months later. Limited availability requires checking the actual target browsers.
+
+For a feature outside the preferred tier, identify its owner, browser requirements and failure behavior. Use progressive enhancement when unsupported browsers retain usable content and controls. Add a fallback or polyfill only when essential behavior needs it; measure its cost. A server-only API is constrained by the Node.js runtime, not browser Baseline status. Check framework and dependency browser minimums separately.
+
+Baseline covers Chrome, Edge, Firefox and Safari, including the documented mobile variants. The project's Chromium and WebKit tests cover two engines; they do not establish Firefox support or compatibility with every historical browser. A feature inventory or a successful Chromium trace is not a complete compatibility certification.
+
 ### Testing and Performance Principles
 
 Prioritize integration tests for feature behavior, focused unit tests for isolated logic and end-to-end tests for critical journeys. Assert observable outcomes rather than internal state or implementation names. Prefer network interception to replacing fetch so request behavior remains under test.
@@ -197,6 +207,8 @@ Prioritize integration tests for feature behavior, focused unit tests for isolat
 Optimize state placement and composition before adding memoization. Use memoization for expensive calculations or reference stability that affects consumers. Split code at useful route or feature boundaries; excessive fragmentation can increase request overhead.
 
 Use styling compatible with the rendering environment. Build-time CSS avoids runtime style generation; dynamic values can use CSS custom properties. Measure assets, rendering and user-facing performance before claiming an improvement.
+
+Follow [web.dev performance guidance](https://web.dev/performance): identify the affected user experience, measure it, reproduce the bottleneck, change one cause and verify the result. Keep necessary render-blocking styles; defer only resources unrelated to the initial view. Separate transfer bytes, decoded asset bytes, laboratory timings and field Core Web Vitals. Do not infer responsiveness from asset size or a Lighthouse score.
 
 Sources: [Bulletproof React testing](https://github.com/alan2207/bulletproof-react/blob/master/docs/testing.md), [performance](https://github.com/alan2207/bulletproof-react/blob/master/docs/performance.md), [Josh W. Comeau on memoization](https://www.joshwcomeau.com/react/usememo-and-usecallback/) and [CSS in Server Components](https://www.joshwcomeau.com/react/css-in-rsc/).
 
@@ -327,17 +339,25 @@ These are explicit compatibility constraints, not a claim that every package use
 
 Use project skills as supporting guidance within the reference priorities above:
 
-| Skill                                                                                 | Scope                                                                                     |
-| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [next-best-practices](../.agents/skills/next-best-practices/SKILL.md)                 | Next.js routes, Server Component boundaries, data access, metadata, assets and hydration. |
-| [vercel-react-best-practices](../.agents/skills/vercel-react-best-practices/SKILL.md) | React and Next.js performance.                                                            |
-| [vercel-composition-patterns](../.agents/skills/vercel-composition-patterns/SKILL.md) | Component composition and reusable interfaces.                                            |
-| [web-design-guidelines](../.agents/skills/web-design-guidelines/SKILL.md)             | Web interface review.                                                                     |
-| [writing-guidelines](../.agents/skills/writing-guidelines/SKILL.md)                   | Clear technical writing.                                                                  |
+| Skill                                                                                 | Scope                                                                                  |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [next-dev-loop](../.agents/skills/next-dev-loop/SKILL.md)                             | Next.js development runtime verification through framework MCP and browser inspection. |
+| [vercel-react-best-practices](../.agents/skills/vercel-react-best-practices/SKILL.md) | React and Next.js performance.                                                         |
+| [vercel-composition-patterns](../.agents/skills/vercel-composition-patterns/SKILL.md) | Component composition and reusable interfaces.                                         |
+| [web-design-guidelines](../.agents/skills/web-design-guidelines/SKILL.md)             | Web interface review.                                                                  |
+| [writing-guidelines](../.agents/skills/writing-guidelines/SKILL.md)                   | Clear technical writing.                                                               |
 
-`next-best-practices` was installed from [vercel-labs/openreview](https://github.com/vercel-labs/openreview/tree/672deb21e70e471e0536d5ad7a67c14b8359e97e/.agents/skills/next-best-practices) at commit `672deb21e70e471e0536d5ad7a67c14b8359e97e`. [skills-lock.json](../skills-lock.json) records its source and content hash. Check examples against the installed Next.js version and official documentation before applying them. Installing a skill does not establish architecture compliance.
+Next.js workflow skills come from the [official Next.js skills directory](https://github.com/vercel/next.js/tree/canary/skills). The legacy `next-best-practices` skill has been removed. General Next.js reference knowledge comes from the installed version's `node_modules/next/dist/docs/`; use matching official documentation if bundled docs are unavailable.
+
+`next-dev-loop` is installed from `vercel/next.js` at commit `ba182aa1a68185844738ed60529cdf6ff6aac683`. [skills-lock.json](../skills-lock.json) records its source, ref and content hash. It requires Next.js 16.3+, Turbopack, a running development server with the required `/_next/mcp` tools, and `agent-browser` 0.31.1 or later. Check these prerequisites before invoking it. Installing the skill does not install its CLI dependencies or verify runtime readiness.
+
+Cache Components and Partial Prefetching adoption/optimization skills are not installed. Add them only for an explicit task involving those features. Canary workflow guidance must be checked against the installed framework version; it does not authorize a framework upgrade or override official version-matched behavior. Installing a skill does not establish architecture compliance.
 
 ### Framework and Module Ownership
+
+The shared Header lives in `src/components/site-header/`, alongside its desktop navigation, private hooks, styles and Header-specific browser tests. Import `@/components/site-header/site-header` directly; no barrel file is used. Cross-page recovery tests and shared Logo, ThemeToggle, IntentLink and UI primitives remain outside this directory.
+
+`next-env.d.ts` is generated by Next.js and excluded from Git. Keep it in `tsconfig.json` includes; do not edit it manually. `npm run typecheck` runs `next typegen` before `tsc --noEmit`, so a fresh checkout does not depend on a prior development session or build.
 
 Use Next.js App Router and TypeScript for localized research pages and server-side reader services. Server-rendered content supports readable initial responses; client islands isolate interactions. This choice trades framework dependence for integrated routing, metadata and rendering.
 
@@ -376,7 +396,7 @@ A transport helper is not a resource cache. If client-managed remote reads are a
 
 Use server-compatible content components and explicit client boundaries for interactions. Pass server-rendered children through the shared theme provider. `ClientForm` disables JavaScript-dependent controls until handlers attach. Native Support submission remains available before hydration.
 
-Tailwind and CSS Modules supply build-time styles compatible with Server Components. The root imports `globals.css`; tokens serve utilities and owned styles. Use finite component variants for shared appearance and CSS Modules for complex motion. Dynamic geometry may use inline values. Reconsider styling tools only against rendering compatibility, maintainability and measured delivery costs.
+Tailwind and CSS Modules supply build-time styles compatible with Server Components. The root imports `globals.css`; tokens serve utilities and owned styles. Article-only Typeset CSS is imported by `MemoArticleContent`, with the shared stylesheet before the memo preset. Keep unrelated routes free of these styles on fresh visits and verify article styles across direct, client and history navigation. Use finite component variants for shared appearance and CSS Modules for complex motion. Dynamic geometry may use inline values. Reconsider styling tools only against rendering compatibility, maintainability and measured delivery costs.
 
 `next-themes` owns `data-theme` and the `mfa:theme:v1` preference. Explicit light/dark choices persist; system appearance is the initial default. The Design System owns colors, typography, layout, motion and component mappings. Do not duplicate its numeric specifications here.
 
@@ -428,7 +448,7 @@ ESLint checks types, hooks, imports and framework rules. Prettier owns formattin
 
 Scope Vitest rules to `*.test.ts` and `*.test.tsx`, Testing Library rules to component tests, and Playwright rules to `*.spec.ts`. Node tests retain JavaScript rules. Keep framework naming exceptions and justified suppressions narrow.
 
-Keep Prettier last in ESLint configuration. Import ordering is not a project requirement. EditorConfig supplies portable editor defaults; VS Code settings enable formatting and explicit lint fixes. The Tailwind formatter scans `globals.css` and recognized class expressions. Private style-map strings still need review.
+Keep Prettier last in ESLint configuration. Import ordering is not a project requirement. EditorConfig supplies portable editor defaults. Use the project ESLint and Prettier commands; no VS Code workspace settings or extension recommendations are maintained. The Tailwind formatter scans `globals.css` and recognized class expressions. Private style-map strings still need review.
 
 There is no CSS semantic linter. Browser checks and review must establish selector and property behavior; formatting cannot do so.
 
@@ -702,7 +722,7 @@ WebKit uses the iPhone 13 viewport, touch, scale and user agent. Tag only phone-
 - Subscription checks verify welcome payloads, preference links, malformed authenticated payload rejection and expiry at the deadline.
 - Portfolio checks verify per-share cost and sorting. `portfolio-page-content.integration.test.tsx` covers all locales, table accessibility, controls, holdings and reconciled totals. Node checks retain the Server/Client boundary.
 - `semantic-content.spec.ts` checks KPI semantics, colors, opacity and composited contrast using `scripts/color-contrast.ts`. Visual rules live in [Design System](DESIGN_SYSTEM.md#typography-roles).
-- Header cases live in `components/site-header.spec.ts`; cross-page layout and CTA cases live in `app/_components/page-layout.spec.ts`. Feature journeys stay with their feature.
+- Header cases live in `components/site-header/site-header.spec.ts`; cross-page layout and CTA cases live in `app/_components/page-layout.spec.ts`. Feature journeys stay with their feature.
 
 References: [Vitest projects](https://vitest.dev/guide/projects), [Testing Library setup](https://testing-library.com/docs/react-testing-library/setup/), [MSW Node integration](https://mswjs.io/guides/integrations/node).
 
@@ -721,7 +741,7 @@ After `plan`, full verification runs six jobs concurrently:
 | Jobs                                   | Runner and work                                                                                    |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `static`                               | Ubuntu: locked install, production dependency audit, types, ESLint, Prettier and Node/Vitest tests |
-| `chromium-shard-1`, `chromium-shard-2` | Ubuntu: production build and native Playwright shards with `--fully-parallel`                      |
+| `chromium-shard-1`, `chromium-shard-2` | Ubuntu: production build and timing-balanced file shards with `--fully-parallel`                   |
 | `performance`                          | Ubuntu: isolated production build, pinned Chromium and sequential Lighthouse budget samples        |
 | `webkit-shard-1`, `webkit-shard-2`     | macOS: production build and mobile WebKit shards                                                   |
 
@@ -745,6 +765,8 @@ Font instances belong to their locale layouts. `SiteDocument` receives the selec
 
 After a production build, `npm run test:performance` starts an isolated loopback server on port 3211 with provider credentials disabled. Lighthouse 13.5.0 collects three fresh mobile samples for Home in each language and English Performance. DevTools applies CPU throttling, 150 ms request latency, 1638.4 Kbps download and 750 Kbps upload directly. Do not compare these results directly with public HTTPS runs using simulated throttling.
 
+Shared formatting helpers must not create `Intl.NumberFormat` instances at module scope. Initialize each formatter on first use and cache it. A CPU profile in PR #92 identified unused share-formatter construction in the initial client module graph; importing date helpers must not initialize number formatting.
+
 ##### CPU Calibration
 
 Calibration and Lighthouse use the same Chrome Launcher version, flags and Playwright-installed Chrome for Testing executable. Each benchmark sample uses a new blank page and one evaluation. Reusing a warmed page or Playwright launch defaults creates a different measurement environment. Do not calibrate with Playwright's default headless shell.
@@ -763,17 +785,19 @@ Do not change the target, discard slow Lighthouse samples or rerun an audit with
 
 ##### Budgets and Evidence
 
-| Metric             | Limit                          | Aggregation |
-| ------------------ | ------------------------------ | ----------- |
-| LCP                | 3000 ms                        | Median      |
-| TBT                | 200 ms                         | Median      |
-| CLS                | 0.1                            | Median      |
-| Decoded JavaScript | 1200KiB                        | Maximum     |
-| Decoded CSS        | 160KiB English; 270KiB Chinese | Maximum     |
+| Metric             | Limit                                | Aggregation |
+| ------------------ | ------------------------------------ | ----------- |
+| LCP                | 3000 ms                              | Median      |
+| TBT                | 200 ms                               | Median      |
+| CLS                | 0.1                                  | Median      |
+| Decoded JavaScript | 1200KiB                              | Maximum     |
+| Decoded CSS        | 180KiB English; 285KiB TC; 275KiB SC | Maximum     |
 
 The TBT limit adopts Chrome's [mobile fast range of 0–200 ms](https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time), replacing the previous project-specific 400 ms ceiling. Exactly 200 ms passes; any excess fails. One good sample cannot hide two slow samples. Resource maxima catch even one accidental font-payload regression. Lighthouse scores are recorded but are not a gate.
 
 Budget tests cover the exact TBT boundary, median aggregation and incomplete evidence. CPU calibration allows three attempts before an audit, retaining each attempt's samples. Only host instability is retryable. Invalid samples, slow hosts, browser errors and evidence-write failures stop the run. Audit measurements, drift failures and budget failures are not retried.
+
+Each run writes `environment.json` before calibration: OS, architecture, CPU models/count, memory, Node, Lighthouse, Playwright, runner image and CI commit/run identity. Only allowlisted metadata is recorded; provider configuration is excluded. Compare application timings on the same host class and protocol. Lighthouse’s benchmark averages string allocation and array-copy throughput; equal benchmark indices do not make macOS ARM and Linux x64 equivalent for ICU initialization, module evaluation or DOM recording. Use CI for release acceptance, not a local substitute.
 
 The CPU target and 15% drift allowance remain fixed. Tests cover retries, failure boundaries and throttle cleanup; each performance run also checks the applied slowdown in Chrome. Compare reports only when CPU, browser, Lighthouse and network settings match. A local pass does not prove CI success.
 
@@ -781,17 +805,56 @@ The `performance` CI job builds with a fake Sentry DSN and Production sampling, 
 
 Field CWV still requires mobile/desktop p75 LCP, INP and CLS from Speed Insights or CrUX. A Lighthouse navigation run does not measure field INP; TBT is only a laboratory diagnostic. Query failures do not establish a pass or absence of field traffic. See [Google Web Vitals](https://web.dev/articles/vitals), [Chrome Lighthouse scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring), [Next.js CSS chunking](https://nextjs.org/docs/app/api-reference/config/next-config-js/cssChunking) and [font optimization](https://nextjs.org/docs/app/getting-started/fonts).
 
+#### Baseline and Lighthouse Review
+
+1. Record the route, deployment identity, workspace changes, Lighthouse and Chrome versions, viewport, throttling, cache state and blocked requests. Use a production build. Keep exploratory default Lighthouse runs separate from the calibrated CI budget protocol.
+2. Review performance, accessibility, best practices and SEO diagnostics. Trace each actionable result to the owning code and reproduce its user impact. An automated accessibility score does not establish WCAG conformance; manual keyboard and assistive-technology checks remain necessary.
+3. Inspect Lighthouse's informational `baseline` audit and its feature-data date. Trace collection covers only exercised behavior; no reported feature does not prove absence. Review newer or limited features against source, current compatibility data and dependency requirements. Verify fallback behavior instead of treating every newer feature as a defect.
+4. Repeat affected measurements under the same conditions before attributing an improvement to a fix. Preserve existing metric budgets, browser coverage, monitoring and security behavior. Do not remove compatibility code solely to silence a diagnostic or tune production headers for a higher score.
+5. Retain raw reports outside tracked source and add focused regression coverage for demonstrated failures. Record unresolved access, browser and route coverage. Follow the field review below before claiming real-user improvement.
+
+Run `npm run test:performance` for the existing calibrated CI-equivalent performance checks. For broader diagnosis, run the installed Lighthouse CLI against the selected URL with `--only-categories=performance,accessibility,best-practices,seo --output=json --output-path=<audit-file> --chrome-flags=--headless=new`, using the installed Playwright Chromium executable through `CHROME_PATH`. The output path must be in `../local/audit/`; replace placeholders with actual paths. Such an exploratory run does not replace the performance budget command.
+
+The current compatibility review distinguishes these uses:
+
+| Feature or diagnostic                                  | Owner and required behavior                                                                                                                                      |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text-wrap: pretty` / `balance`, font metric overrides | Editorial CSS and `next/font`. Unsupported enhancements must leave normally wrapped, readable text. Recheck layout and font shifts when changing fonts.          |
+| Optional scheduler / idle-callback APIs                | Framework and dependency scheduling. Navigation and theme changes must work when these APIs are absent; `theme.spec.ts` covers that path in Chromium and WebKit. |
+| Performance observer extensions                        | Monitoring dependencies. Unsupported entry types must be guarded and must not prevent application interaction; missing telemetry is not a measured zero.         |
+| Lighthouse-injected feature use                        | Audit instrumentation, including `_lighthouse-eval.js`. Do not attribute it to application requirements without source evidence.                                 |
+| Legacy JavaScript / unused JavaScript estimates        | Investigate framework polyfills, monitoring and interaction-only code. Initial-navigation coverage alone does not prove that code is removable.                  |
+
+These are review decisions, not blanket exemptions. Reassess them when dependencies, browser targets or affected behavior change. The installed Next.js guide lists Chrome/Edge/Firefox 111+ and Safari 16.4+ as framework minimums; those numbers do not certify all application dependencies or historical browser behavior.
+
+#### Field and Interaction Performance Review
+
+Use [web.dev's Core Web Vitals](https://web.dev/articles/vitals) targets for field assessment: p75 LCP at most 2500 ms, INP at most 200 ms and CLS at most 0.1, evaluated separately for mobile and desktop. The 3000 ms CI LCP budget is a laboratory regression limit, not the field target. All three field metrics must meet their targets before claiming a field pass.
+
+1. Record the production deployment SHA, workspace revision and uncommitted changes. Check Speed Insights or CrUX for the reporting period, device segment, route or origin scope, and available sample counts. A login barrier, API quota error or insufficient data leaves field status unverified.
+2. Use laboratory reports to investigate the affected routes. Hold browser, CPU/network settings, viewport and cache conditions constant for before/after comparisons. A remote deployment and localhost have different network and hosting costs; do not attribute their timing difference to a code change.
+3. Diagnose [slow interactions](https://web.dev/articles/optimize-inp) across Menu, theme switching, sorting, chart keyboard controls and form input. Record Event Timing interaction IDs, durations and input/processing delays. Group events by interaction ID using the longest duration. Browser event durations are quantized; an empty report below the observer threshold is not a measured zero. A short scripted session's maximum is diagnostic evidence, not field p75 INP.
+4. Keep live-provider writes mocked or intercepted. Document the resulting measurement limits, including blocked monitoring ingestion and disabled caches from request interception. Do not submit live forms or payments as part of a routine performance review.
+5. Retain only fixes supported by repeated measurements. Run affected behavior and rendering checks, preserve budgets, and update the evidence record. After an authorized deployment, compare field data over suitable periods; local improvement alone does not establish production improvement.
+
 #### Local Runs and Shard Maintenance
 
 Use affected checks locally. Full `npm run verify` and `npm run test:webkit` are for diagnosis or explicit requests. If Turbopack cannot bind a worker port locally, use `npm run build -- --webpack` and report it; CI retains Turbopack. Next.js selects the bundler before loading configuration: use graph CSS chunking for Turbopack and the supported default chunking for Webpack. The configuration regression test loads both modes through Next.js's configuration loader.
 
 The WebKit runner accepts `--shard=1` or `--shard=2`; otherwise it runs two sequential processes. Positional spec paths narrow coverage. It rejects `--grep` and `-g`, which would replace the mobile filter. Inspect coverage with `npx playwright test --project=webkit --list`.
 
-WebKit shard 1 selects `scripts/webkit-shard-1.txt`; shard 2 selects its inverse. Paths are relative to `src`. Both retain the `@mobile` filter. New files enter shard 2 automatically. `scripts/browser-shards.test.mjs` checks that every discovered test runs exactly once.
+Both browsers use complementary file lists: shard 1 selects `scripts/<browser>-shard-1.txt`; shard 2 selects its inverse. Paths are relative to `src`. Chromium retains `--fully-parallel`; WebKit retains the `@mobile` filter and its existing execution mode. New files enter shard 2 automatically. `scripts/browser-shards.test.mjs` checks the real Playwright inventory for complete, non-overlapping coverage and rejects stale or duplicate list entries.
 
-The allocation uses [CI run 39481047586](https://github.com/Tianyi0510/modern-fundamental-analyst/actions/runs/39481047586), whose WebKit test steps took 372/690 seconds. Assigning the longest files first to the lighter shard estimates 517.2/517.9 seconds of test work, including retries. This excludes setup and inter-test overhead; confirm the improvement in CI. Keep slow Header and Typography files in separate groups.
+The allocation uses per-test JSON reports from [CI run 39871615680](https://github.com/Tianyi0510/modern-fundamental-analyst/actions/runs/39871615680). `scripts/browser-shard-timings.json` records the source run and summed result durations in milliseconds per file, including retries. Paths follow the current checkout; file moves preserve the recorded historical durations. Chromium timings from both former shards are combined before allocation. For each browser, sort files by descending duration, break ties by path, and assign each file to the lighter group (group 1 on a tie). Sort the resulting group 1 paths before saving the list.
 
-Each shard uploads per-test JSON timing reports for 14 days and separate failure/retry evidence for seven days. Compare test-step and total-job times: extra builds and installs can offset parallelism gains and increase usage. Rebalance the WebKit file list when workload changes.
+| Browser  | Previous test work, seconds | Reallocated test work, seconds |
+| -------- | --------------------------- | ------------------------------ |
+| Chromium | 573.0 / 336.0               | 454.2 / 454.8                  |
+| WebKit   | 345.3 / 491.7               | 418.2 / 418.9                  |
+
+These are historical workload estimates, not measured durations of the new CI allocation. They exclude setup and inter-test overhead. Confirm wall-clock improvement on the next full CI run. Preserve all test cases, retries, workers, timeouts and performance budgets.
+
+Each shard uploads per-test JSON timing reports for 14 days and separate failure/retry evidence for seven days. To rebalance, download all four `browser-timings-*` artifacts from one successful full CI run, aggregate each browser's durations by file, update the timing snapshot and both file lists, and run the shard coverage and workflow tests. Compare test-step and total-job times; additional builds and installs affect elapsed time and runner usage.
 
 #### Reliable Browser Checks
 
@@ -846,6 +909,8 @@ The macOS job allows 20 minutes. The remaining wait covers ordinary queueing and
 - Preserve the gate in `vercel.json`'s build command. Keep it out of `npm run build`, since CI must not wait on itself.
 
 ### Review Evidence
+
+Keep tracked historical narratives in `docs/history/`, with dates and links to the current specification. Keep bulky or machine-local evidence outside the checkout.
 
 Keep local screenshots and dated notes in `../local/audit/`. Legacy `audit/` remains excluded by Git and Vercel. Archive inactive caches or builds under `../local/archives/`; tools recreate their normal output paths.
 

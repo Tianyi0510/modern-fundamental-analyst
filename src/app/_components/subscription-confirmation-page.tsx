@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader } from "@/components/site-header/site-header";
 import { PageHero } from "@/components/page-hero";
 import { Container } from "@/components/container";
 import { PageFooter } from "./page-footer";
