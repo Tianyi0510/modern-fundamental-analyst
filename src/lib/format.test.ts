@@ -1,5 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { formatDate } from "./format";
+
+it("creates the share formatter only when shares are formatted and reuses it", async () => {
+  vi.resetModules();
+  const constructor = vi.spyOn(Intl, "NumberFormat");
+  try {
+    const format = await import("./format");
+    expect(format.formatDate("2026-09-30", "en", true)).toBe("30 Sep 2026");
+    expect(constructor).not.toHaveBeenCalled();
+    expect(format.formatShares(1234.567)).toBe("1,234.57");
+    expect(format.formatShares(0)).toBe("0");
+    expect(constructor).toHaveBeenCalledExactlyOnceWith("en-US", { maximumFractionDigits: 2 });
+  } finally {
+    constructor.mockRestore();
+  }
+});
 
 describe("formatDate", () => {
   it("uses the same September spelling for server and browser rendering", () => {

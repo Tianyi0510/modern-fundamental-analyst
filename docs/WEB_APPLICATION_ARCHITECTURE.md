@@ -765,6 +765,8 @@ Font instances belong to their locale layouts. `SiteDocument` receives the selec
 
 After a production build, `npm run test:performance` starts an isolated loopback server on port 3211 with provider credentials disabled. Lighthouse 13.5.0 collects three fresh mobile samples for Home in each language and English Performance. DevTools applies CPU throttling, 150 ms request latency, 1638.4 Kbps download and 750 Kbps upload directly. Do not compare these results directly with public HTTPS runs using simulated throttling.
 
+Shared formatting helpers must not create `Intl.NumberFormat` instances at module scope. Initialize each formatter on first use and cache it. A CPU profile in PR #92 identified unused share-formatter construction in the initial client module graph; importing date helpers must not initialize number formatting.
+
 ##### CPU Calibration
 
 Calibration and Lighthouse use the same Chrome Launcher version, flags and Playwright-installed Chrome for Testing executable. Each benchmark sample uses a new blank page and one evaluation. Reusing a warmed page or Playwright launch defaults creates a different measurement environment. Do not calibrate with Playwright's default headless shell.
@@ -794,6 +796,8 @@ Do not change the target, discard slow Lighthouse samples or rerun an audit with
 The TBT limit adopts Chrome's [mobile fast range of 0–200 ms](https://developer.chrome.com/docs/lighthouse/performance/lighthouse-total-blocking-time), replacing the previous project-specific 400 ms ceiling. Exactly 200 ms passes; any excess fails. One good sample cannot hide two slow samples. Resource maxima catch even one accidental font-payload regression. Lighthouse scores are recorded but are not a gate.
 
 Budget tests cover the exact TBT boundary, median aggregation and incomplete evidence. CPU calibration allows three attempts before an audit, retaining each attempt's samples. Only host instability is retryable. Invalid samples, slow hosts, browser errors and evidence-write failures stop the run. Audit measurements, drift failures and budget failures are not retried.
+
+Each run writes `environment.json` before calibration: OS, architecture, CPU models/count, memory, Node, Lighthouse, Playwright, runner image and CI commit/run identity. Only allowlisted metadata is recorded; provider configuration is excluded. Compare application timings on the same host class and protocol. Lighthouse’s benchmark averages string allocation and array-copy throughput; equal benchmark indices do not make macOS ARM and Linux x64 equivalent for ICU initialization, module evaluation or DOM recording. Use CI for release acceptance, not a local substitute.
 
 The CPU target and 15% drift allowance remain fixed. Tests cover retries, failure boundaries and throttle cleanup; each performance run also checks the applied slowdown in Chrome. Compare reports only when CPU, browser, Lighthouse and network settings match. A local pass does not prove CI success.
 
