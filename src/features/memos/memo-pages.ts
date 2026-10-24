@@ -20,6 +20,7 @@ export function createMemoStructuredData(slug: string, locale: Locale) {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: memo.title,
+    articleSection: memo.category.label,
     description: memo.summary,
     datePublished: memo.publishedAt,
     inLanguage: localeConfig[getMemoContent(slug, locale)?.language ?? locale].hrefLang,

@@ -56,6 +56,7 @@ test("article metadata and structured data agree with the localized catalog", as
     assert.equal(metadata.openGraph.publishedTime, memo.publishedAt);
     assert.equal(metadata.alternates.canonical, getLocalizedPath(`/memos/${slug}`, locale));
     assert.equal(article.headline, memo.title);
+    assert.equal(article.articleSection, memo.category.label);
     assert.equal(article.description, memo.summary);
     assert.equal(article.datePublished, memo.publishedAt);
     assert.equal(article.inLanguage, "en");

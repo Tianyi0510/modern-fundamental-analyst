@@ -3,7 +3,7 @@ import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({
   title: "投資備忘錄",
-  description: "關於企業品質、估值、風險與資本配置的長篇研究。",
+  description: "關於微軟雲端與 AI 地位、領導層，以及 2024 財政年度財務品質的研究。",
   path: "/memos",
   locale: "zh-tw",
 });

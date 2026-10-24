@@ -28,9 +28,15 @@ Use these templates as implementation examples within the scopes below. They do 
 | [Simple Online Store with Stripe](https://vercel.com/templates/next.js/simple-online-store-with-stripe)      | Checkout and payment integration.                      | Refer to payment patterns for research support. The template does not establish a need for a catalog, cart or store.                |
 | [Upstash Redis and Next.js](https://vercel.com/templates/next.js/get-started-with-upstash-redis-and-next-js) | Connecting Redis to a Next.js application.             | Check patterns against the [Redis runtime](#redis-runtime); connection examples do not define coordination or recovery guarantees.  |
 
+## Content and Local Tool Boundaries
+
+The [README](../README.md#mission) defines the mission; [Architecture](WEB_APPLICATION_ARCHITECTURE.md#editorial-sources-and-publication-status) records editorial sources and publication status. Google Docs links are editorial references, not a configured runtime integration or automatic publishing feed. Article categories use the local memo catalog and do not require Redis, a CMS or another provider. Follow the [MDX publishing contract](WEB_APPLICATION_ARCHITECTURE.md#investment-memo-content).
+
+See [local maintenance tooling](WEB_APPLICATION_ARCHITECTURE.md#local-maintenance-tooling) for the Python cleanup helper. It is outside the deployed application and provider inventory.
+
 ## Operational boundaries
 
-Use [.env.example](../.env.example) for variable names. Store environment-scoped secrets in Vercel and local credentials in ignored `.env.local`. Never commit or print credentials. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) defines application boundaries; [Design System](DESIGN_SYSTEM.md) defines UI contracts. Published portfolio data stays in the workspace.
+Use [.env.example](../.env.example) for variable names. Store environment-scoped secrets in Vercel and local credentials in ignored `.env.local`. Never commit or print credentials. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) defines application boundaries; [Design System](DESIGN_SYSTEM.md) defines UI contracts. Published portfolio and article data are versioned in their feature directories; Redis is not their source.
 
 Routine tests mock provider I/O. Deployment does not authorize real emails, subscriber changes, payments or unrelated cloud changes. Preserve credentials and durable records through rollback windows. When a write's outcome is unknown, reconcile it before retrying or clearing records.
 
@@ -55,7 +61,7 @@ Follow the [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) 
 
 The upstream [vercel-optimize skill](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) requires Node.js 20+, Vercel CLI 53+ with `metrics`, `usage`, `contract` and `api`, an authenticated CLI session, a linked project and Observability Plus for route-level analysis. Scope every query to the verified project and owner. Recheck prerequisites before each run.
 
-Verified on October 21, 2026:
+Historical prerequisite check, October 21, 2026; recheck before use:
 
 | Requirement                | Observation                                                                                                                                      |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -620,12 +626,14 @@ Verify cloud traces in Traces. After an actual service failure, look for `Servic
 
 When investigating missing spans, inspect project ingestion outcomes for the affected deployment window. Sampling drops are expected at the configured rate; distinguish them from network and timestamp failures. Rejected spans cannot be attributed to a release from accepted-event searches alone. Do not change timestamps, sampling or privacy filters without a reproducible cause.
 
+### Uptime monitoring
+
 Uptime monitoring is separate from the SDK. Use one anonymous GET monitor for the production site, verify its URL returns 2xx, and connect outage notifications before treating reachability as monitored. Check existing monitors and the account's included allowance before creating one; an Error Monitor or active trace stream does not establish uptime coverage.
 
 On October 16, 2026, [production monitor 10662057](https://modern-fundamental-analyst.sentry.io/monitors/10662057/) was created for `GET https://www.modernfundamentalanalyst.com/` in `production`: a 60-second interval, 5-second timeout, 2xx response assertion, three failures to open an issue and one success to resolve it. The manual test passed. Existing project alerts appear on its detail page; notification delivery has not been tested.
 
 On October 22, 2026, activation was retried and Sentry again returned `You don't have enough budget available to create a new seat`. Billing showed the Developer plan, Uptime usage `0 / 1` and `$0.00` additional spend. The monitor remained disabled, with no recent scheduled checks. No trial, upgrade or spending increase was enabled. This is an unresolved provider entitlement discrepancy, not an application deployment failure.
 
-Ask Sentry Support to reconcile the included Uptime allowance for monitor `10662057`. Provide the organization, monitor ID, observation date and the error above through an authorized support request; exclude credentials and subscriber data. Do not delete and recreate the monitor or raise spending to bypass the error. After Sentry corrects the entitlement, enable the existing monitor, verify scheduled 2xx check-ins, and verify that the connected notification rules cover downtime and recovery. Notification delivery remains untested. A successful manual check alone does not establish scheduled coverage.
+The owner authorized retaining a support draft only; no support request was sent. Obtain authorization before contacting Sentry Support to reconcile the included Uptime allowance for monitor `10662057`. Provide the organization, monitor ID, observation date and the error above through an authorized support request; exclude credentials and subscriber data. Do not delete and recreate the monitor or raise spending to bypass the error. After Sentry corrects the entitlement, enable the existing monitor, verify scheduled 2xx check-ins, and verify that the connected notification rules cover downtime and recovery. Notification delivery remains untested. A successful manual check alone does not establish scheduled coverage.
 
 References: [Next.js tracing](https://docs.sentry.io/platforms/javascript/guides/nextjs/tracing/), [Logs](https://docs.sentry.io/platforms/javascript/guides/nextjs/logs/), [Metrics](https://docs.sentry.io/platforms/javascript/guides/nextjs/metrics/), and [data collection](https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#dataCollection).

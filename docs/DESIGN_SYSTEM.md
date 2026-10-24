@@ -2,6 +2,15 @@
 
 Use this guide for visual design, component behavior, interface copy and localization. Preserve Jost, brand assets and intentional language variants. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) covers code conventions, rendering, style loading and tooling. [README](../README.md#documentation) maps the documents.
 
+## Navigation
+
+- [Reference ownership](#architecture-and-reference-ownership): priorities and responsibilities.
+- [Typography](#typography-roles), [colors](#color-inventory) and [components](#available-shadcn-components): approved implementation inventories.
+- [Layout](#swiss-grid-and-editorial-layout) and [tablet rules](#tablet-layout-contract): responsive composition.
+- [Interaction and motion](#interaction-motion-and-accessibility): behavior, focus and animation ownership.
+- [Content and localization](#content-and-localization): copy, capitalization and translation.
+- [Verification](#design-verification): acceptance checks and component-specific contracts.
+
 ## Architecture and reference ownership
 
 **Layer 01 owns the visual system. Layer 02 systematizes it. Layer 04 implements it.** Layer 03 governs UX within its assigned scope; Layer 05 supplies interaction primitives. Cross-layer web standards take precedence over every layer.
@@ -11,7 +20,7 @@ Use this guide for visual design, component behavior, interface copy and localiz
 | 01: Design style           | Pentagram → PayPal → Swiss Themes → Bauer Types → Lineto → Jost → Yahoo Finance | Pentagram, Swiss Themes, Bauer Types and Lineto guide visual composition and typographic character. Primitive Colors comprise eight PayPal-inspired brand/neutrals and two Yahoo Finance-inspired financial colors, listed below. Google Fonts supplies Jost, Noto Sans TC and Noto Sans SC. Typography uses Perfect Fourth (4/3, approximately 1.33), a 16px (1rem) base, weights 400/700, leading 1.15/1.5 and tracking 0. |
 | 02: Design foundations     | Fluent 2                                                                        | Global Tokens and Alias Tokens; Color, Elevation, Layout, Material, Motion and Shapes. Functional Colors cover Neutral Colors, Brand Colors, Semantic Colors, Interaction States and Accessibility Best Practices. Motion comprises Duration and Easing. Preserve documented defaults and explicit site mappings within their assigned responsibilities.                                                                     |
 | 03: UX guidelines          | Web Interface Guidelines → Fluent 2 → Cieden Handbook                           | Web Interface Guidelines governs Interactions, Forms, Performance and Copywriting. Fluent 2 governs Accessibility, Content Design, Handoffs, Onboarding and Wait UX. Cieden is a supporting reference. Copywriting and Content Design apply exclusively to UX Writing.                                                                                                                                                       |
-| 04: Components             | shadcn/ui → Lucide                                                              | shadcn/ui Theming, Typeset and Components; Lucide interface icons. Owned component source maps the upper-layer decisions into implementation. Native HTML remains appropriate for static content and native form controls.                                                                                                                                                                                                   |
+| 04: Components             | shadcn/ui → Lucide                                                              | shadcn/ui Theming, Typeset and Components; Lucide interface icons. Owned component source maps the upper-layer decisions into implementation. Theming maps component tokens; Typeset styles Investment Memo Articles. Native HTML remains appropriate for static content and native form controls.                                                                                                                           |
 | 05: Interaction primitives | Base UI                                                                         | Interactive mechanics, including positioning, modal isolation, focus containment and scroll locking. React and the owning feature retain application state, business workflows and interruptible animations.                                                                                                                                                                                                                 |
 
 React, Next.js App Router, TypeScript, Tailwind CSS and owned CSS Modules implement these layers. Dependencies, rendering boundaries and style loading belong in [Application architecture](WEB_APPLICATION_ARCHITECTURE.md#presentation-and-style-loading).
@@ -176,7 +185,7 @@ The site uses an editorial financial style: clear type hierarchy, generous secti
 
 The guided grid uses one column through 800px, two from 801px, and three from 1101px when configured for three columns. Two-column grids retain two columns above 800px. Rows follow content height and DOM order; do not fix text-bearing rows to a pixel height. Tracks use `minmax(0, 1fr)` to contain long translated content.
 
-Home and the memo index share this grid. Their three memo cells occupy three desktop columns; on tablets, the third cell spans the second row. Mobile retains the published memo and hides planned placeholders. Cards own their opaque surfaces, corners and focus feedback. The one-pixel gap exposes `--grid-guide`, an alias of the original gray divider color. The shared material outline remains unchanged.
+Home and the memo index share this grid. Their three memo cells occupy three desktop columns; on tablets, the third cell spans the second row. At 800px and below, the grid shows only its first card. The memo index exposes remaining content through its [disclosure](#article-category-controls). Cards own their opaque surfaces, corners and focus feedback. The one-pixel gap exposes `--grid-guide`, an alias of the original gray divider color. The shared material outline remains unchanged.
 
 Guides are decorative CSS backgrounds, with no focus targets or ARIA grid role. Content keeps native headings, articles and links; keyboard order follows reading order. Do not clip focus outlines or nest guided grids more than one level. Cross markers, dashed guides and overlaying cells are not needed by the current content.
 
@@ -211,11 +220,11 @@ The inventory below covers every non-test module currently under `src/components
 | Collapsible      | [collapsible.tsx](../src/components/ui/collapsible.tsx)         | Used            | Mobile languages and controlled article outlines; AnimatedDisclosure for memo indexes and monthly returns |
 | Data Table       | [data-table.tsx](../src/components/ui/data-table.tsx)           | Used            | Current Holdings; Table renderer for the feature-owned TanStack model                                     |
 | Dropdown Menu    | [dropdown-menu.tsx](../src/components/ui/dropdown-menu.tsx)     | Used            | Desktop Header language menu                                                                              |
-| Empty            | [empty.tsx](../src/components/ui/empty.tsx)                     | Used indirectly | No-data states in DataTable and LineChart                                                                 |
+| Empty            | [empty.tsx](../src/components/ui/empty.tsx)                     | Used            | No-data states in DataTable, LineChart and the memo category filter                                       |
 | Field            | [field.tsx](../src/components/ui/field.tsx)                     | Used            | Field groups and shared accessible form-field composition                                                 |
 | Input            | [input.tsx](../src/components/ui/input.tsx)                     | Used            | Contact and subscription inputs; shared input styling for other controls                                  |
 | Line Chart       | [line-chart.tsx](../src/components/ui/line-chart.tsx)           | Used            | Performance explorer; owned composition of Recharts and Chart                                             |
-| Native Select    | [native-select.tsx](../src/components/ui/native-select.tsx)     | Used            | Mobile holdings sorting and subscription preferences                                                      |
+| Native Select    | [native-select.tsx](../src/components/ui/native-select.tsx)     | Used            | Holdings sorting, subscription preferences and memo category filtering                                    |
 | Navigation Menu  | [navigation-menu.tsx](../src/components/ui/navigation-menu.tsx) | Used            | Desktop Header navigation links                                                                           |
 | Radio Group      | [radio-group.tsx](../src/components/ui/radio-group.tsx)         | Used            | Support amount selection after hydration; native radio fallback retained                                  |
 | Sheet            | [sheet.tsx](../src/components/ui/sheet.tsx)                     | Used            | Mobile/Tablet navigation panel and modal focus lifecycle                                                  |
@@ -776,3 +785,16 @@ Current Holdings uses validated `sort` and `direction` query parameters. Support
 Contact, Subscribe and Support keep the action label while pending, display the shared Spinner and announce progress separately. Existing request locks, idempotency keys and recovery payloads remain unchanged.
 
 These contracts follow the assigned [Web Interface Guidelines](https://vercel.com/design/guidelines#interactions). Automated checks cover URL sorting and pending form states. They do not establish full WCAG conformance, physical-device behavior or field Core Web Vitals compliance.
+
+### Article category controls
+
+The [article taxonomy](WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy) defines categories; the [memo contract](WEB_APPLICATION_ARCHITECTURE.md#investment-memo-content) defines URL state, counts and publication rules.
+
+Use shadcn/ui Field, FieldLabel and Native Select for the category control. Keep a visible localized label, native keyboard behavior, a polite result count and Empty for categories without published articles. Bound the control width on wider screens; use existing typography, color and spacing tokens.
+
+| Viewport    | Cards                        | View all investment memos                                                     |
+| ----------- | ---------------------------- | ----------------------------------------------------------------------------- |
+| Up to 800px | Show only the first card     | List published matches; include the two planned articles under All categories |
+| Above 800px | Retain the three-slot layout | List published matches; hide planned rows                                     |
+
+Home also shows one mobile card. Planned entries are noninteractive and have no publication date or reading time. Filtering updates cards and index entries without moving focus. Preserve article routes and MDX Typeset treatments.

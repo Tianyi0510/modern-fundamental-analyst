@@ -3,7 +3,7 @@ import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({
   title: "Investment memos",
-  description: "Long-form notes on business quality, valuation, risk, and capital allocation.",
+  description: "Research on Microsoft’s cloud and AI position, leadership, and fiscal 2024 financial quality.",
   path: "/memos",
 });
 

@@ -16,6 +16,8 @@ Apply each reference within its assigned domain. Product-specific technical docu
 
 Keep repository execution rules here. Link to [architecture](docs/WEB_APPLICATION_ARCHITECTURE.md), [design](docs/DESIGN_SYSTEM.md) and [integrations](docs/INTEGRATIONS.md) for their domain rules instead of copying them. Use the [installed skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills) only when applicable; a reference does not install a skill, grant access or authorize external actions.
 
+The [README](README.md#mission) owns the mission and investment philosophy; [Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy) owns the article taxonomy and editorial-source status. A source link is not authorization to publish its contents.
+
 ## Project context
 
 The site uses Next.js App Router, React, TypeScript, Tailwind CSS and CSS Modules. Use Node.js 24 and npm. The package manifests define dependencies. English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`.
@@ -46,28 +48,19 @@ The site uses Next.js App Router, React, TypeScript, Tailwind CSS and CSS Module
 
 ## Commands
 
-Run from the repository root containing `package.json`. Use focused checks during development; the full-suite commands below are for CI, explicit requests or diagnosis.
+Run from the repository root containing `package.json`. Use focused checks during development. Reserve full suites for CI, explicit requests or diagnosis.
 
-| Task                                                   | Command                                                                                                               |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| Install locked dependencies                            | `npm ci`                                                                                                              |
-| Development server                                     | `npm run dev`                                                                                                         |
-| Production build / server                              | `npm run build` / `npm run start`                                                                                     |
-| Type checking                                          | `npm run typecheck`                                                                                                   |
-| Lint selected files                                    | `npx eslint <files> --max-warnings=0`                                                                                 |
-| Check / format selected files                          | `npx prettier --check <files>` / `npx prettier --write <files>`                                                       |
-| Vitest unit / integration tests                        | `npm run test:unit` / `npm run test:integration`; append `-- <test-path>` to filter                                   |
-| Vitest watch mode                                      | `npm run test:watch`                                                                                                  |
-| Browser E2E tests                                      | `npm run test:e2e -- <spec-files> --project=chromium` (or `webkit`)                                                   |
-| Selected Node tests                                    | `node --import ./scripts/register-server.mjs --test <test-files>`                                                     |
-| Selected browser tests                                 | `npx playwright test <spec-files> --project=chromium` (or `webkit`)                                                   |
-| Production browser tests                               | After building: `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test <spec-files> --project=chromium` (or `webkit`) |
-| Dedicated performance budgets after a production build | `npm run test:performance`                                                                                            |
-| Full static checks                                     | `npm run verify:static`                                                                                               |
-| Full static, build and production Chromium checks      | `npm run verify`                                                                                                      |
-| Mobile production WebKit checks                        | After building: `npm run test:webkit`; select a shard with `-- --shard=1` or `-- --shard=2`                           |
+Use the [verification command table](README.md#verification) and [local development instructions](README.md#local-development). For file-scoped checks:
 
-Replace angle-bracket placeholders with real paths. Install missing browsers with `npx playwright install chromium webkit`. Playwright starts an isolated server on port 3210 with provider credentials disabled; preserve that isolation. `npm test` runs the existing Node suite plus Vitest unit and integration projects. E2E tests use Playwright separately; CI runs the production browser matrix. Chromium covers all cases; WebKit selects `@mobile` cases with iPhone 13 emulation. Tag phone-only cases explicitly; desktop and cross-breakpoint cases remain in Chromium. Husky's pre-commit hook checks staged formatting and JavaScript/TypeScript lint; it does not replace CI.
+```sh
+npx eslint path/to/changed-file.ts --max-warnings=0
+npx prettier --check path/to/changed-file.ts
+node --import ./scripts/register-server.mjs --test path/to/test.test.mjs
+```
+
+Replace example paths with actual files. After a production build, run focused browser checks with `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npx playwright test path/to/test.spec.ts --project=chromium`. Use `--project=webkit` for mobile cases.
+
+Playwright starts an isolated server on port 3210 with provider credentials disabled. Preserve that isolation. Chromium covers all cases; WebKit selects `@mobile` cases with iPhone 13 emulation. Keep desktop and cross-breakpoint cases in Chromium. Follow the [test workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#test-workflow) for runners, browser installation, shard allocation and CI coverage. Local commit hooks do not replace CI.
 
 ## Task references
 

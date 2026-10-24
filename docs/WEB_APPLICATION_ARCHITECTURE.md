@@ -2,11 +2,22 @@
 
 Use this guide to design, review and operate the application. Architecture principles define the standard. Project decisions explain selected approaches and their limits. Operational procedures define verification, data updates and releases. A working implementation does not establish compliance or justify an exception.
 
+The [README](../README.md#mission) defines the mission and investment philosophy. This guide defines their technical implementation.
+
 ## Navigation
 
 - [Architecture principles](#architecture-principles): references, types, boundaries, state, data, rendering, forms and verification.
 - [Project decisions](#project-decisions): [technology stack](#technology-stack), domain contracts and conditions for reconsideration.
 - [Operational procedures](#operational-procedures): tests, portfolio updates, performance checks and releases.
+
+| Task                                 | Start here                                                                                               |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| Add or review code                   | [Application boundaries](#application-boundaries), [code and components](#code-and-components)           |
+| Publish an article                   | [Memo content](#investment-memo-content), [editorial sources](#editorial-sources-and-publication-status) |
+| Update financial data                | [Portfolio data](#portfolio-data), [update procedure](#update-and-acceptance-procedure)                  |
+| Diagnose a local preview             | [Local preview diagnostics](#local-preview-diagnostics)                                                  |
+| Check performance or browser support | [Performance checks](#performance-regression-checks), [browser support policy](#browser-support-policy)  |
+| Release a change                     | [Release workflow](#release-workflow), [production gate](#production-gate)                               |
 
 ## Architecture Principles
 
@@ -267,9 +278,15 @@ This stack defines each tool's role. Architecture principles govern how the tool
 
 Keep test responsibilities distinct: Vitest runs component integrations, Testing Library drives their UI and MSW controls their network responses. Existing Node-runner tests remain a separate suite. See [test workflow](#test-workflow) for file patterns, environments and browser scope, and [project standards](#project-standards) for linting and formatting rules.
 
+#### Local Maintenance Tooling
+
+[Python](https://www.python.org/) runs the owner's local workspace-cleanup helper at `../local/maintenance/cleanup.py`; its isolated tests are at `../local/maintenance/test_cleanup.py`. It is outside the Git repository and deployment artifact. Python is not an application runtime, a CI prerequisite or a financial-data processing dependency.
+
+The local runbook at `../local/README.md` owns scheduler setup, interpreter selection and recovery. Cleanup must preserve source, credentials, research, audit evidence and active work. Use the existing dry-run and reversible Trash workflow; do not run cleanup or change its schedule as part of a website build or documentation update. The existence of a helper does not verify that its installed copy or scheduler is current. The cleanup helper requires successful, complete process/open-file evidence and finishes all candidate checks plus a final batch snapshot before any move. An inspection error preserves the entire batch; filesystem move failures remain recoverable through the movement journal. Local verification must use temporary fixtures, and helper updates must verify the installed file hash without invoking cleanup.
+
 #### Dependency Versions
 
-Verified on 22 October 2026 against the lockfile and publisher metadata. These are resolved versions, not semver ranges. Update this table with dependency changes. Vite 8.3.5 belongs to the test toolchain; Next.js owns application builds. shadcn/ui components are local source files and have no single installed library version. Hosted services and fonts do not inherit their SDK version.
+Publisher metadata was checked on 22 October 2026. The table records resolved lockfile versions; it does not claim that they remain the latest releases. Update both version tables with dependency changes. Vite 8.3.5 belongs to the test toolchain; Next.js owns application builds. shadcn/ui components are local source files and have no single installed library version. Hosted services and fonts do not inherit their SDK version.
 
 | Package                             | Version | Scope       |
 | ----------------------------------- | ------- | ----------- |
@@ -358,7 +375,7 @@ The Actions workflow pins full upstream commit SHAs. CI installs npm 12.2.1 expl
 - MSW 3 uses `onUnhandledFrame`. The shared test callback records unexpected traffic and throws; `defaults.error()` only logs in this version. The regression test verifies that unmatched requests never reach a real local server.
 - The development dependency chain through braces has an unresolved high-severity advisory, [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). npm reports five affected packages through micromatch, fast-glob and the lint plugins. Do not downgrade Next.js tooling or remove checks to silence the report.
 
-These are explicit compatibility constraints, not a claim that every package uses its highest published version. Recheck publisher peer dependencies before removing them.
+These constraints record the dependency review, not current registry status. Recheck publisher peer dependencies and advisory status before changing them.
 
 ### AI Agents
 
@@ -525,9 +542,47 @@ Investment Memo Articles use locally imported MDX, compiled by `@next/mdx` into 
 
 Keep research prose in `src/features/memos/articles/*.mdx`. Keep titles, summaries, publication dates and localized catalog entries in `memos.ts`. `memo-content.ts` records the actual article language without importing its body, so metadata, API and email paths do not load the MDX renderer. `memo-article-content.tsx` uses an explicit import registry; add an entry when publishing another article. Do not compile remote or reader-supplied MDX.
 
+When publishing a planned article, remove its title from `planned-memos.ts` and add the verified metadata and MDX import together; do not leave both planned and published versions visible.
+
 The Microsoft article remains the English original on all three routes. The localized page owns its translation notice, metadata, publication details and closing disclaimer. Moving the source format does not authorize editing verified research. The migration test checks the normalized rendered-text digest, section/paragraph counts and source links. Update that digest only for an approved content edit after reviewing the text difference.
 
+The [article taxonomy](#article-taxonomy) defines category IDs, labels and publication boundaries. `MemoIndex` receives localized summaries from its Server Component parent; MDX bodies and provider code stay outside its client boundary.
+
+- Validate the `category` URL parameter. Missing or invalid IDs show All categories.
+- Preserve unrelated parameters and fragments when updating history. Reload, sharing and Back/Forward retain valid selections.
+- Filter published cards and index entries together. Specific categories show matching articles or Empty; counts exclude planned articles.
+- Prerender All categories inside a local Suspense boundary, with the select disabled until URL state is available.
+- Keep canonical URLs query-free. Article JSON-LD uses the localized category as `articleSection`.
+
+Planned titles are absent from `getMemos`, static route parameters, the sitemap and subscription metadata. Assign their category only after editorial review. [Design System](DESIGN_SYSTEM.md#article-category-controls) owns responsive card and disclosure behavior. This local catalog does not need a search service, client query cache or database.
+
 Use [Next.js MDX](https://nextjs.org/docs/app/guides/mdx) for compiler conventions. Run the affected memo Node tests and production browser checks after editing article markup; confirm the three language routes and narrow layouts.
+
+#### Article Taxonomy
+
+| Category          | Scope                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| Company Analysis  | Research on an individual company's business, financial quality, valuation and risks.               |
+| Industry Analysis | Research on an industry's structure, competition, technology and economics.                         |
+| Quarterly Report  | A dated quarterly review with an explicitly stated subject and reporting period.                    |
+| Annual Report     | A dated annual review with an explicitly stated subject and reporting period.                       |
+| Blog              | Essays, observations and learning notes that do not fit the research or periodic-report categories. |
+
+The visible label is Blog; its existing `blogs` ID remains stable for saved URLs. Each published article has one stable category ID and localized labels. The Memos index provides All categories and all five category choices, including empty categories. Empty states must not present planned research as published work. English UI labels follow the Design System's sentence-case policy; the table names are taxonomy headings, not a separate capitalization rule.
+
+Microsoft Stock Analysis Fiscal Year 2024 belongs to Company Analysis. Its fiscal-year title does not make it an Annual Report. Keep existing article URLs stable; follow the [publishing contract](#investment-memo-content) for catalog and route changes.
+
+#### Editorial Sources and Publication Status
+
+The owner supplied these source links. Their inclusion records provenance; it does not authorize importing, rewriting or publishing their contents, and the linked document bodies were not reviewed in this update.
+
+| Source                                                                                                                                | Current treatment                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Microsoft Stock Analysis Fiscal Year 2024](https://docs.google.com/document/u/0/d/1X4DwJBuHM0jo77lEtBHMzmTcQSo9Xc5TkrNjcpj2yyw/edit) | The site already publishes a local English MDX article. Preserve its verified body and scope note; the external document has not been compared with the current text.    |
+| [Will AI Kill Software?](https://docs.google.com/document/u/0/d/17QgyooTN3lkpTw_JOrbTvL16qjj8G2eeXP8TZMH7yK0/edit)                    | Displayed as a Planned Article with a localized title and no article link, date or reading time. Confirm the body, category and publication metadata before publication. |
+| [Agentic Finance and Stablecoins](https://docs.google.com/document/u/0/d/1kjg6G3djJ74GVkR0l07N7V2yrhBy7q31YBxbb4hSdVg/edit)           | Displayed as a Planned Article with a localized title and no article link, date or reading time. Confirm the body, category and publication metadata before publication. |
+
+Keep public article bodies in local MDX. Localize catalog metadata and interface copy; identify the actual body language when translations are unavailable. Follow the [article publishing contract](#investment-memo-content).
 
 ### Portfolio Data
 
@@ -726,21 +781,6 @@ Contact delivery and subscription service integration tests use MSW with explici
 The loader, shared helpers, WebKit runner and production gate live in `scripts/`. The journal CLI stays with subscriptions at `src/features/subscriptions/server/subscription-journal-cli.mjs`, invoked through `npm run subscription:journal`.
 
 `npm test` runs Node and both Vitest projects; `verify:static` includes it. Playwright runs separately. Its development server uses `PLAYWRIGHT_ISOLATED_DEV=1` and `node_modules/.cache/next-playwright` so it can coexist with the interactive `.next` development server. It retains the default development hostname so tests exercise the configured loopback alias rather than implicitly trusting it through `--hostname`. Production tests retain the normal build directory. After a build, run selected production cases with `PLAYWRIGHT_USE_PRODUCTION_BUILD=1 npm run test:e2e -- <spec-files> --project=chromium` or `webkit`.
-
-### Local Preview Diagnostics
-
-Use `npm run dev`, then open `http://localhost:3000` or `http://127.0.0.1:3000`. Next.js allows `localhost` by default; `next.config.ts` explicitly adds only `127.0.0.1` through [allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins). Do not use wildcard origins or disable origin protection.
-
-The October 22, 2026 reproduction established a hostname mismatch: a default dev server blocked `/_next/hmr` from `127.0.0.1`, leaving controls unhydrated. The same server worked through `localhost` without a restart or cache reset. Starting with `--hostname 127.0.0.1` masked the missing configuration. The regression checks both hostnames, reloads, menu interactions and rejection of unrelated origins.
-
-If controls stop responding:
-
-1. Record the exact URL, startup command, browser errors and `.next/dev/logs/next-development.log` before restarting. Isolated tests log under `node_modules/.cache/next-playwright/dev/logs/`.
-2. Check development-origin warnings and the HMR connection. Successful HTML or JavaScript HTTP responses alone do not establish hydration.
-3. Verify an enabled subscription control and an opening menu without submitting a form. Compare both loopback hostnames on the same running server.
-4. Run `npm run test:e2e -- src/components/local-preview.spec.ts --project=chromium --workers=1`. Run `--project=webkit` for the mobile interaction cases. Keep provider credentials isolated by the Playwright configuration.
-
-Preserve logs before investigating other failures. A cache reset or restart is recovery evidence, not proof of a root-cause fix. Configuration changes require Next.js to reload the server configuration; they do not require deleting `.next`.
 
 WebKit uses the iPhone 13 viewport, touch, scale and user agent. Tag only phone-sized, mobile-compatible cases `@mobile`. Keep mouse-hover, CDP-only, desktop and cross-breakpoint cases in Chromium. Browser servers use isolated provider settings. Both engines test Contact's unavailable-service response; MSW and route tests cover success and retries. None proves live email delivery.
 
@@ -976,6 +1016,21 @@ Use these additional rules for automated browser assertions:
 
 The hosted Ubuntu browser jobs install Playwright's pinned Chromium without `--with-deps`, matching the performance job. The runner image supplies system libraries; browser startup still fails if a required library is absent. Avoid unrelated apt upgrades during release verification: PR #91 showed they could consume more than nine minutes of the 15-minute Chromium job budget. Test coverage and job timeouts remain unchanged.
 
+### Local Preview Diagnostics
+
+Use `npm run dev`, then open `http://localhost:3000` or `http://127.0.0.1:3000`. Next.js allows `localhost` by default; `next.config.ts` explicitly adds only `127.0.0.1` through [allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins). Do not use wildcard origins or disable origin protection.
+
+The October 22, 2026 reproduction established a hostname mismatch: a default dev server blocked `/_next/hmr` from `127.0.0.1`, leaving controls unhydrated. The same server worked through `localhost` without a restart or cache reset. Starting with `--hostname 127.0.0.1` masked the missing configuration. The regression checks both hostnames, reloads, menu interactions and rejection of unrelated origins.
+
+If controls stop responding:
+
+1. Record the exact URL, startup command, browser errors and `.next/dev/logs/next-development.log` before restarting. Isolated tests log under `node_modules/.cache/next-playwright/dev/logs/`.
+2. Check development-origin warnings and the HMR connection. Successful HTML or JavaScript HTTP responses alone do not establish hydration.
+3. Verify an enabled subscription control and an opening menu without submitting a form. Compare both loopback hostnames on the same running server.
+4. Run `npm run test:e2e -- src/components/local-preview.spec.ts --project=chromium --workers=1`. Run `--project=webkit` for the mobile interaction cases. Keep provider credentials isolated by the Playwright configuration.
+
+Preserve logs before investigating other failures. A cache reset or restart is recovery evidence, not proof of a root-cause fix. Configuration changes require Next.js to reload the server configuration; they do not require deleting `.next`.
+
 ### Release Workflow
 
 Provider recovery follows the [Resend webhook](INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](INTEGRATIONS.md#backup-and-restore) procedures. Treat successful SDK responses without valid acknowledgements as uncertain writes: retain leases and journals, stop further mutations and do not mark webhook processing complete. Production release completion does not resolve a cloud monitoring entitlement failure; record uptime activation separately in [Integrations](INTEGRATIONS.md#local-and-cloud-verification).
@@ -1008,7 +1063,7 @@ The macOS job allows 20 minutes. The remaining wait covers ordinary queueing and
 
 ### Review Evidence
 
-Keep tracked historical narratives in `docs/history/`, with dates and links to the current specification. Keep bulky or machine-local evidence outside the checkout.
+Keep current specifications and durable decisions in tracked documents. Store superseded audit narratives with dated evidence under `../local/audit/`, outside Git and deployment artifacts. Preserve their findings and update relative references when moving them.
 
 Keep local screenshots and dated notes in `../local/audit/`. Legacy `audit/` remains excluded by Git and Vercel. Archive inactive caches or builds under `../local/archives/`; tools recreate their normal output paths.
 
