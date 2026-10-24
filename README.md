@@ -12,6 +12,8 @@ Node.js runs the application and tooling. TypeScript defines static types, React
 
 ESLint checks code rules, Prettier formats source, and Husky runs local Git checks. Vitest runs unit and integration tests; Testing Library exercises components, MSW intercepts test HTTP requests, and Playwright verifies browser journeys in Chromium and WebKit.
 
+Use the [architecture reference categories and priorities](docs/WEB_APPLICATION_ARCHITECTURE.md#architecture-references) to distinguish official contracts, best practices, domain guidance and templates.
+
 See [technology responsibilities](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack) for official references and boundaries. The package manifests define dependencies and versions; the [verification commands](#verification) define how to check changes.
 
 See [integration responsibilities and references](docs/INTEGRATIONS.md#service-responsibilities-and-references) for GitHub, Vercel, Upstash Redis, Stripe, Resend and Sentry, and [integration templates](docs/INTEGRATIONS.md#templates) for conditional implementation examples.
@@ -56,9 +58,11 @@ Run checks for the changed files and behavior. CI runs full verification; releas
 | Full static verification                                 | `npm run verify:static`                                           |
 | Static checks, build and production Chromium             | `npm run verify`                                                  |
 | Performance budgets against an existing production build | `npm run test:performance`                                        |
+| CSS Baseline compatibility lint                          | `npm run lint:compatibility`                                      |
+| Baseline observations from saved performance traces      | `npm run test:compatibility`                                      |
 | Mobile WebKit against an existing production build       | `npm run test:webkit`                                             |
 
-For browser-feature compatibility and broader page-quality audits, follow the [Baseline and Lighthouse review](docs/WEB_APPLICATION_ARCHITECTURE.md#baseline-and-lighthouse-review). Baseline informs feature selection; Lighthouse diagnostics complement browser tests and field Core Web Vitals.
+Follow [Performance and Compatibility](docs/WEB_APPLICATION_ARCHITECTURE.md#performance-and-compatibility) for reference responsibilities and the [Baseline and Lighthouse review](docs/WEB_APPLICATION_ARCHITECTURE.md#baseline-and-lighthouse-review) for execution. Lighthouse provides laboratory diagnostics, Baseline describes browser-feature support, and web.dev/performance guides measured improvements. Browser tests and field Core Web Vitals remain separate evidence.
 
 Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Both browsers use timing-balanced file lists; see [browser shard allocation](docs/WEB_APPLICATION_ARCHITECTURE.md#local-runs-and-shard-maintenance) for evidence and maintenance. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack. The configuration selects supported CSS chunking for each bundler. Both builds need access to Google Fonts when the fonts are not cached.
 

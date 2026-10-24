@@ -5,6 +5,28 @@ import { parse } from "yaml";
 
 const workflow = parse(await readFile(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8"));
 
+test("Baseline analyzes evidence after budget failures and retains its reports", () => {
+  const steps = workflow.jobs.performance.steps;
+  const performance = steps.findIndex((step) => step.id === "performance");
+  const compatibility = steps.findIndex((step) => step.run === "npm run test:compatibility");
+  assert.ok(compatibility > performance && performance >= 0);
+  assert.equal(steps[compatibility].if, "${{ !cancelled() && steps.performance.outcome != 'skipped' }}");
+  assert.equal(steps[compatibility]["continue-on-error"], undefined);
+  const upload = steps.find((step) => step.uses?.startsWith("actions/upload-artifact@"));
+  assert.equal(upload.if, "always()");
+  assert.equal(upload.with.path, "node_modules/.cache/performance/");
+});
+
+test("protected branch check names retain all release verification dependencies", () => {
+  for (const name of ["verify", "webkit"]) {
+    const job = workflow.jobs[name];
+    assert.equal(job.name ?? name, name);
+    assert.equal(job.if, "always()");
+  }
+  assert.deepEqual(workflow.jobs.verify.needs, ["plan", "static", "chromium", "performance"]);
+  assert.deepEqual(workflow.jobs.webkit.needs, ["plan", "webkit-shards"]);
+});
+
 test("remote CI actions use immutable full commit references", () => {
   const references = Object.values(workflow.jobs).flatMap((job) => [
     ...(job.uses ? [job.uses] : []),

@@ -12,7 +12,9 @@
     font-size: var(--typeset-size);
     font-weight: var(--weight-regular);
     letter-spacing: var(--tracking-zero);
-    text-wrap: pretty;
+    @supports (text-wrap: pretty) {
+      text-wrap: pretty;
+    }
   }
 
   .typeset-memo
@@ -22,7 +24,9 @@
       line-height: var(--leading-heading-text);
       letter-spacing: var(--tracking-zero);
       text-transform: none;
-      text-wrap: balance;
+      @supports (text-wrap: balance) {
+        text-wrap: balance;
+      }
       color: inherit;
     }
     &:where(h1) {
@@ -63,7 +67,9 @@
       font-size: var(--font-size-medium-title);
       font-weight: var(--weight-bold);
       line-height: var(--leading-heading-text);
-      text-wrap: balance;
+      @supports (text-wrap: balance) {
+        text-wrap: balance;
+      }
     }
     &:where(pre, :not(pre) > code, kbd, figcaption, caption, .footnotes, [data-footnotes]) {
       font-size: var(--font-size-small-body);
