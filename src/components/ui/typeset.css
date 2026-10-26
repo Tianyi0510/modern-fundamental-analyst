@@ -46,7 +46,9 @@ SOFTWARE.
     line-height: var(--typeset-leading);
     color: var(--color-foreground, currentColor);
     overflow-wrap: break-word;
-    margin-trim: block-start;
+    @supports (margin-trim: block-start) {
+      margin-trim: block-start;
+    }
 
     @media (min-width: 48rem), print {
       font-size: var(--typeset-size);
@@ -225,9 +227,11 @@ SOFTWARE.
     &:where(li > p, li > ul, li > ol) {
       margin-block-start: 0.5em;
     }
+    /* eslint-disable-next-line css/use-baseline -- Native markers remain visible without this color enhancement; covered by baseline-compatibility.spec.ts. */
     &:where(ul > li)::marker {
       color: var(--typeset-muted);
     }
+    /* eslint-disable-next-line css/use-baseline -- Native markers remain visible without this color enhancement; covered by baseline-compatibility.spec.ts. */
     &:where(ol > li)::marker {
       color: var(--typeset-muted);
     }
@@ -240,7 +244,9 @@ SOFTWARE.
     &:where(li.task-list-item > input[type="checkbox"]) {
       margin-inline-end: 0.5em;
       vertical-align: -0.1em;
-      accent-color: var(--color-primary, currentColor);
+      @supports (accent-color: auto) {
+        accent-color: var(--color-primary, currentColor);
+      }
     }
 
     /* Disclosures. */
@@ -252,6 +258,7 @@ SOFTWARE.
       cursor: pointer;
       font-weight: 500;
     }
+    /* eslint-disable-next-line css/use-baseline -- Native markers remain visible without this color enhancement; covered by baseline-compatibility.spec.ts. */
     &:where(summary)::marker {
       color: var(--typeset-muted);
     }
@@ -447,7 +454,9 @@ SOFTWARE.
         break-inside: avoid;
       }
       &:where(h1, h2, h3, h4) {
-        break-after: avoid;
+        @supports (break-after: avoid) {
+          break-after: avoid;
+        }
       }
     }
 

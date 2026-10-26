@@ -200,3 +200,19 @@ test("cycle detection resolves TypeScript aliases and ignores type-only edges", 
     assert.deepEqual(result.messages, []);
   }
 });
+
+test("browser API compatibility lint follows project targets and excludes server and test code", async () => {
+  const config = await eslint.calculateConfigForFile("src/components/site-header/site-header.tsx");
+  const rules = { "compat/compat": config.rules["compat/compat"] };
+  const run = (source) => linter.verify(source, [{ plugins: { compat: config.plugins.compat }, rules }]);
+  assert.ok(run("navigator.bluetooth.requestDevice({});").some((message) => message.ruleId === "compat/compat"));
+  assert.deepEqual(run('fetch("/api/status");'), []);
+  assert.deepEqual(run('if ("bluetooth" in navigator) { navigator.bluetooth.requestDevice({}); }'), []);
+  for (const file of [
+    "src/app/api/contact/route.ts",
+    "src/features/contact/server/contact-service.ts",
+    "src/components/theme.spec.ts",
+  ]) {
+    assert.equal((await eslint.calculateConfigForFile(file)).rules["compat/compat"], undefined, file);
+  }
+});

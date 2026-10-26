@@ -6,15 +6,38 @@ A public-equity research website in English, Traditional Chinese and Simplified 
 
 The site uses Next.js App Router, React, TypeScript, Tailwind CSS, customized shadcn/ui components with Base UI interactions, Lucide icons and CSS Modules. Resend handles email, Upstash Redis coordinates reader services, Stripe provides Hosted Checkout, Sentry monitors errors and performance, and Vercel hosts the site.
 
+## Mission
+
+Modern Fundamental Analyst aims to empower every retail investor through public-equity research, transparent portfolio disclosures and continuous learning. These principles describe the owner’s approach; they do not establish that every holding has a published thesis or valuation model.
+
+## Investment Philosophy
+
+- Use value investing to develop stock pitches and focus investing to manage the portfolio.
+- Stay within the circle of competence and understand the businesses and risks involved.
+- Let compounding, patience and discipline guide long-term decisions.
+- Study AI and other disruptive technologies through fundamental business analysis.
+- Treat accounting as the language of business and the foundation of financial modeling.
+- Build integrated three-statement and discounted cash flow models to estimate intrinsic value. Distinguish a research method from a model actually published with an article.
+- Make investing accessible to everyone while supporting independent judgment.
+
+## Values and Transparency
+
+Publish portfolio holdings and performance monthly, alongside detailed investment theses, to support transparency and accountability. Monthly portfolio disclosure is separate from the [article taxonomy](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy).
+
+Promote a “learn-it-all” growth mindset grounded in curiosity, empathy and continuous learning. The owner's stated values include free trade, the dynamism of capitalism, and individual rights to life, liberty and the pursuit of happiness. These are editorial beliefs, not technical requirements or claims about investment outcomes.
+
+See the [article taxonomy and editorial sources](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy) for content scope and publication status.
+
 ## Technology Stack
 
-Node.js runs the application and tooling. TypeScript defines static types, React builds the UI, Next.js provides the App Router framework, and Tailwind CSS implements utility styles.
+| Responsibility                  | Tools                                                             | Reference                                                                                    |
+| ------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Runtime, language and rendering | Node.js, TypeScript, React, Next.js                               | [Technology stack and versions](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack)       |
+| Styling and interaction         | Tailwind CSS, CSS Modules, shadcn/ui, Base UI, Lucide             | [Design System](docs/DESIGN_SYSTEM.md)                                                       |
+| Quality and tests               | ESLint, Prettier, Husky, Vitest, Testing Library, MSW, Playwright | [Verification](#verification)                                                                |
+| Hosting and reader services     | GitHub, Vercel, Upstash Redis, Stripe, Resend, Sentry             | [Integration responsibilities](docs/INTEGRATIONS.md#service-responsibilities-and-references) |
 
-ESLint checks code rules, Prettier formats source, and Husky runs local Git checks. Vitest runs unit and integration tests; Testing Library exercises components, MSW intercepts test HTTP requests, and Playwright verifies browser journeys in Chromium and WebKit.
-
-See [technology responsibilities](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack) for official references and boundaries. The package manifests define dependencies and versions; the [verification commands](#verification) define how to check changes.
-
-See [integration responsibilities and references](docs/INTEGRATIONS.md#service-responsibilities-and-references) for GitHub, Vercel, Upstash Redis, Stripe, Resend and Sentry, and [integration templates](docs/INTEGRATIONS.md#templates) for conditional implementation examples.
+The package manifests define dependencies. [Architecture references](docs/WEB_APPLICATION_ARCHITECTURE.md#architecture-references) define guidance priorities. Python supports local workspace cleanup only; it is not required to build or run the website.
 
 ## Local Development
 
@@ -39,7 +62,7 @@ Email previews need no service credentials:
 
 For service recovery, follow [Resend webhook recovery](docs/INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](docs/INTEGRATIONS.md#backup-and-restore). These procedures do not certify current cloud settings or a completed restore drill.
 
-See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-local-preview) for all nine localized examples.
+See [email templates and previews](docs/INTEGRATIONS.md#email-templates-and-local-preview) for localized examples and verification.
 
 ## Verification
 
@@ -56,9 +79,11 @@ Run checks for the changed files and behavior. CI runs full verification; releas
 | Full static verification                                 | `npm run verify:static`                                           |
 | Static checks, build and production Chromium             | `npm run verify`                                                  |
 | Performance budgets against an existing production build | `npm run test:performance`                                        |
+| CSS Baseline compatibility lint                          | `npm run lint:compatibility`                                      |
+| Baseline observations from saved performance traces      | `npm run test:compatibility`                                      |
 | Mobile WebKit against an existing production build       | `npm run test:webkit`                                             |
 
-For browser-feature compatibility and broader page-quality audits, follow the [Baseline and Lighthouse review](docs/WEB_APPLICATION_ARCHITECTURE.md#baseline-and-lighthouse-review). Baseline informs feature selection; Lighthouse diagnostics complement browser tests and field Core Web Vitals.
+Follow [Performance and Compatibility](docs/WEB_APPLICATION_ARCHITECTURE.md#performance-and-compatibility) for reference responsibilities and the [Baseline and Lighthouse review](docs/WEB_APPLICATION_ARCHITECTURE.md#baseline-and-lighthouse-review) for execution. Lighthouse provides laboratory diagnostics, Baseline describes browser-feature support, and web.dev/performance guides measured improvements. Browser tests and field Core Web Vitals remain separate evidence.
 
 Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Both browsers use timing-balanced file lists; see [browser shard allocation](docs/WEB_APPLICATION_ARCHITECTURE.md#local-runs-and-shard-maintenance) for evidence and maintenance. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack. The configuration selects supported CSS chunking for each bundler. Both builds need access to Google Fonts when the fonts are not cached.
 
@@ -80,7 +105,7 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 | `src/lib/`                    | Shared formatting, localization, request utilities, and service clients                |
 | `public/`                     | Public icons, logos, and the social sharing image                                      |
 | `.github/`                    | GitHub Actions workflows                                                               |
-| `docs/`                       | Design system, architecture, integrations and historical release preparation           |
+| `docs/`                       | Active design, architecture and integration guides, plus planned release notes         |
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 
@@ -100,9 +125,11 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
 | [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
-| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | Features and known limitations of the first stable release.                                                 |
+| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | Planned features and known limitations of the first stable release.                                         |
 
-[Design QA](docs/history/design-qa.md) is a historical visual audit, not a current design specification. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
+The local copy-editing outline is `../local/WEBSITE_COPY.md`; maintenance instructions are in `../local/README.md`. Both stay outside Git and deployment artifacts. Edit English copy in the outline, then explicitly request website updates and Chinese translations. A fresh clone does not contain these local files.
+
+Historical design audits are archived under `../local/audit/`, outside Git and deployment artifacts. Their superseded presets are not current requirements. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
 
 See [AI Agents](AGENTS.md#ai-agents) for ChatGPT, OpenAI developer and repository-instruction reference responsibilities. These references concern development workflows, not website AI features.
 

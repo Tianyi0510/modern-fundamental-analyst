@@ -35,14 +35,16 @@
     "email": "npm run email:contact",
     "email:contact": "email dev --dir src/features/contact/previews --port 3001",
     "email:preferences": "email dev --dir src/features/subscriptions/previews --port 3002",
-    "verify:static": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "verify:static": "npm run typecheck && npm run lint && npm run lint:compatibility && npm run format:check && npm test",
     "prepare": "node .husky/install.mjs",
     "lint:staged": "lint-staged",
     "test:node": "node --import ./scripts/register-server.mjs --test \"src/**/*.test.mjs\" \"scripts/*.test.mjs\" \"*.test.mjs\"",
     "test:integration": "vitest run --project=integration",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:performance": "node scripts/run-performance.mjs"
+    "test:performance": "node scripts/run-performance.mjs",
+    "test:compatibility": "node scripts/run-baseline.mjs",
+    "lint:compatibility": "eslint --config eslint.css.config.mjs \"src/**/*.css\" --max-warnings=0"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
@@ -69,6 +71,7 @@
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
+    "@eslint/css": "2.0.1",
     "@eslint/js": "9.39.5",
     "@mdx-js/mdx": "^3.1.1",
     "@next/eslint-plugin-next": "16.4.2",
@@ -84,11 +87,13 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitest/eslint-plugin": "^1.6.28",
+    "browserslist": "4.29.4",
     "chrome-launcher": "1.2.2",
     "eslint": "9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-check-file": "^3.3.2",
+    "eslint-plugin-compat": "7.0.2",
     "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-jest-dom": "^5.10.1",
     "eslint-plugin-jsx-a11y": "6.10.2",
@@ -103,6 +108,7 @@
     "msw": "^3.0.3",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "tailwind-csstree": "0.4.1",
     "tailwindcss": "^4.3.3",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
@@ -117,12 +123,21 @@
   },
   "lint-staged": {
     "*": "prettier --check --ignore-unknown",
-    "*.{js,cjs,mjs,jsx,ts,tsx}": "eslint --max-warnings=0 --cache --cache-location node_modules/.cache/eslint"
+    "*.{js,cjs,mjs,jsx,ts,tsx}": "eslint --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
+    "*.css": "eslint --config eslint.css.config.mjs --max-warnings=0"
   },
   "packageManager": "npm@12.2.1",
   "allowScripts": {
     "esbuild@0.28.2": true,
     "unrs-resolver@1.12.2": true,
     "fsevents@2.3.3": true
-  }
+  },
+  "browserslist": [
+    "baseline widely available",
+    "not chrome < 111",
+    "not edge < 111",
+    "not firefox < 128",
+    "not safari < 16.4",
+    "not ios_saf < 16.4"
+  ]
 }

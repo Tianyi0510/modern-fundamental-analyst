@@ -93,7 +93,9 @@
 .tableScroll {
   overflow: auto;
   max-height: min(28rem, 65svh);
-  overscroll-behavior-x: contain;
+  @supports (overscroll-behavior-x: contain) {
+    overscroll-behavior-x: contain;
+  }
   margin-top: var(--space-3);
 }
 .tableScroll table {

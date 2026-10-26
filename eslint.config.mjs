@@ -13,6 +13,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import path from "node:path";
+import compat from "eslint-plugin-compat";
 
 const kebabCase = "+([a-z])*([a-z0-9])*(-+([a-z0-9]))";
 const camelCase = "+([a-z])*([a-z0-9])*([A-Z]*([a-z0-9]))";
@@ -195,4 +196,18 @@ export default tseslint.config(
     ),
   },
   prettier,
+  {
+    files: [
+      "src/components/**/*.{ts,tsx}",
+      "src/hooks/**/*.{ts,tsx}",
+      "src/features/**/*.{ts,tsx}",
+      "src/app/_components/**/*.{ts,tsx}",
+      "src/instrumentation-client.ts",
+      "src/lib/*client*.ts",
+      "src/lib/yield-to-main.ts",
+    ],
+    ignores: ["**/*.test.*", "**/*.spec.*", "**/server/**", "**/*.server.*", "**/previews/**"],
+    plugins: { compat },
+    rules: { "compat/compat": "error" },
+  },
 );

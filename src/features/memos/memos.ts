@@ -1,18 +1,6 @@
 import type { Locale } from "@/lib/i18n";
 
-type MemoCategoryId = "company-analysis" | "industry-analysis" | "monthly-report" | "annual-report";
-
-type MemoCategory = {
-  id: MemoCategoryId;
-  label: string;
-};
-
-const memoCategoryLabels = {
-  "company-analysis": { en: "Company analysis", "zh-tw": "企業分析", "zh-cn": "企业分析" },
-  "industry-analysis": { en: "Industry analysis", "zh-tw": "產業分析", "zh-cn": "行业分析" },
-  "monthly-report": { en: "Monthly report", "zh-tw": "月度報告", "zh-cn": "月度报告" },
-  "annual-report": { en: "Annual report", "zh-tw": "年度報告", "zh-cn": "年度报告" },
-} satisfies Record<MemoCategoryId, Record<Locale, string>>;
+import { getMemoCategory, type MemoCategory, type MemoCategoryId } from "./memo-categories";
 
 export type MemoSummary = {
   slug: string;
@@ -25,13 +13,15 @@ export type MemoSummary = {
   category: MemoCategory;
 };
 
+export type MemoPreview = Omit<MemoSummary, "scopeNote">;
+
 const memoCatalog = [
   {
     slug: "microsoft-stock-analysis-fiscal-year-2024",
     number: "001",
     publishedAt: "2025-10-10",
     readTimeMinutes: 12,
-    category: "company-analysis",
+    category: "company-analysis" satisfies MemoCategoryId,
     locales: {
       en: {
         title: "Microsoft stock analysis fiscal year 2024",
@@ -71,10 +61,7 @@ function localizeMemos(locale: Locale): MemoSummary[] {
       number: memo.number,
       publishedAt: memo.publishedAt,
       readTime,
-      category: {
-        id: memo.category,
-        label: memoCategoryLabels[memo.category][locale],
-      },
+      category: getMemoCategory(memo.category, locale),
       ...localized,
     };
   });
