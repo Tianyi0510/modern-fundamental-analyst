@@ -871,6 +871,14 @@ After a production build, `npm run test:performance` starts an isolated loopback
 
 Shared formatting helpers must not create `Intl.NumberFormat` instances at module scope. Initialize each formatter on first use and cache it. A CPU profile in PR #92 identified unused share-formatter construction in the initial client module graph; importing date helpers must not initialize number formatting.
 
+##### Navigation Trace Integrity
+
+Lighthouse uses `scripts/performance-navigation.mjs` to prepare `/robots.txt` on the isolated audit origin before recording a navigation. The runner requires HTTP 200, no redirect, `text/plain` and `Cross-Origin-Opener-Policy: same-origin`. This script-free document establishes the target origin and opener policy without loading application code, styles or fonts. Lighthouse then clears origin storage and the browser cache using its default navigation preparation. Do not disable storage reset or preload the measured page.
+
+PR #94 exposed missing main-frame `navigationStart` events in two Linux CI traces. Both documents returned HTTP 200; the trace began in an `about:blank` renderer and committed the target document in a different renderer. Later iframe events were present, but could not replace the missing main-frame event. CPU calibration succeeded. The failure was incomplete navigation evidence, not a measured budget violation. Local alternating controls confirmed that same-origin preparation removes the renderer transition; they did not reproduce the intermittent Linux trace loss or establish its Chromium-internal cause.
+
+For every sample, require the prepared main frame, a target-document commit in the same renderer and a matching main-frame `navigationStart`. Missing evidence or a renderer change stops the run. Keep raw traces, DevTools logs and reports; never synthesize navigation timestamps, accept iframe events, discard slow samples or retry audit measurements automatically. All twelve samples, CPU checks, network throttling and budgets remain required. The navigation tests cover preparation failures, renderer swaps and misleading unrelated navigation events. Linux CI remains the release acceptance environment.
+
 ##### CPU Calibration
 
 Calibration and Lighthouse use the same Chrome Launcher version, flags and Playwright-installed Chrome for Testing executable. Each benchmark sample uses a new blank page and one evaluation. Reusing a warmed page or Playwright launch defaults creates a different measurement environment. Do not calibrate with Playwright's default headless shell.
