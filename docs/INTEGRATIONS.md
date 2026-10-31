@@ -55,7 +55,9 @@ The owner reported the domain transfer from Wix to Vercel on 2026-09-22. Manage 
 
 Preserve root and `www` website records and Resend verification, sending and receiving records for `mail.modernfundamentalanalyst.com`. Obtain exact values from current dashboards. A registrar transfer does not prove a nameserver change. See [Receiving](#receiving) and [Checkout](#checkout-behavior) for separate service settings. Owner reports are not live DNS or delivery checks.
 
-Follow the [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for hosting and CI gating. Confirm the target environment and current provider state before changing DNS or credentials.
+Follow the [Branch → PR → Main release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for hosting and CI gating. Opening a PR can create a Vercel Preview; merging to `main` triggers the production deployment workflow. Merge only with explicit owner authorization to merge the PR. A deployment request alone does not grant merge authorization. Confirm the target environment and current provider state before changing DNS or credentials.
+
+The npm command wrapper normalizes the unsupported `cache-dir` environment setting observed in production build logs on October 25, 2026. The original injection source is unverified; no cloud environment variables were changed. Verify that the warning is absent in both installation and build logs after the next authorized deployment. See the [deepmerge residual risk](WEB_APPLICATION_ARCHITECTURE.md#deepmerge-residual-risk) before changing email dependencies or conversion options. Architecture owns the risk assessment, mitigations and reassessment conditions.
 
 ### vercel-optimize readiness
 

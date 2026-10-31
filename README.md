@@ -33,6 +33,7 @@ See the [article taxonomy and editorial sources](docs/WEB_APPLICATION_ARCHITECTU
 | Responsibility                  | Tools                                                             | Reference                                                                                    |
 | ------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Runtime, language and rendering | Node.js, TypeScript, React, Next.js                               | [Technology stack and versions](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack)       |
+| Package management and scripts  | npm                                                               | [Technology stack and versions](docs/WEB_APPLICATION_ARCHITECTURE.md#technology-stack)       |
 | Styling and interaction         | Tailwind CSS, CSS Modules, shadcn/ui, Base UI, Lucide             | [Design System](docs/DESIGN_SYSTEM.md)                                                       |
 | Quality and tests               | ESLint, Prettier, Husky, Vitest, Testing Library, MSW, Playwright | [Verification](#verification)                                                                |
 | Hosting and reader services     | GitHub, Vercel, Upstash Redis, Stripe, Resend, Sentry             | [Integration responsibilities](docs/INTEGRATIONS.md#service-responsibilities-and-references) |
@@ -41,7 +42,7 @@ The package manifests define dependencies. [Architecture references](docs/WEB_AP
 
 ## Local Development
 
-Use Node.js 24.22.1 LTS (`.nvmrc`) and npm 12.2.1 (`packageManager`). Select the Node version before installing npm.
+Use Node.js 24.22.1 LTS (`.nvmrc`) and npm 12.2.1 (`packageManager`). Node.js runs JavaScript tools and server code; npm installs dependencies and runs package scripts. Select the Node version before installing npm.
 
 ```bash
 npm install --global npm@12.2.1
@@ -131,7 +132,7 @@ The local copy-editing outline is `../local/WEBSITE_COPY.md`; maintenance instru
 
 Historical design audits are archived under `../local/audit/`, outside Git and deployment artifacts. Their superseded presets are not current requirements. Active guides describe the current checkout; they do not establish which changes are deployed. Use GitHub CI and Vercel release evidence for live status.
 
-See [AI Agents](AGENTS.md#ai-agents) for ChatGPT, OpenAI developer and repository-instruction reference responsibilities. These references concern development workflows, not website AI features.
+See [AI Agents](AGENTS.md#ai-agents) for ChatGPT, OpenAI developer and repository-instruction reference responsibilities. These references concern development workflows, not website AI features. Follow [software maintenance](docs/WEB_APPLICATION_ARCHITECTURE.md#software-maintenance) for evidence-based cleanup, CI improvements and evaluation of agent instructions.
 
 Project Agent Skills and their responsibilities are listed in [Installed Agent Skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills). See [vercel-optimize readiness](docs/INTEGRATIONS.md#vercel-optimize-readiness) before planning a production optimization audit.
 
@@ -146,9 +147,11 @@ Project Agent Skills and their responsibilities are listed in [Installed Agent S
 
 Documentation-only changes do not require the full application suite. [AGENTS.md](AGENTS.md#verification-and-review) defines completion checks.
 
+For dependency updates, follow [dependency security](docs/WEB_APPLICATION_ARCHITECTURE.md#dependency-security). Review audit findings and affected behavior before changing versions; a passing CI severity threshold does not mean the audit is clean. See the [deepmerge residual risk](docs/WEB_APPLICATION_ARCHITECTURE.md#deepmerge-residual-risk) for current mitigations and reassessment conditions.
+
 ## Deployment
 
-Submit changes through a PR. Review CI and Vercel Preview for its head commit; merge when release is authorized. Main CI may reuse recent full PR evidence only for an identical Git tree.
+Follow **Branch → PR → Main**: create a branch from current `main`, commit and push changes, then open a PR targeting `main`. Review the diff, CI and Vercel Preview. Merge only after explicit owner authorization to merge the PR; a commit, PR or deployment request alone is insufficient. Do not enable auto-merge. Merging triggers the production deployment workflow. Main CI may reuse recent full PR evidence only for an identical Git tree.
 
 Production must pass CI for the exact release commit. Report success after Vercel is `READY` and its commit and production aliases match. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow) and [production gate](docs/WEB_APPLICATION_ARCHITECTURE.md#production-gate). Use environment-scoped credentials and isolated Preview resources.
 

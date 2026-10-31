@@ -8,10 +8,17 @@ import { chromium } from "@playwright/test";
 import { calibrateCpuWithRetry, validateCpuCalibration } from "./performance-cpu.mjs";
 import { performanceEnvironment } from "./performance-environment.mjs";
 
+import {
+  performanceOrigin,
+  preparationUrl,
+  validatePreparationResponse,
+  validateNavigationTrace,
+} from "./performance-navigation.mjs";
+
 const require = createRequire(import.meta.url);
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = new URL("../node_modules/.cache/performance/", import.meta.url);
-const origin = "http://127.0.0.1:3211";
+const origin = performanceOrigin;
 const env = {
   ...process.env,
   CHROME_PATH: chromium.executablePath(),
@@ -79,6 +86,9 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
   if (!ready) throw new Error("Isolated production server did not become ready");
+  const preparation = await fetch(preparationUrl, { signal: AbortSignal.timeout(5000) });
+  await preparation.body?.cancel();
+  validatePreparationResponse(preparation);
   // Match Lighthouse CLI's launcher and flags; Playwright launch defaults differ.
   const chromeFlags = (process.env.LIGHTHOUSE_CHROME_FLAGS || "--headless=new").split(/\s+/).filter(Boolean);
   const chrome = await launch({ chromePath: env.CHROME_PATH, chromeFlags });
@@ -120,6 +130,7 @@ try {
             require.resolve("lighthouse/cli/index.js"),
             origin + route.path,
             "--only-categories=performance",
+            `--config-path=${fileURLToPath(new URL("./performance-navigation.mjs", import.meta.url))}`,
             "--throttling-method=devtools",
             `--throttling.cpuSlowdownMultiplier=${calibration.cpuSlowdownMultiplier}`,
             "--throttling.requestLatencyMs=150",
@@ -140,6 +151,8 @@ try {
       });
       const report = JSON.parse(await readFile(path, "utf8"));
       validateCpuCalibration(report, calibration);
+      const trace = JSON.parse(await readFile(new URL(`route-${index}-${sample}-0.trace.json`, output), "utf8"));
+      validateNavigationTrace(trace, origin + route.path);
       if (new URL(report.finalDisplayedUrl).href !== origin + route.path)
         throw new Error("Lighthouse measured an unexpected URL");
       reports.push(report);
