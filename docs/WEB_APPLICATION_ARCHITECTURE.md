@@ -30,7 +30,7 @@ Use each reference only within its assigned responsibility. Official documentati
 | Category                                                        | Responsibility                                                                                    |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | [Technology Stack](#technology-stack)                           | Selected technologies, official product references, installed versions and tool responsibilities. |
-| [Official Documentation](#official-documentation)               | Supported language, framework and browser behavior.                                               |
+| [Official Documentation](#official-documentation)               | Supported language, framework, package-management and browser behavior.                           |
 | [Best Practices](#best-practices)                               | Architecture, composition, implementation and task-specific development workflows.                |
 | [Performance and Compatibility](#performance-and-compatibility) | Laboratory diagnostics, browser-feature support and measured performance improvements.            |
 | [CI/CD](#cicd)                                                  | Workflow execution, verification and release controls.                                            |
@@ -47,6 +47,7 @@ Keep tool choices and versions under Project Decisions and execution steps under
 | [React](https://react.dev/learn)                                               | Component behavior, rendering, state, hooks and React APIs.                                     |
 | [Next.js](https://nextjs.org/docs)                                             | App Router conventions, server/client execution, caching, routing, metadata and framework APIs. |
 | [MDN Web Docs](https://developer.mozilla.org/)                                 | HTML, CSS, JavaScript, browser APIs and compatibility.                                          |
+| [npm Docs](https://docs.npmjs.com/)                                            | Package manifests, lockfiles, dependency installation, scripts and npm CLI behavior.            |
 
 MDN explains web-platform behavior; normative web standards take precedence. Check APIs against the installed framework version. Use the bundled Next.js documentation when available. A general React example does not override a Next.js routing contract.
 
@@ -256,27 +257,61 @@ These decisions select approaches for this application's requirements. They do n
 
 This stack defines each tool's role. Architecture principles govern how the tools work together; operational procedures define how to run and verify them. Use each tool's official documentation for its supported APIs. Listing order does not establish precedence across unrelated responsibilities.
 
-| Category                   | Technology                                                              | Resolved Version                                            | Responsibility                                                                              |
-| -------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Runtime                    | [Node.js](https://nodejs.org/)                                          | 24.22.1 LTS                                                 | Run development tools, builds and Node.js server code.                                      |
-| Language                   | [TypeScript](https://www.typescriptlang.org/)                           | 6.0.3                                                       | Check static types and define code contracts. Validate external data at runtime separately. |
-| UI                         | [React](https://react.dev/)                                             | 19.3.1                                                      | Compose components and manage rendering and interaction state.                              |
-| Framework                  | [Next.js](https://nextjs.org/)                                          | 16.4.2                                                      | Provide App Router routing, server/client rendering, metadata and builds.                   |
-| Styling                    | [Tailwind CSS](https://tailwindcss.com/)                                | 4.3.3                                                       | Apply utility classes and expose design tokens to component styles.                         |
-| Code quality               | [ESLint](https://eslint.org/)                                           | 9.39.5                                                      | Enforce static analysis, framework rules and dependency boundaries.                         |
-| Formatting                 | [Prettier](https://prettier.io/)                                        | 3.9.10                                                      | Format source files consistently, including supported Tailwind class ordering.              |
-| Git hooks                  | [Husky](https://typicode.github.io/husky/)                              | 9.1.7                                                       | Run configured local Git checks. Hooks do not replace CI.                                   |
-| Unit and integration tests | [Vitest](https://vitest.dev/)                                           | 5.0.5                                                       | Run unit and integration tests with assertions and mocks.                                   |
-| Component testing          | [Testing Library](https://testing-library.com/)                         | React 16.3.3; DOM 10.4.2; jest-dom 7.0.1; user-event 14.6.8 | Query and interact with rendered components through user-facing behavior.                   |
-| Network mocking            | [MSW](https://mswjs.io/)                                                | 3.0.3                                                       | Intercept test HTTP requests and simulate provider responses and failures.                  |
-| End-to-end tests           | [Playwright](https://playwright.dev/)                                   | 1.64.1                                                      | Automate browser journeys and verify rendered behavior.                                     |
-| Browser coverage           | [Chromium](https://www.chromium.org/) and [WebKit](https://webkit.org/) | Chromium 156.0.8078.4; WebKit 27.2                          | Exercise the application across the two configured browser engines.                         |
+| Category                       | Technology                                                              | Resolved Version                                            | Responsibility                                                                               |
+| ------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Runtime                        | [Node.js](https://nodejs.org/)                                          | 24.22.1 LTS                                                 | Execute JavaScript outside the browser, including development tools, builds and server code. |
+| Package management and scripts | [npm](https://docs.npmjs.com/)                                          | 12.2.1                                                      | Install dependencies, maintain the lockfile and run package scripts.                         |
+| Language                       | [TypeScript](https://www.typescriptlang.org/)                           | 6.0.3                                                       | Check static types and define code contracts. Validate external data at runtime separately.  |
+| UI                             | [React](https://react.dev/)                                             | 19.3.1                                                      | Compose components and manage rendering and interaction state.                               |
+| Framework                      | [Next.js](https://nextjs.org/)                                          | 16.4.2                                                      | Provide App Router routing, server/client rendering, metadata and builds.                    |
+| Styling                        | [Tailwind CSS](https://tailwindcss.com/)                                | 4.3.3                                                       | Apply utility classes and expose design tokens to component styles.                          |
+| Code quality                   | [ESLint](https://eslint.org/)                                           | 9.39.5                                                      | Enforce static analysis, framework rules and dependency boundaries.                          |
+| Formatting                     | [Prettier](https://prettier.io/)                                        | 3.9.10                                                      | Format source files consistently, including supported Tailwind class ordering.               |
+| Git hooks                      | [Husky](https://typicode.github.io/husky/)                              | 9.1.7                                                       | Run configured local Git checks. Hooks do not replace CI.                                    |
+| Unit and integration tests     | [Vitest](https://vitest.dev/)                                           | 5.0.5                                                       | Run unit and integration tests with assertions and mocks.                                    |
+| Component testing              | [Testing Library](https://testing-library.com/)                         | React 16.3.3; DOM 10.4.2; jest-dom 7.0.1; user-event 14.6.8 | Query and interact with rendered components through user-facing behavior.                    |
+| Network mocking                | [MSW](https://mswjs.io/)                                                | 3.0.3                                                       | Intercept test HTTP requests and simulate provider responses and failures.                   |
+| End-to-end tests               | [Playwright](https://playwright.dev/)                                   | 1.64.1                                                      | Automate browser journeys and verify rendered behavior.                                      |
+| Browser coverage               | [Chromium](https://www.chromium.org/) and [WebKit](https://webkit.org/) | Chromium 156.0.8078.4; WebKit 27.2                          | Exercise the application across the two configured browser engines.                          |
 
 [Chrome for Developers](https://developer.chrome.com/) provides Chrome tooling and documentation; it is not a separate application dependency or test engine. Playwright's WebKit with device emulation does not establish behavior on a physical iPhone.
 
 [package.json](../package.json) defines dependencies, scripts and the Node.js requirement; [package-lock.json](../package-lock.json) locks dependency versions. Use Node.js 24.22.1 LTS and npm 12.2.1. Versions below describe this checkout, not the deployed release. Browser versions come from the Playwright manifest; platform overrides may select a different build. Component and visual responsibilities belong in the [Design System](DESIGN_SYSTEM.md); service responsibilities and official references belong in [Integrations](INTEGRATIONS.md#service-responsibilities-and-references). Its [templates](INTEGRATIONS.md#templates) provide conditional implementation examples, not architecture requirements.
 
+Node.js provides the JavaScript runtime; npm manages packages and invokes scripts. Use `npm install` for intentional dependency changes and commit the updated manifest and lockfile together. Use `npm ci` for clean installations from the committed lockfile in CI and deployment. npm does not replace the Node.js runtime.
+
 Keep test responsibilities distinct: Vitest runs component integrations, Testing Library drives their UI and MSW controls their network responses. Existing Node-runner tests remain a separate suite. See [test workflow](#test-workflow) for file patterns, environments and browser scope, and [project standards](#project-standards) for linting and formatting rules.
+
+#### Dependency Security
+
+Use [npm audit](https://docs.npmjs.com/cli/v12/commands/npm-audit/) to inspect both runtime and development dependencies. CI blocks high and critical production dependency findings; a passing threshold is not a clean audit. Review lower-severity findings separately. Use targeted, compatible updates and verify the lockfile diff and affected behavior. Do not use `npm audit fix --force` without reviewing the proposed version and API changes.
+
+On October 28, 2026, a targeted `npm update fast-uri --ignore-scripts` updated the locked transitive dependency from 3.1.8 to 3.1.9 without changing direct dependency ranges. The [URI advisory](https://github.com/advisories/GHSA-w74x-v6f9-j3xg) identifies 3.1.9 as patched.
+
+##### deepmerge Residual Risk
+
+Reviewed October 28, 2026. Owner: repository owner. Status: open upstream dependency risk, mitigated at the application boundary; not fixed.
+
+| Item            | Assessment                                                                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Advisory        | [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4): prototype poisoning in merged objects. No official patched version was listed at review. |
+| Dependency path | `react-email → @react-email/render → html-to-text → deepmerge@4.3.1`.                                                                                              |
+| Audit result    | Four low-severity entries from one underlying advisory and its dependency chain. The audit is not clean.                                                           |
+| Exposure        | No user-controlled conversion settings were found in the reviewed contact and preference rendering paths. This does not prove the dependency safe for other uses.  |
+| Residual risk   | The vulnerable code remains installed. New call sites, changed dependencies or external conversion options could expose it.                                        |
+
+**Mitigations:** Keep rendering and HTML-to-text options application-owned. Reader fields are escaped content, not conversion settings. Production plain-text messages are constructed separately. Preserve the [email regression tests](../src/features/subscriptions/preference-email.test.mjs): they verify HTML output, escaping and rejection of reader-supplied rendering options. The prototype-shaped input case also checks `Object.prototype`; it does not test or repair every vulnerable merge operation.
+
+**Reassess when:**
+
+- An upstream fix, replacement recommendation, advisory revision or credible exploitation report appears.
+- Any package in the dependency path changes, or email rendering, previews or conversion options change.
+- A new call site accepts external objects, a boundary test fails, or evidence shows a reachable exploit.
+- A release review finds the recorded evidence stale or incomplete.
+
+Before merging a change to this dependency path or its input boundaries, rerun `npm audit`, inspect the resolved chain and run affected email tests. Record the date, evidence and decision. If exposure is found, remove or isolate the affected path and evaluate a tested upgrade, replacement or maintained patch. Do not force a downgrade, suppress the advisory or maintain a fork solely to clear audit output.
+
+Close this record only when a verified fix or dependency removal addresses the advisory and affected tests pass. Distinguish workspace remediation from deployment verification. Audit evidence is retained under `../local/audit/npm-review-2026-10-28/`; it is outside Git and does not establish a production fix. This record creates no automatic monitoring task and grants no merge or deployment authorization.
 
 #### Local Maintenance Tooling
 
@@ -364,7 +399,7 @@ Publisher metadata was checked on 22 October 2026. The table records resolved lo
 | GitHub Actions upload-artifact | 7.0.2             |
 | Stripe API request version     | 2026-09-30.endive |
 
-The Actions workflow pins full upstream commit SHAs. CI installs npm 12.2.1 explicitly; Vercel uses `npx --yes npm@12.2.1 ci`. npm 12 blocks dependency install scripts unless approved. `allowScripts` permits only reviewed versions of esbuild, unrs-resolver and fsevents. Review new scripts before adding an approval; do not use blanket approval.
+The Actions workflow pins full upstream commit SHAs. CI installs npm 12.2.1 explicitly; Vercel runs `node scripts/run-npm.mjs ci`. The wrapper reads the exact npm version from `packageManager` and invokes it through `npx` for installation and build scripts. It translates inherited `npm_config_cache_dir` keys, regardless of case, to the supported `npm_config_cache` setting unless an explicit cache setting already exists. Other environment values and command failures are preserved. The production CI gate still runs before the build wrapper. npm 12 blocks dependency install scripts unless approved. `allowScripts` permits only reviewed versions of esbuild, unrs-resolver and fsevents. Review new scripts before adding an approval; do not use blanket approval.
 
 #### Upgrade Constraints
 
@@ -1016,6 +1051,20 @@ Use these additional rules for automated browser assertions:
 
 The hosted Ubuntu browser jobs install Playwright's pinned Chromium without `--with-deps`, matching the performance job. The runner image supplies system libraries; browser startup still fails if a required library is absent. Avoid unrelated apt upgrades during release verification: PR #91 showed they could consume more than nine minutes of the 15-minute Chromium job budget. Test coverage and job timeouts remain unchanged.
 
+### Software Maintenance
+
+Apply the [OpenAI maintenance case study](https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family) within the task’s authorized scope:
+
+1. **Scope:** Start with one bounded problem. Define behavior to preserve and acceptance evidence before editing.
+2. **Investigate:** Check direct and indirect references, Git history, overlapping PRs and relevant provider state or telemetry. Missing observations do not prove non-use. Preserve intentional fallbacks, recovery paths and emergency controls.
+3. **Prioritize:** Compare expected benefit with implementation and maintenance cost. Rank CI improvements using run history; label estimates and measure results under comparable conditions. Preserve coverage and performance thresholds.
+4. **Verify:** Make a focused change and run affected checks. Fix flaky-test causes rather than hiding failures with retries or removed assertions.
+5. **Review:** Present the evidence, behavior changes, validation and limits in a small PR when requested. Incorporate review feedback before expanding scope.
+
+For a suspected harmful agent instruction, compare the same task, repository snapshot and model with only that instruction changed. Evaluate correctness, tool use, runtime and available cost data. Run this experiment only when useful and authorized; do not make replay a routine requirement.
+
+Follow [Branch → PR → Main](#release-workflow). This workflow grants no additional permission to publish, modify cloud resources or merge. Explicit owner authorization to merge the PR remains required.
+
 ### Local Preview Diagnostics
 
 Use `npm run dev`, then open `http://localhost:3000` or `http://127.0.0.1:3000`. Next.js allows `localhost` by default; `next.config.ts` explicitly adds only `127.0.0.1` through [allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins). Do not use wildcard origins or disable origin protection.
@@ -1035,13 +1084,14 @@ Preserve logs before investigating other failures. A cache reset or restart is r
 
 Provider recovery follows the [Resend webhook](INTEGRATIONS.md#webhook-recovery) and [Redis backup and restore](INTEGRATIONS.md#backup-and-restore) procedures. Treat successful SDK responses without valid acknowledgements as uncertain writes: retain leases and journals, stop further mutations and do not mark webhook processing complete. Production release completion does not resolve a cloud monitoring entitlement failure; record uptime activation separately in [Integrations](INTEGRATIONS.md#local-and-cloud-verification).
 
-1. Push the reviewed PR and wait for full CI and the Vercel Preview for its head SHA.
-2. When release is authorized, merge the verified PR into `main` and record the resulting SHA. GitHub automatically deletes the remote PR branch. Main CI verifies reusable evidence or runs the complete suite.
-3. Confirm a Vercel production deployment exists for that SHA. Distinguish a missing Git trigger from a deployment waiting for CI, building, failed or ready. If no deployment appears, inspect the Git integration instead of rerunning successful tests. Create a deployment from that Git reference when integration recovery requires it.
-4. Wait for successful release CI, Vercel `READY`, matching deployed SHA and production aliases. A ready preview or successful CI alone does not establish production success. Preserve the exact-commit gate; retry a timed-out deployment only after that same SHA has passed CI.
-5. After production succeeds, fetch/prune refs, confirm no commits were added after merge, leave the merged branch and safely delete it with `git branch -d`. Remove only clean task-owned temporary worktrees when needed. Preserve ongoing work and unmerged commits; never force-delete to resolve uncertainty. Start subsequent work from current `main`.
+1. **Branch:** Start new work on a feature branch from current `main`. Reuse the existing branch for ongoing work. Commit changes on that branch; do not push changes directly to `main`.
+2. **PR:** Push the branch and open a PR targeting `main` within the authorized scope. Review the diff, full CI and Vercel Preview for its head SHA. Keep the PR open while changes or owner authorization are pending.
+3. **Main:** Merge only after the owner explicitly authorizes merging the PR and required checks pass. Record the resulting SHA. GitHub automatically deletes the remote PR branch. Main CI verifies reusable evidence or runs the complete suite.
+4. Confirm a Vercel production deployment exists for that SHA. Distinguish a missing Git trigger from a deployment waiting for CI, building, failed or ready. If no deployment appears, inspect the Git integration instead of rerunning successful tests. Create a deployment from that Git reference when integration recovery requires it.
+5. Wait for successful release CI, Vercel `READY`, matching deployed SHA and production aliases. A ready preview or successful CI alone does not establish production success. Preserve the exact-commit gate; retry a timed-out deployment only after that same SHA has passed CI.
+6. After production succeeds, fetch/prune refs, confirm no commits were added after merge, leave the merged branch and safely delete it with `git branch -d`. Remove only clean task-owned temporary worktrees when needed. Preserve ongoing work and unmerged commits; never force-delete to resolve uncertainty. Start subsequent work from current `main`.
 
-A PR-only request does not authorize merging. Deployment includes safe local cleanup of the released branch. Production browser smoke tests are optional follow-up checks unless evidence indicates a failure. Report deployment completion promptly once version and live-state checks pass.
+A commit, PR or deployment request alone does not authorize merging. Passing CI, a ready Preview and an approving code review do not replace explicit owner authorization to merge. Do not enable auto-merge. Prepare the diff and verification evidence before asking for missing authorization; do not ask again when authorization already covers the PR. Merging to `main` triggers the production deployment workflow. Deployment includes safe local cleanup of the released branch. Production browser smoke tests are optional follow-up checks unless evidence indicates a failure. Report deployment completion promptly once version and live-state checks pass.
 
 ### Production Gate
 

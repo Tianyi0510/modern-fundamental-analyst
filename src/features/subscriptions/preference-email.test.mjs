@@ -88,3 +88,34 @@ for (const [locale, lang] of [
     }
   });
 }
+
+test("prototype-shaped reader text stays content and cannot supply renderer options", async () => {
+  const { renderContactEmail } = await import("../contact/contact-email.tsx");
+  const payload = '{"__proto__":{"polluted":"yes"},"constructor":{"prototype":{"polluted":"yes"}}}';
+  const options = JSON.parse('{"__proto__":{"plainText":true},"plainText":true,"htmlToTextOptions":{"wordwrap":1}}');
+  const contact = await renderContactEmail({
+    name: payload,
+    email: "reader@example.com",
+    subject: payload,
+    message: payload,
+    locale: "en",
+    ...options,
+  });
+  const preference = await renderPreferenceEmail(
+    {
+      heading: payload,
+      body: payload,
+      action: "Open preferences",
+      note: payload,
+      ...options,
+    },
+    "https://example.com/preferences",
+  );
+  for (const html of [contact, preference]) {
+    const document = new JSDOM(html).window.document;
+    assert.ok(document.querySelector("table"), "reader fields cannot switch HTML rendering to plain text");
+    assert.ok(document.body.textContent.includes(payload));
+    assert.equal(document.querySelector("script"), null);
+  }
+  assert.equal(Object.prototype.polluted, undefined);
+});
