@@ -72,7 +72,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             if (route === "/about") {
               await expect(page.locator(".page-intro")).toContainText("Tianyi (David) Li");
               await expect(page.locator(".about-copy").first()).toContainText(
-                "You can examine this public record over time.",
+                "I publish my research, portfolio and performance so you can examine my thinking and results over time.",
               );
             }
           }
