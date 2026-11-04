@@ -42,6 +42,8 @@ test.describe("mobile content and navigation QA", () => {
     { tag: "@mobile" },
     async ({ page }) => {
       await page.goto("/memos");
+      await expect(page.locator(".memo-count")).toBeVisible();
+      await expect(page.locator(".memo-summary-meta svg")).toBeVisible();
       const countBox = await page.locator(".memo-count").boundingBox();
       const arrowBox = await page.locator(".memo-summary-meta svg").boundingBox();
       expect(countBox).not.toBeNull();

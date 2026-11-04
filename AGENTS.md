@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for agents working on Modern Fundamental Analyst. Follow higher-priority instructions and explicit user requests. A nested `AGENTS.md` governs its subtree; `AGENTS.override.md` can replace it in the same directory.
+Instructions for agents working on Modern Fundamental Analyst. Follow higher-priority instructions and explicit user requests. For Codex [instruction discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md?surface=app), each directory contributes at most one non-empty file: `AGENTS.override.md` takes precedence over `AGENTS.md`. Codex loads project instructions from the repository root down to the working directory; nearer guidance overrides earlier guidance. Read applicable subtree instructions before editing there; do not assume starting at the root automatically loads every nested file.
 
 ## AI Agents
 
@@ -19,6 +19,18 @@ Use OpenAI’s [maintenance case study](https://developers.openai.com/blog/maint
 Keep repository execution rules here. Link to [architecture](docs/WEB_APPLICATION_ARCHITECTURE.md), [design](docs/DESIGN_SYSTEM.md) and [integrations](docs/INTEGRATIONS.md) for their domain rules instead of copying them. Use the [installed skills](docs/WEB_APPLICATION_ARCHITECTURE.md#installed-agent-skills) only when applicable; a reference does not install a skill, grant access or authorize external actions.
 
 The [README](README.md#mission) owns the mission and investment philosophy; [Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy) owns the article taxonomy and editorial-source status. A source link is not authorization to publish its contents.
+
+### Subagent workflow
+
+Follow the official [Subagents guide](https://learn.chatgpt.com/docs/agent-configuration/subagents?surface=app) within the current task's authorization. Delegate only when the user or an applicable instruction explicitly requests it; this section does not require delegation for ordinary work.
+
+- Keep the primary agent on its current model. It owns scope, file ownership, integration and final verification.
+- Unless the user specifies otherwise, use the project-scoped [`implementation`](.codex/agents/implementation.toml) agent (GPT-6.1 Sol, `gpt-6.1-sol`, `medium` reasoning) for implementation and related tests, and [`reviewer`](.codex/agents/reviewer.toml) (GPT-6.1 Terra, `gpt-6.1-terra`, `medium` reasoning) for read-only review. These standalone TOML files supply role instructions and defaults; no role registration in `.codex/config.toml` is needed. If the active tool cannot select custom agents, pass the same instructions and both settings explicitly through its supported spawn interface. Report unavailable settings instead of silently substituting.
+- Custom agent files' model and effort values take precedence over explicit spawn values. For a user-requested override, spawn without a preset that fixes conflicting settings and pass the requested model and effort explicitly. Keep the same task boundaries and review discipline; do not change account or global defaults.
+- Before spawning, assign bounded tasks and non-overlapping write scopes. Include relevant paths, existing changes, behavior to preserve, required checks and the expected result. Agents share the workspace; reviewers must not edit files. Read-only review is an instruction, not a separate enforced sandbox: subagents inherit the parent session's permissions, provider and MCP servers.
+- When delegation is authorized, have the read-only reviewer identify regression risks while the implementation agent prepares the fix and focused tests. The primary agent owns diagnosis and integration; do not duplicate full suites across agents.
+- Wait for the assigned agents' results before final integration. The primary agent checks the actual diff, resolves findings through the implementation owner when applicable, and runs affected verification. Subagent summaries do not establish correctness by themselves. Serialize browser performance measurements to avoid contention.
+- Preserve the user's action limits across all agents. Delegation grants no additional permission to commit, push, merge, deploy or contact external services.
 
 ## Project context
 
@@ -46,8 +58,8 @@ The site uses Next.js App Router, React, TypeScript, Tailwind CSS and CSS Module
 - For new behavior or a reproducible bug, establish an independent expected result or regression case. Documentation and formatting edits do not require test-first work.
 - Measure optimizations against a baseline and check correctness. Preserve failure, retry and accessibility behavior. Line count, test count and passing checks alone do not prove improvement.
 - Follow the [maintenance workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#software-maintenance) for cleanup and CI improvements. Verify indirect uses and operational purpose before removal. Preserve fallbacks and recovery paths when non-use is unproven.
-- When repeated attempts add no evidence, reassess the assumption and failure category. Stop optional checks once the remaining risk is covered; report blockers accurately.
-- Review the final diff. Report changes, reasons, checks and limits. Distinguish workspace results, mocked tests, CI evidence and live-provider state.
+- After two unsuccessful attempts using the same approach, pause that approach and reassess the hypothesis, framework behavior and failure category before another edit. Stop optional checks once the remaining risk is covered; report blockers accurately. This is a diagnostic checkpoint, not a reason to abandon authorized work or request routine permission.
+- Review the final diff. Report changes, reasons, checks and limits. Distinguish workspace results, mocked tests, CI evidence and live-provider state. For performance reports, retain the build provenance alongside `commit`, `workingTreeDirty` and `workflowRunAttempt`; a clean Git status does not verify ignored build output. Do not describe local SEO checks as indexing or ranking acceptance.
 
 ## Commands
 
@@ -101,6 +113,19 @@ Before changing Next.js APIs, routing or configuration, read the installed-versi
 ## Verification and review
 
 Run affected checks locally. CI owns full verification; deployment checks establish release identity and live status. Do not routinely rerun full suites locally. Repeat a passed check only after a relevant change or to resolve a remaining failure.
+
+### CI and performance repair workflow
+
+Apply this sequence to CI failures and performance repairs; documentation-only changes still use the documentation checks below.
+
+1. **Triage together.** Read the available failed-job logs, artifacts and review findings for the current PR head before choosing a fix. Group failures into stale assertions, application regressions, performance bottlenecks and infrastructure problems. Record the expected behavior and smallest reproduction; check newly completed jobs before finalizing the candidate.
+2. **Verify the mechanism first.** Before changing rendering, hydration or streaming boundaries, consult installed-version or matching official framework documentation. Check server output and no-JavaScript behavior as well as client behavior. Do not assume a successful build or prerendered route guarantees visible initial HTML; do not choose a loading boundary solely to split hydration work.
+3. **Run focused regression checks early.** For hydration or streaming changes, use a production build to check initial header/footer/content visibility, no-JavaScript form notices and disabled controls, hydration errors, and affected navigation/form interactions in the relevant locales and browsers. Run these before a full performance measurement or a push intended to trigger full CI. Keep behavioral assertions intact when updating approved copy.
+4. **Measure narrowly, then completely.** During diagnosis, prefer existing traces and measurements of affected routes using supported tooling. Keep before/after build identity, sampling, throttling and calibration policy comparable. Label partial diagnostic runs explicitly; do not change the acceptance runner or budgets to obtain a pass. Once the candidate is stable, run the required full route/sample set, preferably in CI, and preserve fonts, complete glyph coverage, monitoring and fallbacks.
+5. **Escalate verification once the candidate is stable.** After focused checks and diff review pass, run the required complete CI within the user's authorization. Reuse valid results for unchanged code; rerun only checks affected by a subsequent edit or unresolved failure. Do not rerun unchanged failing jobs merely to obtain green results. Serialize local browser performance measurements and avoid competing builds or browser suites during measurement.
+6. **Close with exact evidence.** Match CI, review and measurement evidence to the final commit and build. Mark intermediate results as superseded after relevant edits. A review of an older commit and passing individual jobs do not establish final-head review or completion of a queued aggregate job. Report the remaining remote checks explicitly, preserve the verification record, and stop optional work once acceptance is established.
+
+Keep progress reports focused on new findings, decisions and results. When only remote checks remain, state that clearly and use brief required checkpoints instead of repeating the same job inventory. If the user asks to wrap up before completion, report the last verified state and pending checks without claiming success.
 
 | Change                    | Completion checks                                                                                                                         |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |

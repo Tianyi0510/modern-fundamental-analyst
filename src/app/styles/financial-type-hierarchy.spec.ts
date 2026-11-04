@@ -12,7 +12,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     test(
       `${prefix || "English"} financial values retain their assigned scale and complete content on ${mobile ? "mobile" : "desktop"}`,
       mobile ? { tag: "@mobile" } : {},
-      async ({ page, browserName }, testInfo) => {
+      async ({ page, browserName }) => {
         for (const width of mobile ? [320, 390, 800] : [801, 900, 1440]) {
           await page.setViewportSize({ width, height: 1000 });
           for (const surface of surfaces) {
@@ -98,19 +98,6 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
                 await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
                 `${prefix}${surface.path} at ${width}px / ${scale}x: ${JSON.stringify(overflow)}`,
               ).toBe(true);
-              if (
-                prefix === "" &&
-                testInfo.project.name === "chromium" &&
-                surface.path === "/" &&
-                (width === 390 || width === 1440)
-              ) {
-                await page
-                  .locator(".metric-band")
-                  .screenshot({ path: testInfo.outputPath(`kpi-${width}-${scale}x.png`) });
-                await page
-                  .locator(".performance-home")
-                  .screenshot({ path: testInfo.outputPath(`performance-${width}-${scale}x.png`) });
-              }
             }
           }
         }

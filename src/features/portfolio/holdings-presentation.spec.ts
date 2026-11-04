@@ -33,10 +33,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       }
       await expect(column).toHaveAttribute("aria-sort", "ascending");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      if (prefix === "" && [390, 1440].includes(width)) {
-        await page.locator(".portfolio-holdings-heading").scrollIntoViewIfNeeded();
-        await page.screenshot({ path: `../local/audit/holdings-2026-10-17/${test.info().project.name}-${width}.png` });
-      }
+
       await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
       await expect(value).toHaveCSS("font-size", "32px");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

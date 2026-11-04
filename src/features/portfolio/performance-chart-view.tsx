@@ -38,17 +38,14 @@ const twrCopy = {
   en: {
     title: "Cumulative Reconstructed TWRR",
     note: "Cumulative closing-price TWRR. Contributions are modeled at period start; net income and costs at period end. Not observed intraday TWRR.",
-    axis: "Cumulative Reconstructed TWRR",
   },
   "zh-tw": {
     title: "累積重建 TWRR",
     note: "以收盤估值重建的累積 TWRR；假設資金於期初流入，淨股息與費用於期末結算，並非實際日內 TWRR。",
-    axis: "累積重建 TWRR",
   },
   "zh-cn": {
     title: "累计重建 TWRR",
     note: "以收盘估值重建的累计 TWRR；假设资金于期初流入，净股息与费用于期末结算，并非实际日内 TWRR。",
-    axis: "累计重建 TWRR",
   },
 } as const;
 
@@ -56,19 +53,16 @@ const xirrCopy = {
   en: {
     title: "Annualized XIRR",
     note: "Since-inception annualized XIRR at each month-end, not individual monthly returns. Periods shorter than 30 days are not annualized and are omitted from the lines.",
-    axis: "Annualized XIRR",
     unavailable: "Not annualized: less than 30 days",
   },
   "zh-tw": {
     title: "年化 XIRR",
     note: "每個月底自成立以來的年化 XIRR，並非各月份的單月報酬；不足 30 天的期間不作年化，也不繪入折線。",
-    axis: "年化 XIRR",
     unavailable: "未年化：不足 30 天",
   },
   "zh-cn": {
     title: "年化 XIRR",
     note: "每个月底自成立以来的年化 XIRR，并非各月份的单月回报；不足 30 天的期间不作年化，也不绘入折线。",
-    axis: "年化 XIRR",
     unavailable: "未年化：不足 30 天",
   },
 } as const;

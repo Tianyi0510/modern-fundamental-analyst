@@ -3,6 +3,17 @@ import { expect, test } from "@playwright/test";
 const origin = "https://www.modernfundamentalanalyst.com";
 const languages = { en: "", "zh-Hant-TW": "/zh-tw", "zh-Hans-CN": "/zh-cn", "x-default": "" };
 
+test("the browser favicon fallback resolves to the existing PNG icon", async ({ request }) => {
+  const redirect = await request.get("/favicon.ico", { maxRedirects: 0 });
+  expect(redirect.status()).toBe(308);
+  expect(redirect.headers().location).toBe("/icon.png");
+  const icon = await request.get("/favicon.ico");
+  expect(icon.ok()).toBe(true);
+  expect(icon.headers()["content-type"]).toContain("image/png");
+  const existing = await request.get("/icon.png");
+  expect(await icon.body()).toEqual(await existing.body());
+});
+
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} public and private search metadata retain their indexing boundary`, async ({ page }) => {
     await page.goto(`${prefix}/about?utm_source=search-regression`);

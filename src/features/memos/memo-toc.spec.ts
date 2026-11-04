@@ -5,9 +5,7 @@ for (const [prefix, label] of [
   ["/zh-tw", "本頁目錄"],
   ["/zh-cn", "本页目录"],
 ]) {
-  test(`${prefix || "English"} article outline opens and targets unique headings @mobile`, async ({
-    page,
-  }, testInfo) => {
+  test(`${prefix || "English"} article outline opens and targets unique headings @mobile`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`${prefix}/memos/microsoft-stock-analysis-fiscal-year-2024`);
@@ -51,9 +49,7 @@ for (const [prefix, label] of [
       await trigger.click();
       await expect(nav).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      if (width === 320) {
-        await page.screenshot({ path: testInfo.outputPath("memo-toc-mobile.png") });
-      }
+
       await trigger.click();
       await expect(nav).toBeHidden();
     }

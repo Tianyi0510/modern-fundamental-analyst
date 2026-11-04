@@ -7,8 +7,8 @@ const source = "b".repeat(40);
 const now = Date.parse("2026-10-02T12:00:00Z");
 function fixture() {
   return {
-    [`/commits/${sha}`]: { parents: [{ sha: "c".repeat(40) }, { sha: source }], commit: { tree: { sha: "tree" } } },
-    [`/commits/${source}`]: { commit: { tree: { sha: "tree" } } },
+    [`/git/commits/${sha}`]: { parents: [{ sha: "c".repeat(40) }, { sha: source }], tree: { sha: "tree" } },
+    [`/git/commits/${source}`]: { tree: { sha: "tree" } },
     [`/actions/workflows/ci.yml/runs?event=pull_request&head_sha=${source}&per_page=100`]: {
       workflow_runs: [
         {
@@ -37,8 +37,27 @@ function fixture() {
 const evaluate = (data, event = "push") =>
   findReusableCI({ event, sha, repository: "owner/repo", now, get: (path) => Promise.resolve(data[path]) });
 const runsKey = `/actions/workflows/ci.yml/runs?event=pull_request&head_sha=${source}&per_page=100`;
-test("identical merge tree reuses recent complete same-repository PR evidence", async () => {
-  assert.deepEqual(await evaluate(fixture()), { id: 42, sha: source, tree: "tree" });
+test("identical merge tree reuses evidence using Git commit metadata without fetching file diffs", async () => {
+  const data = fixture();
+  const paths = [];
+  const evidence = await findReusableCI({
+    event: "push",
+    sha,
+    repository: "owner/repo",
+    now,
+    get: async (path) => {
+      paths.push(path);
+      assert.ok(Object.hasOwn(data, path), `Unexpected endpoint: ${path}`);
+      return data[path];
+    },
+  });
+  assert.deepEqual(evidence, { id: 42, sha: source, tree: "tree" });
+  assert.deepEqual(paths, [
+    `/git/commits/${sha}`,
+    `/git/commits/${source}`,
+    runsKey,
+    "/actions/runs/42/attempts/1/jobs?per_page=100",
+  ]);
 });
 test("PR events always run complete CI", async () => {
   assert.equal(await evaluate({}, "pull_request"), null);
@@ -46,10 +65,10 @@ test("PR events always run complete CI", async () => {
 test("changed trees, non-merge commits and missing evidence require full CI", async () => {
   for (const mutate of [
     (d) => {
-      d[`/commits/${source}`].commit.tree.sha = "different";
+      d[`/git/commits/${source}`].tree.sha = "different";
     },
     (d) => {
-      d[`/commits/${sha}`].parents.pop();
+      d[`/git/commits/${sha}`].parents.pop();
     },
     (d) => {
       delete d[runsKey];
@@ -118,4 +137,52 @@ test("performance evidence is required for reuse", async () => {
       conclusion;
     assert.equal(await evaluate(data), null);
   }
+});
+
+test("missing commit parents or either tree requires full CI", async () => {
+  for (const mutate of [
+    (data) => {
+      delete data[`/git/commits/${sha}`].parents;
+    },
+    (data) => {
+      data[`/git/commits/${sha}`].parents[1] = null;
+    },
+    (data) => {
+      delete data[`/git/commits/${sha}`].tree;
+    },
+    (data) => {
+      delete data[`/git/commits/${source}`].tree;
+    },
+    (data) => {
+      data[`/git/commits/${sha}`].tree.sha = "";
+    },
+  ]) {
+    const data = fixture();
+    mutate(data);
+    assert.equal(await evaluate(data), null);
+  }
+});
+
+test("reuse expires after 24 hours and rejects future timestamps", async () => {
+  for (const [age, reusable] of [
+    [0, true],
+    [86_400_000, true],
+    [86_400_001, false],
+    [-1, false],
+  ]) {
+    const data = fixture();
+    data[runsKey].workflow_runs[0].updated_at = new Date(now - age).toISOString();
+    assert.equal(Boolean(await evaluate(data)), reusable, `Evidence age: ${age}`);
+  }
+});
+
+test("only the latest run attempt can provide all six successful jobs", async () => {
+  const data = fixture();
+  data[runsKey].workflow_runs[0].run_attempt = 2;
+  data["/actions/runs/42/attempts/2/jobs?per_page=100"] = structuredClone(
+    data["/actions/runs/42/attempts/1/jobs?per_page=100"],
+  );
+  assert.deepEqual(await evaluate(data), { id: 42, sha: source, tree: "tree" });
+  data["/actions/runs/42/attempts/2/jobs?per_page=100"].jobs.pop();
+  assert.equal(await evaluate(data), null);
 });

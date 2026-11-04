@@ -4,6 +4,8 @@ import { pageFunctions } from "lighthouse/core/lib/page-functions.js";
 // Target 1000 is slightly slower than that reference's effective index of 1048.31.
 const targetBenchmarkIndex = 1000;
 const maximumDrift = 0.15;
+const targetPrecision = 0.05;
+const maximumCorrections = 2;
 
 class CpuCalibrationInstability extends Error {}
 
@@ -41,15 +43,29 @@ export async function calibrateCpu(openPage, recordSamples = async () => {}) {
   const samples = await sample();
   await recordSamples("host", samples);
   const calibration = createCpuCalibration(samples);
-  const effectiveSamples = await sample(calibration.cpuSlowdownMultiplier);
-  await recordSamples("effective", effectiveSamples);
-  if (effectiveSamples.some((value) => !Number.isFinite(value) || value <= 0)) {
-    throw new Error("Three valid effective CPU benchmark samples are required");
+  let cpuSlowdownMultiplier = calibration.cpuSlowdownMultiplier;
+  const steps = [];
+  for (let correction = 0; correction <= maximumCorrections; correction++) {
+    const effectiveSamples = await sample(cpuSlowdownMultiplier);
+    const stage = correction === 0 ? "effective" : `effective-correction-${correction}`;
+    await recordSamples(stage, effectiveSamples, { cpuSlowdownMultiplier });
+    if (effectiveSamples.some((value) => !Number.isFinite(value) || value <= 0)) {
+      throw new Error("Three valid effective CPU benchmark samples are required");
+    }
+    if (effectiveSamples.some((value) => !withinDrift(value, targetBenchmarkIndex))) {
+      throw new CpuCalibrationInstability("Applied CPU slowdown did not reproduce the performance reference");
+    }
+    const effectiveBenchmarkIndex = [...effectiveSamples].sort((a, b) => a - b)[1];
+    steps.push({ cpuSlowdownMultiplier, effectiveSamples, effectiveBenchmarkIndex });
+    if (Math.abs(effectiveBenchmarkIndex - targetBenchmarkIndex) <= targetBenchmarkIndex * targetPrecision) {
+      return { ...calibration, cpuSlowdownMultiplier, effectiveSamples, targetPrecision, maximumDrift, steps };
+    }
+    // Correct only measured pre-audit bias, never an application timing or budget failure.
+    const adjusted = Math.max(1, cpuSlowdownMultiplier * (effectiveBenchmarkIndex / targetBenchmarkIndex));
+    if (adjusted === cpuSlowdownMultiplier) break;
+    cpuSlowdownMultiplier = adjusted;
   }
-  if (effectiveSamples.some((value) => !withinDrift(value, targetBenchmarkIndex))) {
-    throw new CpuCalibrationInstability("Applied CPU slowdown did not reproduce the performance reference");
-  }
-  return { ...calibration, effectiveSamples };
+  throw new CpuCalibrationInstability("Applied CPU slowdown did not reach the 5% target precision");
 }
 
 // Retry only pre-audit host instability; never retry Lighthouse samples or budget failures.
@@ -57,7 +73,9 @@ export async function calibrateCpuWithRetry(openPage, recordSamples = async () =
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       return {
-        ...(await calibrateCpu(openPage, (stage, samples) => recordSamples(stage, samples, attempt))),
+        ...(await calibrateCpu(openPage, (stage, samples, settings) =>
+          recordSamples(stage, samples, attempt, settings),
+        )),
         attempt,
       };
     } catch (error) {

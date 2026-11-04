@@ -1,7 +1,7 @@
 import { postJson } from "@/lib/client-post-json";
 import type { Locale } from "@/lib/i18n";
 
-export type ContactMessageRequest = {
+type ContactMessageRequest = {
   name: string;
   email: string;
   subject: string;

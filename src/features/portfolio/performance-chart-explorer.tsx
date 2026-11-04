@@ -84,7 +84,7 @@ export function PerformanceChartExplorer({
             {visible ? (
               <Suspense fallback={placeholder}>
                 <InteractiveLineChart
-                  data={observations.map((row) => ({ ...row }))}
+                  data={observations}
                   config={{
                     portfolioReturn: { label: portfolio, color: "var(--chart-portfolio)" },
                     benchmarkReturn: { label: "SPY", color: "var(--chart-benchmark)" },

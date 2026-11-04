@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 export type ButtonVariant = "primary" | "contrast" | "inverse" | "quiet";
-export type ButtonDisabledFeedback = "standard" | "muted" | "muted-busy";
+type ButtonDisabledFeedback = "standard" | "muted" | "muted-busy";
 export type ButtonSize = "regular" | "small" | "text" | "icon";
 
 const variants: Record<ButtonVariant, string> = {

@@ -5,6 +5,7 @@ import { appearance } from "./performance-page-content.styles";
 import { PerformanceChart } from "@/features/portfolio/performance-chart";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header/site-header";
+import { Activity } from "react";
 import { portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
@@ -168,7 +169,10 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
 
   return (
     <div className="performance-page">
-      <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+      {/* Always-visible boundaries split hydration while preserving the initial HTML. */}
+      <Activity mode="visible">
+        <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+      </Activity>
       <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <PageHero
           variant="performance"
@@ -232,7 +236,9 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
           </section>
         </div>
       </main>
-      <PageFooter locale={locale} />
+      <Activity mode="visible">
+        <PageFooter locale={locale} />
+      </Activity>
     </div>
   );
 }

@@ -29,7 +29,7 @@ for (const copy of [
   test(
     `${copy.prefix || "English"} Contact identifies invalid fields and distinguishes HTTP 400`,
     { tag: "@mobile" },
-    async ({ page }, testInfo) => {
+    async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       let requests = 0;
       const keys: (string | undefined)[] = [];
@@ -63,9 +63,7 @@ for (const copy of [
       await expect(name).toHaveAccessibleDescription(copy.name);
       await expect(name).toHaveAttribute("aria-invalid", "true");
       expect(requests).toBe(0);
-      if (copy.prefix === "" && testInfo.project.name === "chromium") {
-        await page.locator(".contact-section").screenshot({ path: testInfo.outputPath("inline-validation.png") });
-      }
+
       await name.fill("Reader");
       await expect(name).not.toHaveAttribute("aria-invalid", "true");
       await submit.click();

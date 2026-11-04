@@ -161,6 +161,37 @@ test("child spans retain release and segment metadata without copying private at
   assert.ok(!JSON.stringify(span).includes("reader@example.com"));
 });
 
+test("span measurements retain only own finite numbers without mutating input", () => {
+  const attributes = Object.freeze(
+    Object.assign(Object.create({ "measurements.inherited": 100 }), {
+      "sentry.op": "navigation",
+      "measurements.zero": 0,
+      "measurements.finite": 123.5,
+      "measurements.nan": NaN,
+      "measurements.infinity": Infinity,
+      "measurements.string": "123",
+      "user.email": "reader@example.com",
+    }),
+  );
+  const input = Object.freeze({
+    trace_id: "trace",
+    span_id: "span",
+    start_timestamp: 1,
+    end_timestamp: 2,
+    name: "GET https://www.modernfundamentalanalyst.com/performance?token=secret",
+    attributes,
+  });
+  const result = sanitizeSentrySpan(input);
+  assert.equal(result.name, "GET https://www.modernfundamentalanalyst.com/performance");
+  assert.deepEqual(result.attributes, {
+    "sentry.op": "navigation",
+    "measurements.zero": 0,
+    "measurements.finite": 123.5,
+  });
+  assert.notEqual(result.attributes, attributes);
+  assert.equal(input.attributes["user.email"], "reader@example.com");
+});
+
 test("chart failures retain original stack locations and standard types without private error details", () => {
   const original = {
     tags: { feature: "performance-chart", measure: "twr" },

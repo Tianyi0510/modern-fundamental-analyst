@@ -5,11 +5,12 @@ import { pathToFileURL } from "node:url";
 export async function findReusableCI({ event, sha, repository, get, now = Date.now() }) {
   if (event !== "push" || !/^[a-f0-9]{40}$/.test(sha ?? "")) return null;
   try {
-    const commit = await get(`/commits/${sha}`);
+    // Git metadata supplies parents and trees without downloading changed files or patches.
+    const commit = await get(`/git/commits/${sha}`);
     if (commit.parents?.length !== 2) return null;
     const source = commit.parents[1].sha;
-    const original = await get(`/commits/${source}`);
-    if (!commit.commit?.tree?.sha || commit.commit.tree.sha !== original.commit?.tree?.sha) return null;
+    const original = await get(`/git/commits/${source}`);
+    if (!commit.tree?.sha || commit.tree.sha !== original.tree?.sha) return null;
     const data = await get(`/actions/workflows/ci.yml/runs?event=pull_request&head_sha=${source}&per_page=100`);
     const run = data.workflow_runs
       .filter(
@@ -41,7 +42,7 @@ export async function findReusableCI({ event, sha, repository, get, now = Date.n
       )
     )
       return null;
-    return { id: run.id, sha: source, tree: commit.commit.tree.sha };
+    return { id: run.id, sha: source, tree: commit.tree.sha };
   } catch {
     // Missing, malformed or unavailable evidence means run the full suite.
     return null;

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-  test(`${prefix || "English"} Home performance reflows with enlarged text`, async ({ page }, testInfo) => {
+  test(`${prefix || "English"} Home performance reflows with enlarged text`, async ({ page }) => {
     for (const width of [900, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(prefix || "/");
@@ -37,9 +37,6 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         }),
       ).toBe(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-      if (prefix === "" && width === 900) {
-        await page.locator(".performance-home").screenshot({ path: testInfo.outputPath("enlarged-performance.png") });
-      }
     }
     await page.locator(".performance-copy").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/performance$`));

@@ -3,9 +3,10 @@ export const preparationUrl = `${performanceOrigin}/robots.txt`;
 
 // Prepare a same-origin renderer before tracing without loading application assets.
 // Lighthouse still clears storage and the browser cache before the measured navigation.
+// onlyAudits adds the native Baseline audit to the CLI performance-category selection.
 export default {
   extends: "lighthouse:default",
-  settings: { blankPage: preparationUrl, disableStorageReset: false },
+  settings: { blankPage: preparationUrl, disableStorageReset: false, onlyAudits: ["baseline"] },
 };
 
 export function validatePreparationResponse(response) {

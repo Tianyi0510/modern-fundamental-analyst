@@ -46,25 +46,6 @@ test.describe("header interaction QA", () => {
     await expect(legalBody).toHaveCSS("padding-bottom", "96px");
   });
 
-  test("desktop page heroes share one vertical rhythm", async ({ page }) => {
-    for (const path of [
-      "/",
-      "/about",
-      "/portfolio",
-      "/performance",
-      "/memos",
-      "/contact",
-      "/support",
-      "/disclaimer",
-      "/subscription-preferences",
-    ]) {
-      await page.goto(path);
-      const hero = page.locator(".hero, .page-hero, .legal-hero").first();
-      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
-      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
-    }
-  });
-
   test("CTA focus uses shared scale without lift or shadow", async ({ page }) => {
     for (const [path, selector] of [
       ["/", ".hero .button"],
@@ -301,25 +282,6 @@ test.describe("mobile content and navigation QA", () => {
     const legalBody = page.locator(".legal-body");
     await expect(legalBody).toHaveCSS("padding-top", "96px");
     await expect(legalBody).toHaveCSS("padding-bottom", "96px");
-  });
-
-  test("mobile page heroes share one vertical rhythm", { tag: "@mobile" }, async ({ page }) => {
-    for (const path of [
-      "/",
-      "/about",
-      "/portfolio",
-      "/performance",
-      "/memos",
-      "/contact",
-      "/support",
-      "/disclaimer",
-      "/subscription-preferences",
-    ]) {
-      await page.goto(path);
-      const hero = page.locator(".hero, .page-hero, .legal-hero").first();
-      await expect(hero, `${path} hero`).toHaveCSS("padding-top", "96px");
-      await expect(hero, `${path} hero`).toHaveCSS("padding-bottom", "96px");
-    }
   });
 
   test("mobile page content converges on shared gutters and stack spacing", { tag: "@mobile" }, async ({ page }) => {

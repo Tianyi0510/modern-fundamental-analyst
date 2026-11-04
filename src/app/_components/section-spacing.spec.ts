@@ -80,39 +80,43 @@ const routes = [
 ] as const;
 
 for (const width of [1440, 390]) {
-  test(`page sections use 96px padding without external gaps at ${width}px`, async ({ page }) => {
-    for (const [route, sections] of routes) {
-      await page.setViewportSize({ width, height: 1000 });
-      await page.goto(route);
-      for (const [outer, inner] of sections) {
-        await expect(page.locator(outer).first()).toBeAttached();
-        await expect(page.locator(inner).first()).toBeAttached();
-        for (const block of await page.locator(outer).all()) {
-          await expect(block).toHaveCSS("margin-top", "0px");
-          await expect(block).toHaveCSS("margin-bottom", "0px");
+  test(
+    `page sections use 96px padding without external gaps at ${width}px`,
+    width === 390 ? { tag: "@mobile" } : {},
+    async ({ page }) => {
+      for (const [route, sections] of routes) {
+        await page.setViewportSize({ width, height: 1000 });
+        await page.goto(route);
+        for (const [outer, inner] of sections) {
+          await expect(page.locator(outer).first()).toBeAttached();
+          await expect(page.locator(inner).first()).toBeAttached();
+          for (const block of await page.locator(outer).all()) {
+            await expect(block).toHaveCSS("margin-top", "0px");
+            await expect(block).toHaveCSS("margin-bottom", "0px");
+          }
+          for (const block of await page.locator(inner).all()) {
+            await expect(block).toHaveCSS("padding-top", "96px");
+            await expect(block).toHaveCSS("padding-bottom", inner === ".memo-article-header" ? "0px" : "96px");
+          }
         }
-        for (const block of await page.locator(inner).all()) {
-          await expect(block).toHaveCSS("padding-top", "96px");
-          await expect(block).toHaveCSS("padding-bottom", inner === ".memo-article-header" ? "0px" : "96px");
-        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    }
-    await page.goto("/disclaimer");
-    await expect(page.locator(".legal-content")).toHaveCSS("row-gap", "48px");
-    await page.goto("/");
-    const gap = await page.locator(".home-about").evaluate((element) => {
-      const previous = element.previousElementSibling!;
-      return element.getBoundingClientRect().top - previous.getBoundingClientRect().bottom;
-    });
-    expect(gap).toBe(0);
-    await expect(page.locator(".home-about")).toHaveCSS("row-gap", "48px");
-    const headerGap = await page.locator(".home-opening").evaluate((element) => {
-      const header = document.querySelector(".home-header")!;
-      return element.getBoundingClientRect().top - header.getBoundingClientRect().bottom;
-    });
-    expect(headerGap).toBe(0);
-  });
+      await page.goto("/disclaimer");
+      await expect(page.locator(".legal-content")).toHaveCSS("row-gap", "48px");
+      await page.goto("/");
+      const gap = await page.locator(".home-about").evaluate((element) => {
+        const previous = element.previousElementSibling!;
+        return element.getBoundingClientRect().top - previous.getBoundingClientRect().bottom;
+      });
+      expect(gap).toBe(0);
+      await expect(page.locator(".home-about")).toHaveCSS("row-gap", "48px");
+      const headerGap = await page.locator(".home-opening").evaluate((element) => {
+        const header = document.querySelector(".home-header")!;
+        return element.getBoundingClientRect().top - header.getBoundingClientRect().bottom;
+      });
+      expect(headerGap).toBe(0);
+    },
+  );
 }
 
 for (const width of [390, 801, 1440]) {

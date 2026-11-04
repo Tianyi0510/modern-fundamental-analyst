@@ -1,4 +1,4 @@
-import { appearance } from "./not-found.styles";
+import { appearance } from "@/app/_components/not-found.styles";
 import { ButtonLink } from "@/components/button-link";
 
 export default function NotFound() {

@@ -562,6 +562,10 @@ Prefer integration-managed values. Never expose the upload token with `NEXT_PUBL
 
 `src/instrumentation-client.ts` starts the browser monitoring bridge before hydration. The bridge buffers early errors immediately and loads the SDK asynchronously after yielding to the browser. `src/instrumentation.ts` loads Node/Edge configuration and exposes request-error reporting. Localized and global boundaries report errors while preserving retry and navigation UI.
 
+The browser bootstrap resolves its DSN through the lightweight `src/lib/sentry-dsn.ts` module. The asynchronous SDK module constructs shared privacy and sampling options before initialization, keeping the sanitizers out of the initial script graph while preserving early error buffering.
+
+The reporting bridge isolates synchronous SDK capture failures, including errors whose stack getter throws. A failed capture does not invalidate an initialized SDK or prevent subsequent buffered errors from being attempted. The failed event is not retried or reported recursively; application error recovery remains available. Node and Edge configuration tests cover DSN precedence, missing configuration, runtime opt-out and production privacy/sampling settings.
+
 `next.config.ts` wraps Next.js with Sentry, uploads maps only with complete upload settings, then deletes uploaded generated maps from output. Runtime reporting needs no upload token.
 
 Production builds replace `__SENTRY_DEBUG__` with `false` through Next.js `compiler.define`, allowing both bundlers to remove internal SDK debug diagnostics. Development retains those diagnostics. This does not disable Sentry Logs, errors, tracing, metrics or Replay; their sampling and initialization remain unchanged.
@@ -614,11 +618,12 @@ For telemetry regressions, CI builds with a fake DSN and `NEXT_PUBLIC_VERCEL_ENV
 
 ```bash
 node --import ./scripts/register-server.mjs --test src/lib/sentry-options.test.mjs src/lib/sentry-server.test.mjs
+npm run test:unit -- src/sentry-config.test.ts src/lib/sentry-client.test.ts src/lib/sentry-client-scheduling.test.ts src/lib/sentry-client-sdk.test.ts src/lib/sentry-replay.test.ts src/lib/yield-to-main.test.ts
 NEXT_PUBLIC_SENTRY_DSN=https://public@sentry.invalid/1 NEXT_PUBLIC_VERCEL_ENV=test SENTRY_DSN= SENTRY_AUTH_TOKEN= npm run build
 PLAYWRIGHT_USE_PRODUCTION_BUILD=1 PLAYWRIGHT_SENTRY_TEST=1 npx playwright test src/lib/sentry.spec.ts --project=chromium --project=webkit
 ```
 
-These commands send no event to the real project. A focused development-server check is also available:
+The unit checks cover Node/Edge configuration, capture-failure isolation, startup scheduling and Replay privacy; mocked boundaries do not establish browser transport or cloud ingestion. These commands send no event to the real project. A focused development-server check is also available:
 
 ```sh
 PLAYWRIGHT_SENTRY_TEST=1 npx playwright test src/lib/sentry.spec.ts --project=chromium

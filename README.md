@@ -38,7 +38,7 @@ See the [article taxonomy and editorial sources](docs/WEB_APPLICATION_ARCHITECTU
 | Quality and tests               | ESLint, Prettier, Husky, Vitest, Testing Library, MSW, Playwright | [Verification](#verification)                                                                |
 | Hosting and reader services     | GitHub, Vercel, Upstash Redis, Stripe, Resend, Sentry             | [Integration responsibilities](docs/INTEGRATIONS.md#service-responsibilities-and-references) |
 
-The package manifests define dependencies. [Architecture references](docs/WEB_APPLICATION_ARCHITECTURE.md#architecture-references) define guidance priorities. Python supports local workspace cleanup only; it is not required to build or run the website.
+The package manifests define dependencies. [Architecture references](docs/WEB_APPLICATION_ARCHITECTURE.md#architecture-references) define guidance priorities. Python supports optional font-asset regeneration and local workspace cleanup; it is not required to build or run the website. See [font asset maintenance](docs/WEB_APPLICATION_ARCHITECTURE.md#font-asset-maintenance).
 
 ## Local Development
 
@@ -81,12 +81,13 @@ Run checks for the changed files and behavior. CI runs full verification; releas
 | Static checks, build and production Chromium             | `npm run verify`                                                  |
 | Performance budgets against an existing production build | `npm run test:performance`                                        |
 | CSS Baseline compatibility lint                          | `npm run lint:compatibility`                                      |
-| Baseline observations from saved performance traces      | `npm run test:compatibility`                                      |
 | Mobile WebKit against an existing production build       | `npm run test:webkit`                                             |
+
+Lighthouse reports from `npm run test:performance` include the native Baseline audit in `audits.baseline`; no separate Baseline command is required. Keep raw reports and environment identity with each measurement; the working-tree flag and CI attempt identify important provenance differences, but do not prove that an existing build matches the checkout.
 
 Follow [Performance and Compatibility](docs/WEB_APPLICATION_ARCHITECTURE.md#performance-and-compatibility) for reference responsibilities and the [Baseline and Lighthouse review](docs/WEB_APPLICATION_ARCHITECTURE.md#baseline-and-lighthouse-review) for execution. Lighthouse provides laboratory diagnostics, Baseline describes browser-feature support, and web.dev/performance guides measured improvements. Browser tests and field Core Web Vitals remain separate evidence.
 
-Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Both browsers use timing-balanced file lists; see [browser shard allocation](docs/WEB_APPLICATION_ARCHITECTURE.md#local-runs-and-shard-maintenance) for evidence and maintenance. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack. The configuration selects supported CSS chunking for each bundler. Both builds need access to Google Fonts when the fonts are not cached.
+Replace placeholders with actual paths. WebKit selects `@mobile` cases with iPhone 13 emulation; CI runs its two shards on separate macOS runners. Both browsers use timing-balanced file lists; see [browser shard allocation](docs/WEB_APPLICATION_ARCHITECTURE.md#local-runs-and-shard-maintenance) for evidence and maintenance. Install missing browsers with `npx playwright install chromium webkit`. If local Turbopack cannot bind a worker port, use `npm run build -- --webpack` and report that fallback; CI uses Turbopack. The configuration selects supported CSS chunking for each bundler. Both builds may need Google Fonts access for Jost and Noto Sans TC when uncached; Noto Sans SC uses checked-in assets.
 
 ### Commit hooks
 
@@ -96,17 +97,17 @@ Fix failures, review and stage the changes, then commit again. lint-staged tempo
 
 ## Project Layout
 
-| Directory                     | Purpose                                                                                |
-| ----------------------------- | -------------------------------------------------------------------------------------- |
-| `src/app/`                    | Routes, localized page composition in `_components`, metadata, and global CSS          |
-| `src/components/site-header/` | Header implementation, owned hooks, styles and browser tests.                          |
-| `src/features/`               | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls |
-| `src/components/`             | Shared navigation, footer, disclosure, form primitives, and email layout               |
-| `scripts/`                    | Node loader, test helpers, WebKit runner, and production deployment gate               |
-| `src/lib/`                    | Shared formatting, localization, request utilities, and service clients                |
-| `public/`                     | Public icons, logos, and the social sharing image                                      |
-| `.github/`                    | GitHub Actions workflows                                                               |
-| `docs/`                       | Active design, architecture and integration guides, plus planned release notes         |
+| Directory                     | Purpose                                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| `src/app/`                    | Routes, localized page composition in `_components`, metadata, and global CSS                  |
+| `src/components/site-header/` | Header implementation, owned hooks, styles and browser tests.                                  |
+| `src/features/`               | Portfolio, memos, subscriptions, contact, and support; each owns its data and controls         |
+| `src/components/`             | Shared navigation, footer, disclosure, form primitives, and email layout                       |
+| `scripts/`                    | Node loader, test helpers, browser/performance runners, font regeneration and CI/release gates |
+| `src/lib/`                    | Shared formatting, localization, request utilities, and service clients                        |
+| `public/`                     | Public icons, logos, and the social sharing image                                              |
+| `.github/`                    | GitHub Actions workflows                                                                       |
+| `docs/`                       | Active design, architecture and integration guides, plus planned release notes                 |
 
 English routes have no prefix; Chinese routes use `/zh-tw` and `/zh-cn`. The `(en)` route group does not add a URL segment. Route files follow Next.js naming conventions.
 

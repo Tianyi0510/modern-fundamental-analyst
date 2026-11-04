@@ -24,7 +24,7 @@ function trace() {
 test("preparation retains Lighthouse defaults and cold storage reset", () => {
   assert.deepEqual(config, {
     extends: "lighthouse:default",
-    settings: { blankPage: preparationUrl, disableStorageReset: false },
+    settings: { blankPage: preparationUrl, disableStorageReset: false, onlyAudits: ["baseline"] },
   });
 });
 
@@ -64,4 +64,15 @@ test("renderer swaps, missing evidence and wrong URLs fail closed", () => {
   const wrongProcess = trace();
   wrongProcess.traceEvents[2].pid = 99;
   assert.throws(() => validateNavigationTrace(wrongProcess, target), /navigationStart/);
+});
+
+// Resolve the installed Lighthouse configuration, without starting a browser.
+test("performance selection includes the native Baseline audit without unrelated audits", async () => {
+  const { initializeConfig } = await import("lighthouse/core/config/config.js");
+  const flags = { onlyCategories: ["performance"] };
+  const { resolvedConfig } = await initializeConfig("navigation", config, flags);
+  const { resolvedConfig: performanceOnly } = await initializeConfig("navigation", undefined, flags);
+  const ids = (value) => value.audits.map((audit) => audit.implementation.meta.id).sort();
+  assert.deepEqual(ids(resolvedConfig), [...ids(performanceOnly), "baseline"].sort());
+  assert.ok(resolvedConfig.audits.find((audit) => audit.implementation.meta.id === "baseline"));
 });

@@ -8,8 +8,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
     try {
       const page = await context.newPage();
-      for (const route of ["contact", "subscription-preferences"]) {
+      for (const route of ["", "performance", "contact", "subscription-preferences"]) {
         await page.goto(`${prefix}/${route}`);
+        await expect(page.getByRole("banner")).toBeVisible();
+        await expect(page.getByRole("contentinfo")).toBeVisible();
         const forms = page.locator("form");
         expect(await forms.count()).toBeGreaterThan(0);
         for (const form of await forms.all()) {

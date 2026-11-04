@@ -51,6 +51,7 @@ const nextConfig: NextConfig = {
     const newSlug = "microsoft-stock-analysis-fiscal-year-2024";
 
     return [
+      { source: "/favicon.ico", destination: "/icon.png", permanent: true },
       ...["", "/zh-tw", "/zh-cn"].map((prefix) => ({
         source: `${prefix}/memos/${oldSlug}`,
         destination: `${prefix}/memos/${newSlug}`,

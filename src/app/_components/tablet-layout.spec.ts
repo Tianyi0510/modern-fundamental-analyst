@@ -15,7 +15,7 @@ const routes = [
 ];
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-  test(`${prefix || "English"} tablet pages remain contained`, async ({ page }, testInfo) => {
+  test(`${prefix || "English"} tablet pages remain contained`, async ({ page }) => {
     test.setTimeout(120_000);
     for (const width of [768, 834, 1024, 1180, 1280]) {
       await page.setViewportSize({ width, height: 1024 });
@@ -43,12 +43,6 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             const second = (await options.nth(1).boundingBox())!;
             expect(first.y).toBeCloseTo(second.y, 0);
           }
-        }
-        if (!prefix && width === 834) {
-          await page.screenshot({
-            path: testInfo.outputPath(`${route.replaceAll("/", "-") || "home"}.png`),
-            fullPage: true,
-          });
         }
       }
     }

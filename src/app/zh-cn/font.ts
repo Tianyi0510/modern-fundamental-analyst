@@ -1,8 +1,3 @@
-import { Noto_Sans_SC } from "next/font/google";
+import "./fonts/noto-sans-sc.css";
 
-export const notoSansSc = Noto_Sans_SC({
-  variable: "--font-noto-sans-sc",
-  subsets: ["latin"],
-  display: "swap",
-  preload: false,
-});
+export const notoSansSc = { variable: "font-noto-sans-sc" };

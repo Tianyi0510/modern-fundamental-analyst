@@ -43,7 +43,6 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:performance": "node scripts/run-performance.mjs",
-    "test:compatibility": "node scripts/run-baseline.mjs",
     "lint:compatibility": "eslint --config eslint.css.config.mjs \"src/**/*.css\" --max-warnings=0"
   },
   "dependencies": {

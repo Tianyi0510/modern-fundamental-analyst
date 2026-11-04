@@ -43,6 +43,65 @@ function benchmarkPage(samples) {
   return { page, commands };
 }
 
+test("observed CI bias is corrected and independently remeasured before acceptance", async () => {
+  const { page } = benchmarkPage([3468, 3803.5, 3803.5, 857, 902, 893, 995, 1000, 1005]);
+  const evidence = [];
+  const result = await calibrateCpu(page, (...entry) => evidence.push(entry));
+  assert.equal(result.cpuSlowdownMultiplier, 3.8035 * 0.893);
+  assert.deepEqual(result.effectiveSamples, [995, 1000, 1005]);
+  assert.equal(result.steps.length, 2);
+  assert.deepEqual(evidence[1], ["effective", [857, 902, 893], { cpuSlowdownMultiplier: 3.8035 }]);
+  assert.equal(evidence[2][0], "effective-correction-1");
+});
+
+test("feedback corrects fast and slow bias symmetrically without relaxing the target", async () => {
+  for (const observed of [900, 1100]) {
+    const { page } = benchmarkPage([4000, 4000, 4000, observed, observed, observed, 990, 1000, 1010]);
+    const result = await calibrateCpu(page);
+    assert.equal(result.targetBenchmarkIndex, 1000);
+    assert.equal(result.cpuSlowdownMultiplier, 4 * (observed / 1000));
+  }
+});
+
+test("feedback stops after two corrections and retains the last failed samples", async () => {
+  const { page, commands } = benchmarkPage([4000, 4000, 4000, ...Array(9).fill(900)]);
+  const evidence = [];
+  await assert.rejects(
+    calibrateCpu(page, (...entry) => evidence.push(entry)),
+    /precision/,
+  );
+  assert.equal(evidence.at(-1)[0], "effective-correction-2");
+  assert.equal(commands.filter(([method]) => method === "close").length, 12);
+});
+
+test("the stricter median precision accepts its exact endpoints without a correction", async () => {
+  for (const value of [950, 1050]) {
+    const { page } = benchmarkPage([4000, 4000, 4000, value, value, value]);
+    const result = await calibrateCpu(page);
+    assert.equal(result.steps.length, 1);
+    assert.equal(result.cpuSlowdownMultiplier, 4);
+    assert.equal(result.targetPrecision, 0.05);
+  }
+});
+
+test("failed correction settings survive the retry wrapper", async () => {
+  const { page } = benchmarkPage([4000, 4000, 4000, 900, 900, 900, NaN, 1000, 1000]);
+  const evidence = [];
+  await assert.rejects(
+    calibrateCpuWithRetry(page, (...entry) => evidence.push(entry)),
+    /valid effective/,
+  );
+  assert.deepEqual(evidence.at(-1), ["effective-correction-1", [NaN, 1000, 1000], 1, { cpuSlowdownMultiplier: 3.6 }]);
+});
+
+test("calibration never asks Chrome to accelerate a host below a 1x slowdown", async () => {
+  const { page, commands } = benchmarkPage([1000, 1000, 1000, 900, 900, 900]);
+  await assert.rejects(calibrateCpu(page), /precision/);
+  for (const [method, parameters] of commands) {
+    if (method === "Emulation.setCPUThrottlingRate") assert.ok(parameters.rate >= 1);
+  }
+});
+
 test("calibration verifies the applied slowdown against observed benchmark samples", async () => {
   for (const host of [2000, 4000]) {
     const { page, commands } = benchmarkPage([host, host, host, 990, 1000, 1010]);

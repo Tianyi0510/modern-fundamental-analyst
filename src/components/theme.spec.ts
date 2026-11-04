@@ -27,7 +27,7 @@ for (const { prefix } of labels) {
   test(`${prefix || "English"} theme toggle persists and overrides the initial system preference @mobile`, async ({
     page,
     browserName,
-  }, testInfo) => {
+  }) => {
     const pageErrors: string[] = [];
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.emulateMedia({ colorScheme: "dark" });
@@ -114,10 +114,9 @@ for (const { prefix } of labels) {
         ).toBeGreaterThanOrEqual(4.5);
       await expect(page.locator("header .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       if (!prefix && !route && browserName === "chromium") {
-        await page.screenshot({ path: testInfo.outputPath("home-dark.png"), fullPage: true });
         await page.locator(".header-actions [data-theme-toggle]").click();
         await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-        await page.screenshot({ path: testInfo.outputPath("home-light.png"), fullPage: true });
+
         await page.locator(".header-actions [data-theme-toggle]").click();
       }
       for (const width of [320, 390, 1440]) {
@@ -142,7 +141,7 @@ for (const { prefix } of labels) {
     await expect(dialog).toBeVisible();
     await expect(page.locator(".mobile-menu-layer")).toHaveAttribute("data-menu-phase", "open");
     await expect(page.locator(".mobile-menu-close")).toHaveCSS("color", "rgb(0, 0, 0)");
-    if (!prefix && browserName === "chromium") await page.screenshot({ path: testInfo.outputPath("menu-dark.png") });
+
     await dialog.locator("[data-theme-toggle]").click();
     await page.emulateMedia({ colorScheme: "light" });
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -443,26 +442,78 @@ for (const { prefix } of labels) {
   }
 }
 
-test("mobile navigation and theme work without optional scheduling APIs @mobile", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.addInitScript(() => {
-    for (const name of ["scheduler", "requestIdleCallback", "cancelIdleCallback"]) {
-      Object.defineProperty(window, name, { configurable: true, value: undefined });
+for (const scheduling of ["missing", "rejected"] as const) {
+  test(`mobile navigation, theme and monitoring work with ${scheduling} scheduling APIs @mobile`, async ({
+    page,
+    context,
+  }) => {
+    let captured = false;
+    let bufferedCaptured = false;
+    context.on("request", (request) => {
+      if (
+        request.url().startsWith("https://sentry.invalid/") &&
+        request.postData()?.includes("Buffered scheduling probe")
+      )
+        bufferedCaptured = true;
+      if (
+        request.url().startsWith("https://sentry.invalid/") &&
+        request.postData()?.includes("Scheduling fallback probe")
+      )
+        captured = true;
+    });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript((scheduling) => {
+      for (const name of ["requestIdleCallback", "cancelIdleCallback"]) {
+        Object.defineProperty(window, name, { configurable: true, value: undefined });
+      }
+      let firstYield = true;
+      Object.defineProperty(window, "scheduler", {
+        configurable: true,
+        value:
+          scheduling === "missing"
+            ? undefined
+            : {
+                yield: () => {
+                  if (firstYield) {
+                    firstYield = false;
+                    // The first startup yield runs after native buffering is installed, before SDK import.
+                    window.dispatchEvent(new ErrorEvent("error", { error: new Error("Buffered scheduling probe") }));
+                  }
+                  return Promise.reject(new Error("Scheduling unavailable"));
+                },
+              },
+      });
+    }, scheduling);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    if (scheduling === "rejected" && process.env.PLAYWRIGHT_SENTRY_TEST === "1") {
+      await expect.poll(() => bufferedCaptured).toBe(true);
+    }
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await page.locator(".mobile-menu-button").click();
+    const menu = page.getByRole("dialog");
+    await expect(menu).toBeVisible();
+    await menu.locator("[data-theme-toggle]").click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await menu.getByRole("link", { name: "Contact", exact: true }).click();
+    await expect(page).toHaveURL(/\/contact$/);
+    await expect(menu).toBeHidden();
+    await expect(page.locator("main h1")).toBeVisible();
+    expect(errors).toEqual([]);
+    if (process.env.PLAYWRIGHT_SENTRY_TEST === "1") {
+      await page.evaluate(() => {
+        const button = document.createElement("button");
+        button.textContent = "Trigger scheduling fallback probe";
+        button.onclick = () => {
+          throw new Error("Scheduling fallback probe");
+        };
+        document.body.append(button);
+      });
+      await page.getByRole("button", { name: "Trigger scheduling fallback probe", exact: true }).click();
+      await expect.poll(() => captured).toBe(true);
+      expect(errors).toEqual(["Scheduling fallback probe"]);
     }
   });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await page.locator(".mobile-menu-button").click();
-  const menu = page.getByRole("dialog");
-  await expect(menu).toBeVisible();
-  await menu.locator("[data-theme-toggle]").click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await menu.getByRole("link", { name: "Contact", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact$/);
-  await expect(menu).toBeHidden();
-  await expect(page.locator("main h1")).toBeVisible();
-  expect(errors).toEqual([]);
-});
+}

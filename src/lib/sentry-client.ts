@@ -9,8 +9,13 @@ const pending: Array<{ error: unknown; context?: CaptureContext }> = [];
 const bufferLimit = 25;
 
 export function reportClientError(error: unknown, context?: CaptureContext): void {
-  if (client) client.captureException(error, context);
-  else if (startup && !failed && pending.length < bufferLimit) pending.push({ error, context });
+  if (client) {
+    try {
+      client.captureException(error, context);
+    } catch {
+      // SDK inspection of an error can throw; monitoring must not break error recovery.
+    }
+  } else if (startup && !failed && pending.length < bufferLimit) pending.push({ error, context });
 }
 
 export function getSentryClient() {
@@ -36,7 +41,9 @@ export function startSentryClient(options: Parameters<ClientSdk["init"]>[0]) {
   // Capture from the first instrumentation turn while SDK code loads in a separate task.
   window.addEventListener("error", bufferError);
   window.addEventListener("unhandledrejection", bufferRejection);
-  startup = yieldToMain()
+  // Publish startup before invoking optional scheduling, which may synchronously emit errors.
+  startup = Promise.resolve()
+    .then(yieldToMain)
     .then(() => import("./sentry-client-sdk"))
     .then(async (sdk) => {
       // Module evaluation and SDK setup must not extend the same browser task.
@@ -44,7 +51,7 @@ export function startSentryClient(options: Parameters<ClientSdk["init"]>[0]) {
       sdk.init(options);
       client = sdk;
       removeBuffer();
-      for (const event of pending.splice(0)) sdk.captureException(event.error, event.context);
+      for (const event of pending.splice(0)) reportClientError(event.error, event.context);
       return sdk;
     })
     .catch(() => {
