@@ -1,6 +1,27 @@
 import type { ErrorEvent, init } from "@sentry/nextjs";
 import type { Log, Metric, StreamedSpanJSON } from "@sentry/core";
 
+export { resolveSentryDsn } from "./sentry-dsn";
+
+const serviceMetadataKeys = ["sentry.environment", "sentry.release", "sentry.sdk.name", "sentry.sdk.version"];
+const spanAttributeKeys = [
+  "sentry.op",
+  "sentry.origin",
+  "sentry.kind",
+  "sentry.sample_rate",
+  ...serviceMetadataKeys,
+  "sentry.segment.id",
+  "sentry.trace_lifecycle",
+  "http.request.method",
+  "http.response.status_code",
+];
+const ownHosts = new Set([
+  "modernfundamentalanalyst.com",
+  "www.modernfundamentalanalyst.com",
+  "localhost",
+  "127.0.0.1",
+]);
+
 function serviceAttributes(attributes?: Record<string, unknown>) {
   const operation = attributes?.operation;
   const failureKind = attributes?.failure_kind;
@@ -12,7 +33,7 @@ function serviceAttributes(attributes?: Record<string, unknown>) {
   )
     return null;
   const result: Record<string, unknown> = { operation, failure_kind: failureKind };
-  for (const key of ["sentry.environment", "sentry.release", "sentry.sdk.name", "sentry.sdk.version"]) {
+  for (const key of serviceMetadataKeys) {
     if (typeof attributes?.[key] === "string") result[key] = attributes[key];
   }
   return result;
@@ -37,12 +58,7 @@ function sanitizeSpanName(name: string, operation?: unknown) {
     : redactMessage(name.split(/[?#]/)[0] ?? "Operation").replace(/https?:\/\/[^\s<>"']+/gi, (value) => {
         try {
           const url = new URL(value);
-          const ownHost = [
-            "modernfundamentalanalyst.com",
-            "www.modernfundamentalanalyst.com",
-            "localhost",
-            "127.0.0.1",
-          ].includes(url.hostname);
+          const ownHost = ownHosts.has(url.hostname);
           return ownHost ? `${url.origin}${url.pathname}` : url.origin;
         } catch {
           return "[URL]";
@@ -53,24 +69,13 @@ function sanitizeSpanName(name: string, operation?: unknown) {
 export function sanitizeSentrySpan(span: StreamedSpanJSON): StreamedSpanJSON {
   const name = sanitizeSpanName(span.name, span.attributes["sentry.op"]);
   const attributes: StreamedSpanJSON["attributes"] = {};
-  for (const key of [
-    "sentry.op",
-    "sentry.origin",
-    "sentry.kind",
-    "sentry.sample_rate",
-    "sentry.environment",
-    "sentry.release",
-    "sentry.segment.id",
-    "sentry.sdk.name",
-    "sentry.sdk.version",
-    "sentry.trace_lifecycle",
-    "http.request.method",
-    "http.response.status_code",
-  ]) {
+  for (const key of spanAttributeKeys) {
     if (span.attributes[key] !== undefined) attributes[key] = span.attributes[key];
   }
-  for (const [key, value] of Object.entries(span.attributes)) {
-    if (key.startsWith("measurements.") && typeof value === "number" && Number.isFinite(value)) attributes[key] = value;
+  for (const key in span.attributes) {
+    if (!key.startsWith("measurements.") || !Object.hasOwn(span.attributes, key)) continue;
+    const value = span.attributes[key];
+    if (typeof value === "number" && Number.isFinite(value)) attributes[key] = value;
   }
   if (span.is_segment) attributes["sentry.segment.name"] = name;
   else if (typeof span.attributes["sentry.segment.name"] === "string") {
@@ -78,12 +83,6 @@ export function sanitizeSentrySpan(span: StreamedSpanJSON): StreamedSpanJSON {
   }
   // Streamed spans can contain provider URLs, Redis keys and user scope attributes.
   return { ...span, name, attributes, links: undefined };
-}
-
-export function resolveSentryDsn(serverDsn?: string, publicDsn?: string, disabled?: string) {
-  // Runtime opt-out must override public values baked into a production build.
-  if (disabled === "1") return undefined;
-  return serverDsn?.trim() || publicDsn?.trim() || undefined;
 }
 
 function redactMessage(value: string) {

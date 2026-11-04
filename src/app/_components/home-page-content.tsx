@@ -20,7 +20,7 @@ const copy = {
   en: {
     hero: ["Focus investing for a", "disruptive future"],
     heroIntro:
-      "Long-term value research, financial modeling, and a fully disclosed portfolio built to empower every retail investor.",
+      "I believe investing is for everyone. The mission of Modern Fundamental Analyst is to empower every retail investor.",
     viewPortfolio: "View portfolio",
     readLatest: "Read the latest investment memo",
     portfolioSnapshot: "Portfolio snapshot",
@@ -33,7 +33,7 @@ const copy = {
     aboutLabel: "01 · About",
     aboutTitle: ["Investment principles and", "continuous learning"],
     aboutCopy:
-      "Explore focus investing and long-term business valuation in a changing technological environment. Accounting and financial models connect business fundamentals with value. The approach combines interest in AI and other disruptive technologies with curiosity, empathy and continuous learning.",
+      "I believe in value investing for stock pitching and focus investing for portfolio management. I believe in staying in the circle of competence, the power of compounding, and the importance of patience and discipline.",
     aboutLink: "Explore the investment approach",
     portfolioLabel: "02 · Portfolio",
     portfolioTitle: ["A focus portfolio built", "for long-term ownership"],
@@ -60,7 +60,7 @@ const copy = {
   },
   "zh-tw": {
     hero: ["為顛覆性未來，", "實踐集中投資"],
-    heroIntro: "透過長期價值研究、財務建模與完整揭露的投資組合，幫助每一位個人投資者建立獨立判斷。",
+    heroIntro: "我相信投資屬於每一個人。Modern Fundamental Analyst 的使命，是賦能每一位個人投資者。",
     viewPortfolio: "查看投資組合",
     readLatest: "閱讀最新投資備忘錄",
     portfolioSnapshot: "投資組合摘要",
@@ -73,7 +73,7 @@ const copy = {
     aboutLabel: "01 · 關於",
     aboutTitle: ["投資原則與", "持續學習"],
     aboutCopy:
-      "探索科技變化下的集中投資與長期企業估值。會計與財務模型將企業基本面與價值連結起來，研究方式則結合對人工智慧與其他顛覆性科技的關注，以及好奇心、同理心與持續學習。",
+      "我相信以價值投資提出股票投資論點，以集中投資管理投資組合。我相信堅守能力圈、複利的力量，以及耐心與紀律的重要性。",
     aboutLink: "探索投資研究方式",
     portfolioLabel: "02 · 投資組合",
     portfolioTitle: ["為長期持有而建立的", "集中投資組合"],
@@ -100,7 +100,7 @@ const copy = {
   },
   "zh-cn": {
     hero: ["为颠覆性未来，", "实践集中投资"],
-    heroIntro: "通过长期价值研究、财务建模与完整披露的投资组合，帮助每一位个人投资者建立独立判断。",
+    heroIntro: "我相信投资属于每一个人。Modern Fundamental Analyst 的使命，是赋能每一位个人投资者。",
     viewPortfolio: "查看投资组合",
     readLatest: "阅读最新投资备忘录",
     portfolioSnapshot: "投资组合摘要",
@@ -113,7 +113,7 @@ const copy = {
     aboutLabel: "01 · 关于",
     aboutTitle: ["投资原则与", "持续学习"],
     aboutCopy:
-      "探索科技变化下的集中投资与长期企业估值。会计与财务模型将企业基本面与价值联系起来，研究方式则结合对人工智能与其他颠覆性科技的关注，以及好奇心、同理心与持续学习。",
+      "我相信以价值投资提出股票投资论点，以集中投资管理投资组合。我相信坚守能力圈、复利的力量，以及耐心与纪律的重要性。",
     aboutLink: "探索投资研究方式",
     portfolioLabel: "02 · 投资组合",
     portfolioTitle: ["为长期持有而建立的", "集中投资组合"],

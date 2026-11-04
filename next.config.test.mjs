@@ -2,6 +2,26 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 
+test("the browser favicon fallback permanently redirects to the existing icon asset", () => {
+  const output = execFileSync(
+    process.execPath,
+    [
+      "--import",
+      "./scripts/register-server.mjs",
+      "--input-type=module",
+      "-e",
+      'import config from "./next.config.ts"; console.log(JSON.stringify(await config.redirects()));',
+    ],
+    {
+      cwd: import.meta.dirname,
+      env: { ...process.env, NODE_ENV: "production", SENTRY_AUTH_TOKEN: "" },
+      encoding: "utf8",
+    },
+  );
+  const matches = JSON.parse(output).filter((redirect) => redirect.source === "/favicon.ico");
+  assert.deepEqual(matches, [{ source: "/favicon.ico", destination: "/icon.png", permanent: true }]);
+});
+
 test("development origin configuration adds only the IPv4 loopback alias", () => {
   const output = execFileSync(
     process.execPath,

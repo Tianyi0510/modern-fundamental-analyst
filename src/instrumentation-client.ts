@@ -1,6 +1,6 @@
 import { getSentryClient, startSentryClient } from "@/lib/sentry-client";
 import type { captureRouterTransitionStart } from "@sentry/nextjs";
-import { createSentryOptions, resolveSentryDsn } from "@/lib/sentry-options";
+import { resolveSentryDsn } from "@/lib/sentry-dsn";
 
 import { canRecordReplay } from "@/lib/sentry-replay";
 import { yieldToMain } from "@/lib/yield-to-main";
@@ -18,7 +18,8 @@ const dsn = resolveSentryDsn(undefined, process.env.NEXT_PUBLIC_SENTRY_DSN);
 if (dsn) {
   const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV;
   startup = startSentryClient({
-    ...createSentryOptions(dsn, environment),
+    dsn,
+    environment,
     integrations: [],
     replaysSessionSampleRate: environment === "test" ? 1 : 0.1,
     replaysOnErrorSampleRate: 1,

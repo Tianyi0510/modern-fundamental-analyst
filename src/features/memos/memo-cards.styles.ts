@@ -11,6 +11,5 @@ export const appearance = {
   description: "text-small-body text-[var(--text-secondary)]",
   footer:
     "mt-auto mx-[var(--card-spacing)] border-[var(--border-subtle)] bg-transparent px-0 pt-[var(--space-4)] pb-[var(--card-spacing)] text-small-body",
-  "date-text":
-    "date-text [.performance-page_.page-intro_&]:[margin-left:auto] [.performance-page_.page-intro_&]:[max-width:100%] [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums] [@media((max-width:_800px))]:[.performance-page_.page-intro_&]:[margin-left:0]",
+  "date-text": "date-text [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums]",
 } as const;

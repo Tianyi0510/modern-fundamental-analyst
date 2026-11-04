@@ -11,6 +11,12 @@ export function performanceEnvironment(env = process.env, cwd = new URL("../", i
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
   }).trim();
+  const workingTreeDirty =
+    execFileSync("git", ["status", "--porcelain", "--untracked-files=normal"], {
+      cwd,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    }).trim().length > 0;
   const processors = cpus();
   return {
     platform: platform(),
@@ -25,7 +31,9 @@ export function performanceEnvironment(env = process.env, cwd = new URL("../", i
     runnerImage: env.ImageOS ?? null,
     runnerImageVersion: env.ImageVersion ?? null,
     commit,
+    workingTreeDirty,
     eventCommit: env.GITHUB_SHA ?? null,
     workflowRun: env.GITHUB_RUN_ID ?? null,
+    workflowRunAttempt: env.GITHUB_RUN_ATTEMPT ?? null,
   };
 }

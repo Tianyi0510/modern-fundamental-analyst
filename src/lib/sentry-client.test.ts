@@ -26,7 +26,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => vi.unstubAllGlobals());
-const options = { dsn: "https://public@sentry.invalid/1" };
+const options = { dsn: "https://public@sentry.invalid/1", environment: "test" };
 
 it("buffers native errors, rejections and reported errors until one SDK initialization completes", async () => {
   const { startSentryClient, reportClientError, getSentryClient } = await import("./sentry-client");
@@ -60,6 +60,41 @@ it("bounds the transient startup buffer without storing errors on disk", async (
   expect(mocks.captureException).toHaveBeenCalledTimes(25);
   expect(mocks.captureException.mock.calls[0]?.[0]).toEqual(expect.objectContaining({ message: "0" }));
   expect(mocks.captureException.mock.calls[24]?.[0]).toEqual(expect.objectContaining({ message: "24" }));
+});
+
+it("keeps the initialized SDK available and drains remaining errors when one buffered capture throws", async () => {
+  const { startSentryClient, reportClientError, getSentryClient } = await import("./sentry-client");
+  const ready = startSentryClient(options);
+  const first = new Error("Uninspectable error");
+  const next = new Error("Next buffered error");
+  mocks.captureException.mockImplementationOnce(() => {
+    throw new Error("Cannot read stack");
+  });
+  reportClientError(first);
+  reportClientError(next);
+  scheduler.release();
+  const sdk = await ready;
+  expect(sdk).toBeDefined();
+  expect(sdk).toBe(getSentryClient());
+  expect(startSentryClient(options)).toBe(ready);
+  expect(mocks.init).toHaveBeenCalledExactlyOnceWith(options);
+  expect(mocks.captureException.mock.calls.map(([captured]) => captured)).toEqual([first, next]);
+  window.dispatchEvent(Object.assign(new Event("error"), { error: new Error("SDK owns native capture") }));
+  expect(mocks.captureException).toHaveBeenCalledTimes(2);
+});
+
+it("contains capture failures after initialization so error boundaries can retain their fallback", async () => {
+  const { startSentryClient, reportClientError } = await import("./sentry-client");
+  const ready = startSentryClient(options);
+  scheduler.release();
+  await ready;
+  mocks.captureException.mockImplementationOnce(() => {
+    throw new Error("Cannot read stack");
+  });
+  expect(() => reportClientError(new Error("Uninspectable error"))).not.toThrow();
+  const next = new Error("Later error");
+  reportClientError(next);
+  expect(mocks.captureException).toHaveBeenLastCalledWith(next, undefined);
 });
 
 it("cleans up native listeners when SDK initialization fails", async () => {

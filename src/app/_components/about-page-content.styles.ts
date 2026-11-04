@@ -3,7 +3,7 @@ import { containerAppearance } from "@/components/container";
 export const appearance = {
   shell: containerAppearance,
   eyebrow:
-    "eyebrow [margin:0] flex items-center [gap:10px] [font-family:var(--font-ui)] text-large-label [text-transform:none] [&_span]:[width:9px] [&_span]:[height:9px] [&_span]:rounded-full [&_span]:[color:var(--interactive-accent)] [&_span]:[background:var(--interactive-accent)] [.cta_&]:[grid-column:1_/_-1] [.cta_&]:[margin:0_0_46px] [.about-closing_>_&]:[grid-column:1_/_-1] [@media((max-width:_800px))]:[.cta_&]:[margin-bottom:0]",
+    "eyebrow [margin:0] flex items-center [gap:10px] [font-family:var(--font-ui)] text-large-label [text-transform:none] [&_span]:[width:9px] [&_span]:[height:9px] [&_span]:rounded-full [&_span]:[color:var(--interactive-accent)] [&_span]:[background:var(--interactive-accent)] [.about-closing_>_&]:[grid-column:1_/_-1]",
   "section-gray": "section-gray [background:var(--surface-secondary)]",
   "about-section":
     "about-section @max-[56rem]/about-page:grid-cols-1 @max-[56rem]/about-page:gap-[var(--space-heading-content)] data-after-hero:py-[var(--space-section-padding)] [padding:var(--space-section-padding)_0] grid [grid-template-columns:var(--grid-editorial)] [column-gap:var(--grid-column-gap)] [row-gap:var(--space-section-content)] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[padding:var(--space-section-padding)_0] [@media((max-width:_800px))]:[gap:var(--space-heading-content)]",

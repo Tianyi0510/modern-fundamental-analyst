@@ -161,10 +161,18 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         for (const sheet of document.styleSheets) visit(sheet);
         return removed;
       });
-      expect(removed.length).toBeGreaterThan(0);
+      expect(removed).toEqual(
+        expect.arrayContaining(["ascent-override", "descent-override", "line-gap-override", "text-wrap"]),
+      );
       await expect(page.locator("main h1")).toBeVisible();
       await expect(page.locator("main p").first()).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      if (!path.includes("/memos/")) {
+        const supportsEmojiPresentation = await page.evaluate(() => CSS.supports("font-variant-emoji", "text"));
+        if (supportsEmojiPresentation) expect(removed).toContain("font-variant-emoji");
+        else expect(removed).not.toContain("font-variant-emoji");
+        await expect(page.locator(".home-page .text-link svg.arrow-icon").first()).toBeVisible();
+      }
       if (path.includes("/memos/")) {
         expect(removed).toContain("marker");
         expect(removed).toContain("accent-color");

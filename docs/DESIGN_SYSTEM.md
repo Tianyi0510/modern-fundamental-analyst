@@ -278,6 +278,8 @@ Use size-first names: Large / Medium / Small + Display / Headline / Title / Labe
 
 All tracking is **0**. Weights are **400 and 700 only**. Display, Headline and Title use **1.15** leading; Label and Body use **1.5**. These rules apply to English, Traditional Chinese, Simplified Chinese, every viewport and every interaction state. Inline emphasis uses 700 and inherits its surrounding size and leading. Keep Jost before the locale-specific Noto Sans fallback; English routes must not load Chinese fonts. The shared text wordmark uses Jost 700, zero tracking and 1.15 leading, with 21px desktop and 18px mobile as a brand exception.
 
+Google Fonts is the source of the retained families, not a requirement to fetch every locale's fonts during builds. Jost and Noto Sans TC use the framework's Google font integration; Noto Sans SC uses checked-in, licensed assets. Its smaller home-page shards retain full original coverage and do not limit future copy. Follow [font asset maintenance](WEB_APPLICATION_ARCHITECTURE.md#font-asset-maintenance) for regeneration and verification. Asset delivery changes must preserve the typography roles above. Partial-glyph removal is not a performance optimization permitted by this design contract.
+
 | Role              | Desktop size / line height | Mobile size / line height | Leading | Weight | Tracking | Use                                                               |
 | ----------------- | -------------------------- | ------------------------- | ------- | ------ | -------- | ----------------------------------------------------------------- |
 | `Large Display`   | 90 / 103.5                 | 51 / 58.65                | 1.15    | 700    | 0        | All page Hero H1s; featured return                                |

@@ -189,17 +189,4 @@ function Toaster({
 
 const createToastManager = ToastPrimitive.createToastManager;
 
-export {
-  Toaster,
-  Toast,
-  ToastAction,
-  ToastClose,
-  ToastContent,
-  ToastDescription,
-  ToastPortal,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-  createToastManager,
-  toast,
-};
+export { Toaster, Toast, ToastProvider, ToastViewport, createToastManager, toast };
