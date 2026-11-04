@@ -15,6 +15,7 @@ import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
 import { getNavigationCopy } from "@/lib/navigation-copy";
 import { createWebsiteStructuredData } from "@/lib/site-config";
+import { Activity } from "react";
 
 const copy = {
   en: {
@@ -160,7 +161,10 @@ export function HomePageContent({ locale }: { locale: Locale }) {
     <div className="home-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: createWebsiteStructuredData() }} />
       <div className={appearance["home-header"]}>
-        <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+        {/* Always-visible boundaries split hydration while preserving the initial HTML. */}
+        <Activity mode="visible">
+          <SiteHeader copy={getNavigationCopy(locale)} locale={locale} />
+        </Activity>
       </div>
       <main id="main-content" tabIndex={-1} className="@container/financial-summary">
         <div className={appearance["home-opening"]}>
@@ -398,7 +402,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           </section>
         </div>
       </main>
-      <PageFooter locale={locale} />
+      <Activity mode="visible">
+        <PageFooter locale={locale} />
+      </Activity>
     </div>
   );
 }

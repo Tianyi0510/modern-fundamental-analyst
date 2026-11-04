@@ -19,7 +19,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { Suspense, useRef, type MouseEvent } from "react";
+import { useRef, type MouseEvent } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
@@ -35,16 +35,7 @@ type SiteHeaderProps = {
   languageQuery?: string;
 };
 
-export function SiteHeader(props: SiteHeaderProps) {
-  // Hydrate navigation independently from the page and subscription form.
-  return (
-    <Suspense fallback={null}>
-      <SiteHeaderContent {...props} />
-    </Suspense>
-  );
-}
-
-function SiteHeaderContent({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
+export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
   const pathname = usePathname();
   const languageRootRef = useRef<HTMLDivElement>(null);
   const languageTriggerRef = useRef<HTMLButtonElement>(null);
