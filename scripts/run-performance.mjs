@@ -116,8 +116,17 @@ try {
           lifecycle.check();
           return context.newPage();
         },
-        (stage, samples, attempt) =>
-          writeFile(new URL(`cpu-attempt-${attempt}-${stage}-samples.json`, output), JSON.stringify(samples) + "\n"),
+        async (stage, samples, attempt, settings) => {
+          await writeFile(
+            new URL(`cpu-attempt-${attempt}-${stage}-samples.json`, output),
+            JSON.stringify(samples) + "\n",
+          );
+          if (settings)
+            await writeFile(
+              new URL(`cpu-attempt-${attempt}-${stage}-settings.json`, output),
+              JSON.stringify(settings) + "\n",
+            );
+        },
       )),
       browserVersion: browser.version(),
       executablePath: env.CHROME_PATH,

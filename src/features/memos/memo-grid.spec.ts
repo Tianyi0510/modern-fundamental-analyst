@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-  test(`${prefix || "English"} memo grid reflows without changing reading order`, async ({ page }, testInfo) => {
+  test(`${prefix || "English"} memo grid reflows without changing reading order`, async ({ page }) => {
     for (const width of [320, 390, 900, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}/memos`);
@@ -16,11 +16,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       );
       const [first, second, third] = boxes;
       if (!first || (width > 800 && (!second || !third))) throw new Error("Expected visible memo cells");
-      if (prefix === "" && testInfo.project.name === "chromium" && (width === 390 || width === 900)) {
-        const path = testInfo.outputPath(`memo-grid-${width}.png`);
-        await grid.screenshot({ path });
-        await testInfo.attach(`memo-grid-${width}`, { path, contentType: "image/png" });
-      }
+
       if (second && third) {
         if (width > 1100) {
           expect(first.y).toBeCloseTo(third.y, 0);

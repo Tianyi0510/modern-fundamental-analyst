@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n";
 
 export const contactFieldLimits = { name: 100, email: 254, subject: 160, message: 5000 } as const;
 type ContactField = keyof typeof contactFieldLimits;
-export type ContactDraft = Record<ContactField, string> & { submissionId?: string };
+type ContactDraft = Record<ContactField, string> & { submissionId?: string };
 const storageKey = (locale: Locale) => `mfa:contact-draft:v1:${locale}`;
 
 export function readContactDraft(locale: Locale): ContactDraft | undefined {

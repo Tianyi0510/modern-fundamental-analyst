@@ -1,7 +1,7 @@
 import { resolveLocale, type Locale } from "@/lib/i18n";
 
 const SUPPORT_AMOUNTS = [6, 12, 18] as const;
-export type SupportAmount = (typeof SUPPORT_AMOUNTS)[number];
+type SupportAmount = (typeof SUPPORT_AMOUNTS)[number];
 const SUPPORT_PRODUCT_IDS = ["support-6-v1", "support-12-v1", "support-18-v1"] as const;
 export type SupportProductId = (typeof SUPPORT_PRODUCT_IDS)[number];
 export function parseSupportProductId(value: string | null): SupportProductId | null {

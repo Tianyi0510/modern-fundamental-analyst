@@ -1,7 +1,7 @@
 import { isValidEmail } from "@/lib/email-validation";
 
 export type ContactField = "name" | "email" | "subject" | "message";
-export type ContactFields = Record<ContactField, string>;
+type ContactFields = Record<ContactField, string>;
 
 export function getInvalidContactFields(fields: ContactFields): ContactField[] {
   const invalid: ContactField[] = [];

@@ -538,7 +538,7 @@ for (const mobile of [false, true]) {
   test(
     `selected typography keeps the Home reading order on ${mobile ? "mobile" : "desktop"}`,
     mobile ? { tag: "@mobile" } : {},
-    async ({ page }, testInfo) => {
+    async ({ page }) => {
       await page.setViewportSize(mobile ? { width: 390, height: 844 } : { width: 1488, height: 1058 });
       await page.goto("/");
       await page.evaluate(() => document.fonts.ready);
@@ -556,7 +556,7 @@ for (const mobile of [false, true]) {
       expect(copyBox!.y).toBeGreaterThanOrEqual(titleBox!.y + titleBox!.height);
       expect(copyBox!.x).toBeCloseTo(titleBox!.x, 0);
       await heading.scrollIntoViewIfNeeded();
-      await page.screenshot({ path: testInfo.outputPath(`typography-home-${mobile ? "mobile" : "desktop"}.png`) });
+
       await page.locator(".hero-actions .button").click();
       await expect(page).toHaveURL(/\/portfolio$/);
     },

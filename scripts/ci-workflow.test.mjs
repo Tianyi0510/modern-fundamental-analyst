@@ -7,6 +7,7 @@ import { parse } from "yaml";
 const workflow = parse(await readFile(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8"));
 
 test("performance failures retain raw Lighthouse reports and native audit results", () => {
+  assert.equal(workflow.jobs.performance["runs-on"], "ubuntu-24.04");
   const steps = workflow.jobs.performance.steps;
   const performance = steps.findIndex((step) => step.run === "npm run test:performance");
   const uploadIndex = steps.findIndex((step) => step.uses?.startsWith("actions/upload-artifact@"));

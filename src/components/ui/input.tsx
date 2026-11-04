@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-export type FieldVariant = "standard" | "inverse";
+type FieldVariant = "standard" | "inverse";
 const variants: Record<FieldVariant, string> = {
   standard:
     "border-[var(--field-border)] rounded-field bg-[var(--field-surface)] text-[var(--field-text)] placeholder:text-[var(--field-text)] placeholder:opacity-100 focus-visible:outline-[var(--field-focus-ring)] focus-visible:border-[var(--field-focus-border)]",

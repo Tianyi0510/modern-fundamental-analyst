@@ -27,7 +27,7 @@ for (const { prefix } of labels) {
   test(`${prefix || "English"} theme toggle persists and overrides the initial system preference @mobile`, async ({
     page,
     browserName,
-  }, testInfo) => {
+  }) => {
     const pageErrors: string[] = [];
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.emulateMedia({ colorScheme: "dark" });
@@ -114,10 +114,9 @@ for (const { prefix } of labels) {
         ).toBeGreaterThanOrEqual(4.5);
       await expect(page.locator("header .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       if (!prefix && !route && browserName === "chromium") {
-        await page.screenshot({ path: testInfo.outputPath("home-dark.png"), fullPage: true });
         await page.locator(".header-actions [data-theme-toggle]").click();
         await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-        await page.screenshot({ path: testInfo.outputPath("home-light.png"), fullPage: true });
+
         await page.locator(".header-actions [data-theme-toggle]").click();
       }
       for (const width of [320, 390, 1440]) {
@@ -142,7 +141,7 @@ for (const { prefix } of labels) {
     await expect(dialog).toBeVisible();
     await expect(page.locator(".mobile-menu-layer")).toHaveAttribute("data-menu-phase", "open");
     await expect(page.locator(".mobile-menu-close")).toHaveCSS("color", "rgb(0, 0, 0)");
-    if (!prefix && browserName === "chromium") await page.screenshot({ path: testInfo.outputPath("menu-dark.png") });
+
     await dialog.locator("[data-theme-toggle]").click();
     await page.emulateMedia({ colorScheme: "light" });
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");

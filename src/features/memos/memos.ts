@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n";
 
 import { getMemoCategory, type MemoCategory, type MemoCategoryId } from "./memo-categories";
 
-export type MemoSummary = {
+type MemoSummary = {
   slug: string;
   number: string;
   title: string;

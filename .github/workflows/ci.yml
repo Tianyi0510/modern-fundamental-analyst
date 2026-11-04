@@ -158,7 +158,8 @@ jobs:
   performance:
     needs: plan
     if: needs.plan.outputs.reuse != 'true'
-    runs-on: ubuntu-latest
+    # Pin the measured OS release; hosted CPU models can still vary between runs.
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
       NEXT_PUBLIC_SENTRY_DSN: https://public@sentry.invalid/1

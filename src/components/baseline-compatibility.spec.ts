@@ -121,7 +121,7 @@ test("route announcements do not require ShadowRoot referenceTarget @mobile", as
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} Limited CSS enhancements degrade to readable fallback content @mobile`, async ({
     page,
-  }, testInfo) => {
+  }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.setViewportSize({ width: 390, height: 844 });
@@ -179,7 +179,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         await expect(page.locator(".typeset li").first()).toBeVisible();
       }
     }
-    await page.screenshot({ path: testInfo.outputPath("limited-css-fallback.png") });
+
     expect(errors).toEqual([]);
   });
 }

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 for (const theme of ["light", "dark"]) {
-  test(`foundation aliases preserve layout and materials in ${theme} mode`, async ({ page }, testInfo) => {
+  test(`foundation aliases preserve layout and materials in ${theme} mode`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: theme === "dark" ? "dark" : "light", reducedMotion: "no-preference" });
     await page.goto("/contact");
     await expect(page.locator("[data-theme-toggle]").first()).toBeEnabled();
@@ -24,7 +24,7 @@ for (const theme of ["light", "dark"]) {
     const shadow = await popup.evaluate((el) => getComputedStyle(el).boxShadow);
     expect(shadow).toContain("0px 8px 16px 0px");
     expect(shadow).toContain("0px 0px 2px 0px");
-    await page.screenshot({ path: testInfo.outputPath("foundation.png") });
+
     await page.evaluate(() => {
       const root = document.documentElement.style;
       root.setProperty("--material-popup", "rgb(12, 34, 56)");
