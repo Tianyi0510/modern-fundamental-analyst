@@ -7,7 +7,7 @@ export const appearance = {
   "memo-article-header": "memo-article-header [padding-top:var(--space-section-padding)]",
   shell: containerAppearance + " max-w-[var(--width-article)]",
   "article-meta":
-    "article-meta max-w-[var(--width-article)] flex items-center [flex-wrap:wrap] [gap:28px] [padding:18px_0] [border-top:1px_solid_var(--border-strong)] [border-bottom:1px_solid_var(--border-subtle)] text-small-body [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums]",
+    "article-meta max-w-[var(--width-article)] flex items-center [flex-wrap:wrap] [gap:var(--space-32px)] [padding:var(--space-16px)_0] [border-top:1px_solid_var(--border-strong)] [border-bottom:1px_solid_var(--border-subtle)] text-small-body [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums]",
   "article-lead":
     "article-lead max-w-[var(--width-article)] [margin:0_0_var(--space-related-content)] text-large-body [text-transform:none] [text-wrap:pretty]",
   "article-notes":

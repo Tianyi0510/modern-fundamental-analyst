@@ -5,9 +5,9 @@ import {
 import { expect, test } from "@playwright/test";
 
 for (const { prefix, date } of [
-  { prefix: "", date: "30 Sep 2026" },
-  { prefix: "/zh-tw", date: "2026年9月30日" },
-  { prefix: "/zh-cn", date: "2026年9月30日" },
+  { prefix: "", date: "31 Oct 2026" },
+  { prefix: "/zh-tw", date: "2026年10月31日" },
+  { prefix: "/zh-cn", date: "2026年10月31日" },
 ]) {
   test(
     `${prefix || "English"} chart dates hydrate without browser errors`,

@@ -158,12 +158,12 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "grid min-w-32 items-start gap-1.5 rounded-control border border-border bg-background px-2.5 py-1.5 text-small-body shadow-[var(--shadow-chart-tooltip)]",
+        "grid min-w-32 items-start gap-2 rounded-control border border-border bg-background px-2 py-2 text-small-body shadow-[var(--shadow-chart-tooltip)]",
         className,
       )}
     >
       {!nestLabel ? tooltipLabel : null}
-      <div className="grid gap-1.5">
+      <div className="grid gap-2">
         {payload
           .filter((item) => item.type !== "none")
           .map((item, index) => {
@@ -197,7 +197,7 @@ function ChartTooltipContent({
                             "h-2.5 w-2.5": indicator === "dot",
                             "w-1": indicator === "line",
                             "w-0 border-[1.5px] border-dashed bg-transparent": indicator === "dashed",
-                            "my-0.5": nestLabel && indicator === "dashed",
+                            "my-1": nestLabel && indicator === "dashed",
                           })}
                           style={
                             {
@@ -209,7 +209,7 @@ function ChartTooltipContent({
                       )
                     )}
                     <div className={cn("flex flex-1 justify-between", nestLabel ? "items-end" : "items-center")}>
-                      <div className="grid gap-1.5">
+                      <div className="grid gap-2">
                         {nestLabel ? tooltipLabel : null}
                         <span className="text-muted-foreground">{itemConfig?.label ?? item.name}</span>
                       </div>

@@ -18,9 +18,9 @@ const variants: Record<ButtonVariant, string> = {
 };
 const sizes: Record<ButtonSize, string> = {
   icon: "size-[var(--size-touch-target)] shrink-0 p-0 [&_svg]:size-5",
-  text: "min-h-[var(--size-touch-target)] px-[var(--space-3)]",
-  regular: "min-h-[var(--size-control)] px-[1.6em] gap-[1.333em]",
-  small: "button-small min-h-[var(--size-control-small)] px-[1.333em] gap-[1.333em]",
+  text: "min-h-[var(--size-touch-target)] px-[var(--space-8px)]",
+  regular: "min-h-[var(--size-control)] px-[var(--space-24px)] gap-[var(--space-24px)]",
+  small: "button-small min-h-[var(--size-control-small)] px-[var(--space-24px)] gap-[var(--space-24px)]",
 };
 
 const disabledFeedback: Record<ButtonDisabledFeedback, string> = {

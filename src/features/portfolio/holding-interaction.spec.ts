@@ -16,9 +16,9 @@ test.describe("header interaction QA", () => {
       );
     const before = await positions();
     await row.hover();
-    await expect(row).toHaveCSS("padding-left", "14px");
-    await expect(row).toHaveCSS("padding-right", "14px");
-    expect((await positions())[0]!.x - before[0]!.x).toBeCloseTo(14, 1);
+    await expect(row).toHaveCSS("padding-left", "16px");
+    await expect(row).toHaveCSS("padding-right", "16px");
+    expect((await positions())[0]!.x - before[0]!.x).toBeCloseTo(16, 1);
   });
 });
 
@@ -43,10 +43,10 @@ test.describe("touch holding feedback", () => {
       await expect(row).toHaveCSS("padding-left", "0px");
       await page.mouse.down();
       try {
-        await expect(row).toHaveCSS("padding-left", "14px");
+        await expect(row).toHaveCSS("padding-left", "16px");
         const pressed = await positions();
-        expect(pressed.numberX - before.numberX).toBeCloseTo(14, 1);
-        expect(pressed.nameX - before.nameX).toBeCloseTo(14, 1);
+        expect(pressed.numberX - before.numberX).toBeCloseTo(16, 1);
+        expect(pressed.nameX - before.nameX).toBeCloseTo(16, 1);
         expect(pressed.gap).toBeCloseTo(before.gap, 1);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       } finally {

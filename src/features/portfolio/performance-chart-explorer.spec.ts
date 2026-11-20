@@ -27,7 +27,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           expect(dashes.filter(Boolean)).toHaveLength(1);
           const tooltip = await showLatestPerformanceTooltip(figure);
           await expect(tooltip).toContainText("SPY");
-          await expect(tooltip).toContainText(prefix ? "2026年9月30日" : "30 Sep 2026");
+          await expect(tooltip).toContainText(prefix ? "2026年10月31日" : "31 Oct 2026");
           await expect(figure.getByRole("application")).toBeFocused();
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

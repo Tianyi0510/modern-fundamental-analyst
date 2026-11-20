@@ -68,7 +68,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
             ) : null}
             <MemoArticleContent slug={slug} language={content.language} locale={locale} />
             <aside className={appearance["article-disclaimer"]} aria-labelledby="memo-disclaimer-title">
-              <h2 id="memo-disclaimer-title" className="mb-[var(--space-3)] text-medium-title">
+              <h2 id="memo-disclaimer-title" className="mb-[var(--space-8px)] text-medium-title">
                 {text.disclaimerTitle}
               </h2>
               <p>{memo.scopeNote}</p>

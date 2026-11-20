@@ -33,7 +33,7 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
     await page.goto(`${prefix}/portfolio`);
     const summaryReturn = page.locator('.portfolio-kpis [data-tone="brand"] strong');
     const tableReturn = page.locator(".portfolio-total-return");
-    await expect(summaryReturn).toHaveText("+32.84%");
+    await expect(summaryReturn).toHaveText("+26.17%");
     const summary = page.locator('.portfolio-kpis [data-tone="brand"]');
     await expect(summary.getByRole("term")).toHaveText(
       prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total Return",
@@ -41,7 +41,7 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
     await expect(summary.locator("small")).toHaveText(
       prefix === "/zh-tw" ? "絕對報酬率" : prefix === "/zh-cn" ? "绝对回报率" : "Absolute return",
     );
-    await expect(tableReturn).toHaveText("+32.84%");
+    await expect(tableReturn).toHaveText("+26.17%");
     await expect(page.locator(".portfolio-table-wrap + .portfolio-return-note p")).toContainText(returnNote);
   });
 

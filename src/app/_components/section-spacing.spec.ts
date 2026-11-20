@@ -79,9 +79,9 @@ const routes = [
   ],
 ] as const;
 
-for (const width of [1440, 390]) {
+for (const width of [1440, 834, 390]) {
   test(
-    `page sections use 96px padding without external gaps at ${width}px`,
+    `page sections use 64px padding without external gaps at ${width}px`,
     width === 390 ? { tag: "@mobile" } : {},
     async ({ page }) => {
       for (const [route, sections] of routes) {
@@ -95,8 +95,8 @@ for (const width of [1440, 390]) {
             await expect(block).toHaveCSS("margin-bottom", "0px");
           }
           for (const block of await page.locator(inner).all()) {
-            await expect(block).toHaveCSS("padding-top", "96px");
-            await expect(block).toHaveCSS("padding-bottom", inner === ".memo-article-header" ? "0px" : "96px");
+            await expect(block).toHaveCSS("padding-top", "64px");
+            await expect(block).toHaveCSS("padding-bottom", inner === ".memo-article-header" ? "0px" : "64px");
           }
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -110,6 +110,8 @@ for (const width of [1440, 390]) {
       });
       expect(gap).toBe(0);
       await expect(page.locator(".home-about")).toHaveCSS("row-gap", "48px");
+      await expect(page.locator(".allocation-legend")).toHaveCSS("row-gap", "8px");
+      await expect(page.locator(".holding-row div").first()).toHaveCSS("row-gap", "8px");
       const headerGap = await page.locator(".home-opening").evaluate((element) => {
         const header = document.querySelector(".home-header")!;
         return element.getBoundingClientRect().top - header.getBoundingClientRect().bottom;

@@ -772,8 +772,17 @@ test.describe("mobile content and navigation QA", () => {
     );
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("color", "rgb(13, 40, 139)");
     await expect(page.locator('.mobile-menu-drawer nav a[aria-current="page"]')).toHaveCSS("border-radius", "4px");
-    await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "12px");
-    await expect(page.locator(".mobile-menu-language").first()).toHaveCSS("padding-left", "42px");
+    await expect(page.locator(".mobile-menu-drawer nav a").first()).toHaveCSS("padding-left", "8px");
+    const label = await languageTrigger.locator("span span").boundingBox();
+    expect(label).not.toBeNull();
+    for (const option of await page.locator(".mobile-menu-language").all()) {
+      const textLeft = await option.evaluate((link) => {
+        const range = document.createRange();
+        range.selectNodeContents(link);
+        return range.getBoundingClientRect().left;
+      });
+      expect(textLeft).toBeCloseTo(label!.x, 1);
+    }
     const menuTop = page.locator(".mobile-menu-top");
     const topBeforeScroll = await menuTop.boundingBox();
     expect(topBeforeScroll).not.toBeNull();

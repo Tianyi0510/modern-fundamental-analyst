@@ -135,34 +135,28 @@
   --font-size-large-body: 1.3125rem;
   --font-size-medium-body: 1rem;
   --font-size-small-body: 1rem;
-  --space-2: var(--spacingVerticalS);
-  --space-3: var(--spacingVerticalM);
-  --space-4: var(--spacingVerticalL);
-  --space-5: var(--spacingVerticalXXL);
-  --space-6: var(--spacingVerticalXXXL);
-  --space-7: calc(var(--spacingVerticalXXXL) + var(--spacingVerticalS));
-  --space-8: calc(var(--spacingVerticalXXL) * 2);
-  --space-9: calc(var(--spacingVerticalXXXL) + var(--spacingVerticalXXL));
-  --space-10: calc(var(--spacingVerticalXXL) * 3);
-  --space-11: calc(var(--spacingVerticalXXXL) * 3);
+  --space-4px: 4px;
+  --space-8px: 8px;
+  --space-16px: 16px;
+  --space-24px: 24px;
+  --space-32px: 32px;
+  --space-48px: 48px;
+  --space-64px: 64px;
   --space-page-gutter: var(--spacingHorizontalXXXL);
-  --space-section: var(--space-11);
-  --space-section-padding: var(--space-11);
-  --space-section-content: var(--space-8);
+  --space-section: var(--space-64px);
+  --space-section-padding: var(--space-64px);
+  --space-section-content: var(--space-48px);
   --grid-column-gap: var(--spacingHorizontalXXXL);
-  --grid-editorial: minmax(0, 5fr) minmax(0, 7fr);
-  --grid-sidebar: minmax(0, 4fr) minmax(0, 8fr);
-  --grid-feature: minmax(0, 8fr) minmax(0, 4fr);
-  --grid-comparison: minmax(0, 7fr) minmax(0, 5fr);
+  --grid-columns: repeat(12, minmax(0, 1fr));
   --grid-portfolio-summary: repeat(3, minmax(0, 1fr));
-  --space-section-compact: var(--space-10);
+  --space-section-compact: var(--space-64px);
   --space-heading-content: var(--space-section-content);
-  --space-related-content: var(--space-7);
-  --space-footer-main: var(--space-10);
+  --space-related-content: var(--space-48px);
+  --space-footer-main: var(--space-64px);
   --size-footer-heading: calc(var(--font-size-medium-title) * var(--leading-heading-text));
-  --space-footer-heading: var(--spacingVerticalM);
+  --space-footer-heading: var(--space-16px);
   --size-footer-link: calc(var(--size-footer-heading) + var(--space-footer-heading));
-  --space-footer-bottom: var(--space-5);
+  --space-footer-bottom: var(--space-24px);
   --size-control: 52px;
   --size-control-small: 44px;
   --size-field: 56px;
@@ -174,11 +168,11 @@
   --focus-ring-on-dark: var(--blue-bright);
   --focus-ring-brand: var(--blue-medium);
   --focus-ring-color: var(--interactive-accent);
-  --space-field-label: var(--space-3);
-  --space-form-row: var(--space-5);
-  --space-form-column: var(--space-5);
-  --space-field-block: var(--space-3);
-  --space-field-inline: var(--space-4);
+  --space-field-label: var(--space-8px);
+  --space-form-row: var(--space-24px);
+  --space-form-column: var(--space-24px);
+  --space-field-block: var(--space-8px);
+  --space-field-inline: var(--space-16px);
   --size-status-reserve: 1.65em;
   --opacity-disabled: 1;
   --opacity-disabled-preferences: 1;
@@ -303,22 +297,15 @@
     --font-size-large-headline: 4.1875rem;
   }
 }
-/* Reading and form regions stack before their secondary columns become cramped. */
-@media (min-width: 801px) and (max-width: 1100px) {
-  :root {
-    --grid-editorial: minmax(0, 1fr);
-    --grid-sidebar: minmax(0, 1fr);
-  }
-}
 @media (max-width: 800px) {
   :root {
     --space-page-gutter: var(--spacingHorizontalL);
     --grid-column-gap: var(--spacingHorizontalL);
-    --space-section: var(--space-10);
-    --space-section-compact: var(--space-9);
+    --space-section: var(--space-64px);
+    --space-section-compact: var(--space-48px);
     --space-heading-content: var(--space-section-content);
-    --space-related-content: var(--space-6);
-    --space-footer-main: var(--space-8);
+    --space-related-content: var(--space-32px);
+    --space-footer-main: var(--space-48px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

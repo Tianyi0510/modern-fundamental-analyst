@@ -10,23 +10,23 @@
   font-weight: var(--weight-bold);
 }
 .figure p {
-  margin: var(--space-3) 0;
+  margin: var(--space-8px) 0;
   font-size: var(--font-size-small-body);
   line-height: var(--leading-body-text);
 }
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-5);
+  gap: var(--space-24px);
   list-style: none;
   padding: 0;
-  margin: var(--space-5) 0;
+  margin: var(--space-24px) 0;
   font-size: var(--font-size-medium-label);
 }
 .legend li {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-8px);
 }
 .portfolioKey,
 .benchmarkKey {
@@ -38,17 +38,17 @@
   border-top-style: dashed;
 }
 .details {
-  margin-top: var(--space-5);
+  margin-top: var(--space-24px);
   font-size: var(--font-size-small-body);
 }
 .details [data-slot="collapsible-trigger"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-16px);
   min-height: var(--size-control);
   cursor: pointer;
-  padding: var(--space-4) 0;
+  padding: var(--space-16px) 0;
   width: 100%;
   background: transparent;
   color: inherit;
@@ -83,7 +83,7 @@
 .figure .scrollHint {
   font-size: var(--font-size-small-body);
   line-height: var(--leading-body-text);
-  margin: var(--space-3) 0;
+  margin: var(--space-8px) 0;
 }
 .details [data-slot="collapsible-trigger"]:focus-visible,
 .tableScroll:focus-visible {
@@ -96,7 +96,7 @@
   @supports (overscroll-behavior-x: contain) {
     overscroll-behavior-x: contain;
   }
-  margin-top: var(--space-3);
+  margin-top: var(--space-8px);
 }
 .tableScroll table {
   width: 100%;
@@ -107,13 +107,13 @@
 }
 .tableScroll caption {
   text-align: left;
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-8px);
   caption-side: bottom;
-  padding-top: var(--space-3);
+  padding-top: var(--space-8px);
 }
 .tableScroll th,
 .tableScroll td {
-  padding: var(--space-3);
+  padding: var(--space-8px);
   border-bottom: 1px solid var(--border-subtle);
   text-align: right;
   white-space: nowrap;

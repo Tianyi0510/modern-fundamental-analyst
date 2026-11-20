@@ -88,7 +88,7 @@ export function PerformanceChartView({
   const returnLabel = measure === "twr" ? "TWRR" : "XIRR";
   const formatReturn = (value: number | null) => (value === null ? xirrCopy[locale].unavailable : formatPercent(value));
   return (
-    <Card className="gap-0 p-[var(--space-5)] compact:p-[var(--space-4)]">
+    <Card className="gap-0 p-[var(--space-24px)] compact:p-[var(--space-16px)]">
       <figure className={styles.figure} aria-labelledby={titleId}>
         <figcaption>
           <h3 id={titleId}>{text.title}</h3>

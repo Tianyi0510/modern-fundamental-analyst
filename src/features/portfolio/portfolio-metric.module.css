@@ -3,11 +3,11 @@
   .metric {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    column-gap: var(--space-6);
-    row-gap: var(--space-3);
+    column-gap: var(--space-32px);
+    row-gap: var(--space-8px);
     align-content: center;
     min-height: 136px;
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-24px) var(--space-32px);
   }
 
   .metric > dt {

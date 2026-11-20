@@ -637,7 +637,7 @@ The portfolio feature owns financial data, sources, calculations and monthly acc
 
 #### Workspace Data
 
-`src/features/portfolio/portfolio-detail.ts` records 91 purchase lots with fees, SPY adjusted prices by applied trading date, 124 cash events, three corporate actions and 22 month-end position, price and XIRR snapshots.
+`src/features/portfolio/portfolio-detail.ts` records 91 purchase lots with fees, SPY adjusted prices by applied trading date, 130 cash events, three corporate actions and 23 month-end position, price and XIRR snapshots.
 
 - Amounts and prices use USD; dates use `YYYY-MM-DD`.
 - Dividends are positive; withholding tax and financing interest are negative.
@@ -648,7 +648,7 @@ The portfolio feature owns financial data, sources, calculations and monthly acc
 
 The latest month-end valuation defines `asOf`. Exclude later purchases and cash events from the snapshot. Include a simulated SPY purchase only after both its transaction and applied price dates. Preparing future records must not change the published snapshot.
 
-The 2026-09-30 snapshot has 18 holdings and 22 monthly observations: USD 127,533.11 in stocks and ETFs and USD 121,237.01 in simulated SPY.
+The 2026-10-31 snapshot has 18 holdings and 23 monthly observations: USD 121,085.13 in stocks and ETFs and USD 120,138.51 in simulated SPY.
 
 XIRR and TWR use the same boundary:
 
@@ -662,16 +662,20 @@ Performance shows reconstructed cumulative TWR versus SPY total return and since
 
 `PortfolioTable` owns its columns, controlled single-column sorting and TanStack sorted row model. `DataTable` renders native table structure; its row-rendering extension preserves the feature's row headers, mobile labels and financial styles. The footer stays outside the sorted model. Shared UI never imports portfolio calculations. Chart interaction never alters the monthly ledger or return calculations. `PerformanceChart` normalizes the display observations once on the server; the client explorer passes them directly to `LineChart`. Treat the observation array and its rows as read-only rather than copying them on every render.
 
-Historical evidence: the September update was reviewed against the monthly brokerage statement on 2026-10-05:
+The September and October snapshots were reconciled to their monthly brokerage statements on 2026-10-05 and 2026-11-05, respectively.
 
-| Item                                                         | Reviewed result                  |
-| ------------------------------------------------------------ | -------------------------------- |
-| Position quantities                                          | Unchanged                        |
-| Dividend and withholding-tax events                          | 16 events; USD 117.79 net income |
-| Purchases, sales, deposits, withdrawals and interest charges | None listed for September        |
-| Cumulative net dividends                                     | USD 644.48                       |
-| Cumulative financing interest                                | USD 85.75                        |
-| Since-inception annualized portfolio XIRR                    | 24.426811448224484%              |
+| Item                                      | September 2026 | October 2026 |
+| ----------------------------------------- | -------------: | -----------: |
+| Positions at month-end                    |             18 |           18 |
+| Stocks and ETFs at month-end (USD)        |     127,533.11 |   121,085.13 |
+| Dividend and withholding-tax events       |             16 |            6 |
+| Net dividend income for the month (USD)   |         117.79 |        16.98 |
+| Cumulative net dividends (USD)            |         644.48 |       661.46 |
+| Cumulative financing interest (USD)       |          85.75 |        85.75 |
+| Since-inception annualized portfolio XIRR |         24.43% |       18.34% |
+| Since-inception annualized SPY XIRR       |         19.26% |       17.22% |
+
+September had no listed purchases, sales, deposits, withdrawals or interest charges. The October 31 snapshot uses the October 30 U.S. trading close.
 
 XIRR was calculated independently from dated purchase costs, signed cash events and terminal stock value.
 
@@ -708,12 +712,12 @@ Each month records the applied U.S. trading date, which precedes the calendar mo
 
 #### Reconstructed Time-weighted Return
 
-`portfolio-closing-marks.ts` contains 450 daily/event-date marks and 6,752 held-position prices for 2024-12-30 through 2026-09-30. Yahoo Finance chart data was retrieved on 2026-10-05.
+`portfolio-closing-marks.ts` contains 473 daily/event-date marks and 7,166 held-position prices for 2024-12-30 through 2026-10-31. The October extension uses Yahoo Finance chart data retrieved on 2026-11-05, linked at the September close.
 
 - Use split-adjusted **close**, not dividend-adjusted close; the cash ledger records dividends and tax separately.
 - Multiply VGT prices before its 2026-04-21 split by eight to match contemporaneous share counts.
 - Use the preceding U.S. trading close for non-trading dates, retaining the applied date.
-- Reconcile all 22 month-end stock valuations within USD 0.011.
+- Reconcile all 23 month-end stock valuations within USD 0.011.
 
 Keep broker files and account identifiers outside the repository.
 
@@ -738,12 +742,13 @@ Stop on missing event/position prices, unvalued transfers or invalid ordering. T
 
 Server-only `portfolio-twr.ts` exports period valuations, monthly returns and the latest summary. Never bundle the historical price table into client code.
 
-For September 2026, cumulative portfolio TWR is 38.2694002516289%, the linked monthly return is 5.2341595775561744%, and SPY cumulative total return is 32.19753204498825%. SPY uses one dividend-adjusted vintage from the first purchase date without simulated purchase fees. This index comparison differs from the same-investment-date XIRR simulation. Published XIRRs and their frozen price basis remain unchanged.
+For October 2026, cumulative portfolio TWR is 31.30%, the linked monthly return is −5.04%, and SPY cumulative total return is 31.00%. SPY cumulative TWR links dividend-adjusted prices from the first purchase date. The October series joins the previous series at the September 30 close and excludes simulated purchase fees. This index comparison differs from the same-investment-date XIRR simulation. Published XIRRs and their frozen price basis remain unchanged.
 
 | Location                          | Return shown                                                                                                   |
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Home and Performance summaries    | Reconstructed cumulative portfolio TWRR, not annualized                                                        |
-| Portfolio summary and table Total | Cost-basis total return: 32.84% for September 2026                                                             |
+| Portfolio summary and table Total | Cost-basis total return: 26.17% for October 2026                                                               |
+| Home performance bars             | Since-inception annualized XIRR for the portfolio and simulated SPY, on a shared linear scale through zero     |
 | Individual holdings               | Position-level cost-basis return                                                                               |
 | Performance charts                | Full cumulative TWR and annualized XIRR comparisons, each with a monthly table; no second set of summary cards |
 

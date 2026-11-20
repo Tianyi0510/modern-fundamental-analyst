@@ -37,13 +37,13 @@ test.describe("header interaction QA", () => {
   test("desktop footer and legal sections use balanced vertical spacing", async ({ page }) => {
     await page.goto("/disclaimer");
     const footer = page.locator(".site-footer");
-    await expect(footer.locator(".footer-main")).toHaveCSS("padding-top", "72px");
-    await expect(footer.locator(".footer-main")).toHaveCSS("padding-bottom", "72px");
+    await expect(footer.locator(".footer-main")).toHaveCSS("padding-top", "64px");
+    await expect(footer.locator(".footer-main")).toHaveCSS("padding-bottom", "64px");
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-top", "24px");
     await expect(footer.locator(".footer-bottom")).toHaveCSS("padding-bottom", "24px");
     const legalBody = page.locator(".legal-body");
-    await expect(legalBody).toHaveCSS("padding-top", "96px");
-    await expect(legalBody).toHaveCSS("padding-bottom", "96px");
+    await expect(legalBody).toHaveCSS("padding-top", "64px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "64px");
   });
 
   test("CTA focus uses shared scale without lift or shadow", async ({ page }) => {
@@ -280,8 +280,8 @@ test.describe("mobile content and navigation QA", () => {
     await expect(upperBlock).toHaveCSS("row-gap", "32px");
     await expect(footer.locator(".footer-links")).toHaveCSS("grid-template-columns", "358px");
     const legalBody = page.locator(".legal-body");
-    await expect(legalBody).toHaveCSS("padding-top", "96px");
-    await expect(legalBody).toHaveCSS("padding-bottom", "96px");
+    await expect(legalBody).toHaveCSS("padding-top", "64px");
+    await expect(legalBody).toHaveCSS("padding-bottom", "64px");
   });
 
   test("mobile page content converges on shared gutters and stack spacing", { tag: "@mobile" }, async ({ page }) => {

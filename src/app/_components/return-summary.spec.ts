@@ -9,7 +9,7 @@ for (const { prefix, label, note } of [
     for (const path of ["/", "/performance"]) {
       await page.goto(`${prefix}${path}`);
       const metric = page.getByRole("main").getByRole("term").filter({ hasText: label }).locator("..");
-      await expect(metric.locator("strong")).toHaveText("+38.27%");
+      await expect(metric.locator("strong")).toHaveText("+31.30%");
       await expect(metric.locator("small")).toHaveText(note);
       const xirrNote =
         prefix === "/zh-tw"

@@ -5,11 +5,11 @@ export const appearance = {
   "memo-card-placeholder":
     "memo-card-placeholder [cursor:default] [&:hover]:[background:var(--surface-primary)] [&:hover]:[transform:none] [&:focus-visible]:[background:var(--surface-primary)] [&:focus-visible]:[transform:none] [&:active]:[background:var(--surface-primary)] [&:active]:[transform:none]",
   body: "[--radius-surface:var(--radius-memo)] min-h-full flex-1 gap-0 border-0 bg-transparent p-0 text-inherit ring-0 [--card-spacing:var(--space-section-content)]",
-  header: "flex items-center justify-between gap-5 pt-[var(--card-spacing)] text-large-label",
-  content: " pt-[var(--space-8)] pb-[var(--space-6)]",
-  title: "mb-[var(--space-5)] text-large-title text-balance",
+  header: "flex items-center justify-between gap-6 pt-[var(--card-spacing)] text-large-label",
+  content: " pt-[var(--space-48px)] pb-[var(--space-32px)]",
+  title: "mb-[var(--space-24px)] text-large-title text-balance",
   description: "text-small-body text-[var(--text-secondary)]",
   footer:
-    "mt-auto mx-[var(--card-spacing)] border-[var(--border-subtle)] bg-transparent px-0 pt-[var(--space-4)] pb-[var(--card-spacing)] text-small-body",
+    "mt-auto mx-[var(--card-spacing)] border-[var(--border-subtle)] bg-transparent px-0 pt-[var(--space-16px)] pb-[var(--card-spacing)] text-small-body",
   "date-text": "date-text [font-family:var(--font-ui)] [font-variant-numeric:tabular-nums]",
 } as const;

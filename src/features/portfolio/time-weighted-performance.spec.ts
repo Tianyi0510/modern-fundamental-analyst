@@ -23,36 +23,36 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         exact: true,
       }),
     ).toBeVisible();
-    await expect(await showLatestPerformanceTooltip(xirr)).toContainText("24.43%");
-    await expect(await showLatestPerformanceTooltip(xirr)).toContainText("19.26%");
+    await expect(await showLatestPerformanceTooltip(xirr)).toContainText("18.34%");
+    await expect(await showLatestPerformanceTooltip(xirr)).toContainText("17.22%");
     await expect(xirr.locator(".recharts-line-curve")).toHaveCount(2);
     for (const line of await xirr.locator(".recharts-line-curve").all()) {
-      expect((await line.getAttribute("d"))!.match(/[-\d.]+,[-\d.]+/g)).toHaveLength(21);
+      expect((await line.getAttribute("d"))!.match(/[-\d.]+,[-\d.]+/g)).toHaveLength(22);
     }
     await xirr.locator("[data-slot=collapsible-trigger]").click();
     await expect(xirr.getByRole("table")).toBeVisible();
-    await expect(xirr.locator("tbody tr")).toHaveCount(22);
-    await expect(xirr.locator("tbody tr").first()).toContainText("+24.43%");
-    await expect(xirr.locator("tbody tr").first()).toContainText("+19.26%");
+    await expect(xirr.locator("tbody tr")).toHaveCount(23);
+    await expect(xirr.locator("tbody tr").first()).toContainText("+18.34%");
+    await expect(xirr.locator("tbody tr").first()).toContainText("+17.22%");
     await expect(xirr.locator("tbody tr").last()).toContainText(prefix ? "30" : "less than 30 days");
     await expect(page.locator(".performance-twr-summary")).toHaveCount(0);
     await expect(page.locator(".performance-summary").getByRole("term")).toHaveCount(3);
-    await expect(page.locator(".performance-summary")).toContainText("+24.43%");
+    await expect(page.locator(".performance-summary")).toContainText("+18.34%");
     const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
     await expect(chart.getByRole("heading")).toHaveText(
       prefix === "/zh-tw" ? "累積重建 TWRR" : prefix === "/zh-cn" ? "累计重建 TWRR" : "Cumulative Reconstructed TWRR",
     );
-    await expect(await showLatestPerformanceTooltip(chart)).toContainText("38.27%");
-    await expect(await showLatestPerformanceTooltip(chart)).toContainText("32.20%");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("31.30%");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("31.00%");
     await expect(chart.locator(".recharts-line-curve")).toHaveCount(2);
     const summaryButton = chart.locator("[data-slot=collapsible-trigger]");
     await summaryButton.focus();
     await page.keyboard.press("Enter");
     await expect(chart.getByRole("table")).toBeVisible();
     await expect(chart.getByRole("columnheader").filter({ hasText: "TWRR" })).toHaveCount(2);
-    await expect(chart.locator("tbody tr")).toHaveCount(22);
-    await expect(chart.locator("tbody tr").first()).toContainText("127,533.11");
-    await expect(chart.locator("tbody tr").first()).toContainText("+38.27%");
+    await expect(chart.locator("tbody tr")).toHaveCount(23);
+    await expect(chart.locator("tbody tr").first()).toContainText("121,085.13");
+    await expect(chart.locator("tbody tr").first()).toContainText("+31.30%");
     const ids = await page.locator("[id]").evaluateAll((elements) => elements.map((element) => element.id));
     expect(new Set(ids).size).toBe(ids.length);
     for (const width of [320, 390, 1440]) {

@@ -11,7 +11,7 @@ export function FormPanel({
 }) {
   if (variant === "inverse") return children;
   return (
-    <Card className="min-w-0 gap-0 p-[var(--space-6)] compact:p-[var(--space-4)]">
+    <Card className="min-w-0 gap-0 p-[var(--space-32px)] compact:p-[var(--space-16px)]">
       <CardContent className="min-w-0 px-0">{children}</CardContent>
     </Card>
   );

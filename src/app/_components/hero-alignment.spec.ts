@@ -69,8 +69,9 @@ for (const [prefix, hint] of [
       node.scrollLeft = node.scrollWidth;
     });
     expect(await region.evaluate((node) => node.scrollLeft + node.clientWidth >= node.scrollWidth - 1)).toBe(true);
-    await expect(card.locator("strong")).toHaveText("$127,533.11");
-    await page.setViewportSize({ width: 390, height: 900 });
+    await expect(card.locator("strong")).toHaveText("$121,085.13");
+    // A 390px window with a classic scrollbar has about 375px of usable width.
+    await page.setViewportSize({ width: 375, height: 900 });
     await expect(card.locator(".financial-scroll-hint")).toHaveCount(0);
     await expect(region).not.toHaveAttribute("tabindex");
   });
