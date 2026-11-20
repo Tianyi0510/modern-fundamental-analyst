@@ -35,7 +35,7 @@ SOFTWARE.
     --typeset-font-mono: var(--font-mono);
     --typeset-size: 1em;
     --typeset-leading: 1.75;
-    --typeset-flow: 1.25em;
+    --typeset-flow: var(--space-24px);
   }
 }
 
@@ -90,7 +90,7 @@ SOFTWARE.
     &:where(h2) {
       font-size: 1.25em;
       line-height: 1.4;
-      margin-block-start: calc(var(--typeset-flow) * 1.4);
+      margin-block-start: var(--space-32px);
     }
     &:where(h3) {
       font-size: 1.125em;
@@ -107,7 +107,7 @@ SOFTWARE.
       line-height: 1.5;
       font-weight: 500;
       color: var(--typeset-muted);
-      margin-block-start: calc(var(--typeset-flow) / 0.875);
+      margin-block-start: var(--space-24px);
     }
     &:where(h6) {
       font-size: 0.8125em;
@@ -116,7 +116,7 @@ SOFTWARE.
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--typeset-muted);
-      margin-block-start: calc(var(--typeset-flow) / 0.8125);
+      margin-block-start: var(--space-32px);
     }
     /* Anchors. */
     &:where([id]) {
@@ -125,7 +125,7 @@ SOFTWARE.
 
     /* Headings own the space below them. */
     &:where(h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + *) {
-      margin-block-start: 1em;
+      margin-block-start: var(--space-16px);
     }
     &:where(:is(h1, h2, h3, h4) :is(code)) {
       font-size: 0.9em;
@@ -160,7 +160,7 @@ SOFTWARE.
     &:where(mark) {
       background-color: var(--surface-selected);
       color: inherit;
-      padding: 0.05em 0.15em;
+      padding: var(--space-4px) var(--space-4px);
       border-radius: 0.2em;
     }
     &:where(abbr[title]) {
@@ -218,14 +218,14 @@ SOFTWARE.
     &:where(ul, ol) {
       margin-block-start: var(--typeset-flow);
       margin-block-end: 0;
-      padding-inline-start: 1.5em;
+      padding-inline-start: var(--space-24px);
     }
     &:where(li) {
-      margin-block-start: 0.5em;
-      padding-inline-start: 0.4em;
+      margin-block-start: var(--space-8px);
+      padding-inline-start: var(--space-8px);
     }
     &:where(li > p, li > ul, li > ol) {
-      margin-block-start: 0.5em;
+      margin-block-start: var(--space-8px);
     }
     /* eslint-disable-next-line css/use-baseline -- Native markers remain visible without this color enhancement; covered by baseline-compatibility.spec.ts. */
     &:where(ul > li)::marker {
@@ -239,10 +239,10 @@ SOFTWARE.
     /* GFM task lists. */
     &:where(ul.contains-task-list) {
       list-style-type: none;
-      padding-inline-start: 0.25em;
+      padding-inline-start: var(--space-4px);
     }
     &:where(li.task-list-item > input[type="checkbox"]) {
-      margin-inline-end: 0.5em;
+      margin-inline-end: var(--space-8px);
       vertical-align: -0.1em;
       @supports (accent-color: auto) {
         accent-color: var(--color-primary, currentColor);
@@ -271,7 +271,7 @@ SOFTWARE.
       border: 1px solid var(--typeset-rule);
       border-block-end-width: 2px;
       border-radius: min(calc(var(--radius, 0.5em) * 0.6), 0.35em);
-      padding: 0.0625em 0.35em;
+      padding: var(--space-4px) var(--space-4px);
     }
 
     /* Definition lists. */
@@ -281,15 +281,15 @@ SOFTWARE.
     }
     &:where(dt) {
       font-weight: 500;
-      margin-block-start: 1em;
+      margin-block-start: var(--space-16px);
     }
     &:where(dt + dt) {
-      margin-block-start: 0.25em;
+      margin-block-start: var(--space-4px);
     }
     &:where(dd) {
-      margin-block-start: 0.25em;
+      margin-block-start: var(--space-4px);
       margin-inline-start: 0;
-      padding-inline-start: 1em;
+      padding-inline-start: var(--space-16px);
       color: var(--typeset-muted);
     }
 
@@ -299,7 +299,7 @@ SOFTWARE.
       font-family: var(--typeset-font-mono);
       font-size: 0.85em;
       border-radius: min(calc(var(--radius, 0.5em) * 0.6), 0.35em);
-      padding: 0.125em 0.3em;
+      padding: var(--space-4px) var(--space-4px);
     }
 
     /* Code blocks. */
@@ -311,9 +311,9 @@ SOFTWARE.
       tab-size: 2;
       direction: ltr;
       border-radius: var(--radius, 0.5em);
-      padding: 0.75em 1em;
+      padding: var(--space-16px) var(--space-16px);
       overflow-x: auto;
-      margin-block-start: calc(var(--typeset-flow) / 0.875);
+      margin-block-start: var(--space-24px);
       margin-block-end: 0;
     }
     &:where(pre code) {
@@ -327,7 +327,7 @@ SOFTWARE.
     /* Blockquote. */
     &:where(blockquote) {
       border-inline-start: 2px solid var(--typeset-rule);
-      padding-inline-start: 1em;
+      padding-inline-start: var(--space-16px);
       margin-block-start: var(--typeset-flow);
       margin-block-end: 0;
       margin-inline: 0;
@@ -337,7 +337,7 @@ SOFTWARE.
     &:where(hr) {
       border: 0;
       border-block-start: 1px solid var(--typeset-rule);
-      margin-block-start: calc(var(--typeset-flow) * 2.4);
+      margin-block-start: var(--space-64px);
       margin-block-end: 0;
     }
     &:where(hr + h1, hr + h2, hr + h3, hr + h4) {
@@ -346,7 +346,7 @@ SOFTWARE.
 
     /* GFM footnotes. */
     &:where(.footnotes, [data-footnotes]) {
-      margin-block-start: calc(var(--typeset-flow) * 2);
+      margin-block-start: var(--space-48px);
       border-block-start: 1px solid var(--typeset-rule);
       padding-block-start: var(--typeset-flow);
       font-size: 0.875em;
@@ -359,7 +359,7 @@ SOFTWARE.
       margin-block-end: 0;
       overflow-x: auto;
       overflow-y: hidden;
-      padding-block: 0.25em;
+      padding-block: var(--space-4px);
     }
 
     /* Media. */
@@ -382,7 +382,7 @@ SOFTWARE.
       color: var(--typeset-muted);
       font-size: 0.875em;
       text-align: center;
-      margin-block-start: calc(0.75em / 0.875);
+      margin-block-start: var(--space-16px);
     }
     &:where(caption) {
       caption-side: bottom;
@@ -420,10 +420,10 @@ SOFTWARE.
       font-weight: 500;
       text-align: start;
       white-space: nowrap;
-      padding: 0.65em 1em;
+      padding: var(--space-8px) var(--space-16px);
     }
     &:where(:is(tbody, tfoot) :is(td, th)) {
-      padding: 0.75em 1em;
+      padding: var(--space-16px) var(--space-16px);
       text-align: start;
       vertical-align: top;
       border-block-start: 1px solid var(--typeset-rule);
@@ -443,10 +443,10 @@ SOFTWARE.
 
     /* Blocks inside list items keep the list's tighter rhythm. */
     &:where(li > blockquote, li > table, li > figure) {
-      margin-block-start: 0.5em;
+      margin-block-start: var(--space-8px);
     }
     &:where(li > pre) {
-      margin-block-start: calc(0.5em / 0.875);
+      margin-block-start: var(--space-8px);
     }
 
     @media print {

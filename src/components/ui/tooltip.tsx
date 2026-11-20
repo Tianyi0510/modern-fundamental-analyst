@@ -32,7 +32,7 @@ export function TooltipContent({
         <Primitive.Popup
           data-slot="tooltip-content"
           className={cn(
-            "max-w-[min(20rem,var(--available-width))] rounded-control bg-foreground px-3 py-2 text-small-body text-background shadow-[var(--shadow-popover)] transition-opacity duration-[var(--motion-duration-fast)] data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none",
+            "max-w-[min(20rem,var(--available-width))] rounded-control bg-foreground px-4 py-2 text-small-body text-background shadow-[var(--shadow-popover)] transition-opacity duration-[var(--motion-duration-fast)] data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none",
             className,
           )}
           {...props}

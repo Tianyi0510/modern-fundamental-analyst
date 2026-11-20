@@ -8,7 +8,7 @@
     --typeset-font-mono: var(--font-ui);
     --typeset-size: var(--font-size-medium-body);
     --typeset-leading: var(--leading-body-text);
-    --typeset-flow: 1.35em;
+    --typeset-flow: var(--space-24px);
     font-size: var(--typeset-size);
     font-weight: var(--weight-regular);
     letter-spacing: var(--tracking-zero);
@@ -34,13 +34,13 @@
     }
     &:where(h2) {
       font-size: var(--font-size-small-headline);
-      margin: 0 0 34px;
+      margin: 0 0 var(--space-32px);
     }
     &:where(h3, h4) {
       font-size: var(--font-size-medium-title);
     }
     &:where(h3) {
-      margin: 0 0 18px;
+      margin: 0 0 var(--space-16px);
     }
     &:where(h5, h6) {
       font-size: var(--font-size-large-label);
@@ -59,8 +59,8 @@
       font-weight: var(--weight-bold);
     }
     &:where(blockquote) {
-      margin: 64px 0;
-      padding: 34px 0;
+      margin: var(--space-64px) 0;
+      padding: var(--space-32px) 0;
       border-inline-start: 0;
       border-top: 3px solid var(--border-brand);
       border-bottom: 1px solid var(--border-subtle);

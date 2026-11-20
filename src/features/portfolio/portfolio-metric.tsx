@@ -33,19 +33,19 @@ export function PortfolioMetric({
   return (
     <div
       data-tone={tone}
-      className={`${styles.metric} flex min-h-[200px] min-w-0 flex-col rounded-[var(--radius-data)] p-[var(--space-6)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] compact:py-[var(--space-5)] ${tones[tone]} ${className}`}
+      className={`${styles.metric} flex min-h-[200px] min-w-0 flex-col rounded-[var(--radius-data)] p-[var(--space-32px)] [overflow-wrap:anywhere] compact:min-h-[168px] compact:px-[var(--space-page-gutter)] compact:py-[var(--space-24px)] ${tones[tone]} ${className}`}
     >
       <dt id={labelId} className="text-large-label">
         {label}
       </dt>
-      <dd className="kpi-value mt-[var(--space-4)] min-w-0">
+      <dd className="kpi-value mt-[var(--space-16px)] min-w-0">
         <FinancialValueScroll labelId={labelId} locale={locale}>
           <strong className="block w-max min-w-full text-medium-display whitespace-nowrap tabular-nums [--font-size-medium-display:3.1875rem]">
             {value}
           </strong>
         </FinancialValueScroll>
       </dd>
-      <dd className="kpi-note mt-[var(--space-3)]">
+      <dd className="kpi-note mt-[var(--space-8px)]">
         <small className={`block text-small-body opacity-100 compact:max-w-[32ch] ${noteClassName}`}>{note}</small>
       </dd>
     </div>

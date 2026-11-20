@@ -11,7 +11,7 @@ export function SidebarMenu({ className, ...props }: ComponentProps<"ul">) {
       role="list"
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-[calc(var(--space-2)/2)]", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-[var(--space-4px)]", className)}
       {...props}
     />
   );
@@ -46,7 +46,7 @@ export function SidebarMenuButton({
       "data-active": isActive,
       ...props,
       className: cn(
-        "flex min-h-[var(--size-touch-target)] w-full min-w-0 items-center gap-[var(--space-3)] rounded-control bg-transparent px-[var(--space-3)] py-[var(--space-3)] text-left text-medium-label [overflow-wrap:anywhere] whitespace-normal text-[var(--sidebar-text)] transition-[color,background-color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] outline-none hover:text-accent hover:not-data-[active=true]:bg-[var(--sidebar-hover-surface)] focus-visible:text-accent focus-visible:outline-[length:var(--focus-ring-width)] focus-visible:outline-offset-[calc(var(--focus-ring-width)*-1)] focus-visible:outline-accent focus-visible:outline-solid focus-visible:not-data-[active=true]:bg-[var(--sidebar-hover-surface)] active:bg-[var(--sidebar-pressed-surface)] active:text-accent disabled:pointer-events-none disabled:opacity-[var(--opacity-disabled)] data-[active=true]:bg-[var(--sidebar-selected-surface)] data-[active=true]:text-accent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:bg-transparent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:text-[var(--sidebar-text)] [&>span]:min-w-0 [&>svg]:size-[18px] [&>svg]:shrink-0",
+        "flex min-h-[var(--size-touch-target)] w-full min-w-0 items-center gap-[var(--space-8px)] rounded-control bg-transparent px-[var(--space-8px)] py-[var(--space-8px)] text-left text-medium-label [overflow-wrap:anywhere] whitespace-normal text-[var(--sidebar-text)] transition-[color,background-color] duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] outline-none hover:text-accent hover:not-data-[active=true]:bg-[var(--sidebar-hover-surface)] focus-visible:text-accent focus-visible:outline-[length:var(--focus-ring-width)] focus-visible:outline-offset-[calc(var(--focus-ring-width)*-1)] focus-visible:outline-accent focus-visible:outline-solid focus-visible:not-data-[active=true]:bg-[var(--sidebar-hover-surface)] active:bg-[var(--sidebar-pressed-surface)] active:text-accent disabled:pointer-events-none disabled:opacity-[var(--opacity-disabled)] data-[active=true]:bg-[var(--sidebar-selected-surface)] data-[active=true]:text-accent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:bg-transparent touch:[&:hover:not([data-active=true]):not(:active):not(:focus-visible)]:text-[var(--sidebar-text)] [&>span]:min-w-0 [&>svg]:size-[18px] [&>svg]:shrink-0",
         className,
       ),
     },

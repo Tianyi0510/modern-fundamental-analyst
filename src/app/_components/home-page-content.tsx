@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
+import { HomeReturnBars } from "./home-return-bars";
 import { appearance } from "./home-page-content.styles";
 import { ButtonLink } from "@/components/button-link";
 import Link from "next/link";
@@ -270,7 +271,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               aria-labelledby="home-allocation-title"
               className={appearance["allocation-card"]}
             >
-              <CardHeader className="flex flex-row items-center gap-3 px-0">
+              <CardHeader className="flex flex-row items-center gap-4 px-0">
                 <ChartPie size={24} strokeWidth={2} aria-hidden="true" className="shrink-0" />
                 <h3 id="home-allocation-title" className="m-0 text-large-label">
                   {text.holdingsAllocation}
@@ -320,23 +321,13 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               </h2>
             </div>
             <div className={appearance["performance-grid"]}>
-              <div className={appearance["performance-bars"]} aria-label={text.chartLabel}>
-                <div className={appearance["year-bar"]}>
-                  <div className={appearance["bar-value"]} style={{ height: `${portfolioSnapshot.xirr * 8}px` }}>
-                    <span>{formatPercent(portfolioSnapshot.xirr)}</span>
-                  </div>
-                  <small>{text.portfolioName}</small>
-                </div>
-                <div className={appearance["year-bar"]}>
-                  <div
-                    className={appearance["bar-value"]}
-                    style={{ height: `${portfolioSnapshot.benchmarkXirr * 8}px` }}
-                  >
-                    <span>{benchmarkReturn}</span>
-                  </div>
-                  <small>{portfolioSnapshot.benchmark}</small>
-                </div>
-              </div>
+              <HomeReturnBars
+                label={text.chartLabel}
+                series={[
+                  { name: text.portfolioName, value: portfolioSnapshot.xirr },
+                  { name: portfolioSnapshot.benchmark, value: portfolioSnapshot.benchmarkXirr },
+                ]}
+              />
               <div className={appearance["performance-copy"]}>
                 <div
                   className="performance-value financial-value-scroll max-w-full overflow-x-auto overflow-y-hidden"
@@ -358,7 +349,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </small>
                 <ButtonLink
                   variant="contrast"
-                  className="button-white mt-[48px]"
+                  className="button-white mt-[var(--space-48px)]"
                   href={getLocalizedPath("/performance", locale)}
                 >
                   {text.viewPerformance}

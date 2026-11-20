@@ -89,7 +89,7 @@
 }
 .languageDisclosure > [data-slot="collapsible-trigger"] {
   min-height: var(--size-touch-target);
-  padding: var(--space-3);
+  padding: var(--space-8px);
   border-radius: var(--radius-control);
   outline: none;
   display: flex;
@@ -164,7 +164,7 @@
   height: var(--collapsible-panel-height);
   position: absolute;
   bottom: 100%;
-  inset-inline: calc(-1 * var(--space-2));
+  inset-inline: calc(-1 * var(--space-8px));
   z-index: 2;
   border-radius: var(--radius-menu) var(--radius-menu) 0 0;
   background: var(--sidebar-language-surface);
@@ -172,8 +172,8 @@
   transition: height var(--motion-duration-base) var(--motion-ease-standard);
 }
 .languageDisclosure > [data-slot="collapsible-content"] > div {
-  padding-top: var(--space-2);
-  padding-inline: var(--space-2);
+  padding-top: var(--space-8px);
+  padding-inline: var(--space-8px);
 }
 .languageDisclosure > [data-slot="collapsible-content"][data-starting-style],
 .languageDisclosure > [data-slot="collapsible-content"][data-ending-style] {

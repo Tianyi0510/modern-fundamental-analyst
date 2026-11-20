@@ -8,9 +8,9 @@ export function ServiceLoading({ locale }: { locale: Locale }) {
   return (
     <div className={appearance["shell"]} role="status" aria-live="polite" aria-busy="true">
       <span>{copy[locale]}</span>
-      <div className="mt-[var(--space-4)] grid gap-[var(--space-3)]" aria-hidden="true">
-        <Skeleton className="h-[var(--space-5)] w-2/3" />
-        <Skeleton className="h-[var(--space-4)] w-full" />
+      <div className="mt-[var(--space-16px)] grid gap-[var(--space-8px)]" aria-hidden="true">
+        <Skeleton className="h-[var(--space-24px)] w-2/3" />
+        <Skeleton className="h-[var(--space-16px)] w-full" />
       </div>
     </div>
   );

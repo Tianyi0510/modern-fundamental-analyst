@@ -16,7 +16,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.evaluate(() => document.fonts.ready);
       await expect(body).toBeVisible();
       const hero = page.locator(".memo-article-header");
-      await expect(hero).toHaveCSS("padding-top", "96px");
+      await expect(hero).toHaveCSS("padding-top", "64px");
       await expect(hero).toHaveCSS("padding-bottom", "0px");
       await expect(hero.locator("h1")).toHaveCSS("font-size", width < 800 ? "51px" : width < 1200 ? "67px" : "90px");
       const share = hero.getByRole("button");

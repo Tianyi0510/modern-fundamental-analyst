@@ -187,7 +187,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                 })}
               </SidebarMenu>
             </nav>
-            <div className="mobile-menu-preferences mt-auto grid shrink-0 justify-items-start gap-[calc(var(--space-2)/2)]">
+            <div className="mobile-menu-preferences mt-auto grid shrink-0 justify-items-start gap-[var(--space-4px)]">
               <div className={appearance["mobile-language-links"]}>
                 <Collapsible
                   ref={languageRootRef}
@@ -199,7 +199,7 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
                   }}
                 >
                   <CollapsibleTrigger ref={languageTriggerRef}>
-                    <span className="inline-flex min-w-0 items-center gap-[var(--space-3)]">
+                    <span className="inline-flex min-w-0 items-center gap-[var(--space-8px)]">
                       <Globe aria-hidden="true" strokeWidth={1.75} />
                       <span>{localeConfig[locale].label}</span>
                     </span>

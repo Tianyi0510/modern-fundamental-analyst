@@ -5,17 +5,18 @@ import { portfolioMonthlyValuations } from "./portfolio-detail.ts";
 import { portfolioTwrMonthlyReturns, portfolioTwrSnapshot, portfolioTwrValuations } from "./portfolio-twr.ts";
 
 test("reconstructed month-end positions reconcile to every published broker stock valuation", () => {
-  assert.equal(portfolioClosingMarks.length, 450);
-  assert.equal(portfolioTwrMonthlyReturns.length, 22);
+  assert.equal(portfolioClosingMarks.length, 473);
+  assert.equal(portfolioTwrMonthlyReturns.length, 23);
   for (const [index, source] of portfolioMonthlyValuations.entries()) {
     const actual = portfolioTwrMonthlyReturns[index];
     assert.equal(actual.date, source.date);
     assert.ok(Math.abs(actual.endingValue - source.stockValue) < 0.011, source.date);
   }
+  assert.equal(portfolioTwrSnapshot.priceDate, "2026-10-30");
   assert.equal(portfolioTwrSnapshot.startDate, "2024-12-30");
-  assert.equal(portfolioTwrSnapshot.date, "2026-09-30");
-  assert.ok(Math.abs(portfolioTwrSnapshot.portfolioTwr - 38.2694002516289) < 0.000001);
-  assert.ok(Math.abs(portfolioTwrSnapshot.benchmarkTwr - 32.19753204498825) < 0.000001);
+  assert.equal(portfolioTwrSnapshot.date, "2026-10-31");
+  assert.ok(Math.abs(portfolioTwrSnapshot.portfolioTwr - 31.296615427541074) < 0.000001);
+  assert.ok(Math.abs(portfolioTwrSnapshot.benchmarkTwr - 30.999717299892325) < 0.000001);
 });
 
 test("monthly returns geometrically reproduce cumulative TWR, including the first period", () => {

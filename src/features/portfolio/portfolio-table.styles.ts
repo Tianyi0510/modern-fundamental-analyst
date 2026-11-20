@@ -1,23 +1,23 @@
-const columns = "grid grid-cols-[1.05fr_0.5fr_0.75fr_0.9fr_1fr_0.65fr_0.6fr] gap-[22px] items-center";
+const columns = "grid grid-cols-[1.05fr_0.5fr_0.75fr_0.9fr_1fr_0.65fr_0.6fr] gap-[var(--space-24px)] items-center";
 const valueText = "text-small-body tabular-nums";
 const mobileControl =
   "w-full min-w-0 min-h-0 h-[var(--size-control)] border border-[var(--border-control)] rounded-control bg-surface text-ink text-medium-label";
-const rowLayout = `${columns} min-h-[var(--size-control)] [&_>_*]:p-0 [&_>_*:not(:first-child)]:text-right compact:min-h-0 compact:grid-cols-2 compact:gap-x-[var(--space-4)] compact:gap-y-[var(--space-2)] compact:py-[var(--space-3)] compact:[&_>_*]:min-w-0 compact:[&_>_*]:grid compact:[&_>_*]:gap-[5px] compact:[&_>_*]:text-left compact:[&_>_*]:wrap-anywhere compact:[&_>_*::before]:content-[attr(data-label)] compact:[&_>_*::before]:text-large-label compact:[&_>_*::before]:text-[var(--text-tertiary)] compact:[&_>_th:first-child]:col-span-full [&_>_th:first-child]:text-large-label compact:[&_>_th:first-child::before]:hidden`;
+const rowLayout = `${columns} min-h-[var(--size-control)] [&_>_*]:p-0 [&_>_*:not(:first-child)]:text-right compact:min-h-0 compact:grid-cols-2 compact:gap-x-[var(--space-16px)] compact:gap-y-[var(--space-8px)] compact:py-[var(--space-8px)] compact:[&_>_*]:min-w-0 compact:[&_>_*]:grid compact:[&_>_*]:gap-[var(--space-4px)] compact:[&_>_*]:text-left compact:[&_>_*]:wrap-anywhere compact:[&_>_*::before]:content-[attr(data-label)] compact:[&_>_*::before]:text-large-label compact:[&_>_*::before]:text-[var(--text-tertiary)] compact:[&_>_th:first-child]:col-span-full [&_>_th:first-child]:text-large-label compact:[&_>_th:first-child::before]:hidden`;
 
 export const appearance = {
   "portfolio-mobile-sort":
-    "portfolio-mobile-sort hidden compact:grid compact:grid-cols-2 compact:gap-x-[var(--space-3)] compact:gap-y-[var(--space-2)] compact:items-center compact:mb-[var(--space-5)]",
+    "portfolio-mobile-sort hidden compact:grid compact:grid-cols-2 compact:gap-x-[var(--space-8px)] compact:gap-y-[var(--space-8px)] compact:items-center compact:mb-[var(--space-24px)]",
   mobileLabel: "contents",
   mobileHeading: "col-span-full text-large-label whitespace-nowrap",
-  mobileSelect: `${mobileControl} pl-[14px] pr-[36px]`,
-  mobileDirection: `${mobileControl} px-[14px] py-0 gap-[var(--space-2)] wrap-anywhere [--action-quiet-hover-surface:var(--surface-inverse)] hover:text-[var(--text-inverse)] focus-visible:text-[var(--text-inverse)] active:text-[var(--text-inverse)] data-[touch-pressed=true]:text-[var(--text-inverse)] touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:text-ink`,
+  mobileSelect: `${mobileControl} pl-[var(--space-16px)] pr-[var(--space-32px)]`,
+  mobileDirection: `${mobileControl} px-[var(--space-16px)] py-0 gap-[var(--space-8px)] wrap-anywhere [--action-quiet-hover-surface:var(--surface-inverse)] hover:text-[var(--text-inverse)] focus-visible:text-[var(--text-inverse)] active:text-[var(--text-inverse)] data-[touch-pressed=true]:text-[var(--text-inverse)] touch:[&:hover:not(:is(:active,[data-touch-pressed=true])):not(:focus-visible)]:text-ink`,
   mobileArrow: "size-[17px] ml-auto shrink-0",
   "portfolio-table":
     "portfolio-table portfolio-table-detailed block w-full min-w-[1080px] border-t border-[var(--border-strong)] [&_>_:is(thead,tbody,tfoot)]:block [&_:is(th,td)]:p-0 [&_:is(th,td)]:text-left compact:min-w-0 compact:border-t-0",
   "table-head": `table-head ${columns} min-h-[var(--size-field)] text-[var(--text-secondary)] text-large-label [&_>_th:not(:first-child)]:text-right compact:sr-only compact:min-h-0 compact:block`,
   "portfolio-column-label": "portfolio-column-label hidden compact:inline",
   "sort-button":
-    "sort-button w-full py-[10px] inline-flex items-center gap-[6px] whitespace-nowrap text-large-label transition-[color,transform] duration-[var(--motion-duration-fast)] hover:text-brand focus-visible:text-brand active:scale-[var(--motion-scale-press)] [&_svg]:w-[13px] [&_svg]:h-[13px] [&_svg]:shrink-0 [&_svg]:transition-transform [&_svg]:duration-[var(--motion-duration-base)] [&_svg]:ease-[var(--motion-ease-emphasized)] [&:hover_svg]:translate-y-[var(--motion-offset-sort)] [&:focus-visible_svg]:translate-y-[var(--motion-offset-sort)] compact:hidden",
+    "sort-button w-full py-[var(--space-8px)] inline-flex items-center gap-[var(--space-8px)] whitespace-nowrap text-large-label transition-[color,transform] duration-[var(--motion-duration-fast)] hover:text-brand focus-visible:text-brand active:scale-[var(--motion-scale-press)] [&_svg]:w-[13px] [&_svg]:h-[13px] [&_svg]:shrink-0 [&_svg]:transition-transform [&_svg]:duration-[var(--motion-duration-base)] [&_svg]:ease-[var(--motion-ease-emphasized)] [&:hover_svg]:translate-y-[var(--motion-offset-sort)] [&:focus-visible_svg]:translate-y-[var(--motion-offset-sort)] compact:hidden",
   sortAlignment: "justify-end",
   "is-active": "is-active text-brand",
   "portfolio-row": `portfolio-row ${rowLayout} ${valueText} font-normal border-t border-[var(--border-subtle)] transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease-standard)] hover:bg-[var(--portfolio-row-hover-surface)]`,

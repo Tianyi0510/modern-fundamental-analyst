@@ -8,7 +8,7 @@ import { colorContrast } from "../../../scripts/color-contrast";
 test.use({ hasTouch: true });
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
-  test(`${prefix || "English"} September performance chart and monthly data remain accessible`, async ({ page }) => {
+  test(`${prefix || "English"} October performance chart and monthly data remain accessible`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(`${prefix}/performance`);
@@ -17,15 +17,15 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(page.locator(".methodology-explanation > p")).toHaveCount(4);
     const methodologyNote = page.getByRole("complementary");
     await expect(methodologyNote).toBeVisible();
-    await expect(methodologyNote).toContainText(prefix ? "2026年9月30日" : "30 Sep 2026");
+    await expect(methodologyNote).toContainText(prefix ? "2026年10月31日" : "31 Oct 2026");
     await expect(methodologyNote).toContainText(
       prefix === "/zh-tw" ? "並非即時報價" : prefix === "/zh-cn" ? "并非实时报价" : "not live quotes",
     );
     const chart = page.locator('figure[aria-labelledby="performance-twr-chart-title"]');
     await showInteractivePerformanceChart(chart);
     await expect(chart.getByRole("application")).toBeVisible();
-    await expect(await showLatestPerformanceTooltip(chart)).toContainText("38.27%");
-    await expect(await showLatestPerformanceTooltip(chart)).toContainText("32.20%");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("31.30%");
+    await expect(await showLatestPerformanceTooltip(chart)).toContainText("31.00%");
     await expect(chart.locator(".recharts-line-curve")).toHaveCount(2);
     const strokes = await chart
       .locator(".recharts-line-curve")
@@ -33,16 +33,16 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     for (const stroke of strokes) expect(colorContrast(stroke, "rgb(255, 255, 255)")).toBeGreaterThanOrEqual(3);
     for (const line of await chart.locator(".recharts-line-curve").all()) {
       const points = (await line.getAttribute("d"))!.match(/[-\d.]+,[-\d.]+/g)!;
-      expect(points).toHaveLength(22);
+      expect(points).toHaveLength(23);
       for (const point of points) {
         const y = Number(point.split(",")[1]);
         expect(y).toBeGreaterThanOrEqual(0);
         expect(y).toBeLessThanOrEqual(300);
       }
     }
-    await expect(page.locator(".performance-summary")).toContainText("+24.43%");
-    await expect(page.locator(".performance-summary")).toContainText("+19.26%");
-    if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText("As of 30 Sep 2026");
+    await expect(page.locator(".performance-summary")).toContainText("+18.34%");
+    await expect(page.locator(".performance-summary")).toContainText("+17.22%");
+    if (!prefix) await expect(page.locator(".page-intro .date-text")).toContainText("As of 31 Oct 2026");
     const summary = chart.locator("[data-slot=collapsible-trigger]");
     await expect(summary.locator("svg.lucide-chevron-down")).toBeVisible();
     expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -50,16 +50,16 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
     await expect(summary).toHaveCSS("outline-style", "solid");
     await page.keyboard.press("Enter");
     await expect(chart.getByRole("table")).toBeVisible();
-    await expect(chart.locator("tbody tr")).toHaveCount(22);
-    await expect(chart.locator("tbody tr").first()).toContainText("127,533.11");
-    await expect(chart.locator("tbody tr").first()).toContainText("+38.27%");
+    await expect(chart.locator("tbody tr")).toHaveCount(23);
+    await expect(chart.locator("tbody tr").first()).toContainText("121,085.13");
+    await expect(chart.locator("tbody tr").first()).toContainText("+31.30%");
     const region = chart.getByRole("region");
     await expect(chart.locator('[data-slot="table-container"]')).toHaveCount(1);
     await expect(region).toHaveAttribute("data-slot", "table-container");
     await expect(region).toHaveAttribute("tabindex", "0");
     await expect(chart.getByRole("table")).toHaveAttribute("data-slot", "table");
     await expect(chart.locator('thead th[scope="col"]')).toHaveCount(4);
-    await expect(chart.locator('tbody th[scope="row"]')).toHaveCount(22);
+    await expect(chart.locator('tbody th[scope="row"]')).toHaveCount(23);
     await expect(chart.locator("caption")).toHaveAttribute("data-slot", "table-caption");
     await expect(chart.locator("thead th").first()).toHaveCSS("position", "sticky");
     await region.focus();
