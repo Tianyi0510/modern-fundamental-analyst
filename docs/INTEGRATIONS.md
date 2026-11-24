@@ -32,8 +32,6 @@ Use these templates as implementation examples within the scopes below. They do 
 
 The [README](../README.md#mission) defines the mission; [Architecture](WEB_APPLICATION_ARCHITECTURE.md#editorial-sources-and-publication-status) records editorial sources and publication status. Google Docs links are editorial references, not a configured runtime integration or automatic publishing feed. Article categories use the local memo catalog and do not require Redis, a CMS or another provider. Follow the [MDX publishing contract](WEB_APPLICATION_ARCHITECTURE.md#investment-memo-content).
 
-See [local maintenance tooling](WEB_APPLICATION_ARCHITECTURE.md#local-maintenance-tooling) for the Python cleanup helper. It is outside the deployed application and provider inventory.
-
 ## Operational boundaries
 
 Use [.env.example](../.env.example) for variable names. Store environment-scoped secrets in Vercel and local credentials in ignored `.env.local`. Never commit or print credentials. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) defines application boundaries; [Design System](DESIGN_SYSTEM.md) defines UI contracts. Published portfolio and article data are versioned in their feature directories; Redis is not their source.
@@ -55,7 +53,7 @@ The owner reported the domain transfer from Wix to Vercel on 2026-09-22. Manage 
 
 Preserve root and `www` website records and Resend verification, sending and receiving records for `mail.modernfundamentalanalyst.com`. Obtain exact values from current dashboards. A registrar transfer does not prove a nameserver change. See [Receiving](#receiving) and [Checkout](#checkout-behavior) for separate service settings. Owner reports are not live DNS or delivery checks.
 
-Follow the [Branch → PR → Main release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for hosting and CI gating. Opening a PR can create a Vercel Preview; merging to `main` triggers the production deployment workflow. Merge only with explicit owner authorization to merge the PR. A deployment request alone does not grant merge authorization. Confirm the target environment and current provider state before changing DNS or credentials.
+Vercel creates Preview and Production deployments through the Git integration. Follow the [release workflow](WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for CI and deployment verification. Confirm the target environment and current provider state before changing DNS or credentials.
 
 The npm command wrapper normalizes the unsupported `cache-dir` environment setting observed in production build logs on October 25, 2026. The original injection source is unverified; no cloud environment variables were changed. Verify that the warning is absent in both installation and build logs after the next authorized deployment. See the [deepmerge residual risk](WEB_APPLICATION_ARCHITECTURE.md#deepmerge-residual-risk) before changing email dependencies or conversion options. Architecture owns the risk assessment, mitigations and reassessment conditions.
 
@@ -363,6 +361,8 @@ The subscription journal has no plaintext email or preference token and retains 
 Preference and confirmation email retry records are separate: they contain the sender, recipient, subject, original encrypted preference link or opaque confirmation link, email text and HTML for up to 25 hours. The same request ID can retrieve its original payload for 25 minutes; the record remains afterward so that reusing an old ID cannot create a fresh payload during the provider's deduplication window. The request key is reused as the provider idempotency key; it is not stored in the payload. Treat these records as sensitive, restrict Redis access, and follow [Resend request reliability](#request-reliability) for retry behavior.
 
 ### Subscription reconciliation
+
+Contact lookup requires a contact ID and boolean subscription state. Only an explicit 404 permits creation. Email sends and contact or segment writes require a nonempty provider ID. Segment removal also requires `deleted: true`; welcome events require the expected event name and object type. Before changing language, read every segment page and validate its IDs, boolean `has_more` and nonrepeating pagination cursor.
 
 A malformed acknowledgement after activation, a preference save or unsubscribe leaves the provider outcome unknown. The service returns failure and retains the subscriber lease and any existing journal. It does not issue further writes or attempt rollback. Activation does not send a welcome event. Unsubscribe bypasses the journal gate and neither creates nor clears a journal. Reconcile provider state before clearing a record.
 

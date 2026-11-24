@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useId } from "react";
+import { pushPageUrl } from "@/lib/sentry-replay";
 import { useSearchParams } from "next/navigation";
 import { getMemoCategories, readMemoCategory } from "./memo-categories";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -59,7 +60,7 @@ function UrlMemoIndex(props: MemoIndexProps) {
     const next = readMemoCategory(value);
     if (next === "all") url.searchParams.delete("category");
     else url.searchParams.set("category", next);
-    if (url.href !== window.location.href) window.history.pushState(null, "", url);
+    pushPageUrl(url);
   };
   return <MemoIndexView {...props} category={category} setCategory={setCategory} />;
 }

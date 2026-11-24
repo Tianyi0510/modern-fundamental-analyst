@@ -1,5 +1,6 @@
 "use client";
 
+import { pushPageUrl } from "@/lib/sentry-replay";
 import { useSearchParams } from "next/navigation";
 
 import { appearance } from "./portfolio-table.styles";
@@ -89,7 +90,7 @@ function UrlPortfolioTable(props: PortfolioTableProps) {
     const next = typeof update === "function" ? update(readSorting(url.searchParams)) : update;
     url.searchParams.set("sort", next[0]!.id);
     url.searchParams.set("direction", next[0]!.desc ? "desc" : "asc");
-    if (url.href !== window.location.href) window.history.pushState(null, "", url);
+    pushPageUrl(url);
   }, []);
   return <PortfolioTableView {...props} sorting={sorting} setSorting={setSorting} />;
 }

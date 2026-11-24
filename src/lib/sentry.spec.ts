@@ -92,6 +92,32 @@ test("session replay masks page text and excludes form contents", { tag: "@mobil
   for (const children of forms) expect(children).toEqual([]);
 });
 
+for (const routePath of ["/memos", "/portfolio"]) {
+  test(`native URL updates on ${routePath} stop active Replay`, async ({ page }) => {
+    test.skip(process.env.PLAYWRIGHT_SENTRY_TEST !== "1", "Requires an explicitly enabled fake DSN");
+    let recorded = false;
+    let eventBody = "";
+    await page.route("https://sentry.invalid/**", async (route) => {
+      const body = route.request().postDataBuffer();
+      if (body?.includes('"type":"replay_recording"')) recorded = true;
+      if (body?.includes("Native history Replay regression")) eventBody = body.toString();
+      await route.fulfill({ status: 200, json: {} });
+    });
+    await page.goto(routePath);
+    await expect.poll(() => recorded, { timeout: 20_000 }).toBe(true);
+    if (routePath === "/memos") await page.getByRole("combobox", { name: "Article category" }).selectOption("blogs");
+    else await page.locator("thead th").first().getByRole("button").click();
+    await expect(page).toHaveURL(/\?(?:category|sort)=/);
+    await page.evaluate(() => {
+      setTimeout(() => {
+        throw new Error("Native history Replay regression");
+      }, 0);
+    });
+    await expect.poll(() => eventBody).toContain("Native history Replay regression");
+    expect(eventBody).not.toContain('"replay_id"');
+  });
+}
+
 test("private navigation cancels pending Replay initialization", { tag: "@mobile" }, async ({ page }) => {
   test.skip(process.env.PLAYWRIGHT_SENTRY_TEST !== "1", "Requires an explicitly enabled fake DSN");
   let releaseReplay!: () => void;

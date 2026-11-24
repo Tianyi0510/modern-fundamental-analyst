@@ -19,6 +19,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(hero).toHaveCSS("padding-top", "64px");
       await expect(hero).toHaveCSS("padding-bottom", "0px");
       await expect(hero.locator("h1")).toHaveCSS("font-size", width < 800 ? "51px" : width < 1200 ? "67px" : "90px");
+      await expect(hero.locator("h1")).toHaveCSS("margin-block-start", "48px");
+      await expect(hero.locator("h1")).toHaveCSS("margin-block-end", "48px");
       const share = hero.getByRole("button");
       await expect(share).toBeEnabled();
       const metadataText = hero.locator(".article-meta time");

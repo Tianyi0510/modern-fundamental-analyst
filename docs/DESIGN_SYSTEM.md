@@ -736,7 +736,7 @@ Empty renders genuine no-data states in DataTable and LineChart; it does not rep
 
 Support amount cards progressively enhance native radio inputs to shadcn/ui RadioGroup after hydration. The group submits product_id, retains the server-selected product, and uses the existing fieldset lock and frozen retry payload. Native radios remain the no-JavaScript fallback; keyboard focus is visible on the full amount card.
 
-Each Performance chart reserves a 300px Skeleton and loads within 200px of the viewport. It stays mounted after loading. Monthly tables remain independent of chart loading and rendering.
+Each Performance chart reserves a 300px Skeleton so the page stays stable while loading. Readers can open the monthly table independently. See [portfolio data](WEB_APPLICATION_ARCHITECTURE.md#portfolio-data) for chart loading and rendering.
 
 Performance charts include a 1px dashed reference line at 0% (6px dash, 4px gap), using `--chart-reference`: black in light mode and `#cccccc` in dark mode. The reference extends the Y-axis domain when needed and does not change the return data or series styles.
 
@@ -783,7 +783,7 @@ Footer Email Preferences starts 16px below the input bottom edge on multi-column
 
 ## Implementation status
 
-Current Holdings uses validated `sort` and `direction` query parameters. Supported keys match the table columns; direction is `asc` or `desc`. Missing or invalid pairs use market value descending. Native history updates preserve other parameters and the fragment, support reload and Back/Forward, and avoid fetching portfolio data again. A local Suspense boundary retains the default server-rendered table with disabled sorting controls while URL state becomes available. Consecutive sorting actions read the latest URL before updating it.
+Current Holdings opens sorted by descending market value. Readers can share the current sort order, reload it and use Back or Forward to revisit earlier views. Controls remain disabled until sorting is available. See [state and request decisions](WEB_APPLICATION_ARCHITECTURE.md#state-and-request-decisions) for URL handling.
 
 Contact, Subscribe and Support keep the action label while pending, display the shared Spinner and announce progress separately. Existing request locks, idempotency keys and recovery payloads remain unchanged.
 

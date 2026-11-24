@@ -127,7 +127,7 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
 | [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
-| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | Planned features and known limitations of the first stable release.                                         |
+| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | First stable version overview, investment approach, reader features and release evidence.                   |
 
 The local copy-editing outline is `../local/WEBSITE_COPY.md`; maintenance instructions are in `../local/README.md`. Both stay outside Git and deployment artifacts. Edit English copy in the outline, then explicitly request website updates and Chinese translations. A fresh clone does not contain these local files.
 
@@ -152,9 +152,7 @@ For dependency updates, follow [dependency security](docs/WEB_APPLICATION_ARCHIT
 
 ## Deployment
 
-Follow **Branch → PR → Main**: create a branch from current `main`, commit and push changes, then open a PR targeting `main`. Review the diff, CI and Vercel Preview. Merge only after explicit owner authorization to merge the PR; a commit, PR or deployment request alone is insufficient. Do not enable auto-merge. Merging triggers the production deployment workflow. Main CI may reuse recent full PR evidence only for an identical Git tree.
-
-Production must pass CI for the exact release commit. Report success after Vercel is `READY` and its commit and production aliases match. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow) and [production gate](docs/WEB_APPLICATION_ARCHITECTURE.md#production-gate). Use environment-scoped credentials and isolated Preview resources.
+Changes reach production through a pull request to `main`, GitHub Actions and the Vercel Git integration. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for authorization, deployment and verification.
 
 Keep local review evidence in `../local/audit/`; see [evidence retention](docs/WEB_APPLICATION_ARCHITECTURE.md#review-evidence).
 
