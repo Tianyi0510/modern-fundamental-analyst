@@ -16,7 +16,7 @@ Use Next.js App Router and TypeScript for localized research pages and server-si
 | `src/features`                      | Portfolio, memos, contact, subscriptions and support workflows.        |
 | `src/components` and `src/lib`      | Shared UI, utilities and service clients without feature dependencies. |
 
-ESLint enforces import boundaries and runtime cycles, including aliases and literal dynamic imports. Type-only cycles are excluded. Shared modules and features must not import application modules. Peer features communicate through application composition.
+ESLint checks static imports, re-exports and dynamic imports in production JavaScript and TypeScript against the same layer boundaries. It resolves relative paths and the `@/` alias and derives feature ownership from the directory under `src/features`. TypeScript inline import types follow the same ownership rule. Dynamic imports in these layers require literal paths. A separate rule detects runtime cycles and excludes type-only cycles. Shared modules and features must not import application modules. Peer features communicate through application composition.
 
 Shared provider contracts live in `src/lib` so Contact and Subscriptions can use the same acknowledgement checks. Provider and token modules use `server-only` to enforce the browser boundary at build time.
 
@@ -314,15 +314,9 @@ On October 28, 2026, a targeted `npm update fast-uri --ignore-scripts` updated t
 
 ##### deepmerge Residual Risk
 
-Reviewed October 28, 2026. Owner: repository owner. Status: open upstream dependency risk, mitigated at the application boundary; not fixed.
+**Workspace status, November 25, 2026.** Closed for the current lockfile. The resolved email dependency chain is `react-email@6.11.16 → @react-email/render@2.3.1 → html-to-text@10.0.1 → deepmerge-ts@8.0.2`. The lockfile contains no installation of the affected `deepmerge` package. On this date, `npm audit --omit=dev` reported zero findings. The full `npm audit` reported eight moderate entries in the development dependency tree involving `minimatch` and lint tooling.
 
-| Item            | Assessment                                                                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Advisory        | [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4): prototype poisoning in merged objects. No official patched version was listed at review. |
-| Dependency path | `react-email → @react-email/render → html-to-text → deepmerge@4.3.1`.                                                                                              |
-| Audit result    | Four low-severity entries from one underlying advisory and its dependency chain. The audit is not clean.                                                           |
-| Exposure        | No user-controlled conversion settings were found in the reviewed contact and preference rendering paths. This does not prove the dependency safe for other uses.  |
-| Residual risk   | The vulnerable code remains installed. New call sites, changed dependencies or external conversion options could expose it.                                        |
+**Historical assessment, October 28, 2026.** The repository owner recorded [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) for prototype poisoning in merged objects. At the time, the path `react-email → @react-email/render → html-to-text → deepmerge@4.3.1` was installed. The audit reported four low-severity entries for that advisory and its dependency chain. No official patch was listed. The reviewed contact and preference email paths kept conversion settings under application control, so the owner retained the upstream risk as open pending a fix or removal. The original audit evidence is retained under `../local/audit/npm-review-2026-10-28/`.
 
 **Mitigations:** Keep rendering and HTML-to-text options application-owned. Reader fields are escaped content, not conversion settings. Production plain-text messages are constructed separately. Preserve the [email regression tests](../src/features/subscriptions/preference-email.test.mjs): they verify HTML output, escaping and rejection of reader-supplied rendering options. The prototype-shaped input case also checks `Object.prototype`; it does not test or repair every vulnerable merge operation.
 
@@ -335,7 +329,7 @@ Reviewed October 28, 2026. Owner: repository owner. Status: open upstream depend
 
 Before merging a change to this dependency path or its input boundaries, rerun `npm audit`, inspect the resolved chain and run affected email tests. Record the date, evidence and decision. If exposure is found, remove or isolate the affected path and evaluate a tested upgrade, replacement or maintained patch. Do not force a downgrade, suppress the advisory or maintain a fork solely to clear audit output.
 
-Close this record only when a verified fix or dependency removal addresses the advisory and affected tests pass. Distinguish workspace remediation from deployment verification. Audit evidence is retained under `../local/audit/npm-review-2026-10-28/`; it is outside Git and does not establish a production fix. This record creates no automatic monitoring task and grants no merge or deployment authorization.
+The November closure applies to the workspace dependency graph. Confirm the deployed revision separately when verifying a release.
 
 #### Font Asset Maintenance
 
@@ -360,7 +354,7 @@ The Actions workflow pins full upstream commit SHAs. CI installs npm 12.2.1 expl
 - Node stays on the user-selected 24 LTS line; Node 26 Current is not the target. Node types stay on the matching 24 series.
 - TypeScript remains 6.0.3 because typescript-eslint 8.72.0 declares support below 6.1.0. TypeScript 7.0.2 is not a supported combination.
 - ESLint and `@eslint/js` remain on 9.39.5 because jsx-a11y 6.10.2 does not declare ESLint 10 support. Preserve accessibility checks instead of forcing the dependency tree. ESLint 9 is deprecated upstream; revisit this constraint when compatible tooling is available.
-- Sentry Core stays at 11.8.0 to match Sentry Next.js 11.8.0, rather than independently upgrading Core to 11.9.0.
+- Keep Sentry Core and Sentry Next.js on the same exact SDK version.
 - MSW 3 uses `onUnhandledFrame`. The shared test callback records unexpected traffic and throws; `defaults.error()` only logs in this version. The regression test verifies that unmatched requests never reach a real local server.
 - The development dependency chain through braces has an unresolved high-severity advisory, [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). npm reports five affected packages through micromatch, fast-glob and the lint plugins. Do not downgrade Next.js tooling or remove checks to silence the report.
 
@@ -935,7 +929,7 @@ The allocation uses per-test JSON reports from [CI run 39871615680](https://gith
 
 These are historical workload estimates, not measured durations of the new CI allocation. They exclude setup and inter-test overhead. Confirm wall-clock improvement on the next full CI run. Preserve all test cases, retries, workers, timeouts and performance budgets.
 
-Each shard uploads per-test JSON timing reports for 14 days and separate failure/retry evidence for seven days. To rebalance, download all four `browser-timings-*` artifacts from one successful full CI run, aggregate each browser's durations by file, update the timing snapshot and both file lists, and run the shard coverage and workflow tests. Compare test-step and total-job times; additional builds and installs affect elapsed time and runner usage.
+Each shard uploads per-test JSON timing reports for 14 days and separate failure/retry evidence for seven days. To rebalance, download all four `browser-timings-*` artifacts from one successful full CI run, aggregate each browser's durations by file, update the timing snapshot and both file lists, then run `node scripts/check-shard-balance.mjs`. The longer estimated shard must take less than 1.01 times the shorter one for each browser. Run `node --test scripts/browser-shards.test.mjs scripts/ci-workflow.test.mjs` to verify discovery and workflow coverage. Compare test-step and total-job times; additional builds and installs affect elapsed time and runner usage.
 
 #### Reliable Browser Checks
 

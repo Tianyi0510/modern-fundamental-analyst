@@ -7,7 +7,6 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } f
 export function LineChart({
   data,
   config,
-  series,
   xKey,
   label,
   emptyMessage,
@@ -20,7 +19,6 @@ export function LineChart({
 }: {
   data: Array<Record<string, string | number | null>>;
   config: ChartConfig;
-  series: string[];
   xKey: string;
   label: string;
   emptyMessage: string;
@@ -94,7 +92,6 @@ export function LineChart({
           <Line
             key={key}
             dataKey={key}
-            hide={!series.includes(key)}
             type="linear"
             stroke={`var(--color-${key}, var(--color-chart-${(index % 5) + 1}))`}
             strokeWidth={3}

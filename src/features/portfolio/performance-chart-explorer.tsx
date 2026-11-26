@@ -4,28 +4,37 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatPercent } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
-import { ChartBoundary } from "./chart-boundary";
+import { ChartBoundary, ChartLoadError } from "./chart-boundary";
 import styles from "./performance-chart.module.css";
-import type { ChartObservation } from "./performance-chart-view";
+export type ChartPoint = {
+  date: string;
+  portfolioReturn: number | null;
+  benchmarkReturn: number | null;
+};
 
-const InteractiveLineChart = lazy(() =>
-  import("@/components/ui/line-chart").then((module) => ({ default: module.LineChart })),
-);
+const InteractiveLineChart = lazy(async () => {
+  try {
+    const { LineChart } = await import("@/components/ui/line-chart");
+    return { default: LineChart };
+  } catch (cause) {
+    throw new ChartLoadError("Unable to load the chart module", { cause });
+  }
+});
 const copy = {
   en: {
     loading: "Loading interactive chart…",
     empty: "No performance data is available.",
-    hint: "Hover, touch, or use the Left and Right Arrow keys to compare monthly returns.",
+    hint: "Hover, touch, or use the Left and Right Arrow keys to compare month-end values.",
   },
   "zh-tw": {
     loading: "正在載入互動圖表…",
     empty: "目前沒有績效資料。",
-    hint: "使用滑鼠、觸控或左右方向鍵，比較每月報酬。",
+    hint: "使用滑鼠、觸控或左右方向鍵，比較各月底的數值。",
   },
   "zh-cn": {
     loading: "正在加载互动图表…",
     empty: "目前没有绩效数据。",
-    hint: "使用鼠标、触控或左右方向键，比较每月回报。",
+    hint: "使用鼠标、触控或左右方向键，比较各月底的数值。",
   },
 } as const;
 
@@ -36,7 +45,7 @@ export function PerformanceChartExplorer({
   title,
   portfolio,
 }: {
-  observations: ChartObservation[];
+  observations: ChartPoint[];
   locale: Locale;
   measure: "twr" | "xirr";
   title: string;
@@ -89,8 +98,6 @@ export function PerformanceChartExplorer({
                     portfolioReturn: { label: portfolio, color: "var(--chart-portfolio)" },
                     benchmarkReturn: { label: "SPY", color: "var(--chart-benchmark)" },
                   }}
-                  series={["portfolioReturn", "benchmarkReturn"]}
-                  showPoints={false}
                   referenceValue={0}
                   dashedSeries={["benchmarkReturn"]}
                   xKey="date"

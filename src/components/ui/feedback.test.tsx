@@ -18,14 +18,7 @@ it("keeps the localized pending label as the button's accessible name", () => {
 
 it("shows a genuine chart empty state without a loading announcement", () => {
   render(
-    <LineChart
-      data={[]}
-      config={{}}
-      series={[]}
-      xKey="date"
-      label="Returns"
-      emptyMessage="No performance data is available."
-    />,
+    <LineChart data={[]} config={{}} xKey="date" label="Returns" emptyMessage="No performance data is available." />,
   );
   expect(screen.getByRole("status")).toHaveTextContent("No performance data is available.");
   expect(screen.getByText("No performance data is available.")).toHaveAttribute("data-slot", "empty-description");

@@ -16,6 +16,8 @@ const copy = {
     send: "Send Message",
     sending: "Sending…",
     success: "Your message has been sent. Thank you for reaching out.",
+    rateLimited: "Too many requests. Please wait before trying again.",
+    retryAfter: "Too many requests. Try again after {seconds} s.",
     error: "Your message couldn't be sent. Please try again later.",
     validation: {
       name: "Enter your name.",
@@ -39,6 +41,8 @@ const copy = {
     send: "傳送訊息",
     sending: "傳送中…",
     success: "訊息已成功傳送，感謝你的聯絡。",
+    rateLimited: "請求次數過多，請稍後再試。",
+    retryAfter: "請求次數過多，請於 {seconds} 秒後再試。",
     error: "目前無法傳送訊息，請稍後再試。",
     validation: {
       name: "請輸入姓名。",
@@ -62,6 +66,8 @@ const copy = {
     send: "发送信息",
     sending: "发送中…",
     success: "信息已成功发送，感谢你的联系。",
+    rateLimited: "请求次数过多，请稍后再试。",
+    retryAfter: "请求次数过多，请于 {seconds} 秒后再试。",
     error: "目前无法发送信息，请稍后再试。",
     validation: {
       name: "请输入姓名。",

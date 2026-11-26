@@ -250,3 +250,35 @@ it("enables deletion for a restored draft", () => {
   expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Restored unsent message.");
   expect(screen.getByRole("button", { name: "Clear Message" })).toBeEnabled();
 });
+
+it.each([
+  ["en", "Send Message", "Too many requests. Try again after 600 s."],
+  ["zh-tw", "傳送訊息", "請求次數過多，請於 600 秒後再試。"],
+  ["zh-cn", "发送信息", "请求次数过多，请于 600 秒后再试。"],
+] as const)("retains draft and retry identity after a localized 429 (%s)", async (locale, submit, expected) => {
+  const draft = {
+    name: "Reader",
+    email: "reader@example.com",
+    subject: "Research",
+    message: "Please explain these returns.",
+  };
+  saveContactDraft(locale, draft);
+  const keys: (string | null)[] = [];
+  server.use(
+    http.post("http://localhost:3210/api/contact", ({ request }) => {
+      keys.push(request.headers.get("idempotency-key"));
+      return keys.length === 1
+        ? HttpResponse.json({}, { status: 429, headers: { "Retry-After": "600" } })
+        : HttpResponse.json({});
+    }),
+  );
+  const user = userEvent.setup();
+  render(<ContactForm locale={locale} />);
+  await user.click(screen.getByRole("button", { name: submit }));
+  expect(await screen.findByText(expected)).toBeVisible();
+  expect(readContactDraft(locale)).toMatchObject(draft);
+  expect(keys[0]).toBeTruthy();
+  await user.click(screen.getByRole("button", { name: submit }));
+  expect(keys).toEqual([keys[0], keys[0]]);
+  expect(readContactDraft(locale)).toBeUndefined();
+});
