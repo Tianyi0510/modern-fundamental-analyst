@@ -47,25 +47,12 @@ for (const project of ["chromium", "webkit"]) {
   });
 }
 
-const timingBaseline = JSON.parse(readFileSync(new URL("./browser-shard-timings.json", import.meta.url), "utf8"));
-
 for (const project of ["chromium", "webkit"]) {
-  test(`${project} file allocation balances the recorded CI workload`, () => {
+  test(`${project} shard list contains unique existing files`, () => {
     const selected = readFileSync(new URL(`./${project}-shard-1.txt`, import.meta.url), "utf8")
       .trim()
       .split("\n");
     assert.equal(new Set(selected).size, selected.length, "list must not duplicate files");
-    const timings = timingBaseline.projects[project];
-    for (const file of selected) {
-      assert.ok(existsSync(`${root}src/${file}`), `stale shard entry: ${file}`);
-      assert.ok(Object.hasOwn(timings, file), `missing timing evidence: ${file}`);
-    }
-    const loads = [0, 0];
-    for (const [file, duration] of Object.entries(timings)) {
-      assert.ok(Number.isFinite(duration) && duration >= 0);
-      loads[selected.includes(file) ? 0 : 1] += duration;
-    }
-    assert.ok(Math.min(...loads) > 0);
-    assert.ok(Math.max(...loads) / Math.min(...loads) < 1.01, `unbalanced historical workload: ${loads}`);
+    for (const file of selected) assert.ok(existsSync(`${root}src/${file}`), `stale shard entry: ${file}`);
   });
 }

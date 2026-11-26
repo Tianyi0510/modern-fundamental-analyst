@@ -2,8 +2,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
-import { PerformanceChartExplorer } from "./performance-chart-explorer";
-import type { ChartObservation } from "./performance-chart-view";
+import { PerformanceChartExplorer, type ChartPoint } from "./performance-chart-explorer";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -20,10 +19,10 @@ it("renders and explores frozen observations without changing the shared monthly
       disconnect() {}
     },
   );
-  const observations: ChartObservation[] = [
-    { date: "2026-07-31", marketValue: 100, portfolioReturn: 0, benchmarkReturn: 0 },
-    { date: "2026-08-31", marketValue: 105, portfolioReturn: null, benchmarkReturn: 2 },
-    { date: "2026-09-30", marketValue: 110, portfolioReturn: 10, benchmarkReturn: 5 },
+  const observations: ChartPoint[] = [
+    { date: "2026-07-31", portfolioReturn: 0, benchmarkReturn: 0 },
+    { date: "2026-08-31", portfolioReturn: null, benchmarkReturn: 2 },
+    { date: "2026-09-30", portfolioReturn: 10, benchmarkReturn: 5 },
   ];
   const expected = structuredClone(observations);
   observations.forEach(Object.freeze);

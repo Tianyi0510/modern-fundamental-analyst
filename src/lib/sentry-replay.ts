@@ -8,6 +8,14 @@ export function canRecordReplay(href: string) {
   );
 }
 
+export const privateHistoryNavigation = "mfa:private-history-navigation";
+
+export function pushPageUrl(url: URL) {
+  if (url.href === window.location.href) return;
+  if (!canRecordReplay(url.href)) window.dispatchEvent(new Event(privateHistoryNavigation));
+  window.history.pushState(null, "", url);
+}
+
 export function createReplayOptions(): NonNullable<Parameters<typeof replayIntegration>[0]> {
   return {
     useCompression: true,

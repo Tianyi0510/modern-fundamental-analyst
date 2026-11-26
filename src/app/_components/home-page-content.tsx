@@ -1,3 +1,4 @@
+import { holdingPath } from "@/features/portfolio/holding-path";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
@@ -10,7 +11,7 @@ import { ChartPie, MoveRight } from "lucide-react";
 import { MemoCards } from "@/features/memos/memo-cards";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header/site-header";
-import { getMemos } from "@/features/memos/memos";
+import { getLatestMemo, getMemos } from "@/features/memos/memos";
 import { getHoldingWeight, portfolioHoldings, portfolioSnapshot } from "@/features/portfolio/portfolio";
 import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import { getLocalizedPath, type Locale } from "@/lib/i18n";
@@ -20,7 +21,7 @@ import { Activity } from "react";
 
 const copy = {
   en: {
-    hero: ["Focus investing for a", "disruptive future"],
+    hero: ["Value investing", "in the coming waves"],
     heroIntro:
       "I believe investing is for everyone. The mission of Modern Fundamental Analyst is to empower every retail investor.",
     viewPortfolio: "View portfolio",
@@ -35,10 +36,10 @@ const copy = {
     aboutLabel: "01 · About",
     aboutTitle: ["Investment principles and", "continuous learning"],
     aboutCopy:
-      "I believe in value investing for stock pitching and focus investing for portfolio management. I believe in staying in the circle of competence, the power of compounding, and the importance of patience and discipline.",
+      "When I pitch a stock, I start with what the business is worth. I keep my portfolio concentrated in businesses I understand. Giving those investments time to compound takes patience and discipline.",
     aboutLink: "Explore the investment approach",
     portfolioLabel: "02 · Portfolio",
-    portfolioTitle: ["A focus portfolio built", "for long-term ownership"],
+    portfolioTitle: ["A concentrated portfolio built", "for long-term compounding"],
     fullPortfolio: "View full portfolio",
     holdingsAllocation: "Holdings allocation",
     other: "Other",
@@ -49,20 +50,20 @@ const copy = {
     portfolioName: "Portfolio",
     performanceCopy: (benchmarkReturn: string) =>
       `Portfolio XIRR, versus ${benchmarkReturn} for ${portfolioSnapshot.benchmark} over the same cash-flow period.`,
-    verified: "As of",
+    asOf: "As of",
     viewPerformance: "Track portfolio performance",
     memosLabel: "04 · Investment memos",
-    memosTitle: ["Published investment research", "for independent evaluation"],
+    memosTitle: ["Published investment research", "with accountability"],
     viewAllMemos: "View all investment memos",
     contactLabel: "05 · Contact",
-    contactTitle: ["Stay connected with", "new research"],
+    contactTitle: ["Stay connected with", "the latest research"],
     contactLink: "Get in touch",
     marketValueSuffix: "Market value",
     updatedMonthly: "Updated monthly",
   },
   "zh-tw": {
-    hero: ["為顛覆性未來，", "實踐集中投資"],
-    heroIntro: "我相信投資屬於每一個人。Modern Fundamental Analyst 的使命，是賦能每一位個人投資者。",
+    hero: ["在新一波浪潮中", "實踐價值投資"],
+    heroIntro: "我相信每個人都可以投資。Modern Fundamental Analyst 的使命，是幫助每位個人投資者獨立做判斷。",
     viewPortfolio: "查看投資組合",
     readLatest: "閱讀最新投資備忘錄",
     portfolioSnapshot: "投資組合摘要",
@@ -75,24 +76,24 @@ const copy = {
     aboutLabel: "01 · 關於",
     aboutTitle: ["投資原則與", "持續學習"],
     aboutCopy:
-      "我相信以價值投資提出股票投資論點，以集中投資管理投資組合。我相信堅守能力圈、複利的力量，以及耐心與紀律的重要性。",
+      "提出個股投資觀點前，我先問這家企業值多少錢。我的持股集中在自己了解的企業。要讓複利發揮作用，需要時間，也需要耐心與紀律。",
     aboutLink: "探索投資研究方式",
     portfolioLabel: "02 · 投資組合",
-    portfolioTitle: ["為長期持有而建立的", "集中投資組合"],
+    portfolioTitle: ["為長期複利而建立的", "集中投資組合"],
     fullPortfolio: "查看完整投資組合",
     holdingsAllocation: "持倉佔比",
     other: "其他",
     topHoldings: "前四大持倉與其他",
     performanceLabel: "03 · 績效",
-    performanceTitle: ["每月完整透明揭露", "投資結果"],
+    performanceTitle: ["每月完整公開", "投資績效"],
     chartLabel: "XIRR 比較圖表",
     portfolioName: "投資組合",
     performanceCopy: (benchmarkReturn: string) =>
       `投資組合 XIRR；相同現金流期間的 ${portfolioSnapshot.benchmark} 為 ${benchmarkReturn}。`,
-    verified: "截至",
+    asOf: "截至",
     viewPerformance: "追蹤投資組合績效",
     memosLabel: "04 · 投資備忘錄",
-    memosTitle: ["公開投資研究，", "供讀者獨立評估"],
+    memosTitle: ["公開投資研究，", "為自己的判斷負責"],
     viewAllMemos: "查看所有投資備忘錄",
     contactLabel: "05 · 聯絡",
     contactTitle: ["持續掌握", "最新研究"],
@@ -101,8 +102,8 @@ const copy = {
     updatedMonthly: "每月更新",
   },
   "zh-cn": {
-    hero: ["为颠覆性未来，", "实践集中投资"],
-    heroIntro: "我相信投资属于每一个人。Modern Fundamental Analyst 的使命，是赋能每一位个人投资者。",
+    hero: ["在新一轮浪潮中", "践行价值投资"],
+    heroIntro: "我相信每个人都可以投资。Modern Fundamental Analyst 的使命，是帮助每位个人投资者独立做判断。",
     viewPortfolio: "查看投资组合",
     readLatest: "阅读最新投资备忘录",
     portfolioSnapshot: "投资组合摘要",
@@ -115,24 +116,24 @@ const copy = {
     aboutLabel: "01 · 关于",
     aboutTitle: ["投资原则与", "持续学习"],
     aboutCopy:
-      "我相信以价值投资提出股票投资论点，以集中投资管理投资组合。我相信坚守能力圈、复利的力量，以及耐心与纪律的重要性。",
+      "分析一只股票是否值得投资时，我先问这家企业值多少钱。我的持仓集中在自己了解的企业。要让复利发挥作用，需要时间，也需要耐心和纪律。",
     aboutLink: "探索投资研究方式",
     portfolioLabel: "02 · 投资组合",
-    portfolioTitle: ["为长期持有而建立的", "集中投资组合"],
+    portfolioTitle: ["为长期复利而建立的", "集中投资组合"],
     fullPortfolio: "查看完整投资组合",
     holdingsAllocation: "持仓占比",
     other: "其他",
     topHoldings: "前四大持仓与其他",
     performanceLabel: "03 · 业绩",
-    performanceTitle: ["每月完整透明披露", "投资结果"],
+    performanceTitle: ["每月完整披露", "投资业绩"],
     chartLabel: "XIRR 比较图表",
     portfolioName: "投资组合",
     performanceCopy: (benchmarkReturn: string) =>
       `投资组合 XIRR；相同现金流期间的 ${portfolioSnapshot.benchmark} 为 ${benchmarkReturn}。`,
-    verified: "截至",
+    asOf: "截至",
     viewPerformance: "追踪投资组合业绩",
     memosLabel: "04 · 投资备忘录",
-    memosTitle: ["公开投资研究，", "供读者独立评估"],
+    memosTitle: ["公开投资研究，", "为自己的判断负责"],
     viewAllMemos: "查看所有投资备忘录",
     contactLabel: "05 · 联系",
     contactTitle: ["持续关注", "最新研究"],
@@ -155,6 +156,7 @@ const allocationGradient = `conic-gradient(var(--blue-deep) 0 ${firstStop}%, var
 export function HomePageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const memos = getMemos(locale);
+  const latestMemo = getLatestMemo(locale);
   const portfolioDate = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
   const benchmarkReturn = formatPercent(portfolioSnapshot.benchmarkXirr);
 
@@ -182,10 +184,15 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                   <ButtonLink variant="contrast" href={getLocalizedPath("/portfolio", locale)}>
                     {text.viewPortfolio}
                   </ButtonLink>
-                  <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/memos", locale)}>
-                    {text.readLatest}
-                    <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
-                  </IntentLink>
+                  {latestMemo && (
+                    <IntentLink
+                      className={appearance["text-link"]}
+                      href={getLocalizedPath(`/memos/${latestMemo.slug}`, locale)}
+                    >
+                      {text.readLatest}
+                      <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
+                    </IntentLink>
+                  )}
                 </div>
               </div>
               <dl className={appearance["metric-band"]} aria-label={text.portfolioSnapshot}>
@@ -256,7 +263,14 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 <li className={appearance["holding-row"]} key={holding.symbol}>
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <div>
-                    <strong>{holding.symbol}</strong>
+                    <strong>
+                      <IntentLink
+                        href={getLocalizedPath(holdingPath(holding.symbol), locale)}
+                        className="underline underline-offset-4"
+                      >
+                        {holding.symbol}
+                      </IntentLink>
+                    </strong>
                     <small>
                       {formatUsd(holding.marketValue, 0)} {text.marketValueSuffix}
                     </small>
@@ -342,9 +356,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </div>
                 <p>{text.performanceCopy(benchmarkReturn)}</p>
                 <small className={appearance["date-text"]}>
-                  {text.verified} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time>
-                  {locale === "en" ? "" : locale === "zh-tw" ? " 的已驗證快照" : " 的已验证快照"} ·{" "}
-                  {text.updatedMonthly}
+                  {text.asOf} <time dateTime={portfolioSnapshot.asOf}>{portfolioDate}</time> · {text.updatedMonthly}
                   {locale === "en" ? "." : "。"}
                 </small>
                 <ButtonLink

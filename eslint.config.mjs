@@ -24,7 +24,7 @@ const appFolder = `@(${routeSegment}|\\(${kebabCase}\\)|@${camelCase}|_${kebabCa
 const sourceRoot = path.join(import.meta.dirname, "src");
 const architecture = {
   rules: {
-    "dynamic-import-boundaries": {
+    "import-boundaries": {
       meta: {
         type: "problem",
         schema: [],
@@ -34,29 +34,36 @@ const architecture = {
         },
       },
       create(context) {
+        const [layer, feature] = path.relative(sourceRoot, context.filename).split(path.sep);
+        function checkSource(node) {
+          const source = node.source;
+          if (!source) return; // A named export can reference a local binding.
+          const specifier =
+            source.type === "TemplateLiteral" && source.expressions.length === 0
+              ? source.quasis[0].value.cooked
+              : source.value;
+          if (typeof specifier !== "string") {
+            context.report({ node: source, messageId: "literal" });
+            return;
+          }
+          if (!specifier.startsWith("@/") && !specifier.startsWith(".") && !path.isAbsolute(specifier)) return;
+          const target = specifier.startsWith("@/")
+            ? path.resolve(sourceRoot, specifier.slice(2))
+            : path.resolve(path.dirname(context.filename), specifier);
+          const [targetLayer, targetFeature] = path.relative(sourceRoot, target).split(path.sep);
+          if (
+            targetLayer === "app" ||
+            (targetLayer === "features" && (layer !== "features" || feature !== targetFeature))
+          ) {
+            context.report({ node: source, messageId: "boundary" });
+          }
+        }
         return {
-          ImportExpression(node) {
-            const source = node.source;
-            const specifier =
-              source.type === "Literal" && typeof source.value === "string"
-                ? source.value
-                : source.type === "TemplateLiteral" && source.expressions.length === 0
-                  ? source.quasis[0].value.cooked
-                  : null;
-            if (specifier === null) {
-              context.report({ node, messageId: "literal" });
-              return;
-            }
-            if (!specifier.startsWith("@/") && !specifier.startsWith(".")) return;
-            const target = specifier.startsWith("@/")
-              ? path.resolve(sourceRoot, specifier.slice(2))
-              : path.resolve(path.dirname(context.filename), specifier);
-            const from = path.relative(sourceRoot, context.filename).split(path.sep);
-            const to = path.relative(sourceRoot, target).split(path.sep);
-            if (to[0] === "app" || (to[0] === "features" && (from[0] !== "features" || from[1] !== to[1]))) {
-              context.report({ node, messageId: "boundary" });
-            }
-          },
+          ImportDeclaration: checkSource,
+          ExportNamedDeclaration: checkSource,
+          ExportAllDeclaration: checkSource,
+          ImportExpression: checkSource,
+          TSImportType: checkSource,
         };
       },
     },
@@ -103,48 +110,11 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   {
-    files: ["src/{components,lib,features}/**/*.{ts,tsx}"],
+    files: ["src/{components,lib,features}/**/*.{js,mjs,ts,tsx}"],
+    ignores: ["**/*.{test,spec}.{js,mjs}"],
     plugins: { architecture },
-    rules: { "architecture/dynamic-import-boundaries": "error" },
+    rules: { "architecture/import-boundaries": "error" },
   },
-  {
-    files: ["src/{components,lib}/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["@/app/**", "@/features/**", "**/app/**", "**/features/**"],
-              message: "Shared modules cannot depend on application or feature modules.",
-            },
-          ],
-        },
-      ],
-    },
-  },
-  ...["portfolio", "memos", "subscriptions", "contact", "support"].map((feature) => ({
-    files: [`src/features/${feature}/**/*.{ts,tsx}`],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: [
-                "@/app/**",
-                "**/app/**",
-                ...["portfolio", "memos", "subscriptions", "contact", "support"]
-                  .filter((name) => name !== feature)
-                  .flatMap((name) => [`@/features/${name}/**`, `**/${name}/**`]),
-              ],
-              message: "Compose features in app; inject cross-feature data through explicit inputs.",
-            },
-          ],
-        },
-      ],
-    },
-  })),
   {
     files: ["**/*.{js,mjs,ts,tsx}"],
     plugins: { "import-x": importX },

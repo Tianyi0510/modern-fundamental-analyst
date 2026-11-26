@@ -50,11 +50,16 @@ export type ContactFormCopy = {
   sending: string;
   success: string;
   error: string;
+  rateLimited: string;
+  retryAfter: string;
+  retryAfterOne?: string;
   validation: Record<ContactField | "summary", string>;
 };
 
 export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; locale: Locale }) {
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error" | "invalid">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "sending" | "success" | "error" | "invalid" | { rateLimited: true; seconds?: number }
+  >("idle");
   const [hasContent, setHasContent] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
   const [invalidFields, setInvalidFields] = useState<ContactField[]>([]);
@@ -162,9 +167,25 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
         resetSubmissionId();
         setStatus("success");
       } catch (error) {
-        setStatus(error instanceof PostJsonError && error.status === 400 ? "invalid" : "error");
+        if (error instanceof PostJsonError && error.status === 429) {
+          setStatus({ rateLimited: true, seconds: error.retryAfterSeconds });
+        } else setStatus(error instanceof PostJsonError && error.status === 400 ? "invalid" : "error");
       }
     });
+  }
+
+  let feedback = "";
+  if (typeof status === "object") {
+    feedback =
+      status.seconds === undefined
+        ? copy.rateLimited
+        : status.seconds === 1 && copy.retryAfterOne
+          ? copy.retryAfterOne
+          : copy.retryAfter.replace("{seconds}", String(status.seconds));
+  } else if (status === "invalid") {
+    feedback = copy.validation.summary;
+  } else if (status !== "idle") {
+    feedback = copy[status];
   }
 
   return (
@@ -267,15 +288,7 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
                     {copy.clear}
                   </AlertDialogTrigger>
                   <Alert ref={feedbackRef} tabIndex={-1} className="max-w-[420px] basis-full">
-                    {status === "sending"
-                      ? copy.sending
-                      : status === "success"
-                        ? copy.success
-                        : status === "error"
-                          ? copy.error
-                          : status === "invalid"
-                            ? copy.validation.summary
-                            : ""}
+                    {feedback}
                   </Alert>
                 </div>
               </FieldGroup>

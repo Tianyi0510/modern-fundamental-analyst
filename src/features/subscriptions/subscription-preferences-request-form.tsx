@@ -1,6 +1,6 @@
 "use client";
 
-import { appearance } from "./subscription-preferences-request-form.styles";
+import { appearance } from "./subscription-preferences-form.styles";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";

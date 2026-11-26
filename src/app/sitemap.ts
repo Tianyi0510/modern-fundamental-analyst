@@ -1,3 +1,5 @@
+import { portfolioHoldings } from "@/features/portfolio/portfolio";
+import { holdingPath } from "@/features/portfolio/holding-path";
 import type { MetadataRoute } from "next";
 import { memos } from "@/features/memos/memos";
 import { getLanguageAlternates, getLocalizedPath, locales } from "@/lib/i18n";
@@ -13,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact",
     "/support",
     "/disclaimer",
+    ...portfolioHoldings.map((holding) => holdingPath(holding.symbol)),
     ...memos.map((memo) => `/memos/${memo.slug}`),
   ];
   return routes.flatMap((route) => {

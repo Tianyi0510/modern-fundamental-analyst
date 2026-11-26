@@ -1,0 +1,411 @@
+import type { Locale } from "@/lib/i18n";
+
+type Profile = {
+  name: string;
+  exchange: string;
+  business: Record<Locale, string>;
+  periodEnd: string;
+  report: string;
+  issuer: string;
+} & (
+  | {
+      kind: "company";
+      filed: string;
+      industry: string;
+      investorRelations: string;
+      priorRevenue: number;
+      netIncomeToCommon: number;
+      assets: number;
+      revenue: number;
+      operatingCashFlow: number;
+    }
+  | { kind: "fund"; expenseRatio: number; inception: string }
+);
+
+// Company amounts are annual USD figures from the linked filing. Fund fees are percentage points.
+const profiles: Record<string, Profile> = {
+  ADBE: {
+    kind: "company",
+    name: "Adobe Inc.",
+    exchange: "Nasdaq",
+    business: {
+      en: "Adobe sells subscriptions for creative production and document workflows, alongside software for marketing and customer analytics.",
+      "zh-tw": "Adobe 以訂閱方式銷售創作與文件處理軟體，也提供行銷及客戶分析工具。",
+      "zh-cn": "Adobe 以订阅方式销售创作与文档处理软件，也提供营销及客户分析工具。",
+    },
+    periodEnd: "2025-11-28",
+    filed: "2026-01-15",
+    industry: "7372 · Services-Prepackaged Software",
+    investorRelations: "https://www.adobe.com/investor-relations.html",
+    priorRevenue: 21505000000,
+    netIncomeToCommon: 7130000000,
+    assets: 29496000000,
+    revenue: 23769000000,
+    operatingCashFlow: 10031000000,
+    report: "https://www.sec.gov/Archives/edgar/data/796343/000079634326000003/adbe-20251128.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=796343",
+  },
+  AMD: {
+    kind: "company",
+    name: "Advanced Micro Devices, Inc.",
+    exchange: "Nasdaq",
+    business: {
+      en: "AMD designs EPYC server processors and Instinct accelerators for data centers, Ryzen processors for PCs, and chips for gaming and embedded systems.",
+      "zh-tw":
+        "AMD 為資料中心設計 EPYC 伺服器處理器與 Instinct 加速器，也供應 Ryzen 個人電腦處理器、遊戲晶片及嵌入式晶片。",
+      "zh-cn":
+        "AMD 为数据中心设计 EPYC 服务器处理器与 Instinct 加速器，也供应 Ryzen 个人电脑处理器、游戏芯片及嵌入式芯片。",
+    },
+    periodEnd: "2025-12-27",
+    filed: "2026-02-04",
+    industry: "3674 · Semiconductors & Related Devices",
+    investorRelations: "https://ir.amd.com/",
+    priorRevenue: 25785000000,
+    netIncomeToCommon: 4335000000,
+    assets: 76926000000,
+    revenue: 34639000000,
+    operatingCashFlow: 7709000000,
+    report: "https://www.sec.gov/Archives/edgar/data/2488/000000248826000018/amd-20251227.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=2488",
+  },
+  AMZN: {
+    kind: "company",
+    name: "Amazon.com, Inc.",
+    exchange: "Nasdaq",
+    business: {
+      en: "Amazon earns revenue from retail sales, marketplace services, advertising, and subscriptions. Amazon Web Services sells cloud computing and storage.",
+      "zh-tw": "Amazon 的收入來自零售、第三方賣家服務、廣告及訂閱。旗下 AWS 向客戶提供雲端運算與儲存服務。",
+      "zh-cn": "Amazon 的收入来自零售、第三方卖家服务、广告及订阅。旗下 AWS 向客户提供云计算与存储服务。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-02-06",
+    industry: "5961 · Retail-Catalog & Mail-Order Houses",
+    investorRelations: "https://ir.aboutamazon.com/",
+    priorRevenue: 637959000000,
+    netIncomeToCommon: 77670000000,
+    assets: 818042000000,
+    revenue: 716924000000,
+    operatingCashFlow: 139514000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1018724/000101872426000004/amzn-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1018724",
+  },
+  BMNR: {
+    kind: "company",
+    name: "Bitmine Immersion Technologies, Inc.",
+    exchange: "NYSE",
+    business: {
+      en: "Bitmine holds and stakes ether (ETH) and operates blockchain infrastructure. Changes in the value of its digital assets can move earnings independently of operating cash flow.",
+      "zh-tw":
+        "Bitmine 持有並質押以太幣（ETH），同時經營區塊鏈基礎設施。數位資產估值變動會影響盈餘，未必伴隨營業現金流入。",
+      "zh-cn":
+        "Bitmine 持有并质押以太币（ETH），同时经营区块链基础设施。数字资产估值变动会影响利润，未必伴随经营现金流入。",
+    },
+    periodEnd: "2026-08-31",
+    filed: "2026-11-10",
+    industry: "6199 · Finance Services",
+    investorRelations: "https://bitminetech.io/investor-relations",
+    priorRevenue: 6095000,
+    netIncomeToCommon: -6321235000,
+    assets: 15428541000,
+    revenue: 124812000,
+    operatingCashFlow: -305149000,
+    report: "https://www.sec.gov/Archives/edgar/data/1829311/000162828026072846/bmnr-20260831.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1829311",
+  },
+  "BRK.B": {
+    kind: "company",
+    name: "Berkshire Hathaway Inc. (Class B)",
+    exchange: "NYSE",
+    business: {
+      en: "Berkshire owns insurance, railroad, energy, and industrial businesses and holds an equity portfolio. Its insurance operations generate float that it can invest before claims are paid.",
+      "zh-tw": "波克夏旗下業務涵蓋保險、鐵路、能源與工業，並持有上市股票。保費收取與理賠之間產生的浮存金可用於投資。",
+      "zh-cn": "伯克希尔旗下业务涵盖保险、铁路、能源与工业，并持有上市股票。收取保费与理赔之间产生的浮存金可用于投资。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-03-02",
+    industry: "6331 · Fire, Marine & Casualty Insurance",
+    investorRelations: "https://www.berkshirehathaway.com/",
+    priorRevenue: 371433000000,
+    netIncomeToCommon: 66968000000,
+    assets: 1222176000000,
+    revenue: 371444000000,
+    operatingCashFlow: 45969000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1067983/000119312526083899/brka-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1067983",
+  },
+  DELL: {
+    kind: "company",
+    name: "Dell Technologies Inc. (Class C)",
+    exchange: "NYSE",
+    business: {
+      en: "Dell sells servers, networking, and storage systems to enterprises, alongside PCs and peripherals. The mix of infrastructure and client hardware influences margins.",
+      "zh-tw": "Dell 向企業銷售伺服器、網路與儲存設備，也供應個人電腦及周邊產品。兩類硬體的銷售組合會影響利潤率。",
+      "zh-cn": "戴尔向企业销售服务器、网络与存储设备，也供应个人电脑及外设。两类硬件的销售组合会影响利润率。",
+    },
+    periodEnd: "2026-01-30",
+    filed: "2026-03-16",
+    industry: "3571 · Electronic Computers",
+    investorRelations: "https://investors.delltechnologies.com/",
+    priorRevenue: 95567000000,
+    netIncomeToCommon: 5936000000,
+    assets: 101286000000,
+    revenue: 113538000000,
+    operatingCashFlow: 11185000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1571996/000157199626000008/dell-20260130.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1571996",
+  },
+  DUOL: {
+    kind: "company",
+    name: "Duolingo, Inc. (Class A)",
+    exchange: "Nasdaq",
+    business: {
+      en: "Duolingo offers language learning through a free app and earns revenue from paid subscriptions, advertising, in-app purchases, and English proficiency tests.",
+      "zh-tw": "Duolingo 以免費語言學習應用程式吸引用戶，透過付費訂閱、廣告、應用程式內購及英語能力測驗取得收入。",
+      "zh-cn": "多邻国以免费语言学习应用吸引用户，通过付费订阅、广告、应用内购买及英语能力测试取得收入。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-02-27",
+    industry: "7372 · Services-Prepackaged Software",
+    investorRelations: "https://investors.duolingo.com/",
+    priorRevenue: 748024000,
+    netIncomeToCommon: 414065000,
+    assets: 1992182000,
+    revenue: 1037589000,
+    operatingCashFlow: 387823000,
+    report: "https://www.sec.gov/Archives/edgar/data/1562088/000162828026012494/duol-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1562088",
+  },
+  GOOG: {
+    kind: "company",
+    name: "Alphabet Inc. (Class C)",
+    exchange: "Nasdaq",
+    business: {
+      en: "Alphabet sells advertising through Google Search and YouTube. Google Cloud earns revenue from computing infrastructure, platforms, and workplace software. GOOG represents its nonvoting Class C shares.",
+      "zh-tw":
+        "Alphabet 透過 Google 搜尋與 YouTube 銷售廣告；Google Cloud 提供運算基礎設施、平台與辦公軟體。GOOG 代表無投票權的 C 類股。",
+      "zh-cn":
+        "Alphabet 通过 Google 搜索与 YouTube 销售广告；Google Cloud 提供计算基础设施、平台与办公软件。GOOG 代表无投票权的 C 类股。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-02-05",
+    industry: "7370 · Services-Computer Programming, Data Processing, Etc.",
+    investorRelations: "https://abc.xyz/investor/",
+    priorRevenue: 350018000000,
+    netIncomeToCommon: 132170000000,
+    assets: 595281000000,
+    revenue: 402836000000,
+    operatingCashFlow: 164713000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1652044",
+  },
+  GRNY: {
+    kind: "fund",
+    name: "Fundstrat Granny Shots US Large Cap ETF",
+    exchange: "NYSE Arca",
+    business: {
+      en: "Fundstrat actively selects large-cap U.S. stocks that qualify under at least two of its investment themes. Qualifying stocks receive equal weights when the portfolio is rebalanced.",
+      "zh-tw": "Fundstrat 主動挑選同時符合至少兩項投資主題的美國大型股，並在再平衡時對入選股票採等權重配置。",
+      "zh-cn": "Fundstrat 主动挑选同时符合至少两项投资主题的美国大型股，并在再平衡时对入选股票采用等权重配置。",
+    },
+    periodEnd: "2026-03-31",
+    expenseRatio: 0.75,
+    inception: "2024-11-07",
+    report: "https://grannyshots.com/wp-content/uploads/2026/06/GRNY_Fact-Sheet_20260609-PM.pdf",
+    issuer: "https://grannyshots.com/fundstrat-granny-shots-us-large-cap-etf/",
+  },
+  LLY: {
+    kind: "company",
+    name: "Eli Lilly and Company",
+    exchange: "NYSE",
+    business: {
+      en: "Lilly develops and sells prescription medicines, including treatments for diabetes and obesity. Clinical trials, patent protection, and manufacturing capacity shape its product economics.",
+      "zh-tw": "禮來研發及銷售處方藥，涵蓋糖尿病與肥胖治療。臨床試驗、專利保護與產能影響藥品的商業回報。",
+      "zh-cn": "礼来研发及销售处方药，涵盖糖尿病与肥胖治疗。临床试验、专利保护与产能影响药品的商业回报。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-02-12",
+    industry: "2834 · Pharmaceutical Preparations",
+    investorRelations: "https://investor.lilly.com/",
+    priorRevenue: 45043000000,
+    netIncomeToCommon: 20640000000,
+    assets: 112476000000,
+    revenue: 65179000000,
+    operatingCashFlow: 16813000000,
+    report: "https://www.sec.gov/Archives/edgar/data/59478/000005947826000013/lly-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=59478",
+  },
+  META: {
+    kind: "company",
+    name: "Meta Platforms, Inc. (Class A)",
+    exchange: "Nasdaq",
+    business: {
+      en: "Meta sells advertising across apps including Facebook and Instagram. Its Reality Labs segment develops augmented and virtual reality hardware and software.",
+      "zh-tw": "Meta 在 Facebook、Instagram 等應用程式銷售廣告。Reality Labs 部門研發擴增實境與虛擬實境的軟硬體。",
+      "zh-cn": "Meta 在 Facebook、Instagram 等应用中销售广告。Reality Labs 部门研发增强现实与虚拟现实软硬件。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-01-29",
+    industry: "7370 · Services-Computer Programming, Data Processing, Etc.",
+    investorRelations: "https://investor.atmeta.com/",
+    priorRevenue: 164501000000,
+    netIncomeToCommon: 60458000000,
+    assets: 366021000000,
+    revenue: 200966000000,
+    operatingCashFlow: 115800000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1326801/000162828026003942/meta-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1326801",
+  },
+  MSFT: {
+    kind: "company",
+    name: "Microsoft Corporation",
+    exchange: "Nasdaq",
+    business: {
+      en: "Microsoft sells cloud infrastructure through Azure, productivity subscriptions through Microsoft 365, and software, devices, and gaming products through its personal computing business.",
+      "zh-tw":
+        "微軟透過 Azure 提供雲端基礎設施，透過 Microsoft 365 銷售生產力軟體訂閱，並經營個人電腦軟體、裝置與遊戲業務。",
+      "zh-cn":
+        "微软通过 Azure 提供云基础设施，通过 Microsoft 365 销售生产力软件订阅，并经营个人电脑软件、设备与游戏业务。",
+    },
+    periodEnd: "2026-06-30",
+    filed: "2026-07-29",
+    industry: "7372 · Services-Prepackaged Software",
+    investorRelations: "https://www.microsoft.com/en-us/Investor/",
+    priorRevenue: 281724000000,
+    netIncomeToCommon: 133749000000,
+    assets: 758376000000,
+    revenue: 331839000000,
+    operatingCashFlow: 182935000000,
+    report: "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=789019",
+  },
+  MU: {
+    kind: "company",
+    name: "Micron Technology, Inc.",
+    exchange: "Nasdaq",
+    business: {
+      en: "Micron manufactures DRAM memory and NAND storage. Selling prices per bit, manufacturing costs, and investment in fabrication capacity drive the economics of its memory business.",
+      "zh-tw": "美光生產 DRAM 記憶體與 NAND 儲存產品。每位元售價、製造成本與晶圓廠產能投資是理解記憶體業務的關鍵。",
+      "zh-cn": "美光生产 DRAM 内存与 NAND 存储产品。每比特售价、制造成本与晶圆厂产能投资是理解存储业务的关键。",
+    },
+    periodEnd: "2026-09-03",
+    filed: "2026-10-09",
+    industry: "3674 · Semiconductors & Related Devices",
+    investorRelations: "https://investors.micron.com/",
+    priorRevenue: 37378000000,
+    netIncomeToCommon: 84969000000,
+    assets: 195888000000,
+    revenue: 133188000000,
+    operatingCashFlow: 89675000000,
+    report: "https://www.sec.gov/Archives/edgar/data/723125/000072312526000023/mu-20260903.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=723125",
+  },
+  NVDA: {
+    kind: "company",
+    name: "NVIDIA Corporation",
+    exchange: "Nasdaq",
+    business: {
+      en: "NVIDIA sells accelerated computing platforms that combine GPUs, networking, and software for data centers. It also supplies graphics processors for gaming and professional visualization.",
+      "zh-tw": "輝達向資料中心銷售結合 GPU、網路及軟體的加速運算平台，也供應遊戲與專業視覺化使用的圖形處理器。",
+      "zh-cn": "英伟达向数据中心销售结合 GPU、网络及软件的加速计算平台，也供应游戏与专业可视化使用的图形处理器。",
+    },
+    periodEnd: "2026-01-25",
+    filed: "2026-02-25",
+    industry: "3674 · Semiconductors & Related Devices",
+    investorRelations: "https://investor.nvidia.com/",
+    priorRevenue: 130497000000,
+    netIncomeToCommon: 120067000000,
+    assets: 206803000000,
+    revenue: 215938000000,
+    operatingCashFlow: 102718000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1045810",
+  },
+  PYPL: {
+    kind: "company",
+    name: "PayPal Holdings, Inc.",
+    exchange: "Nasdaq",
+    business: {
+      en: "PayPal connects merchants and consumers through branded checkout, Venmo, and payment processing. Transaction volume and the fees earned on that volume are distinct drivers of revenue.",
+      "zh-tw":
+        "PayPal 透過品牌結帳服務、Venmo 與支付處理連結商家及消費者。分析收入時，可分別觀察支付總額與每筆交易的收費水準。",
+      "zh-cn":
+        "PayPal 通过品牌结账服务、Venmo 与支付处理连接商家及消费者。分析收入时，可分别观察支付总额与每笔交易的收费水平。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-02-03",
+    industry: "7389 · Services-Business Services, NEC",
+    investorRelations: "https://investor.pypl.com/",
+    priorRevenue: 31797000000,
+    netIncomeToCommon: 5233000000,
+    assets: 80173000000,
+    revenue: 33172000000,
+    operatingCashFlow: 6416000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1633917/000163391726000024/pypl-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1633917",
+  },
+  TSLA: {
+    kind: "company",
+    name: "Tesla, Inc.",
+    exchange: "Nasdaq",
+    business: {
+      en: "Tesla sells electric vehicles and energy storage systems. Automotive sales and leasing, services, and energy generation and storage have different cost structures.",
+      "zh-tw": "特斯拉銷售電動車與儲能系統。汽車銷售及租賃、服務、能源生產與儲存各有不同的成本結構。",
+      "zh-cn": "特斯拉销售电动车与储能系统。汽车销售及租赁、服务、能源生产与存储各有不同的成本结构。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-01-29",
+    industry: "3711 · Motor Vehicles & Passenger Car Bodies",
+    investorRelations: "https://ir.tesla.com/",
+    priorRevenue: 97690000000,
+    netIncomeToCommon: 3794000000,
+    assets: 137806000000,
+    revenue: 94827000000,
+    operatingCashFlow: 14747000000,
+    report: "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=1318605",
+  },
+  UNH: {
+    kind: "company",
+    name: "UnitedHealth Group Incorporated",
+    exchange: "NYSE",
+    business: {
+      en: "UnitedHealthcare provides health insurance. Optum delivers care, health technology, and pharmacy services. Medical costs relative to premiums are a central driver of the insurance business.",
+      "zh-tw":
+        "UnitedHealthcare 提供健康保險，Optum 提供醫療照護、健康科技與藥事服務。醫療支出佔保費的比例會直接影響保險業務的獲利。",
+      "zh-cn":
+        "UnitedHealthcare 提供健康保险，Optum 提供医疗服务、健康科技与药事服务。医疗支出占保费的比例会直接影响保险业务的盈利。",
+    },
+    periodEnd: "2025-12-31",
+    filed: "2026-03-02",
+    industry: "6324 · Hospital & Medical Service Plans",
+    investorRelations: "https://www.unitedhealthgroup.com/investors.html",
+    priorRevenue: 400278000000,
+    netIncomeToCommon: 12056000000,
+    assets: 309581000000,
+    revenue: 447567000000,
+    operatingCashFlow: 19697000000,
+    report: "https://www.sec.gov/Archives/edgar/data/731766/000073176626000062/unh-20251231.htm",
+    issuer: "https://www.sec.gov/edgar/browse/?CIK=731766",
+  },
+  VGT: {
+    kind: "fund",
+    name: "Vanguard Information Technology ETF",
+    exchange: "NYSE Arca",
+    business: {
+      en: "Vanguard tracks the MSCI US Investable Market Information Technology 25/50 Index. Its portfolio spans U.S. software, hardware, and semiconductor companies across market capitalizations.",
+      "zh-tw": "Vanguard 追蹤 MSCI 美國可投資市場資訊科技 25/50 指數，涵蓋不同市值規模的美國軟體、硬體與半導體公司。",
+      "zh-cn": "Vanguard 跟踪 MSCI 美国可投资市场信息技术 25/50 指数，涵盖不同市值规模的美国软件、硬件与半导体公司。",
+    },
+    periodEnd: "2026-03-31",
+    expenseRatio: 0.09,
+    inception: "2004-01-26",
+    report: "https://fund-docs.vanguard.com/F0958.pdf",
+    issuer: "https://advisors.vanguard.com/investments/products/vgt/vanguard-information-technology-etf",
+  },
+};
+
+export function getHoldingResearch(symbol: string) {
+  const profile = profiles[symbol];
+  if (!profile) throw new Error(`Missing research profile for ${symbol}`);
+  return profile;
+}

@@ -2,83 +2,85 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ESLint, Linter } from "eslint";
 import path from "node:path";
+import { tmpdir } from "node:os";
 
 const eslint = new ESLint();
 const linter = new Linter();
-async function restricted(file, specifier) {
-  const config = await eslint.calculateConfigForFile(file);
-  return linter
-    .verify(`import { value } from "${specifier}";`, [
-      {
-        rules: { "no-restricted-imports": config.rules["no-restricted-imports"] },
-      },
-    ])
-    .filter((message) => message.ruleId === "no-restricted-imports");
-}
+const boundaryRule = "architecture/import-boundaries";
 
-test("shared modules cannot import features or application composition", async () => {
-  for (const file of ["src/components/site-header/site-header.tsx", "src/lib/format.ts"]) {
-    for (const specifier of [
-      "@/features/support/support-config",
-      "../features/support/support-config",
-      "@/app/_components/page-footer",
-      "../app/_components/page-footer",
+test("imports and re-exports respect resolved layer and feature ownership", async () => {
+  const cases = [
+    ["src/lib/format.ts", "../features/support/support-config", "boundary"],
+    ["src/lib/format.ts", "../app/_components/page-footer", "boundary"],
+    ["src/components/site-header/site-header.tsx", "../../features/memos/memos", "boundary"],
+    ["src/components/site-header/site-header.tsx", "@/lib/i18n", null],
+    ["src/features/new-domain/service.js", "../support/support-config", "boundary"],
+    ["src/features/support/support-config.ts", "@/features/new-domain/catalog", "boundary"],
+    ["src/features/new-domain/service.js", "@/features/new-domain/catalog", null],
+    ["src/features/new-domain/service.js", "@/app/api/contact/route", "boundary"],
+    ["src/features/support/server/catalog.ts", "../support-config", null],
+    ["src/features/support/server/catalog.ts", "../../memos/memos", "boundary"],
+    ["src/features/support/support-config.ts", "@/lib/../features/memos/memos", "boundary"],
+    ["src/features/subscriptions/server/subscription-journal-cli.mjs", "./subscription-journal.ts", null],
+    ["src/features/subscriptions/server/subscription-journal-cli.mjs", "@/features/support/support-config", "boundary"],
+    ["src/features/subscriptions/server/subscription-journal-cli.mjs", "node:path", null],
+    ["src/app/_components/home-page.tsx", "@/features/support/support-config", null],
+    ["src/lib/example.test.mjs", "@/features/support/support-config", null],
+  ];
+  for (const [file, specifier, expected] of cases) {
+    const source = JSON.stringify(specifier);
+    for (const code of [
+      `import ${source};`,
+      `export { value } from ${source};`,
+      `export * from ${source};`,
+      `import(${source});`,
     ]) {
-      assert.equal((await restricted(file, specifier)).length, 1, `${file}: ${specifier}`);
+      const messages = await isolatedMessages(file, code, [boundaryRule]);
+      assert.deepEqual(
+        messages.map((message) => message.messageId),
+        expected ? [expected] : [],
+        `${file}: ${code}`,
+      );
     }
-    assert.equal((await restricted(file, "@/lib/i18n")).length, 0);
   }
 });
 
-test("features allow local and shared inputs while rejecting cross-feature imports", async () => {
-  const file = "src/features/support/support-config.ts";
-  for (const specifier of ["@/features/memos/memos", "../memos/memos", "@/app/api/subscribe/route"]) {
-    assert.equal((await restricted(file, specifier)).length, 1, specifier);
-  }
-  for (const specifier of ["@/features/support/support-copy", "./support-copy", "@/lib/i18n"]) {
-    assert.equal((await restricted(file, specifier)).length, 0, specifier);
-  }
-});
-
-test("dynamic imports enforce resolved module boundaries without blocking local or package imports", async () => {
-  async function errors(file, expression) {
-    const config = await eslint.calculateConfigForFile(file);
-    return linter.verify(
-      `const loaded = import(${expression});`,
-      [
-        {
-          plugins: { architecture: config.plugins.architecture },
-          files: ["**/*.{ts,tsx}"],
-          rules: { "architecture/dynamic-import-boundaries": "error" },
-        },
-      ],
-      { filename: path.resolve(file) },
+test("inline TypeScript import types respect the same layer boundaries", async () => {
+  for (const [file, specifier, expected] of [
+    ["src/lib/format.ts", "@/features/contact/contact-validation", "boundary"],
+    ["src/features/support/support-config.ts", "../contact/contact-validation", "boundary"],
+    ["src/features/contact/contact-form.tsx", "./contact-validation", null],
+    ["src/lib/format.ts", "@/lib/i18n", null],
+  ]) {
+    const code = `type T = typeof import(${JSON.stringify(specifier)});`;
+    const messages = await isolatedMessages(file, code, [boundaryRule]);
+    assert.deepEqual(
+      messages.map((message) => message.messageId),
+      expected ? [expected] : [],
+      `${file}: ${code}`,
     );
   }
-  for (const file of [
-    "src/components/site-header/site-header.tsx",
-    "src/lib/format.ts",
-    "src/features/support/support-config.ts",
+});
+
+test("local exports and literal dynamic imports retain their semantics", async () => {
+  for (const [code, expected] of [
+    ["const value = 1; export { value };", null],
+    ["import type { Value } from '@/features/memos/memos';", "boundary"],
+    ["type Field = import('@/features/contact/contact-validation').ContactField;", "boundary"],
+    ["type Language = import('./i18n').Locale;", null],
+    ["export type { Value } from '@/features/memos/memos';", "boundary"],
+    ["import(`@/features/memos/memos`);", "boundary"],
+    ["import('react');", null],
+    ["import(targetModule);", "literal"],
+    ["import(`./${moduleName}`);", "literal"],
   ]) {
-    for (const expression of ['"@/features/memos/memos"', '"../memos/memos"', '"@/app/api/subscribe/route"']) {
-      // The relative peer path is relevant inside features, not inside shared directories.
-      if (expression === '"../memos/memos"' && !file.includes("features")) continue;
-      assert.equal((await errors(file, expression)).length, 1, `${file}: ${expression}`);
-    }
-    assert.equal((await errors(file, '"@/lib/i18n"')).length, 0);
-    assert.equal((await errors(file, '"react"')).length, 0);
-    assert.equal((await errors(file, '"./local-module"')).length, 0);
-    assert.equal((await errors(file, '"@/lib/../features/memos/memos"')).length, 1);
-    assert.equal((await errors(file, "`@/features/memos/memos`")).length, 1);
-    assert.equal((await errors(file, "targetModule")).length, 1);
-    assert.equal((await errors(file, "`./${moduleName}`")).length, 1);
+    const messages = await isolatedMessages("src/lib/format.ts", code, [boundaryRule]);
+    assert.deepEqual(
+      messages.map((message) => message.messageId),
+      expected ? [expected] : [],
+      code,
+    );
   }
-  assert.equal((await errors("src/features/support/support-config.ts", '"@/features/support/support-copy"')).length, 0);
-  assert.equal((await errors("src/components/site-header/site-header.tsx", '"../../features/memos/memos"')).length, 1);
-  assert.equal((await errors("src/features/support/server/catalog.ts", '"../../memos/memos"')).length, 1);
-  assert.equal((await errors("src/features/support/server/catalog.ts", '"../support-config"')).length, 0);
-  const appConfig = await eslint.calculateConfigForFile("src/app/_components/home-page.tsx");
-  assert.equal(appConfig.rules["architecture/dynamic-import-boundaries"], undefined);
 });
 
 async function isolatedMessages(file, code, ruleNames) {
@@ -87,7 +89,7 @@ async function isolatedMessages(file, code, ruleNames) {
     code,
     [
       {
-        files: ["**/*.{mjs,ts,tsx}"],
+        files: ["**/*.{js,mjs,ts,tsx}"],
         languageOptions: { parser: config.languageOptions.parser },
         plugins: config.plugins,
         settings: config.settings,
@@ -164,27 +166,21 @@ test("source naming allows Next.js conventions and rejects mixed-case source pat
 });
 
 test("cycle detection resolves TypeScript aliases and ignores type-only edges", async (t) => {
-  const { mkdtemp, writeFile, rm } = await import("node:fs/promises");
-  const directory = await mkdtemp(path.resolve("src/lib/lint-cycle-"));
-  t.after(() => rm(directory, { recursive: true, force: true }));
-  const alias = `@/lib/${path.basename(directory)}`;
+  const { copyFile, mkdir, mkdtemp, realpath, rm, symlink, writeFile } = await import("node:fs/promises");
+  const project = await mkdtemp(path.join(await realpath(tmpdir()), "lint-cycle-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  // Load the real lint and alias configuration against an isolated source tree.
+  for (const file of ["eslint.config.mjs", "tsconfig.json"]) {
+    await copyFile(path.join(import.meta.dirname, file), path.join(project, file));
+  }
+  await symlink(path.join(import.meta.dirname, "node_modules"), path.join(project, "node_modules"), "junction");
+  const directory = path.join(project, "src", "lib");
+  await mkdir(directory, { recursive: true });
   const first = path.join(directory, "first.ts");
   const second = path.join(directory, "second.ts");
-  await writeFile(first, `import { second } from "${alias}/second"; export const first = () => second;`);
+  await writeFile(first, 'import { second } from "@/lib/second"; export const first = () => second;');
   await writeFile(second, 'import { first } from "./first"; export const second = () => first;');
-  const config = await eslint.calculateConfigForFile(first);
-  const checker = new ESLint({
-    overrideConfigFile: true,
-    overrideConfig: [
-      {
-        files: ["**/*.ts"],
-        plugins: { "import-x": config.plugins["import-x"] },
-        settings: config.settings,
-        languageOptions: { parser: config.languageOptions.parser },
-        rules: { "import-x/no-cycle": config.rules["import-x/no-cycle"] },
-      },
-    ],
-  });
+  const checker = new ESLint({ cwd: project, ruleFilter: ({ ruleId }) => ruleId === "import-x/no-cycle" });
   const results = await checker.lintFiles([first, second]);
   for (const result of results) {
     assert.ok(
@@ -194,7 +190,7 @@ test("cycle detection resolves TypeScript aliases and ignores type-only edges", 
   }
   const types = path.join(directory, "types.ts");
   const value = path.join(directory, "value.ts");
-  await writeFile(types, `import type { Value } from "${alias}/value"; export type Types = { value: Value };`);
+  await writeFile(types, 'import type { Value } from "@/lib/value"; export type Types = { value: Value };');
   await writeFile(value, 'import type { Types } from "./types"; export type Value = { types: Types };');
   for (const result of await checker.lintFiles([types, value])) {
     assert.deepEqual(result.messages, []);

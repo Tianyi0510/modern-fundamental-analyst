@@ -21,7 +21,7 @@ const cases = [
     legal: [/損失本金/, /前瞻性陳述/, /專業關係/, /不附帶保證/, /依法不得排除或限制/],
     boundary: "獨立基金帳戶持倉",
     included: "股票交易紀錄內的上市 ETF（包括 VGT 與 GRNY）仍納入計算",
-    memoNotice: "本文目前僅提供英文原文，尚無中文譯文。",
+    memoNotice: "這篇備忘錄目前只提供英文版。",
   },
   {
     prefix: "/zh-cn",
@@ -29,7 +29,7 @@ const cases = [
     legal: [/损失本金/, /前瞻性陈述/, /专业关系/, /不附带保证/, /依法不得排除或限制/],
     boundary: "独立基金账户持仓",
     included: "股票交易记录内的上市 ETF（包括 VGT 与 GRNY）仍纳入计算",
-    memoNotice: "本文目前仅提供英文原文，尚无中文译文。",
+    memoNotice: "这篇备忘录目前只提供英文版。",
   },
 ];
 
@@ -58,10 +58,15 @@ for (const copy of cases) {
       await disclaimer.evaluate((element) => Boolean(element.previousElementSibling?.matches(".article-body"))),
     ).toBe(true);
     await expect(page.locator(".article-meta time")).toHaveAttribute("datetime", "2025-10-10");
-    await expect(page.locator(".memo-references a")).toHaveCount(5);
+    await expect(page.locator(".memo-references a")).toHaveText([
+      "Why Microsoft Azure could take the cloud lead from Amazon AWS by 2026",
+      "The Total Economic Impact\u2122 of Microsoft Fabric",
+      "Brand Guardianship Index 2025",
+      "Microsoft Fiscal Year 2024 Annual Report",
+      "1987 Letter to Shareholders",
+    ]);
     for (const link of await page.locator(".memo-references a").all()) {
       await expect(link).toHaveAttribute("href", /^https:\/\//);
-      await expect(link).toHaveText("Read source");
     }
     await expect(page.locator(".article-body")).toHaveAttribute("lang", "en");
     if (copy.memoNotice) await expect(page.getByRole("article")).toContainText(copy.memoNotice);

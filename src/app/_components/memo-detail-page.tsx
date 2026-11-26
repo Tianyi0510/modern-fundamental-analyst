@@ -19,12 +19,12 @@ const copy = {
   },
   "zh-tw": {
     memoLabel: "投資備忘錄",
-    languageNotice: "本文目前僅提供英文原文，尚無中文譯文。",
+    languageNotice: "這篇備忘錄目前只提供英文版。",
     disclaimerTitle: "免責聲明",
   },
   "zh-cn": {
     memoLabel: "投资备忘录",
-    languageNotice: "本文目前仅提供英文原文，尚无中文译文。",
+    languageNotice: "这篇备忘录目前只提供英文版。",
     disclaimerTitle: "免责声明",
   },
 } as const;

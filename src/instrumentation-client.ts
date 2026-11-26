@@ -2,15 +2,17 @@ import { getSentryClient, startSentryClient } from "@/lib/sentry-client";
 import type { captureRouterTransitionStart } from "@sentry/nextjs";
 import { resolveSentryDsn } from "@/lib/sentry-dsn";
 
-import { canRecordReplay } from "@/lib/sentry-replay";
+import { canRecordReplay, privateHistoryNavigation } from "@/lib/sentry-replay";
 import { yieldToMain } from "@/lib/yield-to-main";
 
 let replayAllowed = false;
+function stopReplay() {
+  replayAllowed = false;
+  void getSentryClient()?.getReplay()?.stop();
+}
+
 function stopPrivateReplay(href: string) {
-  if (!canRecordReplay(href)) {
-    replayAllowed = false;
-    void getSentryClient()?.getReplay()?.stop();
-  }
+  if (!canRecordReplay(href)) stopReplay();
 }
 
 let startup: ReturnType<typeof startSentryClient> | undefined;
@@ -44,6 +46,7 @@ if (dsn) {
       });
   }
   // Stop before recording recovery links or entering pages with private state.
+  window.addEventListener(privateHistoryNavigation, stopReplay);
   window.addEventListener("popstate", () => {
     stopPrivateReplay(window.location.href);
   });

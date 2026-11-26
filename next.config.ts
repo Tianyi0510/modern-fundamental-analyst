@@ -76,6 +76,8 @@ export default withSentryConfig(withMDX(nextConfig), {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: !process.env.CI,
   telemetry: false,
+  // Events go directly to the DSN. Avoid generating a managed tunnel route during Vercel builds.
+  tunnelRoute: false,
   sourcemaps: {
     disable: !(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT),
     deleteSourcemapsAfterUpload: true,

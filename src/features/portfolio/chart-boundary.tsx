@@ -6,23 +6,25 @@ import { Button } from "@/components/ui/button";
 import type { Locale } from "@/lib/i18n";
 
 const copy = {
-  en: { unavailable: "This chart is temporarily unavailable.", retry: "Try Again" },
-  "zh-tw": { unavailable: "此圖表暫時無法顯示。", retry: "重試" },
-  "zh-cn": { unavailable: "此图表暂时无法显示。", retry: "重试" },
+  en: { unavailable: "This chart is temporarily unavailable.", retry: "Try Again", reload: "Reload Page" },
+  "zh-tw": { unavailable: "此圖表暫時無法顯示。", retry: "重試", reload: "重新載入頁面" },
+  "zh-cn": { unavailable: "此图表暂时无法显示。", retry: "重试", reload: "重新加载页面" },
 };
+
+export class ChartLoadError extends Error {}
 
 type Props = { children: ReactNode; locale: Locale; measure: "twr" | "xirr"; streaming?: boolean };
 
-export class ChartBoundary extends Component<Props, { failed: boolean }> {
-  state = { failed: false };
+export class ChartBoundary extends Component<Props, { failed: boolean; loadFailed: boolean }> {
+  state = { failed: false, loadFailed: false };
 
-  static getDerivedStateFromError() {
-    return { failed: true };
+  static getDerivedStateFromError(error: unknown) {
+    return { failed: true, loadFailed: error instanceof ChartLoadError };
   }
 
   componentDidCatch(error: Error) {
     // Preserve the original stack; beforeSend removes chart error messages and payloads.
-    reportClientError(error, {
+    reportClientError(error instanceof ChartLoadError && error.cause instanceof Error ? error.cause : error, {
       tags: { feature: "performance-chart", measure: this.props.measure },
     });
   }
@@ -36,8 +38,14 @@ export class ChartBoundary extends Component<Props, { failed: boolean }> {
           {measure === "twr" ? "TWRR" : "XIRR"}: {text.unavailable}
         </p>
         {this.state.failed ? (
-          <Button type="button" onClick={() => this.setState({ failed: false })}>
-            {text.retry}
+          <Button
+            type="button"
+            onClick={() => {
+              if (this.state.loadFailed) window.location.reload();
+              else this.setState({ failed: false });
+            }}
+          >
+            {this.state.loadFailed ? text.reload : text.retry}
           </Button>
         ) : null}
       </div>

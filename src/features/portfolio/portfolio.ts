@@ -23,12 +23,12 @@ for (const purchase of portfolioPurchases) {
   );
 }
 
-export const portfolioHoldings: ReadonlyArray<PortfolioHolding> = Object.entries(latestValuation.shares).map(
-  ([symbol, shares]) => {
+export const portfolioHoldings: ReadonlyArray<PortfolioHolding> = Object.entries(latestValuation.shares)
+  .filter(([, shares]) => shares > 0)
+  .map(([symbol, shares]) => {
     const price = latestValuation.prices[symbol as keyof typeof latestValuation.prices];
     return { symbol, shares, costBasis: costBasisBySymbol.get(symbol) ?? 0, price, marketValue: price * shares };
-  },
-);
+  });
 
 const roundCents = (amount: number) => Math.round(amount * 100) / 100;
 const cashTotals = portfolioCashEvents.reduce(

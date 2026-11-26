@@ -20,8 +20,10 @@ for (const { prefix, label, note } of [
       await expect(page.locator(path === "/" ? ".metric-band" : ".performance-summary")).toContainText(xirrNote);
       if (path === "/") {
         await expect(page.locator(".metric-band dt").last()).toHaveText("XIRR");
-        if (!prefix)
-          await expect(page.getByRole("link", { name: "Read the latest investment memo", exact: true })).toBeVisible();
+        const latest = page
+          .locator(".hero")
+          .getByRole("link", { name: /Read the latest investment memo|閱讀最新投資備忘錄|阅读最新投资备忘录/ });
+        await expect(latest).toHaveAttribute("href", `${prefix}/memos/microsoft-stock-analysis-fiscal-year-2024`);
       }
       await page.addStyleTag({ content: "html { font-size: 32px !important; }" });
       for (const width of [320, 390, 1440]) {

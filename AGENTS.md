@@ -20,6 +20,8 @@ Keep repository execution rules here. Link to [architecture](docs/WEB_APPLICATIO
 
 The [README](README.md#mission) owns the mission and investment philosophy; [Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy) owns the article taxonomy and editorial-source status. A source link is not authorization to publish its contents.
 
+Open Codex in the checkout containing `AGENTS.md` and `package.json`. Verify instruction and role discovery in a fresh session after editing those files.
+
 ### Subagent workflow
 
 Follow the official [Subagents guide](https://learn.chatgpt.com/docs/agent-configuration/subagents?surface=app) within the current task's authorization. Delegate only when the user or an applicable instruction explicitly requests it; this section does not require delegation for ordinary work.
@@ -98,6 +100,7 @@ Before changing Next.js APIs, routing or configuration, read the installed-versi
 - Use `getLocalizedPath` / `getLanguageAlternates` from `src/lib/i18n.ts` and `createRootMetadata` / `createPageMetadata` from `src/lib/site-config.ts`. Links and metadata must identify the correct locale and page.
 - When changing website copy, search all test files, fixtures and snapshots for the previous text, accessible names and related translations. Update every affected assertion and run the relevant Node, component and browser tests; do not weaken behavioral checks to accommodate new wording.
 - Keep copy with its owning page/component, use server components for static content and minimize client boundaries. Reuse `HoneypotField`, submission hooks and `postJson`; preserve each form's submission, idempotency and retry semantics.
+- When changing holding pages, reconcile the latest detail row with the portfolio table and check direct loading in each locale. Use the [portfolio update procedure](docs/WEB_APPLICATION_ARCHITECTURE.md#portfolio-data) for source checks and the [holding page layout](docs/DESIGN_SYSTEM.md#holding-detail-pages) for responsive acceptance.
 - Preserve deliberate language, layout and form variants. Do not change verified research or monthly portfolio snapshots without a content-update request; they are not live prices.
 - Follow the [Design System](docs/DESIGN_SYSTEM.md) and its [reference priorities](docs/DESIGN_SYSTEM.md#architecture-and-reference-ownership). Preserve approved colors, typography, language and layout variants unless the requested change covers them. Use the documented tokens and styling boundaries rather than library defaults.
 - Use the configured Base UI shadcn registry and shared components. Preserve native semantics, refs and handlers when composing with `render`; keep business state in its owning feature.
@@ -158,15 +161,9 @@ These rules supplement tests and branch protection; they do not enforce cloud se
 
 ## Deployment completion
 
-Use GitHub Actions and the Vercel Git integration. Follow the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow):
-
 During deployment, change only what is necessary to resolve a demonstrated release blocker. Validate each fix with targeted checks before running required CI. Do not expand the scope with unrelated cleanup, refactoring or additional reviews. Prepare the reviewed diff, required CI results and Preview before requesting any missing merge authorization. If authorization already covers the PR, do not ask again. After the authorized merge, confirm release identity and deployment status without adding optional checks or reviews.
 
-1. Start new changes from current `main` on a `codex/` branch; reuse an existing branch/PR for ongoing work. Push the branch and open a PR targeting `main` when requested. Review its diff, required CI and Preview. Do not push changes directly to `main` or bypass branch protection.
-2. Merge the verified PR only with explicit owner authorization to merge that PR. Otherwise, leave it open and report readiness. Merging to `main` triggers the production deployment workflow; record the resulting release SHA. PRs run full CI; main may reuse recent full PR evidence only when `scripts/ci-plan.mjs` verifies an identical Git tree and all required jobs. Missing or uncertain evidence requires full CI.
-3. Declare deployment complete only after release CI succeeds, Vercel is `READY`, and its deployed SHA and production aliases match the intended release. Preview readiness or CI success alone is insufficient.
-4. Report completion promptly. Do not add production smoke checks unless requested or evidence indicates a failure; report incomplete diagnostics separately.
-5. After successful deployment, safely delete the local merged feature branch after checking for unmerged work and switching away. Preserve active branches. GitHub deletes the merged remote branch automatically.
+Use the [release workflow](docs/WEB_APPLICATION_ARCHITECTURE.md#release-workflow) for the branch, PR, production checks and safe cleanup. Create new task branches with the `codex/` prefix. Merge only with explicit owner authorization for that PR. Report completion promptly once release CI succeeds and the ready production deployment and aliases match the release SHA. Add production smoke checks only when requested or when evidence indicates a failure.
 
 ## Maintaining this file
 

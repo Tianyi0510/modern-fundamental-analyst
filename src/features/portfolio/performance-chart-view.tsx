@@ -3,7 +3,7 @@ import { formatDate, formatPercent, formatUsd } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { PerformanceChartExplorer } from "./performance-chart-explorer";
+import { PerformanceChartExplorer, type ChartPoint } from "./performance-chart-explorer";
 import { AnimatedDisclosure } from "@/components/animated-disclosure";
 import styles from "./performance-chart.module.css";
 
@@ -67,12 +67,7 @@ const xirrCopy = {
   },
 } as const;
 
-export type ChartObservation = {
-  date: string;
-  marketValue: number;
-  portfolioReturn: number | null;
-  benchmarkReturn: number | null;
-};
+type ChartObservation = ChartPoint & { marketValue: number };
 
 export function PerformanceChartView({
   locale,
@@ -95,7 +90,11 @@ export function PerformanceChartView({
           <p>{text.note}</p>
         </figcaption>
         <PerformanceChartExplorer
-          observations={observations}
+          observations={observations.map(({ date, portfolioReturn, benchmarkReturn }) => ({
+            date,
+            portfolioReturn,
+            benchmarkReturn,
+          }))}
           locale={locale}
           measure={measure}
           title={text.title}

@@ -134,18 +134,8 @@ test("memo Hero describes the published research and planned articles remain unp
       "This historical article does not include a published valuation model.",
       ["Will AI Kill Software?", "Agentic Finance and Stablecoins"],
     ],
-    [
-      "/zh-tw",
-      "探討企業品質與財務表現",
-      "這篇歷史文章未附公開的估值模型。",
-      ["AI 會取代軟體嗎？", "AI 代理金融與穩定幣"],
-    ],
-    [
-      "/zh-cn",
-      "探讨企业质量与财务表现",
-      "这篇历史文章未附公开的估值模型。",
-      ["AI 会取代软件吗？", "AI 代理金融与稳定币"],
-    ],
+    ["/zh-tw", "探討企業品質與財務表現", "文章未附公開的估值模型。", ["AI 會取代軟體嗎？", "AI 代理金融與穩定幣"]],
+    ["/zh-cn", "探讨企业质量与财务表现", "文章未附公开的估值模型。", ["AI 会取代软件吗？", "AI 代理金融与稳定币"]],
   ] as const) {
     await page.goto(`${prefix}/memos`);
     await expect(page.locator("main h1")).toHaveText(title);

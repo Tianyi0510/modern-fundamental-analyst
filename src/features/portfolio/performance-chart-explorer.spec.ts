@@ -16,6 +16,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         const figures = page.locator("main figure");
         await expect(figures).toHaveCount(2);
         for (const figure of await figures.all()) {
+          const hint =
+            prefix === "/zh-cn"
+              ? "比较各月底的回报率"
+              : prefix === "/zh-tw"
+                ? "比較各月底的報酬率"
+                : "compare returns at each month-end";
+          await expect(figure.getByText(hint, { exact: false })).toBeVisible();
           await showInteractivePerformanceChart(figure);
           await expect(figure.getByRole("button")).toHaveCount(1);
           await expect(figure.locator('[data-slot="collapsible-trigger"]')).toHaveCount(1);
@@ -51,3 +58,38 @@ test(
     await expect(figure.getByRole("application")).toHaveCount(1);
   },
 );
+
+test("recovers from a failed chart chunk on the same performance page", async ({ browser, page, baseURL }) => {
+  // Observe scripts requested by a successful reveal in a separate, cold browser context.
+  const probe = await browser.newPage({ baseURL, viewport: { width: 390, height: 844 } });
+  const deferredScripts = new Set<string>();
+  try {
+    await probe.goto("/performance");
+    const figure = probe.locator("main figure").first();
+    await expect(figure.getByRole("application")).toHaveCount(0);
+    probe.on("request", (request) => {
+      if (request.resourceType() === "script" && new URL(request.url()).origin === new URL(probe.url()).origin) {
+        deferredScripts.add(request.url());
+      }
+    });
+    await figure.locator("[data-chart-viewport]").scrollIntoViewIfNeeded();
+    await expect(figure.getByRole("application")).toBeVisible();
+  } finally {
+    await probe.close();
+  }
+  expect(deferredScripts.size).toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/performance");
+  const isDeferredScript = (url: URL) => deferredScripts.has(url.href);
+  await page.route(isDeferredScript, (route) => route.abort("failed"));
+  const figure = page.locator("main figure").first();
+  await figure.locator("[data-chart-viewport]").scrollIntoViewIfNeeded();
+  const reload = figure.getByRole("button", { name: "Reload Page" });
+  await expect(reload).toBeVisible();
+  await page.unroute(isDeferredScript);
+  await reload.click();
+  await expect(page).toHaveURL(/\/performance$/);
+  await figure.locator("[data-chart-viewport]").scrollIntoViewIfNeeded();
+  await expect(figure.getByRole("application")).toBeVisible();
+});
