@@ -24,6 +24,8 @@ Modern Fundamental Analyst aims to empower every retail investor through public-
 
 Publish portfolio holdings and performance monthly, alongside detailed investment theses, to support transparency and accountability. Monthly portfolio disclosure is separate from the [article taxonomy](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy).
 
+From Home or Portfolio, select a ticker to see what the position is worth, its share of the portfolio and its return on purchase cost. The month-end table shows how share count, closing price and market value changed over time. Company pages include annual financial figures and links to the original filing and investor relations website. ETF pages link to the fund profile and fact sheet.
+
 Promote a “learn-it-all” growth mindset grounded in curiosity, empathy and continuous learning. The owner's stated values include free trade, the dynamism of capitalism, and individual rights to life, liberty and the pursuit of happiness. These are editorial beliefs, not technical requirements or claims about investment outcomes.
 
 See the [article taxonomy and editorial sources](docs/WEB_APPLICATION_ARCHITECTURE.md#article-taxonomy) for content scope and publication status.
@@ -127,7 +129,7 @@ Investment Memo Articles are authored in local MDX and rendered as Server Compon
 | [Web Application Architecture](docs/WEB_APPLICATION_ARCHITECTURE.md) | Code conventions, application/data boundaries, portfolio updates, verification tooling, tests and releases. |
 | [Integrations](docs/INTEGRATIONS.md)                                 | Service responsibilities, official references, templates, provider setup and recovery.                      |
 | [AGENTS.md](AGENTS.md)                                               | Agent execution constraints and completion requirements.                                                    |
-| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | First stable version overview, investment approach, reader features and release evidence.                   |
+| [Modern Fundamental Analyst 1.0.0](docs/v1.0.0.md)                   | First stable version overview, investment approach, research content and reader features.                   |
 
 The local copy-editing outline is `../local/WEBSITE_COPY.md`; maintenance instructions are in `../local/README.md`. Both stay outside Git and deployment artifacts. Edit English copy in the outline, then explicitly request website updates and Chinese translations. A fresh clone does not contain these local files.
 

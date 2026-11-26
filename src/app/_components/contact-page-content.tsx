@@ -13,21 +13,21 @@ const copy = {
     subscribe: "Subscribe",
     subscribeIntro:
       "Receive new investment research and website updates by email. Confirm your subscription in your inbox.",
-    title: ["Connect through research,", "ideas, and opportunities"],
+    title: ["Let’s talk about", "investing"],
     intro:
-      "Reach out to discuss investment research, financial modeling, business opportunities, or ideas that empower retail investors.",
+      "Have a question about my research, a financial model to discuss, or an idea for working together? I’d like to hear from you.",
   },
   "zh-tw": {
     subscribe: "訂閱",
-    subscribeIntro: "透過電子郵件接收最新投資研究與網站更新。請在收到郵件後確認訂閱。",
-    title: ["透過研究、觀點與機會", "建立連結"],
-    intro: "交流投資研究、財務建模、商業機會，或能幫助個人投資者的想法。",
+    subscribeIntro: "訂閱後，新的投資研究和網站消息會寄到你的信箱。請先開啟確認信，完成訂閱。",
+    title: ["來聊聊", "投資"],
+    intro: "對我的研究有疑問、想討論財務模型，或有合作的想法？歡迎寫信給我。",
   },
   "zh-cn": {
     subscribe: "订阅",
-    subscribeIntro: "通过电子邮件接收最新投资研究与网站更新。请在收到邮件后确认订阅。",
-    title: ["通过研究、观点与机会", "建立联系"],
-    intro: "交流投资研究、财务建模、商业机会，或能够帮助个人投资者的想法。",
+    subscribeIntro: "订阅后，新的投资研究和网站消息会发到你的邮箱。请先打开确认邮件，完成订阅。",
+    title: ["来聊聊", "投资"],
+    intro: "对我的研究有疑问、想讨论财务模型，或有合作的想法？欢迎给我留言。",
   },
 } as const;
 

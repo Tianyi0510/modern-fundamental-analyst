@@ -1,3 +1,4 @@
+import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./portfolio-page-content.styles";
@@ -15,21 +16,22 @@ const copy = {
       <>
         A Fully Disclosed
         <br />
-        <em>Focus Portfolio</em>
+        <em>Concentrated Portfolio</em>
       </>
     ),
-    intro: "Review monthly holdings, position sizes, published research and the long-term portfolio approach.",
+    intro:
+      "See what I own, how much of the portfolio each holding represents, and how those positions change each month.",
     summaryLabel: "Portfolio Summary",
     marketValue: "Total Market Value",
     currency: "USD",
     totalReturn: "Total Return",
-    returnSummaryNote: "Absolute return",
+    returnSummaryNote: "Return on purchase cost",
     holdings: "Holdings",
     holdingsNote: "Stocks and ETFs",
     currentHoldings: "Current Holdings",
     positionCount: `${portfolioSnapshot.holdingsCount} Disclosed Positions`,
     returnNote:
-      "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
+      "The portfolio accounts for net dividends and financing interest. Individual position returns exclude both.",
   },
   "zh-tw": {
     title: (
@@ -39,17 +41,17 @@ const copy = {
         <em>集中投資組合</em>
       </>
     ),
-    intro: "查看每月持股、部位規模、已發布研究與長期投資組合管理方式。",
+    intro: "這是我的每月持股紀錄。你可以查看每檔持股的比重，也可以追蹤持股變化。",
     summaryLabel: "投資組合摘要",
     marketValue: "總市值",
     currency: "美元",
     totalReturn: "總報酬率",
-    returnSummaryNote: "絕對報酬率",
+    returnSummaryNote: "以買入成本計算",
     holdings: "持股數量",
     holdingsNote: "股票與 ETF",
     currentHoldings: "目前持股",
     positionCount: `${portfolioSnapshot.holdingsCount} 個已揭露部位`,
-    returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
+    returnNote: "整體投資組合的報酬率計入稅後股息，並扣除融資利息。個別持股的報酬率不含這兩項。",
   },
   "zh-cn": {
     title: (
@@ -59,17 +61,17 @@ const copy = {
         <em>集中投资组合</em>
       </>
     ),
-    intro: "查看每月持仓、仓位规模、已发布研究与长期投资组合管理方式。",
+    intro: "这里记录了我每个月的持仓。你可以查看每只股票或 ETF 的占比，也可以追踪持仓变化。",
     summaryLabel: "投资组合摘要",
     marketValue: "总市值",
     currency: "美元",
     totalReturn: "总回报率",
-    returnSummaryNote: "绝对回报率",
+    returnSummaryNote: "按买入成本计算",
     holdings: "持仓数量",
     holdingsNote: "股票与 ETF",
     currentHoldings: "当前持仓",
     positionCount: `${portfolioSnapshot.holdingsCount} 个已披露持仓`,
-    returnNote: "净股息与融资利息在投资组合层面计入，不分摊至单项持仓。",
+    returnNote: "整个投资组合的回报率计入税后股息，并扣除融资利息。单只股票或 ETF 的回报率不含这两项。",
   },
 } as const;
 
@@ -79,7 +81,7 @@ const tableCopy = {
     empty: "No holdings to display.",
     symbol: "Position",
     shares: "Shares",
-    costBasis: "Cost Basis",
+    costBasis: "Average Cost per Share",
     price: "Price",
     marketValue: "Market Value",
     returnPct: "Return",
@@ -94,10 +96,10 @@ const tableCopy = {
     empty: "目前沒有可顯示的持股。",
     symbol: "部位",
     shares: "股數",
-    costBasis: "成本基礎",
+    costBasis: "每股平均成本",
     price: "價格",
-    marketValue: "市場價值",
-    returnPct: "報酬",
+    marketValue: "市值",
+    returnPct: "報酬率",
     weight: "權重",
     sortBy: "排序依據",
     ascending: "升序",
@@ -109,10 +111,10 @@ const tableCopy = {
     empty: "目前没有可显示的持仓。",
     symbol: "持仓",
     shares: "股数",
-    costBasis: "成本基础",
+    costBasis: "每股平均成本",
     price: "价格",
-    marketValue: "市场价值",
-    returnPct: "回报",
+    marketValue: "市值",
+    returnPct: "回报率",
     weight: "权重",
     sortBy: "排序依据",
     ascending: "升序",
@@ -125,6 +127,8 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const isChinese = locale !== "en";
   const asOf = formatDate(portfolioSnapshot.asOf, locale, locale === "en");
+
+  const priceDate = formatDate(portfolioTwrSnapshot.priceDate, locale, locale === "en");
 
   return (
     <div className="portfolio-page">
@@ -179,18 +183,23 @@ export function PortfolioPageContent({ locale }: { locale: Locale }) {
                 {locale === "en"
                   ? "Click any column heading to sort. "
                   : locale === "zh-tw"
-                    ? "點選任一欄位標題即可排序；"
-                    : "点击任一栏标题即可排序；"}
+                    ? "點選欄位標題即可排序。"
+                    : "点击列标题即可排序。"}
               </span>
               {locale === "en"
-                ? `Prices and market values use closing prices as of ${asOf}.`
+                ? `The ${asOf} valuation uses closing prices from ${priceDate}.`
                 : locale === "zh-tw"
-                  ? `價格與市場價值均採用 ${asOf} 收盤價。`
-                  : `价格与市场价值均采用 ${asOf} 收盘价。`}
+                  ? `${asOf} 的持股市值按 ${priceDate} 的收盤價計算。`
+                  : `${asOf} 的持仓市值按 ${priceDate} 的收盘价计算。`}
             </p>
           </div>
           <div className={appearance["portfolio-table-wrap"] + " " + appearance["shell"]}>
-            <PortfolioTable copy={tableCopy[locale]} holdings={portfolioHoldings} income={portfolioIncome} />
+            <PortfolioTable
+              locale={locale}
+              copy={tableCopy[locale]}
+              holdings={portfolioHoldings}
+              income={portfolioIncome}
+            />
           </div>
           <div className={appearance["portfolio-return-note"] + " " + appearance["shell"]}>
             <p>{text.returnNote}</p>

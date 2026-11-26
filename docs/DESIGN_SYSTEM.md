@@ -246,7 +246,7 @@ Use these composition boundaries:
 - **Holdings:** the feature owns TanStack sorting and calculations; DataTable renders native Table semantics, headings, totals and `aria-sort`. Mobile sorting uses Native Select and Button.
 - **Home performance bars** compare since-inception annualized XIRR for the portfolio and SPY. Use one linear scale that includes zero and both unrounded returns. Positive bars extend up and negative bars extend down. A zero return has zero height. When both values are zero, center the baseline. Place percentage labels beyond the ends of the bars and keep the series names below the plot. The Home Hero reports cumulative reconstructed TWRR separately.
 - **Performance:** two measures, cumulative reconstructed TWRR and annualized XIRR, each with one interactive Recharts composition in Card, with solid Portfolio and dashed SPY. Keep keyboard/touch comparison, missing-data gaps and the monthly Table alternative. No static chart or custom series buttons.
-- **Memos:** linked Cards represent published articles; planned research stays noninteractive. H2/H3 semantics depend on placement. Article outlines compose Collapsible directly; indexes and monthly tables use AnimatedDisclosure.
+- **Memos:** linked Cards represent published articles; planned research stays noninteractive. H2/H3 semantics depend on placement. Article outlines compose Collapsible directly; memo indexes and Performance chart data tables use AnimatedDisclosure.
 - **Forms:** standard forms use FormPanel; Footer Subscribe retains its inverse treatment. Field feedback and provider results stay inline. Support enhances native payment radios after hydration.
 - **Feedback:** Alert Dialog confirms draft clearing. Memo copy-link success/failure uses an instance-local Toast manager; copying omits query and fragment. Empty represents no data, Skeleton represents loading, and Spinner accompanies pending actions.
 
@@ -548,6 +548,12 @@ Before adding a component, inspect its source and dependencies. Add only the nee
 
 See [Menu behavior](#menu-behavior) and [Disclosure and animation ownership](#disclosure-and-animation-ownership) for lifecycle rules.
 
+### Holding detail pages
+
+Place the ticker and the localized “View All Holdings” link at opposite ends of the Hero title row. Give the company or fund name and exchange the same type size. For companies, leave 32px above and below the SEC industry classification and 8px between its label and value.
+
+Above 1100px, give the month-end heading, record count and date range four grid tracks. Align the table to the eight tracks used by the research figures above it. At narrower widths, stack the heading above the table. Show the table on page load. Its focusable scroll region uses the smaller of 24rem and 60svh, with a sticky header, regular-weight dates and right-aligned numbers. Place the USD and return methodology note outside the scroll region, 48px below it and aligned with its left edge. Associate the note with the table using `aria-describedby`.
+
 ## UX tasks and acceptance
 
 Identify the reader, their task and the information needed at each decision. Use Web Interface Guidelines for interactions, forms, performance and UX Copywriting; Fluent 2 for Accessibility, UX Content Design, Handoffs, Onboarding and Wait UX; and Cieden as a supporting reference for task analysis, information architecture and usability checks. The tasks below describe the site's current intent; they are working assumptions, not findings from a user-research study.
@@ -623,7 +629,7 @@ On entry, focus the close control. During closing, make the wordmark and navigat
 
 ### Disclosure and animation ownership
 
-Memos and monthly tables use shadcn/ui Collapsible through AnimatedDisclosure. Keep mounted server-rendered content hidden while closed. Opening requires JavaScript; do not describe this as native details or a no-JavaScript disclosure. Base UI synchronizes requested state, `aria-expanded` and panel visibility. CSS height transitions can reverse and respond to resizing; reduced motion disables them. Closing returns focus from the content to its trigger without scrolling.
+Memo indexes and Performance chart data tables use shadcn/ui Collapsible through AnimatedDisclosure. Keep mounted server-rendered content hidden while closed. Opening requires JavaScript; do not describe this as native details or a no-JavaScript disclosure. Base UI synchronizes requested state, `aria-expanded` and panel visibility. CSS height transitions can reverse and respond to resizing; reduced motion disables them. Closing returns focus from the content to its trigger without scrolling.
 
 Web Animations API owns panel and icon transforms; CSS Modules own separate color and touch effects. Completion, cancellation, resize, reduced-motion changes and unmount must leave no stale effects.
 
@@ -650,6 +656,8 @@ Identify the reader, task, known state and next action before writing. Keep copy
 Use short sentences, familiar words and active voice. Avoid blame, filler and unsupported outcome or timing promises. Verify translations against the same consent, privacy and payment states. Search tests and fixtures for replaced wording, then check visible copy, accessible names and mobile wrapping. Mock provider writes during routine verification.
 
 ### Capitalization and editorial conventions
+
+Use American English for original English copy, including U.S. spelling and a serial comma in lists of three or more items. Keep official names and quotations as written.
 
 For UX Writing, [Web Interface Guidelines](https://vercel.com/design/guidelines#copywriting) takes precedence over Fluent 2 Content Design: functional interface headings and buttons use Chicago Title Case as adopted by this project. Sentence case for marketing and editorial content is a separate site editorial decision. The context matrix below preserves current copy conventions; neither external UX Writing reference governs research prose or marketing content. Capitalization is not a universal accessibility rule.
 
@@ -761,7 +769,7 @@ Use [Fluent 2 Design Tokens](https://fluent2.microsoft.design/design-tokens) as 
 
 Above the stacking threshold, Portfolio summaries use `--grid-portfolio-summary` with three equal-width columns. Home, Portfolio and Performance summary grids use equal-height rows, including stacked layouts. Home performance uses 7+5 tracks for the chart and headline figure, preventing large percentage values from clipping on landscape tablets. Validate the bar geometry with +1% and +4% (a 1:4 height ratio), zero and a negative return. Check percentage labels for clipping and overlap at 320, 390, 834 and 1440px. See the [Home return bars regression](../src/app/_components/home-return-bars.spec.ts).
 
-The memo-article Hero follows the deployed editorial composition: 64px top padding, a Large Display title with 48px block margins, and a bordered metadata row at the bottom of the secondary surface, with no extra bottom padding. Metadata and the Copy Article Link action share the 1120px title/body width; the action remains right-aligned above 800px and moves to its own left-aligned row at 800px and below. The summary and language notice remain in the body, which retains 64px top padding. This Hero is an explicit exception to symmetric section padding.
+The memo-article Hero uses 64px top padding, a Large Display title with a 0px top margin and a 48px bottom margin, and a bordered metadata row at the bottom of the secondary surface, with no extra bottom padding. Metadata and the Copy Article Link action share the 1120px title/body width; the action remains right-aligned above 800px and moves to its own left-aligned row at 800px and below. The summary and language notice remain in the body, which retains 64px top padding. This Hero is an explicit exception to symmetric section padding.
 
 Hero metadata (dates and About disciplines) aligns to the right edge of the introduction container at every width, including when it wraps onto a separate row. PageHero owns this rule; page-specific date classes must not override it.
 

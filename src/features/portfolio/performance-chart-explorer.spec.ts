@@ -18,10 +18,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         for (const figure of await figures.all()) {
           const hint =
             prefix === "/zh-cn"
-              ? "比较各月底的数值"
+              ? "比较各月底的回报率"
               : prefix === "/zh-tw"
-                ? "比較各月底的數值"
-                : "compare month-end values";
+                ? "比較各月底的報酬率"
+                : "compare returns at each month-end";
           await expect(figure.getByText(hint, { exact: false })).toBeVisible();
           await showInteractivePerformanceChart(figure);
           await expect(figure.getByRole("button")).toHaveCount(1);

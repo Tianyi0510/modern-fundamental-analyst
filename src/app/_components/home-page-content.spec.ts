@@ -4,7 +4,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} holdings and footer links expose list semantics across layouts`, async ({ page }) => {
     await page.goto(prefix || "/");
     const researchTitle = page.getByRole("heading", {
-      name: /Published investment research for independent evaluation|公開投資研究，\s*供讀者獨立評估|公开投资研究，\s*供读者独立评估/,
+      name: /Published investment research with accountability|公開投資研究，\s*為自己的判斷負責|公开投资研究，\s*为自己的判断负责/,
     });
     await expect(researchTitle).toBeVisible();
     const holdings = page.locator(".holdings-list");

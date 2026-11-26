@@ -13,23 +13,35 @@ const introLayout =
 
 export function PageHero({
   title,
+  action,
   intro,
   children,
   variant = "standard",
 }: {
   title: ReactNode;
+  action?: ReactNode;
   intro: ReactNode;
   children?: ReactNode;
   variant?: HeroVariant;
 }) {
+  const heading = (
+    <h1
+      className={`mt-0 text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+    >
+      {title}
+    </h1>
+  );
   return (
     <div className="page-hero-band bg-[var(--surface-secondary)]">
       <Container as="section" className="page-hero @container/financial-summary py-[var(--space-section-padding)]">
-        <h1
-          className={`mt-0 text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
-        >
-          {title}
-        </h1>
+        {action ? (
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[var(--space-16px)]">
+            {heading}
+            {action}
+          </div>
+        ) : (
+          heading
+        )}
         <div
           className={`page-intro mt-[var(--space-section-content)] [&_p]:m-0 [&_p]:max-w-[630px] [&_p]:text-large-body [&_p]:text-pretty [&_small]:text-small-body [&_small]:text-[var(--text-secondary)] ${introLayout}`}
         >

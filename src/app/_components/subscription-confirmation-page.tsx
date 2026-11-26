@@ -9,8 +9,8 @@ import { SubscriptionConfirmationForm } from "@/features/subscriptions/subscript
 
 const pageBody: Record<Locale, string> = {
   en: "Confirm that you want to receive updates from Modern Fundamental Analyst. This link expires in 24 hours.",
-  "zh-tw": "請確認你希望接收 Modern Fundamental Analyst 的更新。此連結將於 24 小時後到期。",
-  "zh-cn": "请确认你希望接收 Modern Fundamental Analyst 的更新。此链接将于 24 小时后到期。",
+  "zh-tw": "請確認訂閱，以便收到 Modern Fundamental Analyst 的更新。這個連結在 24 小時內有效。",
+  "zh-cn": "请确认订阅，以便收到 Modern Fundamental Analyst 的更新。这个链接在 24 小时内有效。",
 };
 
 export async function SubscriptionConfirmationPage({

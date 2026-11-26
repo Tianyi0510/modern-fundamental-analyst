@@ -78,7 +78,10 @@ export function getMemos(locale: Locale): readonly MemoSummary[] {
 }
 
 export function getLatestMemo(locale: Locale) {
-  return getMemos(locale)[0];
+  return getMemos(locale).reduce<MemoSummary | undefined>(
+    (latest, memo) => (!latest || memo.publishedAt > latest.publishedAt ? memo : latest),
+    undefined,
+  );
 }
 
 export function getMemo(slug: string, locale: Locale) {

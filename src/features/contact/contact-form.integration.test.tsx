@@ -252,10 +252,15 @@ it("enables deletion for a restored draft", () => {
 });
 
 it.each([
-  ["en", "Send Message", "Too many requests. Try again after 600 s."],
-  ["zh-tw", "傳送訊息", "請求次數過多，請於 600 秒後再試。"],
-  ["zh-cn", "发送信息", "请求次数过多，请于 600 秒后再试。"],
-] as const)("retains draft and retry identity after a localized 429 (%s)", async (locale, submit, expected) => {
+  ["en", "Send Message", "600", "Try sending your message again in 600 seconds."],
+  ["en", "Send Message", "1", "Try sending your message again in 1 second."],
+  ["en", "Send Message", "0", "Try sending your message again in 0 seconds."],
+  ["en", "Send Message", undefined, "Please wait a moment, then try sending your message again."],
+  ["zh-tw", "傳送訊息", "600", "請在 600 秒後再傳送訊息。"],
+  ["zh-tw", "傳送訊息", undefined, "請稍候，再試著傳送訊息。"],
+  ["zh-cn", "发送信息", "600", "请在 600 秒后再发送消息。"],
+  ["zh-cn", "发送信息", undefined, "请稍等片刻，再尝试发送消息。"],
+] as const)("retains draft and retry identity after a localized 429 (%s)", async (locale, submit, delay, expected) => {
   const draft = {
     name: "Reader",
     email: "reader@example.com",
@@ -268,7 +273,7 @@ it.each([
     http.post("http://localhost:3210/api/contact", ({ request }) => {
       keys.push(request.headers.get("idempotency-key"));
       return keys.length === 1
-        ? HttpResponse.json({}, { status: 429, headers: { "Retry-After": "600" } })
+        ? HttpResponse.json({}, { status: 429, headers: delay === undefined ? {} : { "Retry-After": delay } })
         : HttpResponse.json({});
     }),
   );

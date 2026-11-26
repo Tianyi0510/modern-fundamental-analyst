@@ -32,6 +32,8 @@ Use these templates as implementation examples within the scopes below. They do 
 
 The [README](../README.md#mission) defines the mission; [Architecture](WEB_APPLICATION_ARCHITECTURE.md#editorial-sources-and-publication-status) records editorial sources and publication status. Google Docs links are editorial references, not a configured runtime integration or automatic publishing feed. Article categories use the local memo catalog and do not require Redis, a CMS or another provider. Follow the [MDX publishing contract](WEB_APPLICATION_ARCHITECTURE.md#investment-memo-content).
 
+SEC EDGAR filings, company investor relations sites and ETF issuer fact sheets supply the research references on holding pages. Maintainers verify the figures against these sources and store them in the repository. Rendering a page reads the checked-in profile. Readers follow the source links to consult the original documents. See [portfolio data](WEB_APPLICATION_ARCHITECTURE.md#portfolio-data) for the financial field definitions and update procedure.
+
 ## Operational boundaries
 
 Use [.env.example](../.env.example) for variable names. Store environment-scoped secrets in Vercel and local credentials in ignored `.env.local`. Never commit or print credentials. [Architecture](WEB_APPLICATION_ARCHITECTURE.md) defines application boundaries; [Design System](DESIGN_SYSTEM.md) defines UI contracts. Published portfolio and article data are versioned in their feature directories; Redis is not their source.

@@ -14,10 +14,10 @@ type LegalCopy = {
 
 const copy = {
   en: {
-    title: "Legal disclaimer and important",
-    titleAccent: "investment risk disclosures",
+    title: "Legal disclaimer and",
+    titleAccent: "risk disclosures",
     subtitle:
-      "Read these terms before using this website’s research, financial information, valuations or performance data.",
+      "Read these terms before using this website’s research, financial information, valuations, or performance data.",
     sections: [
       [
         "No investment advice",
@@ -49,8 +49,8 @@ const copy = {
     ],
   },
   "zh-tw": {
-    title: "法律免責聲明與重要",
-    titleAccent: "投資風險揭露",
+    title: "法律免責聲明與",
+    titleAccent: "風險揭露",
     subtitle: "使用本網站的研究、財務資訊、估值或績效數據前，請先閱讀這些條款。",
     sections: [
       [
@@ -66,7 +66,7 @@ const copy = {
         "投資結果與未來事件仍具不確定性",
         [
           "所有投資均涉及風險，包括可能損失本金。過往績效不保證亦不能預測未來結果。本網站可能包含依據所標示發布日期當時可取得的資訊、假設與判斷所作的預測、推估、目標價、內在價值估計及其他前瞻性陳述。",
-          "公司業績、競爭、科技、監管、經濟狀況、金融市場、利率、匯率或其他因素的變化，均可能令實際結果出現重大差異。包括三大財務報表與折現現金流模型在內的財務模型是分析工具，並非價值或報酬的保證。作者可能持有或交易所討論的證券，投資組合持倉一般按月揭露，而非即時更新。",
+          "公司業績、競爭、科技、監管、經濟狀況、金融市場、利率、匯率或其他因素的變化，均可能令實際結果出現重大差異。三大財務報表模型與現金流量折現模型等財務模型僅供分析，無法保證估值或報酬。作者可能持有或交易所討論的證券，投資組合持倉一般按月揭露，而非即時更新。",
           "除非另有明確說明，作者不承擔修訂或更新任何前瞻性陳述的義務。",
         ],
       ],
@@ -81,8 +81,8 @@ const copy = {
     ],
   },
   "zh-cn": {
-    title: "法律免责声明与重要",
-    titleAccent: "投资风险披露",
+    title: "法律免责声明与",
+    titleAccent: "风险披露",
     subtitle: "使用本网站的研究、财务信息、估值或业绩数据前，请先阅读这些条款。",
     sections: [
       [
@@ -98,7 +98,7 @@ const copy = {
         "投资结果与未来事件仍具不确定性",
         [
           "所有投资均涉及风险，包括可能损失本金。过往业绩不保证亦不能预测未来结果。本网站可能包含依据所标示发布日期当时可取得的信息、假设与判断所作的预测、推算、目标价、内在价值估计及其他前瞻性陈述。",
-          "公司业绩、竞争、科技、监管、经济状况、金融市场、利率、汇率或其他因素的变化，均可能令实际结果出现重大差异。包括三大财务报表与折现现金流模型在内的财务模型是分析工具，并非价值或回报的保证。作者可能持有或交易所讨论的证券，投资组合持仓一般按月披露，而非实时更新。",
+          "公司业绩、竞争、科技、监管、经济状况、金融市场、利率、汇率或其他因素的变化，均可能令实际结果出现重大差异。三大财务报表模型和现金流折现模型等财务模型仅供分析，无法保证估值或回报。作者可能持有或交易所讨论的证券，投资组合持仓一般按月披露，而非实时更新。",
           "除非另有明确说明，作者不承担修订或更新任何前瞻性陈述的义务。",
         ],
       ],

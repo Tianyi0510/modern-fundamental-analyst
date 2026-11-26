@@ -46,10 +46,10 @@ test("memo MDX preserves the verified article text, hierarchy and source referen
   const text = [...document.querySelectorAll("h2,h3,p,li")]
     .map((element) => element.textContent.replace(/\s+/g, " ").trim())
     .join("\n");
-  // Original rendered research text, with the approved References heading punctuation update.
+  // Verified rendered research text, including the source titles used as reference links.
   assert.equal(
     createHash("sha256").update(text).digest("hex"),
-    "627fe4d7b066ac1d1ba126271a682f06bc17478e7f5099e0d3a60178f0afa78a",
+    "74fba3b0faf13c7644aa2ff99521c98e7b0f0886cac67ea95994f634d1bb7061",
   );
   assert.equal(document.querySelectorAll(".memo-section").length, 3);
   assert.equal(document.querySelectorAll("p").length, 40);

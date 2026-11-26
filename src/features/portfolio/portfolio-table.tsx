@@ -3,6 +3,9 @@
 import { pushPageUrl } from "@/lib/sentry-replay";
 import { useSearchParams } from "next/navigation";
 
+import { IntentLink } from "@/components/intent-link";
+import { getLocalizedPath, type Locale } from "@/lib/i18n";
+import { holdingPath } from "./holding-path";
 import { appearance } from "./portfolio-table.styles";
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
@@ -31,6 +34,7 @@ import {
 type SortKey = "symbol" | "shares" | "costBasis" | "price" | "marketValue" | "returnPct" | "weight";
 
 type PortfolioTableProps = {
+  locale: Locale;
   copy: PortfolioTableCopy;
   holdings: ReadonlyArray<PortfolioHolding>;
   income: { netDividends: number; financingInterest: number };
@@ -96,6 +100,7 @@ function UrlPortfolioTable(props: PortfolioTableProps) {
 }
 
 function PortfolioTableView({
+  locale,
   copy,
   holdings,
   income,
@@ -227,7 +232,12 @@ function PortfolioTableView({
         renderRow={({ original: { holding, costPerShare, returnPct, weight } }) => (
           <TableRow className={`${appearance["portfolio-row"]} border-b-0`} key={holding.symbol}>
             <TableHead className="h-auto whitespace-normal text-inherit" scope="row" data-label={copy.symbol}>
-              {holding.symbol}
+              <IntentLink
+                href={getLocalizedPath(holdingPath(holding.symbol), locale)}
+                className="inline-flex min-h-[var(--size-touch-target)] items-center underline underline-offset-4"
+              >
+                {holding.symbol}
+              </IntentLink>
             </TableHead>
             <TableCell className="whitespace-normal" data-label={copy.shares}>
               {formatShares(holding.shares)}

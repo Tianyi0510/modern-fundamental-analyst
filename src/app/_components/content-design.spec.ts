@@ -49,15 +49,15 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
               ).toBeVisible();
             if (route === "/portfolio") {
               await expect(page.locator("#portfolio-holdings-title")).toHaveText(/^\d+ Disclosed Positions$/);
-              await expect(page.locator("main h1")).toHaveText(/A Fully Disclosed\s*Focus Portfolio/);
-              await expect(page.getByRole("columnheader").filter({ hasText: "Cost Basis" })).toHaveCount(1);
+              await expect(page.locator("main h1")).toHaveText(/A Fully Disclosed\s*Concentrated Portfolio/);
+              await expect(page.getByRole("columnheader").filter({ hasText: "Average Cost per Share" })).toHaveCount(1);
             }
             if (route === "/performance") {
               await expect(page.locator("#performance-twr-chart-title")).toHaveText("Cumulative Reconstructed TWRR");
               await expect(page.getByRole("button", { name: "View Monthly Data", exact: true })).toHaveCount(2);
             }
             if (route === "/contact") {
-              await expect(page.locator("main h1")).toHaveText(/Connect through research,\s*ideas, and opportunities/);
+              await expect(page.locator("main h1")).toHaveText(/Let’s talk about\s*investing/);
               await expect(page.getByRole("heading", { name: "Send a Message", exact: true })).toBeVisible();
               await expect(page.getByRole("button", { name: "Send Message", exact: true })).toBeVisible();
             }
@@ -72,7 +72,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
             if (route === "/about") {
               await expect(page.locator(".page-intro")).toContainText("Tianyi (David) Li");
               await expect(page.locator(".about-copy").first()).toContainText(
-                "I publish my research, portfolio and performance so you can examine my thinking and results over time.",
+                "I share what I own, why I own it, and how those investments perform.",
               );
             }
           }

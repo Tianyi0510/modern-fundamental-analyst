@@ -8,7 +8,7 @@ const locales = [
     subscribeSuccess: "Check your inbox. Open the confirmation email to finish subscribing.",
     preferencesSuccess: "If this address is subscribed, check your inbox for a secure link to manage your preferences.",
     returnNote:
-      "Net dividends and financing interest are applied at the portfolio level; not allocated to individual positions.",
+      "The portfolio accounts for net dividends and financing interest. Individual position returns exclude both.",
   },
   {
     prefix: "/zh-tw",
@@ -16,7 +16,7 @@ const locales = [
     contactSuccess: "訊息已成功傳送",
     subscribeSuccess: "請查看收件匣，開啟確認郵件以完成訂閱。",
     preferencesSuccess: "若此地址已訂閱",
-    returnNote: "淨股息與融資利息於投資組合層級計入，不分攤至個別持股。",
+    returnNote: "整體投資組合的報酬率計入稅後股息，並扣除融資利息。個別持股的報酬率不含這兩項。",
   },
   {
     prefix: "/zh-cn",
@@ -24,7 +24,7 @@ const locales = [
     contactSuccess: "信息已成功发送",
     subscribeSuccess: "请查看收件箱，打开确认邮件以完成订阅。",
     preferencesSuccess: "如果此地址已订阅",
-    returnNote: "净股息与融资利息在投资组合层面计入，不分摊至单项持仓。",
+    returnNote: "整个投资组合的回报率计入税后股息，并扣除融资利息。单只股票或 ETF 的回报率不含这两项。",
   },
 ] as const;
 
@@ -39,7 +39,7 @@ for (const { prefix, name, contactSuccess, subscribeSuccess, preferencesSuccess,
       prefix === "/zh-tw" ? "總報酬率" : prefix === "/zh-cn" ? "总回报率" : "Total Return",
     );
     await expect(summary.locator("small")).toHaveText(
-      prefix === "/zh-tw" ? "絕對報酬率" : prefix === "/zh-cn" ? "绝对回报率" : "Absolute return",
+      prefix === "/zh-tw" ? "以買入成本計算" : prefix === "/zh-cn" ? "按买入成本计算" : "Return on purchase cost",
     );
     await expect(tableReturn).toHaveText("+26.17%");
     await expect(page.locator(".portfolio-table-wrap + .portfolio-return-note p")).toContainText(returnNote);

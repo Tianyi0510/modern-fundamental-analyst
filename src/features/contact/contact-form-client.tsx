@@ -52,6 +52,7 @@ export type ContactFormCopy = {
   error: string;
   rateLimited: string;
   retryAfter: string;
+  retryAfterOne?: string;
   validation: Record<ContactField | "summary", string>;
 };
 
@@ -176,7 +177,11 @@ export function ContactFormClient({ copy, locale }: { copy: ContactFormCopy; loc
   let feedback = "";
   if (typeof status === "object") {
     feedback =
-      status.seconds === undefined ? copy.rateLimited : copy.retryAfter.replace("{seconds}", String(status.seconds));
+      status.seconds === undefined
+        ? copy.rateLimited
+        : status.seconds === 1 && copy.retryAfterOne
+          ? copy.retryAfterOne
+          : copy.retryAfter.replace("{seconds}", String(status.seconds));
   } else if (status === "invalid") {
     feedback = copy.validation.summary;
   } else if (status !== "idle") {

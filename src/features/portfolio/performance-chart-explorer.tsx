@@ -24,17 +24,17 @@ const copy = {
   en: {
     loading: "Loading interactive chart…",
     empty: "No performance data is available.",
-    hint: "Hover, touch, or use the Left and Right Arrow keys to compare month-end values.",
+    hint: "Hover, touch, or use the Left and Right Arrow keys to compare returns at each month-end.",
   },
   "zh-tw": {
     loading: "正在載入互動圖表…",
     empty: "目前沒有績效資料。",
-    hint: "使用滑鼠、觸控或左右方向鍵，比較各月底的數值。",
+    hint: "使用滑鼠、觸控或左右方向鍵，比較各月底的報酬率。",
   },
   "zh-cn": {
     loading: "正在加载互动图表…",
     empty: "目前没有绩效数据。",
-    hint: "使用鼠标、触控或左右方向键，比较各月底的数值。",
+    hint: "使用鼠标、触控或左右方向键，比较各月底的回报率。",
   },
 } as const;
 
