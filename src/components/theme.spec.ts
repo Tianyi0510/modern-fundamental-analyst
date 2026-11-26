@@ -28,6 +28,18 @@ for (const { prefix } of labels) {
     page,
     browserName,
   }) => {
+    // WebKit can tear down a document before Playwright fulfills its final keepalive envelope.
+    // Stub only the fake SDK endpoint here. The transport tests below still exercise the network.
+    await page.addInitScript(() => {
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (input, init) => {
+        const url = new URL(input instanceof Request ? input.url : String(input), location.href);
+        if (url.origin === "https://sentry.invalid" && url.pathname === "/api/1/envelope/") {
+          return Promise.resolve(new Response("{}", { status: 200 }));
+        }
+        return originalFetch(input, init);
+      };
+    });
     const pageErrors: string[] = [];
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.emulateMedia({ colorScheme: "dark" });
