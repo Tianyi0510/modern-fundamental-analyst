@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createRef } from "react";
 import { ChartPie } from "lucide-react";
 import { render, screen, within } from "@testing-library/react";
@@ -14,10 +15,10 @@ it("keeps navigation as a list of real links with one current page", async () =>
         <SidebarMenuItem>
           <SidebarMenuButton
             render={
-              <a href="/portfolio">
+              <Link href="/portfolio">
                 <ChartPie aria-hidden="true" />
                 <span>Portfolio</span>
-              </a>
+              </Link>
             }
             isActive
             aria-current="page"
@@ -26,9 +27,9 @@ it("keeps navigation as a list of real links with one current page", async () =>
         <SidebarMenuItem>
           <SidebarMenuButton
             render={
-              <a href="/about" hrefLang="en">
+              <Link href="/about" hrefLang="en">
                 About
-              </a>
+              </Link>
             }
             onClick={onNavigate}
           />
@@ -58,7 +59,7 @@ it("merges the rendered link's ref, accessible name and handlers without adding 
   const onItemClick = vi.fn();
   render(
     <SidebarMenuButton
-      render={<a ref={ref} href="/portfolio" aria-label="Full Portfolio" onClick={onLinkClick} />}
+      render={<Link ref={ref} href="/portfolio" aria-label="Full Portfolio" onClick={onLinkClick} />}
       onClick={onItemClick}
     >
       Portfolio
