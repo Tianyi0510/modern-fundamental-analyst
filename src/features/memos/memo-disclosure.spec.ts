@@ -131,15 +131,25 @@ test("memo Hero describes the published research and planned articles remain unp
     [
       "",
       "Research on business qualityand financial performance",
-      "This historical article does not include a published valuation model.",
+      "In these memos, I explain how a business makes money, what I look for in its financial statements, and which risks shape my investment thesis.",
       ["Will AI Kill Software?", "Agentic Finance and Stablecoins"],
     ],
-    ["/zh-tw", "探討企業品質與財務表現", "文章未附公開的估值模型。", ["AI 會取代軟體嗎？", "AI 代理金融與穩定幣"]],
-    ["/zh-cn", "探讨企业质量与财务表现", "文章未附公开的估值模型。", ["AI 会取代软件吗？", "AI 代理金融与稳定币"]],
+    [
+      "/zh-tw",
+      "探討企業品質與財務表現",
+      "在這些備忘錄裡，我會說明一家公司如何獲利、我讀財報時關注哪些地方，以及哪些風險會影響我的投資判斷。",
+      ["AI 會取代軟體嗎？", "AI 代理金融與穩定幣"],
+    ],
+    [
+      "/zh-cn",
+      "探讨企业质量与财务表现",
+      "在这些备忘录里，我会分析一家公司如何盈利、我读财报时关注哪些问题，以及哪些风险会影响我的投资判断。",
+      ["AI 会取代软件吗？", "AI 代理金融与稳定币"],
+    ],
   ] as const) {
     await page.goto(`${prefix}/memos`);
     await expect(page.locator("main h1")).toHaveText(title);
-    await expect(page.locator("main")).toContainText(scope);
+    await expect(page.locator(".page-intro > p").first()).toHaveText(scope);
     await expect(page.locator(".memo-grid .memo-card:visible")).toHaveCount(1);
     const planned = page.locator(".memo-planned-row");
     await expect(planned).toHaveCount(2);

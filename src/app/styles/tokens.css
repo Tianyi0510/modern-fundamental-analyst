@@ -16,25 +16,15 @@
   --layer-popover: 110;
   /* Fluent Web geometry and motion defaults; material colors map to the Layer 01 palette. */
   --spacingHorizontalNone: 0px;
-  --spacingHorizontalXXS: 2px;
   --spacingHorizontalXS: 4px;
-  --spacingHorizontalSNudge: 6px;
   --spacingHorizontalS: 8px;
-  --spacingHorizontalMNudge: 10px;
-  --spacingHorizontalM: 12px;
   --spacingHorizontalL: 16px;
-  --spacingHorizontalXL: 20px;
   --spacingHorizontalXXL: 24px;
   --spacingHorizontalXXXL: 32px;
   --spacingVerticalNone: 0px;
-  --spacingVerticalXXS: 2px;
   --spacingVerticalXS: 4px;
-  --spacingVerticalSNudge: 6px;
   --spacingVerticalS: 8px;
-  --spacingVerticalMNudge: 10px;
-  --spacingVerticalM: 12px;
   --spacingVerticalL: 16px;
-  --spacingVerticalXL: 20px;
   --spacingVerticalXXL: 24px;
   --spacingVerticalXXXL: 32px;
   --borderRadiusNone: 0px;
@@ -146,17 +136,16 @@
   --space-section: var(--space-64px);
   --space-section-padding: var(--space-64px);
   --space-section-content: var(--space-48px);
+  --space-heading-prose: var(--space-32px);
+  --space-paragraph: var(--space-24px);
   --grid-column-gap: var(--spacingHorizontalXXXL);
   --grid-columns: repeat(12, minmax(0, 1fr));
   --grid-portfolio-summary: repeat(3, minmax(0, 1fr));
-  --space-section-compact: var(--space-64px);
   --space-heading-content: var(--space-section-content);
-  --space-related-content: var(--space-48px);
-  --space-footer-main: var(--space-64px);
+  --space-related-content: var(--space-section-content);
+  --space-site-bar: var(--space-24px);
   --size-footer-heading: calc(var(--font-size-medium-title) * var(--leading-heading-text));
-  --space-footer-heading: var(--space-16px);
-  --size-footer-link: calc(var(--size-footer-heading) + var(--space-footer-heading));
-  --space-footer-bottom: var(--space-24px);
+  --space-footer-heading: var(--space-24px);
   --size-control: 52px;
   --size-control-small: 44px;
   --size-field: 56px;
@@ -302,10 +291,7 @@
     --space-page-gutter: var(--spacingHorizontalL);
     --grid-column-gap: var(--spacingHorizontalL);
     --space-section: var(--space-64px);
-    --space-section-compact: var(--space-48px);
     --space-heading-content: var(--space-section-content);
-    --space-related-content: var(--space-32px);
-    --space-footer-main: var(--space-48px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

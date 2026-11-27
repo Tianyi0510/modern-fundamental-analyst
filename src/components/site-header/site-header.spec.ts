@@ -645,7 +645,7 @@ test.describe("header interaction QA", () => {
 
   test("desktop navigation uses stable color, motion, and menu states", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".site-header").first()).toHaveCSS("height", "72px");
+    await expect(page.locator(".site-header > .wordmark").first()).toHaveCSS("margin-block", "24px");
     const about = page.locator(".header-actions nav a").filter({ hasText: "About" });
     await about.hover();
     await expect(about).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -695,7 +695,7 @@ test.describe("mobile content and navigation QA", () => {
       const background = page.locator(".home-header");
       const header = page.locator(".site-header").first();
       await expect(header).toHaveCSS("position", "relative");
-      await expect(header).toHaveCSS("height", "64px");
+      await expect(header.locator(":scope > .wordmark")).toHaveCSS("margin-block", "24px");
       await expect(header.locator(":scope > .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
       expect(wordmarkBox).not.toBeNull();

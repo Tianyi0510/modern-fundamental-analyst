@@ -14,6 +14,12 @@
   font-size: var(--font-size-small-body);
   line-height: var(--leading-body-text);
 }
+.figure h3 + p {
+  margin-block-start: var(--space-heading-prose);
+}
+.figure p + p {
+  margin-block-start: var(--space-paragraph);
+}
 .legend {
   display: flex;
   flex-wrap: wrap;

@@ -7,7 +7,7 @@ export const appearance = {
   body: "[--radius-surface:var(--radius-memo)] min-h-full flex-1 gap-0 border-0 bg-transparent p-0 text-inherit ring-0 [--card-spacing:var(--space-section-content)]",
   header: "flex items-center justify-between gap-6 pt-[var(--card-spacing)] text-large-label",
   content: " pt-[var(--space-48px)] pb-[var(--space-32px)]",
-  title: "mb-[var(--space-24px)] text-large-title text-balance",
+  title: "mb-[var(--space-heading-prose)] text-large-title text-balance",
   description: "text-small-body text-[var(--text-secondary)]",
   footer:
     "mt-auto mx-[var(--card-spacing)] border-[var(--border-subtle)] bg-transparent px-0 pt-[var(--space-16px)] pb-[var(--card-spacing)] text-small-body",

@@ -292,14 +292,17 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </h3>
               </CardHeader>
               <CardContent className={appearance["allocation-visual"] + " px-0"}>
-                <div
-                  className={appearance["allocation-ring"]}
-                  style={{ background: allocationGradient }}
-                  role="img"
-                  aria-label={text.topHoldings}
-                >
-                  <span>{portfolioSnapshot.holdingsCount}</span>
-                  <small>{text.holdingsAllocation}</small>
+                <div className="@container/ring grid w-full max-w-[210px] justify-self-center compact:max-w-[268px]">
+                  <div
+                    className={appearance["allocation-ring"]}
+                    style={{ background: allocationGradient }}
+                    role="img"
+                    aria-label={text.topHoldings}
+                  />
+                  <div className={appearance["allocation-caption"]}>
+                    <span>{portfolioSnapshot.holdingsCount}</span>
+                    <small>{text.holdingsAllocation}</small>
+                  </div>
                 </div>
                 <ul className={appearance["allocation-legend"]}>
                   {featuredHoldings.map((holding) => (

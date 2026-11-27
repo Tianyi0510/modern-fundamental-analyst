@@ -7,7 +7,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await page.setViewportSize({ width, height: 900 });
       const header = page.locator(".site-header");
       const trigger = page.locator(".mobile-menu-button");
-      await expect(header).toHaveCSS("height", "72px");
+      await expect(header.locator(":scope > .wordmark")).toHaveCSS("margin-block", "24px");
       await expect(trigger).toHaveCSS("width", "44px");
       await expect(trigger).toHaveCSS("height", "44px");
       await expect(trigger.locator("svg")).toHaveCSS("width", "20px");

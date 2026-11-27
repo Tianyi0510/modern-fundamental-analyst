@@ -40,7 +40,7 @@ test.describe("footer layout and typography", () => {
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} footer wordmark aligns with column headings`, async ({ page }) => {
-    await page.goto(`${prefix}/disclaimer`);
+    await page.goto(`${prefix}/`);
     await page.evaluate(() => document.fonts.ready);
     for (const width of [834, 1280, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
@@ -64,12 +64,18 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} footer second row and navigation rhythm align`, async ({ page }) => {
-    await page.goto(`${prefix}/disclaimer`);
+    await page.goto(`${prefix}/`);
     await page.evaluate(() => document.fonts.ready);
     for (const width of [390, 834, 1100, 1280, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       const footer = page.locator(".site-footer");
       await footer.scrollIntoViewIfNeeded();
+      const memoLink = page.locator(".memos-all");
+      const box = (await memoLink.boundingBox())!;
+      const cards = (await page.locator(".memos-home .memo-grid").boundingBox())!;
+      const band = (await page.locator(".memos-home-band").boundingBox())!;
+      expect(box.y - cards.y - cards.height).toBeCloseTo(48, 0);
+      expect(band.y + band.height - box.y - box.height).toBeCloseTo(64, 0);
       const geometry = await footer.evaluate((element) => {
         const rect = (selector: string) => {
           const { top, bottom, height } = element.querySelector(selector)!.getBoundingClientRect();
@@ -89,7 +95,11 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           links: Array.from(element.querySelectorAll(".footer-links a"), (link) => {
             const range = document.createRange();
             range.selectNodeContents(link.querySelector("span") ?? link);
-            return { top: link.getBoundingClientRect().top, textTop: range.getBoundingClientRect().top };
+            return {
+              top: link.getBoundingClientRect().top,
+              lineHeight: parseFloat(getComputedStyle(link).lineHeight),
+              textTop: range.getBoundingClientRect().top,
+            };
           }),
         };
       });
@@ -99,13 +109,13 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const precedingControl = width <= 800 ? geometry.submit : geometry.input;
       expect(Math.abs(geometry.preferences.top - precedingControl.bottom - 16)).toBeLessThan(1);
       expect(geometry.links).toHaveLength(6);
-      const step = geometry.links[1]!.top - geometry.links[0]!.top;
-      expect(Math.abs(geometry.links[0]!.top - geometry.heading.top - step)).toBeLessThan(1);
+      expect(geometry.links[0]!.top - geometry.heading.bottom).toBeCloseTo(24, 0);
       for (let index = 1; index < geometry.links.length; index++) {
-        expect(Math.abs(geometry.links[index]!.top - geometry.links[index - 1]!.top - step)).toBeLessThan(1);
+        const previous = geometry.links[index - 1]!;
+        expect(geometry.links[index]!.top - previous.top - previous.lineHeight).toBeCloseTo(16, 0);
       }
-      expect(Math.abs(geometry.description.top - geometry.logo.bottom - 16)).toBeLessThan(1);
-      expect(Math.abs(geometry.input.top - geometry.subscription.bottom - 16)).toBeLessThan(1);
+      expect(Math.abs(geometry.description.top - geometry.logo.bottom - 24)).toBeLessThan(1);
+      expect(Math.abs(geometry.input.top - geometry.subscription.bottom - 24)).toBeLessThan(1);
       if (width > 800) {
         expect(Math.abs(geometry.description.top - geometry.links[0]!.top)).toBeLessThan(1);
         expect(Math.abs(geometry.descriptionTextTop - geometry.links[0]!.textTop)).toBeLessThan(1);

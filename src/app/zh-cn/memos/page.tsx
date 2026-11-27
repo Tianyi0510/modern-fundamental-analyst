@@ -3,7 +3,7 @@ import { createPageMetadata } from "@/lib/site-config";
 
 export const metadata = createPageMetadata({
   title: "投资备忘录",
-  description: "关于微软云计算与 AI 地位、领导层，以及 2024 财政年度财务质量的研究。",
+  description: "通过投资备忘录，了解企业的盈利模式、财报重点，以及影响投资判断的风险。",
   path: "/memos",
   locale: "zh-cn",
 });

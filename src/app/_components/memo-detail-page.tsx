@@ -61,14 +61,19 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
               </div>
             </header>
           </div>
-          <div className={appearance["shell"] + " memo-article-body py-[var(--space-section-padding)]"}>
+          <div
+            className={
+              appearance["shell"] +
+              " memo-article-body pt-[var(--space-section-content)] pb-[var(--space-section-padding)]"
+            }
+          >
             <p className={appearance["article-lead"]}>{memo.summary}</p>
             {content.language !== locale ? (
               <p className={appearance["article-notes"] + " memo-language-notice"}>{text.languageNotice}</p>
             ) : null}
             <MemoArticleContent slug={slug} language={content.language} locale={locale} />
             <aside className={appearance["article-disclaimer"]} aria-labelledby="memo-disclaimer-title">
-              <h2 id="memo-disclaimer-title" className="mb-[var(--space-8px)] text-medium-title">
+              <h2 id="memo-disclaimer-title" className="mb-[var(--space-heading-prose)] text-medium-title">
                 {text.disclaimerTitle}
               </h2>
               <p>{memo.scopeNote}</p>

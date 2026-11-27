@@ -135,12 +135,12 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
             {text.subtitle ? <p className={appearance["legal-subtitle"]}>{text.subtitle}</p> : null}
           </header>
         </section>
-        <section className={appearance["legal-body"]}>
-          <div className={appearance["legal-content"] + " " + appearance["shell"]}>
-            {text.sections.map(([title, lead, paragraphs], index) => {
-              const SectionLabel = lead ? "p" : "h2";
-              return (
-                <section className={appearance["legal-section"]} key={title}>
+        <div className="legal-body">
+          {text.sections.map(([title, lead, paragraphs], index) => {
+            const SectionLabel = lead ? "p" : "h2";
+            return (
+              <section className={appearance["legal-section"]} key={title}>
+                <div className={appearance["legal-content"] + " " + appearance["shell"]}>
                   <div className={appearance["legal-section-heading"]}>
                     <SectionLabel className={appearance["section-number"] + " " + appearance["legal-section-label"]}>
                       <span>{String(index + 1).padStart(2, "0")}</span>
@@ -154,11 +154,11 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
                       <p key={paragraph}>{paragraph}</p>
                     ))}
                   </div>
-                </section>
-              );
-            })}
-          </div>
-        </section>
+                </div>
+              </section>
+            );
+          })}
+        </div>
       </main>
       <PageFooter locale={locale} />
     </div>

@@ -18,6 +18,18 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const hero = page.locator(".memo-article-header");
       await expect(hero).toHaveCSS("padding-top", "64px");
       await expect(hero).toHaveCSS("padding-bottom", "0px");
+      await expect(page.locator(".memo-article-body")).toHaveCSS("padding-bottom", "64px");
+      for (const [before, after, gap] of [
+        [".article-meta", ".article-lead", 48],
+        [".memo-subsection h3", ".memo-subsection h3 + p", 32],
+        [".memo-references h2", ".memo-references li", 32],
+        [".memo-references li", ".memo-references li + li", 24],
+        [".article-disclaimer h2", ".article-disclaimer p", 32],
+      ] as const) {
+        const first = (await page.locator(before).first().boundingBox())!;
+        const next = (await page.locator(after).first().boundingBox())!;
+        expect(next.y - first.y - first.height).toBeCloseTo(gap, 0);
+      }
       await expect(hero.locator("h1")).toHaveCSS("font-size", width < 800 ? "51px" : width < 1200 ? "67px" : "90px");
       await expect(hero.locator("h1")).toHaveCSS("margin-block-start", "0px");
       await expect(hero.locator("h1")).toHaveCSS("margin-block-end", "48px");

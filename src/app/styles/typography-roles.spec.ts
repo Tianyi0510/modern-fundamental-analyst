@@ -23,7 +23,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   "/": {
     largeDisplay: [".hero h1", ".performance-value strong"],
     summaryDisplay: [".metric strong"],
-    smallDisplay: [".allocation-ring > span"],
+    smallDisplay: [".allocation-caption > span"],
     largeHeadline: [".home-about h2", ".intro h2", ".section-heading h2", ".cta h2"],
     largeTitle: [".memo-card h3"],
     mediumTitle: [".footer-heading", ".holding-row strong", ".holding-row b"],

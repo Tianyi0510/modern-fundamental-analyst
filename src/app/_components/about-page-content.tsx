@@ -348,31 +348,33 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
             </div>
           );
         })}
-        <section className={appearance["about-boundaries"]}>
-          {text.boundaries.map((boundary, index) => (
-            <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>
-              <Card variant="plain">
-                <CardHeader className="px-0">
-                  <h2>{boundary.title}</h2>
-                </CardHeader>
-                <CardContent className="px-0">
-                  {/* Safari retains list semantics when visual markers are removed. */}
-                  {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
-                  <ol role="list">
-                    {boundary.items.map((item) => (
-                      <li key={item}>
-                        <span className={appearance["about-boundary-number"]} aria-hidden="true">
-                          {index === 0 ? <Check size={24} strokeWidth={2} /> : <X size={24} strokeWidth={2} />}
-                        </span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </CardContent>
-              </Card>
-            </section>
-          ))}
-        </section>
+        <div className="@container/boundaries relative isolate bg-[var(--surface-inverse)] before:absolute before:inset-y-0 before:right-0 before:-z-10 before:w-1/2 before:bg-[var(--surface-highlight)]">
+          <section className={appearance.shell + " " + appearance["about-boundaries"]}>
+            {text.boundaries.map((boundary, index) => (
+              <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>
+                <Card variant="plain" className={appearance.shell + " min-[1101px]:mx-0 min-[1101px]:w-full"}>
+                  <CardHeader className="px-0">
+                    <h2>{boundary.title}</h2>
+                  </CardHeader>
+                  <CardContent className="px-0">
+                    {/* Safari retains list semantics when visual markers are removed. */}
+                    {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
+                    <ol role="list">
+                      {boundary.items.map((item) => (
+                        <li key={item}>
+                          <span className={appearance["about-boundary-number"]} aria-hidden="true">
+                            {index === 0 ? <Check size={24} strokeWidth={2} /> : <X size={24} strokeWidth={2} />}
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </CardContent>
+                </Card>
+              </section>
+            ))}
+          </section>
+        </div>
         <section className={appearance["about-closing"] + " " + appearance["shell"]}>
           <p className={appearance["eyebrow"]}>
             <span /> {text.closingLabel}

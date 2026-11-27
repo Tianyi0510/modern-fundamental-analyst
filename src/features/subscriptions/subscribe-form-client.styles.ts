@@ -5,7 +5,7 @@ export const appearance = {
     standard:
       "subscribe-section grid min-w-0 grid-cols-1 min-[1101px]:grid-cols-[var(--grid-columns)] min-[1101px]:[&>:first-child]:[grid-column:1/5] min-[1101px]:[&>:nth-child(2)]:[grid-column:5/-1] items-start gap-x-[var(--grid-column-gap)] gap-y-[var(--space-section-content)] py-[var(--space-section-padding)] text-ink [&_h2]:m-0 [&_h2]:text-large-title max-[800px]:grid-cols-1 max-[800px]:gap-[var(--space-heading-content)]",
   },
-  intro: "mt-[var(--space-related-content)] max-w-[390px] text-small-body",
+  intro: "mt-[var(--space-heading-prose)] max-w-[390px] text-small-body",
   "subscribe-form":
     "subscribe-form grid [grid-template-columns:minmax(0,_1fr)_auto] [align-items:start] [column-gap:var(--space-8px)] [row-gap:var(--space-8px)] [@media((max-width:_800px))]:[grid-template-columns:1fr]",
   preferences: {

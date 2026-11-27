@@ -107,7 +107,7 @@ export function HoldingResearchSection({ symbol, locale }: { symbol: string; loc
           <time dateTime={profile.periodEnd}>{formatDate(profile.periodEnd, locale, true)}</time>
         </p>
         {profile.kind === "company" && (
-          <p className="text-small-body">
+          <p className="mt-[var(--space-8px)] text-small-body">
             {text.filed} <time dateTime={profile.filed}>{formatDate(profile.filed, locale, true)}</time>
           </p>
         )}
@@ -115,14 +115,14 @@ export function HoldingResearchSection({ symbol, locale }: { symbol: string; loc
       <div className="min-w-0 min-[1101px]:col-span-8">
         <p className="m-0 max-w-[var(--width-reading)] text-large-body">{profile.business[locale]}</p>
         {profile.kind === "company" && (
-          <dl className="mt-[var(--space-32px)]">
+          <dl className="mt-[var(--space-section-content)]">
             <dt className="text-large-label">{text.industry}</dt>
             <dd className="m-0 mt-2 text-small-body" lang="en">
               {profile.industry}
             </dd>
           </dl>
         )}
-        <dl className="my-[var(--space-32px)] grid gap-[var(--space-24px)] min-[801px]:grid-cols-2">
+        <dl className="my-[var(--space-section-content)] grid gap-x-[var(--space-24px)] gap-y-[var(--space-section-content)] min-[801px]:grid-cols-2">
           {metrics.map(([label, value, unit]) => (
             <div key={label} className="border-t border-border pt-[var(--space-16px)]">
               <dt className="text-large-label">

@@ -11,7 +11,7 @@ export const appearance = {
   shell: containerAppearance,
   // Keep the text wordmark aligned with the page grid.
   wordmark:
-    "wordmark block w-[var(--width-brand-logo)] max-w-full justify-self-start max-[801px]:ps-[var(--space-4px)] nav-compact:min-w-0",
+    "wordmark my-[var(--space-site-bar)] block w-[var(--width-brand-logo)] max-w-full justify-self-start max-[801px]:ps-[var(--space-4px)] nav-compact:min-w-0",
   "mobile-menu-button": `mobile-menu-button hidden nav-compact:grid bg-surface ${iconButton} ${motion.openButton}`,
   "mobile-menu-close": `mobile-menu-close grid shrink-0 outline-none bg-highlight ${iconButton} ${motion.closeButton}`,
   "mobile-menu-touch-ring": `mobile-menu-touch-ring absolute -inset-[6px] border-2 border-[var(--focus-ring-brand)] rounded-[inherit] pointer-events-none opacity-0 ${motion.touchRing}`,
@@ -23,12 +23,12 @@ export const appearance = {
   "mobile-language-disclosure": `mobile-language-disclosure [--language-icon-size:18px] [&_svg]:size-[var(--language-icon-size)] ${controlText} ${motion.languageDisclosure}`,
   "mobile-menu-language": `mobile-menu-language min-h-[var(--size-touch-target)] ps-[calc(var(--space-8px)*2+var(--language-icon-size))] pr-[var(--space-8px)] rounded-control outline-none text-ink flex items-center hover:bg-[var(--sidebar-hover-surface)] focus-visible:bg-[var(--sidebar-hover-surface)] active:bg-[var(--sidebar-pressed-surface)] hover:text-accent focus-visible:text-accent active:text-accent ${controlText} ${focusMarker} ${motion.mobileLink}`,
   "site-header":
-    "site-header h-[72px] grid grid-cols-[auto_minmax(0,1fr)] items-center nav-compact:relative nav-compact:z-[var(--layer-navigation)] nav-compact:h-auto min-h-[72px] max-[801px]:min-h-[64px] nav-compact:grid-cols-[minmax(0,1fr)_auto] nav-compact:gap-x-[var(--space-8px)] nav-compact:py-[var(--space-8px)] bg-surface",
+    "site-header grid grid-cols-[auto_minmax(0,1fr)] items-center nav-compact:relative nav-compact:z-[var(--layer-navigation)] nav-compact:grid-cols-[minmax(0,1fr)_auto] nav-compact:gap-x-[var(--space-8px)] bg-surface",
   "mobile-menu-wordmark": "mobile-menu-wordmark",
   "language-menu": "language-menu relative nav-compact:hidden",
   "mobile-menu-drawer": "mobile-menu-drawer absolute inset-0 w-full h-dvh min-h-full text-ink flex flex-col isolate",
   "mobile-menu-top":
-    "mobile-menu-top relative z-[2] min-h-[64px] min-[801px]:min-h-[72px] px-[var(--space-page-gutter)] py-[var(--space-8px)] grid grid-cols-[minmax(0,1fr)_auto] items-center gap-[var(--space-8px)] shrink-0 bg-surface",
+    "mobile-menu-top relative z-[2] px-[var(--space-page-gutter)] grid grid-cols-[minmax(0,1fr)_auto] items-center gap-[var(--space-8px)] shrink-0 bg-surface",
   "mobile-menu-content":
     "mobile-menu-content relative min-h-0 px-[var(--space-page-gutter)] pt-[var(--space-8px)] pb-[max(24px,env(safe-area-inset-bottom))] bg-surface flex flex-1 flex-col gap-[var(--space-24px)] overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]",
   "mobile-language-links":

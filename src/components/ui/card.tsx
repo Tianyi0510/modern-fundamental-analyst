@@ -12,7 +12,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col overflow-hidden text-small-body [--card-spacing:--spacing(4)] data-[size=sm]:[--card-spacing:--spacing(3)]",
+        "group/card flex flex-col overflow-hidden text-small-body [--card-spacing:--spacing(4)] data-[size=sm]:[--card-spacing:var(--space-8px)]",
         variant === "plain"
           ? "gap-0 text-inherit"
           : "gap-(--card-spacing) rounded-surface bg-card py-(--card-spacing) text-card-foreground ring-1 ring-foreground has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:has-data-[slot=card-footer]:pb-0",
