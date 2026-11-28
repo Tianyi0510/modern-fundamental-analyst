@@ -1,3 +1,4 @@
+import { ResponsiveHeadingBreak } from "@/components/heading-phrases";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./contact-page-content.styles";
 import { Container } from "@/components/container";
@@ -43,7 +44,7 @@ export function ContactPageContent({ locale }: { locale: Locale }) {
           title={
             <>
               {text.title[0]}
-              <br />
+              <ResponsiveHeadingBreak locale={locale} />
               <em>{text.title[1]}</em>
             </>
           }

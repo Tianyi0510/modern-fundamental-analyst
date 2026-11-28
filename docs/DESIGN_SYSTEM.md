@@ -6,7 +6,7 @@ Use this guide for visual design, component behavior, interface copy and localiz
 
 - [Reference ownership](#architecture-and-reference-ownership): priorities and responsibilities.
 - [Typography](#typography-roles), [colors](#color-inventory) and [components](#available-shadcn-components): approved implementation inventories.
-- [Layout](#swiss-grid-and-editorial-layout) and [tablet rules](#tablet-layout-contract): responsive composition.
+- [Layout](#swiss-grid-and-editorial-layout), [text wrapping](#text-wrapping) and [tablet rules](#tablet-layout-contract) cover responsive composition.
 - [Interaction and motion](#interaction-motion-and-accessibility): behavior, focus and animation ownership.
 - [Content and localization](#content-and-localization): copy, capitalization and translation.
 - [Verification](#design-verification): acceptance checks and component-specific contracts.
@@ -297,7 +297,7 @@ Google Fonts is the source of the retained families, not a requirement to fetch 
 | `Medium Body`     | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Article and Disclaimer prose                                      |
 | `Small Body`      | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Card copy, instructions, table figures, dates, notes and feedback |
 
-Below 375px, English PageHero titles without an action use Small Display (38px) so long words fit. Chinese headings can group short phrases at mobile widths. The table lists desktop and mobile values. Below 50rem use mobile sizes. From 50rem to below 75rem use Large Display 67px; Medium Display, Large Headline and Medium Headline 51px; other roles use desktop sizes. At 75rem use desktop sizes. Breakpoints change size only; leading, weight and tracking stay fixed. Layout breakpoints remain independent.
+Below 375px, English PageHero titles without an action use Small Display (38px) so long words fit. The table lists desktop and mobile values. Below 50rem use mobile sizes. From 50rem to below 75rem use Large Display 67px; Medium Display, Large Headline and Medium Headline 51px; other roles use desktop sizes. At 75rem use desktop sizes. Breakpoints change size only; leading, weight and tracking stay fixed. Layout breakpoints remain independent.
 
 Apply these role assignments and exceptions:
 
@@ -307,11 +307,19 @@ Apply these role assignments and exceptions:
 - CTAs use Large Label. Copy Article Link and Toast titles use Small Body, matching article metadata. Email Preferences links also use Small Body (16px, weight 400) in both subscription form variants. Ordinary navigation uses Medium Label.
 - Footer links use the row sizing specified in [Footer column alignment](#footer-column-alignment). Mobile Sidebar controls retain 48px targets.
 
-Reflow financial summaries below 72rem of container width. Preserve signs, units, precision and complete values. If enlarged text still overflows, use a named local horizontal-scroll region with a localized hint; make it focusable only while overflowing. Never shrink or truncate values to preserve columns.
-
 The article title, metadata, summary, language notice, outline, main prose, References panel and disclaimer all span the Header content container at every viewport width. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation. Cartesian tick labels use `muted-foreground` in both themes and must meet 4.5:1 contrast against the chart surface.
 
 `typography-roles.spec.ts` checks computed metrics and reflow. `financial-type-hierarchy.spec.ts` checks complete values at regular and enlarged text sizes. Assert rendered behavior, not class strings.
+
+### Text wrapping
+
+**Natural wrapping.** Body copy follows the available column width and the browser’s line-breaking rules for the page language. English usually breaks at spaces, and Chinese can break between characters. Hero introductions and selected prose use `text-wrap: pretty` to improve line endings. Contact and Footer subscription feedback can use the full form width and wraps as needed.
+
+**Headings and chosen breaks.** PageHero titles and selected section headings use `text-wrap: balance` to distribute text across lines. Headings allow an overlong string to break when needed to fit. Use `<br>` when the design calls for the next part of a heading to start on a new line at every width. `ResponsiveHeadingBreak` gives selected English headings a space for natural wrapping through 800px and restores the specified line break at 801px and above. In Traditional and Simplified Chinese, it keeps the specified line break at every width. The English Investment Memos list title wraps naturally at every width. Both Chinese versions keep the break before the emphasized text.
+
+Use `HeadingPhrases` to keep selected words together when space permits. At 800px and below, each specified group stays together if it fits and can move to the next line. For example, the Traditional Chinese Home memo heading has a fixed break after “公開投資研究，”. Its second part groups “為自己的” and “判斷負責” so the last character does not end up alone at 320px. Simplified Chinese follows the same layout.
+
+**Content that stays together.** The two short links in the About closing paragraph each move to the next line as a unit when space runs out. On holding pages the ticker stays on one line. “View All Holdings” aligns to the opposite edge when the title and action fit with a 16px gap, then moves to the start of the next row when they do not. Financial summary values keep their sign, digits and unit together. If a value still exceeds its container after the [summary reflows](#hero-summaries-and-vertical-rhythm) at enlarged text sizes, a named local scroll region preserves the full value and shows a localized hint. The region is focusable while it overflows.
 
 ### Memo article Typeset
 
@@ -550,7 +558,7 @@ See [Menu behavior](#menu-behavior) and [Disclosure and animation ownership](#di
 
 ### Holding detail pages
 
-Keep each ticker on one line. Align the localized “View All Holdings” link to the opposite edge when both fit with a 16px gap. Otherwise, place the link at the start of the next row. Give the company or fund name and exchange the same type size. Leave 32px from the research heading to its date line and from the month-end positions heading to its record count. Leave 32px between each financial value and the next row’s label. Center the divider in that gap and align values across paired columns when a label wraps. On company pages, measure the same 32px from the business description to the SEC industry label and from the classification value to the first financial labels. Leave 8px between the classification label and its value.
+See [Text wrapping](#text-wrapping) for the ticker and its action. Give the company or fund name and exchange the same type size. Leave 32px from the research heading to its date line and from the month-end positions heading to its record count. Leave 32px between each financial value and the next row’s label. Center the divider in that gap and align values across paired columns when a label wraps. On company pages, measure the same 32px from the business description to the SEC industry label and from the classification value to the first financial labels. Leave 8px between the classification label and its value.
 
 Above 1100px, give the month-end heading, record count and date range four grid tracks. Align the table to the eight tracks used by the research figures above it. At narrower widths, stack the heading above the table. Show the table on page load. Its focusable scroll region uses the smaller of 24rem and 60svh, with a sticky header, regular-weight dates and right-aligned numbers. Place the USD and return methodology note outside the scroll region, 48px below it and aligned with its left edge. Associate the note with the table using `aria-describedby`.
 
@@ -583,7 +591,7 @@ Subscription forms retain standard Contact and inverse Footer treatments. Their 
 
 Contact draft and retry recovery belong to the [Contact workflow](INTEGRATIONS.md#contact-draft-recovery).
 
-Choose focus tokens according to light or inverse form surfaces. Preferences retain their disabled behavior at full color opacity. Reserve space for status messages and allow long errors to wrap. After a programmatic field reset, keep the success message visible until the user edits again.
+Choose focus tokens according to light or inverse form surfaces. Preferences retain their disabled behavior at full color opacity. Reserve space for status messages. After a programmatic field reset, keep the success message visible until the user edits again.
 
 ### Motion tokens and timing
 

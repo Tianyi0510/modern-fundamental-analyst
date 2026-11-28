@@ -58,7 +58,7 @@ export function MemoListPage({ locale }: { locale: Locale }) {
           title={
             <>
               <HeadingPhrases text={text.title} />
-              <br />
+              {locale === "en" ? " " : <br />}
               <em>{text.emphasis}</em>
             </>
           }

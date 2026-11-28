@@ -1,4 +1,4 @@
-import { HeadingPhrases } from "@/components/heading-phrases";
+import { HeadingPhrases, ResponsiveHeadingBreak } from "@/components/heading-phrases";
 import { appearance } from "./disclaimer-page-content.styles";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header/site-header";
@@ -128,7 +128,7 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
               <HeadingPhrases text={text.title} />
               {text.titleAccent ? (
                 <>
-                  <br />
+                  <ResponsiveHeadingBreak locale={locale} />
                   <em>{text.titleAccent}</em>
                 </>
               ) : null}
