@@ -23,7 +23,7 @@ export function MemoCards({ memos, locale, placement = "section", showPlaceholde
 
   return (
     <Grid
-      className={`${appearance["memo-grid"]} max-[800px]:[&>.memo-card:not(:first-child)]:hidden ${placement === "featured" ? "memo-index-featured mt-0 mb-[var(--space-section-content)]" : "mt-[var(--space-heading-content)]"}`}
+      className={`${appearance["memo-grid"]} compact:[&>.memo-card:not(:first-child)]:hidden ${placement === "featured" ? "memo-index-featured mt-0 mb-[var(--space-section-content)]" : "mt-[var(--space-heading-content)]"}`}
     >
       {slotIndexes.map((index) => {
         const memo = memos[index];

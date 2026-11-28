@@ -19,7 +19,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useRef, type MouseEvent } from "react";
+import { useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { usePathname } from "next/navigation";
@@ -37,11 +37,14 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps) {
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
   const languageRootRef = useRef<HTMLDivElement>(null);
   const languageTriggerRef = useRef<HTMLButtonElement>(null);
   const {
     close: closeMenu,
-    closeImmediately: closeMenuForNavigation,
+    closeImmediately: closeMenuImmediately,
     closeButtonRef: menuCloseButtonRef,
     attachContent: menuContentRef,
     drawerRef: menuDrawerRef,
@@ -52,14 +55,36 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
     phase: menuPhase,
     open: openMenu,
     triggerRef: menuButtonRef,
-  } = useMobileMenu();
+  } = useMobileMenu(compact);
+  useLayoutEffect(() => {
+    const header = headerRef.current!;
+    const actions = actionsRef.current!;
+    const brand = header.querySelector<HTMLElement>(".wordmark")!;
+    const tablet = window.matchMedia("(max-width: 1279px)");
+    const measure = () => {
+      const gap = parseFloat(getComputedStyle(header).columnGap);
+      const required = brand.getBoundingClientRect().width + gap + actions.getBoundingClientRect().width;
+      const needsMenu = tablet.matches || required > header.getBoundingClientRect().width;
+      setCompact(needsMenu);
+      if (!needsMenu) closeMenuImmediately();
+    };
+    // The desktop controls retain their intrinsic width when hidden on a wide viewport.
+    const observer = new ResizeObserver(measure);
+    for (const element of [header, brand, actions]) observer.observe(element);
+    tablet.addEventListener("change", measure);
+    measure();
+    return () => {
+      observer.disconnect();
+      tablet.removeEventListener("change", measure);
+    };
+  }, [closeMenuImmediately]);
   const navigationClosingRef = useRef(false);
   const closeForNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
     const destination = new URL(event.currentTarget.href);
     const changesPage = destination.pathname !== pathname || destination.search !== window.location.search;
     const opensElsewhere = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
     navigationClosingRef.current = changesPage && !opensElsewhere;
-    closeMenuForNavigation();
+    closeMenuImmediately();
   };
   const { attachClose, ...menuTouchFeedback } = useMenuTouchFeedback(menuButtonRef, menuCloseButtonRef);
   const menuLabel = copy.open;
@@ -83,11 +108,15 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
       open={isMenuOpen}
       onOpenChange={(open, details) => {
         if (open || details.reason === "trigger-press") openMenu();
-        else if (details.reason === "escape-key" && menuPhase === "closing") closeMenuForNavigation();
+        else if (details.reason === "escape-key" && menuPhase === "closing") closeMenuImmediately();
         else closeMenu();
       }}
     >
-      <header className={appearance["site-header"] + " " + appearance["shell"]}>
+      <header
+        ref={headerRef}
+        data-compact={compact || undefined}
+        className={appearance["site-header"] + " " + appearance["shell"]}
+      >
         <IntentLink
           className={appearance["wordmark"]}
           href={getLocalizedPath("/", locale)}
@@ -117,7 +146,14 @@ export function SiteHeader({ copy, locale, languageQuery = "" }: SiteHeaderProps
           <span className={appearance["mobile-menu-touch-ring"]} aria-hidden="true" />
           <Menu aria-hidden="true" strokeWidth={2} />
         </SheetTrigger>
-        <DesktopNavigation copy={copy} locale={locale} languageQuery={languageQuery} navigation={navigation} />
+        <DesktopNavigation
+          actionsRef={actionsRef}
+          compact={compact}
+          copy={copy}
+          locale={locale}
+          languageQuery={languageQuery}
+          navigation={navigation}
+        />
 
         <SheetContent
           ref={menuDrawerRef}

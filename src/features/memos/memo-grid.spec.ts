@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
   test(`${prefix || "English"} memo grid reflows without changing reading order`, async ({ page }) => {
-    for (const width of [320, 390, 900, 1440]) {
+    for (const width of [320, 390, 799, 800, 801, 834, 1100, 1101, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}/memos`);
       const grid = page.locator(".memo-grid");
@@ -24,7 +24,10 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         } else {
           expect(first.y).toBeCloseTo(second.y, 0);
           expect(third.y).toBeGreaterThan(first.y + first.height);
-          expect(third.width).toBeCloseTo(first.width + second.width + 1, 0);
+          expect(third.x).toBeCloseTo(first.x, 1);
+          expect(third.width).toBeCloseTo(first.width, 1);
+          expect(second.width).toBeCloseTo(first.width, 0);
+          await expect(grid).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
         }
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

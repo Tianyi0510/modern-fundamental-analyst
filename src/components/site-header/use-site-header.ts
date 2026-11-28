@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEventHandler } from "react";
 
-// Keep in sync with the nav-compact variant in globals.css.
-const compactNavigationQuery = "(max-width: 1279px)";
-
 function animateMenuDismissal(
   content: HTMLElement,
   closeButton: HTMLButtonElement | null,
@@ -122,7 +119,7 @@ function animateMenuDismissal(
   return { panelAnimation, supportingAnimations };
 }
 
-export function useMobileMenu() {
+export function useMobileMenu(compact: boolean) {
   type MenuPhase = "closed" | "opening" | "open" | "closing";
   const [phase, setPhase] = useState<MenuPhase>("closed");
   const phaseRef = useRef<MenuPhase>("closed");
@@ -247,11 +244,7 @@ export function useMobileMenu() {
   }, [closeImmediately, changePhase]);
 
   useEffect(() => {
-    const compactNavigation = window.matchMedia(compactNavigationQuery);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handleBreakpoint = () => {
-      if (!compactNavigation.matches) closeImmediately();
-    };
     const handleMotion = () => {
       if (reducedMotion.matches && phaseRef.current === "closing") closeImmediately();
       if (reducedMotion.matches) {
@@ -262,10 +255,8 @@ export function useMobileMenu() {
         if (phaseRef.current === "opening") changePhase("open");
       }
     };
-    compactNavigation.addEventListener("change", handleBreakpoint);
     reducedMotion.addEventListener("change", handleMotion);
     return () => {
-      compactNavigation.removeEventListener("change", handleBreakpoint);
       reducedMotion.removeEventListener("change", handleMotion);
       openingAnimationRef.current?.cancel();
       openingIconAnimationRef.current?.cancel();
@@ -308,12 +299,7 @@ export function useMobileMenu() {
     isOpen,
     phase,
     open: () => {
-      if (
-        !window.matchMedia(compactNavigationQuery).matches ||
-        phaseRef.current === "open" ||
-        phaseRef.current === "opening"
-      )
-        return;
+      if (!compact || phaseRef.current === "open" || phaseRef.current === "opening") return;
       if (phaseRef.current === "closing" && contentRef.current) {
         const icon = closeButtonRef.current?.querySelector(".mobile-menu-close-icon");
         const iconStyle = icon ? getComputedStyle(icon) : null;

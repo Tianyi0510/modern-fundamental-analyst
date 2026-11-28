@@ -1,6 +1,64 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createSentryOptions, resolveSentryDsn, sanitizeSentryEvent, sanitizeSentrySpan } from "./sentry-options.ts";
+import { createSentryOptions, sanitizeSentryEvent, sanitizeSentrySpan } from "./sentry-options.ts";
+
+import { browserSentryConfig, resolveSentryDsn } from "./sentry-dsn.ts";
+
+test("local production bundles never start browser telemetry with a real project DSN", () => {
+  const dsn = "https://public@o1.ingest.sentry.io/1";
+  for (const host of ["127.0.0.1", "127.0.0.2", "localhost", "app.localhost", "[::1]"]) {
+    for (const deployment of [undefined, "", "production", "test"]) {
+      assert.equal(browserSentryConfig(dsn, deployment, "production", host), undefined);
+    }
+  }
+  assert.deepEqual(browserSentryConfig(dsn, "production", "development", "localhost"), {
+    dsn,
+    environment: "development",
+  });
+  for (const environment of ["production", "preview"]) {
+    assert.deepEqual(browserSentryConfig(dsn, environment, "production", "www.modernfundamentalanalyst.com"), {
+      dsn,
+      environment,
+    });
+  }
+  const fake = "https://public@sentry.invalid/1";
+  for (const environment of ["test", "production"]) {
+    assert.deepEqual(browserSentryConfig(fake, environment, "production", "127.0.0.1"), { dsn: fake, environment });
+  }
+});
+
+test("LAN previews cannot report to a live DSN, including through local DNS names", () => {
+  const dsn = "https://public@o1.ingest.sentry.io/1";
+  for (const host of ["192.168.1.10", "0.0.0.0", "[fd00::1]", "laptop.local", "www.modernfundamentalanalyst.com.lan"]) {
+    for (const mode of ["production", "development"]) {
+      assert.equal(browserSentryConfig(dsn, "production", mode, host), undefined);
+    }
+  }
+});
+
+test("deployed domains and aliases retain their deployment environment", () => {
+  const dsn = "https://public@o1.ingest.sentry.io/1";
+  const aliases = [
+    "modern-fundamental-analyst-build123-team.vercel.app",
+    "modern-fundamental-analyst-git-feature-team.vercel.app",
+  ];
+  for (const [host, environment] of [
+    ["modernfundamentalanalyst.com", "production"],
+    ["modern-fundamental-analyst.vercel.app", "production"],
+    [aliases[0], "preview"],
+    [aliases[1], "preview"],
+  ]) {
+    assert.deepEqual(browserSentryConfig(dsn, environment, "production", host, aliases), { dsn, environment });
+  }
+  for (const host of ["unrelated.vercel.app", "modern-fundamental-analyst-git-feature-other-team.vercel.app"]) {
+    assert.equal(browserSentryConfig(dsn, "production", "production", host, aliases), undefined);
+  }
+});
+
+test("isolated dev-server tests retain deterministic test sampling", () => {
+  const dsn = "https://public@sentry.invalid/1";
+  assert.deepEqual(browserSentryConfig(dsn, "test", "development", "localhost"), { dsn, environment: "test" });
+});
 
 test("DSN resolution treats empty or whitespace-only overrides as absent", () => {
   const publicDsn = "https://public@sentry.invalid/1";

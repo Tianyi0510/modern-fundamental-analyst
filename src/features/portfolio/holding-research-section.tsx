@@ -102,12 +102,12 @@ export function HoldingResearchSection({ symbol, locale }: { symbol: string; loc
         <h2 id="holding-research" className="m-0 text-small-headline text-brand">
           {company ? text.company : text.fund}
         </h2>
-        <p className="mt-[var(--space-related-content)] text-small-body">
+        <p className="mt-[var(--space-heading-prose)] text-small-body">
           {company ? text.year : text.fundDate}{" "}
           <time dateTime={profile.periodEnd}>{formatDate(profile.periodEnd, locale, true)}</time>
         </p>
         {profile.kind === "company" && (
-          <p className="text-small-body">
+          <p className="mt-[var(--space-8px)] text-small-body">
             {text.filed} <time dateTime={profile.filed}>{formatDate(profile.filed, locale, true)}</time>
           </p>
         )}
@@ -122,14 +122,17 @@ export function HoldingResearchSection({ symbol, locale }: { symbol: string; loc
             </dd>
           </dl>
         )}
-        <dl className="my-[var(--space-32px)] grid gap-[var(--space-24px)] min-[801px]:grid-cols-2">
+        <dl className="my-[var(--space-section-content)] grid gap-x-[var(--space-24px)] gap-y-[var(--space-32px)] min-[801px]:grid-cols-2 [dl+&]:mt-[var(--space-32px)]">
           {metrics.map(([label, value, unit]) => (
-            <div key={label} className="border-t border-border pt-[var(--space-16px)]">
+            <div
+              key={label}
+              className="relative flex flex-col gap-[var(--space-8px)] before:absolute before:inset-x-0 before:-top-[var(--space-16px)] before:border-t before:border-border"
+            >
               <dt className="text-large-label">
                 {label}
                 {unit && <span className="ml-2 text-small-body">({unit})</span>}
               </dt>
-              <dd className="m-0 mt-2 text-medium-title tabular-nums">{value}</dd>
+              <dd className="m-0 mt-auto text-medium-title tabular-nums">{value}</dd>
             </div>
           ))}
         </dl>

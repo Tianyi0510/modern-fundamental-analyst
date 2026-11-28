@@ -44,10 +44,21 @@ for (const [prefix, label] of [
     await page.keyboard.press("Space");
     await expect(nav).toBeHidden();
     await expect(trigger).toBeFocused();
-    for (const width of [320, 834, 1440]) {
+    for (const width of [320, 390, 834, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await trigger.click();
       await expect(nav).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const labels = await links.evaluateAll((elements) =>
+        elements.map((link) => {
+          const text = link.querySelector("span")!.getBoundingClientRect();
+          return { top: text.top, bottom: text.bottom, targetHeight: link.getBoundingClientRect().height };
+        }),
+      );
+      for (const [i, label] of labels.entries()) {
+        expect(label.targetHeight).toBeGreaterThanOrEqual(48);
+        if (i > 0) expect(label.top - labels[i - 1]!.bottom).toBeCloseTo(24, 1);
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
       await trigger.click();

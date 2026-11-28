@@ -26,16 +26,29 @@ for (const [prefix, width, back] of [
         /sec\.gov\/Archives\/edgar\/data\/1067983\//,
       );
       await expect(research).toContainText("371,444");
-      const gapDifference = await research
+      const sicGaps = await research
         .locator("dl")
         .first()
         .evaluate((sic) => {
-          const bounds = sic.getBoundingClientRect();
-          const above = bounds.top - sic.previousElementSibling!.getBoundingClientRect().bottom;
-          const below = sic.nextElementSibling!.getBoundingClientRect().top - bounds.bottom;
-          return Math.abs(above - below);
+          const metrics = Array.from(sic.nextElementSibling!.children);
+          const columns = getComputedStyle(sic.nextElementSibling!).gridTemplateColumns.split(" ").length;
+          const labelTop = (item: Element) => item.querySelector("dt")!.getBoundingClientRect().top;
+          const valueBottom = (item: Element) => item.querySelector("dd")!.getBoundingClientRect().bottom;
+          return [
+            labelTop(sic) - sic.previousElementSibling!.getBoundingClientRect().bottom,
+            ...metrics.map((item, i) => labelTop(item) - valueBottom(i < columns ? sic : metrics[i - columns]!)),
+          ];
         });
-      expect(gapDifference).toBeLessThan(1);
+      for (const gap of sicGaps) expect(gap).toBeCloseTo(32, 1);
+      for (const id of ["holding-research", "holding-history"]) {
+        const gap = await page
+          .locator(`#${id}`)
+          .evaluate(
+            (heading) =>
+              heading.nextElementSibling!.getBoundingClientRect().top - heading.getBoundingClientRect().bottom,
+          );
+        expect(gap).toBeCloseTo(32, 1);
+      }
       const intro = page.locator(".page-intro p");
       await expect(intro.locator("span")).toHaveCSS(
         "font-size",
@@ -99,4 +112,40 @@ for (const [prefix, width, back] of [
       await expect(page).toHaveURL(`${prefix}/portfolio`);
     },
   );
+}
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} every holding ticker stays intact and its action wraps only when needed @mobile`, async ({
+    page,
+  }) => {
+    await page.goto(`${prefix}/portfolio`);
+    const paths = await page
+      .locator("th[scope=row] a")
+      .evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href).pathname));
+    expect(paths.length).toBeGreaterThan(0);
+    for (const path of paths) {
+      await page.goto(path);
+      await page.evaluate(() => document.fonts.ready);
+      for (const width of [320, 375, 390, 430]) {
+        await page.setViewportSize({ width, height: 844 });
+        const result = await page.locator(".page-hero h1").evaluate((h) => {
+          const row = h.parentElement!.getBoundingClientRect();
+          const action = h.nextElementSibling!.getBoundingClientRect();
+          const title = h.getBoundingClientRect();
+          const text = document.createRange();
+          text.selectNodeContents(h.querySelector("em")!.firstChild!);
+          return {
+            lines: text.getClientRects().length,
+            fits: title.width + 16 + action.width <= row.width + 0.01,
+            sameRow: Math.abs(title.top - action.top) < 1 && Math.abs(row.right - action.right) < 1,
+            nextRow: Math.abs(action.top - title.bottom - 16) < 1 && Math.abs(action.left - row.left) < 1,
+            contained: title.right <= row.right + 1 && action.right <= row.right + 1,
+          };
+        });
+        expect(result.lines, path).toBe(1);
+        expect(result.contained, path).toBe(true);
+        expect(result.fits ? result.sameRow : result.nextRow, path + " at " + width).toBe(true);
+      }
+    }
+  });
 }

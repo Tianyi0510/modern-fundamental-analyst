@@ -6,6 +6,7 @@ type MemoSummary = {
   slug: string;
   number: string;
   title: string;
+  titlePhrases?: readonly string[];
   summary: string;
   scopeNote: string;
   publishedAt: string;
@@ -13,7 +14,7 @@ type MemoSummary = {
   category: MemoCategory;
 };
 
-export type MemoPreview = Omit<MemoSummary, "scopeNote">;
+export type MemoPreview = Omit<MemoSummary, "scopeNote" | "titlePhrases">;
 
 const memoCatalog = [
   {
@@ -31,13 +32,13 @@ const memoCatalog = [
           "An assessment of Microsoft’s cloud and AI position, Satya Nadella’s leadership, and the company’s fiscal 2024 financial quality.",
       },
       "zh-tw": {
-        title: "微軟股票分析：2024 財政年度",
+        title: ["微軟", "股票分析：", "2024", " ", "財政年度"],
         scopeNote:
           "本文為歷史文章，檢視微軟 2024 財政年度的業務與財務品質，尚未附有 DCF 模型、公允價值區間、明確的投資論點失效條件或量化下行情境。文中結論不足以判定股價具有吸引力，亦不代表目前的投資建議。",
         summary: "評估微軟在雲端與人工智慧領域的競爭地位、Satya Nadella 的領導能力，以及公司 2024 財政年度的財務品質。",
       },
       "zh-cn": {
-        title: "微软股票分析：2024 财政年度",
+        title: ["微软", "股票分析：", "2024", " ", "财政年度"],
         scopeNote:
           "本文为历史文章，检视微软 2024 财政年度的业务与财务质量，尚未附有 DCF 模型、公允价值区间、明确的投资论点失效条件或量化下行情境。文中结论不足以判定股价具有吸引力，亦不代表当前的投资建议。",
         summary:
@@ -63,6 +64,8 @@ function localizeMemos(locale: Locale): MemoSummary[] {
       readTime,
       category: getMemoCategory(memo.category, locale),
       ...localized,
+      title: typeof localized.title === "string" ? localized.title : localized.title.join(""),
+      titlePhrases: typeof localized.title === "string" ? undefined : localized.title,
     };
   });
 }

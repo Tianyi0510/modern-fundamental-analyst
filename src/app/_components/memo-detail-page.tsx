@@ -1,3 +1,4 @@
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { appearance } from "./memo-detail-page.styles";
 import { createMemoBreadcrumbStructuredData, createMemoStructuredData } from "@/features/memos/memo-pages";
 import { notFound } from "next/navigation";
@@ -48,7 +49,9 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
         <article className={appearance["memo-article"]}>
           <div className={appearance["memo-article-header-band"]}>
             <header className={appearance["memo-article-header"] + " " + appearance["shell"]}>
-              <h1>{memo.title}</h1>
+              <h1>
+                <HeadingPhrases text={memo.titlePhrases ?? memo.title} />
+              </h1>
               <div className={appearance["article-meta"]}>
                 <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>
                 <span>{memo.readTime}</span>
@@ -61,14 +64,19 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
               </div>
             </header>
           </div>
-          <div className={appearance["shell"] + " memo-article-body py-[var(--space-section-padding)]"}>
+          <div
+            className={
+              appearance["shell"] +
+              " memo-article-body pt-[var(--space-section-content)] pb-[var(--space-section-padding)]"
+            }
+          >
             <p className={appearance["article-lead"]}>{memo.summary}</p>
             {content.language !== locale ? (
               <p className={appearance["article-notes"] + " memo-language-notice"}>{text.languageNotice}</p>
             ) : null}
             <MemoArticleContent slug={slug} language={content.language} locale={locale} />
             <aside className={appearance["article-disclaimer"]} aria-labelledby="memo-disclaimer-title">
-              <h2 id="memo-disclaimer-title" className="mb-[var(--space-8px)] text-medium-title">
+              <h2 id="memo-disclaimer-title" className="mb-[var(--space-paragraph)] text-medium-title">
                 {text.disclaimerTitle}
               </h2>
               <p>{memo.scopeNote}</p>

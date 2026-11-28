@@ -1,3 +1,4 @@
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { holdingPath } from "@/features/portfolio/holding-path";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
@@ -62,7 +63,10 @@ const copy = {
     updatedMonthly: "Updated monthly",
   },
   "zh-tw": {
-    hero: ["在新一波浪潮中", "實踐價值投資"],
+    hero: [
+      ["在新一波", "浪潮中"],
+      ["實踐", "價值投資"],
+    ],
     heroIntro: "我相信每個人都可以投資。Modern Fundamental Analyst 的使命，是幫助每位個人投資者獨立做判斷。",
     viewPortfolio: "查看投資組合",
     readLatest: "閱讀最新投資備忘錄",
@@ -102,7 +106,10 @@ const copy = {
     updatedMonthly: "每月更新",
   },
   "zh-cn": {
-    hero: ["在新一轮浪潮中", "践行价值投资"],
+    hero: [
+      ["在新一轮", "浪潮中"],
+      ["践行", "价值投资"],
+    ],
     heroIntro: "我相信每个人都可以投资。Modern Fundamental Analyst 的使命，是帮助每位个人投资者独立做判断。",
     viewPortfolio: "查看投资组合",
     readLatest: "阅读最新投资备忘录",
@@ -174,9 +181,11 @@ export function HomePageContent({ locale }: { locale: Locale }) {
           <div className={appearance["hero-band"]}>
             <section className={appearance["hero"] + " @container/financial-summary " + appearance["shell"]}>
               <h1>
-                {text.hero[0]}
+                <HeadingPhrases text={text.hero[0]} />
                 <br />
-                <em>{text.hero[1]}</em>
+                <em>
+                  <HeadingPhrases text={text.hero[1]} />
+                </em>
               </h1>
               <div className={appearance["hero-bottom"]}>
                 <p>{text.heroIntro}</p>
@@ -292,14 +301,17 @@ export function HomePageContent({ locale }: { locale: Locale }) {
                 </h3>
               </CardHeader>
               <CardContent className={appearance["allocation-visual"] + " px-0"}>
-                <div
-                  className={appearance["allocation-ring"]}
-                  style={{ background: allocationGradient }}
-                  role="img"
-                  aria-label={text.topHoldings}
-                >
-                  <span>{portfolioSnapshot.holdingsCount}</span>
-                  <small>{text.holdingsAllocation}</small>
+                <div className="@container/ring grid w-full max-w-[210px] justify-self-center compact:max-w-[268px]">
+                  <div
+                    className={appearance["allocation-ring"]}
+                    style={{ background: allocationGradient }}
+                    role="img"
+                    aria-label={text.topHoldings}
+                  />
+                  <div className={appearance["allocation-caption"]}>
+                    <span>{portfolioSnapshot.holdingsCount}</span>
+                    <small>{text.holdingsAllocation}</small>
+                  </div>
                 </div>
                 <ul className={appearance["allocation-legend"]}>
                   {featuredHoldings.map((holding) => (

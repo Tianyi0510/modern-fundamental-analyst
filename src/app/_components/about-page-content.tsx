@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
 import { brandSurface } from "@/components/brand-surface";
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./about-page-content.styles";
 import Link from "next/link";
@@ -303,13 +304,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
               {locale === "en" ? " " : null}
               <br className="compact:hidden" />
               <em>
-                {Array.isArray(text.headline[1])
-                  ? text.headline[1].map((phrase) => (
-                      <span key={phrase} className="compact:inline-block">
-                        {phrase}
-                      </span>
-                    ))
-                  : text.headline[1]}
+                <HeadingPhrases text={text.headline[1]} />
               </em>
             </>
           }
@@ -331,14 +326,12 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
                 data-after-hero={index === 0 ? "" : undefined}
                 className={appearance["about-section"] + " " + appearance["shell"]}
               >
-                <div className={appearance["about-section-heading"]}>
-                  <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
-                    <span>{number}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{sectionName}</span>
-                  </p>
-                  <h2>{section.title}</h2>
-                </div>
+                <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
+                  <span>{number}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{sectionName}</span>
+                </p>
+                <h2 className={appearance["about-section-heading"]}>{section.title}</h2>
                 <div className={appearance["about-copy"]}>
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
@@ -348,31 +341,33 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
             </div>
           );
         })}
-        <section className={appearance["about-boundaries"]}>
-          {text.boundaries.map((boundary, index) => (
-            <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>
-              <Card variant="plain">
-                <CardHeader className="px-0">
-                  <h2>{boundary.title}</h2>
-                </CardHeader>
-                <CardContent className="px-0">
-                  {/* Safari retains list semantics when visual markers are removed. */}
-                  {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
-                  <ol role="list">
-                    {boundary.items.map((item) => (
-                      <li key={item}>
-                        <span className={appearance["about-boundary-number"]} aria-hidden="true">
-                          {index === 0 ? <Check size={24} strokeWidth={2} /> : <X size={24} strokeWidth={2} />}
-                        </span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </CardContent>
-              </Card>
-            </section>
-          ))}
-        </section>
+        <div className="@container/boundaries relative isolate bg-[var(--surface-inverse)] before:absolute before:inset-y-0 before:right-0 before:-z-10 before:w-1/2 before:bg-[var(--surface-highlight)]">
+          <section className={appearance.shell + " " + appearance["about-boundaries"]}>
+            {text.boundaries.map((boundary, index) => (
+              <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>
+                <Card variant="plain" className={appearance.shell + " min-[1101px]:mx-0 min-[1101px]:w-full"}>
+                  <CardHeader className="px-0">
+                    <h2>{boundary.title}</h2>
+                  </CardHeader>
+                  <CardContent className="px-0">
+                    {/* Safari retains list semantics when visual markers are removed. */}
+                    {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
+                    <ol role="list">
+                      {boundary.items.map((item) => (
+                        <li key={item}>
+                          <span className={appearance["about-boundary-number"]} aria-hidden="true">
+                            {index === 0 ? <Check size={24} strokeWidth={2} /> : <X size={24} strokeWidth={2} />}
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </CardContent>
+                </Card>
+              </section>
+            ))}
+          </section>
+        </div>
         <section className={appearance["about-closing"] + " " + appearance["shell"]}>
           <p className={appearance["eyebrow"]}>
             <span /> {text.closingLabel}

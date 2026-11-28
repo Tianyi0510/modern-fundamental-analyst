@@ -170,7 +170,7 @@ export function HoldingPage({ locale, slug }: { locale: Locale; slug: string }) 
             <h2 id="holding-history" className="m-0 text-small-headline text-brand">
               {text.history}
             </h2>
-            <p className="mt-[var(--space-related-content)] text-small-body text-muted-foreground tabular-nums">
+            <p className="mt-[var(--space-heading-prose)] text-small-body text-muted-foreground tabular-nums">
               {text.records(history.length)}
               {oldest && latest && (
                 <>

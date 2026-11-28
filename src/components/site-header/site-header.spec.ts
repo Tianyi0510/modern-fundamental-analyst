@@ -645,7 +645,7 @@ test.describe("header interaction QA", () => {
 
   test("desktop navigation uses stable color, motion, and menu states", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".site-header").first()).toHaveCSS("height", "72px");
+    await expect(page.locator(".site-header > .wordmark").first()).toHaveCSS("margin-block", "24px");
     const about = page.locator(".header-actions nav a").filter({ hasText: "About" });
     await about.hover();
     await expect(about).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -695,7 +695,7 @@ test.describe("mobile content and navigation QA", () => {
       const background = page.locator(".home-header");
       const header = page.locator(".site-header").first();
       await expect(header).toHaveCSS("position", "relative");
-      await expect(header).toHaveCSS("height", "64px");
+      await expect(header.locator(":scope > .wordmark")).toHaveCSS("margin-block", "24px");
       await expect(header.locator(":scope > .wordmark .brand-logo")).toHaveText("Modern Fundamental Analyst.");
       const wordmarkBox = await header.locator(":scope > .wordmark").boundingBox();
       expect(wordmarkBox).not.toBeNull();
@@ -862,11 +862,22 @@ test.describe("mobile content and navigation QA", () => {
       await expect(page.locator(".mobile-menu-layer")).toBeHidden();
       await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
       await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
-      for (const width of [801, 1100, 1151, 1279, 1280, 1440]) {
+      for (const width of [320, 390, 801, 834, 1100, 1151, 1279, 1280, 1440, 1580]) {
         await page.setViewportSize({ width, height: 1000 });
-        const logo = await page.locator(".site-header > .wordmark").boundingBox();
-        const adjacent = await page.locator(width <= 1279 ? ".mobile-menu-button" : ".header-actions").boundingBox();
-        expect(logo!.x + logo!.width).toBeLessThan(adjacent!.x);
+        const boxes = await page.locator(".site-header :is(a, button):visible").evaluateAll((controls) =>
+          controls.map((control) => {
+            const { left, right } = control.getBoundingClientRect();
+            return { left, right };
+          }),
+        );
+        expect(boxes).toHaveLength(width < 1280 ? 2 : 9);
+        const header = (await page.locator(".site-header").boundingBox())!;
+        expect(boxes[0]!.left).toBeCloseTo(header.x, 1);
+        expect(boxes.at(-1)!.right).toBeCloseTo(header.x + header.width, 1);
+        expect(boxes[1]!.left - boxes[0]!.right).toBeGreaterThanOrEqual(8);
+        for (let index = 2; index < boxes.length; index++) {
+          expect(boxes[index]!.left - boxes[index - 1]!.right).toBeCloseTo(8, 1);
+        }
       }
     });
   }

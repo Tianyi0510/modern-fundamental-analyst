@@ -26,7 +26,7 @@ export function PageHero({
 }) {
   const heading = (
     <h1
-      className={`mt-0 text-large-display text-balance max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
+      className={`mt-0 text-large-display text-balance ${action ? "whitespace-nowrap" : "max-[375px]:[&:lang(en)]:text-small-display"} max-[801px]:[overflow-wrap:anywhere] [&_em]:text-brand [&_em]:not-italic ${titleWidths[variant]}`}
     >
       {title}
     </h1>
@@ -35,7 +35,7 @@ export function PageHero({
     <div className="page-hero-band bg-[var(--surface-secondary)]">
       <Container as="section" className="page-hero @container/financial-summary py-[var(--space-section-padding)]">
         {action ? (
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-[var(--space-16px)]">
+          <div className="flex flex-wrap items-start justify-between gap-[var(--space-16px)]">
             {heading}
             {action}
           </div>

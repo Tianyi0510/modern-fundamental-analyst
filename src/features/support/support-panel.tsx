@@ -36,7 +36,10 @@ export function SupportPanel({ locale, params, status }: SupportPanelProps & { s
         <div className={appearance["support-copy"]}>
           <h2>{pending ? text.statusTitle : text.sectionTitle}</h2>
           <p>{text.sectionText}</p>
-          <Link className="underline underline-offset-4" href={getLocalizedPath("/contact", locale)}>
+          <Link
+            className="mt-[var(--space-section-content)] block w-fit underline underline-offset-4"
+            href={getLocalizedPath("/contact", locale)}
+          >
             {text.paymentHelp}
           </Link>
         </div>
