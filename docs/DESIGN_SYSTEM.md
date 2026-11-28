@@ -309,7 +309,7 @@ Apply these role assignments and exceptions:
 
 Reflow financial summaries below 72rem of container width. Preserve signs, units, precision and complete values. If enlarged text still overflows, use a named local horizontal-scroll region with a localized hint; make it focusable only while overflowing. Never shrink or truncate values to preserve columns.
 
-The article title, metadata, main prose and References panel span the Header container. The summary, language notice, outline and disclaimer share a left-aligned reading column capped at 720px (`--width-reading`). On narrower screens the column fills the available container. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation. Cartesian tick labels use `muted-foreground` in both themes and must meet 4.5:1 contrast against the chart surface.
+The article title, metadata, summary, language notice, outline, main prose, References panel and disclaimer all span the Header content container at every viewport width. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation. Cartesian tick labels use `muted-foreground` in both themes and must meet 4.5:1 contrast against the chart surface.
 
 `typography-roles.spec.ts` checks computed metrics and reflow. `financial-type-hierarchy.spec.ts` checks complete values at regular and enlarged text sizes. Assert rendered behavior, not class strings.
 
@@ -701,15 +701,15 @@ Summary containers from 40rem to below 72rem use three equal-width, equal-height
 
 Use the following vertical distances between rendered boxes on phone, tablet and desktop. Assign each gap once. Horizontally paired headings and body columns share a top edge; apply vertical spacing when they stack.
 
-| Content relationship                    | Distance                     | Examples                                                                                                                                 |
-| --------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Compact component details               | 4, 8 or 16px                 | Labels and values, filing dates, icons, control hints                                                                                    |
-| Consecutive prose or reference entries  | 24px                         | Paragraphs on the same topic, neighboring bibliography entries                                                                           |
-| Heading to its own prose or source list | 32px                         | Contact form introductions, Portfolio Data, chart captions, article subsections, References and the article disclaimer                   |
-| Major editorial groups                  | 48px                         | Hero title to introduction or metadata, article metadata to lead, numbered label to heading, heading to chart, stacked editorial columns |
-| Page section edges                      | 64px on each side vertically | Hero, main content bands and main Footer; adjacent bands meet without external margins                                                   |
+| Content relationship                    | Distance                     | Examples                                                                                                                                                 |
+| --------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Compact component details               | 4, 8 or 16px                 | Labels and values, filing dates, icons, control hints                                                                                                    |
+| Consecutive prose or reference entries  | 24px                         | Paragraphs on the same topic, Portfolio Data, memo subsection and article disclaimer headings to their first paragraph, neighboring bibliography entries |
+| Heading to its own prose or source list | 32px                         | Contact form introductions, chart captions and References                                                                                                |
+| Major editorial groups                  | 48px                         | Hero title to introduction or metadata, article metadata to lead, numbered label to heading, heading to chart, stacked editorial columns                 |
+| Page section edges                      | 64px on each side vertically | Hero, main content bands and main Footer; adjacent bands meet without external margins                                                                   |
 
-The memo article header and body share one pair of outer section insets. Its metadata row ends the header band. The site Header and copyright row use 24px above and below the wordmark and copyright line boxes respectively. Wrapped copyright text increases the row height. The default tokens for prose paragraphs, heading-to-prose spacing, group spacing and section insets are `--space-paragraph`, `--space-heading-prose`, `--space-section-content` and `--space-section-padding`.
+Memo subsections begin 48px below the preceding content. The memo article header and body share one pair of outer section insets. Its metadata row ends the header band. The site Header and copyright row use 24px above and below the wordmark and copyright line boxes respectively. Wrapped copyright text increases the row height. The default tokens for prose paragraphs, heading-to-prose spacing, group spacing and section insets are `--space-paragraph`, `--space-heading-prose`, `--space-section-content` and `--space-section-padding`.
 
 Home Portfolio uses one padded grid: the section label sits 48px above the title, and the allocation card starts at the title row in the desktop right column and stretches to the bottom of the holdings list. On mobile, the card follows the holdings list with a 48px gap. About boundary panels align with the shared content container, stacking through 1100px and sharing a row from 1101px. Each panel owns its vertical padding. In the two-column layout each side of the center seam uses the outer gutter width, capped at 64px.
 
@@ -729,7 +729,7 @@ The site owns its Swiss Grid / Editorial Layout: proximity, shared alignment, co
 | Column gutter     | `--grid-column-gap`: 32px desktop, 16px mobile; stacked major regions use a 48px row gap                       |
 | Editorial regions | 12 equal tracks (`--grid-columns`) with shared column gaps; regions span 5+7, 4+8, 8+4 or 7+5 tracks           |
 | Repeated modules  | Memo cards reflow 3/2/1 columns at 1101px/801px; 1px guide lines remain a deliberate modular-grid separator    |
-| Manuscript        | The title and main prose span the Header container. The reading column starts at the same left edge            |
+| Manuscript        | All article sections share the Header content container and its outer gutters                                  |
 
 Use the existing content-driven stacking thresholds: 800px for phone layouts, 1100px for editorial/sidebar regions and the intermediate Footer composition, and container queries for About, KPI and chart regions. Use CSS Grid placement to span the shared tracks. Regions use `minmax(0, ...)` so text can reflow. Keep source order meaningful when columns stack. Do not shrink typography to preserve columns. Desktop Header navigation requires both a viewport of at least 1280px and enough container width for all controls.
 
@@ -786,7 +786,7 @@ Memo Markdown headings may supply an explicit trailing `\{#id\}` anchor (braces 
 
 Both edges of the References panel align with the main prose and Header container. Its horizontal padding is 48px above 800px and 24px at narrower widths, including 800px. The ordered list adds 24px for numbering.
 
-The outline spans the reading column and leaves 48px before the body. Its interface label follows the site locale; links retain the article language and original heading wording. H2 entries are bold and H3 entries indented. It remains outside Typeset so article prose rules do not style the control.
+The outline spans the article container and leaves 48px before the body. Its interface label follows the site locale; links retain the article language and original heading wording. Leave 24px between the last text line box of one entry and the first of the next, including wrapped entries. Each link contributes 12px of block padding on each side, with no additional row gap. H2 entries are bold and H3 entries indented. It remains outside Typeset so article prose rules do not style the control.
 
 The local `remark-memo-toc.mjs` plugin builds heading IDs and the exported outline together during MDX compilation. Heading IDs use unprefixed title slugs (for example, `framework-for-understanding-business`). Repeated headings receive unique, deterministic suffixes. Native fragment links preserve deep linking without client-side heading discovery or duplicated editorial metadata. Tests verify the unchanged research-text hash, link targets, three locales, keyboard expansion/collapse and narrow layouts.
 

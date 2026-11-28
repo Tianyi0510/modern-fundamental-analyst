@@ -39,7 +39,10 @@
     &:where(h3, h4) {
       font-size: var(--font-size-medium-title);
     }
-    &:where(.memo-references h2, h3) {
+    &:where(.memo-subsection > h3) {
+      margin: 0 0 var(--space-paragraph);
+    }
+    &:where(.memo-references h2) {
       margin: 0 0 var(--space-heading-prose);
     }
     &:where(h5, h6) {

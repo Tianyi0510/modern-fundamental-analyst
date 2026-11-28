@@ -21,10 +21,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(page.locator(".memo-article-body")).toHaveCSS("padding-bottom", "64px");
       for (const [before, after, gap] of [
         [".article-meta", ".article-lead", 48],
-        [".memo-subsection h3", ".memo-subsection h3 + p", 32],
         [".memo-references h2", ".memo-references li", 32],
-
-        [".article-disclaimer h2", ".article-disclaimer p", 32],
+        [".article-disclaimer h2", ".article-disclaimer p", 24],
       ] as const) {
         const first = (await page.locator(before).first().boundingBox())!;
         const next = (await page.locator(after).first().boundingBox())!;
@@ -37,6 +35,21 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         (p) => p.getBoundingClientRect().top - p.previousElementSibling!.getBoundingClientRect().bottom,
       );
       expect(paragraphGap).toBeCloseTo(24, 1);
+      const subsectionGaps = await body.locator(".memo-subsection").evaluateAll((sections) =>
+        sections.map((section) => {
+          const heading = section.querySelector("h3")!.getBoundingClientRect();
+          const paragraph = section.querySelector("h3 + p")!.getBoundingClientRect();
+          return {
+            above: heading.top - section.previousElementSibling!.getBoundingClientRect().bottom,
+            below: paragraph.top - heading.bottom,
+          };
+        }),
+      );
+      expect(subsectionGaps.length).toBeGreaterThan(0);
+      for (const { above, below } of subsectionGaps) {
+        expect(above).toBeCloseTo(48, 1);
+        expect(below).toBeCloseTo(paragraphGap, 1);
+      }
       const entryGaps = await panel
         .locator("li + li")
         .evaluateAll((entries) =>
@@ -74,17 +87,18 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       expect(titleBox!.x).toBeCloseTo(headerBox.x, 1);
       expect(titleBox!.width).toBeCloseTo(headerBox.width, 1);
       expect(meta.width).toBeCloseTo(headerBox.width, 1);
-      for (const region of [body, panel]) {
+      const regions = [
+        body,
+        panel,
+        page.locator(".article-lead"),
+        page.locator(".article-disclaimer"),
+        page.locator(".memo-toc"),
+      ];
+      if (prefix) regions.push(page.locator(".article-notes"));
+      for (const region of regions) {
         const box = (await region.boundingBox())!;
         expect(box.x).toBeCloseTo(headerBox.x, 1);
         expect(box.width).toBeCloseTo(headerBox.width, 1);
-      }
-      for (const selector of [".article-lead", ".article-disclaimer", ".article-notes", ".memo-toc"]) {
-        for (const region of await page.locator(selector).all()) {
-          const box = await region.boundingBox();
-          expect(box!.x).toBeCloseTo(titleBox!.x, 0);
-          expect(box!.width).toBeCloseTo(Math.min(720, headerBox.width), 0);
-        }
       }
       for (const theme of ["light", "dark"]) {
         await page.evaluate((theme) => document.documentElement.setAttribute("data-theme", theme), theme);

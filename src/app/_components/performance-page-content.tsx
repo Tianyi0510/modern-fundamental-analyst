@@ -229,7 +229,7 @@ export function PerformancePageContent({ locale }: { locale: Locale }) {
             <div className={appearance["methodology-content"]}>
               <div className={appearance["methodology-explanation"]}>{text.methodologyCopy}</div>
               <aside className={appearance["methodology-source"]}>
-                <h3 className="mb-[var(--space-heading-prose)] text-medium-title">{text.dataSources}</h3>
+                <h3 className="mb-[var(--space-paragraph)] text-medium-title">{text.dataSources}</h3>
                 {text.snapshotCopy(asOf)}
               </aside>
             </div>

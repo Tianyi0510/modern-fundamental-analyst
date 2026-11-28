@@ -67,7 +67,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
           <div
             className={
               appearance["shell"] +
-              " memo-article-body pt-[var(--space-section-content)] pb-[var(--space-section-padding)] [&>:not(.article-body)]:max-w-[var(--width-reading)]"
+              " memo-article-body pt-[var(--space-section-content)] pb-[var(--space-section-padding)]"
             }
           >
             <p className={appearance["article-lead"]}>{memo.summary}</p>
@@ -76,7 +76,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
             ) : null}
             <MemoArticleContent slug={slug} language={content.language} locale={locale} />
             <aside className={appearance["article-disclaimer"]} aria-labelledby="memo-disclaimer-title">
-              <h2 id="memo-disclaimer-title" className="mb-[var(--space-heading-prose)] text-medium-title">
+              <h2 id="memo-disclaimer-title" className="mb-[var(--space-paragraph)] text-medium-title">
                 {text.disclaimerTitle}
               </h2>
               <p>{memo.scopeNote}</p>

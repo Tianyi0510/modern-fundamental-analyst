@@ -35,14 +35,14 @@ export function MemoTableOfContents({
       </CollapsibleTrigger>
       <CollapsibleContent keepMounted className={disclosureStyles.panel}>
         <nav aria-label={labels[locale]} className="pb-[var(--space-24px)]">
-          <ol lang={language} className="grid gap-1 text-small-body">
+          <ol lang={language} className="grid text-small-body">
             {entries.map((entry) => (
-              <li key={entry.id} className={entry.level === 3 ? "pl-[var(--space-24px)]" : "pt-2 font-bold first:pt-0"}>
+              <li key={entry.id} className={entry.level === 3 ? "pl-[var(--space-24px)]" : "font-bold"}>
                 <a
                   href={`#${entry.id}`}
-                  className="flex min-h-[var(--size-touch-target)] items-center py-2 wrap-anywhere underline-offset-4 hover:text-brand hover:underline focus-visible:underline"
+                  className="flex min-h-[var(--size-touch-target)] items-center py-[calc(var(--space-24px)/2)] wrap-anywhere underline-offset-4 hover:text-brand hover:underline focus-visible:underline"
                 >
-                  {entry.title}
+                  <span>{entry.title}</span>
                 </a>
               </li>
             ))}

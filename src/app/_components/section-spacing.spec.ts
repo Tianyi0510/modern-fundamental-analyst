@@ -150,7 +150,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       expect(await gapAfter(".returns .section-heading")).toBeCloseTo(48, 0);
       expect(await gapAfter("figure h3:has(+ p) >> nth=0")).toBeCloseTo(32, 0);
       expect(await gapAfter("figure p:has(+ p) >> nth=0")).toBeCloseTo(24, 0);
-      expect(await gapAfter(".methodology-source h3")).toBeCloseTo(32, 0);
+      expect(await gapAfter(".methodology-source h3")).toBeCloseTo(24, 0);
       expect(await gapAfter(".methodology-explanation > p:first-child")).toBeCloseTo(24, 0);
       expect(await gapAfter(".methodology-explanation")).toBeCloseTo(48, 0);
       await expect(page.locator(".methodology")).toHaveCSS("padding-block", "64px");
