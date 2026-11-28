@@ -130,7 +130,7 @@ test("memo Hero describes the published research and planned articles remain unp
   for (const [prefix, title, scope, plannedTitles] of [
     [
       "",
-      "Research on business qualityand financial performance",
+      "Research on business quality and financial performance",
       "In these memos, I explain how a business makes money, what I look for in its financial statements, and which risks shape my investment thesis.",
       ["Will AI Kill Software?", "Agentic Finance and Stablecoins"],
     ],

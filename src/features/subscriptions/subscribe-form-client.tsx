@@ -155,7 +155,7 @@ export function SubscribeFormClient({
             <a className={appearance.preferences[variant]} href={preferencesHref}>
               {copy.preferences}
             </a>
-            <Alert tone={variant} className="col-span-full max-w-[390px] compact:col-auto">
+            <Alert tone={variant} className="col-span-full compact:col-auto">
               {status === "submitting"
                 ? copy.submitting
                 : status === "success"

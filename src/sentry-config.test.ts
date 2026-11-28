@@ -33,6 +33,28 @@ describe.each([
     expect(sdk.init).not.toHaveBeenCalled();
   });
 
+  const fakeDsn = "https://public@sentry.invalid/1";
+  const liveDsn = "https://public@o1.ingest.sentry.io/1";
+  it.each([
+    ["test", "production", liveDsn, fakeDsn, false],
+    ["test", "preview", "", liveDsn, false],
+    ["development", "test", liveDsn, "", false],
+    ["production", "test", "", liveDsn, false],
+    ["test", "production", fakeDsn, liveDsn, true],
+    ["production", "test", "", fakeDsn, true],
+  ] as const)(
+    "restricts test reporting for %s/%s with %s and %s",
+    async (mode, deployment, server, browser, allowed) => {
+      vi.stubEnv("NODE_ENV", mode);
+      vi.stubEnv("VERCEL_ENV", deployment);
+      vi.stubEnv("SENTRY_DSN", server);
+      vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", browser);
+      await load();
+      const expectedOptions = expect.objectContaining({ dsn: fakeDsn, environment: "test" }) as unknown;
+      expect(sdk.init.mock.calls).toEqual(allowed ? [[expectedOptions]] : []);
+    },
+  );
+
   it("prefers local development mode over an inherited production deployment", async () => {
     vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("VERCEL_ENV", "production");

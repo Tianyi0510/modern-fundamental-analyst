@@ -1,6 +1,5 @@
 export const appearance = {
-  "preferences-form":
-    "preferences-form [max-width:760px] grid [grid-template-columns:minmax(0,_1fr)] [gap:var(--space-32px)]",
+  "preferences-form": "preferences-form grid [grid-template-columns:minmax(0,_1fr)] [gap:var(--space-32px)]",
   "preferences-field":
     "preferences-field grid [grid-template-columns:minmax(0,_1fr)] [gap:var(--space-field-label)] min-w-0 text-large-label [&_strong]:text-medium-body",
   "preferences-actions":

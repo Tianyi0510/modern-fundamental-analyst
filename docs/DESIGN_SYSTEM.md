@@ -6,7 +6,7 @@ Use this guide for visual design, component behavior, interface copy and localiz
 
 - [Reference ownership](#architecture-and-reference-ownership): priorities and responsibilities.
 - [Typography](#typography-roles), [colors](#color-inventory) and [components](#available-shadcn-components): approved implementation inventories.
-- [Layout](#swiss-grid-and-editorial-layout) and [tablet rules](#tablet-layout-contract): responsive composition.
+- [Layout](#swiss-grid-and-editorial-layout), [text wrapping](#text-wrapping) and [tablet rules](#tablet-layout-contract) cover responsive composition.
 - [Interaction and motion](#interaction-motion-and-accessibility): behavior, focus and animation ownership.
 - [Content and localization](#content-and-localization): copy, capitalization and translation.
 - [Verification](#design-verification): acceptance checks and component-specific contracts.
@@ -297,7 +297,7 @@ Google Fonts is the source of the retained families, not a requirement to fetch 
 | `Medium Body`     | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Article and Disclaimer prose                                      |
 | `Small Body`      | 16 / 24                    | 16 / 24                   | 1.5     | 400    | 0        | Card copy, instructions, table figures, dates, notes and feedback |
 
-Below 375px, English PageHero titles without an action use Small Display (38px) so long words fit. Chinese headings can group short phrases at mobile widths. The table lists desktop and mobile values. Below 50rem use mobile sizes. From 50rem to below 75rem use Large Display 67px; Medium Display, Large Headline and Medium Headline 51px; other roles use desktop sizes. At 75rem use desktop sizes. Breakpoints change size only; leading, weight and tracking stay fixed. Layout breakpoints remain independent.
+Below 375px, English PageHero titles without an action use Small Display (38px) so long words fit. The table lists desktop and mobile values. Below 50rem use mobile sizes. From 50rem to below 75rem use Large Display 67px; Medium Display, Large Headline and Medium Headline 51px; other roles use desktop sizes. At 75rem use desktop sizes. Breakpoints change size only; leading, weight and tracking stay fixed. Layout breakpoints remain independent.
 
 Apply these role assignments and exceptions:
 
@@ -307,11 +307,19 @@ Apply these role assignments and exceptions:
 - CTAs use Large Label. Copy Article Link and Toast titles use Small Body, matching article metadata. Email Preferences links also use Small Body (16px, weight 400) in both subscription form variants. Ordinary navigation uses Medium Label.
 - Footer links use the row sizing specified in [Footer column alignment](#footer-column-alignment). Mobile Sidebar controls retain 48px targets.
 
-Reflow financial summaries below 72rem of container width. Preserve signs, units, precision and complete values. If enlarged text still overflows, use a named local horizontal-scroll region with a localized hint; make it focusable only while overflowing. Never shrink or truncate values to preserve columns.
-
 The article title, metadata, summary, language notice, outline, main prose, References panel and disclaimer all span the Header content container at every viewport width. Heading semantics remain independent of visual size. Touch padding is independent of line height. Chart labels use Small Body with SVG alignment compensation. Cartesian tick labels use `muted-foreground` in both themes and must meet 4.5:1 contrast against the chart surface.
 
 `typography-roles.spec.ts` checks computed metrics and reflow. `financial-type-hierarchy.spec.ts` checks complete values at regular and enlarged text sizes. Assert rendered behavior, not class strings.
+
+### Text wrapping
+
+**Natural wrapping.** Body copy follows the available column width and the browser’s line-breaking rules for the page language. English usually breaks at spaces, and Chinese can break between characters. Hero introductions and selected prose use `text-wrap: pretty` to improve line endings. Contact and Footer subscription feedback can use the full form width and wraps as needed.
+
+**Headings and chosen breaks.** PageHero titles and selected section headings use `text-wrap: balance` to distribute text across lines. Headings allow an overlong string to break when needed to fit. Use `<br>` when the design calls for the next part of a heading to start on a new line at every width. `ResponsiveHeadingBreak` gives selected English headings a space for natural wrapping through 800px and restores the specified line break at 801px and above. In Traditional and Simplified Chinese, it keeps the specified line break at every width. The English Investment Memos list title wraps naturally at every width. Both Chinese versions keep the break before the emphasized text.
+
+Use `HeadingPhrases` to keep selected words together when space permits. At 800px and below, each specified group stays together if it fits and can move to the next line. For example, the Traditional Chinese Home memo heading has a fixed break after “公開投資研究，”. Its second part groups “為自己的” and “判斷負責” so the last character does not end up alone at 320px. Simplified Chinese follows the same layout.
+
+**Content that stays together.** The two short links in the About closing paragraph each move to the next line as a unit when space runs out. On holding pages the ticker stays on one line. “View All Holdings” aligns to the opposite edge when the title and action fit with a 16px gap, then moves to the start of the next row when they do not. Financial summary values keep their sign, digits and unit together. If a value still exceeds its container after the [summary reflows](#hero-summaries-and-vertical-rhythm) at enlarged text sizes, a named local scroll region preserves the full value and shows a localized hint. The region is focusable while it overflows.
 
 ### Memo article Typeset
 
@@ -550,7 +558,7 @@ See [Menu behavior](#menu-behavior) and [Disclosure and animation ownership](#di
 
 ### Holding detail pages
 
-Keep each ticker on one line. Align the localized “View All Holdings” link to the opposite edge when both fit with a 16px gap. Otherwise, place the link at the start of the next row. Give the company or fund name and exchange the same type size. Leave 32px from the research heading to its date line and from the month-end positions heading to its record count. Leave 32px between each financial value and the next row’s label. Center the divider in that gap and align values across paired columns when a label wraps. On company pages, measure the same 32px from the business description to the SEC industry label and from the classification value to the first financial labels. Leave 8px between the classification label and its value.
+See [Text wrapping](#text-wrapping) for the ticker and its action. Give the company or fund name and exchange the same type size. Leave 32px from the research heading to its date line and from the month-end positions heading to its record count. Leave 32px between each financial value and the next row’s label. Center the divider in that gap and align values across paired columns when a label wraps. On company pages, measure the same 32px from the business description to the SEC industry label and from the classification value to the first financial labels. Leave 8px between the classification label and its value.
 
 Above 1100px, give the month-end heading, record count and date range four grid tracks. Align the table to the eight tracks used by the research figures above it. At narrower widths, stack the heading above the table. Show the table on page load. Its focusable scroll region uses the smaller of 24rem and 60svh, with a sticky header, regular-weight dates and right-aligned numbers. Place the USD and return methodology note outside the scroll region, 48px below it and aligned with its left edge. Associate the note with the table using `aria-describedby`.
 
@@ -583,7 +591,7 @@ Subscription forms retain standard Contact and inverse Footer treatments. Their 
 
 Contact draft and retry recovery belong to the [Contact workflow](INTEGRATIONS.md#contact-draft-recovery).
 
-Choose focus tokens according to light or inverse form surfaces. Preferences retain their disabled behavior at full color opacity. Reserve space for status messages and allow long errors to wrap. After a programmatic field reset, keep the success message visible until the user edits again.
+Choose focus tokens according to light or inverse form surfaces. Preferences retain their disabled behavior at full color opacity. Reserve space for status messages. After a programmatic field reset, keep the success message visible until the user edits again.
 
 ### Motion tokens and timing
 
@@ -711,7 +719,7 @@ Use the following vertical distances between rendered boxes on phone, tablet and
 
 Memo subsections begin 48px below the preceding content. The memo article header and body share one pair of outer section insets. Its metadata row ends the header band. The site Header and copyright row use 24px above and below the wordmark and copyright line boxes respectively. Wrapped copyright text increases the row height. The default tokens for prose paragraphs, heading-to-prose spacing, group spacing and section insets are `--space-paragraph`, `--space-heading-prose`, `--space-section-content` and `--space-section-padding`.
 
-Home Portfolio uses one padded grid: the section label sits 48px above the title, and the allocation card starts at the title row in the desktop right column and stretches to the bottom of the holdings list. On mobile, the card follows the holdings list with a 48px gap. About boundary panels align with the shared content container, stacking through 1100px and sharing a row from 1101px. Each panel owns its vertical padding. In the two-column layout each side of the center seam uses the outer gutter width, capped at 64px.
+Home Portfolio uses one padded grid: the section label sits 48px above the title, and the allocation card starts at the title row in the desktop right column and stretches to the bottom of the holdings list. On mobile, the card follows the holdings list with a 48px gap. About boundary panels align with the shared content container, stacking through 1100px and sharing a row from 1101px. Each panel owns its vertical padding. On desktop the background changes at the center. The left panel content occupies tracks 1–6. The right heading and list are inset from the center seam by the same distance as the left content is inset from the page edge. The right list ends at the shared outer edge while space permits and retains a readable width on ultrawide screens.
 
 Home, Portfolio and Performance contain their KPI summaries inside the Hero content container, aligned to the title edges rather than the viewport. Keep 48px between the introduction/actions and summary. Home Hero actions retain a 32px horizontal gap and a 16px gap when they wrap onto separate rows. Portfolio shows three summary cells (market value, total return and holdings), in one desktop row or stacked when the Hero summary is narrower than 72rem. Net Cost Basis remains in the underlying data and holdings calculations, not as a summary cell. Current Holdings uses the white primary surface. At Hero summary container widths from 20rem up to but excluding 22rem, use 8px inline padding so the full market value fits alongside a classic browser scrollbar. When its Hero summary is narrower than 10rem (for example, 320px with 200% root text), reduce cell inline padding to 4px; locally scroll a value that still exceeds the available width. Keep form status-message reserve space inside the form. About content and closing columns stack through 800px using their phone rules and at 801–1100px through the editorial stacking breakpoint. Their named `about-page` container query also stacks them below 56rem of available page width, including when enlarged root text raises that threshold. Above 1100px with at least 56rem of container width, each numbered About section and the closing section place their label across all twelve tracks. On the next row the heading spans five tracks and the body spans seven, with their top edges aligned.
 
@@ -731,7 +739,7 @@ The site owns its Swiss Grid / Editorial Layout: proximity, shared alignment, co
 | Repeated modules  | Memo cards reflow 3/2/1 columns at 1101px/801px; 1px guide lines remain a deliberate modular-grid separator    |
 | Manuscript        | All article sections share the Header content container and its outer gutters                                  |
 
-Use the existing content-driven stacking thresholds: 800px for phone layouts, 1100px for editorial/sidebar regions and the intermediate Footer composition, and container queries for About, KPI and chart regions. Use CSS Grid placement to span the shared tracks. Regions use `minmax(0, ...)` so text can reflow. Keep source order meaningful when columns stack. Do not shrink typography to preserve columns. Desktop Header navigation requires both a viewport of at least 1280px and enough container width for all controls.
+Use the existing content-driven stacking thresholds: 800px for phone layouts, 1100px for editorial/sidebar regions and the intermediate Footer composition, and container queries for About, KPI and chart regions. Align both edges of each primary content column to the shared tracks. A stacked column fills the shared page container from gutter to gutter. On desktop, the Home About copy and subscription preferences form each use seven tracks; the other five remain open. The Home About paragraph uses an inner 80ch reading measure based on the inherited body font. The Home contact heading and action share a 9:3 row above 800px when the container has at least 42rem available. With less room the action moves below the heading. The English title wraps naturally in both layouts. Traditional and Simplified Chinese retain the specified break above 800px. Apply reading-width limits inside the column. Text wraps within its available measure; controls, table cells, chart marks and card interiors retain their own layout. Regions use `minmax(0, ...)` so text can reflow. Keep source order meaningful when columns stack. Do not shrink typography to preserve columns. Desktop Header navigation requires both a viewport of at least 1280px and enough container width for all controls.
 
 Spacing belongs to one owner: section padding surrounds the complete block; a group gap separates peer groups; compact component spacing relates metadata and controls. The memo index owns 64px padding and uses exactly 48px between cards and disclosure. Memo cards have content-driven heights, with aligned footers, instead of fixed empty vertical space. Text and controls follow shared left edges; numeric table columns retain their deliberate right alignment. Preserve the approved typography rather than forcing its line boxes onto an artificial 4px baseline.
 
@@ -792,7 +800,7 @@ The local `remark-memo-toc.mjs` plugin builds heading IDs and the exported outli
 
 ### Footer column alignment
 
-Footer title rows share `--size-footer-heading` (Medium Title line height, 24.15px at the default root size) and the component-specific `--space-footer-heading` gap. The description, first navigation link line box and subscription input top border share the second-row start in the three-column layout. Leave 24px below each column heading and 16px between navigation link text lines. Include the space below each link in its clickable area. Social icons retain vertical alignment with their 24px text lines. The Footer wordmark uses the available column width to avoid unnecessary wrapping; Tablet retains its separate subscription row and mobile retains stacked groups.
+Footer title rows share `--size-footer-heading` (Medium Title line height, 24.15px at the default root size) and the component-specific `--space-footer-heading` gap. The description, first navigation link line box and subscription input top border share the second-row start in the three-column layout. Leave 24px below each column heading and 16px between navigation link text lines. Include each 16px inter-link gap in the preceding link’s clickable area. The last link has no trailing padding. Social icons retain vertical alignment with their 24px text lines. The Footer wordmark uses the available column width to avoid unnecessary wrapping; Tablet retains its separate subscription row and mobile retains stacked groups.
 
 Footer Email Preferences starts 16px below the input bottom edge on multi-column forms (8px grid gap plus 8px link margin). On mobile, it remains below the Subscribe button with the same 16px gap.
 

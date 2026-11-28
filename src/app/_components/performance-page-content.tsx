@@ -1,3 +1,4 @@
+import { ResponsiveHeadingBreak } from "@/components/heading-phrases";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
 import { PageHero } from "@/components/page-hero";
@@ -16,7 +17,7 @@ const copy = {
     title: (
       <>
         A Monthly Record of
-        <br />
+        <ResponsiveHeadingBreak locale="en" />
         <em>Decisions and Results</em>
       </>
     ),

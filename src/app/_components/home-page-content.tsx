@@ -1,4 +1,4 @@
-import { HeadingPhrases } from "@/components/heading-phrases";
+import { HeadingPhrases, ResponsiveHeadingBreak } from "@/components/heading-phrases";
 import { holdingPath } from "@/features/portfolio/holding-path";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
@@ -97,7 +97,7 @@ const copy = {
     asOf: "截至",
     viewPerformance: "追蹤投資組合績效",
     memosLabel: "04 · 投資備忘錄",
-    memosTitle: ["公開投資研究，", "為自己的判斷負責"],
+    memosTitle: ["公開投資研究，", ["為自己的", "判斷負責"]],
     viewAllMemos: "查看所有投資備忘錄",
     contactLabel: "05 · 聯絡",
     contactTitle: ["持續掌握", "最新研究"],
@@ -140,7 +140,7 @@ const copy = {
     asOf: "截至",
     viewPerformance: "追踪投资组合业绩",
     memosLabel: "04 · 投资备忘录",
-    memosTitle: ["公开投资研究，", "为自己的判断负责"],
+    memosTitle: ["公开投资研究，", ["为自己的", "判断负责"]],
     viewAllMemos: "查看所有投资备忘录",
     contactLabel: "05 · 联系",
     contactTitle: ["持续关注", "最新研究"],
@@ -182,7 +182,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <section className={appearance["hero"] + " @container/financial-summary " + appearance["shell"]}>
               <h1>
                 <HeadingPhrases text={text.hero[0]} />
-                <br />
+                <ResponsiveHeadingBreak locale={locale} />
                 <em>
                   <HeadingPhrases text={text.hero[1]} />
                 </em>
@@ -243,12 +243,14 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <p className={appearance["section-number"]}>{text.aboutLabel}</p>
             <h2>
               {text.aboutTitle[0]}
-              <br />
+              <ResponsiveHeadingBreak locale={locale} />
               {text.aboutTitle[1]}
             </h2>
           </div>
           <div>
-            <p>{text.aboutCopy}</p>
+            <div className="max-w-[80ch]">
+              <p>{text.aboutCopy}</p>
+            </div>
             <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
               {text.aboutLink}
               <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
@@ -389,8 +391,8 @@ export function HomePageContent({ locale }: { locale: Locale }) {
               <p className={appearance["section-number"]}>{text.memosLabel}</p>
               <h2>
                 {text.memosTitle[0]}
-                <br />
-                {text.memosTitle[1]}
+                <ResponsiveHeadingBreak locale={locale} />
+                <HeadingPhrases text={text.memosTitle[1]} />
               </h2>
             </div>
             <MemoCards memos={memos} locale={locale} />
@@ -409,8 +411,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <p className={appearance["eyebrow"]}>{text.contactLabel}</p>
             <h2>
               {text.contactTitle[0]}
-              {locale === "en" ? " " : null}
-              <br className="compact:hidden" />
+              {locale === "en" ? " " : <br className="compact:hidden" />}
               {text.contactTitle[1]}
             </h2>
             <ButtonLink href={getLocalizedPath("/contact", locale)}>{text.contactLink}</ButtonLink>

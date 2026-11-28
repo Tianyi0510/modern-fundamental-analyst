@@ -102,7 +102,7 @@ test("error events retain stack identity without request payloads or recovery se
     },
   });
   assert.equal(event.event_id, "test-event");
-  assert.deepEqual(event.request, { method: "POST", url: "https://example.com/subscription-preferences" });
+  assert.deepEqual(event.request, { method: "POST", url: "https://example.com" });
   assert.equal(event.exception.values[0].type, "TypeError");
   assert.equal(event.exception.values[0].stacktrace.frames[0].lineno, 10);
   const serialized = JSON.stringify(event);
@@ -263,7 +263,7 @@ test("chart failures retain original stack locations and standard types without 
           stacktrace: {
             frames: [
               {
-                filename: "https://example.com/_next/static/chart.js?token=private-token",
+                filename: "https://www.modernfundamentalanalyst.com/_next/static/chart.js?token=private-token",
                 function: "PerformanceChartView",
                 lineno: 42,
                 colno: 17,
@@ -280,7 +280,7 @@ test("chart failures retain original stack locations and standard types without 
   assert.equal(event.exception.values[0].type, "TypeError");
   assert.deepEqual(event.exception.values[0].stacktrace.frames, [
     {
-      filename: "https://example.com/_next/static/chart.js",
+      filename: "https://www.modernfundamentalanalyst.com/_next/static/chart.js",
       function: "PerformanceChartView",
       lineno: 42,
       colno: 17,

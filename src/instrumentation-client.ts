@@ -21,11 +21,6 @@ const config = browserSentryConfig(
   process.env.NEXT_PUBLIC_VERCEL_ENV,
   process.env.NODE_ENV,
   window.location.hostname,
-  [
-    process.env.NEXT_PUBLIC_VERCEL_URL,
-    process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL,
-    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
-  ],
 );
 if (config) {
   const { dsn, environment } = config;

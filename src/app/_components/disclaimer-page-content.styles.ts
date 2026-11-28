@@ -17,5 +17,5 @@ export const appearance = {
   "legal-section-label":
     "legal-section-label m-0 inline-flex items-baseline gap-[var(--space-4px)] text-[var(--text-secondary)] text-large-label [&_>_span:first-child]:min-w-[2ch] [&_>_span:first-child]:tabular-nums",
   "legal-section-copy":
-    "legal-section-copy max-w-[var(--width-reading)] [&_p]:max-w-[var(--width-reading)] [&_p]:m-0 [&_p]:text-ink [&_p]:text-medium-body [&_p]:text-pretty [&_p_+_p]:mt-[var(--space-paragraph)]",
+    "legal-section-copy [&_p]:max-w-[var(--width-reading)] [&_p]:m-0 [&_p]:text-ink [&_p]:text-medium-body [&_p]:text-pretty [&_p_+_p]:mt-[var(--space-paragraph)]",
 } as const;
