@@ -248,7 +248,9 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             </h2>
           </div>
           <div>
-            <p>{text.aboutCopy}</p>
+            <div className="max-w-[80ch]">
+              <p>{text.aboutCopy}</p>
+            </div>
             <IntentLink className={appearance["text-link"]} href={getLocalizedPath("/about", locale)}>
               {text.aboutLink}
               <MoveRight className={appearance["arrow-icon"]} aria-hidden="true" strokeWidth={3} />
@@ -409,8 +411,7 @@ export function HomePageContent({ locale }: { locale: Locale }) {
             <p className={appearance["eyebrow"]}>{text.contactLabel}</p>
             <h2>
               {text.contactTitle[0]}
-              {locale === "en" ? " " : null}
-              <br className="compact:hidden" />
+              {locale === "en" ? " " : <br className="compact:hidden" />}
               {text.contactTitle[1]}
             </h2>
             <ButtonLink href={getLocalizedPath("/contact", locale)}>{text.contactLink}</ButtonLink>

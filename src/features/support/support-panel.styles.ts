@@ -7,7 +7,7 @@ export const appearance = {
     "support-layout grid grid-cols-1 min-[1101px]:grid-cols-[var(--grid-columns)] min-[1101px]:[&>:first-child]:[grid-column:1/5] min-[1101px]:[&>:nth-child(2)]:[grid-column:5/-1] [column-gap:var(--grid-column-gap)] [row-gap:var(--space-section-content)] [align-items:start] [@media((max-width:_800px))]:[grid-template-columns:minmax(0,_1fr)] [@media((max-width:_800px))]:[gap:var(--space-section-content)]",
   shell: containerAppearance,
   "support-copy":
-    "support-copy min-w-0 [&_h2]:[margin:0] [&_p]:[max-width:520px] [&_p]:[margin:var(--space-related-content)_0_0] [&_p]:[color:var(--text-primary)] [&_p]:text-medium-body",
+    "support-copy min-w-0 [&_h2]:[margin:0] [&_p]:[max-width:520px] [&_p]:[margin:var(--space-heading-prose)_0_0] [&_p]:[color:var(--text-primary)] [&_p]:text-medium-body",
   "support-note": "support-note [margin:var(--space-16px)_0_0] [color:var(--text-secondary)] text-medium-body",
   "support-honeypot": "support-honeypot absolute [left:-9999px] [width:1px] [height:1px] [overflow:hidden]",
   "support-amounts":

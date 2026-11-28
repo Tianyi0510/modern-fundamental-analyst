@@ -88,6 +88,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
           logo: rect(".footer-mark"),
           heading: rect(".footer-heading"),
           subscription: rect("h2"),
+          lastLinkText: rect(".footer-x span"),
+          copyrightRow: rect(".footer-bottom"),
           description: rect(".footer-brand p"),
           input: rect("input[type=email]"),
           submit: rect("button[type=submit]"),
@@ -109,6 +111,8 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       const precedingControl = width <= 800 ? geometry.submit : geometry.input;
       expect(Math.abs(geometry.preferences.top - precedingControl.bottom - 16)).toBeLessThan(1);
       expect(geometry.links).toHaveLength(6);
+      const nextSection = width > 1100 ? geometry.copyrightRow : geometry.subscription;
+      expect(nextSection.top - geometry.lastLinkText.bottom).toBeCloseTo(width > 1100 ? 64 : 48, 0);
       expect(geometry.links[0]!.top - geometry.heading.bottom).toBeCloseTo(24, 0);
       for (let index = 1; index < geometry.links.length; index++) {
         const previous = geometry.links[index - 1]!;

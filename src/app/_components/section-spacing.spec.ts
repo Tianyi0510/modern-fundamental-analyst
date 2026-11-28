@@ -144,6 +144,7 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
               element.nextElementSibling!.getBoundingClientRect().top - element.getBoundingClientRect().bottom,
           );
       await page.goto(`${prefix}/support`);
+      expect(await gapAfter(".support-copy h2")).toBeCloseTo(32, 0);
       expect(await gapAfter(".support-copy p")).toBeCloseTo(48, 0);
       await page.goto(`${prefix}/performance`);
       expect(await gapAfter(".returns .section-number")).toBeCloseTo(48, 0);

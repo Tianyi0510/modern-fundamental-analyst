@@ -341,7 +341,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
             </div>
           );
         })}
-        <div className="@container/boundaries relative isolate bg-[var(--surface-inverse)] before:absolute before:inset-y-0 before:right-0 before:-z-10 before:w-1/2 before:bg-[var(--surface-highlight)]">
+        <div className="@container relative isolate bg-[var(--surface-inverse)] before:absolute before:inset-y-0 before:right-0 before:-z-10 before:w-1/2 before:bg-[var(--surface-highlight)]">
           <section className={appearance.shell + " " + appearance["about-boundaries"]}>
             {text.boundaries.map((boundary, index) => (
               <section key={boundary.title} className={index === 1 ? brandSurface : undefined}>

@@ -17,7 +17,7 @@ export const appearance = {
   "methodology-content":
     "methodology-content [.performance-page_&_>_*]:min-w-0 [.performance-page_&_>_*]:[overflow-wrap:anywhere] [@media((max-width:_800px))]:grid [@media((max-width:_800px))]:[gap:var(--space-section-content)]",
   "methodology-explanation":
-    "methodology-explanation [max-width:760px] [&_p]:[margin:0] [&_p_+_p]:[margin-top:var(--space-paragraph)]",
+    "methodology-explanation [&_p]:max-w-[760px] [&_p]:[margin:0] [&_p_+_p]:[margin-top:var(--space-paragraph)]",
   "methodology-source":
     "methodology-source [margin-top:var(--space-section-content)] [padding:var(--space-32px)] [border-left:4px_solid_var(--blue-deep)] [background:var(--surface-primary)] [color:var(--text-primary)] [&_p]:[margin:0] [&_p_+_p]:[margin-top:var(--space-paragraph)] [&_p:first-child]:[color:var(--text-primary)] [@media((max-width:_800px))]:[margin-top:0] [@media((max-width:_800px))]:[padding:var(--space-24px)] [@media((max-width:_800px))]:[border-left:0] [@media((max-width:_800px))]:[border-top:4px_solid_var(--blue-deep)]",
 } as const;
