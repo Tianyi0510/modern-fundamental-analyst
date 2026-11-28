@@ -102,7 +102,7 @@ for (const prefix of ["/zh-tw", "/zh-cn"]) {
         await expect(notice).toBeVisible();
         const [noticeBox, bodyBox] = await Promise.all([notice.boundingBox(), body.boundingBox()]);
         expect(noticeBox!.x).toBeCloseTo(bodyBox!.x, 0);
-        expect(noticeBox!.width).toBeCloseTo(bodyBox!.width, 0);
+        expect(noticeBox!.width).toBeCloseTo(Math.min(720, bodyBox!.width), 0);
         expect(bodyBox!.y - noticeBox!.y - noticeBox!.height).toBeGreaterThanOrEqual(width <= 800 ? 39 : 55);
         expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       }

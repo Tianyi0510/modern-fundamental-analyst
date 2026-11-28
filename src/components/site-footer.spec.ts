@@ -30,7 +30,7 @@ test.describe("footer layout and typography", () => {
       await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-size", "16px");
       await expect(page.locator(".site-footer [role=status]")).toHaveCSS("font-weight", "700");
       const inset = await page.locator(".legal-body").evaluate((body) => {
-        const first = body.querySelector(".legal-section-heading")!;
+        const first = body.querySelector(".legal-section-label")!;
         return first.getBoundingClientRect().top - body.getBoundingClientRect().top;
       });
       expect(inset).toBe(64);

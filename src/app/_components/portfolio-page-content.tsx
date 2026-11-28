@@ -1,5 +1,6 @@
 import { portfolioTwrSnapshot } from "@/features/portfolio/portfolio-twr";
 import { PortfolioMetric } from "@/features/portfolio/portfolio-metric";
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./portfolio-page-content.styles";
 import { PortfolioTable, type PortfolioTableCopy } from "@/features/portfolio/portfolio-table";
@@ -38,7 +39,9 @@ const copy = {
       <>
         完整揭露的
         <br />
-        <em>集中投資組合</em>
+        <em>
+          <HeadingPhrases text={["集中", "投資組合"]} />
+        </em>
       </>
     ),
     intro: "這是我的每月持股紀錄。你可以查看每檔持股的比重，也可以追蹤持股變化。",
@@ -58,7 +61,9 @@ const copy = {
       <>
         完整披露的
         <br />
-        <em>集中投资组合</em>
+        <em>
+          <HeadingPhrases text={["集中", "投资组合"]} />
+        </em>
       </>
     ),
     intro: "这里记录了我每个月的持仓。你可以查看每只股票或 ETF 的占比，也可以追踪持仓变化。",

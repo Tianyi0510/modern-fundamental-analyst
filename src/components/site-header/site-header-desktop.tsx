@@ -4,7 +4,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuL
 import { ThemeToggle } from "../theme-toggle";
 import { IntentLink as Link } from "../intent-link";
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, type RefObject } from "react";
 import { usePathname } from "next/navigation";
 import { ButtonLink } from "../button-link";
 import {
@@ -19,13 +19,22 @@ import { getLocalizedPath, localeConfig, locales, type Locale } from "@/lib/i18n
 import type { NavigationCopy } from "@/lib/navigation-copy";
 
 type DesktopNavigationProps = {
+  actionsRef: RefObject<HTMLDivElement | null>;
+  compact: boolean;
   copy: NavigationCopy;
   locale: Locale;
   languageQuery: string;
   navigation: readonly { href: string; label: string }[];
 };
 
-export function DesktopNavigation({ copy, locale, languageQuery, navigation }: DesktopNavigationProps) {
+export function DesktopNavigation({
+  actionsRef,
+  compact,
+  copy,
+  locale,
+  languageQuery,
+  navigation,
+}: DesktopNavigationProps) {
   const pathname = usePathname();
   const homePath = getLocalizedPath("/", locale);
   const isCurrentPath = (href: string) => pathname === href || (href !== homePath && pathname.startsWith(`${href}/`));
@@ -33,19 +42,12 @@ export function DesktopNavigation({ copy, locale, languageQuery, navigation }: D
   const languageTriggerRef = useRef<HTMLButtonElement>(null);
   const appearanceRef = useRef<HTMLButtonElement>(null);
   const skipLanguageReturnFocusRef = useRef(false);
-  useEffect(() => {
-    const compact = window.matchMedia("(max-width: 1279px)");
-    const closeDesktopMenu = () => {
-      if (compact.matches) setLanguageOpen(false);
-    };
-    compact.addEventListener("change", closeDesktopMenu);
-    return () => compact.removeEventListener("change", closeDesktopMenu);
-  }, []);
+  if (compact && isLanguageOpen) setLanguageOpen(false);
 
   return (
-    <div className={appearance["header-actions"]}>
+    <div ref={actionsRef} inert={compact} className={appearance["header-actions"]}>
       <NavigationMenu aria-label={copy.primary}>
-        <NavigationMenuList className="gap-[var(--space-8px)] min-[1280px]:gap-[var(--space-16px)]">
+        <NavigationMenuList className="gap-[var(--space-8px)]">
           {navigation.map(({ href, label }) => (
             <NavigationMenuItem key={href}>
               <NavigationMenuLink

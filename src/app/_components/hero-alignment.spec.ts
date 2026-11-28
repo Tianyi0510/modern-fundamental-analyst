@@ -87,3 +87,50 @@ test("Disclaimer Hero keeps a 48px title-to-description gap", async ({ page }) =
       expect(description.y - title.y - title.height).toBeCloseTo(48, 0);
     }
 });
+
+for (const locale of ["en", "zh-tw", "zh-cn"] as const) {
+  test(`${locale} mobile titles preserve whole words and Chinese phrases @mobile`, async ({ page }) => {
+    const cases = [
+      ["/", ["價值投資"], ["价值投资"]],
+      ["/about", ["投資決策"], ["投资决策"]],
+      ["/portfolio", ["投資組合"], ["投资组合"]],
+      ["/memos", ["企業品質"], ["企业质量"]],
+      ["/memos/microsoft-stock-analysis-fiscal-year-2024", ["股票分析", "財政年度"], ["股票分析", "财政年度"]],
+      ["/support", ["投資研究"], ["投资研究"]],
+      ["/disclaimer", ["免責聲明"], ["免责声明"]],
+      ["/subscription-preferences", ["你的訂閱"], ["你的订阅"]],
+    ] as const;
+    for (const [route, traditional, simplified] of cases) {
+      await page.goto((locale === "en" ? "" : "/" + locale) + route);
+      await page.evaluate(() => document.fonts.ready);
+      const heading = page.getByRole("heading", { level: 1 });
+      for (const width of [320, 375, 390, 430]) {
+        await page.setViewportSize({ width, height: 844 });
+        const broken = await heading.evaluate(
+          (h, phrases) => {
+            const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+            const nodes: Text[] = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+            const failures = [];
+            for (const phrase of phrases ?? nodes.flatMap((n) => n.data.match(/[A-Za-z]+/g) ?? [])) {
+              const node = nodes.find((n) => n.data.includes(phrase));
+              if (!node) {
+                failures.push(phrase);
+                continue;
+              }
+              const start = node.data.indexOf(phrase);
+              const r = document.createRange();
+              r.setStart(node, start);
+              r.setEnd(node, start + phrase.length);
+              const rects = [...r.getClientRects()];
+              if (rects.length !== 1 || rects[0]!.left < 0 || rects[0]!.right > innerWidth) failures.push(phrase);
+            }
+            return failures;
+          },
+          locale === "en" ? null : [...(locale === "zh-tw" ? traditional : simplified)],
+        );
+        expect(broken, route + " at " + width).toEqual([]);
+      }
+    }
+  });
+}

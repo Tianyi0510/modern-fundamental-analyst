@@ -34,7 +34,7 @@ const routeRoles: Record<string, Partial<Record<Role, string[]>>> = {
   },
   "/about": {
     largeDisplay: [".page-hero h1"],
-    smallHeadline: [".about-section-heading h2", ".about-closing h2"],
+    smallHeadline: ["h2.about-section-heading", ".about-closing h2"],
     mediumTitle: [".about-boundaries h2"],
     mediumBody: [".about-copy", ".about-boundaries ol"],
   },

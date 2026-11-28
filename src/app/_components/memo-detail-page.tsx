@@ -1,3 +1,4 @@
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { appearance } from "./memo-detail-page.styles";
 import { createMemoBreadcrumbStructuredData, createMemoStructuredData } from "@/features/memos/memo-pages";
 import { notFound } from "next/navigation";
@@ -48,7 +49,9 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
         <article className={appearance["memo-article"]}>
           <div className={appearance["memo-article-header-band"]}>
             <header className={appearance["memo-article-header"] + " " + appearance["shell"]}>
-              <h1>{memo.title}</h1>
+              <h1>
+                <HeadingPhrases text={memo.titlePhrases ?? memo.title} />
+              </h1>
               <div className={appearance["article-meta"]}>
                 <time dateTime={memo.publishedAt}>{formatDate(memo.publishedAt, locale, locale === "en")}</time>
                 <span>{memo.readTime}</span>
@@ -64,7 +67,7 @@ export function MemoDetailPage({ locale, slug }: { locale: Locale; slug: string 
           <div
             className={
               appearance["shell"] +
-              " memo-article-body pt-[var(--space-section-content)] pb-[var(--space-section-padding)]"
+              " memo-article-body pt-[var(--space-section-content)] pb-[var(--space-section-padding)] [&>:not(.article-body)]:max-w-[var(--width-reading)]"
             }
           >
             <p className={appearance["article-lead"]}>{memo.summary}</p>

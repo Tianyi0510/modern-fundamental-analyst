@@ -80,12 +80,10 @@
   --shadow-dialog: var(--shadow64);
   /* Layout primitives feed independent semantic widths even when values match. */
   --width-720: 720px;
-  --width-1120: 1120px;
   --width-1312: 1312px;
   --width-content: var(--width-1312);
   --width-content-compact: var(--width-720);
   --width-reading: var(--width-720);
-  --width-article: var(--width-1120);
   --radius-control: var(--borderRadiusMedium);
   --radius-surface: var(--borderRadiusXLarge);
   --radius-data: var(--borderRadiusNone);
@@ -111,7 +109,6 @@
   --weight-bold: 700;
   --leading-heading-text: 1.15;
   --leading-body-text: 1.5;
-  --width-brand-logo: clamp(15.625rem, 14.0625rem + 6.25vw, 18.75rem);
   --font-size-large-display: 3.1875rem;
   --font-size-medium-display: 3.1875rem;
   --font-size-small-display: 2.375rem;

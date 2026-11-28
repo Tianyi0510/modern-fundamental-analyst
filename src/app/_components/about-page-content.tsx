@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
 import { brandSurface } from "@/components/brand-surface";
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./about-page-content.styles";
 import Link from "next/link";
@@ -303,13 +304,7 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
               {locale === "en" ? " " : null}
               <br className="compact:hidden" />
               <em>
-                {Array.isArray(text.headline[1])
-                  ? text.headline[1].map((phrase) => (
-                      <span key={phrase} className="compact:inline-block">
-                        {phrase}
-                      </span>
-                    ))
-                  : text.headline[1]}
+                <HeadingPhrases text={text.headline[1]} />
               </em>
             </>
           }
@@ -331,14 +326,12 @@ export function AboutPageContent({ locale }: { locale: Locale }) {
                 data-after-hero={index === 0 ? "" : undefined}
                 className={appearance["about-section"] + " " + appearance["shell"]}
               >
-                <div className={appearance["about-section-heading"]}>
-                  <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
-                    <span>{number}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{sectionName}</span>
-                  </p>
-                  <h2>{section.title}</h2>
-                </div>
+                <p className={appearance["section-number"] + " " + appearance["about-section-label"]}>
+                  <span>{number}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{sectionName}</span>
+                </p>
+                <h2 className={appearance["about-section-heading"]}>{section.title}</h2>
                 <div className={appearance["about-copy"]}>
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>

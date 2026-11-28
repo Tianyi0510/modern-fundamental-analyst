@@ -1,3 +1,4 @@
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { appearance } from "./disclaimer-page-content.styles";
 import { PageFooter } from "@/app/_components/page-footer";
 import { SiteHeader } from "@/components/site-header/site-header";
@@ -6,7 +7,7 @@ import { getNavigationCopy } from "@/lib/navigation-copy";
 
 type LegalSection = readonly [title: string, lead: string | null, paragraphs: readonly string[]];
 type LegalCopy = {
-  title: string;
+  title: string | readonly string[];
   titleAccent: string | null;
   subtitle: string | null;
   sections: readonly LegalSection[];
@@ -49,7 +50,7 @@ const copy = {
     ],
   },
   "zh-tw": {
-    title: "法律免責聲明與",
+    title: ["法律", "免責聲明與"],
     titleAccent: "風險揭露",
     subtitle: "使用本網站的研究、財務資訊、估值或績效數據前，請先閱讀這些條款。",
     sections: [
@@ -81,7 +82,7 @@ const copy = {
     ],
   },
   "zh-cn": {
-    title: "法律免责声明与",
+    title: ["法律", "免责声明与"],
     titleAccent: "风险披露",
     subtitle: "使用本网站的研究、财务信息、估值或业绩数据前，请先阅读这些条款。",
     sections: [
@@ -124,7 +125,7 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
         <section className={appearance["legal-hero"]}>
           <header className={"legal-header" + " " + appearance["shell"]}>
             <h1 className={appearance.legalTitle}>
-              {text.title}
+              <HeadingPhrases text={text.title} />
               {text.titleAccent ? (
                 <>
                   <br />
@@ -141,14 +142,12 @@ export function DisclaimerPageContent({ locale }: { locale: Locale }) {
             return (
               <section className={appearance["legal-section"]} key={title}>
                 <div className={appearance["legal-content"] + " " + appearance["shell"]}>
-                  <div className={appearance["legal-section-heading"]}>
-                    <SectionLabel className={appearance["section-number"] + " " + appearance["legal-section-label"]}>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{title}</span>
-                    </SectionLabel>
-                    {lead ? <h2 className="legal-section-lead">{lead}</h2> : null}
-                  </div>
+                  <SectionLabel className={appearance["section-number"] + " " + appearance["legal-section-label"]}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{title}</span>
+                  </SectionLabel>
+                  {lead ? <h2 className="legal-section-lead">{lead}</h2> : null}
                   <div className={appearance["legal-section-copy"]}>
                     {paragraphs.map((paragraph) => (
                       <p key={paragraph}>{paragraph}</p>

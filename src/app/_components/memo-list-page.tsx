@@ -1,3 +1,4 @@
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./memo-list-page.styles";
 import { MemoIndex } from "@/features/memos/memo-index";
@@ -18,14 +19,14 @@ const copy = {
     indexLabel: "View all investment memos",
   },
   "zh-tw": {
-    title: "探討企業品質",
+    title: ["探討", "企業品質"],
     emphasis: "與財務表現",
     subtitle: "在這些備忘錄裡，我會說明一家公司如何獲利、我讀財報時關注哪些地方，以及哪些風險會影響我的投資判斷。",
     updated: "最後更新於",
     indexLabel: "查看所有投資備忘錄",
   },
   "zh-cn": {
-    title: "探讨企业质量",
+    title: ["探讨", "企业质量"],
     emphasis: "与财务表现",
     subtitle: "在这些备忘录里，我会分析一家公司如何盈利、我读财报时关注哪些问题，以及哪些风险会影响我的投资判断。",
     updated: "最后更新于",
@@ -56,7 +57,7 @@ export function MemoListPage({ locale }: { locale: Locale }) {
           variant="standard"
           title={
             <>
-              {text.title}
+              <HeadingPhrases text={text.title} />
               <br />
               <em>{text.emphasis}</em>
             </>

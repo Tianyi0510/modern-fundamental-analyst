@@ -23,7 +23,7 @@ export function MemoTableOfContents({
     <Collapsible
       open={open}
       onOpenChange={setOpen}
-      className="memo-toc mb-[var(--space-section-content)] w-[min(var(--width-article),100%)] border-y border-border"
+      className="memo-toc mb-[var(--space-section-content)] border-y border-border"
     >
       <CollapsibleTrigger className="group flex min-h-[var(--size-touch-target)] w-full items-center gap-4 py-[var(--space-16px)] text-left text-large-label hover:text-brand">
         <List className="size-5 shrink-0" aria-hidden="true" />

@@ -181,14 +181,34 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       await expect(risk).toHaveCSS("background-color", gray);
       expect((await risk.boundingBox())!.width).toBe(width);
       const left = (await page.locator(".legal-header").boundingBox())!.x;
-      for (const heading of await page.locator(".legal-section-heading").all()) {
-        await expect(heading).toHaveCSS("row-gap", "48px");
-        expect((await heading.boundingBox())!.x).toBeCloseTo(left, 0);
+      for (const section of await page.locator(".legal-content").all()) {
+        const label = (await section.locator(".legal-section-label").boundingBox())!;
+        const heading = (await section.locator("h2").boundingBox())!;
+        const first = (await section.locator(".legal-section-copy p").first().boundingBox())!;
+        expect(heading.x).toBeCloseTo(left, 1);
+        expect(heading.y - label.y - label.height).toBeCloseTo(48, 1);
+        if (width > 1100) {
+          expect(first.y).toBeCloseTo(heading.y, 1);
+          expect(first.x).toBeGreaterThan(heading.x + heading.width);
+        } else {
+          expect(first.x).toBeCloseTo(left, 1);
+          expect(first.y - heading.y - heading.height).toBeCloseTo(48, 1);
+        }
       }
       await page.goto(`${prefix}/about`);
       expect(await gapAfter(".about-copy:has(p + p) p:first-child >> nth=0")).toBeCloseTo(24, 0);
-      for (const heading of await page.locator(".about-section-heading").all()) {
-        await expect(heading).toHaveCSS("row-gap", "48px");
+      for (const section of await page.locator(".about-section").all()) {
+        const label = (await section.locator(".about-section-label").boundingBox())!;
+        const heading = (await section.locator("h2").boundingBox())!;
+        const copy = (await section.locator(".about-copy p").first().boundingBox())!;
+        expect(heading.y - label.y - label.height).toBeCloseTo(48, 1);
+        if (width > 1100) {
+          expect(copy.y).toBeCloseTo(heading.y, 1);
+          expect(copy.x).toBeGreaterThan(heading.x + heading.width);
+        } else {
+          expect(copy.x).toBeCloseTo(heading.x, 1);
+          expect(copy.y - heading.y - heading.height).toBeCloseTo(48, 1);
+        }
       }
       expect(await gapAfter(".about-closing > div > p:first-child")).toBeCloseTo(24, 0);
       const panels = page.locator(".about-boundaries > section");
@@ -215,6 +235,29 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       }
       await page.goto(`${prefix}/memos/microsoft-stock-analysis-fiscal-year-2024`);
       expect(await gapAfter(".memo-subsection p:has(+ p) >> nth=0")).toBeCloseTo(24, 0);
+    }
+  });
+}
+
+for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
+  test(`${prefix || "English"} Home Hero action rows retain their grouping @mobile`, async ({ page }) => {
+    await page.goto(prefix || "/");
+    await page.evaluate(() => document.fonts.ready);
+    for (const width of [320, 390, 834, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const actions = page.locator(".hero-actions");
+      const group = (await actions.boundingBox())!;
+      const links = actions.getByRole("link");
+      const first = (await links.nth(0).boundingBox())!;
+      const second = (await links.nth(1).boundingBox())!;
+      const summary = (await page.locator(".metric-band").boundingBox())!;
+      if (second.y >= first.y + first.height) {
+        expect(second.y - first.y - first.height).toBeCloseTo(16, 1);
+      } else {
+        expect(second.x - first.x - first.width).toBeCloseTo(32, 1);
+      }
+      if (!prefix && width === 390) expect(second.y).toBeGreaterThan(first.y + first.height);
+      expect(summary.y - group.y - group.height).toBeCloseTo(48, 1);
     }
   });
 }

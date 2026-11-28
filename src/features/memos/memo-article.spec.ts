@@ -23,13 +23,28 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
         [".article-meta", ".article-lead", 48],
         [".memo-subsection h3", ".memo-subsection h3 + p", 32],
         [".memo-references h2", ".memo-references li", 32],
-        [".memo-references li", ".memo-references li + li", 24],
+
         [".article-disclaimer h2", ".article-disclaimer p", 32],
       ] as const) {
         const first = (await page.locator(before).first().boundingBox())!;
         const next = (await page.locator(after).first().boundingBox())!;
         expect(next.y - first.y - first.height).toBeCloseTo(gap, 0);
       }
+      const panel = body.locator(".memo-references");
+      await expect(panel).toHaveCSS("padding-inline", width <= 800 ? "24px" : "48px");
+      const paragraph = body.locator("p + p").first();
+      const paragraphGap = await paragraph.evaluate(
+        (p) => p.getBoundingClientRect().top - p.previousElementSibling!.getBoundingClientRect().bottom,
+      );
+      expect(paragraphGap).toBeCloseTo(24, 1);
+      const entryGaps = await panel
+        .locator("li + li")
+        .evaluateAll((entries) =>
+          entries.map(
+            (li) => li.getBoundingClientRect().top - li.previousElementSibling!.getBoundingClientRect().bottom,
+          ),
+        );
+      for (const gap of entryGaps) expect(gap).toBeCloseTo(paragraphGap, 1);
       await expect(hero.locator("h1")).toHaveCSS("font-size", width < 800 ? "51px" : width < 1200 ? "67px" : "90px");
       await expect(hero.locator("h1")).toHaveCSS("margin-block-start", "0px");
       await expect(hero.locator("h1")).toHaveCSS("margin-block-end", "48px");
@@ -55,19 +70,20 @@ for (const prefix of ["", "/zh-tw", "/zh-cn"]) {
       expect(action.x).toBeGreaterThanOrEqual(meta.x);
       expect(action.x + action.width).toBeLessThanOrEqual(meta.x + meta.width + 1);
       const titleBox = await page.locator(".memo-article h1").boundingBox();
-      expect(titleBox!.x).toBeCloseTo((width - titleBox!.width) / 2, 0);
-      for (const selector of [
-        ".article-body",
-        ".article-lead",
-        ".article-disclaimer",
-        ".article-notes",
-        ".memo-toc",
-        ".article-meta",
-      ]) {
+      const headerBox = (await page.locator(".site-header").boundingBox())!;
+      expect(titleBox!.x).toBeCloseTo(headerBox.x, 1);
+      expect(titleBox!.width).toBeCloseTo(headerBox.width, 1);
+      expect(meta.width).toBeCloseTo(headerBox.width, 1);
+      for (const region of [body, panel]) {
+        const box = (await region.boundingBox())!;
+        expect(box.x).toBeCloseTo(headerBox.x, 1);
+        expect(box.width).toBeCloseTo(headerBox.width, 1);
+      }
+      for (const selector of [".article-lead", ".article-disclaimer", ".article-notes", ".memo-toc"]) {
         for (const region of await page.locator(selector).all()) {
           const box = await region.boundingBox();
           expect(box!.x).toBeCloseTo(titleBox!.x, 0);
-          expect(box!.width).toBeCloseTo(titleBox!.width, 0);
+          expect(box!.width).toBeCloseTo(Math.min(720, headerBox.width), 0);
         }
       }
       for (const theme of ["light", "dark"]) {

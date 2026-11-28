@@ -1,3 +1,4 @@
+import { HeadingPhrases } from "@/components/heading-phrases";
 import { PageHero } from "@/components/page-hero";
 import { appearance } from "./subscription-preferences-page.styles";
 import { Container } from "@/components/container";
@@ -38,7 +39,7 @@ const copy = {
     error: "Your request couldn't be completed. Please try again.",
   },
   "zh-tw": {
-    title: "管理你的訂閱",
+    title: ["管理", "你的訂閱"],
     intro: "選擇你想用哪種語言閱讀研究更新，或在這裡取消訂閱。",
     invalid: "輸入電子郵件地址，索取管理偏好設定的安全連結。為保護你的隱私，所有地址都會顯示相同的確認訊息。",
     email: "電子郵件地址",
@@ -57,7 +58,7 @@ const copy = {
     error: "目前無法完成要求，請稍後再試。",
   },
   "zh-cn": {
-    title: "管理你的订阅",
+    title: ["管理", "你的订阅"],
     intro: "选择你想用哪种语言阅读研究更新，也可以在这里取消订阅。",
     invalid: "输入电子邮件地址，获取管理偏好设置的安全链接。为保护你的隐私，所有地址都会显示相同的确认信息。",
     email: "电子邮件地址",
@@ -77,7 +78,7 @@ const copy = {
   },
 } satisfies Record<
   Locale,
-  PreferencesCopy & PreferencesRequestCopy & { title: string; intro: string; invalid: string }
+  PreferencesCopy & PreferencesRequestCopy & { title: string | readonly string[]; intro: string; invalid: string }
 >;
 
 export async function SubscriptionPreferencesPage({
@@ -102,7 +103,7 @@ export async function SubscriptionPreferencesPage({
       <main id="main-content" tabIndex={-1}>
         <PageHero
           variant="standard"
-          title={<>{text.title}</>}
+          title={<HeadingPhrases text={text.title} />}
           intro={
             <>
               <p>{text.intro}</p>

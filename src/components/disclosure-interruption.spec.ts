@@ -51,11 +51,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           await expect(target).toBeVisible();
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           await page.emulateMedia({ reducedMotion: "reduce" });
-          // Settle the resized mobile viewport before resolving pointer coordinates.
-          await trigger.evaluate((element) => element.scrollIntoView({ behavior: "instant", block: "center" }));
+          // A late viewport reflow can move the trigger after the initial scroll.
           await expect
             .poll(() =>
               trigger.evaluate((element) => {
+                element.scrollIntoView({ behavior: "instant", block: "center" });
                 const rect = element.getBoundingClientRect();
                 return Math.abs(rect.top + rect.height / 2 - innerHeight / 2);
               }),
