@@ -1,12 +1,21 @@
 import type { ErrorEvent, init } from "@sentry/nextjs";
 import type { Log, Metric, StreamedSpanJSON } from "@sentry/core";
 
-import { resolveSentryDsn } from "./sentry-dsn";
+import {
+  isSentryDeploymentHost,
+  isSentryLoopbackHost,
+  resolveSentryDsn,
+  resolveSentryEnvironment,
+  testSentryDsn,
+} from "./sentry-dsn";
 
 export function resolveServerSentryDsn() {
   if (process.env.NODE_ENV === "production" && (process.env.VERCEL !== "1" || !process.env.VERCEL_REGION?.trim()))
     return;
-  return resolveSentryDsn(process.env.SENTRY_DSN, process.env.NEXT_PUBLIC_SENTRY_DSN, process.env.SENTRY_DISABLED);
+  const dsn = resolveSentryDsn(process.env.SENTRY_DSN, process.env.NEXT_PUBLIC_SENTRY_DSN, process.env.SENTRY_DISABLED);
+  if (resolveSentryEnvironment(process.env.VERCEL_ENV, process.env.NODE_ENV) === "test" && dsn !== testSentryDsn)
+    return;
+  return dsn;
 }
 
 const serviceMetadataKeys = ["sentry.environment", "sentry.release", "sentry.sdk.name", "sentry.sdk.version"];
@@ -21,12 +30,21 @@ const spanAttributeKeys = [
   "http.request.method",
   "http.response.status_code",
 ];
-const ownHosts = new Set([
-  "modernfundamentalanalyst.com",
-  "www.modernfundamentalanalyst.com",
-  "localhost",
-  "127.0.0.1",
-]);
+function sanitizeSentryUrl(address: string): string {
+  const path = address.trim();
+  if (!/^(?:blob:|https?:|\/\/)/i.test(path)) return address.split(/[?#]/, 1)[0] ?? "";
+  try {
+    const url = new URL(path.startsWith("//") ? `https:${path}` : path);
+    if (url.origin === "null") return "[URL]";
+    const host = (url.protocol === "blob:" ? new URL(url.origin).hostname : url.hostname).replace(/\.$/, "");
+    if (!isSentryDeploymentHost(host) && !isSentryLoopbackHost(host)) return url.origin;
+    url.search = "";
+    url.hash = "";
+    return url.protocol === "blob:" ? url.href : url.origin + url.pathname;
+  } catch {
+    return "[URL]";
+  }
+}
 
 function serviceAttributes(attributes?: Record<string, unknown>) {
   const operation = attributes?.operation;
@@ -61,15 +79,7 @@ function sanitizeSentryMetric(metric: Metric): Metric | null {
 function sanitizeSpanName(name: string, operation?: unknown) {
   return typeof operation === "string" && operation.startsWith("db")
     ? "Database operation"
-    : redactMessage(name.split(/[?#]/)[0] ?? "Operation").replace(/https?:\/\/[^\s<>"']+/gi, (value) => {
-        try {
-          const url = new URL(value);
-          const ownHost = ownHosts.has(url.hostname);
-          return ownHost ? `${url.origin}${url.pathname}` : url.origin;
-        } catch {
-          return "[URL]";
-        }
-      });
+    : redactMessage(name.split(/[?#]/)[0] ?? "Operation");
 }
 
 export function sanitizeSentrySpan(span: StreamedSpanJSON): StreamedSpanJSON {
@@ -94,11 +104,38 @@ export function sanitizeSentrySpan(span: StreamedSpanJSON): StreamedSpanJSON {
 function redactMessage(value: string) {
   return (
     value
-      // Apostrophes are valid URL characters. Keep standalone numeric error codes emitted by React.
-      .replace(/[^\s<>"]+/g, (token) => {
+      // Keep diagnostic identifiers intact, including quoted private fields and member access.
+      .replace(/[^\s<>"]+/g, (token: string, offset: number) => {
         const suffix = token.search(/[?#]/);
-        if (suffix < 0 || /^#\d+[.,;:!?)]?$/.test(token)) return token;
+        if (suffix < 0) return token;
+        const preceding = value.slice(0, offset);
+        if (/^#\d+[.,;:!?)]?$/.test(token) && /\bReact error\s+$/i.test(preceding)) return token;
+        const prefix = token.slice(0, suffix);
+        // A request target such as receipt.#anchor can also look like member access.
+        if (/\b(?:GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH)\s+"?$/i.test(preceding)) {
+          return token.startsWith("'") && token.endsWith("'") ? prefix + "'" : prefix;
+        }
+        const diagnosticField =
+          (prefix === "" || prefix === "'") &&
+          /\b(?:private (?:member|field|method|accessor|name)|identifier|cannot initialize|cannot use 'in' operator to search for)\s+["']?$/i.test(
+            preceding,
+          );
+        const accessorDiagnostic =
+          prefix === "'" &&
+          token.endsWith("'") &&
+          /^ was defined without a (?:getter|setter)\b/.test(value.slice(offset + token.length));
+        const memberAccess = /^[$_\p{ID_Start}][$_\p{ID_Continue}]*\.$/u.test(prefix);
+        if (
+          (diagnosticField || accessorDiagnostic || memberAccess) &&
+          /^#[$_\p{ID_Start}][$_\p{ID_Continue}]*'?[.,;:!?)]?$/u.test(token.slice(suffix))
+        )
+          return token;
         return token.slice(0, suffix);
+      })
+      .replace(/('?)((?:blob:)?(?:https?:)?\/\/[^\s<>"]+)/gi, (_match, openingQuote: string, target: string) => {
+        const closingQuote = openingQuote && target.endsWith("'") ? "'" : "";
+        const address = closingQuote ? target.slice(0, -1) : target;
+        return openingQuote + sanitizeSentryUrl(address) + closingQuote;
       })
       .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[Email]")
       .replace(/\bBearer\s+\S+/gi, "Bearer [Filtered]")
@@ -119,7 +156,7 @@ export function sanitizeSentryEvent(event: ErrorEvent): ErrorEvent {
   if (event.request) {
     event.request = {
       method: event.request.method,
-      url: event.request.url?.split(/[?#]/)[0],
+      url: event.request.url && sanitizeSentryUrl(event.request.url),
     };
   }
   const isChartFailure = event.tags?.feature === "performance-chart";
@@ -145,10 +182,13 @@ export function sanitizeSentryEvent(event: ErrorEvent): ErrorEvent {
       }
     } else if (exception.value) exception.value = redactMessage(exception.value);
     for (const frame of exception.stacktrace?.frames ?? []) {
-      if (frame.filename) frame.filename = frame.filename.split(/[?#]/)[0];
-      if (frame.abs_path) frame.abs_path = frame.abs_path.split(/[?#]/)[0];
+      if (frame.filename) frame.filename = sanitizeSentryUrl(frame.filename);
+      if (frame.abs_path) frame.abs_path = sanitizeSentryUrl(frame.abs_path);
       delete frame.vars;
     }
+  }
+  for (const image of event.debug_meta?.images ?? []) {
+    if (image.code_file) image.code_file = sanitizeSentryUrl(image.code_file);
   }
   return event;
 }
