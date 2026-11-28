@@ -9,7 +9,10 @@ beforeEach(() => {
   vi.stubEnv("SENTRY_DSN", "");
   vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", "");
   vi.stubEnv("SENTRY_DISABLED", "");
+  vi.stubEnv("VERCEL", "1");
+  vi.stubEnv("VERCEL_REGION", "iad1");
   vi.stubEnv("VERCEL_ENV", "production");
+  vi.stubEnv("NODE_ENV", "production");
 });
 afterEach(() => vi.unstubAllEnvs());
 
@@ -28,6 +31,42 @@ describe.each([
     vi.stubEnv("SENTRY_DISABLED", "1");
     await load();
     expect(sdk.init).not.toHaveBeenCalled();
+  });
+
+  it("prefers local development mode over an inherited production deployment", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("SENTRY_DSN", "https://server@sentry.invalid/2");
+    await load();
+    expect(sdk.init).toHaveBeenCalledWith(expect.objectContaining({ environment: "development" }));
+  });
+
+  it.each(["production", "preview", ""])(
+    "isolates local next start despite inherited deployment %s",
+    async (deployment) => {
+      vi.stubEnv("VERCEL", "");
+      vi.stubEnv("VERCEL_ENV", deployment);
+      vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", "https://public@sentry.invalid/1");
+      vi.stubEnv("SENTRY_DSN", "https://server@sentry.invalid/2");
+      await load();
+      expect(sdk.init).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["production", "preview"])("ignores pulled %s settings during direct local startup", async (deployment) => {
+    vi.stubEnv("VERCEL_ENV", deployment);
+    vi.stubEnv("VERCEL_REGION", undefined);
+    vi.stubEnv("SENTRY_DSN", "https://server@sentry.invalid/2");
+    vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", "https://public@sentry.invalid/1");
+    await load();
+    expect(sdk.init).not.toHaveBeenCalled();
+  });
+
+  it("keeps deployed preview reporting separate from production", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("SENTRY_DSN", "https://server@sentry.invalid/2");
+    await load();
+    expect(sdk.init).toHaveBeenCalledWith(expect.objectContaining({ environment: "preview" }));
   });
 
   it.each([

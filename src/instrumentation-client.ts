@@ -1,6 +1,6 @@
 import { getSentryClient, startSentryClient } from "@/lib/sentry-client";
 import type { captureRouterTransitionStart } from "@sentry/nextjs";
-import { resolveSentryDsn } from "@/lib/sentry-dsn";
+import { browserSentryConfig } from "@/lib/sentry-dsn";
 
 import { canRecordReplay, privateHistoryNavigation } from "@/lib/sentry-replay";
 import { yieldToMain } from "@/lib/yield-to-main";
@@ -16,9 +16,19 @@ function stopPrivateReplay(href: string) {
 }
 
 let startup: ReturnType<typeof startSentryClient> | undefined;
-const dsn = resolveSentryDsn(undefined, process.env.NEXT_PUBLIC_SENTRY_DSN);
-if (dsn) {
-  const environment = process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NODE_ENV;
+const config = browserSentryConfig(
+  process.env.NEXT_PUBLIC_SENTRY_DSN,
+  process.env.NEXT_PUBLIC_VERCEL_ENV,
+  process.env.NODE_ENV,
+  window.location.hostname,
+  [
+    process.env.NEXT_PUBLIC_VERCEL_URL,
+    process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL,
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
+  ],
+);
+if (config) {
+  const { dsn, environment } = config;
   startup = startSentryClient({
     dsn,
     environment,

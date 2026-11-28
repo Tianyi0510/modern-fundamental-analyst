@@ -1,7 +1,13 @@
 import type { ErrorEvent, init } from "@sentry/nextjs";
 import type { Log, Metric, StreamedSpanJSON } from "@sentry/core";
 
-export { resolveSentryDsn } from "./sentry-dsn";
+import { resolveSentryDsn } from "./sentry-dsn";
+
+export function resolveServerSentryDsn() {
+  if (process.env.NODE_ENV === "production" && (process.env.VERCEL !== "1" || !process.env.VERCEL_REGION?.trim()))
+    return;
+  return resolveSentryDsn(process.env.SENTRY_DSN, process.env.NEXT_PUBLIC_SENTRY_DSN, process.env.SENTRY_DISABLED);
+}
 
 const serviceMetadataKeys = ["sentry.environment", "sentry.release", "sentry.sdk.name", "sentry.sdk.version"];
 const spanAttributeKeys = [
@@ -86,10 +92,17 @@ export function sanitizeSentrySpan(span: StreamedSpanJSON): StreamedSpanJSON {
 }
 
 function redactMessage(value: string) {
-  return value
-    .replace(/https?:\/\/[^\s<>"']+/gi, (url) => url.split(/[?#]/)[0] ?? "[URL]")
-    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[Email]")
-    .replace(/\bBearer\s+\S+/gi, "Bearer [Filtered]");
+  return (
+    value
+      // Apostrophes are valid URL characters. Keep standalone numeric error codes emitted by React.
+      .replace(/[^\s<>"]+/g, (token) => {
+        const suffix = token.search(/[?#]/);
+        if (suffix < 0 || /^#\d+[.,;:!?)]?$/.test(token)) return token;
+        return token.slice(0, suffix);
+      })
+      .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[Email]")
+      .replace(/\bBearer\s+\S+/gi, "Bearer [Filtered]")
+  );
 }
 
 export function sanitizeSentryEvent(event: ErrorEvent): ErrorEvent {

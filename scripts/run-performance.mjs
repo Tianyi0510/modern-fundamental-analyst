@@ -32,6 +32,7 @@ const env = {
   UPSTASH_KV_REST_API_TOKEN: "",
   SENTRY_AUTH_TOKEN: "",
   SENTRY_DSN: "",
+  SENTRY_DISABLED: "1",
   SUBSCRIPTION_PREFERENCES_SECRET: "performance-preferences-only",
   SUPPORT_CHECKOUT_SECRET: "performance-checkout-only",
 };

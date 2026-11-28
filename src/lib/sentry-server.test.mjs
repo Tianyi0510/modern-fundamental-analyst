@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { logger, metrics, withScope } from "@sentry/core";
+import { captureEvent, logger, metrics, withScope } from "@sentry/core";
 import { captureRequestError } from "@sentry/nextjs";
 import { monitoringCapture } from "../../scripts/sentry-test-client.mjs";
 import { reportServiceFailure } from "./sentry-server.ts";
@@ -30,6 +30,31 @@ test("Next.js request errors remove recovery queries while preserving route cont
     assert.equal(event.contexts.nextjs.router_path, event.contexts.nextjs.request_path);
     assert.ok(!JSON.stringify(event).includes("private-"));
   }
+});
+
+test("error envelopes remove relative URL queries and fragments from messages and exceptions", async (t) => {
+  const { events, flush } = monitoringCapture(t);
+  const frame = { filename: "/_next/static/chunk.js", lineno: 17 };
+  captureEvent({
+    message:
+      "Minified React error #418; GET /subscription-preferences?ref=O'Brien&token=private-query#private-fragment failed",
+    exception: {
+      values: [
+        {
+          type: "Error",
+          value:
+            "Minified React error #418; from ../support#O'Brien-private-anchor to receipt?ref=O'Brien&session_id=private-session",
+          stacktrace: { frames: [frame] },
+        },
+      ],
+    },
+  });
+  await flush();
+  assert.equal(events.length, 1);
+  assert.equal(events[0].message, "Minified React error #418; GET /subscription-preferences failed");
+  assert.equal(events[0].exception.values[0].value, "Minified React error #418; from ../support to receipt");
+  assert.deepEqual(events[0].exception.values[0].stacktrace.frames, [frame]);
+  assert.ok(!JSON.stringify(events).includes("private-"));
 });
 
 test("handled service errors use the existing client and bounded diagnostic tags", async (t) => {
